@@ -11,9 +11,9 @@
     <modules>
         <module>deloitte-modules-system</module>
         <module>deloitte-modules-gen</module>
-        <module>deloitte-modules-job</module>
         <module>deloitte-modules-file</module>
-        <module>deloitte-modules-crm</module>
+        <module>inner-crm</module>
+        <module>inner-additional-recording</module>
     </modules>
 
     <artifactId>deloitte-modules</artifactId>
