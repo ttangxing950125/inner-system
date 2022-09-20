@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityMasterMapper">
+    
+    <resultMap type="EntityMaster" id="EntityMasterResult">
+        <result property="id"    column="id"    />
+        <result property="masterCode"    column="master_code"    />
+        <result property="entityCode"    column="entity_code"    />
+        <result property="created"    column="created"    />
+        <result property="update"    column="update"    />
+    </resultMap>
+
+    <sql id="selectEntityMasterVo">
+        select id, master_code, entity_code, created, update from entity_master
+    </sql>
+
+    <select id="selectEntityMasterList" parameterType="EntityMaster" resultMap="EntityMasterResult">
+        <include refid="selectEntityMasterVo"/>
+        <where>  
+            <if test="masterCode != null  and masterCode != ''"> and master_code = #{masterCode}</if>
+            <if test="entityCode != null  and entityCode != ''"> and entity_code = #{entityCode}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="update != null "> and update = #{update}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityMasterById" parameterType="Long" resultMap="EntityMasterResult">
+        <include refid="selectEntityMasterVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityMaster" parameterType="EntityMaster" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_master
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="masterCode != null">master_code,</if>
+            <if test="entityCode != null">entity_code,</if>
+            <if test="created != null">created,</if>
+            <if test="update != null">update,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="masterCode != null">#{masterCode},</if>
+            <if test="entityCode != null">#{entityCode},</if>
+            <if test="created != null">#{created},</if>
+            <if test="update != null">#{update},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityMaster" parameterType="EntityMaster">
+        update entity_master
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="masterCode != null">master_code = #{masterCode},</if>
+            <if test="entityCode != null">entity_code = #{entityCode},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="update != null">update = #{update},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityMasterById" parameterType="Long">
+        delete from entity_master where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityMasterByIds" parameterType="String">
+        delete from entity_master where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

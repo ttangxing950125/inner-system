@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityAttrMapper">
+    
+    <resultMap type="EntityAttr" id="EntityAttrResult">
+        <result property="id"    column="id"    />
+        <result property="attrCateId"    column="attr_cate_id"    />
+        <result property="attrCateName"    column="attr_cate_name"    />
+        <result property="name"    column="name"    />
+        <result property="dataType"    column="data_type"    />
+        <result property="source"    column="source"    />
+        <result property="sourceId"    column="source_id"    />
+        <result property="multiple"    column="multiple"    />
+        <result property="attrType"    column="attr_type"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectEntityAttrVo">
+        select id, attr_cate_id, attr_cate_name, name, data_type, source, source_id, multiple, attr_type, remarks, created, updated from entity_attr
+    </sql>
+
+    <select id="selectEntityAttrList" parameterType="EntityAttr" resultMap="EntityAttrResult">
+        <include refid="selectEntityAttrVo"/>
+        <where>  
+            <if test="attrCateId != null "> and attr_cate_id = #{attrCateId}</if>
+            <if test="attrCateName != null  and attrCateName != ''"> and attr_cate_name like concat('%', #{attrCateName}, '%')</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="dataType != null  and dataType != ''"> and data_type = #{dataType}</if>
+            <if test="source != null  and source != ''"> and source = #{source}</if>
+            <if test="sourceId != null "> and source_id = #{sourceId}</if>
+            <if test="multiple != null "> and multiple = #{multiple}</if>
+            <if test="attrType != null "> and attr_type = #{attrType}</if>
+            <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityAttrById" parameterType="Long" resultMap="EntityAttrResult">
+        <include refid="selectEntityAttrVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityAttr" parameterType="EntityAttr" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_attr
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="attrCateId != null">attr_cate_id,</if>
+            <if test="attrCateName != null">attr_cate_name,</if>
+            <if test="name != null">name,</if>
+            <if test="dataType != null">data_type,</if>
+            <if test="source != null">source,</if>
+            <if test="sourceId != null">source_id,</if>
+            <if test="multiple != null">multiple,</if>
+            <if test="attrType != null">attr_type,</if>
+            <if test="remarks != null">remarks,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="attrCateId != null">#{attrCateId},</if>
+            <if test="attrCateName != null">#{attrCateName},</if>
+            <if test="name != null">#{name},</if>
+            <if test="dataType != null">#{dataType},</if>
+            <if test="source != null">#{source},</if>
+            <if test="sourceId != null">#{sourceId},</if>
+            <if test="multiple != null">#{multiple},</if>
+            <if test="attrType != null">#{attrType},</if>
+            <if test="remarks != null">#{remarks},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityAttr" parameterType="EntityAttr">
+        update entity_attr
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attrCateId != null">attr_cate_id = #{attrCateId},</if>
+            <if test="attrCateName != null">attr_cate_name = #{attrCateName},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="dataType != null">data_type = #{dataType},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="sourceId != null">source_id = #{sourceId},</if>
+            <if test="multiple != null">multiple = #{multiple},</if>
+            <if test="attrType != null">attr_type = #{attrType},</if>
+            <if test="remarks != null">remarks = #{remarks},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityAttrById" parameterType="Long">
+        delete from entity_attr where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityAttrByIds" parameterType="String">
+        delete from entity_attr where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

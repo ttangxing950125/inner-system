@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityInfoMapper">
+    
+    <resultMap type="EntityInfo" id="EntityInfoResult">
+        <result property="id"    column="id"    />
+        <result property="entityName"    column="entity_name"    />
+        <result property="entityCode"    column="entity_code"    />
+        <result property="creditCode"    column="credit_code"    />
+        <result property="list"    column="list"    />
+        <result property="issueBonds"    column="issue_bonds"    />
+        <result property="creditError"    column="credit_error"    />
+        <result property="creditErrorType"    column="credit_error_type"    />
+        <result property="entityNameHis"    column="entity_name_his"    />
+        <result property="entityNameHisRemarks"    column="entity_name_his_remarks"    />
+        <result property="creater"    column="creater"    />
+        <result property="updater"    column="updater"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectEntityInfoVo">
+        select id, entity_name, entity_code, credit_code, list, issue_bonds, credit_error, credit_error_type, entity_name_his, entity_name_his_remarks, creater, updater, created, updated from entity_info
+    </sql>
+
+    <select id="selectEntityInfoList" parameterType="EntityInfo" resultMap="EntityInfoResult">
+        <include refid="selectEntityInfoVo"/>
+        <where>  
+            <if test="entityName != null  and entityName != ''"> and entity_name like concat('%', #{entityName}, '%')</if>
+            <if test="entityCode != null  and entityCode != ''"> and entity_code = #{entityCode}</if>
+            <if test="creditCode != null  and creditCode != ''"> and credit_code = #{creditCode}</if>
+            <if test="list != null "> and list = #{list}</if>
+            <if test="issueBonds != null "> and issue_bonds = #{issueBonds}</if>
+            <if test="creditError != null "> and credit_error = #{creditError}</if>
+            <if test="creditErrorType != null "> and credit_error_type = #{creditErrorType}</if>
+            <if test="entityNameHis != null  and entityNameHis != ''"> and entity_name_his = #{entityNameHis}</if>
+            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''"> and entity_name_his_remarks = #{entityNameHisRemarks}</if>
+            <if test="creater != null  and creater != ''"> and creater = #{creater}</if>
+            <if test="updater != null  and updater != ''"> and updater = #{updater}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityInfoById" parameterType="Long" resultMap="EntityInfoResult">
+        <include refid="selectEntityInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityInfo" parameterType="EntityInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entityName != null">entity_name,</if>
+            <if test="entityCode != null">entity_code,</if>
+            <if test="creditCode != null">credit_code,</if>
+            <if test="list != null">list,</if>
+            <if test="issueBonds != null">issue_bonds,</if>
+            <if test="creditError != null">credit_error,</if>
+            <if test="creditErrorType != null">credit_error_type,</if>
+            <if test="entityNameHis != null">entity_name_his,</if>
+            <if test="entityNameHisRemarks != null">entity_name_his_remarks,</if>
+            <if test="creater != null">creater,</if>
+            <if test="updater != null">updater,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entityName != null">#{entityName},</if>
+            <if test="entityCode != null">#{entityCode},</if>
+            <if test="creditCode != null">#{creditCode},</if>
+            <if test="list != null">#{list},</if>
+            <if test="issueBonds != null">#{issueBonds},</if>
+            <if test="creditError != null">#{creditError},</if>
+            <if test="creditErrorType != null">#{creditErrorType},</if>
+            <if test="entityNameHis != null">#{entityNameHis},</if>
+            <if test="entityNameHisRemarks != null">#{entityNameHisRemarks},</if>
+            <if test="creater != null">#{creater},</if>
+            <if test="updater != null">#{updater},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityInfo" parameterType="EntityInfo">
+        update entity_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="entityName != null">entity_name = #{entityName},</if>
+            <if test="entityCode != null">entity_code = #{entityCode},</if>
+            <if test="creditCode != null">credit_code = #{creditCode},</if>
+            <if test="list != null">list = #{list},</if>
+            <if test="issueBonds != null">issue_bonds = #{issueBonds},</if>
+            <if test="creditError != null">credit_error = #{creditError},</if>
+            <if test="creditErrorType != null">credit_error_type = #{creditErrorType},</if>
+            <if test="entityNameHis != null">entity_name_his = #{entityNameHis},</if>
+            <if test="entityNameHisRemarks != null">entity_name_his_remarks = #{entityNameHisRemarks},</if>
+            <if test="creater != null">creater = #{creater},</if>
+            <if test="updater != null">updater = #{updater},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityInfoById" parameterType="Long">
+        delete from entity_info where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityInfoByIds" parameterType="String">
+        delete from entity_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

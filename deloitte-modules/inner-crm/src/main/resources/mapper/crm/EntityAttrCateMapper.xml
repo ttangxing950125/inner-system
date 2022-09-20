@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityAttrCateMapper">
+    
+    <resultMap type="EntityAttrCate" id="EntityAttrCateResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectEntityAttrCateVo">
+        select id, name, created, updated from entity_attr_cate
+    </sql>
+
+    <select id="selectEntityAttrCateList" parameterType="EntityAttrCate" resultMap="EntityAttrCateResult">
+        <include refid="selectEntityAttrCateVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityAttrCateById" parameterType="Long" resultMap="EntityAttrCateResult">
+        <include refid="selectEntityAttrCateVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityAttrCate" parameterType="EntityAttrCate" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_attr_cate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityAttrCate" parameterType="EntityAttrCate">
+        update entity_attr_cate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityAttrCateById" parameterType="Long">
+        delete from entity_attr_cate where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityAttrCateByIds" parameterType="String">
+        delete from entity_attr_cate where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.ModelMasterMapper">
+    
+    <resultMap type="ModelMaster" id="ModelMasterResult">
+        <result property="id"    column="id"    />
+        <result property="masterName"    column="master_name"    />
+        <result property="masterCode"    column="master_code"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectModelMasterVo">
+        select id, master_name, master_code, remarks, created, updated from model_master
+    </sql>
+
+    <select id="selectModelMasterList" parameterType="ModelMaster" resultMap="ModelMasterResult">
+        <include refid="selectModelMasterVo"/>
+        <where>  
+            <if test="masterName != null  and masterName != ''"> and master_name like concat('%', #{masterName}, '%')</if>
+            <if test="masterCode != null  and masterCode != ''"> and master_code = #{masterCode}</if>
+            <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectModelMasterById" parameterType="Long" resultMap="ModelMasterResult">
+        <include refid="selectModelMasterVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertModelMaster" parameterType="ModelMaster" useGeneratedKeys="true" keyProperty="id">
+        insert into model_master
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="masterName != null">master_name,</if>
+            <if test="masterCode != null">master_code,</if>
+            <if test="remarks != null">remarks,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="masterName != null">#{masterName},</if>
+            <if test="masterCode != null">#{masterCode},</if>
+            <if test="remarks != null">#{remarks},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateModelMaster" parameterType="ModelMaster">
+        update model_master
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="masterName != null">master_name = #{masterName},</if>
+            <if test="masterCode != null">master_code = #{masterCode},</if>
+            <if test="remarks != null">remarks = #{remarks},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteModelMasterById" parameterType="Long">
+        delete from model_master where id = #{id}
+    </delete>
+
+    <delete id="deleteModelMasterByIds" parameterType="String">
+        delete from model_master where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

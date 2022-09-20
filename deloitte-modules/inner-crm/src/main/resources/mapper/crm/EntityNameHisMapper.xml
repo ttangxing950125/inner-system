@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityNameHisMapper">
+    
+    <resultMap type="EntityNameHis" id="EntityNameHisResult">
+        <result property="id"    column="id"    />
+        <result property="entityType"    column="entity_type"    />
+        <result property="status"    column="status"    />
+        <result property="dqCode"    column="dq_code"    />
+        <result property="happenDate"    column="happen_date"    />
+        <result property="oldName"    column="old_name"    />
+        <result property="remarks"    column="remarks"    />
+        <result property="source"    column="source"    />
+        <result property="creater"    column="creater"    />
+        <result property="created"    column="created"    />
+        <result property="update"    column="update"    />
+    </resultMap>
+
+    <sql id="selectEntityNameHisVo">
+        select id, entity_type, status, dq_code, happen_date, old_name, remarks, source, creater, created, update from entity_name_his
+    </sql>
+
+    <select id="selectEntityNameHisList" parameterType="EntityNameHis" resultMap="EntityNameHisResult">
+        <include refid="selectEntityNameHisVo"/>
+        <where>  
+            <if test="entityType != null "> and entity_type = #{entityType}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="dqCode != null  and dqCode != ''"> and dq_code = #{dqCode}</if>
+            <if test="happenDate != null "> and happen_date = #{happenDate}</if>
+            <if test="oldName != null  and oldName != ''"> and old_name like concat('%', #{oldName}, '%')</if>
+            <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
+            <if test="source != null "> and source = #{source}</if>
+            <if test="creater != null  and creater != ''"> and creater = #{creater}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="update != null "> and update = #{update}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityNameHisById" parameterType="Long" resultMap="EntityNameHisResult">
+        <include refid="selectEntityNameHisVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityNameHis" parameterType="EntityNameHis" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_name_his
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entityType != null">entity_type,</if>
+            <if test="status != null">status,</if>
+            <if test="dqCode != null">dq_code,</if>
+            <if test="happenDate != null">happen_date,</if>
+            <if test="oldName != null">old_name,</if>
+            <if test="remarks != null">remarks,</if>
+            <if test="source != null">source,</if>
+            <if test="creater != null">creater,</if>
+            <if test="created != null">created,</if>
+            <if test="update != null">update,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entityType != null">#{entityType},</if>
+            <if test="status != null">#{status},</if>
+            <if test="dqCode != null">#{dqCode},</if>
+            <if test="happenDate != null">#{happenDate},</if>
+            <if test="oldName != null">#{oldName},</if>
+            <if test="remarks != null">#{remarks},</if>
+            <if test="source != null">#{source},</if>
+            <if test="creater != null">#{creater},</if>
+            <if test="created != null">#{created},</if>
+            <if test="update != null">#{update},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityNameHis" parameterType="EntityNameHis">
+        update entity_name_his
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="entityType != null">entity_type = #{entityType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="dqCode != null">dq_code = #{dqCode},</if>
+            <if test="happenDate != null">happen_date = #{happenDate},</if>
+            <if test="oldName != null">old_name = #{oldName},</if>
+            <if test="remarks != null">remarks = #{remarks},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="creater != null">creater = #{creater},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="update != null">update = #{update},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityNameHisById" parameterType="Long">
+        delete from entity_name_his where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityNameHisByIds" parameterType="String">
+        delete from entity_name_his where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
