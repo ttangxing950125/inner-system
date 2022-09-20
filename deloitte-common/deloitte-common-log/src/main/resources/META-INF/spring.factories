@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.deloitte.common.log.service.AsyncLogService,\
+  com.deloitte.common.log.aspect.LogAspect

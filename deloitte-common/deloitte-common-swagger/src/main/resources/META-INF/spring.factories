@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.deloitte.common.swagger.config.SwaggerAutoConfiguration,\
+  com.deloitte.common.swagger.config.SwaggerWebConfiguration,\
+  com.deloitte.common.swagger.config.SwaggerBeanPostProcessor
