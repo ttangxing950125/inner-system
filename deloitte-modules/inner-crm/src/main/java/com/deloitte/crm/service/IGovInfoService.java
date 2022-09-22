@@ -1,7 +1,9 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.GovInfo;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -58,4 +60,8 @@ public interface IGovInfoService
      * @return 结果
      */
     public int deleteGovInfoById(Long id);
+
+    Page<GovInfo> getInfoList(GovInfo govInfo, Integer pageNum, Integer pageSize);
+
+    Integer updateInfoList(List<GovInfo> list);
 }

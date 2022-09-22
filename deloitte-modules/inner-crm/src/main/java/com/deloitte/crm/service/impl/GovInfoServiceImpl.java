@@ -1,11 +1,14 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.mapper.GovInfoMapper;
+import com.deloitte.crm.service.IGovInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.GovInfoMapper;
-import com.deloitte.crm.domain.GovInfo;
-import com.deloitte.crm.service.IGovInfoService;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -89,5 +92,18 @@ public class GovInfoServiceImpl implements IGovInfoService
     public int deleteGovInfoById(Long id)
     {
         return govInfoMapper.deleteGovInfoById(id);
+    }
+
+    @Override
+    public Page<GovInfo> getInfoList(GovInfo govInfo, Integer pageNum, Integer pageSize) {
+        Page<GovInfo> pageInfo=new Page<>(pageNum,pageSize);
+        QueryWrapper<GovInfo>queryWrapper=new QueryWrapper<>(govInfo);
+        return govInfoMapper.selectPage(pageInfo, queryWrapper);
+    }
+
+    @Override
+    public Integer updateInfoList(List<GovInfo> list) {
+        list.stream().forEach(o->govInfoMapper.updateById(o));
+        return list.size();
     }
 }

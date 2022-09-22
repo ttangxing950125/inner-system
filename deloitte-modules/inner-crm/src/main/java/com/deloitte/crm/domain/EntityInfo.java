@@ -1,12 +1,10 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
-
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 entity_info
@@ -14,7 +12,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class EntityInfo extends BaseEntity
+public class EntityInfo implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

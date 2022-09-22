@@ -1,7 +1,10 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.EntityInfo;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -58,4 +61,16 @@ public interface IEntityInfoService
      * @return 结果
      */
     public int deleteEntityInfoById(Long id);
+    /**
+     *添加方法描述
+     *
+     * @param pageNum
+     * @param pageSize
+     * @return int
+     * @author 冉浩岑
+     * @date 2022/9/22 14:14
+    */
+    Page<EntityInfo> getInfoList(@RequestBody EntityInfo entityInfo, Integer pageNum, Integer pageSize);
+
+    Integer updateInfoList(List<EntityInfo> list);
 }

@@ -1,11 +1,15 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.mapper.EntityInfoMapper;
+import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.service.IEntityInfoService;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -89,5 +93,18 @@ public class EntityInfoServiceImpl implements IEntityInfoService
     public int deleteEntityInfoById(Long id)
     {
         return entityInfoMapper.deleteEntityInfoById(id);
+    }
+
+    @Override
+    public Page<EntityInfo> getInfoList(@RequestBody EntityInfo entityInfo, Integer pageNum, Integer pageSize) {
+        Page<EntityInfo> pageInfo=new Page<>(pageNum,pageSize);
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
+        return entityInfoMapper.selectPage(pageInfo, queryWrapper);
+    }
+
+    @Override
+    public Integer updateInfoList(List<EntityInfo> list) {
+        list.stream().forEach(o->entityInfoMapper.updateById(o));
+        return list.size();
     }
 }
