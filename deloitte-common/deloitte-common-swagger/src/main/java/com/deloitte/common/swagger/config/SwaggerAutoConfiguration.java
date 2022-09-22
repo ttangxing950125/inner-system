@@ -73,6 +73,7 @@ public class SwaggerAutoConfiguration
         swaggerProperties.getExcludePath().forEach(p -> builder.paths(PathSelectors.ant(p).negate()));
 
         return builder.build().securitySchemes(securitySchemes()).securityContexts(securityContexts()).pathMapping("/");
+
     }
 
     /**

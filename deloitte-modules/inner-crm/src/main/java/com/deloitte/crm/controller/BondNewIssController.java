@@ -3,6 +3,10 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,18 +34,23 @@ import com.deloitte.common.core.web.page.TableDataInfo;
  */
 @RestController
 @RequestMapping("/iss")
+@Api(description = "新债发行，债券信息表")
 public class BondNewIssController extends BaseController
 {
     @Autowired
     private IBondNewIssService bondNewIssService;
+
+
 
     /**
      * 查询新债发行-新发行债券-20220801-20220914列表
      */
     @RequiresPermissions("crm:iss:list")
     @GetMapping("/list")
+    @ApiOperation(value = "分页查询")
     public TableDataInfo list(BondNewIss bondNewIss)
     {
+        QueryWrapper<BondNewIss> wrapper = new QueryWrapper<>();
         startPage();
         List<BondNewIss> list = bondNewIssService.selectBondNewIssList(bondNewIss);
         return getDataTable(list);
