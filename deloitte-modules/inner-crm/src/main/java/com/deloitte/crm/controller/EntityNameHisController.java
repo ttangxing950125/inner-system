@@ -9,6 +9,8 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.service.IEntityNameHisService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -103,6 +105,8 @@ public class EntityNameHisController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/22 23:50
     */
+    @ApiOperation(value = "根据德勤code查询曾用名列表")
+    @ApiImplicitParam(name="getNameListByDqCoded",value="",required = true,paramType = "String")
     @PostMapping("/getNameListByDqCoded")
     public AjaxResult getNameListByDqCoded(String dqCode)
     {

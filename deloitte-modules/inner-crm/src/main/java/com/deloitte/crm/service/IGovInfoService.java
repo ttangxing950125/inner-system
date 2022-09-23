@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 
@@ -77,5 +78,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     AjaxResult updateOldName(GovInfo govInfo);
 
-    AjaxResult checkList(GovInfo govInfo);
+    AjaxResult checkGov(GovInfo govInfo);
+
+    AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
 }

@@ -86,7 +86,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     Integer updateInfoList(List<EntityInfo> list);
 
-    List<EntityInfo> checkList(EntityInfo entityInfo);
+    List<EntityInfo> checkEntity(EntityInfo entityInfo);
 
     AjaxResult getOneAllInfo(String entityCode);
 

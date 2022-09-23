@@ -1,15 +1,16 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
@@ -23,20 +24,14 @@ import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityInfoService;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.deloitte.common.core.utils.bean.BeanUtils;
-import com.deloitte.common.security.utils.SecurityUtils;
-import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.vo.EntityInfoVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -58,6 +53,37 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     private EntityAttrMapper entityAttrMapper;
 
     private EntityAttrValueMapper entityAttrValueMapper;
+
+    /**
+     * 字段对应的名称
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_NAME="name";
+    /**
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_ID="id";
+    /**
+     * 添加的指标封装的字段
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_MORE="more";
+    /**
+     * 新增指标的字段名称
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_KEY="key";
+    /**
+     * 新增指标的字段值
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_VALUE="value";
+
     /**
      *
      *
@@ -352,7 +378,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     }
 
     @Override
-    public List<EntityInfo> checkList(EntityInfo entityInfo) {
+    public List<EntityInfo> checkEntity(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper(entityInfo);
         return entityInfoMapper.selectList(queryWrapper);
     }
@@ -381,9 +407,46 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
 
     @Override
     public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
-        return null;
-    }
+        Integer pageNum = entityAttrDto.getPageNum();
+        Integer pageSize = entityAttrDto.getPageSize();
 
+        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+
+        Page<EntityInfo>pageInfo=new Page<>(pageNum,pageSize);
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
+        queryWrapper.lambda().eq(EntityInfo::getList,1);
+        Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
+
+        //查询分页数据集
+        Page<Map<String, Object>> pageResult=new Page<>();
+        pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
+
+        //封装新的结果集
+        List<Map<String,Object>> resultRecords = new ArrayList<>();
+        //添加指标栏位
+        List<EntityInfo> records = entityInfoPage.getRecords();
+        records.stream().forEach(o->{
+            Map<String, Object> resultMap = JSON.parseObject(JSON.toJSONString(o), new TypeReference<Map<String, String>>() {});
+            for (Map<String,String> map:mapList){
+                QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
+                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                        .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                        .eq(EntityAttrValue::getEntityCode,o.getEntityCode()));
+                //新增指标栏
+                Map<String,Object> more=new HashMap<>();
+                more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
+                if (attrValue==null){
+                    more.put(MORE_ENTITY_KPI_VALUE,null);
+                }else {
+                    more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                }
+                resultMap.put(MORE_ENTITY_KPI_MORE, more);
+            }
+            resultRecords.add(resultMap);
+        });
+        pageResult.setRecords(resultRecords);
+        return AjaxResult.success(pageResult);
+    }
 
     /**
      * EntityInfo 对象转 map,并查询 曾用名条数

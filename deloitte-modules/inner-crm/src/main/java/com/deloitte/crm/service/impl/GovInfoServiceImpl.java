@@ -6,10 +6,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.dto.GovInfoDto;
+import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
@@ -227,10 +230,83 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public AjaxResult checkList(GovInfo govInfo) {
+    public AjaxResult checkGov(GovInfo govInfo) {
         QueryWrapper<GovInfo>queryWrapper=new QueryWrapper(govInfo);
         return AjaxResult.success(govInfoMapper.selectList(queryWrapper));
     }
+
+    @Override
+    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
+        Integer pageNum = entityAttrDto.getPageNum();
+        Integer pageSize = entityAttrDto.getPageSize();
+
+        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+
+        Page<GovInfo>pageInfo=new Page<>(pageNum,pageSize);
+        QueryWrapper<GovInfo>queryWrapper=new QueryWrapper<>();
+        Page<GovInfo> entityInfoPage = govInfoMapper.selectPage(pageInfo, queryWrapper);
+
+        //查询分页数据集
+        Page<Map<String, Object>> pageResult=new Page<>();
+        pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
+
+        //封装新的结果集
+        List<Map<String,Object>> resultRecords = new ArrayList<>();
+        //添加指标栏位
+        List<GovInfo> records = entityInfoPage.getRecords();
+        records.stream().forEach(o->{
+            Map<String, Object> resultMap = JSON.parseObject(JSON.toJSONString(o), new TypeReference<Map<String, String>>() {});
+            for (Map<String,String> map:mapList){
+                QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
+                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                        .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                        .eq(EntityAttrValue::getEntityCode,o.getDqGovCode()));
+                //新增指标栏
+                Map<String,Object> more=new HashMap<>();
+                more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
+                if (attrValue==null){
+                    more.put(MORE_ENTITY_KPI_VALUE,null);
+                }else {
+                    more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                }
+                resultMap.put(MORE_ENTITY_KPI_MORE, more);
+            }
+            resultRecords.add(resultMap);
+        });
+        pageResult.setRecords(resultRecords);
+        return AjaxResult.success(pageResult);
+    }
+    /**
+     * 字段对应的名称
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+    */
+    public static final String MORE_ENTITY_KPI_NAME="name";
+    /**
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_ID="id";
+    /**
+     * 添加的指标封装的字段
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_MORE="more";
+    /**
+     * 新增指标的字段名称
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_KEY="key";
+    /**
+     * 新增指标的字段值
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_VALUE="value";
+
+    private EntityAttrValueMapper entityAttrValueMapper;
 
     /**
      * GovInfo 对象转 map,并查询 曾用名条数

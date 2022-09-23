@@ -8,8 +8,11 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.service.IGovInfoService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -113,13 +116,14 @@ public class GovInfoController extends BaseController
     }
 
     /**
-     * 批量修改
-     *
+     * 政府主体批量修改
      * @param govInfoList
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 15:24
     */
+    @ApiOperation(value = "政府主题批量修改")
+    @ApiImplicitParam(name="updateInfoList",value="包含表中egov_info的所有字段",required = true,paramType = "List<GovInfo>")
     @PostMapping("/updateInfoList")
     public AjaxResult updateInfoList(List<GovInfo>govInfoList)
     {
@@ -127,38 +131,41 @@ public class GovInfoController extends BaseController
     }
     /**
      * 查询政府名称，或者编码，是否重复
-     *
      * @param govInfo
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 17:49
     */
-    @PostMapping("/checkList")
-    public AjaxResult checkList(@RequestBody GovInfo govInfo)
+    @ApiOperation(value = "查询政府名称，或者编码，是否重复")
+    @ApiImplicitParam(name="checkGov",value="包含表中gov_info的所有字段",required = true,paramType = "GovInfo")
+    @PostMapping("/checkGov")
+    public AjaxResult checkGov(@RequestBody GovInfo govInfo)
     {
-        return AjaxResult.success(govInfoService.checkList(govInfo));
+        return AjaxResult.success(govInfoService.checkGov(govInfo));
     }
     /**
-     * 分页查询
-     *
+     * 政府主体分页查询
      * @param govInfo
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
+    @ApiOperation(value = "政府主体分页查询")
+    @ApiImplicitParam(name="getInfoList",value="包含表中gov_info的所有字段",required = true,paramType = "GovInfoByDto")
     @PostMapping("/getInfoList")
     public AjaxResult getInfoList(@RequestBody GovInfoByDto govInfo)
     {
         return govInfoService.getInfoList(govInfo);
     }
     /**
-     * 修改曾用名
-     *
+     * 修改政府主体的曾用名
      * @param govInfo
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/23 8:44
     */
+    @ApiOperation(value = "修改政府主体的曾用名")
+    @ApiImplicitParam(name="updateOldName",value="包含表中gov_info的所有字段",required = true,paramType = "GovInfo")
     @PostMapping("/updateOldName")
     public AjaxResult updateOldName(GovInfo govInfo)
     {
@@ -166,14 +173,29 @@ public class GovInfoController extends BaseController
     }
     /**
      * 根据 dqCode 查询政府主体
-     *
      * @param govInfo
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/23 8:59
     */
+    @ApiOperation(value = "根据 dqCode 查询政府主体")
+    @ApiImplicitParam(name="getInfoDetail",value="包含表中gov_info的所有字段",required = true,paramType = "GovInfo")
     @PostMapping("/getInfoDetail")
     public AjaxResult getInfoDetail(GovInfo govInfo){
         return govInfoService.getNewInfo(govInfo);
     }
+    /**
+     * 分页查询全部上市主体
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/23 10:56
+     */
+    @ApiOperation(value = "分页查询全部上市主体")
+    @ApiImplicitParam(name="getListEntityByPage",value="包含表中gov_info的所有字段和分页参数 pageSize pageNum",required = true,paramType = "EntityAttrByDto")
+    @PostMapping("/getListEntityByPage")
+    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
+    {
+        return govInfoService.getListEntityByPage(entityAttrDto);
+    }
+
 }

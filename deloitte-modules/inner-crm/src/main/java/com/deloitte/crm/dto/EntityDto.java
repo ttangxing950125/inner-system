@@ -2,6 +2,7 @@ package com.deloitte.crm.dto;
 
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  * @date 2022/9/23
  */
 @Data
+@Accessors(chain = true)
 public class EntityDto {
 
     /** $column.columnComment */
