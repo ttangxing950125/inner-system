@@ -2,6 +2,8 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,6 +58,8 @@ public class CrmWindTaskController extends BaseController
   */
 
     @PostMapping("/queryList")
+    @ApiOperation(value = "{根据指定TaskDate}")
+    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据",required = true,paramType = "String")
     public AjaxResult getDataTable(@RequestBody String TaskDate) {
       return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
     }
@@ -68,6 +72,8 @@ public class CrmWindTaskController extends BaseController
      * @date 2022/9/22 10:45
     */
     @PostMapping("/getTaskByDate")
+    @ApiOperation(value = "{根据指定TaskDate}")
+    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询任务完成度",required = true,paramType = "String")
     public AjaxResult getTaskCompleted(String TaskDate) {
        return AjaxResult.success("查询成功",crmWindTaskService.selectComTaskByDate(TaskDate));
     }
@@ -82,6 +88,8 @@ public class CrmWindTaskController extends BaseController
      * @date 2022/9/22 17:02
     */
     @PostMapping("/queryTaskByDate")
+    @ApiOperation(value = "{根据指定TaskDate,指定的TaskCateId}")
+    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据,指定的TaskCateId",required = true,paramType = "String,String")
     public AjaxResult selectCrmWindTask(@RequestBody String TaskDate,String TaskCateId) {
         return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
     }

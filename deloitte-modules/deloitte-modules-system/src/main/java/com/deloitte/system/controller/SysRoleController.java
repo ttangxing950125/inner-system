@@ -42,6 +42,12 @@ public class SysRoleController extends BaseController
     @Autowired
     private ISysUserService userService;
 
+
+    @PostMapping("/roleById")
+    public List<SysUser> getRoleUserByRoleId(Integer roleId){
+        return roleService.getUserByRole(roleId);
+    }
+
     @RequiresPermissions("system:role:list")
     @GetMapping("/list")
     public TableDataInfo list(SysRole role)

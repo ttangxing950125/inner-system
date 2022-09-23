@@ -23,6 +23,8 @@ public class EmailUtil {
 
         }
 
+
+
         /**
          * 发送邮件
          *
@@ -68,7 +70,7 @@ public class EmailUtil {
             String send = "";
             MailAccount mailAccount = getMailAccount();
             try {
-                send = MailUtil.send(mailAccount,address, "德勤智慧股票尽职调查咨询需求", scopeTemplate(companyText,contentText), true);
+                send = MailUtil.send(mailAccount,address, "Crm主体管理", scopeTemplate(companyText,contentText), true);
             }catch (Exception e){
                 e.printStackTrace();
             }finally {
@@ -76,6 +78,9 @@ public class EmailUtil {
             }
 
         }
+
+
+
 
         //读取到html文件模板，替换文件模板中的信息
         public static String scopeTemplate(String companyName,String context) {

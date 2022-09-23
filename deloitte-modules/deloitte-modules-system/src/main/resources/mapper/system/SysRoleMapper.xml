@@ -92,8 +92,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectRoleVo"/>
 		 where r.role_key=#{roleKey} limit 1
 	</select>
-	
- 	<insert id="insertRole" parameterType="SysRole" useGeneratedKeys="true" keyProperty="roleId">
+	<select id="getRoleUserById" resultType="com.deloitte.system.api.domain.SysUser" parameterType="integer">
+		SELECT su.* FROM sys_role r
+		    INNER JOIN sys_user_role ur ON r.role_id = ur.role_id
+		    INNER JOIN sys_user su ON su.user_id = ur.user_id WHERE r.role_id= #{roleId}
+	</select>
+
+
+	<insert id="insertRole" parameterType="SysRole" useGeneratedKeys="true" keyProperty="roleId">
  		insert into sys_role(
  			<if test="roleId != null and roleId != 0">role_id,</if>
  			<if test="roleName != null and roleName != ''">role_name,</if>

@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.deloitte.system.api.RoleService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,7 +45,10 @@ public class SysDictDataController extends BaseController
     private ISysDictTypeService dictTypeService;
 
 
+
+
     @PostMapping("/queryRoles")
+    @ApiOperation(value = "{查询内容}")
      public List<SysDictData>  getRoles(){
          return dictDataService.selectDictDataListByType();
      }

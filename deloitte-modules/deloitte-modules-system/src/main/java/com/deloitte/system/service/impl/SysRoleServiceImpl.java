@@ -8,7 +8,6 @@ import java.util.Set;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.deloitte.common.core.constant.UserConstants;
@@ -27,6 +26,8 @@ import com.deloitte.system.mapper.SysRoleMenuMapper;
 import com.deloitte.system.mapper.SysUserRoleMapper;
 import com.deloitte.system.service.ISysRoleService;
 
+import javax.annotation.Resource;
+
 /**
  * 角色 业务层处理
  * 
@@ -35,17 +36,34 @@ import com.deloitte.system.service.ISysRoleService;
 @Service
 public class SysRoleServiceImpl implements ISysRoleService
 {
-    @Autowired
+    @Resource
     private SysRoleMapper roleMapper;
 
-    @Autowired
+    @Resource
     private SysRoleMenuMapper roleMenuMapper;
 
-    @Autowired
+    @Resource
     private SysUserRoleMapper userRoleMapper;
 
-    @Autowired
+    @Resource
     private SysRoleDeptMapper roleDeptMapper;
+
+
+    /**
+     *根据角色id 查询用户信息
+     *
+     * @param roleId
+     * @return List<SysUser>
+     * @author penTang
+     * @date 2022/9/23 15:01
+    */
+    @Override
+    public List<SysUser> getUserByRole(Integer roleId){
+        return roleMapper.getRoleUserById(roleId);
+
+
+    }
+
 
     /**
      * 根据条件分页查询角色数据
@@ -69,6 +87,7 @@ public class SysRoleServiceImpl implements ISysRoleService
     @Override
     public List<SysRole> selectRolesByUserId(Long userId)
     {
+
         List<SysRole> userRoles = roleMapper.selectRolePermissionByUserId(userId);
         List<SysRole> roles = selectRoleAll();
         for (SysRole role : roles)

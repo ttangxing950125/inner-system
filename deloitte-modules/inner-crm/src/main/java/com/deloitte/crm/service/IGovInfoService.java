@@ -18,6 +18,15 @@ import java.util.List;
  */
 public interface IGovInfoService  extends IService<GovInfo>
 {
+
+    /**
+     * 统计政府信息
+     *
+     * @return GovInfoDto
+     * @author penTang
+     * @date 2022/9/22 23:21
+     *
+     */
     GovInfoDto getGovInfo();
 
     /**

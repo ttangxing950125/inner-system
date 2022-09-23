@@ -139,6 +139,16 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return AjaxResult.success(govInfos.get(0));
     }
 
+
+    /**
+     * 统计政府信息
+     *
+     * @return GovInfoDto
+     * @author penTang
+     * @date 2022/9/22 23:21
+     *
+     */
+
     @Override
     public GovInfoDto getGovInfo() {
         List<GovInfo> list = this.list();

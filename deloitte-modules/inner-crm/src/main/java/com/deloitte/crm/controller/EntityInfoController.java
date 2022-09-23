@@ -41,6 +41,7 @@ public class EntityInfoController extends BaseController
    * @date 2022/9/22 22:41
   */
     @PostMapping("/entityInfoList")
+    @ApiOperation(value = "{统计整体企业主体情况}")
     public AjaxResult getList(){
         return AjaxResult.success("查询成功",entityInfoService.getEntityInfo());
     }

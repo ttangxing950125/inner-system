@@ -2,6 +2,7 @@ package com.deloitte.system.mapper;
 
 import java.util.List;
 import com.deloitte.system.api.domain.SysRole;
+import com.deloitte.system.api.domain.SysUser;
 
 /**
  * 角色表 数据层
@@ -10,6 +11,19 @@ import com.deloitte.system.api.domain.SysRole;
  */
 public interface SysRoleMapper
 {
+
+   /**
+    *根据角色id查询 用户信息
+    *
+    * @param roleId
+    * @return List<SysUser>
+    * @author penTang
+    * @date 2022/9/23 15:24
+   */
+    public List<SysUser> getRoleUserById(Integer roleId);
+
+
+
     /**
      * 根据条件分页查询角色数据
      * 

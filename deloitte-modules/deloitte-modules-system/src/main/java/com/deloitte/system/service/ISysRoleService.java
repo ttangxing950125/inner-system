@@ -3,6 +3,7 @@ package com.deloitte.system.service;
 import java.util.List;
 import java.util.Set;
 import com.deloitte.system.api.domain.SysRole;
+import com.deloitte.system.api.domain.SysUser;
 import com.deloitte.system.domain.SysUserRole;
 
 /**
@@ -12,6 +13,17 @@ import com.deloitte.system.domain.SysUserRole;
  */
 public interface ISysRoleService
 {
+
+    /**
+     *根据角色id 查询用户信息
+     *
+     * @param roleId
+     * @return List<SysUser>
+     * @author penTang
+     * @date 2022/9/23 15:01
+     */
+    List<SysUser> getUserByRole(Integer roleId);
+
     /**
      * 根据条件分页查询角色数据
      * 

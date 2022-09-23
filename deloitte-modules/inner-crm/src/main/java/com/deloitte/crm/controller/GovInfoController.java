@@ -11,6 +11,7 @@ import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.service.IGovInfoService;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

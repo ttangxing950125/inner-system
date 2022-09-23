@@ -20,7 +20,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 {
     /**
      *
-     *
+     *统计企业主体信息
      * @return List<EntityInfoDto>
      * @author penTang
      * @date 2022/9/22 22:40
