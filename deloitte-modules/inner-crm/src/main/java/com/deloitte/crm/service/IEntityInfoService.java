@@ -1,6 +1,11 @@
 package com.deloitte.crm.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoByDto;
+import com.deloitte.crm.dto.EntityInfoDto;
 
 import java.util.List;
 
@@ -67,7 +72,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @author 冉浩岑
      * @date 2022/9/22 14:14
     */
-    AjaxResult getInfoList(EntityInfoDto entityInfo);
+    AjaxResult getInfoList(EntityInfoByDto entityInfo);
 
     Integer updateInfoList(List<EntityInfo> list);
 
@@ -75,5 +80,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     AjaxResult getOneAllInfo(String entityCode);
 
-    AjaxResult getListEntityByPage(EntityAttrDto entityAttrDto);
+    AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
+
+    EntityInfoDto getEntityInfo();
 }

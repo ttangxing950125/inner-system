@@ -4,21 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.crm.dto.EntityInfoDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
-import com.deloitte.crm.domain.dto.EntityAttrDto;
-import com.deloitte.crm.domain.dto.EntityInfoDto;
+import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoByDto;
+import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
@@ -33,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -42,7 +37,6 @@ import java.util.Map;
  */
 @Service
 @Aspect
-public class EntityInfoServiceImpl implements IEntityInfoService
 public class EntityInfoServiceImpl  extends ServiceImpl<EntityInfoMapper, EntityInfo> implements IEntityInfoService
 {
     @Autowired
@@ -179,7 +173,7 @@ public class EntityInfoServiceImpl  extends ServiceImpl<EntityInfoMapper, Entity
     }
 
     @Override
-    public AjaxResult getInfoList(EntityInfoDto entityInfoDto) {
+    public AjaxResult getInfoList(EntityInfoByDto entityInfoDto) {
         entityInfoDto.setEntityInfo();
         EntityInfo entityInfo = entityInfoDto.getEntityInfo();
         Integer pageNum = entityInfoDto.getPageNum();
@@ -242,7 +236,7 @@ public class EntityInfoServiceImpl  extends ServiceImpl<EntityInfoMapper, Entity
     }
 
     @Override
-    public AjaxResult getListEntityByPage(EntityAttrDto entityAttrDto) {
+    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
         return null;
     }
 

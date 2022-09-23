@@ -1,15 +1,13 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.deloitte.common.core.web.domain.AjaxResult;
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.GovInfo;
-import com.deloitte.crm.domain.dto.GovInfoDto;
+import com.deloitte.crm.domain.dto.GovInfoByDto;
+import com.deloitte.crm.dto.GovInfoDto;
 
 import java.util.List;
-import com.deloitte.crm.dto.GovInfoDto;
 
 /**
  * 【请填写功能名称】Service接口
@@ -75,7 +73,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     AjaxResult getNewInfo(GovInfo govInfo);
 
-    AjaxResult getInfoList(GovInfoDto govInfo);
+    AjaxResult getInfoList(GovInfoByDto govInfo);
 
     AjaxResult updateOldName(GovInfo govInfo);
 

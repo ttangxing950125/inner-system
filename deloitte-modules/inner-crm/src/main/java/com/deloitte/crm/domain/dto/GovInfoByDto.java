@@ -12,7 +12,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
-public class GovInfoDto implements Serializable
+public class GovInfoByDto implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

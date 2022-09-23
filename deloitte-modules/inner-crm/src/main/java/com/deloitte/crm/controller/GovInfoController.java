@@ -8,6 +8,7 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.service.IGovInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class GovInfoController extends BaseController
    * @date 2022/9/22 23:21
    *
   */
-  @PostMapping("/govList")
+    @PostMapping("/govList")
     public AjaxResult getGovInfo(){
         return AjaxResult.success("查询成功",govInfoService.getGovInfo());
 
@@ -146,7 +147,7 @@ public class GovInfoController extends BaseController
      * @date 2022/9/22 17:49
      */
     @PostMapping("/getInfoList")
-    public AjaxResult getInfoList(@RequestBody GovInfoDto govInfo)
+    public AjaxResult getInfoList(@RequestBody GovInfoByDto govInfo)
     {
         return govInfoService.getInfoList(govInfo);
     }

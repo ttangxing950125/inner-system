@@ -4,24 +4,25 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.GovInfo;
-import com.deloitte.crm.domain.dto.GovInfoDto;
+import com.deloitte.crm.domain.dto.GovInfoByDto;
+import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.crm.dto.GovInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -135,9 +136,40 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return AjaxResult.success(govInfos.get(0));
     }
 
-
     @Override
-    public AjaxResult getInfoList(GovInfoDto govInfodto) {
+    public GovInfoDto getGovInfo() {
+        List<GovInfo> list = this.list();
+        GovInfoDto govInfoDto = new GovInfoDto();
+//TODO gov_level_big 是否 省  1-是
+        List<GovInfo>  province = list().stream()
+                .filter(row -> row.getGovLevelBig() == 1)
+                .collect(Collectors.toList());
+
+//TODO gov_level_big 是否 市  2-是
+        List<GovInfo> city = list().stream()
+                .filter(row -> row.getGovLevelBig() == 2)
+                .collect(Collectors.toList());
+
+//TODO gov_level_big 是否 县  3-是
+        List<GovInfo> county = list().stream()
+                .filter(row -> row.getGovLevelBig() == 3)
+                .collect(Collectors.toList());
+
+//TODO gov_level_big 是否 经开  4-是
+        List<GovInfo> open = list().stream()
+                .filter(row -> row.getGovLevelBig() == 4)
+
+                .collect(Collectors.toList());
+
+        govInfoDto.setProvince(province.size());
+        govInfoDto.setCity(city.size());
+        govInfoDto.setCounty(county.size());
+        govInfoDto.setOpen(open.size());
+        govInfoDto.setGovSum(list.size());
+        return govInfoDto;
+    }
+    @Override
+    public AjaxResult getInfoList(GovInfoByDto govInfodto) {
         govInfodto.setGovInfo();
         GovInfo govInfo = govInfodto.getGovInfo();
         Integer pageNum = govInfodto.getPageNum();
