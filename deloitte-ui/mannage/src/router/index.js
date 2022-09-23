@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from "@/layout";
 
 /**
  * Note: 路由配置项
@@ -31,133 +31,225 @@ import Layout from '@/layout'
 // 公共路由
 export const constantRoutes = [
   {
-    path: '/redirect',
+    path: "/redirect",
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/redirect/:path(.*)',
-        component: () => import('@/views/redirect')
-      }
-    ]
+        path: "/redirect/:path(.*)",
+        component: () => import("@/views/redirect"),
+      },
+    ],
   },
   {
-    path: '/login',
-    component: () => import('@/views/login'),
-    hidden: true
+    path: "/login",
+    component: () => import("@/views/login"),
+    hidden: true,
   },
   {
-    path: '/register',
-    component: () => import('@/views/register'),
-    hidden: true
+    path: "/register",
+    component: () => import("@/views/register"),
+    hidden: true,
   },
   {
-    path: '/404',
-    component: () => import('@/views/error/404'),
-    hidden: true
+    path: "/404",
+    component: () => import("@/views/error/404"),
+    hidden: true,
   },
   {
-    path: '/401',
-    component: () => import('@/views/error/401'),
-    hidden: true
+    path: "/401",
+    component: () => import("@/views/error/401"),
+    hidden: true,
   },
   {
-    path: '',
+    path: "",
     component: Layout,
-    redirect: 'index',
+    redirect: "index",
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/index'),
-        name: 'Index',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
-      }
-    ]
+        path: "index",
+        component: () => import("@/views/dashboard/index.vue"),
+        name: "Index",
+        meta: { title: "每日运维" },
+      },
+      {
+        path: "work",
+        component: () => import("@/views/dashboard/work.vue"),
+        name: "work",
+        meta: { title: "导入任务清单" },
+        hidden: true,
+      },
+    ],
   },
   {
-    path: '/user',
+    path: "/subjectManagement",
+    component: Layout,
+    redirect: "subjectManagement",
+    children: [
+      {
+        path: "/subjectManagement/overview",
+        component: () => import("@/views/subjectManagement/index"),
+        name: "overview",
+        meta: { title: "总览" },
+      },
+      {
+        path: "/subjectManagement/enterprise",
+        component: () => import("@/views/subjectManagement/enterprise.vue"),
+        name: "enterprise",
+        meta: { title: "企业主体管理" },
+      },
+      {
+        path: "/subjectManagement/government",
+        component: () => import("@/views/subjectManagement/government.vue"),
+        name: "government",
+        meta: { title: "政府主体管理" },
+      },
+      {
+        path: "/subjectManagement/addGovernment",
+        component: () => import("@/views/subjectManagement/addGovernment.vue"),
+        name: "addGovernment",
+        meta: { title: "新增政府主体" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/eidtGovernment",
+        component: () => import("@/views/subjectManagement/eidtGovernment"),
+        name: "eidtGovernment",
+        meta: { title: "修改政府主体信息" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/historyGovernment",
+        component: () =>
+          import("@/views/subjectManagement/historyGovernment.vue"),
+        name: "historyGovernment",
+        meta: { title: "政府主体信息更新记录" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/indexGovernment",
+        component: () =>
+          import("@/views/subjectManagement/indexGovernment.vue"),
+        name: "indexGovernment",
+        meta: { title: "政府主体更多指标" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/addEnterprise",
+        component: () => import("@/views/subjectManagement/addEnterprise.vue"),
+        name: "addEnterprise",
+        meta: { title: "新增企业主体" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/eidtEnterprise",
+        component: () => import("@/views/subjectManagement/eidtEnterprise.vue"),
+        name: "eidtEnterprise",
+        meta: { title: "修改企业主体信息" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/historyEnterprise",
+        component: () =>
+          import("@/views/subjectManagement/historyEnterprise.vue"),
+        name: "historyEnterprise",
+        meta: { title: "企业主体更新记录" },
+        hidden: true,
+      },
+      {
+        path: "/subjectManagement/indexEnterprise",
+        component: () =>
+          import("@/views/subjectManagement/indexEnterprise.vue"),
+        name: "indexEnterprise",
+        meta: { title: "企业主体更多指标" },
+        hidden: true,
+      },
+    ],
+  },
+  {
+    path: "/user",
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
+    redirect: "noredirect",
     children: [
       {
-        path: 'profile',
-        component: () => import('@/views/system/user/profile/index'),
-        name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' }
-      }
-    ]
-  }
-]
+        path: "profile",
+        component: () => import("@/views/system/user/profile/index"),
+        name: "Profile",
+        meta: { title: "个人中心", icon: "user" },
+      },
+    ],
+  },
+];
 
 // 动态路由，基于用户权限动态去加载
 export const dynamicRoutes = [
   {
-    path: '/system/user-auth',
+    path: "/system/user-auth",
     component: Layout,
     hidden: true,
-    permissions: ['system:user:edit'],
+    permissions: ["system:user:edit"],
     children: [
       {
-        path: 'role/:userId(\\d+)',
-        component: () => import('@/views/system/user/authRole'),
-        name: 'AuthRole',
-        meta: { title: '分配角色', activeMenu: '/system/user' }
-      }
-    ]
+        path: "role/:userId(\\d+)",
+        component: () => import("@/views/system/user/authRole"),
+        name: "AuthRole",
+        meta: { title: "分配角色", activeMenu: "/system/user" },
+      },
+    ],
   },
   {
-    path: '/system/role-auth',
+    path: "/system/role-auth",
     component: Layout,
     hidden: true,
-    permissions: ['system:role:edit'],
+    permissions: ["system:role:edit"],
     children: [
       {
-        path: 'user/:roleId(\\d+)',
-        component: () => import('@/views/system/role/authUser'),
-        name: 'AuthUser',
-        meta: { title: '分配用户', activeMenu: '/system/role' }
-      }
-    ]
+        path: "user/:roleId(\\d+)",
+        component: () => import("@/views/system/role/authUser"),
+        name: "AuthUser",
+        meta: { title: "分配用户", activeMenu: "/system/role" },
+      },
+    ],
   },
   {
-    path: '/system/dict-data',
+    path: "/system/dict-data",
     component: Layout,
     hidden: true,
-    permissions: ['system:dict:list'],
+    permissions: ["system:dict:list"],
     children: [
       {
-        path: 'index/:dictId(\\d+)',
-        component: () => import('@/views/system/dict/data'),
-        name: 'Data',
-        meta: { title: '字典数据', activeMenu: '/system/dict' }
-      }
-    ]
+        path: "index/:dictId(\\d+)",
+        component: () => import("@/views/system/dict/data"),
+        name: "Data",
+        meta: { title: "字典数据", activeMenu: "/system/dict" },
+      },
+    ],
   },
   {
-    path: '/tool/gen-edit',
+    path: "/tool/gen-edit",
     component: Layout,
     hidden: true,
-    permissions: ['tool:gen:edit'],
+    permissions: ["tool:gen:edit"],
     children: [
       {
-        path: 'index/:tableId(\\d+)',
-        component: () => import('@/views/tool/gen/editTable'),
-        name: 'GenEdit',
-        meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
-      }
-    ]
-  }
-]
+        path: "index/:tableId(\\d+)",
+        component: () => import("@/views/tool/gen/editTable"),
+        name: "GenEdit",
+        meta: { title: "修改生成配置", activeMenu: "/tool/gen" },
+      },
+    ],
+  },
+];
 
 // 防止连续点击多次路由报错
 let routerPush = Router.prototype.push;
 Router.prototype.push = function push(location) {
-  return routerPush.call(this, location).catch(err => err)
-}
+  return routerPush.call(this, location).catch((err) => err);
+};
 
 export default new Router({
-  mode: 'history', // 去掉url中的#
+  mode: "history", // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+  routes: constantRoutes,
+});
