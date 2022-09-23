@@ -1,7 +1,9 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.GovInfoDto;
 
 import java.util.List;
 
@@ -64,4 +66,12 @@ public interface IGovInfoService
     Page<GovInfo> getInfoList(GovInfo govInfo, Integer pageNum, Integer pageSize);
 
     Integer updateInfoList(List<GovInfo> list);
+
+    AjaxResult getNewInfo(GovInfo govInfo);
+
+    AjaxResult getInfoList(GovInfoDto govInfo);
+
+    AjaxResult updateOldName(GovInfo govInfo);
+
+    AjaxResult checkList(GovInfo govInfo);
 }

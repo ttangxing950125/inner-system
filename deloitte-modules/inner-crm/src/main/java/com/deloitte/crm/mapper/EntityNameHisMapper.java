@@ -1,7 +1,9 @@
 package com.deloitte.crm.mapper;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityNameHis;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.EntityNameHis;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface EntityNameHisMapper 
+public interface EntityNameHisMapper extends BaseMapper<EntityNameHis>
 {
     /**
      * 查询【请填写功能名称】

@@ -1,7 +1,8 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
 import com.deloitte.crm.domain.EntityNameHis;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -58,4 +59,13 @@ public interface IEntityNameHisService
      * @return 结果
      */
     public int deleteEntityNameHisById(Long id);
+    /**
+     * 根据德勤code查询曾用名列表
+     *
+     * @param dqCode
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/22 23:50
+     */
+    List<EntityNameHis> getNameListByDqCoded(String dqCode);
 }

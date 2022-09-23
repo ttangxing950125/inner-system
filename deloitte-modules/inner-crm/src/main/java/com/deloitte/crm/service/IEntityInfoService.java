@@ -1,8 +1,8 @@
 package com.deloitte.crm.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.deloitte.crm.domain.dto.EntityInfoDto;
 
 import java.util.List;
 
@@ -64,13 +64,12 @@ public interface IEntityInfoService
     /**
      *添加方法描述
      *
-     * @param pageNum
-     * @param pageSize
+     * @param  entityInfo
      * @return int
      * @author 冉浩岑
      * @date 2022/9/22 14:14
     */
-    Page<EntityInfo> getInfoList(@RequestBody EntityInfo entityInfo, Integer pageNum, Integer pageSize);
+    AjaxResult getInfoList(EntityInfoDto entityInfo);
 
     Integer updateInfoList(List<EntityInfo> list);
 }

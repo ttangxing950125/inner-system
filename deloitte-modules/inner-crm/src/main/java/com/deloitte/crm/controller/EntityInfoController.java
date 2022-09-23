@@ -8,6 +8,7 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -97,20 +98,17 @@ public class EntityInfoController extends BaseController
     }
 
     /**
-     *添加方法描述
+     * 分页查询
      *
-     * @param pageNum
-     * @param pageSize
+     * @param entityInfo
      * @return AjaxResult
      * @author 冉浩岑
-     * @date 2022/9/22 14:14
-    */
+     * @date 2022/9/22 17:49
+     */
     @PostMapping("/getInfoList")
-    public AjaxResult getInfoList(Integer pageNum,
-                                  Integer pageSize)
+    public AjaxResult getInfoList(@RequestBody EntityInfoDto entityInfo)
     {
-        EntityInfo entityInfo = new EntityInfo();
-        return AjaxResult.success(entityInfoService.getInfoList(entityInfo, pageNum, pageSize));
+        return entityInfoService.getInfoList(entityInfo);
     }
     /**
      *添加方法描述
@@ -120,7 +118,7 @@ public class EntityInfoController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/22 15:24
     */
-    @PostMapping("/getInfoList")
+    @PostMapping("/updateInfoList")
     public AjaxResult updateInfoList(List<EntityInfo>list)
     {
         return AjaxResult.success(entityInfoService.updateInfoList(list));

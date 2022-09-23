@@ -1,7 +1,9 @@
 package com.deloitte.crm.mapper;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityAttrCate;
+
+import java.util.List;
 
 /**
  * 企业属性分类Mapper接口
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.EntityAttrCate;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface EntityAttrCateMapper 
+public interface EntityAttrCateMapper extends BaseMapper<EntityAttrCate>
 {
     /**
      * 查询企业属性分类

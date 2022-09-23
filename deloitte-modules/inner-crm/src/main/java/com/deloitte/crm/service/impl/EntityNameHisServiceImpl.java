@@ -1,11 +1,13 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.service.IEntityNameHisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
-import com.deloitte.crm.domain.EntityNameHis;
-import com.deloitte.crm.service.IEntityNameHisService;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -89,5 +91,13 @@ public class EntityNameHisServiceImpl implements IEntityNameHisService
     public int deleteEntityNameHisById(Long id)
     {
         return entityNameHisMapper.deleteEntityNameHisById(id);
+    }
+
+    @Override
+    public List<EntityNameHis> getNameListByDqCoded(String dqCode) {
+        QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
+        return entityNameHisMapper.selectList(
+                queryWrapper.lambda()
+                        .eq(EntityNameHis::getDqCode,dqCode));
     }
 }

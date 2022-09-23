@@ -8,6 +8,7 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.GovInfoDto;
 import com.deloitte.crm.service.IGovInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -96,7 +97,7 @@ public class GovInfoController extends BaseController
         return toAjax(govInfoService.deleteGovInfoByIds(ids));
     }
     /**
-     *添加方法描述
+     * 分页查询
      *
      * @param pageNum
      * @param pageSize
@@ -112,16 +113,67 @@ public class GovInfoController extends BaseController
         return AjaxResult.success(govInfoService.getInfoList(govInfo, pageNum, pageSize));
     }
     /**
-     *添加方法描述
+     * 批量修改
      *
      * @param list
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 15:24
     */
-    @PostMapping("/getInfoList")
+    @PostMapping("/updateInfoList")
     public AjaxResult updateInfoList(List<GovInfo>list)
     {
         return AjaxResult.success(govInfoService.updateInfoList(list));
+    }
+    /**
+     * 查询政府名称，或者编码，是否重复
+     *
+     * @param govInfo
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/22 17:49
+    */
+    @PostMapping("/checkList")
+    public AjaxResult checkList(@RequestBody GovInfo govInfo)
+    {
+        return AjaxResult.success(govInfoService.checkList(govInfo));
+    }
+    /**
+     * 分页查询
+     *
+     * @param govInfo
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/22 17:49
+     */
+    @PostMapping("/getInfoList")
+    public AjaxResult getInfoList(@RequestBody GovInfoDto govInfo)
+    {
+        return govInfoService.getInfoList(govInfo);
+    }
+    /**
+     * 修改曾用名
+     *
+     * @param govInfo
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/23 8:44
+    */
+    @PostMapping("/updateOldName")
+    public AjaxResult updateOldName(GovInfo govInfo)
+    {
+        return govInfoService.updateOldName(govInfo);
+    }
+    /**
+     * 根据 dqCode 查询政府主体
+     *
+     * @param govInfo
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/23 8:59
+    */
+    @PostMapping("/getOneAllInfo")
+    public AjaxResult getOneAllInfo(GovInfo govInfo){
+        return govInfoService.getNewInfo(govInfo);
     }
 }
