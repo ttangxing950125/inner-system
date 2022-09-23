@@ -103,7 +103,7 @@ public class EntityInfoController extends BaseController
      */
     @RequiresPermissions("crm:entityInfo:add")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
-    @ApiImplicitParam(name="entityInfoDto",value="包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段")
+    @ApiImplicitParam(name="entityInfoDto",value="包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段",required = true,dataType = "body",dataTypeClass = EntityDto.class)
     @PostMapping("/insert")
     public AjaxResult add(@RequestBody EntityDto entityDto)
     {
