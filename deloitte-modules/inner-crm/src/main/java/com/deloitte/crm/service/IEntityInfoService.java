@@ -1,9 +1,6 @@
 package com.deloitte.crm.service;
 
-import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.dto.EntityAttrDto;
-import com.deloitte.crm.domain.dto.EntityInfoDto;
 
 import java.util.List;
 
@@ -13,7 +10,7 @@ import java.util.List;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IEntityInfoService 
+public interface IEntityInfoService extends IService<EntityInfo>
 {
     /**
      * 查询【请填写功能名称】

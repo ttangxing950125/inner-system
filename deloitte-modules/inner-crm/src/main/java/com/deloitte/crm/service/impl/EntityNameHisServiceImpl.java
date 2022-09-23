@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 /**
  * 【请填写功能名称】Service业务层处理
  * 
@@ -18,7 +20,7 @@ import java.util.List;
 @Service
 public class EntityNameHisServiceImpl implements IEntityNameHisService 
 {
-    @Autowired
+    @Resource
     private EntityNameHisMapper entityNameHisMapper;
 
     /**

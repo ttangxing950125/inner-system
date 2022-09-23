@@ -24,6 +24,9 @@ public class CrmWindDict extends BaseEntity
     /** wind文件分类名 */
     @Excel(name = "wind文件分类名")
     private String cateName;
+    /** windCateId */
+    @Excel(name = "windCateId")
+    private Integer cateId;
 
     /** wind文件具体名称 */
     @Excel(name = "wind文件具体名称")
@@ -133,6 +136,14 @@ public class CrmWindDict extends BaseEntity
     public Date getUpdated() 
     {
         return updated;
+    }
+
+    public Integer getCateId() {
+        return cateId;
+    }
+
+    public void setCateId(Integer cateId) {
+        this.cateId = cateId;
     }
 
     @Override

@@ -11,6 +11,11 @@ import com.deloitte.crm.domain.dto.GovInfoDto;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.crm.dto.GovInfoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -25,7 +30,7 @@ import java.util.*;
  * @date 2022-09-21
  */
 @Service
-public class GovInfoServiceImpl implements IGovInfoService 
+public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> implements IGovInfoService
 {
     @Autowired
     private GovInfoMapper govInfoMapper;

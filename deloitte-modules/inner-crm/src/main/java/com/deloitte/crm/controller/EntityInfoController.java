@@ -8,8 +8,6 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.dto.EntityAttrDto;
-import com.deloitte.crm.domain.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +27,18 @@ public class EntityInfoController extends BaseController
 {
     @Autowired
     private IEntityInfoService entityInfoService;
+
+  /**
+   *统计整体企业主体情况
+   *
+   * @return AjaxResult
+   * @author penTang
+   * @date 2022/9/22 22:41
+  */
+    @PostMapping("/entityInfoList")
+    public AjaxResult getList(){
+        return AjaxResult.success("查询成功",entityInfoService.getEntityInfo());
+    }
 
     /**
      * 查询【请填写功能名称】列表

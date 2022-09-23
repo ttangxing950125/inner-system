@@ -39,6 +39,11 @@ public class EntityInfo implements Serializable
     @Excel(name = "是否发债 0-未发债 1-已发债")
     private Integer issueBonds;
 
+
+    /** 是否金融机构 0-否 1-是 */
+    @Excel(name = "是金融机构 0-否 1-是")
+    private Integer finance;
+
     /** 统一社会信用代码是否异常 0-正常 1-异常 */
     @Excel(name = "统一社会信用代码是否异常 0-正常 1-异常")
     private Integer creditError;
@@ -203,6 +208,14 @@ public class EntityInfo implements Serializable
     public Date getUpdated() 
     {
         return updated;
+    }
+
+    public Integer getFinance() {
+        return finance;
+    }
+
+    public void setFinance(Integer finance) {
+        this.finance = finance;
     }
 
     @Override

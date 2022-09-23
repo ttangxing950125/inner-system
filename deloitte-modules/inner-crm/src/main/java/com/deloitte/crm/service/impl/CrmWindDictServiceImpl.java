@@ -1,6 +1,8 @@
 package com.deloitte.crm.service.impl;
-
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindDictMapper;
@@ -14,10 +16,25 @@ import com.deloitte.crm.service.ICrmWindDictService;
  * @date 2022-09-21
  */
 @Service
-public class CrmWindDictServiceImpl implements ICrmWindDictService 
+public class CrmWindDictServiceImpl extends ServiceImpl<CrmWindDictMapper,CrmWindDict> implements ICrmWindDictService
 {
     @Autowired
     private CrmWindDictMapper crmWindDictMapper;
+
+  /**
+   *创建角色1的详细任务 crm_wind_task(开启)
+   *
+   * @return List<CrmWindDict>
+   * @author penTang
+   * @date 2022/9/22 20:35
+  */
+    @Override
+    public List<CrmWindDict> selectAll(){
+       return list(
+             new LambdaQueryWrapper<CrmWindDict>()
+                     .eq(CrmWindDict::getStatus,1)
+       );
+    }
 
     /**
      * 查询导入的wind文件分类
