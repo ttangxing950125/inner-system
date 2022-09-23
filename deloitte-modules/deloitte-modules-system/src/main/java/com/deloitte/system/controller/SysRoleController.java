@@ -1,5 +1,4 @@
 package com.deloitte.system.controller;
-
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import com.deloitte.system.api.domain.SysUser;
 import com.deloitte.system.domain.SysUserRole;
 import com.deloitte.system.service.ISysRoleService;
 import com.deloitte.system.service.ISysUserService;
-
 /**
  * 角色信息
  * 

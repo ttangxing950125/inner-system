@@ -1,5 +1,4 @@
 package com.deloitte.common.core.utils.bean;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;

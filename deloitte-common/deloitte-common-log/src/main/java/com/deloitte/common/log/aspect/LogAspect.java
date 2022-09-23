@@ -41,6 +41,7 @@ public class LogAspect
     @Autowired
     private AsyncLogService asyncLogService;
 
+
     /**
      * 处理完请求后执行
      *

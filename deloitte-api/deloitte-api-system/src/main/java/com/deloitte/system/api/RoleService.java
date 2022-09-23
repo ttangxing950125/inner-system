@@ -1,12 +1,10 @@
 package com.deloitte.system.api;
-
 import com.deloitte.common.core.constant.ServiceNameConstants;
 import com.deloitte.system.api.domain.SysDictData;
 import com.deloitte.system.api.domain.SysUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
-
 import java.util.List;
 
 /**
