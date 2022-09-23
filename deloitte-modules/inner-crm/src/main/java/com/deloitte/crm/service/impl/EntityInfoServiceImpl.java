@@ -1,11 +1,42 @@
 package com.deloitte.crm.service.impl;
 
+import java.util.Date;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityInfoMapper;
+import java.util.stream.Collectors;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoByDto;
+import com.deloitte.crm.dto.EntityDto;
+import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.mapper.EntityAttrMapper;
+import com.deloitte.crm.mapper.EntityAttrValueMapper;
+import com.deloitte.crm.mapper.EntityInfoMapper;
+import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.deloitte.common.core.utils.bean.BeanUtils;
+import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.SuccessInfo;
+import com.deloitte.crm.service.IEntityNameHisService;
+import com.deloitte.crm.vo.EntityInfoVo;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -14,10 +45,68 @@ import com.deloitte.crm.service.IEntityInfoService;
  * @date 2022-09-21
  */
 @Service
-public class EntityInfoServiceImpl implements IEntityInfoService 
+@AllArgsConstructor
+public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityInfo> implements IEntityInfoService
 {
-    @Autowired
+
+    private IEntityNameHisService iEntityNameHisService;
+
     private EntityInfoMapper entityInfoMapper;
+
+    private EntityNameHisMapper nameHisMapper;
+
+    private EntityAttrMapper entityAttrMapper;
+
+    private EntityAttrValueMapper entityAttrValueMapper;
+    /**
+     *
+     *
+     * @return List<EntityInfoDto>
+     * @author penTang
+     * @date 2022/9/22 22:40
+    */
+    @Override
+    public EntityInfoDto getEntityInfo(){
+
+        EntityInfoDto entityInfoDto = new EntityInfoDto();
+        List<EntityInfo> list = this.list();
+
+        //TODO issue_bonds 是否发债 0-未发债 1-已发债
+        List<EntityInfo> bonds = list().stream()
+                .filter(row -> row.getIssueBonds() == 1)
+                .collect(Collectors.toList());
+
+        //TODO finance 是否金融机构
+        List<EntityInfo> finance = list().stream()
+                .filter(row -> row.getFinance() == 1)
+                .collect(Collectors.toList());
+
+        //TODO list 是否上市 0-未上市 1-已上市
+        List<EntityInfo> entityInfoList = list().stream()
+                .filter(row -> row.getList() == 1)
+                .collect(Collectors.toList());
+
+        //TODO 即是上市又是发债
+        List<EntityInfo> listAndBonds = list().stream()
+                .filter(row -> row.getList() == 1)
+                .filter(row->row.getIssueBonds()==1)
+                .collect(Collectors.toList());
+
+        //TODO !即是上市又是发债
+        List<EntityInfo> notListAndBonds = list().stream()
+                .filter(row -> row.getList() == 0)
+                .filter(row->row.getIssueBonds()==0)
+                .collect(Collectors.toList());
+        entityInfoDto.setBondsAndList(bonds.size());
+        entityInfoDto.setEntitySum(list.size());
+        entityInfoDto.setNotBondsAndList(notListAndBonds.size());
+        entityInfoDto.setList(entityInfoList.size());
+        entityInfoDto.setBondsAndList(listAndBonds.size());
+        entityInfoDto.setFinance(finance.size());
+
+        return entityInfoDto;
+
+    }
 
     /**
      * 查询【请填写功能名称】
@@ -43,16 +132,48 @@ public class EntityInfoServiceImpl implements IEntityInfoService
         return entityInfoMapper.selectEntityInfoList(entityInfo);
     }
 
+    private final String IB = "IB";
+
+    private final String ZERO = "0";
+
+    private final Integer CODE_NUMBER = 6;
+
     /**
      * 新增【请填写功能名称】
      * 
-     * @param entityInfo 【请填写功能名称】
+     * @param entityDto 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int insertEntityInfo(EntityInfo entityInfo)
-    {
-        return entityInfoMapper.insertEntityInfo(entityInfo);
+    public int insertEntityInfo(EntityDto entityDto) {
+        EntityInfo entityInfo = new EntityInfo();
+        BeanUtils.copyBeanProp(entityInfo,entityDto);
+
+        //TODO 生成entity_code 那么将该值的 用 IB+0..+id  例 IB000001
+        baseMapper.insert(entityInfo);
+        Integer id = entityInfo.getId();
+        StringBuilder sb = new StringBuilder(IB);
+        for (int j = 0; j < CODE_NUMBER - String.valueOf(id).length(); j++) {sb.append(ZERO);}
+        entityInfo.setEntityCode(sb.toString()+id);
+
+        UpdateWrapper<EntityInfo> wrapper = new UpdateWrapper<>();
+        wrapper.lambda()
+                .eq(EntityInfo::getId,id)
+                .set(EntityInfo::getEntityCode,entityInfo.getEntityCode());
+
+        //TODO 新增曾用名 entity_name_his
+        EntityNameHis entityNameHis = new EntityNameHis();
+        //1-企业主体
+        entityNameHis.setEntityType(1);
+        entityNameHis.setDqCode(entityInfo.getEntityCode());
+        entityNameHis.setOldName(entityDto.getOldName());
+        //1-曾用名为自动生曾
+        entityNameHis.setSource(1);
+        entityNameHis.setCreater(SecurityUtils.getUsername());
+        entityNameHis.setCreated(new Date());
+        iEntityNameHisService.insertEntityNameHis(entityNameHis);
+
+        return entityInfoMapper.update(entityInfo,wrapper);
     }
 
     /**
@@ -90,4 +211,219 @@ public class EntityInfoServiceImpl implements IEntityInfoService
     {
         return entityInfoMapper.deleteEntityInfoById(id);
     }
+
+    private final String CREDIT_CODE = "credit_code";
+
+    private final String ENTITY_NAME = "entity_name";
+
+    private final String DQ_CODE = "dq_code";
+
+    /**
+     * 传入社会信用代码于企业名称
+     *  => 存在该社会信用代码 返回 比较信息为 false
+     *     ==> 前端跳转调用人工对比信息，并确认
+     *
+     *  => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
+     *     ==> 前端跳转调用人工对比信息，并确认
+     *
+     *  => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
+     *     ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
+     *
+     * @author 正杰
+     * @date 2022/9/22
+     * @param creditCode 传入 企业统一社会信用代码
+     * @param entityName 传入 企业名称
+     * @return 比较信息结果
+     */
+    @Override
+    public AjaxResult validEntity(String creditCode, String entityName) {
+        //TODO 校验数据库是否存在该主体
+        EntityInfo entityByCode = baseMapper.selectOne(new QueryWrapper<EntityInfo>().eq(CREDIT_CODE, creditCode));
+        //库内无该社会信用代码
+        if(entityByCode==null){
+            EntityInfo entityByName = baseMapper.selectOne(new QueryWrapper<EntityInfo>().eq(ENTITY_NAME, entityName));
+            //库内无该主体 是新增
+            if(entityByName==null){
+                return AjaxResult.success(new EntityInfoVo().setMsg(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()));
+            }
+
+            //库内存在该主体 但是不存在该社会信用代码
+            else{
+                return AjaxResult.success(new EntityInfoVo()
+                        .setEntityInfo(entityByName)
+                        .setBo(BadInfo.GET)
+                        .setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
+            }
+        }
+        //库内已存在该社会信用代码
+        return AjaxResult.success(new EntityInfoVo()
+                .setEntityInfo(entityByCode)
+                .setBo(BadInfo.GET)
+                .setMsg(BadInfo.EXITS_CREDIT_CODE.getInfo()));
+    }
+
+    /**
+     * => 修改主体信息中的主体名称 & 汇总曾用名
+     * => 新增主体曾用名
+     * @author 正杰
+     * @date 2022/9/22
+     * @param creditCode 统一社会信用代码
+     * @param entityNewName 主体新名称
+     * @param remarks 备注
+     * @return 修改返回信息
+     */
+    @Override
+    public AjaxResult editEntityNameHis(String creditCode, String entityNewName,String remarks) {
+
+        //TODO 修改主体
+        EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>().eq(CREDIT_CODE,creditCode));
+        String oldName = entity.getEntityName();
+
+        //修改主体曾用名 entity_name_his 时 需要用 、 拼接
+        entity.setEntityNameHis(entity.getEntityNameHis()+"、"+ oldName);
+        //修改主体曾用名 entity_name_his_remarks 时 需要用 日期+更新人+备注;
+        entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
+                +"\r\n"
+                +"；"
+                + new Date()
+                + " "
+                + SecurityUtils.getUsername()
+                + " "
+                + remarks
+        );
+
+        UpdateWrapper<EntityInfo> entityInfoUpdateWrapper = new UpdateWrapper<>();
+        entityInfoUpdateWrapper.lambda().eq(EntityInfo::getCreditCode,creditCode)
+                .set(EntityInfo::getEntityName,entityNewName)
+                .set(EntityInfo::getEntityNameHis,entity.getEntityNameHis())
+                .set(EntityInfo::getEntityNameHisRemarks,entity.getEntityNameHisRemarks())
+                .set(EntityInfo::getUpdated,entity.getUpdated());
+        baseMapper.update(entity,entityInfoUpdateWrapper);
+
+        //TODO 新增曾用名 entity_name_his
+        EntityNameHis entityNameHis = new EntityNameHis();
+        //1-企业主体
+        entityNameHis.setEntityType(1);
+        entityNameHis.setDqCode(entity.getEntityCode());
+        entityNameHis.setOldName(oldName);
+        entityNameHis.setRemarks(remarks);
+        //1-曾用名为自动生曾
+        entityNameHis.setSource(1);
+        entityNameHis.setCreater(SecurityUtils.getUsername());
+        entityNameHis.setCreated(new Date());
+        iEntityNameHisService.insertEntityNameHis(entityNameHis);
+
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult getInfoList(EntityInfoByDto entityInfoDto) {
+        entityInfoDto.setEntityInfo();
+        EntityInfo entityInfo = entityInfoDto.getEntityInfo();
+        Integer pageNum = entityInfoDto.getPageNum();
+        Integer pageSize = entityInfoDto.getPageSize();
+        if (ObjectUtils.isEmpty(pageNum)){
+            return AjaxResult.error("请输入页码");
+        }
+        if (ObjectUtils.isEmpty(pageSize)){
+            pageSize=EntityInfoUtil.DEFAULT_PAGE_SIZE;
+        }
+        Page<EntityInfo> pageInfo=new Page<>(pageNum,pageSize);
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
+
+        Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
+
+        //创建结果集
+        Page<Map<String, Object>> pageResult=new Page<>();
+        pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
+        //封装结果集
+        List<Map<String,Object>> records = new ArrayList<>();
+        entityInfoPage.getRecords().stream().forEach(o-> {
+            records.add(getResultMap(o));
+        });
+        pageResult.setRecords(records);
+        return AjaxResult.success(pageResult);
+    }
+
+    @Override
+    public Integer updateInfoList(List<EntityInfo> list) {
+        list.stream().forEach(o->entityInfoMapper.updateById(o));
+        return list.size();
+    }
+
+    @Override
+    public List<EntityInfo> checkList(EntityInfo entityInfo) {
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper(entityInfo);
+        return entityInfoMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public AjaxResult getOneAllInfo(String entityCode) {
+        try {
+            QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper();
+            //企业主体基本信息
+            EntityInfo entityInfo = entityInfoMapper.selectOne(queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityCode));
+            //企业主体全量信息
+            QueryWrapper<EntityAttrValue>valueQuery=new QueryWrapper();
+            Long attrId = entityAttrValueMapper.selectOne(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode)).getAttrId();
+            EntityAttr entityAttr = entityAttrMapper.selectById(attrId);
+
+            //封装结果集
+            Map<String,Object>resultMap=new HashMap<>();
+            resultMap.put("entityInfo", entityInfo);
+            resultMap.put("entityAttr",entityAttr );
+            return AjaxResult.success(resultMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            return AjaxResult.error();
+        }
+    }
+
+    @Override
+    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
+        return null;
+    }
+
+
+    /**
+     * EntityInfo 对象转 map,并查询 曾用名条数
+     *
+     * @param entityInfo
+     * @return Map<String,Object>
+     * @author 冉浩岑
+     * @date 2022/9/22 23:45
+     */
+    public Map<String, Object> getResultMap(EntityInfo entityInfo) {
+        Map<String, Object> resultMap = new HashMap();
+        if (null != entityInfo) {
+            resultMap = JSON.parseObject(JSON.toJSONString(entityInfo), new TypeReference<Map<String, String>>() {
+            });
+            try {
+                QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
+                Long count = nameHisMapper.selectCount(wrapper.lambda().eq(EntityNameHis::getDqCode, entityInfo.getEntityCode()));
+                resultMap.put(EntityInfoUtil.NAME_USED_NUM, count);
+            }catch (Exception e){
+                return resultMap;
+            }
+        }
+        return resultMap;
+    }
+}
+class EntityInfoUtil{
+    /***
+     * 默认页面条数
+     */
+    public static final Integer DEFAULT_PAGE_SIZE=9;
+    /***
+     * 曾用名
+     */
+    public static final String NAME_USED_NUM="nameUsedNum";
+    /***
+     * 曾用名分隔符
+     */
+    public static final String NAME_USED_SIGN=",";
+    /***
+     * 曾用名备注分隔符
+     */
+    public static final String NAME_USED_REMARK_SIGN=";";
 }

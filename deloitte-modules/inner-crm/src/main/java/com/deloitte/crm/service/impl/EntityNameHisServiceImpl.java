@@ -1,11 +1,18 @@
 package com.deloitte.crm.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.service.IEntityNameHisService;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
-import com.deloitte.crm.domain.EntityNameHis;
-import com.deloitte.crm.service.IEntityNameHisService;
+
+import java.util.List;
+
+import javax.annotation.Resource;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -14,9 +21,9 @@ import com.deloitte.crm.service.IEntityNameHisService;
  * @date 2022-09-21
  */
 @Service
-public class EntityNameHisServiceImpl implements IEntityNameHisService 
+public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,EntityNameHis> implements IEntityNameHisService
 {
-    @Autowired
+    @Resource
     private EntityNameHisMapper entityNameHisMapper;
 
     /**
@@ -89,5 +96,13 @@ public class EntityNameHisServiceImpl implements IEntityNameHisService
     public int deleteEntityNameHisById(Long id)
     {
         return entityNameHisMapper.deleteEntityNameHisById(id);
+    }
+
+    @Override
+    public List<EntityNameHis> getNameListByDqCoded(String dqCode) {
+        QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
+        return entityNameHisMapper.selectList(
+                queryWrapper.lambda()
+                        .eq(EntityNameHis::getDqCode,dqCode));
     }
 }

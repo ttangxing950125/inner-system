@@ -1,26 +1,19 @@
 package com.deloitte.crm.controller;
 
-import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.common.core.web.controller.BaseController;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.service.IEntityNameHisService;
-import com.deloitte.common.core.web.controller.BaseController;
-import com.deloitte.common.core.web.domain.AjaxResult;
-import com.deloitte.common.core.utils.poi.ExcelUtil;
-import com.deloitte.common.core.web.page.TableDataInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Controller
@@ -101,5 +94,18 @@ public class EntityNameHisController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(entityNameHisService.deleteEntityNameHisByIds(ids));
+    }
+    /**
+     * 根据德勤code查询曾用名列表
+     *
+     * @param dqCode
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/22 23:50
+    */
+    @PostMapping("/getNameListByDqCoded")
+    public AjaxResult getNameListByDqCoded(String dqCode)
+    {
+        return AjaxResult.success(entityNameHisService.getNameListByDqCoded(dqCode));
     }
 }

@@ -1,7 +1,13 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.dto.GovInfoByDto;
+import com.deloitte.crm.dto.GovInfoDto;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -9,8 +15,10 @@ import com.deloitte.crm.domain.GovInfo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IGovInfoService 
+public interface IGovInfoService  extends IService<GovInfo>
 {
+    GovInfoDto getGovInfo();
+
     /**
      * 查询【请填写功能名称】
      * 
@@ -58,4 +66,16 @@ public interface IGovInfoService
      * @return 结果
      */
     public int deleteGovInfoById(Long id);
+
+    Page<GovInfo> getInfoList(GovInfo govInfo, Integer pageNum, Integer pageSize);
+
+    Integer updateInfoList(List<GovInfo> list);
+
+    AjaxResult getNewInfo(GovInfo govInfo);
+
+    AjaxResult getInfoList(GovInfoByDto govInfo);
+
+    AjaxResult updateOldName(GovInfo govInfo);
+
+    AjaxResult checkList(GovInfo govInfo);
 }

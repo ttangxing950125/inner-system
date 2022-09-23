@@ -2,6 +2,9 @@ package com.deloitte.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +34,7 @@ import com.deloitte.system.service.ISysConfigService;
  */
 @RestController
 @RequestMapping("/config")
+@Api(value = "config")
 public class SysConfigController extends BaseController
 {
     @Autowired
@@ -41,6 +45,7 @@ public class SysConfigController extends BaseController
      */
     @RequiresPermissions("system:config:list")
     @GetMapping("/list")
+    @ApiOperation(value = "分页查询")
     public TableDataInfo list(SysConfig config)
     {
         startPage();

@@ -1,6 +1,9 @@
 package com.deloitte.system.service.impl;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.deloitte.common.security.utils.DictUtils;
@@ -14,7 +17,7 @@ import com.deloitte.system.service.ISysDictDataService;
  * @author lipeng
  */
 @Service
-public class SysDictDataServiceImpl implements ISysDictDataService
+public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper,SysDictData> implements ISysDictDataService
 {
     @Autowired
     private SysDictDataMapper dictDataMapper;
@@ -30,6 +33,22 @@ public class SysDictDataServiceImpl implements ISysDictDataService
     {
         return dictDataMapper.selectDictDataList(dictData);
     }
+   /**
+    *查询crm角色
+    *
+    * @return List<SysDictData>
+    * @author penTang
+    * @date 2022/9/22 19:00
+   */
+   @Override
+    public List<SysDictData> selectDictDataListByType(){
+
+        return list(new LambdaQueryWrapper<SysDictData>()
+                .eq(SysDictData::getDictType,"task_role_type")
+        );
+
+    }
+
 
     /**
      * 根据字典类型和字典键值查询字典数据信息

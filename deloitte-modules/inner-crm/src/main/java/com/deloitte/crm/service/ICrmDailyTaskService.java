@@ -1,0 +1,35 @@
+package com.deloitte.crm.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.crm.domain.CrmDailyTask;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 每日生生成角色任务service接口
+ * @author PenTang
+ * @date 2022/09/22 15:34
+ */
+public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
+
+   /**
+    *保存每日的角色相关任务
+    *
+    * @param tasks
+    * @return Boolean
+    * @author penTang
+    * @date 2022/9/22 20:27
+   */
+    Boolean saveCrmDailyTask(List<CrmDailyTask> tasks);
+
+    /**
+     * 根据当天时间和角色1的type更新成有任务未完成(2)
+     *
+     * @param dateTime
+     * @return Boolean
+     * @author penTang
+     * @date 2022/9/22 20:24
+     */
+    Boolean updateByType(Date dateTime);
+}

@@ -1,8 +1,7 @@
 package com.deloitte.crm.controller;
-
 import java.util.List;
-import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +34,7 @@ public class CrmWindTaskController extends BaseController
     @Autowired
     private ICrmWindTaskService crmWindTaskService;
 
+
     /**
      * 查询角色1的每日任务，导入wind文件的任务列表
      */
@@ -46,6 +46,46 @@ public class CrmWindTaskController extends BaseController
         List<CrmWindTask> list = crmWindTaskService.selectCrmWindTaskList(crmWindTask);
         return getDataTable(list);
     }
+
+  /**
+   *根据月份获取当月的任务信息
+   *
+   * @return AjaxResult
+   * @author penTang
+   * @date 2022/9/21 18:06
+  */
+
+    @PostMapping("/queryList")
+    public AjaxResult getDataTable(@RequestBody String TaskDate) {
+      return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
+    }
+    /**
+     *根据指定日期查询任务完成度
+     *
+     * @param TaskDate
+     * @return AjaxResult
+     * @author penTang
+     * @date 2022/9/22 10:45
+    */
+    @PostMapping("/getTaskByDate")
+    public AjaxResult getTaskCompleted(String TaskDate) {
+       return AjaxResult.success("查询成功",crmWindTaskService.selectComTaskByDate(TaskDate));
+    }
+
+    /**
+     *查询某一组的基础任务信息
+     *
+     * @param TaskDate
+     * @param TaskCateId
+     * @return AjaxResult
+     * @author penTang
+     * @date 2022/9/22 17:02
+    */
+    @PostMapping("/queryTaskByDate")
+    public AjaxResult selectCrmWindTask(@RequestBody String TaskDate,String TaskCateId) {
+        return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
+    }
+
 
     /**
      * 导出角色1的每日任务，导入wind文件的任务列表

@@ -1,11 +1,18 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.mapper.EntityAttrMapper;
+import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityAttrMapper;
-import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.service.IEntityAttrService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -89,5 +96,20 @@ public class EntityAttrServiceImpl implements IEntityAttrService
     public int deleteEntityAttrById(Long id)
     {
         return entityAttrMapper.deleteEntityAttrById(id);
+    }
+
+    @Override
+    public AjaxResult getAllByGroup() {
+        List<EntityAttr> entityAttrs = entityAttrMapper.selectList(new QueryWrapper<>());
+
+        Map<String, List<EntityAttr>> listMap = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getAttrCateName));
+        List<Map<String,Object>>result=new ArrayList<>();
+        for (String key:listMap.keySet()){
+            Map<String,Object>map=new HashMap<>();
+            map.put("key", key);
+            map.put("value", listMap.get(key));
+            result.add(map);
+        }
+        return AjaxResult.success(result);
     }
 }

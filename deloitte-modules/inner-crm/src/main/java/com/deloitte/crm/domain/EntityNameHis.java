@@ -1,12 +1,11 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
-
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 entity_name_his
@@ -14,7 +13,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class EntityNameHis extends BaseEntity
+public class EntityNameHis implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +35,7 @@ public class EntityNameHis extends BaseEntity
     /** 改名日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "改名日期", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date happenDate;
+    private Date happenDate = new Date();
 
     /** 曾用名 */
     @Excel(name = "曾用名")

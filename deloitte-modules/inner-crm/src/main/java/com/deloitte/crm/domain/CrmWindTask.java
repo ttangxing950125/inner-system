@@ -21,6 +21,10 @@ public class CrmWindTask extends BaseEntity
     /** $column.columnComment */
     private Long id;
 
+    /** task_cate_id*/
+    @Excel(name = "task_cate_id")
+    private Integer taskCateId;
+
     /** crm_task_dict的id */
     @Excel(name = "crm_task_dict的id")
     private Long taskDictId;
@@ -201,8 +205,32 @@ public class CrmWindTask extends BaseEntity
         return remarks;
     }
 
+    public Integer getTaskCateId() {
+        return taskCateId;
+    }
+
+    public void setTaskCateId(Integer taskCateId) {
+        this.taskCateId = taskCateId;
+    }
+
     @Override
     public String toString() {
-        return this.getClass().getName() + JSON.toJSONString(this);
+        return "CrmWindTask{" +
+                "id=" + id +
+                ", taskCateId=" + taskCateId +
+                ", taskDictId=" + taskDictId +
+                ", taskDesc='" + taskDesc + '\'' +
+                ", taskDate=" + taskDate +
+                ", taskFileName='" + taskFileName + '\'' +
+                ", taskCategory='" + taskCategory + '\'' +
+                ", imported=" + imported +
+                ", confirmInsert=" + confirmInsert +
+                ", confirmUpdate=" + confirmUpdate +
+                ", complete=" + complete +
+                ", handleUser=" + handleUser +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", remarks='" + remarks + '\'' +
+                '}';
     }
 }

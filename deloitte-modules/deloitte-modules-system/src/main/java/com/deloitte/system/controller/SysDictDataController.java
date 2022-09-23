@@ -42,6 +42,14 @@ public class SysDictDataController extends BaseController
     @Autowired
     private ISysDictTypeService dictTypeService;
 
+
+    @PostMapping("/queryRoles")
+     public List<SysDictData>  getRoles(){
+         return dictDataService.selectDictDataListByType();
+     }
+
+
+
     @RequiresPermissions("system:dict:list")
     @GetMapping("/list")
     public TableDataInfo list(SysDictData dictData)

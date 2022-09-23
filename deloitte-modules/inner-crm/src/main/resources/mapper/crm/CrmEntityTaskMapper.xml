@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectCrmEntityTaskById" parameterType="Long" resultMap="CrmEntityTaskResult">
+    <select id="selectCrmEntityTaskById" parameterType="Integer" resultMap="CrmEntityTaskResult">
         <include refid="selectCrmEntityTaskVo"/>
         where id = #{id}
     </select>
@@ -83,7 +83,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-    <delete id="deleteCrmEntityTaskById" parameterType="Long">
+    <delete id="deleteCrmEntityTaskById" parameterType="Integer">
         delete from crm_entity_task where id = #{id}
     </delete>
 
@@ -93,4 +93,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <!-- 查询本月内的任务情况 -->
+    <select id="selectCrmEntityTaskListThisMouth" parameterType="java.util.Date" resultMap="CrmEntityTaskResult">
+        SELECT * FROM crm_entity_task WHERE task_date BETWEEN #{first} AND  #{last}
+    </select>
+
 </mapper>

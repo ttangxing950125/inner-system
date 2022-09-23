@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSON;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 
 /**
  * 角色7，根据导入的数据新增主体的任务对象 crm_entity_task
@@ -14,12 +13,12 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class CrmEntityTask extends BaseEntity
+public class CrmEntityTask
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Integer id;
 
     /** 捕获渠道， crm_wind_task的task_category */
     @Excel(name = "捕获渠道， crm_wind_task的task_category")
@@ -58,12 +57,12 @@ public class CrmEntityTask extends BaseEntity
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 
-    public void setId(Long id) 
+    public void setId(Integer id)
     {
         this.id = id;
     }
 
-    public Long getId() 
+    public Integer getId()
     {
         return id;
     }

@@ -1,8 +1,8 @@
 package com.deloitte.crm.controller;
 
 import java.util.List;
-import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,7 +65,7 @@ public class CrmEntityTaskController extends BaseController
      */
     @RequiresPermissions("crm:entityTask:query")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
+    public AjaxResult getInfo(@PathVariable("id") Integer id)
     {
         return AjaxResult.success(crmEntityTaskService.selectCrmEntityTaskById(id));
     }
@@ -98,8 +98,9 @@ public class CrmEntityTaskController extends BaseController
     @RequiresPermissions("crm:entityTask:remove")
     @Log(title = "角色7，根据导入的数据新增主体的任务", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
+    public AjaxResult remove(@PathVariable Integer[] ids)
     {
         return toAjax(crmEntityTaskService.deleteCrmEntityTaskByIds(ids));
     }
+
 }

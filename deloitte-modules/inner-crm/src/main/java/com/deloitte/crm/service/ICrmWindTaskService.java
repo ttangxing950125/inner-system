@@ -1,7 +1,11 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.dto.CrmWindTaskDto;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 角色1的每日任务，导入wind文件的任务Service接口
@@ -9,8 +13,42 @@ import com.deloitte.crm.domain.CrmWindTask;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICrmWindTaskService 
+public interface ICrmWindTaskService extends IService<CrmWindTask>
+
 {
+    /**
+     *查询某组任务信息详情的接口
+     *
+     * @param TaskDate
+     * @param TaskCateId
+     * @return List<CrmWindTask>
+     * @author penTang
+     * @date 2022/9/22 17:05
+    */
+    List<CrmWindTask> selectCrmWindTask(@RequestBody String TaskDate, String TaskCateId);
+
+    /**
+     *根据指定日期查询当月的任务
+     *
+     * @param TaskDate
+     * @return List<CrmWindTask>
+     * @author penTang
+     * @date 2022/9/22 10:48
+    */
+    List<CrmWindTask> selectCrmWindTaskByDate(String TaskDate);
+
+    /**
+     * 根据指定日期查询任务完成度接口
+     *
+     * @param TaskDate
+     * @return List<CrmWindTaskDto>
+     * @author penTang
+     * @date 2022/9/22 17:06
+    */
+    List<CrmWindTaskDto> selectComTaskByDate(String TaskDate);
+
+    Boolean saveCrmWindTas(List<CrmWindTask> crmWind);
+
     /**
      * 查询角色1的每日任务，导入wind文件的任务
      * 
