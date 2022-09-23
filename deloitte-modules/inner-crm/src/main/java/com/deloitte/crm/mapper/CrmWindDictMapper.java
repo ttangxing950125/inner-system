@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.CrmWindDict;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.CrmWindDict;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface CrmWindDictMapper 
+public interface CrmWindDictMapper extends BaseMapper<CrmWindDict>
 {
     /**
      * 查询导入的wind文件分类
@@ -58,4 +60,13 @@ public interface CrmWindDictMapper
      * @return 结果
      */
     public int deleteCrmWindDictByIds(Long[] ids);
+
+    /**
+     *查询所有未关闭的导入wind的底稿数据
+     *
+     * @return List<CrmWindDict>
+     * @author penTang
+     * @date 2022/9/22 14:56
+    */
+    List<CrmWindDict> selectAll();
 }

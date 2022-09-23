@@ -1,7 +1,5 @@
 package com.deloitte.crm.controller;
-
 import java.util.List;
-import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +32,21 @@ public class GovInfoController extends BaseController
 {
     @Autowired
     private IGovInfoService govInfoService;
+
+
+  /**
+   * 统计政府信息
+   *
+   * @return GovInfoDto
+   * @author penTang
+   * @date 2022/9/22 23:21
+   *
+  */
+  @PostMapping("/govList")
+    public AjaxResult getGovInfo(){
+        return AjaxResult.success("查询成功",govInfoService.getGovInfo());
+
+    }
 
     /**
      * 查询【请填写功能名称】列表

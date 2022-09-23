@@ -4,8 +4,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.deloitte.crm.mapper.CrmWindTaskMapper">
     
-    <resultMap type="CrmWindTask" id="CrmWindTaskResult">
-        <result property="id"    column="id"    />
+    <resultMap type="com.deloitte.crm.domain.CrmWindTask" id="CrmWindTaskResult">
+        <result property="id"    column="id"   />
         <result property="taskDictId"    column="task_dict_id"    />
         <result property="taskDesc"    column="task_desc"    />
         <result property="taskDate"    column="task_date"    />
@@ -48,8 +48,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCrmWindTaskVo"/>
         where id = #{id}
     </select>
-        
-    <insert id="insertCrmWindTask" parameterType="CrmWindTask" useGeneratedKeys="true" keyProperty="id">
+    <select id="selectCrmWindTaskListByDate" resultType="com.deloitte.crm.domain.CrmWindTask" parameterType="string">
+        select  * from crm_daily_task where task_role_type =3 AND task_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+    <select id="selectComWindByDate" resultType="com.deloitte.crm.dto.CrmWindTaskDto" parameterType="string">
+        SELECT task_desc,COUNT(id) as taskCount,COUNT(if(complete = 0,TRUE,NULL))
+         as notComplete FROM crm_wind_task WHERE task_date = #{crmWindTask}  GROUP BY task_cate_id
+    </select>
+
+    <insert id="insertCrmWindTask" parameterType="com.deloitte.crm.domain.CrmWindTask" useGeneratedKeys="true" keyProperty="id">
         insert into crm_wind_task
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="taskDictId != null">task_dict_id,</if>
@@ -83,7 +90,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-    <update id="updateCrmWindTask" parameterType="CrmWindTask">
+    <update id="updateCrmWindTask" parameterType="com.deloitte.crm.domain.CrmWindTask">
         update crm_wind_task
         <trim prefix="SET" suffixOverrides=",">
             <if test="taskDictId != null">task_dict_id = #{taskDictId},</if>

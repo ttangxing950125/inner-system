@@ -7,6 +7,8 @@ import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.service.IEntityNameHisService;
 
+import javax.annotation.Resource;
+
 /**
  * 【请填写功能名称】Service业务层处理
  * 
@@ -16,7 +18,7 @@ import com.deloitte.crm.service.IEntityNameHisService;
 @Service
 public class EntityNameHisServiceImpl implements IEntityNameHisService 
 {
-    @Autowired
+    @Resource
     private EntityNameHisMapper entityNameHisMapper;
 
     /**

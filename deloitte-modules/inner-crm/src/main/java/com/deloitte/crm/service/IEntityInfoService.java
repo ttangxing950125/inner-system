@@ -1,7 +1,11 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.dto.EntityInfoDto;
 
 /**
  * 【请填写功能名称】Service接口
@@ -9,8 +13,10 @@ import com.deloitte.crm.domain.EntityInfo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IEntityInfoService 
+public interface IEntityInfoService extends IService<EntityInfo>
 {
+    EntityInfoDto getEntityInfo();
+
     /**
      * 查询【请填写功能名称】
      * 

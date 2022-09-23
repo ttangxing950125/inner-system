@@ -38,7 +38,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCrmWindDictVo"/>
         where id = #{id}
     </select>
-        
+
+
     <insert id="insertCrmWindDict" parameterType="CrmWindDict" useGeneratedKeys="true" keyProperty="id">
         insert into crm_wind_dict
         <trim prefix="(" suffix=")" suffixOverrides=",">

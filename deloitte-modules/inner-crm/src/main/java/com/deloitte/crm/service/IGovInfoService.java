@@ -1,7 +1,10 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.dto.GovInfoDto;
 
 /**
  * 【请填写功能名称】Service接口
@@ -9,8 +12,10 @@ import com.deloitte.crm.domain.GovInfo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IGovInfoService 
+public interface IGovInfoService  extends IService<GovInfo>
 {
+    GovInfoDto getGovInfo();
+
     /**
      * 查询【请填写功能名称】
      * 

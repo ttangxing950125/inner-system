@@ -1,6 +1,8 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindDict;
 
 /**
@@ -9,8 +11,10 @@ import com.deloitte.crm.domain.CrmWindDict;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICrmWindDictService 
+public interface ICrmWindDictService  extends IService<CrmWindDict>
 {
+    List<CrmWindDict> selectAll();
+
     /**
      * 查询导入的wind文件分类
      * 
