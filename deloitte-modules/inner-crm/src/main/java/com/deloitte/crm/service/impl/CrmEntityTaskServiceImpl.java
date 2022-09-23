@@ -1,7 +1,23 @@
 package com.deloitte.crm.service.impl;
 
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Date;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.alibaba.csp.sentinel.util.TimeUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.constants.SuccessInfo;
+import io.micrometer.core.instrument.util.TimeUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.domain.CrmEntityTask;
@@ -14,9 +30,9 @@ import com.deloitte.crm.service.ICrmEntityTaskService;
  * @date 2022-09-21
  */
 @Service
-public class CrmEntityTaskServiceImpl implements ICrmEntityTaskService 
+@AllArgsConstructor
+public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,CrmEntityTask> implements ICrmEntityTaskService
 {
-    @Autowired
     private CrmEntityTaskMapper crmEntityTaskMapper;
 
     /**
@@ -26,7 +42,7 @@ public class CrmEntityTaskServiceImpl implements ICrmEntityTaskService
      * @return 角色7，根据导入的数据新增主体的任务
      */
     @Override
-    public CrmEntityTask selectCrmEntityTaskById(Long id)
+    public CrmEntityTask selectCrmEntityTaskById(Integer id)
     {
         return crmEntityTaskMapper.selectCrmEntityTaskById(id);
     }
@@ -74,7 +90,7 @@ public class CrmEntityTaskServiceImpl implements ICrmEntityTaskService
      * @return 结果
      */
     @Override
-    public int deleteCrmEntityTaskByIds(Long[] ids)
+    public int deleteCrmEntityTaskByIds(Integer[] ids)
     {
         return crmEntityTaskMapper.deleteCrmEntityTaskByIds(ids);
     }
@@ -86,8 +102,80 @@ public class CrmEntityTaskServiceImpl implements ICrmEntityTaskService
      * @return 结果
      */
     @Override
-    public int deleteCrmEntityTaskById(Long id)
+    public int deleteCrmEntityTaskById(Integer id)
     {
         return crmEntityTaskMapper.deleteCrmEntityTaskById(id);
+    }
+
+
+    /**
+     * 角色7今日运维模块
+     * @author 正杰
+     * @date 2022/9/22
+     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
+     * @param date 请传入具体日期: yyyy-mm-dd
+     * @return 当月或者当日的任务情况
+     */
+    @Override
+    public AjaxResult getTaskInfo(String timeUnit, Date date) {
+
+        CrmEntityTask crmEntityTask = new CrmEntityTask();
+        switch (timeUnit){
+            case Common.DAY:
+                crmEntityTask.setTaskDate(date);
+                CrmEntityTask dayList = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().eq("task_date", date));
+                return AjaxResult.success(SuccessInfo.GET_SUCCESS.getInfo(),dayList);
+            case Common.MOUTH:
+
+                Date first = null;
+                Date last = null;
+                try {
+                    LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                    ParsePosition pos = new ParsePosition(8);
+
+                    first = Date.from(localDate.with(TemporalAdjusters.firstDayOfMonth())
+                            .atTime(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
+                    String firstString = formatter.format(first);
+                    first = formatter.parse(firstString);
+
+                    last = Date.from(localDate.with(TemporalAdjusters.lastDayOfMonth())
+                            .atTime(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
+                    String lastString = formatter.format(last);
+                    last = formatter.parse(lastString);
+                } catch (ParseException e) {
+                    return AjaxResult.error();
+                }
+                List<CrmEntityTask> mouthList = crmEntityTaskMapper.selectCrmEntityTaskListThisMouth(first,last);
+                return AjaxResult.success(SuccessInfo.GET_SUCCESS.getInfo(),mouthList);
+            default:
+                return AjaxResult.error(BadInfo.PARAM_EMPTY.getInfo());
+        }
+
+    }
+
+
+    /**
+     * 确认该任务的主体是新增或是忽略
+     * @author 正杰
+     * @date 2022/9/22
+     * @param id 传入 id
+     * @param state 传入 状态 1是忽略 2是新增
+     * @return 操作成功与否
+     */
+    @Override
+    public AjaxResult changeState(Integer id,Integer state) {
+        try {
+            CrmEntityTask crmEntityTask = new CrmEntityTask();
+            crmEntityTask.setId(id);
+            UpdateWrapper<CrmEntityTask> udWapper = new UpdateWrapper();
+            udWapper.lambda().eq(CrmEntityTask::getId,id)
+                    .set(CrmEntityTask::getState,state);
+            baseMapper.update(crmEntityTask,udWapper);
+        } catch (Exception e) {
+            return AjaxResult.error();
+        }
+        return AjaxResult.success(SuccessInfo.SUCCESS.getInfo());
     }
 }

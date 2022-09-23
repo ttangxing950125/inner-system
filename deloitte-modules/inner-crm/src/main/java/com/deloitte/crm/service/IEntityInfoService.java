@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityInfoDto;
@@ -17,6 +18,15 @@ import java.util.List;
  */
 public interface IEntityInfoService extends IService<EntityInfo>
 {
+    /**
+     *
+     *
+     * @return List<EntityInfoDto>
+     * @author penTang
+     * @date 2022/9/22 22:40
+     */
+    EntityInfoDto getEntityInfo();
+
     /**
      * 查询【请填写功能名称】
      * 
@@ -36,10 +46,10 @@ public interface IEntityInfoService extends IService<EntityInfo>
     /**
      * 新增【请填写功能名称】
      * 
-     * @param entityInfo 【请填写功能名称】
+     * @param entityDto 【请填写功能名称】
      * @return 结果
      */
-    public int insertEntityInfo(EntityInfo entityInfo);
+    public int insertEntityInfo(EntityDto entityDto);
 
     /**
      * 修改【请填写功能名称】
@@ -82,5 +92,34 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
 
-    EntityInfoDto getEntityInfo();
+    /**
+     * 传入社会信用代码于企业名称
+     *  => 存在该社会信用代码 返回 比较信息为 false
+     *     ==> 前端跳转调用人工对比信息，并确认
+     *
+     *  => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
+     *     ==> 前端跳转调用人工对比信息，并确认
+     *
+     *  => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
+     *     ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
+     *
+     * @author 正杰
+     * @date 2022/9/22
+     * @param creditCode 传入 企业统一社会信用代码
+     * @param entityName 传入 企业名称
+     * @return 比较信息结果
+     */
+    AjaxResult validEntity(String creditCode, String entityName);
+
+    /**
+     * => 修改主体信息中的主体名称 & 汇总曾用名
+     * => 新增主体曾用名
+     * @author 正杰
+     * @date 2022/9/22
+     * @param creditCode 统一社会信用代码
+     * @param entityNewName 主体新名称
+     * @param remarks 备注
+     * @return 修改返回信息
+     */
+    AjaxResult editEntityNameHis(String creditCode, String entityNewName,String remarks);
 }

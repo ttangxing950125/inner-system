@@ -40,7 +40,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-		
+
         <!-- Swagger UI -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -87,6 +87,12 @@
         <dependency>
             <groupId>com.deloitte</groupId>
             <artifactId>deloitte-common-swagger</artifactId>
+        </dependency>
+
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
 
     </dependencies>

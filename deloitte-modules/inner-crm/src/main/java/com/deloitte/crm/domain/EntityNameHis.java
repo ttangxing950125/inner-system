@@ -35,7 +35,7 @@ public class EntityNameHis implements Serializable
     /** 改名日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "改名日期", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date happenDate;
+    private Date happenDate = new Date();
 
     /** 曾用名 */
     @Excel(name = "曾用名")

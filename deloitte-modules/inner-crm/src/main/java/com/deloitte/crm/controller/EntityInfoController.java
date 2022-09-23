@@ -1,5 +1,22 @@
 package com.deloitte.crm.controller;
 
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+
+import com.deloitte.crm.dto.EntityDto;
+import com.deloitte.crm.dto.EntityInfoDto;
+
+import com.deloitte.crm.dto.EntityInfoDto;
+import io.swagger.annotations.ApiImplicitParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -78,14 +95,20 @@ public class EntityInfoController extends BaseController
     }
 
     /**
-     * 新增【请填写功能名称】
+     * @author 正杰
+     * @date 2022/9/22
+     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
+     * @param entityDto
+     * @return
      */
     @RequiresPermissions("crm:entityInfo:add")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
-    @PostMapping("/add")
-    public AjaxResult add(@RequestBody EntityInfo entityInfo)
+    @ApiImplicitParam(name="entityInfoDto",value="包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段")
+    @PostMapping("/insert")
+    public AjaxResult add(@RequestBody EntityDto entityDto)
     {
-        return toAjax(entityInfoService.insertEntityInfo(entityInfo));
+        //TODO 新增主体
+        return toAjax(entityInfoService.insertEntityInfo(entityDto));
     }
 
     /**
@@ -93,7 +116,7 @@ public class EntityInfoController extends BaseController
      */
     @RequiresPermissions("crm:entityInfo:edit")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
-    @PutMapping
+    @PutMapping("/edit")
     public AjaxResult edit(@RequestBody EntityInfo entityInfo)
     {
         return toAjax(entityInfoService.updateEntityInfo(entityInfo));

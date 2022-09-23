@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityNameHisService;
+import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,7 @@ import javax.annotation.Resource;
  * @date 2022-09-21
  */
 @Service
-public class EntityNameHisServiceImpl implements IEntityNameHisService 
+public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,EntityNameHis> implements IEntityNameHisService
 {
     @Resource
     private EntityNameHisMapper entityNameHisMapper;

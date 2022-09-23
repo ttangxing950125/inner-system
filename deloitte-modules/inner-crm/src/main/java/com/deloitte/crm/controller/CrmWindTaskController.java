@@ -1,9 +1,7 @@
 package com.deloitte.crm.controller;
 import java.util.List;
-import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
-import com.deloitte.crm.dto.CrmWindTaskDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,10 +67,11 @@ public class CrmWindTaskController extends BaseController
      * @author penTang
      * @date 2022/9/22 10:45
     */
-    @PostMapping("/queryTaskByDate")
-    public AjaxResult getTaskCompleted(@RequestBody String TaskDate) {
+    @PostMapping("/getTaskByDate")
+    public AjaxResult getTaskCompleted(String TaskDate) {
        return AjaxResult.success("查询成功",crmWindTaskService.selectComTaskByDate(TaskDate));
     }
+
     /**
      *查询某一组的基础任务信息
      *

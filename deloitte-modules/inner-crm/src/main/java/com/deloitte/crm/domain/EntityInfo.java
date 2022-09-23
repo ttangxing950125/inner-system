@@ -17,7 +17,7 @@ public class EntityInfo implements Serializable
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Integer id;
 
     /** 企业名 */
     @Excel(name = "企业名")
@@ -49,11 +49,11 @@ public class EntityInfo implements Serializable
     private Integer creditError;
 
     /** 若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：
-1、吊销
-2、注销
-3、非大陆注册机构
-4、其他未知原因
-5、正常 */
+    1、吊销
+    2、注销
+    3、非大陆注册机构
+    4、其他未知原因
+    5、正常 */
     @Excel(name = "若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：1、吊销2、注销3、非大陆注册机构4、其他未知原因5、正常")
     private Integer creditErrorType;
 
@@ -81,14 +81,14 @@ public class EntityInfo implements Serializable
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    private Date updated;
+    private Date updated = new Date();
 
-    public void setId(Long id) 
+    public void setId(Integer id)
     {
         this.id = id;
     }
 
-    public Long getId() 
+    public Integer getId()
     {
         return id;
     }

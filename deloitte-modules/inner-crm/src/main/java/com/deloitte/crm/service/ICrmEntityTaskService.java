@@ -1,6 +1,9 @@
 package com.deloitte.crm.service;
 
+import java.util.Date;
 import java.util.List;
+
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.CrmEntityTask;
 
 /**
@@ -17,7 +20,7 @@ public interface ICrmEntityTaskService
      * @param id 角色7，根据导入的数据新增主体的任务主键
      * @return 角色7，根据导入的数据新增主体的任务
      */
-    public CrmEntityTask selectCrmEntityTaskById(Long id);
+    public CrmEntityTask selectCrmEntityTaskById(Integer id);
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务列表
@@ -49,7 +52,7 @@ public interface ICrmEntityTaskService
      * @param ids 需要删除的角色7，根据导入的数据新增主体的任务主键集合
      * @return 结果
      */
-    public int deleteCrmEntityTaskByIds(Long[] ids);
+    public int deleteCrmEntityTaskByIds(Integer[] ids);
 
     /**
      * 删除角色7，根据导入的数据新增主体的任务信息
@@ -57,5 +60,25 @@ public interface ICrmEntityTaskService
      * @param id 角色7，根据导入的数据新增主体的任务主键
      * @return 结果
      */
-    public int deleteCrmEntityTaskById(Long id);
+    public int deleteCrmEntityTaskById(Integer id);
+
+    /**
+     * 角色7今日运维模块
+     * @author 正杰
+     * @date 2022/9/22
+     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
+     * @param date 请传入具体日期: yyyy-mm-dd
+     * @return 当月或者当日的任务情况
+     */
+    AjaxResult getTaskInfo(String timeUnit, Date date);
+
+    /**
+     * 确认该任务的主体是新增或是忽略
+     * @author 正杰
+     * @date 2022/9/22
+     * @param id 传入 id
+     * @param state 传入 状态 1是忽略 2是新增
+     * @return 操作成功与否
+     */
+    AjaxResult changeState(Integer id,Integer state);
 }
