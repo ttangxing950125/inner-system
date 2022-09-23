@@ -3,8 +3,8 @@ package com.deloitte.system.api;
 import com.deloitte.common.core.constant.ServiceNameConstants;
 import com.deloitte.system.api.domain.SysDictData;
 import com.deloitte.system.api.domain.SysUser;
-import com.deloitte.system.api.factory.GetRoleFallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
@@ -15,8 +15,8 @@ import java.util.List;
  * @date 2022/09/22 19:31
  */
 
-
-@FeignClient(contextId = "RoleService", value = ServiceNameConstants.SYSTEM_SERVICE,fallbackFactory = GetRoleFallbackFactory.class)
+@Service
+@FeignClient(contextId = "RoleService", value = ServiceNameConstants.SYSTEM_SERVICE)
 public interface RoleService {
 
     /**

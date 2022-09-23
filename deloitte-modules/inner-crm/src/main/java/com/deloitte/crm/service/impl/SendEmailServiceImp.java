@@ -3,21 +3,18 @@ package com.deloitte.crm.service.impl;
 import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.system.api.RoleService;
-import com.deloitte.system.api.domain.SysUser;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 发邮件接口
  * @author PenTang
  * @date 2022/09/23 15:46
  */
-@Service
+@Component
 public class SendEmailServiceImp implements SendEmailService {
 
-    @Resource
+    @Autowired
     private RoleService roleService ;
  /**
   *根据角色id发送给相关用户实现
