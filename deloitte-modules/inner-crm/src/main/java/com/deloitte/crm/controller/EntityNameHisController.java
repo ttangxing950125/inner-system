@@ -106,7 +106,7 @@ public class EntityNameHisController extends BaseController
      * @date 2022/9/22 23:50
     */
     @ApiOperation(value = "根据德勤code查询曾用名列表")
-    @ApiImplicitParam(name="getNameListByDqCoded",value="",required = true,paramType = "String")
+    @ApiImplicitParam(name="getNameListByDqCoded",value="",required = true,paramType = "body")
     @PostMapping("/getNameListByDqCoded")
     public AjaxResult getNameListByDqCoded(String dqCode)
     {

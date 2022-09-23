@@ -33,7 +33,7 @@ public class SendEmailServiceImp implements SendEmailService {
      public String SendEmail(Integer id, String title, String content){
         roleService.selectUserListById(id).stream().forEach(row->{
             String center ="你好"+row.getUserName() +content;
-            EmailUtil.sendTemplateEmail(title, center, row.getEmail())
+            EmailUtil.sendTemplateEmail(title, center, row.getEmail());
 
         });
 

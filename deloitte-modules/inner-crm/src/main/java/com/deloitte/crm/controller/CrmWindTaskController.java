@@ -59,7 +59,7 @@ public class CrmWindTaskController extends BaseController
 
     @PostMapping("/queryList")
     @ApiOperation(value = "{根据指定TaskDate}")
-    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据",required = true,paramType = "String")
+    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据",required = true,paramType = "body")
     public AjaxResult getDataTable(@RequestBody String TaskDate) {
       return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
     }
@@ -73,7 +73,7 @@ public class CrmWindTaskController extends BaseController
     */
     @PostMapping("/getTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate}")
-    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询任务完成度",required = true,paramType = "String")
+    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询任务完成度",required = true,paramType = "body")
     public AjaxResult getTaskCompleted(String TaskDate) {
        return AjaxResult.success("查询成功",crmWindTaskService.selectComTaskByDate(TaskDate));
     }
@@ -89,7 +89,7 @@ public class CrmWindTaskController extends BaseController
     */
     @PostMapping("/queryTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate,指定的TaskCateId}")
-    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据,指定的TaskCateId",required = true,paramType = "String,String")
+    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据,指定的TaskCateId",required = true,paramType = "body")
     public AjaxResult selectCrmWindTask(@RequestBody String TaskDate,String TaskCateId) {
         return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
     }
