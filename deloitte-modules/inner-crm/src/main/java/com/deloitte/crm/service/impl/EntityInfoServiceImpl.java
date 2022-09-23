@@ -5,12 +5,18 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.dto.EntityAttrDto;
 import com.deloitte.crm.domain.dto.EntityInfoDto;
+import com.deloitte.crm.mapper.EntityAttrMapper;
+import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityInfoService;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -27,6 +33,7 @@ import java.util.Map;
  * @date 2022-09-21
  */
 @Service
+@Aspect
 public class EntityInfoServiceImpl implements IEntityInfoService 
 {
     @Autowired
@@ -34,6 +41,12 @@ public class EntityInfoServiceImpl implements IEntityInfoService
 
     @Autowired
     private EntityNameHisMapper nameHisMapper;
+
+    @Autowired
+    private EntityAttrMapper entityAttrMapper;
+
+    @Autowired
+    private EntityAttrValueMapper entityAttrValueMapper;
     /**
      * 查询【请填写功能名称】
      * 
@@ -140,6 +153,40 @@ public class EntityInfoServiceImpl implements IEntityInfoService
         list.stream().forEach(o->entityInfoMapper.updateById(o));
         return list.size();
     }
+
+    @Override
+    public List<EntityInfo> checkList(EntityInfo entityInfo) {
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper(entityInfo);
+        return entityInfoMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public AjaxResult getOneAllInfo(String entityCode) {
+        try {
+            QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper();
+            //企业主体基本信息
+            EntityInfo entityInfo = entityInfoMapper.selectOne(queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityCode));
+            //企业主体全量信息
+            QueryWrapper<EntityAttrValue>valueQuery=new QueryWrapper();
+            Long attrId = entityAttrValueMapper.selectOne(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode)).getAttrId();
+            EntityAttr entityAttr = entityAttrMapper.selectById(attrId);
+
+            //封装结果集
+            Map<String,Object>resultMap=new HashMap<>();
+            resultMap.put("entityInfo", entityInfo);
+            resultMap.put("entityAttr",entityAttr );
+            return AjaxResult.success(resultMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            return AjaxResult.error();
+        }
+    }
+
+    @Override
+    public AjaxResult getListEntityByPage(EntityAttrDto entityAttrDto) {
+        return null;
+    }
+
     /**
      * EntityInfo 对象转 map,并查询 曾用名条数
      *

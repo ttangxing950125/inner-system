@@ -1,6 +1,8 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityAttr;
 
 /**
@@ -58,4 +60,6 @@ public interface IEntityAttrService
      * @return 结果
      */
     public int deleteEntityAttrById(Long id);
+
+    AjaxResult getAllByGroup();
 }

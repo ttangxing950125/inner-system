@@ -8,6 +8,7 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.dto.EntityAttrDto;
 import com.deloitte.crm.domain.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class EntityInfoController extends BaseController
      */
     @RequiresPermissions("crm:entityInfo:add")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
-    @PostMapping
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody EntityInfo entityInfo)
     {
         return toAjax(entityInfoService.insertEntityInfo(entityInfo));
@@ -111,16 +112,53 @@ public class EntityInfoController extends BaseController
         return entityInfoService.getInfoList(entityInfo);
     }
     /**
-     *添加方法描述
+     * 查询企业全程，或者编码，是否重复
      *
-     * @param list
+     * @param entityInfo
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/22 17:49
+     */
+    @PostMapping("/checkList")
+    public AjaxResult checkList(@RequestBody EntityInfo entityInfo)
+    {
+        return AjaxResult.success(entityInfoService.checkList(entityInfo));
+    }
+    /**
+     * 批量修改
+     *
+     * @param entityInfoList
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 15:24
-    */
+     */
     @PostMapping("/updateInfoList")
-    public AjaxResult updateInfoList(List<EntityInfo>list)
+    public AjaxResult updateInfoList(List<EntityInfo>entityInfoList)
     {
-        return AjaxResult.success(entityInfoService.updateInfoList(list));
+        return AjaxResult.success(entityInfoService.updateInfoList(entityInfoList));
+    }
+    /**
+     * 根据 entityCode 查询企业主体详情
+     *
+     * @param  entityCode
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/23 8:59
+     */
+    @PostMapping("/getInfoDetail")
+    public AjaxResult getInfoDetail(String entityCode){
+        return entityInfoService.getOneAllInfo(entityCode);
+    }
+    /**
+     * 分页查询全部上市主体
+     *
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/23 10:56
+     */
+    @PostMapping("/getListEntityByPage")
+    public AjaxResult getListEntityByPage(EntityAttrDto entityAttrDto)
+    {
+        return entityInfoService.getListEntityByPage(entityAttrDto);
     }
 }

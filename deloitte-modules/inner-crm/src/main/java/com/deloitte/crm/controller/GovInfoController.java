@@ -65,11 +65,11 @@ public class GovInfoController extends BaseController
     }
 
     /**
-     * 新增【请填写功能名称】
+     * 新增地方政府
      */
     @RequiresPermissions("crm:govInfo:add")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
-    @PostMapping
+    @Log(title = "【新增地方政府】", businessType = BusinessType.INSERT)
+    @PostMapping("/add")
     public AjaxResult add(@RequestBody GovInfo govInfo)
     {
         return toAjax(govInfoService.insertGovInfo(govInfo));
@@ -96,34 +96,19 @@ public class GovInfoController extends BaseController
     {
         return toAjax(govInfoService.deleteGovInfoByIds(ids));
     }
-    /**
-     * 分页查询
-     *
-     * @param pageNum
-     * @param pageSize
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/22 15:13
-    */
-    @PostMapping("/getInfoList")
-    public AjaxResult getInfoList(Integer pageNum,
-                                  Integer pageSize)
-    {
-        GovInfo govInfo = new GovInfo();
-        return AjaxResult.success(govInfoService.getInfoList(govInfo, pageNum, pageSize));
-    }
+
     /**
      * 批量修改
      *
-     * @param list
+     * @param govInfoList
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 15:24
     */
     @PostMapping("/updateInfoList")
-    public AjaxResult updateInfoList(List<GovInfo>list)
+    public AjaxResult updateInfoList(List<GovInfo>govInfoList)
     {
-        return AjaxResult.success(govInfoService.updateInfoList(list));
+        return AjaxResult.success(govInfoService.updateInfoList(govInfoList));
     }
     /**
      * 查询政府名称，或者编码，是否重复
@@ -172,8 +157,8 @@ public class GovInfoController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/23 8:59
     */
-    @PostMapping("/getOneAllInfo")
-    public AjaxResult getOneAllInfo(GovInfo govInfo){
+    @PostMapping("/getInfoDetail")
+    public AjaxResult getInfoDetail(GovInfo govInfo){
         return govInfoService.getNewInfo(govInfo);
     }
 }

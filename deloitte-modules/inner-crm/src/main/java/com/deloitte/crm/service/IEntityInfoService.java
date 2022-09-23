@@ -2,6 +2,7 @@ package com.deloitte.crm.service;
 
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.dto.EntityAttrDto;
 import com.deloitte.crm.domain.dto.EntityInfoDto;
 
 import java.util.List;
@@ -72,4 +73,10 @@ public interface IEntityInfoService
     AjaxResult getInfoList(EntityInfoDto entityInfo);
 
     Integer updateInfoList(List<EntityInfo> list);
+
+    List<EntityInfo> checkList(EntityInfo entityInfo);
+
+    AjaxResult getOneAllInfo(String entityCode);
+
+    AjaxResult getListEntityByPage(EntityAttrDto entityAttrDto);
 }
