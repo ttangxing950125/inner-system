@@ -1,6 +1,8 @@
 package com.deloitte.common.core.utils;
 
 import cn.hutool.core.date.DateException;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
@@ -24,6 +26,26 @@ public class DateUtil extends cn.hutool.core.date.DateUtil {
             "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM",
             "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
             "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
+
+    /**
+     * 解析日期字符串，忽略时分秒，支持的格式包括：
+     * <pre>
+     * yyyy-MM-dd
+     * yyyy/MM/dd
+     * yyyy.MM.dd
+     * yyyy年MM月dd日
+     * </pre>
+     *
+     * @param dateString 标准形式的日期字符串
+     * @return 日期对象
+     */
+    public static DateTime parseDate(CharSequence dateString) {
+        if (StrUtil.isBlank(dateString)){
+            return null;
+        }
+        return cn.hutool.core.date.DateUtil.parseDate(dateString);
+    }
+
 
     /**
      * 获取当前Date型日期

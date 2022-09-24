@@ -1,11 +1,39 @@
 package com.deloitte.crm.service.impl;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.StrUtil;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.crm.domain.BondInfo;
+import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.dto.BondInfoDto;
+import com.deloitte.crm.service.*;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.BondNewIssMapper;
 import com.deloitte.crm.domain.BondNewIss;
-import com.deloitte.crm.service.IBondNewIssService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 
 /**
  * 新债发行-新发行债券-20220801-20220914Service业务层处理
@@ -14,10 +42,100 @@ import com.deloitte.crm.service.IBondNewIssService;
  * @date 2022-09-21
  */
 @Service
-public class BondNewIssServiceImpl implements IBondNewIssService 
+public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNewIss> implements IBondNewIssService
 {
     @Autowired
     private BondNewIssMapper bondNewIssMapper;
+
+    @Resource
+    private IBondInfoService bondInfoService;
+
+    @Lazy
+    @Resource
+    private ICrmWindTaskService crmWindTaskService;
+
+    @Resource
+    private IEntityBondRelService bondRelService;
+
+    @Resource
+    private ICrmMasTaskService crmMasTaskService;
+
+    @Resource
+    private IEntityInfoService entityInfoService;
+
+    @Resource
+    private BondNewIssAsyncService bondNewIssAsyncService;
+
+
+    /**
+     * 导入债券任务
+     * @param windTask
+     * @param isses
+     * @return
+     */
+    @Override
+    public Object doTask(CrmWindTask windTask, List<BondNewIss> isses) throws Exception {
+        //改任务状态
+        windTask.setComplete(2);
+        crmWindTaskService.updateById(windTask);
+
+
+
+        Date timeNow = DateUtil.parseDate(DateUtil.getDate());
+
+        List<Future> futureList = new ArrayList<>();
+
+        //入历史记录库
+        for (BondNewIss newIss : isses) {
+            if (StrUtil.isBlank(newIss.getBondShortName())){
+                continue;
+            }
+            //多线程保存债券信息，更新attrvalue表
+            Future<BondInfoDto> future = bondNewIssAsyncService.doBondImport(newIss, timeNow, windTask);
+
+            futureList.add(future);
+        }
+
+        while (true) {
+            boolean isAllDone = true;
+            for (Future future : futureList) {
+                if (null == future || !future.isDone()) {
+                    isAllDone = false;
+                }
+            }
+            if (isAllDone) {
+                break;
+            }
+        }
+
+        //修改原任务状态
+        windTask.setComplete(1);
+
+        crmWindTaskService.updateById(windTask);
+
+        //如果今天的windTask全部为已完成，修改crm_daily_task的状态
+        crmWindTaskService.checkAllComplete(timeNow);
+
+
+        return true;
+    }
+
+    /**
+     * 根据taskId查询
+     *
+     * @param taskId
+     * @return
+     */
+    @Override
+    public List<BondNewIss> findByTaskIdChangeType(Integer taskId, Integer...changeType) {
+        LambdaUpdateWrapper<BondNewIss> wrapper = Wrappers.<BondNewIss>lambdaUpdate()
+                .eq(BondNewIss::getTaskId, taskId)
+                .in(BondNewIss::getChangeType, changeType);
+
+
+        return list(wrapper);
+    }
+
 
     /**
      * 查询新债发行-新发行债券-20220801-20220914
@@ -90,4 +208,5 @@ public class BondNewIssServiceImpl implements IBondNewIssService
     {
         return bondNewIssMapper.deleteBondNewIssById(id);
     }
+
 }

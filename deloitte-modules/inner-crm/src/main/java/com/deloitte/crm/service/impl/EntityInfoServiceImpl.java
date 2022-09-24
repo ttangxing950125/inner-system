@@ -342,6 +342,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         return AjaxResult.success();
     }
 
+    /**
+     * 根据名称查询主体
+     * @param entityName
+     * @return
+     */
+    @Override
+    public List<EntityInfo> findByName(String entityName) {
+        return baseMapper.findByName(entityName);
+    }
+
     @Override
     public AjaxResult getInfoList(EntityInfoByDto entityInfoDto) {
         entityInfoDto.setEntityInfo();

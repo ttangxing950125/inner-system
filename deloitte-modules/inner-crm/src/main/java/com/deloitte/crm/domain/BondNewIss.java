@@ -3,11 +3,18 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 新债发行-新发行债券-20220801-20220914对象 bond_new_iss
@@ -15,12 +22,22 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class BondNewIss extends BaseEntity
+@Getter
+@Setter
+@ToString
+public class BondNewIss implements Serializable
 {
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     /** 主键 */
-    private Long id;
+    @TableId(type = IdType.AUTO)
+    private Integer id;
+
+    private Integer taskId;
+
+    private Date importTime;
+
+    private Integer changeType;
 
     /** 交易代码 */
     @Excel(name = "交易代码")
@@ -31,14 +48,12 @@ public class BondNewIss extends BaseEntity
     private String bondShortName;
 
     /** 发行起始日 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "发行起始日", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date issStartDate;
+    private String issStartDate;
 
     /** 缴款日 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "缴款日", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date payDate;
+    private String payDate;
 
     /** 计划发行规模(亿) */
     @Excel(name = "计划发行规模(亿)")
@@ -94,22 +109,22 @@ public class BondNewIss extends BaseEntity
 
     /** 付息频率 */
     @Excel(name = "付息频率")
-    private Long payFre;
+    private Integer payFre;
 
     /** 公告日期 yyyy-MM-dd */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "公告日期 yyyy-MM-dd", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date annoDate;
+    private String annoDate;
 
     /** 发行截止日期 yyyy-MM-dd */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "发行截止日期 yyyy-MM-dd", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date issEndDate;
+    @Excel(name = "发行截止日", width = 30, dateFormat = "yyyy-MM-dd")
+    private String issEndDate;
 
     /** 上市日期 yyyy-MM-dd */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "上市日期 yyyy-MM-dd", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date ipoDate;
+    @Excel(name = "上市日期", width = 30, dateFormat = "yyyy-MM-dd")
+    private String ipoDate;
 
     /** 上市地点 */
     @Excel(name = "上市地点")
@@ -118,12 +133,12 @@ public class BondNewIss extends BaseEntity
     /** 起息日 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "起息日", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date valueDate;
+    private String valueDate;
 
     /** 到期日 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "到期日", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date expireDate;
+    private String expireDate;
 
     /** 债券代码列表 */
     @Excel(name = "债券代码列表")
@@ -234,9 +249,8 @@ public class BondNewIss extends BaseEntity
     private String bidRegion;
 
     /** 招标日 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "招标日", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date bidDate;
+    private String bidDate;
 
     /** 招标时间 */
     @Excel(name = "招标时间")
@@ -326,684 +340,4 @@ public class BondNewIss extends BaseEntity
     @Excel(name = "地方政府债置换金额", readConverterExp = "万=")
     private BigDecimal govReplaceAmount;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setTradeCode(String tradeCode) 
-    {
-        this.tradeCode = tradeCode;
-    }
-
-    public String getTradeCode() 
-    {
-        return tradeCode;
-    }
-    public void setBondShortName(String bondShortName) 
-    {
-        this.bondShortName = bondShortName;
-    }
-
-    public String getBondShortName() 
-    {
-        return bondShortName;
-    }
-    public void setIssStartDate(Date issStartDate) 
-    {
-        this.issStartDate = issStartDate;
-    }
-
-    public Date getIssStartDate() 
-    {
-        return issStartDate;
-    }
-    public void setPayDate(Date payDate) 
-    {
-        this.payDate = payDate;
-    }
-
-    public Date getPayDate() 
-    {
-        return payDate;
-    }
-    public void setIssScalePlan(BigDecimal issScalePlan) 
-    {
-        this.issScalePlan = issScalePlan;
-    }
-
-    public BigDecimal getIssScalePlan() 
-    {
-        return issScalePlan;
-    }
-    public void setIssAmountTop(BigDecimal issAmountTop) 
-    {
-        this.issAmountTop = issAmountTop;
-    }
-
-    public BigDecimal getIssAmountTop() 
-    {
-        return issAmountTop;
-    }
-    public void setIssScale(BigDecimal issScale) 
-    {
-        this.issScale = issScale;
-    }
-
-    public BigDecimal getIssScale() 
-    {
-        return issScale;
-    }
-    public void setIssTerm(BigDecimal issTerm) 
-    {
-        this.issTerm = issTerm;
-    }
-
-    public BigDecimal getIssTerm() 
-    {
-        return issTerm;
-    }
-    public void setSpecialTerm(String specialTerm) 
-    {
-        this.specialTerm = specialTerm;
-    }
-
-    public String getSpecialTerm() 
-    {
-        return specialTerm;
-    }
-    public void setBondGrade(String bondGrade) 
-    {
-        this.bondGrade = bondGrade;
-    }
-
-    public String getBondGrade() 
-    {
-        return bondGrade;
-    }
-    public void setEnetityGrade(String enetityGrade) 
-    {
-        this.enetityGrade = enetityGrade;
-    }
-
-    public String getEnetityGrade() 
-    {
-        return enetityGrade;
-    }
-    public void setCouponRate(BigDecimal couponRate) 
-    {
-        this.couponRate = couponRate;
-    }
-
-    public BigDecimal getCouponRate() 
-    {
-        return couponRate;
-    }
-    public void setIpoissYield(BigDecimal ipoissYield) 
-    {
-        this.ipoissYield = ipoissYield;
-    }
-
-    public BigDecimal getIpoissYield() 
-    {
-        return ipoissYield;
-    }
-    public void setGuideRate(BigDecimal guideRate) 
-    {
-        this.guideRate = guideRate;
-    }
-
-    public BigDecimal getGuideRate() 
-    {
-        return guideRate;
-    }
-    public void setGuideRateMargin(BigDecimal guideRateMargin) 
-    {
-        this.guideRateMargin = guideRateMargin;
-    }
-
-    public BigDecimal getGuideRateMargin() 
-    {
-        return guideRateMargin;
-    }
-    public void setFloatRate(BigDecimal floatRate) 
-    {
-        this.floatRate = floatRate;
-    }
-
-    public BigDecimal getFloatRate() 
-    {
-        return floatRate;
-    }
-    public void setRateType(String rateType) 
-    {
-        this.rateType = rateType;
-    }
-
-    public String getRateType() 
-    {
-        return rateType;
-    }
-    public void setPayFre(Long payFre) 
-    {
-        this.payFre = payFre;
-    }
-
-    public Long getPayFre() 
-    {
-        return payFre;
-    }
-    public void setAnnoDate(Date annoDate) 
-    {
-        this.annoDate = annoDate;
-    }
-
-    public Date getAnnoDate() 
-    {
-        return annoDate;
-    }
-    public void setIssEndDate(Date issEndDate) 
-    {
-        this.issEndDate = issEndDate;
-    }
-
-    public Date getIssEndDate() 
-    {
-        return issEndDate;
-    }
-    public void setIpoDate(Date ipoDate) 
-    {
-        this.ipoDate = ipoDate;
-    }
-
-    public Date getIpoDate() 
-    {
-        return ipoDate;
-    }
-    public void setIpoAddr(String ipoAddr) 
-    {
-        this.ipoAddr = ipoAddr;
-    }
-
-    public String getIpoAddr() 
-    {
-        return ipoAddr;
-    }
-    public void setValueDate(Date valueDate) 
-    {
-        this.valueDate = valueDate;
-    }
-
-    public Date getValueDate() 
-    {
-        return valueDate;
-    }
-    public void setExpireDate(Date expireDate) 
-    {
-        this.expireDate = expireDate;
-    }
-
-    public Date getExpireDate() 
-    {
-        return expireDate;
-    }
-    public void setBondCodeList(String bondCodeList) 
-    {
-        this.bondCodeList = bondCodeList;
-    }
-
-    public String getBondCodeList() 
-    {
-        return bondCodeList;
-    }
-    public void setFundUse(String fundUse) 
-    {
-        this.fundUse = fundUse;
-    }
-
-    public String getFundUse() 
-    {
-        return fundUse;
-    }
-    public void setSpecialRule(String specialRule) 
-    {
-        this.specialRule = specialRule;
-    }
-
-    public String getSpecialRule() 
-    {
-        return specialRule;
-    }
-    public void setAddCreditMethod(String addCreditMethod) 
-    {
-        this.addCreditMethod = addCreditMethod;
-    }
-
-    public String getAddCreditMethod() 
-    {
-        return addCreditMethod;
-    }
-    public void setAssessOrgan(String assessOrgan) 
-    {
-        this.assessOrgan = assessOrgan;
-    }
-
-    public String getAssessOrgan() 
-    {
-        return assessOrgan;
-    }
-    public void setBondName(String bondName) 
-    {
-        this.bondName = bondName;
-    }
-
-    public String getBondName() 
-    {
-        return bondName;
-    }
-    public void setIssorShortName(String issorShortName) 
-    {
-        this.issorShortName = issorShortName;
-    }
-
-    public String getIssorShortName() 
-    {
-        return issorShortName;
-    }
-    public void setIssorName(String issorName) 
-    {
-        this.issorName = issorName;
-    }
-
-    public String getIssorName() 
-    {
-        return issorName;
-    }
-    public void setIssorIndustryFirst(String issorIndustryFirst) 
-    {
-        this.issorIndustryFirst = issorIndustryFirst;
-    }
-
-    public String getIssorIndustryFirst() 
-    {
-        return issorIndustryFirst;
-    }
-    public void setIssorIndustrySecond(String issorIndustrySecond) 
-    {
-        this.issorIndustrySecond = issorIndustrySecond;
-    }
-
-    public String getIssorIndustrySecond() 
-    {
-        return issorIndustrySecond;
-    }
-    public void setIssorEntityNature(String issorEntityNature) 
-    {
-        this.issorEntityNature = issorEntityNature;
-    }
-
-    public String getIssorEntityNature() 
-    {
-        return issorEntityNature;
-    }
-    public void setIssorProvince(String issorProvince) 
-    {
-        this.issorProvince = issorProvince;
-    }
-
-    public String getIssorProvince() 
-    {
-        return issorProvince;
-    }
-    public void setIssorCity(String issorCity) 
-    {
-        this.issorCity = issorCity;
-    }
-
-    public String getIssorCity() 
-    {
-        return issorCity;
-    }
-    public void setSponsor(String sponsor) 
-    {
-        this.sponsor = sponsor;
-    }
-
-    public String getSponsor() 
-    {
-        return sponsor;
-    }
-    public void setIssSponsorGrade(String issSponsorGrade) 
-    {
-        this.issSponsorGrade = issSponsorGrade;
-    }
-
-    public String getIssSponsorGrade() 
-    {
-        return issSponsorGrade;
-    }
-    public void setSponsorEntityNature(String sponsorEntityNature) 
-    {
-        this.sponsorEntityNature = sponsorEntityNature;
-    }
-
-    public String getSponsorEntityNature() 
-    {
-        return sponsorEntityNature;
-    }
-    public void setAssureRule(String assureRule) 
-    {
-        this.assureRule = assureRule;
-    }
-
-    public String getAssureRule() 
-    {
-        return assureRule;
-    }
-    public void setMainUnw(String mainUnw) 
-    {
-        this.mainUnw = mainUnw;
-    }
-
-    public String getMainUnw() 
-    {
-        return mainUnw;
-    }
-    public void setFundShare(String fundShare) 
-    {
-        this.fundShare = fundShare;
-    }
-
-    public String getFundShare() 
-    {
-        return fundShare;
-    }
-    public void setCoUnw(String coUnw) 
-    {
-        this.coUnw = coUnw;
-    }
-
-    public String getCoUnw() 
-    {
-        return coUnw;
-    }
-    public void setBookKeeper(String bookKeeper) 
-    {
-        this.bookKeeper = bookKeeper;
-    }
-
-    public String getBookKeeper() 
-    {
-        return bookKeeper;
-    }
-    public void setIssType(String issType) 
-    {
-        this.issType = issType;
-    }
-
-    public String getIssType() 
-    {
-        return issType;
-    }
-    public void setUnwType(String unwType) 
-    {
-        this.unwType = unwType;
-    }
-
-    public String getUnwType() 
-    {
-        return unwType;
-    }
-    public void setIssPrice(BigDecimal issPrice) 
-    {
-        this.issPrice = issPrice;
-    }
-
-    public BigDecimal getIssPrice() 
-    {
-        return issPrice;
-    }
-    public void setTarget(String target) 
-    {
-        this.target = target;
-    }
-
-    public String getTarget() 
-    {
-        return target;
-    }
-    public void setBidType(String bidType) 
-    {
-        this.bidType = bidType;
-    }
-
-    public String getBidType() 
-    {
-        return bidType;
-    }
-    public void setBidRegion(String bidRegion) 
-    {
-        this.bidRegion = bidRegion;
-    }
-
-    public String getBidRegion() 
-    {
-        return bidRegion;
-    }
-    public void setBidDate(Date bidDate) 
-    {
-        this.bidDate = bidDate;
-    }
-
-    public Date getBidDate() 
-    {
-        return bidDate;
-    }
-    public void setBidTime(String bidTime) 
-    {
-        this.bidTime = bidTime;
-    }
-
-    public String getBidTime() 
-    {
-        return bidTime;
-    }
-    public void setBidAddr(String bidAddr) 
-    {
-        this.bidAddr = bidAddr;
-    }
-
-    public String getBidAddr() 
-    {
-        return bidAddr;
-    }
-    public void setWinBidPrice(BigDecimal winBidPrice) 
-    {
-        this.winBidPrice = winBidPrice;
-    }
-
-    public BigDecimal getWinBidPrice() 
-    {
-        return winBidPrice;
-    }
-    public void setWinBidRegion(String winBidRegion) 
-    {
-        this.winBidRegion = winBidRegion;
-    }
-
-    public String getWinBidRegion() 
-    {
-        return winBidRegion;
-    }
-    public void setSubcMult(BigDecimal subcMult) 
-    {
-        this.subcMult = subcMult;
-    }
-
-    public BigDecimal getSubcMult() 
-    {
-        return subcMult;
-    }
-    public void setWeightRate(BigDecimal weightRate) 
-    {
-        this.weightRate = weightRate;
-    }
-
-    public BigDecimal getWeightRate() 
-    {
-        return weightRate;
-    }
-    public void setFullCourtMult(BigDecimal fullCourtMult) 
-    {
-        this.fullCourtMult = fullCourtMult;
-    }
-
-    public BigDecimal getFullCourtMult() 
-    {
-        return fullCourtMult;
-    }
-    public void setMargRate(BigDecimal margRate) 
-    {
-        this.margRate = margRate;
-    }
-
-    public BigDecimal getMargRate() 
-    {
-        return margRate;
-    }
-    public void setMargMult(BigDecimal margMult) 
-    {
-        this.margMult = margMult;
-    }
-
-    public BigDecimal getMargMult() 
-    {
-        return margMult;
-    }
-    public void setIssRate(BigDecimal issRate) 
-    {
-        this.issRate = issRate;
-    }
-
-    public BigDecimal getIssRate() 
-    {
-        return issRate;
-    }
-    public void setUnwMenber(String unwMenber) 
-    {
-        this.unwMenber = unwMenber;
-    }
-
-    public String getUnwMenber() 
-    {
-        return unwMenber;
-    }
-    public void setIssOnlineNub(BigDecimal issOnlineNub) 
-    {
-        this.issOnlineNub = issOnlineNub;
-    }
-
-    public BigDecimal getIssOnlineNub() 
-    {
-        return issOnlineNub;
-    }
-    public void setOnlineSubcCode(String onlineSubcCode) 
-    {
-        this.onlineSubcCode = onlineSubcCode;
-    }
-
-    public String getOnlineSubcCode() 
-    {
-        return onlineSubcCode;
-    }
-    public void setWindBondTypeSecond(String windBondTypeSecond) 
-    {
-        this.windBondTypeSecond = windBondTypeSecond;
-    }
-
-    public String getWindBondTypeSecond() 
-    {
-        return windBondTypeSecond;
-    }
-    public void setSecondMixedCapitalBond(String secondMixedCapitalBond) 
-    {
-        this.secondMixedCapitalBond = secondMixedCapitalBond;
-    }
-
-    public String getSecondMixedCapitalBond() 
-    {
-        return secondMixedCapitalBond;
-    }
-    public void setIssStatus(Integer issStatus) 
-    {
-        this.issStatus = issStatus;
-    }
-
-    public Integer getIssStatus() 
-    {
-        return issStatus;
-    }
-    public void setIsCiBond(Integer isCiBond) 
-    {
-        this.isCiBond = isCiBond;
-    }
-
-    public Integer getIsCiBond() 
-    {
-        return isCiBond;
-    }
-    public void setAddIssStatus(Integer addIssStatus) 
-    {
-        this.addIssStatus = addIssStatus;
-    }
-
-    public Integer getAddIssStatus() 
-    {
-        return addIssStatus;
-    }
-    public void setCrossMarket(Integer crossMarket) 
-    {
-        this.crossMarket = crossMarket;
-    }
-
-    public Integer getCrossMarket() 
-    {
-        return crossMarket;
-    }
-    public void setDenom(BigDecimal denom) 
-    {
-        this.denom = denom;
-    }
-
-    public BigDecimal getDenom() 
-    {
-        return denom;
-    }
-    public void setGovNewAmount(BigDecimal govNewAmount) 
-    {
-        this.govNewAmount = govNewAmount;
-    }
-
-    public BigDecimal getGovNewAmount() 
-    {
-        return govNewAmount;
-    }
-    public void setGovReplaceAmount(BigDecimal govReplaceAmount) 
-    {
-        this.govReplaceAmount = govReplaceAmount;
-    }
-
-    public BigDecimal getGovReplaceAmount() 
-    {
-        return govReplaceAmount;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getName() + JSON.toJSONString(this);
-    }
 }

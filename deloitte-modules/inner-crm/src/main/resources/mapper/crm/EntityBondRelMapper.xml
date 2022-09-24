@@ -19,6 +19,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, entity_code, bd_code, status, new_entity_name, new_entity_code, created, updated from entity_bond_rel
     </sql>
 
+    <select id="findByEntityBondCode" resultMap="EntityBondRelResult">
+        <include refid="selectEntityBondRelVo"></include>
+        where entity_code = #{entityCode}
+        and bd_code = #{bondCode}
+    </select>
+
     <select id="selectEntityBondRelList" parameterType="EntityBondRel" resultMap="EntityBondRelResult">
         <include refid="selectEntityBondRelVo"/>
         <where>  

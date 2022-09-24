@@ -2,6 +2,7 @@ package com.deloitte.crm.mapper;
 
 import java.util.List;
 import com.deloitte.crm.domain.EntityBondRel;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -58,4 +59,13 @@ public interface EntityBondRelMapper
      * @return 结果
      */
     public int deleteEntityBondRelByIds(Long[] ids);
+
+    /**
+     * 根据债券code和企业code查询是否存在
+     * @param entityCode
+     * @param bondCode
+     * @return
+     */
+    EntityBondRel findByEntityBondCode(@Param("entityCode") String entityCode,
+                                       @Param("bondCode") String bondCode);
 }

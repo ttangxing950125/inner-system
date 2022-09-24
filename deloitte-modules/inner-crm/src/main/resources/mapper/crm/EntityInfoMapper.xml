@@ -25,6 +25,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, entity_name, entity_code, credit_code, list, issue_bonds, credit_error, credit_error_type, entity_name_his, entity_name_his_remarks, creater, updater, created, updated from entity_info
     </sql>
 
+    <select id="findByName" resultType="entityInfo">
+        select id, entity_name, entity_code, credit_code, list, issue_bonds, credit_error, credit_error_type, creater, updater, created, updated
+        from entity_info
+        where entity_name = #{entityName}
+        and status = 1
+    </select>
+
     <select id="selectEntityInfoList" parameterType="EntityInfo" resultMap="EntityInfoResult">
         <include refid="selectEntityInfoVo"/>
         <where>  

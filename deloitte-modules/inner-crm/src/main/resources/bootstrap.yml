@@ -3,7 +3,9 @@ server:
   port: 9204
 
 # Spring
-spring: 
+spring:
+  main:
+    allow-circular-references: true
   application:
     # 应用名称
     name: inner-crm

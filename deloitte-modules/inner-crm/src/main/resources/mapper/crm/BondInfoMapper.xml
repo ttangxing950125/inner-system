@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.BondInfoMapper">
+    
+    <resultMap type="BondInfo" id="BondInfoResult">
+        <result property="id"    column="id"    />
+        <result property="bondStatus"    column="bond_status"    />
+        <result property="bondCode"    column="bond_code"    />
+        <result property="bondShortName"    column="bond_short_name"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectBondInfoVo">
+        select id, bond_status, bond_code, bond_short_name, created, updated from bond_info
+    </sql>
+
+    <select id="findByShortName" resultType="bondInfo">
+        <include refid="selectBondInfoVo" />
+        where bond_short_name = #{shortName}
+    </select>
+
+    <select id="selectBondInfoList" parameterType="BondInfo" resultMap="BondInfoResult">
+        <include refid="selectBondInfoVo"/>
+        <where>  
+            <if test="bondStatus != null "> and bond_status = #{bondStatus}</if>
+            <if test="bondCode != null  and bondCode != ''"> and bond_code = #{bondCode}</if>
+            <if test="bondShortName != null  and bondShortName != ''"> and bond_short_name like concat('%', #{bondShortName}, '%')</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectBondInfoById" parameterType="Long" resultMap="BondInfoResult">
+        <include refid="selectBondInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBondInfo" parameterType="BondInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into bond_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bondStatus != null">bond_status,</if>
+            <if test="bondCode != null">bond_code,</if>
+            <if test="bondShortName != null">bond_short_name,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bondStatus != null">#{bondStatus},</if>
+            <if test="bondCode != null">#{bondCode},</if>
+            <if test="bondShortName != null">#{bondShortName},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBondInfo" parameterType="BondInfo">
+        update bond_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bondStatus != null">bond_status = #{bondStatus},</if>
+            <if test="bondCode != null">bond_code = #{bondCode},</if>
+            <if test="bondShortName != null">bond_short_name = #{bondShortName},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBondInfoById" parameterType="Long">
+        delete from bond_info where id = #{id}
+    </delete>
+
+    <delete id="deleteBondInfoByIds" parameterType="String">
+        delete from bond_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,19 +1,15 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
-
 import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.domain.BondNewIss;
-import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.EntityBondRel;
 
 /**
  * 【请填写功能名称】Service接口
  * 
  * @author deloitte
- * @date 2022-09-21
+ * @date 2022-09-23
  */
-public interface IEntityBondRelService 
+public interface IBondInfoService 
 {
     /**
      * 查询【请填写功能名称】
@@ -21,31 +17,31 @@ public interface IEntityBondRelService
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
-    public EntityBondRel selectEntityBondRelById(Long id);
+    public BondInfo selectBondInfoById(Long id);
 
     /**
      * 查询【请填写功能名称】列表
      * 
-     * @param entityBondRel 【请填写功能名称】
+     * @param bondInfo 【请填写功能名称】
      * @return 【请填写功能名称】集合
      */
-    public List<EntityBondRel> selectEntityBondRelList(EntityBondRel entityBondRel);
+    public List<BondInfo> selectBondInfoList(BondInfo bondInfo);
 
     /**
      * 新增【请填写功能名称】
      * 
-     * @param entityBondRel 【请填写功能名称】
+     * @param bondInfo 【请填写功能名称】
      * @return 结果
      */
-    public int insertEntityBondRel(EntityBondRel entityBondRel);
+    public int insertBondInfo(BondInfo bondInfo);
 
     /**
      * 修改【请填写功能名称】
      * 
-     * @param entityBondRel 【请填写功能名称】
+     * @param bondInfo 【请填写功能名称】
      * @return 结果
      */
-    public int updateEntityBondRel(EntityBondRel entityBondRel);
+    public int updateBondInfo(BondInfo bondInfo);
 
     /**
      * 批量删除【请填写功能名称】
@@ -53,7 +49,7 @@ public interface IEntityBondRelService
      * @param ids 需要删除的【请填写功能名称】主键集合
      * @return 结果
      */
-    public int deleteEntityBondRelByIds(Long[] ids);
+    public int deleteBondInfoByIds(Long[] ids);
 
     /**
      * 删除【请填写功能名称】信息
@@ -61,15 +57,20 @@ public interface IEntityBondRelService
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
-    public int deleteEntityBondRelById(Long id);
+    public int deleteBondInfoById(Long id);
 
     /**
-     * 绑定指定主体和债券的关系
-     * 如果没有这个主体，就生成今天的任务
-     * @param issorName
-     * @param bondInfo
-     * @param newIss
+     * 根据债券简称查询
+     * @param shortName
      * @return
      */
-    boolean bindRel(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
+    BondInfo findByShortName(String shortName);
+
+    /**
+     * 根据id保存或新增
+     * @param bondInfo
+     * @return
+     */
+    BondInfo saveOrUpdate(BondInfo bondInfo);
+
 }

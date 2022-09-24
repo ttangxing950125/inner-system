@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,6 +74,8 @@ public class BondNewIssController extends BaseController
      */
     @RequiresPermissions("crm:iss:query")
     @GetMapping(value = "/{id}")
+    @ApiOperation(value = "根据id查询")
+    @ApiImplicitParam(name = "id",value = "需要查询的数据id",required = true,paramType="path")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
         return AjaxResult.success(bondNewIssService.selectBondNewIssById(id));

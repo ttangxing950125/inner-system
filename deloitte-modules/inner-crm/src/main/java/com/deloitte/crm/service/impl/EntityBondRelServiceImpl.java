@@ -1,11 +1,18 @@
 package com.deloitte.crm.service.impl;
 
 import java.util.List;
+
+import cn.hutool.core.collection.CollUtil;
+import com.deloitte.common.core.utils.StrUtil;
+import com.deloitte.crm.domain.*;
+import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.EntityBondRelMapper;
-import com.deloitte.crm.domain.EntityBondRel;
 import com.deloitte.crm.service.IEntityBondRelService;
+
+import javax.annotation.Resource;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -18,6 +25,68 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 {
     @Autowired
     private EntityBondRelMapper entityBondRelMapper;
+
+    @Resource
+    private IEntityInfoService entityInfoService;
+
+    @Resource
+    private ICrmEntityTaskService entityTaskService;
+
+    /**
+     * 绑定指定主体和债券的关系
+     * 如果没有这个主体，就生成今天的任务
+     * @param issorName 发行人全称
+     * @param bondInfo
+     * @param newIss
+     * @return
+     */
+    @Override
+    public boolean bindRel(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask) {
+        //没有发行人名称不处理
+        if (StrUtil.isBlank(issorName)){
+            return false;
+        }
+
+        //查询主体
+        List<EntityInfo> entityInfos = entityInfoService.findByName(issorName);
+        //没有主体就创建任务
+        if (CollUtil.isEmpty(entityInfos)){
+            CrmEntityTask entityTask = new CrmEntityTask();
+            entityTask.setTaskCategory(windTask.getTaskCategory());
+            entityTask.setSourceType(1);
+            entityTask.setSourceId(newIss.getId());
+            String showData = "发行人全称:"+issorName;
+            showData += ", 交易代码"+newIss.getTradeCode()+", 债券简称"+newIss.getBondShortName();
+
+            entityTask.setDataShow(showData);
+
+            entityTaskService.insertCrmEntityTask(entityTask);
+
+            return true;
+        }
+
+        //是否绑定过关联关系
+        for (EntityInfo info : entityInfos) {
+            String entityCode = info.getEntityCode();
+            String bondCode = bondInfo.getBondCode();
+
+            //查询关联关系
+            EntityBondRel dbRel = entityBondRelMapper.findByEntityBondCode(entityCode, bondCode);
+            if (dbRel!=null){
+                continue;
+            }
+
+            //新增关联关系
+            EntityBondRel saveRel = new EntityBondRel();
+            saveRel.setBdCode(bondCode);
+            saveRel.setEntityCode(entityCode);
+            entityBondRelMapper.insertEntityBondRel(saveRel);
+
+        }
+
+
+        return true;
+    }
 
     /**
      * 查询【请填写功能名称】
@@ -90,4 +159,5 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
     {
         return entityBondRelMapper.deleteEntityBondRelById(id);
     }
+
 }
