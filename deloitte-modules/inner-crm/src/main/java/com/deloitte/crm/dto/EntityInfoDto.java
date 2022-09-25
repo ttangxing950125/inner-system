@@ -1,6 +1,7 @@
 package com.deloitte.crm.dto;
 
 import com.deloitte.common.core.annotation.Excel;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date 2022/09/22 22:34
  */
 @Data
+@ApiModel(value = "EntityInfoDto",description = "用于统计主体信息")
 public class EntityInfoDto {
     /** 是否上市 0-未上市 1-已上市 */
     @ApiModelProperty(value = "/** 是否上市 0-未上市 1-已上市 */")

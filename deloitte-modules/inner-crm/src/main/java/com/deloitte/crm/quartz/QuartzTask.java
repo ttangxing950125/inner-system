@@ -26,7 +26,7 @@ public class QuartzTask {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-   @Scheduled(cron = "0 0 24 * * ?" )
+   @Scheduled(cron = "0/1 * * * * ?")
     public void StartRuleTask() {
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();

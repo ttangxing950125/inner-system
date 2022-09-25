@@ -1,5 +1,6 @@
 package com.deloitte.crm.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -7,7 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @date 2022/09/22 10:06
  * 用于返回当天统计任务完成率
  */
-
+@ApiModel(value = "CrmWindTaskDtos",description = "用于返回当天统计任务完成率")
 public class CrmWindTaskDto {
     /** 任务描述 */
     @ApiModelProperty(value = "任务描述")

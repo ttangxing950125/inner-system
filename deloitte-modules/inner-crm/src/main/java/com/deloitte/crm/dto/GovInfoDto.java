@@ -1,5 +1,6 @@
 package com.deloitte.crm.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import lombok.Data;
  * @date 2022/09/22 23:14
  */
 @Data
+@ApiModel(value = "GovInfoDto",description = "用于统计政府信息")
 public class GovInfoDto {
 
     /** 省 */
