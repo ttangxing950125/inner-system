@@ -30,7 +30,7 @@ public class QuartzTask {
     public void StartRuleTask() {
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();
-        log.info("同步任务失败 =============");
+        log.info("同步任务结束 =============");
     }
 
 }

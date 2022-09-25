@@ -43,6 +43,8 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         return update(new LambdaUpdateWrapper<CrmDailyTask>()
                 .eq(CrmDailyTask::getTaskRoleType,3)
                 .eq(CrmDailyTask::getTaskDate,dateTime)
+                .set(CrmDailyTask::getTaskStatus,2)
+
         );
     }
 

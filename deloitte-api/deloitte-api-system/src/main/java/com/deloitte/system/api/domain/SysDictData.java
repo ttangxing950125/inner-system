@@ -93,10 +93,6 @@ public class SysDictData implements Serializable {
     /** 备注 */
     private String remark;
 
-    /** 请求参数 */
-    private Map<String, Object> params;
-
-
     public Long getDictCode() {
         return dictCode;
     }
@@ -221,13 +217,7 @@ public class SysDictData implements Serializable {
         this.remark = remark;
     }
 
-    public Map<String, Object> getParams() {
-        return params;
-    }
 
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
-    }
 
     @Override
     public String toString() {
