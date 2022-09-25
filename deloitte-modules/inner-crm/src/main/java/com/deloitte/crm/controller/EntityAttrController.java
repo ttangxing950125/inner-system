@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -105,9 +106,21 @@ public class EntityAttrController extends BaseController
      * @date 2022/9/23 10:56
     */
     @PostMapping("/getAllByGroup")
-    public AjaxResult getAllByGroup()
+    public R getAllByGroup()
     {
         return entityAttrService.getAllByGroup();
+    }
+    /**
+     * 根据dqCode查询详细信息
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/25 13:56
+     */
+    @PostMapping("/getAttrByDqCode")
+    public R getAttrByDqCode(String dqCode)
+    {
+        return R.ok(entityAttrService.getAttrByDqCode(dqCode));
     }
 
 }

@@ -5,7 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityNameHis;
@@ -117,21 +117,22 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public Integer updateInfoList(List<GovInfo> list) {
+    public R updateInfoList(List<GovInfo> list) {
         list.stream().forEach(o->govInfoMapper.updateById(o));
-        return list.size();
+        return R.ok(list.size());
     }
 
     @Override
-    public AjaxResult getInfoDetail(GovInfo govInfo) {
+    public R getInfoDetail(GovInfo govInfo) {
         QueryWrapper<GovInfo>queryWrapper=new QueryWrapper<>(govInfo);
         List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(govInfos)&&govInfos.size()>1){
-            return AjaxResult.error();
+            return R.fail();
         }
         //TODO  添加主体其余详细信息
 
-        return AjaxResult.success(govInfos.get(0));
+
+        return R.ok(govInfos.get(0));
     }
 
 
@@ -177,13 +178,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return govInfoDto;
     }
     @Override
-    public AjaxResult getInfoList(GovInfoByDto govInfodto) {
+    public R getInfoList(GovInfoByDto govInfodto) {
         govInfodto.setGovInfo();
         GovInfo govInfo = govInfodto.getGovInfo();
         Integer pageNum = govInfodto.getPageNum();
         Integer pageSize = govInfodto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum)){
-            return AjaxResult.error("请输入页码");
+            return R.fail("请输入页码");
         }
         if (ObjectUtils.isEmpty(pageSize)){
             pageSize= EntityUtils.DEFAULT_PAGE_SIZE;
@@ -202,13 +203,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             records.add(getResultMap(o));
         });
         pageResult.setRecords(records);
-        return AjaxResult.success(pageResult);
+        return R.ok(pageResult);
     }
     @Autowired
     private HttpUtils httpUtils;
 
     @Override
-    public AjaxResult addOldName(GovInfo gov) {
+    public R addOldName(GovInfo gov) {
         //获取操作用户
         String remoter = httpUtils.getRemoter();
 
@@ -237,17 +238,17 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         entityNameHis.setRemarks(gov.getEntityNameHisRemarks());
         entityNameHis.setSource(2);
         nameHisMapper.insert(entityNameHis);
-        return AjaxResult.success();
+        return R.ok();
     }
 
     @Override
-    public AjaxResult checkGov(GovInfo govInfo) {
+    public R checkGov(GovInfo govInfo) {
         QueryWrapper<GovInfo>queryWrapper=new QueryWrapper(govInfo);
-        return AjaxResult.success(govInfoMapper.selectList(queryWrapper));
+        return R.ok(govInfoMapper.selectList(queryWrapper));
     }
 
     @Override
-    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
+    public R getListEntityByPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
 
@@ -287,11 +288,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             resultRecords.add(resultMap);
         });
         pageResult.setRecords(resultRecords);
-        return AjaxResult.success(pageResult);
+        return R.ok(pageResult);
     }
 
     @Override
-    public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status) {
+    public R updateOldName(String dqCode,String oldName, String newOldName,String status) {
         //根据dqCode查询主体表
         QueryWrapper<GovInfo>infoQuery=new QueryWrapper<>();
         GovInfo govInfo = govInfoMapper.selectOne(infoQuery.lambda().eq(GovInfo::getDqGovCode, dqCode));
@@ -308,7 +309,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             //修改曾用名表中的数据
             nameHis.setOldName(newOldName);
             nameHisMapper.updateById(nameHis);
-            return AjaxResult.success();
+            return R.ok();
         }
 
         //修改主体表中的数据
@@ -334,7 +335,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //修改曾用名表中的数据
         nameHis.setStatus(EntityUtils.INVALID);
         nameHisMapper.updateById(nameHis);
-        return AjaxResult.success();
+        return R.ok();
     }
 
     /**

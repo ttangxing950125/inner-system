@@ -1,10 +1,10 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityAttr;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -69,7 +69,7 @@ public interface IEntityAttrService extends IService<EntityAttr>
      */
     public int deleteEntityAttrById(Long id);
 
-    AjaxResult getAllByGroup();
+    R getAllByGroup();
 
     /**
      * 根据名称和属性分类查询
@@ -78,4 +78,6 @@ public interface IEntityAttrService extends IService<EntityAttr>
      * @return
      */
     EntityAttr findByNameType(String name, int attrType);
+
+    List<EntityAttr> getAttrByDqCode(String dqCode);
 }

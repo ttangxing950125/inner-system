@@ -151,9 +151,9 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/updateInfoList")
-      public AjaxResult updateInfoList(List<EntityInfo>entityInfoList)
+      public R updateInfoList(List<EntityInfo>entityInfoList)
       {
-          return AjaxResult.success(entityInfoService.updateInfoList(entityInfoList));
+          return R.ok(entityInfoService.updateInfoList(entityInfoList));
       }
       /**
        * 查询企业名称，或者编码，是否重复
@@ -173,9 +173,9 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/checkEntity")
-      public AjaxResult checkEntity(@RequestBody EntityInfo entityInfo)
+      public R checkEntity(@RequestBody EntityInfo entityInfo)
       {
-          return AjaxResult.success(entityInfoService.checkEntity(entityInfo));
+          return R.ok(entityInfoService.checkEntity(entityInfo));
       }
       /**
        * 企业主体分页查询
@@ -195,7 +195,7 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/getInfoList")
-      public AjaxResult getInfoList(@RequestBody EntityInfoByDto entityInfo)
+      public R getInfoList(@RequestBody EntityInfoByDto entityInfo)
       {
           return entityInfoService.getInfoList(entityInfo);
       }
@@ -217,7 +217,7 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/addOldName")
-      public AjaxResult addOldName(@RequestBody EntityInfo entityInfo)
+      public R addOldName(@RequestBody EntityInfo entityInfo)
       {
           return entityInfoService.addOldName(entityInfo);
       }
@@ -272,7 +272,7 @@ public class EntityInfoController extends BaseController
                       example = "新的曾用名")
       })
       @PostMapping("/updateOldName")
-      public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status)
+      public R updateOldName(String dqCode,String oldName, String newOldName,String status)
       {
           return entityInfoService.updateOldName(dqCode,oldName,newOldName,status);
       }
@@ -294,7 +294,7 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/getInfoDetail")
-      public AjaxResult getInfoDetail(@RequestBody EntityInfo entityInfo){
+      public R getInfoDetail(@RequestBody EntityInfo entityInfo){
           return entityInfoService.getInfoDetail(entityInfo);
       }
       /**
@@ -314,7 +314,7 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/getListEntityByPage")
-      public AjaxResult getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto)
+      public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto)
       {
           return entityInfoService.getListEntityByPage(entityAttrDto);
       }

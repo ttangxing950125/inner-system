@@ -2,16 +2,17 @@ package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.common.core.constant.CacheConstants;
-import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.CacheName;
 import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.EntityMaster;
+import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.mapper.EntityAttrMapper;
+import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ import java.util.stream.Collectors;
 public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityAttr> implements IEntityAttrService {
     @Autowired
     private EntityAttrMapper entityAttrMapper;
+
+    @Autowired
+    private EntityAttrValueMapper valueMapper;
 
     @Resource
     private RedisService redisService;
@@ -121,7 +125,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
-    public AjaxResult getAllByGroup() {
+    public R getAllByGroup() {
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(new QueryWrapper<>());
 
         Map<String, List<EntityAttr>> listMap = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getAttrCateName));
@@ -132,7 +136,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
             map.put("value", listMap.get(key));
             result.add(map);
         }
-        return AjaxResult.success(result);
+        return R.ok(result);
     }
 
     /**
@@ -151,5 +155,19 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
         }
 
         return entityAttr;
+    }
+
+    @Override
+    public List<EntityAttr> getAttrByDqCode(String dqCode) {
+        QueryWrapper<EntityAttrValue>valueQuery=new QueryWrapper<>();
+        List<EntityAttrValue> attrValues = valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, dqCode));
+        if (CollectionUtils.isEmpty(attrValues)){
+            return null;
+        }
+        List<EntityAttr>result=new ArrayList<>();
+        attrValues.stream().forEach(o->result.add(entityAttrMapper.selectById(o.getAttrId())));
+
+        //TODO 需要分组返回
+        return result;
     }
 }

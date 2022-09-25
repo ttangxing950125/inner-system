@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -118,8 +119,8 @@ public class EntityNameHisController extends BaseController
             // 示例值
             example = "1")
     @PostMapping("/getNameListByDqCoded")
-    public AjaxResult getNameListByDqCoded(String dqCode)
+    public R getNameListByDqCoded(String dqCode)
     {
-        return AjaxResult.success(entityNameHisService.getNameListByDqCoded(dqCode));
+        return R.ok(entityNameHisService.getNameListByDqCoded(dqCode));
     }
 }

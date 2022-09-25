@@ -145,9 +145,9 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/updateInfoList")
-    public AjaxResult updateInfoList(List<GovInfo>govInfoList)
+    public R updateInfoList(List<GovInfo>govInfoList)
     {
-        return AjaxResult.success(govInfoService.updateInfoList(govInfoList));
+        return R.ok(govInfoService.updateInfoList(govInfoList));
     }
     /**
      * 查询政府名称，或者编码，是否重复
@@ -167,9 +167,9 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/checkGov")
-    public AjaxResult checkGov(@RequestBody GovInfo govInfo)
+    public R checkGov(@RequestBody GovInfo govInfo)
     {
-        return AjaxResult.success(govInfoService.checkGov(govInfo));
+        return R.ok(govInfoService.checkGov(govInfo));
     }
     /**
      * 政府主体分页查询
@@ -189,7 +189,7 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/getInfoList")
-    public AjaxResult getInfoList(@RequestBody GovInfoByDto govInfo)
+    public R getInfoList(@RequestBody GovInfoByDto govInfo)
     {
         return govInfoService.getInfoList(govInfo);
     }
@@ -211,7 +211,7 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/addOldName")
-    public AjaxResult addOldName(@RequestBody GovInfo govInfo)
+    public R addOldName(@RequestBody GovInfo govInfo)
     {
         return govInfoService.addOldName(govInfo);
     }
@@ -266,7 +266,7 @@ public class GovInfoController extends BaseController
                   example = "新的曾用名")
   })
   @PostMapping("/updateOldName")
-  public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status)
+  public R updateOldName(String dqCode,String oldName, String newOldName,String status)
   {
     return govInfoService.updateOldName(dqCode,oldName,newOldName,status);
   }
@@ -288,7 +288,7 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/getInfoDetail")
-    public AjaxResult getInfoDetail(@RequestBody GovInfo govInfo){
+    public R getInfoDetail(@RequestBody GovInfo govInfo){
         return govInfoService.getInfoDetail(govInfo);
     }
     /**
@@ -308,7 +308,7 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/getListEntityByPage")
-    public AjaxResult getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto)
+    public R getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto)
     {
         return govInfoService.getListEntityByPage(govAttrDto);
     }
