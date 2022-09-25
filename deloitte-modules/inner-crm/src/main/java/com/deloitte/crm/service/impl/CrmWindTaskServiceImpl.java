@@ -19,6 +19,7 @@ import com.deloitte.crm.domain.BondNewIss;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.service.IBondNewIssService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,18 +85,22 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             throw new GlobalException("只能完成当天的任务");
         }
 
+        WindTaskContext taskContext = new WindTaskContext();
+        taskContext.setFile(file);
+        taskContext.setTimeNow(timeNow);
+        taskContext.setWindTask(windTask);
 
-
+        return windTaskStrategyManage.doTask(taskContext);
         //改任务未完成，读取文件
         //暂时不做枚举和策略模式了。。。先跑起来
-        if (Objects.equals(windTask.getTaskDictId(), 15L)){
+        /*if (Objects.equals(windTask.getTaskDictId(), 15L)){
             //读取文件
             ExcelUtil<BondNewIss> util = new ExcelUtil<BondNewIss>(BondNewIss.class);
             List<BondNewIss> isses = util.importExcel(file.getInputStream());
             return bondNewIssService.doTask(windTask, isses);
         }else {
             throw new GlobalException("暂不支持:"+windTask.getTaskFileName());
-        }
+        }*/
 
 
 
@@ -148,15 +153,17 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
         List<CrmWindTask> windTasks = this.list(wrapper);
 
-        List<WindTaskDetailsVo> detailsVos = windTasks.stream().map(item -> {
+        return windTasks.stream().map(item -> {
             WindTaskDetailsVo detailsVo = new WindTaskDetailsVo();
             detailsVo.setWindTask(item);
             detailsVo.setTaskFileName(item.getTaskFileName());
             detailsVo.setTaskStatus(item.getComplete());
-            //查询展示到列表上的信息
-            List<Map<String, Object>> data = this.findImportDetail(item);
 
-            List<String> header = this.findImportDetailHeader(item.getTaskDictId());
+            List<Map<String, Object>> data = windTaskStrategyManage.getDetail(item);
+
+            //查询展示到列表上的信息
+
+            List<String> header = windTaskStrategyManage.getDetailHeader(item);
 
 
             detailsVo.setHeader(header);
@@ -164,61 +171,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
             return detailsVo;
         }).collect(Collectors.toList());
-
-        return detailsVos;
-    }
-
-    /**
-     * 角色1查询有过修改的数据列表
-     *
-     *                   key: excel中的列名
-     *                   value: 数据
-     * @return
-     */
-    @Override
-    public List<Map<String, Object>> findImportDetail(CrmWindTask windTask) {
-        Integer taskId = windTask.getId();
-        Integer dictId = windTask.getTaskDictId();
-        Date taskDate = windTask.getTaskDate();
-
-        if (Objects.equals(dictId, 15)){
-            List<BondNewIss> bondNewIsses = bondNewIssService.findByTaskIdChangeType(taskId, 1,2);
-            return bondNewIsses.stream().map(item->{
-                HashMap<String, Object> dataMap = new HashMap<>();
-                dataMap.put("导入日期", item.getImportTime());
-                dataMap.put("ID", item.getId());
-                dataMap.put("债券简称", item.getBondShortName());
-                dataMap.put("发行人全称", item.getIssorName());
-                dataMap.put("变化状态", item.getChangeType());
-
-                return dataMap;
-            }).collect(Collectors.toList());
-        }
-
-
-        return null;
-    }
-
-    /**
-     * 角色1查询有过修改的数据列表表头
-     *
-     * @param taskDictId
-     * @return
-     */
-    @Override
-    public List<String> findImportDetailHeader(Integer taskDictId) {
-        ArrayList<String> arr = new ArrayList<>();
-
-        if (Objects.equals(taskDictId, 15)){
-            arr.add("导入日期");
-            arr.add("债券简称");
-            arr.add("交易代码");
-            arr.add("发行人全称");
-            arr.add("变化状态");
-        }
-
-
-        return arr;
     }
 
 

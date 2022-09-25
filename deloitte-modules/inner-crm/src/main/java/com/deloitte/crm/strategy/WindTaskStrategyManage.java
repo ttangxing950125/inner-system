@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,14 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
-    public Object doTask(WindTaskContext windTaskContext) {
-        return null;
+    public Object doTask(WindTaskContext windTaskContext) throws Exception {
+        CrmWindTask windTask = windTaskContext.getWindTask();
+        WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
+        if (supportItem==null){
+            return null;
+        }
+
+        return supportItem.doTask(windTaskContext);
     }
 
     /**
@@ -45,7 +52,12 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
      * @return
      */
     public List<String> getDetailHeader(CrmWindTask windTask) {
-        return getSupportItem(windTask.getTaskDictId()).getDetailHeader(windTask);
+        WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
+        if (supportItem==null){
+            return new ArrayList<>();
+        }
+
+        return supportItem.getDetailHeader(windTask);
     }
 
     /**
@@ -57,17 +69,17 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
      * @return
      */
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return getSupportItem(windTask.getTaskDictId()).getDetail(windTask);
+        WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
+        if (supportItem==null){
+            return new ArrayList<>();
+        }
+
+        return supportItem.getDetail(windTask);
     }
 
 
     public WindTaskStrategy getSupportItem(Integer taskDictId){
-        WindTaskStrategy strategy = windTaskStrategies.stream().filter(item -> item.support(taskDictId)).findFirst().orElse(null);
-        if (strategy==null){
-            throw new GlobalException("暂不支持该任务");
-        }
-
-        return strategy;
+        return windTaskStrategies.stream().filter(item -> item.support(taskDictId)).findFirst().orElse(null);
     }
 
 }
