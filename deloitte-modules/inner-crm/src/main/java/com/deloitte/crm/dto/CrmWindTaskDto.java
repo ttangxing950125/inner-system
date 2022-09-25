@@ -1,5 +1,7 @@
 package com.deloitte.crm.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author PenTang
  * @date 2022/09/22 10:06
@@ -8,10 +10,13 @@ package com.deloitte.crm.dto;
 
 public class CrmWindTaskDto {
     /** 任务描述 */
+    @ApiModelProperty(value = "任务描述")
     private String  taskDesc;
     /** 任务总数(指定日期) */
+    @ApiModelProperty(value = "任务总数")
     private String taskCount;
     /** 未完成任务数(指定日期) */
+    @ApiModelProperty(value = "未完成任务数(指定日期)")
     private String notComplete;
 
     public String getTaskDesc() {

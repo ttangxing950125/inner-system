@@ -2,7 +2,10 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.dto.CrmWindTaskDto;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,30 +55,44 @@ public class CrmWindTaskController extends BaseController
   /**
    *根据月份获取当月的任务信息
    *
-   * @return AjaxResult
+   * @return R
    * @author penTang
    * @date 2022/9/21 18:06
   */
 
     @PostMapping("/queryList")
-    @ApiOperation(value = "{根据指定TaskDate}")
-    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据",required = true,paramType = "body")
-    public AjaxResult getDataTable(@RequestBody String TaskDate) {
-      return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
+    @ApiOperation(value = "{根据指定TaskDate,获取当月的任务信息}",response = CrmWindTask.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name ="TaskDate",
+                    value = "Crm_wind_task task_date,任务日期",
+                    paramType = "query",
+                    example = "2022-09-23",
+                    dataType = "String"
+            )
+    })
+    public R<List<CrmWindTask>> getDataTable(@RequestBody String TaskDate) {
+      return R.ok(crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
     }
     /**
      *根据指定日期查询任务完成度
      *
      * @param TaskDate
-     * @return AjaxResult
+     * @return R
      * @author penTang
      * @date 2022/9/22 10:45
     */
     @PostMapping("/getTaskByDate")
-    @ApiOperation(value = "{根据指定TaskDate}")
-    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询任务完成度",required = true,paramType = "body")
-    public AjaxResult getTaskCompleted(String TaskDate) {
-       return AjaxResult.success("查询成功",crmWindTaskService.selectComTaskByDate(TaskDate));
+    @ApiOperation(value = "{根据指定TaskDate查询任务完成度}",response = CrmWindTaskDto.class)
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "taskDate",
+            value = "Crm_wind_task task_date,任务日期",
+            paramType = "query",
+            example = "2022-09-23",
+            dataType = "String"
+
+    )})
+    public R getTaskCompleted(String TaskDate) {
+       return R.ok(crmWindTaskService.selectComTaskByDate(TaskDate));
     }
 
     /**
@@ -83,15 +100,28 @@ public class CrmWindTaskController extends BaseController
      *
      * @param TaskDate
      * @param TaskCateId
-     * @return AjaxResult
+     * @return R
      * @author penTang
      * @date 2022/9/22 17:02
     */
     @PostMapping("/queryTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate,指定的TaskCateId}")
-    @ApiImplicitParam(name = "TaskDate",value = "根据指定TaskDate查询数据,指定的TaskCateId",required = true,paramType = "body")
-    public AjaxResult selectCrmWindTask(@RequestBody String TaskDate,String TaskCateId) {
-        return AjaxResult.success("查询成功",crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "taskDate",
+            value = " Crm_wind_task  task_date,任务日期",
+            paramType = "query",
+            example = "2022-09-23",
+            dataType = "String"
+    ),@ApiImplicitParam(
+            name = "TaskCateId",
+            value = "Crm_wind_task  task_cateId,任务日期",
+            paramType = "query",
+            example = "2",
+            dataType = "String"
+
+    )})
+    public R selectCrmWindTask(@RequestBody String TaskDate,String TaskCateId) {
+        return R.ok(crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
     }
 
 
