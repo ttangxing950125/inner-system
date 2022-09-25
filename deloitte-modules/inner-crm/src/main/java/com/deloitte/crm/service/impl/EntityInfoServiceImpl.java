@@ -515,7 +515,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
-        queryWrapper.lambda().eq(EntityInfo::getList,1);
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
 
         //封装新的结果集
@@ -567,7 +566,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
 
         Page<EntityInfo>pageInfo=new Page<>(pageNum,pageSize);
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
-        queryWrapper.lambda().eq(EntityInfo::getList,1);
         Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
 
         //查询分页数据集
