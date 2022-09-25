@@ -3,12 +3,17 @@ package com.deloitte.crm.quartz;
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 /**
  * @author PenTang
  * @date 2022/09/22 14:21
  */
 @Slf4j
+@Component
+@EnableScheduling
 public class QuartzTask {
     @Autowired
     private QuarzRoleTaskService quarzRoleTaskService;
@@ -21,7 +26,7 @@ public class QuartzTask {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-
+   @Scheduled(cron = "0 0 24 * * ?" )
     public void StartRuleTask() {
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();

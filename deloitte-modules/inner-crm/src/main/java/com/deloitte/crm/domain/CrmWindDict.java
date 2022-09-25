@@ -16,7 +16,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  */
 public class CrmWindDict extends BaseEntity
 {
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     /** $column.columnComment */
     private Integer id;
@@ -56,16 +56,15 @@ public class CrmWindDict extends BaseEntity
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 
-    public void setId(Integer id)
-    {
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Integer getId()
-    {
-        return id;
-    }
-    public void setCateName(String cateName) 
+    public void setCateName(String cateName)
     {
         this.cateName = cateName;
     }

@@ -11,7 +11,9 @@ import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysDictData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,8 +25,9 @@ import java.util.List;
  * @date 2022/09/22 21:29
  */
 @Slf4j
+@Service
 public class QuarzRoleTaskImp implements QuarzRoleTaskService {
-    @Autowired
+    @Resource
     private RoleService getRole;
     @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
@@ -44,8 +47,6 @@ public class QuarzRoleTaskImp implements QuarzRoleTaskService {
     */
     @Override
     public void executeQuarzRoleTask() {
-
-
         List<SysDictData> roleByType = getRole.getRoleByType();
         ArrayList<CrmDailyTask> crmDailyTasks = new ArrayList<CrmDailyTask>();
         ArrayList<CrmWindTask> crmWindTasks = new ArrayList<CrmWindTask>();

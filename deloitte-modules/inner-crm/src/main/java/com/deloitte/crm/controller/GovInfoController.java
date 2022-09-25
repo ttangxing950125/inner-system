@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -10,7 +11,9 @@ import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
+import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.service.IGovInfoService;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -43,8 +46,14 @@ public class GovInfoController extends BaseController
    *
   */
     @PostMapping("/govList")
-    public AjaxResult getGovInfo(){
-        return AjaxResult.success("查询成功",govInfoService.getGovInfo());
+    @ApiOperation(value = "{统计政府信息}", response= GovInfoDto.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query"
+
+            )
+    })
+    public R getGovInfo(){
+        return R.ok(govInfoService.getGovInfo());
 
     }
 

@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -11,8 +12,10 @@ import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
+import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,14 +39,20 @@ public class EntityInfoController extends BaseController
   /**
    *统计整体企业主体情况
    *
-   * @return AjaxResult
+   * @return R
    * @author penTang
    * @date 2022/9/22 22:41
   */
     @PostMapping("/entityInfoList")
-    @ApiOperation(value = "{统计整体企业主体情况}")
-    public AjaxResult getList(){
-        return AjaxResult.success("查询成功",entityInfoService.getEntityInfo());
+    @ApiOperation(value = "{统计整体企业主体情况}",response = EntityInfoDto.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query"
+
+            )
+    })
+
+    public R getList(){
+        return R.ok(entityInfoService.getEntityInfo());
     }
 
     /**

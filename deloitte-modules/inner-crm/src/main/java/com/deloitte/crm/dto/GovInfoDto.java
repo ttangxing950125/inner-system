@@ -1,5 +1,6 @@
 package com.deloitte.crm.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -11,14 +12,19 @@ import lombok.Data;
 public class GovInfoDto {
 
     /** 省 */
+    @ApiModelProperty(value = "省")
    private  Integer province ;
     /** 市 */
+    @ApiModelProperty(value = "市")
    private Integer city;
     /** 县*/
+    @ApiModelProperty(value = "县")
     private Integer county;
     /** 经开 */
+    @ApiModelProperty(value = "经开")
     private Integer open;
     /** 政府总数*/
+    @ApiModelProperty(value = "政府总数")
     private Integer govSum;
 
 }
