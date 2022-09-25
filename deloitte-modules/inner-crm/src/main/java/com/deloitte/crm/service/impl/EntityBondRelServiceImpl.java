@@ -56,7 +56,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
             entityTask.setSourceType(1);
             entityTask.setSourceId(newIss.getId());
             String showData = "发行人全称:"+issorName;
-            showData += ", 交易代码"+newIss.getTradeCode()+", 债券简称"+newIss.getBondShortName();
+            showData += ", 交易代码:"+newIss.getTradeCode()+", 债券简称:"+newIss.getBondShortName();
 
             entityTask.setDataShow(showData);
 

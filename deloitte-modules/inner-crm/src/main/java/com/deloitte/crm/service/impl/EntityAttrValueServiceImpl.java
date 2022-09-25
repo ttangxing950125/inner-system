@@ -133,8 +133,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         }
 
 
-        ArrayList<EntityAttrValue> saveList = new ArrayList<>();
-        ArrayList<EntityAttrValue> updateList = new ArrayList<>();
+//        ArrayList<EntityAttrValue> saveList = new ArrayList<>();
+//        ArrayList<EntityAttrValue> updateList = new ArrayList<>();
 
         Set<String> keySet = data.keySet();
         for (String key : keySet) {

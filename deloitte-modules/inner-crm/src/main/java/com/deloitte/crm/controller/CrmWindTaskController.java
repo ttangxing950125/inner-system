@@ -2,8 +2,9 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.vo.WindTaskDetailsVo;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.deloitte.common.log.annotation.Log;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/windTask")
+@Api(tags = "导入wind数据相关接口")
 public class CrmWindTaskController extends BaseController
 {
     @Autowired
@@ -32,8 +34,35 @@ public class CrmWindTaskController extends BaseController
 
 
     @GetMapping("/findTaskDetails")
-    public AjaxResult findTaskDetails(Integer taskCateId, String taskDate){
-        return AjaxResult.success(crmWindTaskService.findTaskDetails(taskCateId, taskDate));
+    @ApiOperation(value = "查询某一天角色1某个分类的wind任务", response = WindTaskDetailsVo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    //参数名
+                    name = "taskCateId",
+                    //参数描述
+                    value = "crm_wind_dict中的cate_id，也就是任务大类",
+                    //参数出现的地方 query 表单数据
+                    //path 路径
+                    //body applicationjson
+                    paramType = "path",
+                    //示例值
+                    example = "2"
+            ),
+            @ApiImplicitParam(
+                    //参数名
+                    name = "taskDate",
+                    //参数描述
+                    value = "需要查询任务的日期 yyyy-MM-dd",
+                    //参数出现的地方 query 表单数据
+                    //path 路径
+                    //body applicationjson
+                    paramType = "path",
+                    //示例值
+                    example = "2022-09-25"
+            )
+    })
+    public R<List<WindTaskDetailsVo>> findTaskDetails(Integer taskCateId, String taskDate){
+        return R.ok(crmWindTaskService.findTaskDetails(taskCateId, taskDate));
     }
 
 
@@ -45,7 +74,29 @@ public class CrmWindTaskController extends BaseController
      * @throws Exception
      */
     @PostMapping("/doTask/{taskId}")
-    public AjaxResult doTask(@PathVariable("taskId") Long taskId, @RequestParam MultipartFile file) throws Exception {
+    @ApiOperation(value = "进行wind任务", response = WindTaskDetailsVo.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    //参数名
+                    name = "taskId",
+                    //参数描述
+                    value = "crm_wind_task表中的id，也就是当前上传文件的任务",
+                    //参数出现的地方 query 表单数据
+                    //path 路径
+                    //body applicationjson
+                    paramType = "path",
+                    //示例值
+                    example = "13"
+            ),
+            @ApiImplicitParam(
+                    paramType = "form", dataType="file", name = "file",
+                    dataTypeClass=MultipartFile.class, required = true,
+                    //参数描述
+                    value = "上传的文件"
+            )
+    })
+    @ApiResponse(code = 200, message = "返回200就代表任务创建成功在后台执行了")
+    public AjaxResult doTask(@PathVariable("taskId") Long taskId, @RequestPart(required = true) MultipartFile file) throws Exception {
 
 
         return AjaxResult.success(crmWindTaskService.doTask(taskId, file));

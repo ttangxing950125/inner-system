@@ -71,9 +71,9 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
         Date taskDate = windTask.getTaskDate();
 
-        Date date = new Date();
+        Date timeNow = DateUtil.parseDate(DateUtil.getDate());
 
-        int compare = DateUtil.compare(taskDate, date, "yyyy-MM-dd");
+        int compare = DateUtil.compare(taskDate, timeNow, "yyyy-MM-dd");
 
         //只能完成当天的
         if (compare!=0){
