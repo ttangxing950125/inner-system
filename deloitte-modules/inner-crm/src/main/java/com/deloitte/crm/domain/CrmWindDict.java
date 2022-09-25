@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
@@ -14,7 +15,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class CrmWindDict extends BaseEntity
+public class CrmWindDict implements Serializable
 {
     private static final Long serialVersionUID = 1L;
 
@@ -50,10 +51,12 @@ public class CrmWindDict extends BaseEntity
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date created;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updated;
 
     public Integer getId() {

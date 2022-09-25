@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -9,6 +10,8 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.service.IEntityAttrService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -104,10 +107,35 @@ public class EntityAttrController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/23 10:56
     */
+    @ApiOperation(value = "分组查询全部---构造父子级关系")
     @PostMapping("/getAllByGroup")
-    public AjaxResult getAllByGroup()
+    public R getAllByGroup()
     {
         return entityAttrService.getAllByGroup();
+    }
+    /**
+     * 根据dqCode查询详细信息
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/25 13:56
+     */
+    @ApiOperation(value = "根据dqCode查询详细信息")
+    @ApiImplicitParam(
+            // 参数名
+            name="dqCode",
+            // 参数描述
+            value="德勤唯一识别码",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+            paramType = "query",
+            // 示例值
+            example = "",
+            //参数类型
+            dataType = "String")
+    @PostMapping("/getAttrByDqCode")
+    public R getAttrByDqCode(String dqCode)
+    {
+        return R.ok(entityAttrService.getAttrByDqCode(dqCode));
     }
 
 }

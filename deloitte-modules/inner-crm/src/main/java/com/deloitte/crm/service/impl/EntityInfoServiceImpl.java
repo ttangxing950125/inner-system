@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.*;
+import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
@@ -357,7 +360,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     }
 
     @Override
-    public AjaxResult addOldName(EntityInfo entity) {
+    public R addOldName(EntityInfo entity) {
         //获取操作用户
         String remoter = httpUtils.getRemoter();
 
@@ -386,11 +389,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         nameHis.setRemarks(entity.getEntityNameHisRemarks());
         nameHis.setSource(2);
         nameHisMapper.insert(nameHis);
-        return AjaxResult.success();
+        return R.ok();
     }
 
     @Override
-    public AjaxResult updateOldName(String dqCode, String oldName, String newOldName, String status) {
+    public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表
         QueryWrapper<EntityInfo>infoQuery=new QueryWrapper<>();
         EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, dqCode));
@@ -407,7 +410,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
             //修改曾用名表中的数据
             nameHis.setOldName(newOldName);
             nameHisMapper.updateById(nameHis);
-            return AjaxResult.success();
+            return R.ok();
         }
 
         //修改主体表中的数据
@@ -433,30 +436,29 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         //修改曾用名表中的数据
         nameHis.setStatus(EntityUtils.INVALID);
         nameHisMapper.updateById(nameHis);
-        return AjaxResult.success();
+        return R.ok();
     }
 
     @Override
-    public AjaxResult getInfoDetail(EntityInfo entityInfo) {
+    public R getInfoDetail(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(entityInfos)&&entityInfos.size()>1){
-            return AjaxResult.error();
+            return R.fail();
         }
         //TODO  添加主体其余详细信息
 
-
-        return AjaxResult.success(entityInfos.get(0));
+        return R.ok(entityInfos.get(0));
     }
 
     @Override
-    public AjaxResult getInfoList(EntityInfoByDto entityInfoDto) {
+    public R getInfoList(EntityInfoByDto entityInfoDto) {
         entityInfoDto.setEntityInfo();
         EntityInfo entityInfo = entityInfoDto.getEntityInfo();
         Integer pageNum = entityInfoDto.getPageNum();
         Integer pageSize = entityInfoDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum)){
-            return AjaxResult.error("请输入页码");
+            return R.fail("请输入页码");
         }
         if (ObjectUtils.isEmpty(pageSize)){
             pageSize= EntityUtils.DEFAULT_PAGE_SIZE;
@@ -475,7 +477,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
             records.add(getResultMap(o));
         });
         pageResult.setRecords(records);
-        return AjaxResult.success(pageResult);
+        return R.ok(pageResult);
     }
 
     @Override
@@ -491,7 +493,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     }
 
     @Override
-    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
+    public R getListEntityByPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
 
@@ -532,7 +534,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
             resultRecords.add(resultMap);
         });
         pageResult.setRecords(resultRecords);
-        return AjaxResult.success(pageResult);
+        return R.ok(pageResult);
     }
 
     /**

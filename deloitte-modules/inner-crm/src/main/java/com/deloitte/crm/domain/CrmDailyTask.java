@@ -4,18 +4,19 @@ import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author PenTang
  * @date 2022/09/22 15:24
  */
-public class CrmDailyTask extends BaseEntity {
+public class CrmDailyTask implements Serializable {
 
  private static final long serialVersionUID = 1L;
 
  /** $column.columnComment */
- private Long id;
+ private Integer id;
     /** 3crm角色1
      4	crm角色2
      5	crm角色3
@@ -43,11 +44,11 @@ public class CrmDailyTask extends BaseEntity {
     private Date updated;
 
 
- public Long getId() {
+ public Integer getId() {
   return id;
  }
 
- public void setId(Long id) {
+ public void setId(Integer id) {
   this.id = id;
  }
 

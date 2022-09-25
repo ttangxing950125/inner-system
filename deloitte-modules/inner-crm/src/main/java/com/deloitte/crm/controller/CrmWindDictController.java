@@ -3,6 +3,8 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +32,7 @@ import com.deloitte.common.core.web.page.TableDataInfo;
  */
 @RestController
 @RequestMapping("/dict")
+@Api(tags = "wind文件数据详情相关接口")
 public class CrmWindDictController extends BaseController
 {
     @Autowired

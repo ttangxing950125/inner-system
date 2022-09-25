@@ -53,13 +53,13 @@ public class QuarzRoleTaskImp implements QuarzRoleTaskService {
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateString = formatter.format(currentTime);
-        ParsePosition pos = new ParsePosition(8);
-        Date dateTime = formatter.parse(dateString, pos);
+
+
         for (SysDictData sysDictData : roleByType) {
             CrmDailyTask crmDailyTask = new CrmDailyTask();
             crmDailyTask.setTaskRoleType(sysDictData.getDictValue());
             crmDailyTask.setTaskStatus(1);
-            crmDailyTask.setTaskDate(dateTime);
+            crmDailyTask.setTaskDate(currentTime);
             crmDailyTasks.add(crmDailyTask);
         }
         if (crmDailyTaskService.saveCrmDailyTask(crmDailyTasks)) {
@@ -70,13 +70,13 @@ public class QuarzRoleTaskImp implements QuarzRoleTaskService {
                 crmWindTask.setTaskCateId(crmWindDict.getCateId());
                 crmWindTask.setTaskDictId(crmWindDict.getId());
                 crmWindTask.setTaskDesc(crmWindDict.getTaskDesc());
-                crmWindTask.setTaskDate(dateTime);
+                crmWindTask.setTaskDate(currentTime);
                 crmWindTask.setTaskFileName(crmWindDict.getWindFileName());
                 crmWindTask.setTaskCategory(crmWindDict.getCateName());
                 crmWindTasks.add(crmWindTask);
             }
             if (crmWindTaskService.saveCrmWindTas(crmWindTasks)) {
-                if (crmDailyTaskService.updateByType(dateTime)) {
+                if (crmDailyTaskService.updateByType(currentTime)) {
                     log.info("修改状态成功");
                 }
 

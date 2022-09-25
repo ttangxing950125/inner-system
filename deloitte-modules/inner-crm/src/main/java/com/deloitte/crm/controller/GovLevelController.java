@@ -1,37 +1,29 @@
 package com.deloitte.crm.controller;
 
-import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.common.core.web.controller.BaseController;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovLevel;
 import com.deloitte.crm.service.IGovLevelService;
-import com.deloitte.common.core.web.controller.BaseController;
-import com.deloitte.common.core.web.domain.AjaxResult;
-import com.deloitte.common.core.utils.poi.ExcelUtil;
-import com.deloitte.common.core.web.page.TableDataInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Controller
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
 @RestController
 @RequestMapping("/level")
-public class GovLevelController extends BaseController
-{
+public class GovLevelController extends BaseController {
     @Autowired
     private IGovLevelService govLevelService;
 
@@ -40,8 +32,7 @@ public class GovLevelController extends BaseController
      */
     @RequiresPermissions("crm:level:list")
     @GetMapping("/list")
-    public TableDataInfo list(GovLevel govLevel)
-    {
+    public TableDataInfo list(GovLevel govLevel) {
         startPage();
         List<GovLevel> list = govLevelService.selectGovLevelList(govLevel);
         return getDataTable(list);
@@ -53,8 +44,7 @@ public class GovLevelController extends BaseController
     @RequiresPermissions("crm:level:export")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, GovLevel govLevel)
-    {
+    public void export(HttpServletResponse response, GovLevel govLevel) {
         List<GovLevel> list = govLevelService.selectGovLevelList(govLevel);
         ExcelUtil<GovLevel> util = new ExcelUtil<GovLevel>(GovLevel.class);
         util.exportExcel(response, list, "【请填写功能名称】数据");
@@ -65,8 +55,7 @@ public class GovLevelController extends BaseController
      */
     @RequiresPermissions("crm:level:query")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(govLevelService.selectGovLevelById(id));
     }
 
@@ -76,8 +65,7 @@ public class GovLevelController extends BaseController
     @RequiresPermissions("crm:level:add")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody GovLevel govLevel)
-    {
+    public AjaxResult add(@RequestBody GovLevel govLevel) {
         return toAjax(govLevelService.insertGovLevel(govLevel));
     }
 
@@ -87,8 +75,7 @@ public class GovLevelController extends BaseController
     @RequiresPermissions("crm:level:edit")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody GovLevel govLevel)
-    {
+    public AjaxResult edit(@RequestBody GovLevel govLevel) {
         return toAjax(govLevelService.updateGovLevel(govLevel));
     }
 
@@ -97,9 +84,8 @@ public class GovLevelController extends BaseController
      */
     @RequiresPermissions("crm:level:remove")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(govLevelService.deleteGovLevelByIds(ids));
     }
 }
