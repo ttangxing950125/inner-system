@@ -132,5 +132,5 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     AjaxResult updateOldName(String dqCode, String oldName, String newOldName, String status);
 
-    AjaxResult getNewInfo(EntityInfo entityInfo);
+    AjaxResult getInfoDetail(EntityInfo entityInfo);
 }

@@ -16,6 +16,7 @@ import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +34,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/entityInfo")
+@Api(tags="企业主体查询修改相关数据")
 public class EntityInfoController extends BaseController
 {
     @Autowired
@@ -151,7 +153,7 @@ public class EntityInfoController extends BaseController
       @PostMapping("/updateInfoList")
       public AjaxResult updateInfoList(List<EntityInfo>entityInfoList)
       {
-        return AjaxResult.success(entityInfoService.updateInfoList(entityInfoList));
+          return AjaxResult.success(entityInfoService.updateInfoList(entityInfoList));
       }
       /**
        * 查询企业名称，或者编码，是否重复
@@ -173,7 +175,7 @@ public class EntityInfoController extends BaseController
       @PostMapping("/checkEntity")
       public AjaxResult checkEntity(@RequestBody EntityInfo entityInfo)
       {
-        return AjaxResult.success(entityInfoService.checkEntity(entityInfo));
+          return AjaxResult.success(entityInfoService.checkEntity(entityInfo));
       }
       /**
        * 企业主体分页查询
@@ -195,7 +197,7 @@ public class EntityInfoController extends BaseController
       @PostMapping("/getInfoList")
       public AjaxResult getInfoList(@RequestBody EntityInfoByDto entityInfo)
       {
-        return entityInfoService.getInfoList(entityInfo);
+          return entityInfoService.getInfoList(entityInfo);
       }
       /**
        * 新增企业主体的曾用名
@@ -215,9 +217,9 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/addOldName")
-      public AjaxResult addOldName(EntityInfo entityInfo)
+      public AjaxResult addOldName(@RequestBody EntityInfo entityInfo)
       {
-        return entityInfoService.addOldName(entityInfo);
+          return entityInfoService.addOldName(entityInfo);
       }
       /**
        * 修改企业主体的曾用名
@@ -272,7 +274,7 @@ public class EntityInfoController extends BaseController
       @PostMapping("/updateOldName")
       public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status)
       {
-        return entityInfoService.updateOldName(dqCode,oldName,newOldName,status);
+          return entityInfoService.updateOldName(dqCode,oldName,newOldName,status);
       }
       /**
        * 根据 dqCode 查询企业主体
@@ -292,8 +294,8 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/getInfoDetail")
-      public AjaxResult getInfoDetail(EntityInfo entityInfo){
-        return entityInfoService.getNewInfo(entityInfo);
+      public AjaxResult getInfoDetail(@RequestBody EntityInfo entityInfo){
+          return entityInfoService.getInfoDetail(entityInfo);
       }
       /**
        * 分页查询全部上市主体
@@ -312,9 +314,9 @@ public class EntityInfoController extends BaseController
               // 示例值
               example = "")
       @PostMapping("/getListEntityByPage")
-      public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
+      public AjaxResult getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto)
       {
-        return entityInfoService.getListEntityByPage(entityAttrDto);
+          return entityInfoService.getListEntityByPage(entityAttrDto);
       }
 
 }

@@ -123,7 +123,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public AjaxResult getNewInfo(GovInfo govInfo) {
+    public AjaxResult getInfoDetail(GovInfo govInfo) {
         QueryWrapper<GovInfo>queryWrapper=new QueryWrapper<>(govInfo);
         List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(govInfos)&&govInfos.size()>1){
@@ -267,20 +267,22 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<GovInfo> records = entityInfoPage.getRecords();
         records.stream().forEach(o->{
             Map<String, Object> resultMap = JSON.parseObject(JSON.toJSONString(o), new TypeReference<Map<String, String>>() {});
-            for (Map<String,String> map:mapList){
-                QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
-                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                        .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
-                        .eq(EntityAttrValue::getEntityCode,o.getDqGovCode()));
-                //新增指标栏
-                Map<String,Object> more=new HashMap<>();
-                more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
-                if (attrValue==null){
-                    more.put(MORE_ENTITY_KPI_VALUE,null);
-                }else {
-                    more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+            if (!CollectionUtils.isEmpty(mapList)){
+                for (Map<String,String> map:mapList){
+                    QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
+                    EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                            .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                            .eq(EntityAttrValue::getEntityCode,o.getDqGovCode()));
+                    //新增指标栏
+                    Map<String,Object> more=new HashMap<>();
+                    more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
+                    if (attrValue==null){
+                        more.put(MORE_ENTITY_KPI_VALUE,null);
+                    }else {
+                        more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                    }
+                    resultMap.put(MORE_ENTITY_KPI_MORE, more);
                 }
-                resultMap.put(MORE_ENTITY_KPI_MORE, more);
             }
             resultRecords.add(resultMap);
         });

@@ -437,13 +437,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     }
 
     @Override
-    public AjaxResult getNewInfo(EntityInfo entityInfo) {
+    public AjaxResult getInfoDetail(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(entityInfos)&&entityInfos.size()>1){
             return AjaxResult.error();
         }
         //TODO  添加主体其余详细信息
+
 
         return AjaxResult.success(entityInfos.get(0));
     }
@@ -511,20 +512,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         List<EntityInfo> records = entityInfoPage.getRecords();
         records.stream().forEach(o->{
             Map<String, Object> resultMap = JSON.parseObject(JSON.toJSONString(o), new TypeReference<Map<String, String>>() {});
-            for (Map<String,String> map:mapList){
-                QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
-                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                        .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
-                        .eq(EntityAttrValue::getEntityCode,o.getEntityCode()));
-                //新增指标栏
-                Map<String,Object> more=new HashMap<>();
-                more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
-                if (attrValue==null){
-                    more.put(MORE_ENTITY_KPI_VALUE,null);
-                }else {
-                    more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+            if (!CollectionUtils.isEmpty(mapList)){
+                for (Map<String,String> map:mapList){
+                    QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
+                    EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                            .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                            .eq(EntityAttrValue::getEntityCode,o.getEntityCode()));
+                    //新增指标栏
+                    Map<String,Object> more=new HashMap<>();
+                    more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
+                    if (attrValue==null){
+                        more.put(MORE_ENTITY_KPI_VALUE,null);
+                    }else {
+                        more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                    }
+                    resultMap.put(MORE_ENTITY_KPI_MORE, more);
                 }
-                resultMap.put(MORE_ENTITY_KPI_MORE, more);
             }
             resultRecords.add(resultMap);
         });

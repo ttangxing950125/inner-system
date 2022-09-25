@@ -78,7 +78,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     Integer updateInfoList(List<GovInfo> list);
 
-    AjaxResult getNewInfo(GovInfo govInfo);
+    AjaxResult getInfoDetail(GovInfo govInfo);
 
     AjaxResult getInfoList(GovInfoByDto govInfo);
 
@@ -86,7 +86,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     AjaxResult checkGov(GovInfo govInfo);
 
-    AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
+    AjaxResult getListEntityByPage(EntityAttrByDto govAttrDto);
 
     AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status);
 }
