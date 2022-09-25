@@ -32,6 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/govInfo")
 @Api(tags="政府主体查询修改相关数据")
+
 public class GovInfoController extends BaseController
 {
     @Autowired
