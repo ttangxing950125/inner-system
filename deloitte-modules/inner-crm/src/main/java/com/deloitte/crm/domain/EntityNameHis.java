@@ -59,7 +59,7 @@ public class EntityNameHis implements Serializable
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    private Date update;
+    private Date updated;
 
     public void setId(Long id) 
     {
@@ -151,14 +151,14 @@ public class EntityNameHis implements Serializable
     {
         return created;
     }
-    public void setUpdate(Date update) 
+    public void setUpdated(Date updated)
     {
-        this.update = update;
+        this.updated = updated;
     }
 
-    public Date getUpdate() 
+    public Date getUpdated()
     {
-        return update;
+        return updated;
     }
 
     @Override
