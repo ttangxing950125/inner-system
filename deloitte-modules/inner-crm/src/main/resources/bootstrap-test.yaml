@@ -4,17 +4,12 @@ server:
 
 # Spring
 spring:
-  mvc:
-    pathmatch:
-      matching-strategy: ANT_PATH_MATCHER
-  main:
-    allow-circular-references: true
   application:
     # 应用名称
     name: inner-crm
   profiles:
     # 环境配置
-    active: dev
+    active: test
   cloud:
     nacos:
       discovery:

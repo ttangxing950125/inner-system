@@ -43,7 +43,9 @@ public class RoleSevenController {
      * @return 当月或者当日的任务情况
      */
     @ApiOperation(value="查询指定日期或当月任务情况")
-    @ApiImplicitParam(name="timeUnit,date",value="请传入时间单位常量 MOUTH || DAY,请传入具体日期: yyyy-mm-dd",required = true,paramType = "query",dataType = "String,Date")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="timeUnit",value="请传入时间单位常量 MOUTH || DAY",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="date",value="请传入具体日期: yyyy-mm-dd",paramType = "query",dataType = "Date")})
     @PostMapping("/getTaskInfo")
     @Log(title = "【查询指定日期或当月任务情况】", businessType = BusinessType.OTHER)
     public AjaxResult getTaskInfo(String timeUnit,Date date){
@@ -60,7 +62,9 @@ public class RoleSevenController {
      * @return 操作成功与否
      */
     @ApiOperation(value="确认该任务的主体是新增或是忽略")
-    @ApiImplicitParam(name="id,state",value="传入 id,传入 状态 1是忽略 2是新增",required = true,paramType = "query",dataType = "Integer,Integer")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer"),
+            @ApiImplicitParam(name="state",value="传入 状态 1是忽略 2是新增",paramType = "query",dataType = "Integer")})
     @Log(title = "【确认该任务的主体是新增或是忽略】", businessType = BusinessType.UPDATE)
     @PostMapping("/changeState")
     public AjaxResult changeState(Integer id,Integer state){
@@ -89,6 +93,10 @@ public class RoleSevenController {
      */
     @ApiOperation(value="校验该主体是否存在，并做其他判断")
     @ApiImplicitParam(name="creditCode,entityName",value="传入 企业统一社会信用代码,传入 企业名称",required = true,paramType = "query",dataType = "String,String")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="creditCode",value="传入 企业统一社会信用代码",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="entityName",value="传入 企业名称",paramType = "query",dataType = "String")
+    })
     @Log(title = "【校验该主体是否存在，并做其他判断】", businessType = BusinessType.OTHER)
     @PostMapping("/validEntity")
     public AjaxResult validEntity(String creditCode,String entityName){
@@ -107,7 +115,11 @@ public class RoleSevenController {
      * @return 修改返回信息
      */
     @ApiOperation(value="修改主体信息中的主体名称 & 汇总曾用名")
-    @ApiImplicitParam(name="creditCode,entityNewName,remarks",value="统一社会信用代码,主体新名称,备注",required = true,paramType = "query",dataType = "String,String,String")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="creditCode",value="统一社会信用代码",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="remarks",value="备注",paramType = "query",dataType = "String")
+    })
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
     public AjaxResult editEntityNameHis(String creditCode,String entityNewName,String remarks){

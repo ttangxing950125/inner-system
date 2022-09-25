@@ -89,24 +89,8 @@ public class EntityInfoController extends BaseController
      * @return
      */
     @RequiresPermissions("crm:entityInfo:add")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
-    @ApiImplicitParam(name="entityInfoDto",value="包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段",required = true,paramType = "body",dataTypeClass = EntityDto.class)
-    @PostMapping("/insert")
-    public AjaxResult add(@RequestBody EntityDto entityDto)
-    {
-        //TODO 新增主体
-        return toAjax(entityInfoService.insertEntityInfo(entityDto));
-    }
-    /**
-     * @author 正杰
-     * @date 2022/9/22
-     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
-     * @param entityDto
-     * @return
-     */
-    @RequiresPermissions("crm:entityInfo:add")
-    @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
-    @ApiImplicitParam(name="entityInfoDto",value="包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段",required = true,paramType = "body",dataTypeClass = EntityDto.class)
+    @Log(title = "【确定该主体是新增后,填写具体要新增主体的信息】", businessType = BusinessType.INSERT)
+    @ApiImplicitParam(name="entityInfoDto",value="包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段",paramType = "body")
     @PostMapping("/add")
     public AjaxResult addEntity(@RequestBody EntityDto entityDto)
     {
