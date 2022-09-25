@@ -13,9 +13,8 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.service.IGovInfoService;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -133,7 +132,15 @@ public class GovInfoController extends BaseController
      * @date 2022/9/22 15:24
     */
     @ApiOperation(value = "政府主题批量修改")
-    @ApiImplicitParam(name="updateInfoList",value="包含表中egov_info的所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="govInfoList",
+            // 参数描述
+            value="包含表中egov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/updateInfoList")
     public AjaxResult updateInfoList(List<GovInfo>govInfoList)
     {
@@ -147,7 +154,15 @@ public class GovInfoController extends BaseController
      * @date 2022/9/22 17:49
     */
     @ApiOperation(value = "查询政府名称，或者编码，是否重复")
-    @ApiImplicitParam(name="checkGov",value="包含表中gov_info的所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="govInfo",
+            // 参数描述
+            value="包含表中egov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/checkGov")
     public AjaxResult checkGov(@RequestBody GovInfo govInfo)
     {
@@ -161,7 +176,15 @@ public class GovInfoController extends BaseController
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "政府主体分页查询")
-    @ApiImplicitParam(name="getInfoList",value="包含表中gov_info的所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="govInfo",
+            // 参数描述
+            value="包含表中egov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/getInfoList")
     public AjaxResult getInfoList(@RequestBody GovInfoByDto govInfo)
     {
@@ -175,7 +198,15 @@ public class GovInfoController extends BaseController
      * @date 2022/9/23 8:44
     */
     @ApiOperation(value = "修改政府主体的曾用名")
-    @ApiImplicitParam(name="updateOldName",value="包含表中gov_info的所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="govInfo",
+            // 参数描述
+            value="包含表中egov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/updateOldName")
     public AjaxResult updateOldName(GovInfo govInfo)
     {
@@ -189,7 +220,15 @@ public class GovInfoController extends BaseController
      * @date 2022/9/23 8:59
     */
     @ApiOperation(value = "根据 dqCode 查询政府主体")
-    @ApiImplicitParam(name="getInfoDetail",value="包含表中gov_info的所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="govInfo",
+            // 参数描述
+            value="包含表中egov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/getInfoDetail")
     public AjaxResult getInfoDetail(GovInfo govInfo){
         return govInfoService.getNewInfo(govInfo);
@@ -201,7 +240,15 @@ public class GovInfoController extends BaseController
      * @date 2022/9/23 10:56
      */
     @ApiOperation(value = "分页查询全部上市主体")
-    @ApiImplicitParam(name="getListEntityByPage",value="包含表中gov_info的所有字段和分页参数 pageSize pageNum",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="entityAttrDto",
+            // 参数描述
+            value="包含表中gov_info的所有字段和分页参数 pageSize pageNum",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/getListEntityByPage")
     public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
     {
