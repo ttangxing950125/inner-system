@@ -24,7 +24,7 @@ public interface WindTaskStrategy {
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
-    Object doTask(WindTaskContext windTaskContext);
+    Object doTask(WindTaskContext windTaskContext) throws Exception;
 
     /**
      * 获得任务详情页，上传的数据的表头

@@ -16,7 +16,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  */
 public class CrmWindDict extends BaseEntity
 {
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     /** $column.columnComment */
     private Integer id;

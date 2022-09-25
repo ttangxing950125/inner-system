@@ -119,19 +119,4 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
      */
     List<WindTaskDetailsVo> findTaskDetails(Integer taskCateId, String taskDate);
 
-    /**
-     * 角色1查询有过修改的数据列表
-     * @param windTasks 具体分类id
-     * key: excel中的列名
-     * value: 数据
-     * @return
-     */
-    List<Map<String, Object>> findImportDetail(CrmWindTask windTasks);
-
-    /**
-     * 角色1查询有过修改的数据列表表头
-     * @param taskDictId
-     * @return
-     */
-    List<String> findImportDetailHeader(Integer taskDictId);
 }
