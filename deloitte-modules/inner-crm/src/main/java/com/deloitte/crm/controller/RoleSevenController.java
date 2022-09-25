@@ -27,7 +27,7 @@ import java.util.Date;
 @RestController
 @RequestMapping("/roleSeven")
 @AllArgsConstructor
-@Api("角色7控制层")
+@Api(tags = "角色7控制层")
 public class RoleSevenController {
 
     private final ICrmEntityTaskService iCrmEntityTaskService;
