@@ -117,7 +117,9 @@ public class EntityNameHisController extends BaseController
             // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "query",
             // 示例值
-            example = "1")
+            example = "1",
+            //参数类型
+            dataType = "String")
     @PostMapping("/getNameListByDqCoded")
     public R getNameListByDqCoded(String dqCode)
     {

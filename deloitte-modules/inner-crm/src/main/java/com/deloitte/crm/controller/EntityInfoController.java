@@ -149,7 +149,9 @@ public class EntityInfoController extends BaseController
               // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
               paramType = "body",
               // 示例值
-              example = "")
+              example = "",
+              //参数类型
+              dataTypeClass = EntityInfo.class)
       @PostMapping("/updateInfoList")
       public R updateInfoList(List<EntityInfo>entityInfoList)
       {
@@ -171,7 +173,9 @@ public class EntityInfoController extends BaseController
               // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
               paramType = "body",
               // 示例值
-              example = "")
+              example = "",
+              //参数类型
+              dataTypeClass = EntityInfo.class)
       @PostMapping("/checkEntity")
       public R checkEntity(@RequestBody EntityInfo entityInfo)
       {
@@ -193,7 +197,9 @@ public class EntityInfoController extends BaseController
               // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
               paramType = "body",
               // 示例值
-              example = "")
+              example = "",
+              //参数类型
+              dataTypeClass = EntityInfoByDto.class)
       @PostMapping("/getInfoList")
       public R getInfoList(@RequestBody EntityInfoByDto entityInfo)
       {
@@ -215,7 +221,9 @@ public class EntityInfoController extends BaseController
               // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
               paramType = "body",
               // 示例值
-              example = "")
+              example = "",
+              //参数类型
+              dataTypeClass = EntityInfo.class)
       @PostMapping("/addOldName")
       public R addOldName(@RequestBody EntityInfo entityInfo)
       {
@@ -242,7 +250,9 @@ public class EntityInfoController extends BaseController
                       // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
                       paramType = "query",
                       // 示例值
-                      example = "1"),
+                      example = "1",
+                      //参数类型
+                      dataType = "String"),
               @ApiImplicitParam(
                       // 参数名
                       name = "oldName",
@@ -251,7 +261,9 @@ public class EntityInfoController extends BaseController
                       // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
                       paramType = "query",
                       // 示例值
-                      example = "原始曾用名"),
+                      example = "原始曾用名",
+                      //参数类型
+                      dataType = "String"),
               @ApiImplicitParam(
                       // 参数名
                       name = "newOldName",
@@ -260,7 +272,9 @@ public class EntityInfoController extends BaseController
                       // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
                       paramType = "query",
                       // 示例值
-                      example = "新的曾用名"),
+                      example = "新的曾用名",
+                      //参数类型
+                      dataType = "String"),
               @ApiImplicitParam(
                       // 参数名
                       name = "status",
@@ -269,7 +283,9 @@ public class EntityInfoController extends BaseController
                       // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
                       paramType = "query",
                       // 示例值
-                      example = "新的曾用名")
+                      example = "新的曾用名",
+                      //参数类型
+                      dataType = "String")
       })
       @PostMapping("/updateOldName")
       public R updateOldName(String dqCode,String oldName, String newOldName,String status)
@@ -292,7 +308,9 @@ public class EntityInfoController extends BaseController
               // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
               paramType = "body",
               // 示例值
-              example = "")
+              example = "",
+              //参数类型
+              dataTypeClass = EntityInfo.class)
       @PostMapping("/getInfoDetail")
       public R getInfoDetail(@RequestBody EntityInfo entityInfo){
           return entityInfoService.getInfoDetail(entityInfo);
@@ -312,7 +330,9 @@ public class EntityInfoController extends BaseController
               // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
               paramType = "body",
               // 示例值
-              example = "")
+              example = "",
+              //参数
+              dataTypeClass = EntityAttrByDto.class)
       @PostMapping("/getListEntityByPage")
       public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto)
       {
