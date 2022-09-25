@@ -16,7 +16,7 @@ import java.util.Map;
  * @date 2022/9/25
  */
 @Component
-public class WindTaskStrategyManage implements ApplicationContextAware, WindTaskStrategy {
+public class WindTaskStrategyManage implements ApplicationContextAware {
 
     /**
      * 能够处理wind任务的对象
@@ -30,23 +30,11 @@ public class WindTaskStrategyManage implements ApplicationContextAware, WindTask
     }
 
     /**
-     * 是否支持当前wind任务
-     *
-     * @param windDictId
-     * @return
-     */
-    @Override
-    public boolean support(Integer windDictId) {
-        return false;
-    }
-
-    /**
      * 开始执行任务
      *
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
-    @Override
     public Object doTask(WindTaskContext windTaskContext) {
         return null;
     }
@@ -56,9 +44,8 @@ public class WindTaskStrategyManage implements ApplicationContextAware, WindTask
      *
      * @return
      */
-    @Override
     public List<String> getDetailHeader(CrmWindTask windTask) {
-        return null;
+        return getSupportItem(windTask.getTaskDictId()).getDetailHeader(windTask);
     }
 
     /**
@@ -69,9 +56,8 @@ public class WindTaskStrategyManage implements ApplicationContextAware, WindTask
      * @param windTask
      * @return
      */
-    @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        return getSupportItem(windTask.getTaskDictId()).getDetail(windTask);
     }
 
 

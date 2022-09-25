@@ -19,6 +19,7 @@ import com.deloitte.crm.domain.BondNewIss;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.service.IBondNewIssService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.strategy.WindTaskStrategyManage;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,6 +55,9 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Resource
     private ICrmDailyTaskService dailyTaskService;
 
+    @Resource
+    private WindTaskStrategyManage windTaskStrategyManage;
+
     /**
      * 导入wind文件
      * @param taskId
@@ -79,6 +83,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         if (compare!=0){
             throw new GlobalException("只能完成当天的任务");
         }
+
 
 
         //改任务未完成，读取文件
@@ -173,10 +178,10 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Override
     public List<Map<String, Object>> findImportDetail(CrmWindTask windTask) {
         Integer taskId = windTask.getId();
-        Long dictId = windTask.getTaskDictId();
+        Integer dictId = windTask.getTaskDictId();
         Date taskDate = windTask.getTaskDate();
 
-        if (Objects.equals(dictId, 15L)){
+        if (Objects.equals(dictId, 15)){
             List<BondNewIss> bondNewIsses = bondNewIssService.findByTaskIdChangeType(taskId, 1,2);
             return bondNewIsses.stream().map(item->{
                 HashMap<String, Object> dataMap = new HashMap<>();
@@ -201,10 +206,10 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
      * @return
      */
     @Override
-    public List<String> findImportDetailHeader(Long taskDictId) {
+    public List<String> findImportDetailHeader(Integer taskDictId) {
         ArrayList<String> arr = new ArrayList<>();
 
-        if (Objects.equals(taskDictId, 15L)){
+        if (Objects.equals(taskDictId, 15)){
             arr.add("导入日期");
             arr.add("债券简称");
             arr.add("交易代码");

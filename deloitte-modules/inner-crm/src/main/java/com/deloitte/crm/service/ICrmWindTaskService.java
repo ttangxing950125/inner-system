@@ -133,5 +133,5 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
      * @param taskDictId
      * @return
      */
-    List<String> findImportDetailHeader(Long taskDictId);
+    List<String> findImportDetailHeader(Integer taskDictId);
 }

@@ -26,7 +26,7 @@ import lombok.ToString;
 @ToString
 public class CrmWindTask implements Serializable
 {
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     /** $column.columnComment */
     @TableId(type = IdType.AUTO)
@@ -38,7 +38,7 @@ public class CrmWindTask implements Serializable
 
     /** crm_task_dict的id */
     @Excel(name = "crm_task_dict的id")
-    private Long taskDictId;
+    private Integer taskDictId;
 
     /** 任务描述 */
     @Excel(name = "任务描述")
@@ -75,7 +75,7 @@ public class CrmWindTask implements Serializable
 
     /** 任务完成人 */
     @Excel(name = "任务完成人")
-    private Long handleUser;
+    private Integer handleUser;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")

@@ -34,7 +34,7 @@ public class CrmWindTaskController extends BaseController
 
 
     @GetMapping("/findTaskDetails")
-    @ApiOperation(value = "查询某一天角色1某个分类的wind任务", response = WindTaskDetailsVo.class)
+    @ApiOperation(value = "吴鹏——查询某一天角色1某个分类的wind任务", response = WindTaskDetailsVo.class)
     @ApiImplicitParams({
             @ApiImplicitParam(
                     //参数名
@@ -74,7 +74,7 @@ public class CrmWindTaskController extends BaseController
      * @throws Exception
      */
     @PostMapping("/doTask/{taskId}")
-    @ApiOperation(value = "进行wind任务", response = WindTaskDetailsVo.class)
+    @ApiOperation(value = "吴鹏——进行wind任务", response = WindTaskDetailsVo.class)
     @ApiImplicitParams({
             @ApiImplicitParam(
                     //参数名
