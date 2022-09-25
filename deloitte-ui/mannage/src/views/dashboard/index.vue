@@ -173,6 +173,201 @@
         >
       </span>
     </el-dialog>
+    <el-dialog title="补充金融机构相关信息" :visible.sync="remarkDig" width="50%">
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="135px"
+        label-position="left"
+      >
+        <el-form-item label="企业名称" prop="region">
+          <span>xxxxxxxxxxxx</span>
+        </el-form-item>
+        <el-form-item label="统一社会信用代码" prop="region">
+          <span>xxxxxxx121xxxxx</span>
+        </el-form-item>
+        <el-form-item label="来源" prop="region">
+          <span>xxxxxxx121xxxxx</span>
+        </el-form-item>
+        <el-form-item label="wind行业划分" prop="region">
+          <span v-if="!edit1">xxxxxxx121xxxxx</span>
+          <el-input
+            class="t-input"
+            v-if="edit1"
+            v-model="ruleForm.name"
+          ></el-input>
+          <el-button
+            style="margin-left: 5px"
+            type="text"
+            @click="edit1 = !edit1"
+            >{{ edit1 ? "保存" : "修改" }}</el-button
+          >
+        </el-form-item>
+        <el-form-item label="申万行业划分" prop="region">
+          <span v-if="!edit2">xxxxxxx121xxxxx</span>
+          <el-input
+            class="t-input"
+            v-if="edit2"
+            v-model="ruleForm.name"
+          ></el-input>
+          <el-button
+            style="margin-left: 5px"
+            type="text"
+            @click="edit2 = !edit2"
+            >{{ edit2 ? "保存" : "修改" }}</el-button
+          >
+        </el-form-item>
+        <el-divider></el-divider>
+        <el-form-item label="所属地区" prop="delivery">
+          <el-col :span="5">
+            <el-form-item prop="date1">
+              <el-date-picker
+                type="date"
+                v-model="ruleForm.date1"
+                style="width: 100%"
+              ></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" :span="1">-</el-col>
+          <el-col :span="5">
+            <el-form-item prop="date2">
+              <el-time-picker
+                v-model="ruleForm.date2"
+                style="width: 100%"
+              ></el-time-picker>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" :span="1">-</el-col>
+          <el-col :span="5">
+            <el-form-item prop="date2">
+              <el-time-picker
+                v-model="ruleForm.date2"
+                style="width: 100%"
+              ></el-time-picker>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="所属辖区" prop="region">
+          <el-select v-model="ruleForm.region" placeholder="选择新增类型">
+            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option label="区域二" value="beijing"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="对口监管机构" prop="delivery">
+          <el-radio-group v-model="ruleForm.resource">
+            <el-radio label="是"></el-radio>
+            <el-radio label="否"></el-radio>
+            <el-radio label="不详"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="备注" prop="delivery">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            v-model="ruleForm.desc"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="remarkDig = false"
+          >确认新增</el-button
+        >
+      </span>
+    </el-dialog>
+    <el-dialog title="补充城投及政府相关信息" :visible.sync="governmentDig" width="50%">
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="135px"
+        label-position="left"
+      >
+        <el-form-item label="企业名称" prop="region">
+          <span>xxxxxxxxxxxx</span>
+        </el-form-item>
+        <el-form-item label="统一社会信用代码" prop="region">
+          <span>xxxxxxx121xxxxx</span>
+        </el-form-item>
+        <el-form-item label="来源" prop="region">
+          <span>xxxxxxx121xxxxx</span>
+        </el-form-item>
+        <el-form-item label="wind行业划分" prop="region">
+          <span v-if="!edit1">xxxxxxx121xxxxx</span>
+          <el-input
+            class="t-input"
+            v-if="edit1"
+            v-model="ruleForm.name"
+          ></el-input>
+          <el-button
+            style="margin-left: 5px"
+            type="text"
+            @click="edit1 = !edit1"
+            >{{ edit1 ? "保存" : "修改" }}</el-button
+          >
+        </el-form-item>
+        <el-form-item label="申万行业划分" prop="region">
+          <span v-if="!edit2">xxxxxxx121xxxxx</span>
+          <el-input
+            class="t-input"
+            v-if="edit2"
+            v-model="ruleForm.name"
+          ></el-input>
+          <el-button
+            style="margin-left: 5px"
+            type="text"
+            @click="edit2 = !edit2"
+            >{{ edit2 ? "保存" : "修改" }}</el-button
+          >
+        </el-form-item>
+        <el-divider></el-divider>
+        <el-form-item label="政府持股方式" prop="region">
+          <el-select v-model="ruleForm.region" placeholder="选择新增类型">
+            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option label="区域二" value="beijing"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="政府对当前城投支持力度" prop="delivery">
+         <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            v-model="ruleForm.desc"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="政府对当前城投支持力度判断依据" prop="delivery">
+         <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            v-model="ruleForm.desc"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="政府部门实际持股比例" prop="delivery">
+         <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            v-model="ruleForm.desc"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="政府部门实际持股比例年份" prop="region">
+          <el-select v-model="ruleForm.region" placeholder="选择新增类型">
+            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option label="区域二" value="beijing"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注" prop="delivery">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            v-model="ruleForm.desc"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="governmentDig = false"
+          >确认新增</el-button
+        >
+      </span>
+    </el-dialog>
     <el-dialog
       title="新增地方政府"
       :visible.sync="addGovernmentDig"
@@ -348,6 +543,9 @@ export default {
       edit2: false,
       edit1: false,
       addGovernmentDig: false,
+      remarkDig: false,
+      governmentDig: false,
+      
     };
   },
   mounted() {
