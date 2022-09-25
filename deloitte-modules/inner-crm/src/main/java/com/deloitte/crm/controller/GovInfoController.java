@@ -13,6 +13,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.service.IGovInfoService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/govInfo")
+@Api(tags="政府主体查询修改相关数据")
 public class GovInfoController extends BaseController
 {
     @Autowired
@@ -180,7 +182,7 @@ public class GovInfoController extends BaseController
             // 参数名
             name="govInfo",
             // 参数描述
-            value="包含表中egov_info的所有字段",
+            value="包含表中gov_info的所有字段",
             // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
@@ -208,7 +210,7 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/addOldName")
-    public AjaxResult addOldName(GovInfo govInfo)
+    public AjaxResult addOldName(@RequestBody GovInfo govInfo)
     {
         return govInfoService.addOldName(govInfo);
     }
@@ -279,14 +281,14 @@ public class GovInfoController extends BaseController
             // 参数名
             name="govInfo",
             // 参数描述
-            value="包含表中egov_info的所有字段",
+            value="包含表中gov_info的所有字段",
             // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")
     @PostMapping("/getInfoDetail")
-    public AjaxResult getInfoDetail(GovInfo govInfo){
-        return govInfoService.getNewInfo(govInfo);
+    public AjaxResult getInfoDetail(@RequestBody GovInfo govInfo){
+        return govInfoService.getInfoDetail(govInfo);
     }
     /**
      * 分页查询全部上市主体
@@ -305,9 +307,9 @@ public class GovInfoController extends BaseController
             // 示例值
             example = "")
     @PostMapping("/getListEntityByPage")
-    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
+    public AjaxResult getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto)
     {
-        return govInfoService.getListEntityByPage(entityAttrDto);
+        return govInfoService.getListEntityByPage(govAttrDto);
     }
 
 }

@@ -1,4 +1,5 @@
 package com.deloitte.crm.controller;
+
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -8,10 +9,12 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.service.IEntityNameHisService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -23,6 +26,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/his")
+@Api(tags="根据德勤code查询曾用名列表")
 public class EntityNameHisController extends BaseController
 {
     @Autowired
