@@ -63,4 +63,11 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @return 结果
      */
     public int deleteEntityInfoByIds(Long[] ids);
+
+    /**
+     * 根据名称查询主体，不会查询失效主体
+     * @param entityName
+     * @return
+     */
+    List<EntityInfo> findByName(String entityName);
 }

@@ -1,6 +1,8 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.EntityAttrValue;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.EntityAttrValue;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IEntityAttrValueService 
+public interface IEntityAttrValueService extends IService<EntityAttrValue>
 {
     /**
      * 查询【请填写功能名称】
@@ -58,4 +60,17 @@ public interface IEntityAttrValueService
      * @return 结果
      */
     public int deleteEntityAttrValueById(Long id);
+
+    /**
+     * 新增或修改
+     * @return
+     */
+    int insertUpdateCondition(EntityAttrValue attrValue);
+
+    /**
+     * 更新entityAttrValue表中债券的相关信息
+     * 反射获取obj里的属性，key 为 Excel 注解 的name 属性, value 为实体类的值
+     * @return
+     */
+    int updateBondAttr(String bondCode, Object obj);
 }

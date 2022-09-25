@@ -15,6 +15,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, attr_id, entity_code, value from entity_attr_value
     </sql>
 
+    <select id="findByAttrCode" resultMap="EntityAttrValueResult">
+        <include refid="selectEntityAttrValueVo"/>
+        where attr_id = #{attrId}
+        and entity_code = #{entityCode}
+    </select>
+
     <select id="selectEntityAttrValueList" parameterType="EntityAttrValue" resultMap="EntityAttrValueResult">
         <include refid="selectEntityAttrValueVo"/>
         <where>  

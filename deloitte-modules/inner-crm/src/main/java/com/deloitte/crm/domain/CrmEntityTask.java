@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSON;
 
 
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 
@@ -15,9 +18,10 @@ import com.deloitte.common.core.annotation.Excel;
  */
 public class CrmEntityTask
 {
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /** 捕获渠道， crm_wind_task的task_category */
@@ -26,11 +30,11 @@ public class CrmEntityTask
 
     /** 1-债券、2-港股、3-股票 表中的id */
     @Excel(name = "1-债券、2-港股、3-股票 表中的id")
-    private Long sourceId;
+    private Integer sourceId;
 
     /** 1-债券、2-港股、3-股票 */
     @Excel(name = "1-债券、2-港股、3-股票")
-    private Long sourceType;
+    private Integer sourceType;
 
     /** 展示给前端的数据 */
     @Excel(name = "展示给前端的数据")
@@ -75,21 +79,21 @@ public class CrmEntityTask
     {
         return taskCategory;
     }
-    public void setSourceId(Long sourceId) 
+    public void setSourceId(Integer sourceId) 
     {
         this.sourceId = sourceId;
     }
 
-    public Long getSourceId() 
+    public Integer getSourceId() 
     {
         return sourceId;
     }
-    public void setSourceType(Long sourceType) 
+    public void setSourceType(Integer sourceType) 
     {
         this.sourceType = sourceType;
     }
 
-    public Long getSourceType() 
+    public Integer getSourceType() 
     {
         return sourceType;
     }

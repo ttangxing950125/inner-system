@@ -1,7 +1,11 @@
 package com.deloitte.crm.service;
 
+import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityInfo;
 
 /**
  * 【请填写功能名称】Service接口
@@ -9,7 +13,7 @@ import com.deloitte.crm.domain.CrmMasTask;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICrmMasTaskService 
+public interface ICrmMasTaskService extends IService<CrmMasTask>
 {
     /**
      * 查询【请填写功能名称】
@@ -58,4 +62,13 @@ public interface ICrmMasTaskService
      * @return 结果
      */
     public int deleteCrmMasTaskById(Long id);
+
+    /**
+     * 创建敞口划分任务
+     * @param entityInfos 主体信息
+     * @param taskCategory 数据来源
+     * @param taskDate 任务日期
+     * @return
+     */
+    boolean createTasks(List<EntityInfo> entityInfos, String taskCategory, Date taskDate);
 }

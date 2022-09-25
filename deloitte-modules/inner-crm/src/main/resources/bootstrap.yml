@@ -3,7 +3,12 @@ server:
   port: 9204
 
 # Spring
-spring: 
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  main:
+    allow-circular-references: true
   application:
     # 应用名称
     name: inner-crm

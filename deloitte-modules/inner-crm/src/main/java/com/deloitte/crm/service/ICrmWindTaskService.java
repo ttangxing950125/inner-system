@@ -1,9 +1,13 @@
 package com.deloitte.crm.service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.vo.WindTaskDetailsVo;
+import org.springframework.web.multipart.MultipartFile;
 import com.deloitte.crm.dto.CrmWindTaskDto;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -96,4 +100,38 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
      * @return 结果
      */
     public int deleteCrmWindTaskById(Long id);
+
+
+    Object doTask(Long taskId, MultipartFile file) throws Exception;
+
+    /**
+     * 检查指定日期任务完成状态，如果全部都是已完成，那么更改今天角色3的日常任务状态
+     * @param timeNow
+     * @return
+     */
+    boolean checkAllComplete(Date timeNow);
+
+    /**
+     * 角色1 任务详情页面需要的数据
+     * @param taskCateId
+     * @param taskDate
+     * @return
+     */
+    List<WindTaskDetailsVo> findTaskDetails(Integer taskCateId, String taskDate);
+
+    /**
+     * 角色1查询有过修改的数据列表
+     * @param windTasks 具体分类id
+     * key: excel中的列名
+     * value: 数据
+     * @return
+     */
+    List<Map<String, Object>> findImportDetail(CrmWindTask windTasks);
+
+    /**
+     * 角色1查询有过修改的数据列表表头
+     * @param taskDictId
+     * @return
+     */
+    List<String> findImportDetailHeader(Integer taskDictId);
 }

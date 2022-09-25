@@ -1,6 +1,11 @@
 package com.deloitte.crm.service.impl;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.crm.domain.EntityInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
@@ -14,7 +19,7 @@ import com.deloitte.crm.service.ICrmMasTaskService;
  * @date 2022-09-21
  */
 @Service
-public class CrmMasTaskServiceImpl implements ICrmMasTaskService 
+public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasTask> implements ICrmMasTaskService
 {
     @Autowired
     private CrmMasTaskMapper crmMasTaskMapper;
@@ -89,5 +94,29 @@ public class CrmMasTaskServiceImpl implements ICrmMasTaskService
     public int deleteCrmMasTaskById(Long id)
     {
         return crmMasTaskMapper.deleteCrmMasTaskById(id);
+    }
+
+    /**
+     * 创建敞口划分任务
+     *
+     * @param entityInfos  主体信息
+     * @param taskCategory 数据来源
+     * @param taskDate     任务日期
+     * @return
+     */
+    @Override
+    public boolean createTasks(List<EntityInfo> entityInfos, String taskCategory, Date taskDate) {
+        List<CrmMasTask> masTasks = entityInfos.stream().map(item -> {
+            CrmMasTask masTask = new CrmMasTask();
+            masTask.setSourceName(taskCategory);
+            masTask.setEntityCode(item.getEntityCode());
+            masTask.setTaskDate(taskDate);
+            return masTask;
+        }).collect(Collectors.toList());
+
+        //保存进库
+        this.saveBatch(masTasks);
+
+        return true;
     }
 }

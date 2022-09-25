@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.BondNewIss;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.BondNewIss;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface BondNewIssMapper 
+public interface BondNewIssMapper extends BaseMapper<BondNewIss>
 {
     /**
      * 查询新债发行-新发行债券-20220801-20220914
@@ -58,4 +60,7 @@ public interface BondNewIssMapper
      * @return 结果
      */
     public int deleteBondNewIssByIds(Long[] ids);
+
+
+    BondNewIss findByShortName(String shortName);
 }

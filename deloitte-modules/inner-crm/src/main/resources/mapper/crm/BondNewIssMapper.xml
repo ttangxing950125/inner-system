@@ -86,6 +86,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, trade_code, bond_short_name, iss_start_date, pay_date, iss_scale_plan, iss_amount_top, iss_scale, iss_term, special_term, bond_grade, enetity_grade, coupon_rate, ipoIss_yield, guide_rate, guide_rate_margin, float_rate, rate_type, pay_fre, anno_date, iss_end_date, ipo_date, ipo_addr, value_date, expire_date, bond_code_list, fund_use, special_rule, add_credit_method, assess_organ, bond_name, issor_short_name, issor_name, issor_industry_first, issor_industry_second, issor_entity_nature, issor_province, issor_city, sponsor, iss_sponsor_grade, sponsor_entity_nature, assure_rule, main_unw, fund_share, co_unw, book_keeper, iss_type, unw_type, iss_price, target, bid_type, bid_region, bid_date, bid_time, bid_addr, win_bid_price, win_bid_region, subc_mult, weight_rate, full_court_mult, marg_rate, marg_mult, iss_rate, unw_menber, iss_online_nub, online_subc_code, wind_bond_type_second, second_mixed_capital_bond, iss_status, is_ci_bond, add_iss_status, cross_market, denom, gov_new_amount, gov_replace_amount from bond_new_iss
     </sql>
 
+
+    <select id="findByShortName" resultType="bondNewIss">
+        <include refid="selectBondNewIssVo"/>
+        where bond_short_name = #{shortName}
+    </select>
+
     <select id="selectBondNewIssList" parameterType="BondNewIss" resultMap="BondNewIssResult">
         <include refid="selectBondNewIssVo"/>
         <where>  
@@ -418,4 +424,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
 </mapper>

@@ -2,6 +2,7 @@ package com.deloitte.crm.service;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityAttr;
 
@@ -11,8 +12,15 @@ import com.deloitte.crm.domain.EntityAttr;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IEntityAttrService 
+public interface IEntityAttrService extends IService<EntityAttr>
 {
+
+    /**
+     * 缓存全部数据
+     * @return
+     */
+    public boolean cacheAll();
+
     /**
      * 查询【请填写功能名称】
      * 
@@ -62,4 +70,12 @@ public interface IEntityAttrService
     public int deleteEntityAttrById(Long id);
 
     AjaxResult getAllByGroup();
+
+    /**
+     * 根据名称和属性分类查询
+     * @param name
+     * @param attrType
+     * @return
+     */
+    EntityAttr findByNameType(String name, int attrType);
 }

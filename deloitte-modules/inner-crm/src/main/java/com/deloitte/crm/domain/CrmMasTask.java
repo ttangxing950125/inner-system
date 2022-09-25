@@ -3,10 +3,17 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 
 
+import java.io.Serializable;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 【请填写功能名称】对象 crm_mas_task
@@ -14,16 +21,23 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class CrmMasTask extends BaseEntity
+@Getter
+@Setter
+@ToString
+public class CrmMasTask implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /** 德勤code */
     @Excel(name = "德勤code")
     private String entityCode;
+
+    @Excel(name = "来源")
+    private String sourceName;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
@@ -44,73 +58,4 @@ public class CrmMasTask extends BaseEntity
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
-
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setEntityCode(String entityCode) 
-    {
-        this.entityCode = entityCode;
-    }
-
-    public String getEntityCode() 
-    {
-        return entityCode;
-    }
-    public void setTaskDate(Date taskDate) 
-    {
-        this.taskDate = taskDate;
-    }
-
-    public Date getTaskDate() 
-    {
-        return taskDate;
-    }
-    public void setState(Integer state) 
-    {
-        this.state = state;
-    }
-
-    public Integer getState() 
-    {
-        return state;
-    }
-    public void setHandleUser(String handleUser) 
-    {
-        this.handleUser = handleUser;
-    }
-
-    public String getHandleUser() 
-    {
-        return handleUser;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdated(Date updated) 
-    {
-        this.updated = updated;
-    }
-
-    public Date getUpdated() 
-    {
-        return updated;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getName() + JSON.toJSONString(this);
-    }
 }

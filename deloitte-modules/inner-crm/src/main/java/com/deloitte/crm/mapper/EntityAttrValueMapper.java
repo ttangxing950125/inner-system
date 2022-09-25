@@ -1,6 +1,7 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 
 import java.util.List;
@@ -60,4 +61,7 @@ public interface EntityAttrValueMapper extends BaseMapper<EntityAttrValue>
      * @return 结果
      */
     public int deleteEntityAttrValueByIds(Long[] ids);
+
+
+    EntityAttrValue findByAttrCode(EntityAttrValue attrValue);
 }

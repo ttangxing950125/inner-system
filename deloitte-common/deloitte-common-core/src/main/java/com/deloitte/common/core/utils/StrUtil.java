@@ -14,6 +14,17 @@ import java.util.List;
  */
 public class StrUtil extends cn.hutool.core.util.StrUtil {
 
+    /**
+     * 如果对象不为空，就转成字符串看是否是空字符串
+     * @return
+     */
+    public static boolean isBlankCast(Object obj){
+        if (obj==null){
+            return true;
+        }
+
+        return StrUtil.isBlank(obj.toString());
+    }
 
     /**
      * 是否为http(s)://开头

@@ -23,6 +23,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, attr_cate_id, attr_cate_name, name, data_type, source, source_id, multiple, attr_type, remarks, created, updated from entity_attr
     </sql>
 
+    <select id="findByNameType" resultMap="EntityAttrResult">
+        <include refid="selectEntityAttrVo"></include>
+        where name = #{name}
+        and attr_type = #{attrType}
+    </select>
+
     <select id="selectEntityAttrList" parameterType="EntityAttr" resultMap="EntityAttrResult">
         <include refid="selectEntityAttrVo"/>
         <where>  

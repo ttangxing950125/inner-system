@@ -122,4 +122,11 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @return 修改返回信息
      */
     AjaxResult editEntityNameHis(String creditCode, String entityNewName,String remarks);
+
+    /**
+     * 根据名称查询主体
+     * @param issorName
+     * @return
+     */
+    List<EntityInfo> findByName(String issorName);
 }

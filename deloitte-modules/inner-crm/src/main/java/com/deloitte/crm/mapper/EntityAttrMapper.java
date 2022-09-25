@@ -2,6 +2,7 @@ package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityAttr;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -60,4 +61,13 @@ public interface EntityAttrMapper extends BaseMapper<EntityAttr>
      * @return 结果
      */
     public int deleteEntityAttrByIds(Long[] ids);
+
+    /**
+     * 根据名称和属性分类查询
+     * @param name
+     * @param attrType
+     * @return
+     */
+    EntityAttr findByNameType(@Param("name") String name,
+                              @Param("attrType") int attrType);
 }

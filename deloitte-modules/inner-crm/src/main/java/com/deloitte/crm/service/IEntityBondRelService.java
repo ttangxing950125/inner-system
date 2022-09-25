@@ -1,6 +1,10 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.deloitte.crm.domain.BondInfo;
+import com.deloitte.crm.domain.BondNewIss;
+import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.domain.EntityBondRel;
 
 /**
@@ -58,4 +62,14 @@ public interface IEntityBondRelService
      * @return 结果
      */
     public int deleteEntityBondRelById(Long id);
+
+    /**
+     * 绑定指定主体和债券的关系
+     * 如果没有这个主体，就生成今天的任务
+     * @param issorName
+     * @param bondInfo
+     * @param newIss
+     * @return
+     */
+    boolean bindRel(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
 }
