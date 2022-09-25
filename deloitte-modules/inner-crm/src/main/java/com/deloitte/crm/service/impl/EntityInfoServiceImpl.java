@@ -10,11 +10,9 @@ import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
@@ -25,9 +23,12 @@ import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
+import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.vo.EntityInfoVo;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -53,6 +54,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     private EntityAttrMapper entityAttrMapper;
 
     private EntityAttrValueMapper entityAttrValueMapper;
+
+    @Autowired
+    private HttpUtils httpUtils;
 
     /**
      * 字段对应的名称
@@ -353,6 +357,98 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     }
 
     @Override
+    public AjaxResult addOldName(EntityInfo entity) {
+        //获取操作用户
+        String remoter = httpUtils.getRemoter();
+
+        EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
+        //修改曾用名记录
+        String entityNameHis = entityInfo.getEntityNameHis();
+        if (ObjectUtils.isEmpty(entityNameHis)){
+            entityInfo.setEntityNameHis(entity.getEntityNameHis());
+        }else {
+            entityInfo.setEntityNameHis(entityNameHis+ EntityUtils.NAME_USED_SIGN+entity.getEntityNameHis());
+        }
+        String nameHisRemarks = entity.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(nameHisRemarks)){
+            entityInfo.setEntityNameHisRemarks(entity.getUpdated()+remoter+entity.getEntityNameHisRemarks());
+        }else {
+            entityInfo.setEntityNameHisRemarks(entityNameHis+ EntityUtils.NAME_USED_REMARK_SIGN+entity.getUpdated()+remoter+entity.getEntityNameHisRemarks());
+        }
+        entityInfoMapper.updateById(entityInfo);
+
+        //插入曾用名记录表
+        EntityNameHis nameHis = new EntityNameHis();
+        nameHis.setDqCode(entityInfo.getEntityCode());
+        nameHis.setOldName(entity.getEntityNameHis());
+        nameHis.setEntityType(2);
+        nameHis.setHappenDate(entity.getUpdated());
+        nameHis.setRemarks(entity.getEntityNameHisRemarks());
+        nameHis.setSource(2);
+        nameHisMapper.insert(nameHis);
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult updateOldName(String dqCode, String oldName, String newOldName, String status) {
+        //根据dqCode查询主体表
+        QueryWrapper<EntityInfo>infoQuery=new QueryWrapper<>();
+        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, dqCode));
+        //根据dqCode查询曾用名列表
+        QueryWrapper<EntityNameHis>hisQuery=new QueryWrapper<>();
+        EntityNameHis nameHis = nameHisMapper.selectOne(hisQuery.lambda()
+                .eq(EntityNameHis::getDqCode, dqCode)
+                .eq(EntityNameHis::getOldName, oldName));
+        if (ObjectUtils.isEmpty(status)){
+            //修改主体表中的数据
+            entityInfo.setEntityNameHis(entityInfo.getEntityNameHis().replaceAll(oldName, newOldName));
+            entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks().replaceAll(oldName,newOldName));
+            entityInfoMapper.updateById(entityInfo);
+            //修改曾用名表中的数据
+            nameHis.setOldName(newOldName);
+            nameHisMapper.updateById(nameHis);
+            return AjaxResult.success();
+        }
+
+        //修改主体表中的数据
+        entityInfo.setEntityNameHis(entityInfo.getEntityNameHis().replaceAll(oldName, ""));
+        entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks().replaceAll(oldName,newOldName));
+        String remarks = entityInfo.getEntityNameHisRemarks();
+        String[] split = remarks.split(EntityUtils.NAME_USED_REMARK_SIGN);
+        String newRemarks="";
+        //拆分曾用名
+        for (String value:split){
+            if (value.contains(oldName)){
+                continue;
+            }
+            if (ObjectUtils.isEmpty(newRemarks)){
+                newRemarks=value;
+            }else {
+                newRemarks=newRemarks+ EntityUtils.NAME_USED_REMARK_SIGN+value;
+            }
+        }
+        entityInfo.setEntityNameHisRemarks(newRemarks);
+        entityInfoMapper.updateById(entityInfo);
+
+        //修改曾用名表中的数据
+        nameHis.setStatus(EntityUtils.INVALID);
+        nameHisMapper.updateById(nameHis);
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult getNewInfo(EntityInfo entityInfo) {
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
+        List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(entityInfos)&&entityInfos.size()>1){
+            return AjaxResult.error();
+        }
+        //TODO  添加主体其余详细信息
+
+        return AjaxResult.success(entityInfos.get(0));
+    }
+
+    @Override
     public AjaxResult getInfoList(EntityInfoByDto entityInfoDto) {
         entityInfoDto.setEntityInfo();
         EntityInfo entityInfo = entityInfoDto.getEntityInfo();
@@ -362,7 +458,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
             return AjaxResult.error("请输入页码");
         }
         if (ObjectUtils.isEmpty(pageSize)){
-            pageSize=EntityInfoUtil.DEFAULT_PAGE_SIZE;
+            pageSize= EntityUtils.DEFAULT_PAGE_SIZE;
         }
         Page<EntityInfo> pageInfo=new Page<>(pageNum,pageSize);
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
@@ -391,28 +487,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     public List<EntityInfo> checkEntity(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper(entityInfo);
         return entityInfoMapper.selectList(queryWrapper);
-    }
-
-    @Override
-    public AjaxResult getOneAllInfo(String entityCode) {
-        try {
-            QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper();
-            //企业主体基本信息
-            EntityInfo entityInfo = entityInfoMapper.selectOne(queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityCode));
-            //企业主体全量信息
-            QueryWrapper<EntityAttrValue>valueQuery=new QueryWrapper();
-            Long attrId = entityAttrValueMapper.selectOne(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode)).getAttrId();
-            EntityAttr entityAttr = entityAttrMapper.selectById(attrId);
-
-            //封装结果集
-            Map<String,Object>resultMap=new HashMap<>();
-            resultMap.put("entityInfo", entityInfo);
-            resultMap.put("entityAttr",entityAttr );
-            return AjaxResult.success(resultMap);
-        }catch (Exception e){
-            e.printStackTrace();
-            return AjaxResult.error();
-        }
     }
 
     @Override
@@ -474,29 +548,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
             try {
                 QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
                 Long count = nameHisMapper.selectCount(wrapper.lambda().eq(EntityNameHis::getDqCode, entityInfo.getEntityCode()));
-                resultMap.put(EntityInfoUtil.NAME_USED_NUM, count);
+                resultMap.put(EntityUtils.NAME_USED_NUM, count);
             }catch (Exception e){
                 return resultMap;
             }
         }
         return resultMap;
     }
-}
-class EntityInfoUtil{
-    /***
-     * 默认页面条数
-     */
-    public static final Integer DEFAULT_PAGE_SIZE=9;
-    /***
-     * 曾用名
-     */
-    public static final String NAME_USED_NUM="nameUsedNum";
-    /***
-     * 曾用名分隔符
-     */
-    public static final String NAME_USED_SIGN=",";
-    /***
-     * 曾用名备注分隔符
-     */
-    public static final String NAME_USED_REMARK_SIGN=";";
 }

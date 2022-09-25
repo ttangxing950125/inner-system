@@ -137,7 +137,7 @@ public class GovInfoController extends BaseController
             name="govInfoList",
             // 参数描述
             value="包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")
@@ -159,7 +159,7 @@ public class GovInfoController extends BaseController
             name="govInfo",
             // 参数描述
             value="包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")
@@ -181,7 +181,7 @@ public class GovInfoController extends BaseController
             name="govInfo",
             // 参数描述
             value="包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")
@@ -191,27 +191,82 @@ public class GovInfoController extends BaseController
         return govInfoService.getInfoList(govInfo);
     }
     /**
-     * 修改政府主体的曾用名
+     * 新增政府主体的曾用名
      * @param govInfo
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/23 8:44
     */
-    @ApiOperation(value = "修改政府主体的曾用名")
+    @ApiOperation(value = "新增政府主体的曾用名")
     @ApiImplicitParam(
             // 参数名
             name="govInfo",
             // 参数描述
-            value="包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            value="包含表中gov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")
-    @PostMapping("/updateOldName")
-    public AjaxResult updateOldName(GovInfo govInfo)
+    @PostMapping("/addOldName")
+    public AjaxResult addOldName(GovInfo govInfo)
     {
-        return govInfoService.updateOldName(govInfo);
+        return govInfoService.addOldName(govInfo);
     }
+  /**
+   * 修改政府主体的曾用名
+   *
+   * @param dqCode
+   * @param oldName
+   * @param newOldName
+   * @param status
+   * @return AjaxResult
+   * @author 冉浩岑
+   * @date 2022/9/25 13:22
+  */
+  @ApiOperation(value = "修改政府主体的曾用名")
+  @ApiImplicitParams({
+          @ApiImplicitParam(
+                  // 参数名
+                  name = "dqCode",
+                  // 参数描述
+                  value = "德勤统一识别码",
+                  // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                  paramType = "query",
+                  // 示例值
+                  example = "1"),
+          @ApiImplicitParam(
+                  // 参数名
+                  name = "oldName",
+                  // 参数描述
+                  value = "原本的曾用名",
+                  // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                  paramType = "query",
+                  // 示例值
+                  example = "原始曾用名"),
+          @ApiImplicitParam(
+                  // 参数名
+                  name = "newOldName",
+                  // 参数描述
+                  value = "修改后的曾用名",
+                  // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                  paramType = "query",
+                  // 示例值
+                  example = "新的曾用名"),
+          @ApiImplicitParam(
+                  // 参数名
+                  name = "status",
+                  // 参数描述
+                  value = "是否停用曾用名",
+                  // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                  paramType = "query",
+                  // 示例值
+                  example = "新的曾用名")
+  })
+  @PostMapping("/updateOldName")
+  public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status)
+  {
+    return govInfoService.updateOldName(dqCode,oldName,newOldName,status);
+  }
     /**
      * 根据 dqCode 查询政府主体
      * @param govInfo
@@ -225,7 +280,7 @@ public class GovInfoController extends BaseController
             name="govInfo",
             // 参数描述
             value="包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")
@@ -245,7 +300,7 @@ public class GovInfoController extends BaseController
             name="entityAttrDto",
             // 参数描述
             value="包含表中gov_info的所有字段和分页参数 pageSize pageNum",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "body",
             // 示例值
             example = "")

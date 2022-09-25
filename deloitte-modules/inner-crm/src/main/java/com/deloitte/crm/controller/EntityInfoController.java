@@ -9,8 +9,10 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
+
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
+
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -129,113 +131,190 @@ public class EntityInfoController extends BaseController
         return toAjax(entityInfoService.deleteEntityInfoByIds(ids));
     }
 
-    /**
-     * 分页查询
-     * @param entityInfo
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/22 17:49
-     */
-    @ApiOperation(value = "主体分页查询")
-    @ApiImplicitParam(
-            // 参数名
-            name="entityInfo",
-            // 参数描述
-            value="包含表中entity_info所有字段以及 pageSize pageNum 额外两个字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
-            paramType = "body",
-            // 示例值
-            example = "")
-    @PostMapping("/getInfoList")
-    public AjaxResult getInfoList(@RequestBody EntityInfoByDto entityInfo)
-    {
-        return entityInfoService.getInfoList(entityInfo);
-    }
-    /**
-     * 检查企业全称，或者编码，是否重复
-     *
-     * @param entityInfo
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/22 17:49
-     */
-    @ApiOperation(value = "主体分页查询")
-    @ApiImplicitParam(
-            // 参数名
-            name="entityInfo",
-            // 参数描述
-            value="包含表中entity_info所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
-            paramType = "body",
-            // 示例值
-            example = "")
-    @PostMapping("/checkEntity")
-    public AjaxResult checkEntity(@RequestBody EntityInfo entityInfo)
-    {
-        return AjaxResult.success(entityInfoService.checkEntity(entityInfo));
-    }
-    /**
-     * 批量修改
-     * @param entityInfoList
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/22 15:24
-     */
-    @ApiOperation(value = "主体批量修改")
-    @ApiImplicitParam(
-            // 参数名
-            name="entityInfoList",
-            // 参数描述
-            value="包含表中entity_info所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
-            paramType = "body",
-            // 示例值
-            example = "")
-    @PostMapping("/updateInfoList")
-    public AjaxResult updateInfoList(List<EntityInfo>entityInfoList)
-    {
+      /**
+       * 企业主体批量修改
+       * @param entityInfoList
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/22 15:24
+       */
+      @ApiOperation(value = "企业主体批量修改")
+      @ApiImplicitParam(
+              // 参数名
+              name="entityInfoList",
+              // 参数描述
+              value="包含表中entity_info的所有字段",
+              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+              paramType = "body",
+              // 示例值
+              example = "")
+      @PostMapping("/updateInfoList")
+      public AjaxResult updateInfoList(List<EntityInfo>entityInfoList)
+      {
         return AjaxResult.success(entityInfoService.updateInfoList(entityInfoList));
-    }
-    /**
-     * 根据 entityCode 查询企业主体详情
-     * @param  entityCode
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/23 8:59
-     */
-    @ApiOperation(value = "根据 entityCode 查询企业主体详情")
-    @ApiImplicitParam(
-            // 参数名
-            name="entityCode",
-            // 参数描述
-            value="包含表中entity_info和附表的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
-            paramType = "body",
-            // 示例值
-            example = "")
-    @PostMapping("/getInfoDetail")
-    public AjaxResult getInfoDetail(String entityCode){
-        return entityInfoService.getOneAllInfo(entityCode);
-    }
-    /**
-     * 分页查询全部上市主体
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/23 10:56
-     */
-    @ApiOperation(value = "分页查询全部上市主体")
-    @ApiImplicitParam(
-            // 参数名
-            name="entityAttrDto",
-            // 参数描述
-            value="包含表中entity_info的所有字段和用户选定的字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
-            paramType = "body",
-            // 示例值
-            example = "")
-    @PostMapping("/getListEntityByPage")
-    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
-    {
+      }
+      /**
+       * 查询企业名称，或者编码，是否重复
+       * @param entityInfo
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/22 17:49
+       */
+      @ApiOperation(value = "查询企业名称，或者编码，是否重复")
+      @ApiImplicitParam(
+              // 参数名
+              name="entityInfo",
+              // 参数描述
+              value="包含表中eentity_info的所有字段",
+              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+              paramType = "body",
+              // 示例值
+              example = "")
+      @PostMapping("/checkEntity")
+      public AjaxResult checkEntity(@RequestBody EntityInfo entityInfo)
+      {
+        return AjaxResult.success(entityInfoService.checkEntity(entityInfo));
+      }
+      /**
+       * 企业主体分页查询
+       * @param entityInfo
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/22 17:49
+       */
+      @ApiOperation(value = "企业主体分页查询")
+      @ApiImplicitParam(
+              // 参数名
+              name="entityInfo",
+              // 参数描述
+              value="包含表中eentity_info的所有字段",
+              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+              paramType = "body",
+              // 示例值
+              example = "")
+      @PostMapping("/getInfoList")
+      public AjaxResult getInfoList(@RequestBody EntityInfoByDto entityInfo)
+      {
+        return entityInfoService.getInfoList(entityInfo);
+      }
+      /**
+       * 新增企业主体的曾用名
+       * @param entityInfo
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/23 8:44
+       */
+      @ApiOperation(value = "新增企业主体的曾用名")
+      @ApiImplicitParam(
+              // 参数名
+              name="entityInfo",
+              // 参数描述
+              value="包含表中entity_info的所有字段",
+              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+              paramType = "body",
+              // 示例值
+              example = "")
+      @PostMapping("/addOldName")
+      public AjaxResult addOldName(EntityInfo entityInfo)
+      {
+        return entityInfoService.addOldName(entityInfo);
+      }
+      /**
+       * 修改企业主体的曾用名
+       *
+       * @param dqCode
+       * @param oldName
+       * @param newOldName
+       * @param status
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/25 13:22
+       */
+      @ApiOperation(value = "修改企业主体的曾用名")
+      @ApiImplicitParams({
+              @ApiImplicitParam(
+                      // 参数名
+                      name = "dqCode",
+                      // 参数描述
+                      value = "德勤统一识别码",
+                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                      paramType = "query",
+                      // 示例值
+                      example = "1"),
+              @ApiImplicitParam(
+                      // 参数名
+                      name = "oldName",
+                      // 参数描述
+                      value = "原本的曾用名",
+                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                      paramType = "query",
+                      // 示例值
+                      example = "原始曾用名"),
+              @ApiImplicitParam(
+                      // 参数名
+                      name = "newOldName",
+                      // 参数描述
+                      value = "修改后的曾用名",
+                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                      paramType = "query",
+                      // 示例值
+                      example = "新的曾用名"),
+              @ApiImplicitParam(
+                      // 参数名
+                      name = "status",
+                      // 参数描述
+                      value = "是否停用曾用名",
+                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+                      paramType = "query",
+                      // 示例值
+                      example = "新的曾用名")
+      })
+      @PostMapping("/updateOldName")
+      public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status)
+      {
+        return entityInfoService.updateOldName(dqCode,oldName,newOldName,status);
+      }
+      /**
+       * 根据 dqCode 查询企业主体
+       * @param entityInfo
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/23 8:59
+       */
+      @ApiOperation(value = "根据 dqCode 查询企业主体")
+      @ApiImplicitParam(
+              // 参数名
+              name="entityInfo",
+              // 参数描述
+              value="包含表中eentity_info的所有字段",
+              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+              paramType = "body",
+              // 示例值
+              example = "")
+      @PostMapping("/getInfoDetail")
+      public AjaxResult getInfoDetail(EntityInfo entityInfo){
+        return entityInfoService.getNewInfo(entityInfo);
+      }
+      /**
+       * 分页查询全部上市主体
+       * @return AjaxResult
+       * @author 冉浩岑
+       * @date 2022/9/23 10:56
+       */
+      @ApiOperation(value = "分页查询全部上市主体")
+      @ApiImplicitParam(
+              // 参数名
+              name="entityAttrDto",
+              // 参数描述
+              value="包含表中entity_info的所有字段和分页参数 pageSize pageNum",
+              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+              paramType = "body",
+              // 示例值
+              example = "")
+      @PostMapping("/getListEntityByPage")
+      public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
+      {
         return entityInfoService.getListEntityByPage(entityAttrDto);
-    }
+      }
+
 }

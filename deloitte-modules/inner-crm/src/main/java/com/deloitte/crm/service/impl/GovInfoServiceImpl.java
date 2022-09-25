@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.GovInfo;
@@ -16,6 +17,7 @@ import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.utils.HttpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -115,13 +117,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public Page<GovInfo> getInfoList(GovInfo govInfo, Integer pageNum, Integer pageSize) {
-        Page<GovInfo> pageInfo=new Page<>(pageNum,pageSize);
-        QueryWrapper<GovInfo>queryWrapper=new QueryWrapper<>(govInfo);
-        return govInfoMapper.selectPage(pageInfo, queryWrapper);
-    }
-
-    @Override
     public Integer updateInfoList(List<GovInfo> list) {
         list.stream().forEach(o->govInfoMapper.updateById(o));
         return list.size();
@@ -191,7 +186,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             return AjaxResult.error("请输入页码");
         }
         if (ObjectUtils.isEmpty(pageSize)){
-            pageSize=GovInfoUtil.DEFAULT_PAGE_SIZE;
+            pageSize= EntityUtils.DEFAULT_PAGE_SIZE;
         }
         Page<GovInfo> pageInfo=new Page<>(pageNum,pageSize);
         QueryWrapper<GovInfo>queryWrapper=new QueryWrapper<>(govInfo);
@@ -209,24 +204,30 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         pageResult.setRecords(records);
         return AjaxResult.success(pageResult);
     }
+    @Autowired
+    private HttpUtils httpUtils;
 
     @Override
-    public AjaxResult updateOldName(GovInfo gov) {
+    public AjaxResult addOldName(GovInfo gov) {
+        //获取操作用户
+        String remoter = httpUtils.getRemoter();
+
         GovInfo govInfo = govInfoMapper.selectById(gov.getId());
         //修改曾用名记录
         String govNameHis = govInfo.getGovNameHis();
         if (ObjectUtils.isEmpty(govNameHis)){
             govInfo.setGovNameHis(gov.getGovNameHis());
         }else {
-            govInfo.setGovNameHis(govNameHis+GovInfoUtil.NAME_USED_SIGN+gov.getGovNameHis());
+            govInfo.setGovNameHis(govNameHis+ EntityUtils.NAME_USED_SIGN+gov.getGovNameHis());
         }
         String nameHisRemarks = gov.getEntityNameHisRemarks();
         if (ObjectUtils.isEmpty(nameHisRemarks)){
-            govInfo.setEntityNameHisRemarks(gov.getUpdated()+gov.getEntityNameHisRemarks());
+            govInfo.setEntityNameHisRemarks(gov.getUpdated()+remoter+gov.getEntityNameHisRemarks());
         }else {
-            govInfo.setEntityNameHisRemarks(govNameHis+GovInfoUtil.NAME_USED_REMARK_SIGN+gov.getUpdated()+gov.getEntityNameHisRemarks());
+            govInfo.setEntityNameHisRemarks(govNameHis+ EntityUtils.NAME_USED_REMARK_SIGN+gov.getUpdated()+remoter+gov.getEntityNameHisRemarks());
         }
         govInfoMapper.updateById(govInfo);
+
         //插入曾用名记录表
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setDqCode(govInfo.getDqGovCode());
@@ -286,6 +287,54 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         pageResult.setRecords(resultRecords);
         return AjaxResult.success(pageResult);
     }
+
+    @Override
+    public AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status) {
+        //根据dqCode查询主体表
+        QueryWrapper<GovInfo>infoQuery=new QueryWrapper<>();
+        GovInfo govInfo = govInfoMapper.selectOne(infoQuery.lambda().eq(GovInfo::getDqGovCode, dqCode));
+        //根据dqCode查询曾用名列表
+        QueryWrapper<EntityNameHis>hisQuery=new QueryWrapper<>();
+        EntityNameHis nameHis = nameHisMapper.selectOne(hisQuery.lambda()
+                                             .eq(EntityNameHis::getDqCode, dqCode)
+                                             .eq(EntityNameHis::getOldName, oldName));
+        if (ObjectUtils.isEmpty(status)){
+            //修改主体表中的数据
+            govInfo.setGovNameHis(govInfo.getGovNameHis().replaceAll(oldName, newOldName));
+            govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks().replaceAll(oldName,newOldName));
+            govInfoMapper.updateById(govInfo);
+            //修改曾用名表中的数据
+            nameHis.setOldName(newOldName);
+            nameHisMapper.updateById(nameHis);
+            return AjaxResult.success();
+        }
+
+        //修改主体表中的数据
+        govInfo.setGovNameHis(govInfo.getGovNameHis().replaceAll(oldName, ""));
+        govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks().replaceAll(oldName,newOldName));
+        String remarks = govInfo.getEntityNameHisRemarks();
+        String[] split = remarks.split(EntityUtils.NAME_USED_REMARK_SIGN);
+        String newRemarks="";
+        //拆分曾用名
+        for (String value:split){
+            if (value.contains(oldName)){
+                continue;
+            }
+            if (ObjectUtils.isEmpty(newRemarks)){
+                newRemarks=value;
+            }else {
+                newRemarks=newRemarks+ EntityUtils.NAME_USED_REMARK_SIGN+value;
+            }
+        }
+        govInfo.setEntityNameHisRemarks(newRemarks);
+        govInfoMapper.updateById(govInfo);
+
+        //修改曾用名表中的数据
+        nameHis.setStatus(EntityUtils.INVALID);
+        nameHisMapper.updateById(nameHis);
+        return AjaxResult.success();
+    }
+
     /**
      * 字段对应的名称
      * @author 冉浩岑
@@ -334,29 +383,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             try {
                 QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
                 Long count = nameHisMapper.selectCount(wrapper.lambda().eq(EntityNameHis::getDqCode, govInfo.getDqGovCode()));
-                resultMap.put(GovInfoUtil.NAME_USED_NUM, count);
+                resultMap.put(EntityUtils.NAME_USED_NUM, count);
             }catch (Exception e){
                 return resultMap;
             }
         }
         return resultMap;
     }
-}
-class GovInfoUtil{
-    /***
-     * 默认页面条数
-    */
-    public static final Integer DEFAULT_PAGE_SIZE=9;
-    /***
-     * 曾用名
-     */
-    public static final String NAME_USED_NUM="nameUsedNum";
-    /***
-     * 曾用名分隔符
-     */
-    public static final String NAME_USED_SIGN=",";
-    /***
-     * 曾用名备注分隔符
-     */
-    public static final String NAME_USED_REMARK_SIGN=";";
 }

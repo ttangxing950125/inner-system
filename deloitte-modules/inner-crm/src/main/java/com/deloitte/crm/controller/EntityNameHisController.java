@@ -109,7 +109,7 @@ public class EntityNameHisController extends BaseController
             name="dqCode",
             // 参数描述
             value="德勤自动生成得唯一识别码",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "query",
             // 示例值
             example = "1")

@@ -7,6 +7,9 @@ import com.deloitte.common.core.annotation.Excel.Type;
 import com.deloitte.common.core.annotation.Excels;
 import com.deloitte.common.core.web.domain.BaseEntity;
 import com.deloitte.common.core.xss.Xss;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -19,6 +22,9 @@ import java.util.List;
  *
  * @author lipeng
  */
+@Data
+@Accessors(chain = true)
+@AllArgsConstructor
 public class SysUser extends BaseEntity {
     private static final long serialVersionUID = 1L;
 

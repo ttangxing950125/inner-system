@@ -1,6 +1,5 @@
 package com.deloitte.crm.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.GovInfo;
@@ -77,17 +76,17 @@ public interface IGovInfoService  extends IService<GovInfo>
      */
     public int deleteGovInfoById(Long id);
 
-    Page<GovInfo> getInfoList(GovInfo govInfo, Integer pageNum, Integer pageSize);
-
     Integer updateInfoList(List<GovInfo> list);
 
     AjaxResult getNewInfo(GovInfo govInfo);
 
     AjaxResult getInfoList(GovInfoByDto govInfo);
 
-    AjaxResult updateOldName(GovInfo govInfo);
+    AjaxResult addOldName(GovInfo govInfo);
 
     AjaxResult checkGov(GovInfo govInfo);
 
     AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
+
+    AjaxResult updateOldName(String dqCode,String oldName, String newOldName,String status);
 }

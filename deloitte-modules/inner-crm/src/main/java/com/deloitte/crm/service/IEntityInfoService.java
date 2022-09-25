@@ -88,8 +88,6 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     List<EntityInfo> checkEntity(EntityInfo entityInfo);
 
-    AjaxResult getOneAllInfo(String entityCode);
-
     AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
 
     /**
@@ -129,4 +127,10 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @return
      */
     List<EntityInfo> findByName(String issorName);
+
+    AjaxResult addOldName(EntityInfo entityInfo);
+
+    AjaxResult updateOldName(String dqCode, String oldName, String newOldName, String status);
+
+    AjaxResult getNewInfo(EntityInfo entityInfo);
 }
