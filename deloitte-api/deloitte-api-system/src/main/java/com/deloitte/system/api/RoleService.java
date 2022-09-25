@@ -24,7 +24,7 @@ public interface RoleService {
      * @author penTang
      * @date 2022/9/22 19:40
     */
-    @PostMapping("dict/data/queryRoles")
+    @PostMapping("/dict/data/queryRoles")
      List<SysDictData> getRoleByType();
 
 

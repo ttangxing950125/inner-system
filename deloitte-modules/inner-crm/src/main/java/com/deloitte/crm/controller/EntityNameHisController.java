@@ -104,7 +104,15 @@ public class EntityNameHisController extends BaseController
      * @date 2022/9/22 23:50
     */
     @ApiOperation(value = "根据德勤code查询曾用名列表")
-    @ApiImplicitParam(name="getNameListByDqCoded",value="",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="dqCode",
+            // 参数描述
+            value="德勤自动生成得唯一识别码",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "query",
+            // 示例值
+            example = "1")
     @PostMapping("/getNameListByDqCoded")
     public AjaxResult getNameListByDqCoded(String dqCode)
     {

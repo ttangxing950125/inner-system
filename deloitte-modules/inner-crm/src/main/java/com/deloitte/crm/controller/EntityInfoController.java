@@ -137,7 +137,15 @@ public class EntityInfoController extends BaseController
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "主体分页查询")
-    @ApiImplicitParam(name="entityInfo",value="包含表中entity_info所有字段以及 pageSize pageNum 额外两个字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="entityInfo",
+            // 参数描述
+            value="包含表中entity_info所有字段以及 pageSize pageNum 额外两个字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/getInfoList")
     public AjaxResult getInfoList(@RequestBody EntityInfoByDto entityInfo)
     {
@@ -152,7 +160,15 @@ public class EntityInfoController extends BaseController
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "主体分页查询")
-    @ApiImplicitParam(name="entityInfo",value="包含表中entity_info所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="entityInfo",
+            // 参数描述
+            value="包含表中entity_info所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/checkEntity")
     public AjaxResult checkEntity(@RequestBody EntityInfo entityInfo)
     {
@@ -166,7 +182,15 @@ public class EntityInfoController extends BaseController
      * @date 2022/9/22 15:24
      */
     @ApiOperation(value = "主体批量修改")
-    @ApiImplicitParam(name="entityInfoList",value="包含表中entity_info所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="entityInfoList",
+            // 参数描述
+            value="包含表中entity_info所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/updateInfoList")
     public AjaxResult updateInfoList(List<EntityInfo>entityInfoList)
     {
@@ -180,7 +204,15 @@ public class EntityInfoController extends BaseController
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "根据 entityCode 查询企业主体详情")
-    @ApiImplicitParam(name="getInfoDetail",value="包含表中entity_info和附表的所有字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="entityCode",
+            // 参数描述
+            value="包含表中entity_info和附表的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/getInfoDetail")
     public AjaxResult getInfoDetail(String entityCode){
         return entityInfoService.getOneAllInfo(entityCode);
@@ -192,7 +224,15 @@ public class EntityInfoController extends BaseController
      * @date 2022/9/23 10:56
      */
     @ApiOperation(value = "分页查询全部上市主体")
-    @ApiImplicitParam(name="getListEntityByPage",value="包含表中entity_info的所有字段和用户选定的字段",required = true,paramType = "body")
+    @ApiImplicitParam(
+            // 参数名
+            name="entityAttrDto",
+            // 参数描述
+            value="包含表中entity_info的所有字段和用户选定的字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路劲
+            paramType = "body",
+            // 示例值
+            example = "")
     @PostMapping("/getListEntityByPage")
     public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto)
     {
