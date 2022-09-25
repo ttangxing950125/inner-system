@@ -329,7 +329,7 @@ public class GovInfoController extends BaseController {
             dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto) {
-        return govInfoService.getListEntityByPage(govAttrDto);
+        return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
 
 }

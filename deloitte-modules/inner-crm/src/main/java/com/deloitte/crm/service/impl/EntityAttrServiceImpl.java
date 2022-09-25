@@ -159,6 +159,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
     @Override
     public List<EntityAttr> getAttrByDqCode(String dqCode) {
+
         QueryWrapper<EntityAttrValue>valueQuery=new QueryWrapper<>();
         List<EntityAttrValue> attrValues = valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, dqCode));
         if (CollectionUtils.isEmpty(attrValues)){

@@ -1,10 +1,9 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
-
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
+
+import java.io.Serializable;
 
 /**
  * 【请填写功能名称】对象 entity_gov_rel
@@ -12,7 +11,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class EntityGovRel extends BaseEntity
+public class EntityGovRel implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

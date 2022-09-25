@@ -336,7 +336,7 @@ public class EntityInfoController extends BaseController
       @PostMapping("/getListEntityByPage")
       public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto)
       {
-          return entityInfoService.getListEntityByPage(entityAttrDto);
+          return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
       }
 
 }

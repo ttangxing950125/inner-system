@@ -89,7 +89,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     List<EntityInfo> checkEntity(EntityInfo entityInfo);
 
-    R getListEntityByPage(EntityAttrByDto entityAttrDto);
+    Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
     /**
      * 传入社会信用代码于企业名称
