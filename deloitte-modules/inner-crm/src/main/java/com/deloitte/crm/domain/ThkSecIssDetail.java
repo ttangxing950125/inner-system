@@ -3,8 +3,12 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
@@ -15,24 +19,25 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class ThkSecIssDetail extends BaseEntity
+public class ThkSecIssDetail implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** 主键 */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /** 名称 */
     @Excel(name = "名称")
     private String name;
 
-    /** 上市日期 yyyy-mm-dd */
+    /** 上市日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "上市日期 yyyy-mm-dd", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "上市日期", width = 30, dateFormat = "yyyy-MM-dd")
     private Date ipoDate;
 
     /** 上市版 */
-    @Excel(name = "上市版")
+    @Excel(name = "上市板")
     private String ipoBoard;
 
     /** 发行方式 */
@@ -76,7 +81,7 @@ public class ThkSecIssDetail extends BaseEntity
     private String sponsor;
 
     /** 发售面值 */
-    @Excel(name = "发售面值")
+    @Excel(name = "首发面值")
     private BigDecimal firstDenom;
 
     /** 面值货币 */
@@ -87,9 +92,9 @@ public class ThkSecIssDetail extends BaseEntity
     @Excel(name = "首发交易单位(股)")
     private String firstUnit;
 
-    /** 招股公告日 yyyy-mm-dd */
+    /** 招股公告日 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "招股公告日 yyyy-mm-dd", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "招股公告日", width = 30, dateFormat = "yyyy-MM-dd")
     private Date prospDate;
 
     /** 招股价区间上限(港元) */

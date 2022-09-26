@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.domain.EntityInfo;
@@ -50,7 +51,6 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
     @Resource
     private IBondInfoService bondInfoService;
 
-    @Lazy
     @Resource
     private ICrmWindTaskService crmWindTaskService;
 
@@ -110,7 +110,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
 
         //修改原任务状态
         windTask.setComplete(1);
-
+        windTask.setHandleUser(SecurityUtils.getUserId().intValue());
         crmWindTaskService.updateById(windTask);
 
         //如果今天的windTask全部为已完成，修改crm_daily_task的状态

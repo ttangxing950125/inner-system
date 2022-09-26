@@ -74,9 +74,13 @@ public class BondNewIssAsyncService {
             if (bondInfo==null){
                 bondInfo = new BondInfo();
                 bondInfo.setBondShortName(shortName);
-                resStatus = 1;
             }
 
+            //看之前有没有导入过这个数据
+            List<BondNewIss> bondNewIsses = bondNewIssMapper.findByShortName(shortName);
+            if (CollUtil.isEmpty(bondNewIsses)){
+                resStatus = 1;
+            }
 
             Integer newStatus = judgeBondStatus(bondInfo.getBondStatus(), newIss.getIssStartDate(), newIss.getIssEndDate(), newIss.getIpoDate(), timeNow);
             if (newStatus!=null){
@@ -103,7 +107,7 @@ public class BondNewIssAsyncService {
 
             //绑定债券和主体关系
             String entityName = newIss.getIssorName();
-            bondRelService.bindRel(entityName, bondInfo, newIss, windTask);
+            bondRelService.bindRelOrCreateTask(entityName, bondInfo, newIss, windTask);
 
 
             //如果债券状态变为成功上市，创建敞口划分任务

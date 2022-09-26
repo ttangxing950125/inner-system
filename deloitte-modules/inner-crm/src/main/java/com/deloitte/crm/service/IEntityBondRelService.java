@@ -71,5 +71,5 @@ public interface IEntityBondRelService
      * @param newIss
      * @return
      */
-    boolean bindRel(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
+    boolean bindRelOrCreateTask(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
 }

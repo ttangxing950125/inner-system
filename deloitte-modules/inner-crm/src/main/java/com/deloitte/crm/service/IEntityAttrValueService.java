@@ -1,9 +1,11 @@
 package com.deloitte.crm.service;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.ThkSecIssInfo;
 
 /**
  * 【请填写功能名称】Service接口
@@ -73,4 +75,27 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      * @return
      */
     int updateBondAttr(String bondCode, Object obj);
+
+    /**
+     * 更新entityAttrValue表中债券的相关信息
+     * @param entityCode entityAttrValue的entityCode
+     * @param obj 反射获取属性的对象
+     * @Param anno         anno 中的 annoFiled的值作为entityAttr的name
+     * @Param annoFiled
+     * @Param entityAttr - attrType
+     * @return
+     */
+    int updateAttrValue(String entityCode,
+                        Object obj,
+                        Integer attrType,
+                        Class<? extends Annotation> anno,
+                        String annoFiled);
+
+    /**
+     * 更新entityAttrValue表中港股的相关信息
+     * @param stockDqCode 港股code
+     * @param secIssInfo ThkSecIssInfo 对象
+     * @return
+     */
+    int updateStockThkAttr(String stockDqCode, ThkSecIssInfo secIssInfo);
 }

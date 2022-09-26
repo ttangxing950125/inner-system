@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/windTask")
+@Api(tags = "导入wind数据相关接口")
 public class CrmWindTaskController extends BaseController
 {
     @Autowired
@@ -54,7 +55,7 @@ public class CrmWindTaskController extends BaseController
             ),
             @ApiImplicitParam(
                     //参数名
-                    name = "taskDate",
+                    name = "taskDate",required = true,
                     //参数描述
                     value = "需要查询任务的日期 yyyy-MM-dd",
                     //参数出现的地方 query 表单数据

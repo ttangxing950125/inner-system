@@ -62,5 +62,5 @@ public interface BondNewIssMapper extends BaseMapper<BondNewIss>
     public int deleteBondNewIssByIds(Long[] ids);
 
 
-    BondNewIss findByShortName(String shortName);
+    List<BondNewIss> findByShortName(String shortName);
 }

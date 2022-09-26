@@ -41,7 +41,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
      * @return
      */
     @Override
-    public boolean bindRel(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask) {
+    public boolean bindRelOrCreateTask(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask) {
         //没有发行人名称不处理
         if (StrUtil.isBlank(issorName)){
             return false;
@@ -53,8 +53,11 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
         if (CollUtil.isEmpty(entityInfos)){
             CrmEntityTask entityTask = new CrmEntityTask();
             entityTask.setTaskCategory(windTask.getTaskCategory());
+            entityTask.setDataSource(1);
+            entityTask.setDataCode(bondInfo.getBondCode());
             entityTask.setSourceType(1);
             entityTask.setSourceId(newIss.getId());
+            entityTask.setTaskDate(windTask.getTaskDate());
             String showData = "发行人全称:"+issorName;
             showData += ", 交易代码:"+newIss.getTradeCode()+", 债券简称:"+newIss.getBondShortName();
 
@@ -90,7 +93,6 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     /**
      * 查询【请填写功能名称】
-     * 
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */

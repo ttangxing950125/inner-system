@@ -1,18 +1,25 @@
 package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
+import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
+import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -33,7 +40,11 @@ import java.util.List;
 @AllArgsConstructor
 public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,CrmEntityTask> implements ICrmEntityTaskService
 {
+    @Resource
     private CrmEntityTaskMapper crmEntityTaskMapper;
+
+    @Resource
+    private ICrmDailyTaskService crmDailyTaskService;
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务
@@ -177,5 +188,31 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
             return AjaxResult.error();
         }
         return AjaxResult.success(SuccessInfo.SUCCESS.getInfo());
+    }
+
+    /**
+     * 创建任务
+     *
+     * @param crmEntityTask
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CrmEntityTask createTask(CrmEntityTask crmEntityTask) {
+        //当前日期
+        Date taskDate = crmEntityTask.getTaskDate();
+
+        crmEntityTaskMapper.insert(crmEntityTask);
+
+        //修改今天角色6的任务为有任务未处理
+        LambdaUpdateWrapper<CrmDailyTask> updateDaily = Wrappers.<CrmDailyTask>lambdaUpdate()
+                .eq(CrmDailyTask::getTaskDate, taskDate)
+                .eq(CrmDailyTask::getTaskRoleType, RoleInfo.ROLE6.getId())
+                .eq(CrmDailyTask::getTaskStatus, 1)
+                .set(CrmDailyTask::getTaskStatus, 2);
+
+        crmDailyTaskService.update(updateDaily);
+
+        return crmEntityTask;
     }
 }

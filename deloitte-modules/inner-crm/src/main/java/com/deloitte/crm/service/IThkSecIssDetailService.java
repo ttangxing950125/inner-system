@@ -1,6 +1,9 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.domain.ThkSecIssDetail;
 
 /**
@@ -9,7 +12,7 @@ import com.deloitte.crm.domain.ThkSecIssDetail;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IThkSecIssDetailService 
+public interface IThkSecIssDetailService extends IService<ThkSecIssDetail>
 {
     /**
      * 查询证券发行-股票发行-首次发行明细
@@ -58,4 +61,12 @@ public interface IThkSecIssDetailService
      * @return 结果
      */
     public int deleteThkSecIssDetailById(Long id);
+
+    /**
+     * 开始执行wind任务  删除证券发行-股票发行-首次发行明细信息
+     * @param windTask
+     * @param thkSecIssInfos
+     * @return
+     */
+    Object doTask(CrmWindTask windTask, List<ThkSecIssDetail> thkSecIssInfos);
 }

@@ -81,4 +81,11 @@ public interface ICrmEntityTaskService
      * @return 操作成功与否
      */
     AjaxResult changeState(Integer id,Integer state);
+
+    /**
+     * 创建任务
+     * @param crmEntityTask
+     * @return
+     */
+    CrmEntityTask createTask(CrmEntityTask crmEntityTask);
 }

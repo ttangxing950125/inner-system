@@ -1,10 +1,14 @@
 package com.deloitte.system.api;
+import com.deloitte.common.core.constant.SecurityConstants;
 import com.deloitte.common.core.constant.ServiceNameConstants;
 import com.deloitte.system.api.domain.SysDictData;
 import com.deloitte.system.api.domain.SysUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
 
 /**
@@ -13,7 +17,6 @@ import java.util.List;
  * @date 2022/09/22 19:31
  */
 
-@Service
 @FeignClient(contextId = "RoleService", value = ServiceNameConstants.SYSTEM_SERVICE)
 public interface RoleService {
 
@@ -38,7 +41,7 @@ public interface RoleService {
      * @date 2022/9/23 14:59
      */
     @PostMapping("/role/roleById")
-    List<SysUser> selectUserListById(Integer RoleId);
+    List<SysUser> selectUserListById(@RequestParam("RoleId") Integer RoleId);
 
 
 }

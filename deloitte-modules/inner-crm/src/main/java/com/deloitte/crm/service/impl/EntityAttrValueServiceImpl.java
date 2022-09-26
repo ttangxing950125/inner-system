@@ -1,15 +1,14 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.ThkSecIssInfo;
 import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.utils.AttrValueUtils;
@@ -124,7 +123,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //更新成功的条数
         int updateCount = 0;
 
-        Map<String, Object> data = null;
+        Map<String, Object> data = new HashMap<>();
         try {
             data = AttrValueUtils.parseObj(obj, Excel.class, "name");
         } catch (Exception e) {
@@ -132,9 +131,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             throw new GlobalException(e.getMessage());
         }
 
-
-//        ArrayList<EntityAttrValue> saveList = new ArrayList<>();
-//        ArrayList<EntityAttrValue> updateList = new ArrayList<>();
 
         Set<String> keySet = data.keySet();
         for (String key : keySet) {
@@ -152,23 +148,75 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             attrValue.setEntityCode(bondCode);
             attrValue.setValue(value.toString());
             attrValue.setAttrId(id);
-
-            /*EntityAttrValue dbAttrValue = entityAttrValueMapper.findByAttrCode(attrValue);
-            if (dbAttrValue==null){
-                //没有这条记录，新增
-                saveList.add(attrValue);
-            }else {
-                //修改
-                attrValue.setId(dbAttrValue.getId());
-                updateList.add(attrValue);
-            }*/
-
             int upCount = this.insertUpdateCondition(attrValue);
             updateCount += upCount;
         }
 
 
         return updateCount;
+    }
+
+    /**
+     * 更新entityAttrValue表中债券的相关信息
+     *
+     * @param entityCode entityAttrValue的entityCode
+     * @param obj        反射获取属性的对象
+     * @param attrType
+     * @param anno
+     * @param annoFiled
+     * @Param anno         anno 中的 annoFiled的值作为entityAttr的name
+     * @Param annoFiled
+     * @Param entityAttr - attrType
+     * @return
+     */
+    @Override
+    public int updateAttrValue(String entityCode, Object obj, Integer attrType, Class<? extends Annotation> anno, String annoFiled) {
+        //更新成功的条数
+        int updateCount = 0;
+
+        Map<String, Object> data = new HashMap<>();
+        try {
+            data = AttrValueUtils.parseObj(obj, anno, annoFiled);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new GlobalException(e.getMessage());
+        }
+
+
+        Set<String> keySet = data.keySet();
+        for (String key : keySet) {
+            Object value = data.get(key);
+            if (StrUtil.isBlankCast(value)){
+                continue;
+            }
+            EntityAttr attr = entityAttrService.findByNameType(key, attrType);
+            if (attr==null){
+                continue;
+            }
+            Long id = attr.getId();
+
+            EntityAttrValue attrValue = new EntityAttrValue();
+            attrValue.setEntityCode(entityCode);
+            attrValue.setValue(value.toString());
+            attrValue.setAttrId(id);
+            int upCount = this.insertUpdateCondition(attrValue);
+            updateCount += upCount;
+        }
+
+
+        return updateCount;
+    }
+
+    /**
+     * 更新entityAttrValue表中港股的相关信息
+     *
+     * @param stockDqCode 港股code
+     * @param secIssInfo  ThkSecIssInfo 对象
+     * @return
+     */
+    @Override
+    public int updateStockThkAttr(String stockDqCode, ThkSecIssInfo secIssInfo) {
+        return this.updateAttrValue(stockDqCode, secIssInfo, 4, Excel.class, "name");
     }
 
     /**

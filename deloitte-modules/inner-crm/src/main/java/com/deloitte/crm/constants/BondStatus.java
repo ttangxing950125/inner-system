@@ -15,18 +15,18 @@ public enum BondStatus {
 
     private final int id;
 
-    private final String remark;
+    private final String name;
 
     public int getId() {
         return id;
     }
 
-    public String getRemark() {
-        return remark;
+    public String getName() {
+        return name;
     }
 
     BondStatus(int id, String name) {
         this.id = id;
-        this.remark = name;
+        this.name = name;
     }
 }

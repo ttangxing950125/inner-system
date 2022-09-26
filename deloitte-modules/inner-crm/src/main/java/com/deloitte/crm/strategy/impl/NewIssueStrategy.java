@@ -32,7 +32,7 @@ public class NewIssueStrategy implements WindTaskStrategy {
      */
     @Override
     public boolean support(Integer windDictId) {
-        return Objects.equals(windDictId, WindTaskEnum.NEW_ISSUE.getId());
+        return Objects.equals(windDictId, WindTaskEnum.BOND_NEW_ISS.getId());
     }
 
     /**

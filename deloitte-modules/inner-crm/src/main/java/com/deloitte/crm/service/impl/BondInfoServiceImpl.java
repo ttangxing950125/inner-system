@@ -131,7 +131,7 @@ public class BondInfoServiceImpl implements IBondInfoService
         BondInfo bondInfo = redisService.getCacheMapValue(CacheName.BOND_CACHE, shortName);
         if (bondInfo==null){
             bondInfo = bondInfoMapper.findByShortName(shortName);
-            redisService.redisTemplate.opsForHash().put(CacheName.BOND_CACHE, shortName, bondInfo);
+            redisService.setCacheMapValue(CacheName.BOND_CACHE, shortName, bondInfo);
         }
 
         return bondInfo;
@@ -148,21 +148,19 @@ public class BondInfoServiceImpl implements IBondInfoService
     public BondInfo saveOrUpdate(BondInfo bondInfo) {
         if (bondInfo.getId()!=null){
             int count = bondInfoMapper.updateBondInfo(bondInfo);
-            BondInfo dbBondInfo = count>0 ? bondInfoMapper.selectBondInfoById(bondInfo.getId()) : bondInfo;
-            redisService.redisTemplate.opsForHash().put(CacheName.BOND_CACHE, bondInfo.getBondShortName(), bondInfo);
-            //有更新从库里重新查询
-            return  dbBondInfo;
+            bondInfo = count>0 ? bondInfoMapper.selectBondInfoById(bondInfo.getId()) : bondInfo;
+        }else{
+            //新增债券
+            bondInfoMapper.insertBondInfo(bondInfo);
+            DecimalFormat g1=new DecimalFormat("000000");
+            String startZeroStr = g1.format(bondInfo.getId());
+            bondInfo.setBondCode("BD"+startZeroStr);
+
+            bondInfoMapper.updateBondInfo(bondInfo);
         }
 
-        //新增债券
-        bondInfoMapper.insertBondInfo(bondInfo);
-        DecimalFormat g1=new DecimalFormat("000000");
-        String startZeroStr = g1.format(bondInfo.getId());
-        bondInfo.setBondCode("BD"+startZeroStr);
+        redisService.redisTemplate.opsForHash().delete(CacheName.BOND_CACHE, bondInfo.getBondShortName());
 
-        bondInfoMapper.updateBondInfo(bondInfo);
-
-        redisService.redisTemplate.opsForHash().put(CacheName.BOND_CACHE, bondInfo.getBondShortName(), bondInfo);
 
         return bondInfo;
     }

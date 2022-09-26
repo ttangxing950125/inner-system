@@ -14,11 +14,15 @@ import lombok.Setter;
 public class BondInfoDto {
 
     /**
-     * 债券
+     * 债券信息
      */
     private BondInfo bondInfo;
 
-
+    /**
+     * 这条债券的数据新增了，还是发生更新了
+     * 如果这条 newIss 是新增的，返回1
+     * 如果这条 newIss 是原有基础上有修改，返回2
+     */
     private Integer resStatus;
 
 }

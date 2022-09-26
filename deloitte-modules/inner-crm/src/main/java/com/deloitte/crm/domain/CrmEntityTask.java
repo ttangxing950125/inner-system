@@ -9,6 +9,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 角色7，根据导入的数据新增主体的任务对象 crm_entity_task
@@ -16,13 +19,25 @@ import com.deloitte.common.core.annotation.Excel;
  * @author deloitte
  * @date 2022-09-21
  */
+@Getter
+@Setter
+@ToString
 public class CrmEntityTask
 {
     private static final Long serialVersionUID = 1L;
 
-    /** $column.columnComment */
     @TableId(type = IdType.AUTO)
     private Integer id;
+
+    /**
+     * 来源主表code
+     */
+    private String dataCode;
+
+    /**
+     * 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
+     */
+    private Integer dataSource;
 
     /** 捕获渠道， crm_wind_task的task_category */
     @Excel(name = "捕获渠道， crm_wind_task的task_category")
@@ -33,7 +48,7 @@ public class CrmEntityTask
     private Integer sourceId;
 
     /** 1-债券、2-港股、3-股票 */
-    @Excel(name = "1-债券、2-港股、3-股票")
+    @Excel(name = "1-债券 、2-港股、3-股票")
     private Integer sourceType;
 
     /** 展示给前端的数据 */
@@ -60,100 +75,4 @@ public class CrmEntityTask
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
-
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    public Integer getId()
-    {
-        return id;
-    }
-    public void setTaskCategory(String taskCategory) 
-    {
-        this.taskCategory = taskCategory;
-    }
-
-    public String getTaskCategory() 
-    {
-        return taskCategory;
-    }
-    public void setSourceId(Integer sourceId) 
-    {
-        this.sourceId = sourceId;
-    }
-
-    public Integer getSourceId() 
-    {
-        return sourceId;
-    }
-    public void setSourceType(Integer sourceType) 
-    {
-        this.sourceType = sourceType;
-    }
-
-    public Integer getSourceType() 
-    {
-        return sourceType;
-    }
-    public void setDataShow(String dataShow) 
-    {
-        this.dataShow = dataShow;
-    }
-
-    public String getDataShow() 
-    {
-        return dataShow;
-    }
-    public void setTaskDate(Date taskDate) 
-    {
-        this.taskDate = taskDate;
-    }
-
-    public Date getTaskDate() 
-    {
-        return taskDate;
-    }
-    public void setState(Integer state) 
-    {
-        this.state = state;
-    }
-
-    public Integer getState() 
-    {
-        return state;
-    }
-    public void setHandleUser(String handleUser) 
-    {
-        this.handleUser = handleUser;
-    }
-
-    public String getHandleUser() 
-    {
-        return handleUser;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdated(Date updated) 
-    {
-        this.updated = updated;
-    }
-
-    public Date getUpdated() 
-    {
-        return updated;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getName() + JSON.toJSONString(this);
-    }
 }

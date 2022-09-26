@@ -147,7 +147,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
         EntityAttr entityAttr = redisService.getCacheMapValue(CacheName.ENTITY_ATTR, name + "::" + attrType);
         if (entityAttr == null) {
             entityAttr = entityAttrMapper.findByNameType(name, attrType);
-            redisService.redisTemplate.opsForHash().put(CacheName.ENTITY_ATTR, name + "::" + attrType, entityAttr);
+            redisService.setCacheMapValue(CacheName.ENTITY_ATTR, name + "::" + attrType, entityAttr);
         }
 
         return entityAttr;

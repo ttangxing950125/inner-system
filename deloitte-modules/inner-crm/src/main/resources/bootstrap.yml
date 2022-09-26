@@ -9,6 +9,7 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
   main:
     allow-circular-references: true
+    allow-bean-definition-overriding: true
   application:
     # 应用名称
     name: inner-crm

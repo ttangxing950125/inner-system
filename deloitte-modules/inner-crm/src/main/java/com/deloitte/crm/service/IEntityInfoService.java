@@ -123,10 +123,10 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 根据名称查询主体
-     * @param issorName
+     * @param entityName
      * @return
      */
-    List<EntityInfo> findByName(String issorName);
+    List<EntityInfo> findByName(String entityName);
 
     AjaxResult addOldName(EntityInfo entityInfo);
 

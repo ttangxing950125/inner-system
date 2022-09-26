@@ -1,5 +1,6 @@
 package com.deloitte.crm.quartz.service.impl;
 
+import com.deloitte.common.core.constant.SecurityConstants;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindDict;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -48,8 +49,8 @@ public class QuarzRoleTaskImp implements QuarzRoleTaskService {
     @Override
     public void executeQuarzRoleTask() {
         List<SysDictData> roleByType = getRole.getRoleByType();
-        ArrayList<CrmDailyTask> crmDailyTasks = new ArrayList<CrmDailyTask>();
-        ArrayList<CrmWindTask> crmWindTasks = new ArrayList<CrmWindTask>();
+        ArrayList<CrmDailyTask> crmDailyTasks = new ArrayList<>();
+        ArrayList<CrmWindTask> crmWindTasks = new ArrayList<>();
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateString = formatter.format(currentTime);

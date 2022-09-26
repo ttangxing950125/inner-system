@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.ThkSecIssDetail;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.ThkSecIssDetail;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ThkSecIssDetailMapper 
+public interface ThkSecIssDetailMapper extends BaseMapper<ThkSecIssDetail>
 {
     /**
      * 查询证券发行-股票发行-首次发行明细

@@ -10,4 +10,6 @@ public class CacheName {
 
     public static final String ENTITY_ATTR = "entity_attr";
 
+    public static final String STOCK_THK_INFO = "stock_thk_info";
+
 }
