@@ -126,13 +126,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //TODO  查询上级行政code
         String preGovCode = govInfos.get(0).getPreGovCode();
         queryWrapper.clear();
-        Map<String,Object>result=new HashMap<>();
-        result.put("govInfo",govInfos.get(0));
-        if (ObjectUtils.isEmpty(preGovCode)){
+        Map<String, Object> result = new HashMap<>();
+        result.put("govInfo", govInfos.get(0));
+        if (ObjectUtils.isEmpty(preGovCode)) {
             return R.ok(result);
         }
         GovInfo preGov = govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getDqGovCode, preGovCode));
-        result.put("preGov",preGov);
+        result.put("preGov", preGov);
         return R.ok(result);
     }
 
@@ -248,31 +248,32 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper(govInfo);
         return R.ok(govInfoMapper.selectList(queryWrapper));
     }
+
     @Override
     public Object getListEntityByPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
-        if (ObjectUtils.isEmpty(pageNum)&&ObjectUtils.isEmpty(pageSize)){
+        if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(entityAttrDto);
-        } else{
+        } else {
             return getListEntityPage(entityAttrDto);
         }
     }
+
     /**
      * 全量导出
      *
      * @param entityAttrDto
      * @return List<GovInfoResult>
      * @author 冉浩岑
-     * @date 2022/9/25 17:05
-    */
-    public List<GovInfoResult>  getListEntityAll(EntityAttrByDto entityAttrDto) {
+     * @date 2022/9/26 00:35
+     */
+    public List<GovInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
 
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
-
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
-        List<GovInfo> govInfos = govInfoMapper.selectList( queryWrapper);
+        List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
 
         //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
@@ -282,22 +283,22 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             govInfoResult.setGovInfo(o);
 
             if (!CollectionUtils.isEmpty(mapList)) {
-                List<Map<String,Object>>more=new ArrayList<>();
+                List<Map<String, Object>> more = new ArrayList<>();
 
                 for (Map<String, String> map : mapList) {
                     QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
                     EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
                             .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
                             .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
-                    Map<String ,Object>moreMap=new HashMap<>();
+                    Map<String, Object> moreMap = new HashMap<>();
                     //新增指标栏
                     moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
-                    if (attrValue == null) {
+                    if (ObjectUtils.isEmpty(attrValue)) {
                         moreMap.put(MORE_ENTITY_KPI_VALUE, null);
                     } else {
-                        moreMap.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                        moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
                     }
-                    more.add( moreMap);
+                    more.add(moreMap);
                 }
                 govInfoResult.setMore(more);
             }
@@ -313,7 +314,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @return Page<GovInfoResult>
      * @author 冉浩岑
      * @date 2022/9/25 17:05
-    */
+     */
     public Page<GovInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
@@ -336,7 +337,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             GovInfoResult govInfoResult = new GovInfoResult();
             govInfoResult.setGovInfo(o);
             if (!CollectionUtils.isEmpty(mapList)) {
-                List<Map<String,Object>>more=new ArrayList<>();
+                List<Map<String, Object>> more = new ArrayList<>();
                 for (Map<String, String> map : mapList) {
                     QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
                     EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
@@ -345,10 +346,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                     //新增指标栏
                     Map<String, Object> moreMap = new HashMap<>();
                     moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
-                    if (attrValue == null) {
+                    if (ObjectUtils.isEmpty(attrValue)) {
                         moreMap.put(MORE_ENTITY_KPI_VALUE, null);
                     } else {
-                        moreMap.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                        moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
                     }
                     more.add(moreMap);
                 }
@@ -405,6 +406,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         nameHis.setStatus(EntityUtils.INVALID);
         nameHisMapper.updateById(nameHis);
         return R.ok();
+    }
+
+    @Override
+    public R getNameList(String param) {
+        return null;
     }
 
     /**

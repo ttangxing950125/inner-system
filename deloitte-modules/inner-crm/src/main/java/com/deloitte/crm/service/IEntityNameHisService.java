@@ -68,4 +68,6 @@ public interface IEntityNameHisService
      * @date 2022/9/22 23:50
      */
     List<EntityNameHis> getNameListByDqCoded(String dqCode);
+
+
 }

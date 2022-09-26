@@ -309,7 +309,7 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 分页查询全部上市主体
+     * 分页查询全部政府主体
      *
      * @return AjaxResult
      * @author 冉浩岑
@@ -332,4 +332,13 @@ public class GovInfoController extends BaseController {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
 
+    @GetMapping("/getNameList/{param}")
+    public R getNameList(@PathVariable("param") String param){
+        return govInfoService.getNameList(param);
+    }
+    @GetMapping("/test")
+    public R test(){
+        System.out.println("测试成功");
+        return R.ok("测试成功");
+    }
 }

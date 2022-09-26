@@ -1,22 +1,20 @@
 package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityNameHisService;
-import java.util.List;
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
@@ -28,7 +26,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     /**
      * 查询【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
@@ -40,7 +38,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     /**
      * 查询【请填写功能名称】列表
-     * 
+     *
      * @param entityNameHis 【请填写功能名称】
      * @return 【请填写功能名称】
      */
@@ -52,7 +50,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     /**
      * 新增【请填写功能名称】
-     * 
+     *
      * @param entityNameHis 【请填写功能名称】
      * @return 结果
      */
@@ -64,7 +62,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     /**
      * 修改【请填写功能名称】
-     * 
+     *
      * @param entityNameHis 【请填写功能名称】
      * @return 结果
      */
@@ -76,7 +74,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     /**
      * 批量删除【请填写功能名称】
-     * 
+     *
      * @param ids 需要删除的【请填写功能名称】主键
      * @return 结果
      */
@@ -88,7 +86,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     /**
      * 删除【请填写功能名称】信息
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
@@ -105,4 +103,12 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 queryWrapper.lambda()
                         .eq(EntityNameHis::getDqCode,dqCode));
     }
+
+
+
+
+
+
+
+
 }

@@ -125,4 +125,5 @@ public class EntityNameHisController extends BaseController
     {
         return R.ok(entityNameHisService.getNameListByDqCoded(dqCode));
     }
+
 }
