@@ -116,7 +116,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             GovInfo govInfo = govInfoMapper.selectById(o.getId());
             govInfoMapper.updateById(o);
             //修改政府主体名称时，需要添加曾用名
-            if (!ObjectUtils.isEmpty(o.getGovName())){
+            if (!ObjectUtils.isEmpty(o.getGovName())) {
                 String oldName = govInfo.getGovName();
                 GovInfo addOldName = new GovInfo();
                 addOldName.setId(o.getId());
@@ -125,12 +125,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 addOldName(addOldName);
             }
             //修改政府主体代码时，需要修改主体历史表中的政府主体代码
-            if (!ObjectUtils.isEmpty(o.getDqGovCode())){
+            if (!ObjectUtils.isEmpty(o.getDqGovCode())) {
                 String oldDqCode = govInfo.getDqGovCode();
-                QueryWrapper<EntityNameHis>wrapper=new QueryWrapper<>();
+                QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
                 EntityNameHis nameHis = new EntityNameHis();
                 nameHis.setDqCode(o.getDqGovCode());
-                nameHisMapper.update(nameHis,wrapper.lambda().eq(EntityNameHis::getDqCode,oldDqCode));
+                nameHisMapper.update(nameHis, wrapper.lambda().eq(EntityNameHis::getDqCode, oldDqCode));
             }
         });
         return R.ok(list.size());
@@ -140,7 +140,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public R getInfoDetail(GovInfo govInfo) {
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>(govInfo);
         List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
-        if (CollectionUtils.isEmpty(govInfos)){
+        if (CollectionUtils.isEmpty(govInfos)) {
             return R.fail("异常查询，数据为空");
         }
         if (govInfos.size() > 1) {
@@ -241,11 +241,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         GovInfo govInfo = govInfoMapper.selectById(gov.getId());
 
-        String govCode = govInfo.getGovCode();
+        String govCode = govInfo.getDqGovCode();
         String nameHis = gov.getGovNameHis();
-        QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
-        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda().eq(EntityNameHis::getDqCode, govCode).eq(EntityNameHis::getOldName, nameHis));
-        if (aLong>0){
+        QueryWrapper<EntityNameHis> queryWrapper = new QueryWrapper<>();
+        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda()
+                .eq(EntityNameHis::getDqCode, govCode)
+                .eq(EntityNameHis::getOldName, nameHis));
+        if (aLong > 0) {
             return R.fail("曾用名重复，请重新输入");
         }
 
@@ -405,7 +407,15 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         EntityNameHis nameHis = nameHisMapper.selectOne(hisQuery.lambda()
                 .eq(EntityNameHis::getDqCode, dqCode)
                 .eq(EntityNameHis::getOldName, oldName));
+
         if (ObjectUtils.isEmpty(status)) {
+            //校验修改后的曾用名是否已经存在
+            Long aLong = nameHisMapper.selectCount(hisQuery.lambda()
+                    .eq(EntityNameHis::getDqCode, dqCode)
+                    .eq(EntityNameHis::getOldName, newOldName));
+            if (aLong > 0) {
+                return R.ok("曾用名已经存在，请重新输入");
+            }
             //修改主体表中的数据
             govInfo.setGovNameHis(govInfo.getGovNameHis().replaceAll(oldName, newOldName));
             govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks().replaceAll(oldName, newOldName));

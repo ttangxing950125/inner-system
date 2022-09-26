@@ -393,9 +393,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R addOldName(EntityInfo entity) {
         EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
         //校验曾用名是否存在
-        String entityCode = entity.getEntityCode();
+        String entityCode = entityInfo.getEntityCode();
         QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
-        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda().eq(EntityNameHis::getDqCode, entityCode).eq(EntityNameHis::getOldName, nameHis));
+        String nameHis = entity.getEntityNameHis();
+        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda()
+                                  .eq(EntityNameHis::getDqCode, entityCode)
+                                  .eq(EntityNameHis::getOldName, nameHis));
         if (aLong>0){
             return R.fail("曾用名重复，请重新输入");
         }
@@ -417,14 +420,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfoMapper.updateById(entityInfo);
 
         //插入曾用名记录表
-        EntityNameHis nameHis = new EntityNameHis();
-        nameHis.setDqCode(entityInfo.getEntityCode());
-        nameHis.setOldName(entity.getEntityNameHis());
-        nameHis.setEntityType(2);
-        nameHis.setHappenDate(entity.getUpdated());
-        nameHis.setRemarks(entity.getEntityNameHisRemarks());
-        nameHis.setSource(2);
-        nameHisMapper.insert(nameHis);
+        EntityNameHis newNameHis = new EntityNameHis();
+        newNameHis.setDqCode(entityInfo.getEntityCode());
+        newNameHis.setOldName(entity.getEntityNameHis());
+        newNameHis.setEntityType(2);
+        newNameHis.setHappenDate(entity.getUpdated());
+        newNameHis.setRemarks(entity.getEntityNameHisRemarks());
+        newNameHis.setSource(2);
+        nameHisMapper.insert(newNameHis);
         return R.ok();
     }
 
@@ -439,7 +442,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityNameHis nameHis = nameHisMapper.selectOne(hisQuery.lambda()
                 .eq(EntityNameHis::getDqCode, dqCode)
                 .eq(EntityNameHis::getOldName, oldName));
+
         if (ObjectUtils.isEmpty(status)) {
+            //校验修改后的曾用名是否已经存在
+            Long aLong = nameHisMapper.selectCount(hisQuery.lambda()
+                    .eq(EntityNameHis::getDqCode, dqCode)
+                    .eq(EntityNameHis::getOldName, newOldName));
+            if (aLong>0){
+                return R.ok("曾用名已经存在，请重新输入");
+            }
             //修改主体表中的数据
             entityInfo.setEntityNameHis(entityInfo.getEntityNameHis().replaceAll(oldName, newOldName));
             entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks().replaceAll(oldName, newOldName));
@@ -480,8 +491,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R getInfoDetail(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>(entityInfo);
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
-        if (!CollectionUtils.isEmpty(entityInfos) && entityInfos.size() > 1) {
-            return R.fail();
+        if (CollectionUtils.isEmpty(entityInfos)){
+            return R.fail("异常查询，数据为空");
+        }
+        if (entityInfos.size() > 1) {
+            return R.fail("异常查询，唯一识别码查出多条数据");
         }
         //TODO  添加主体其余详细信息
 

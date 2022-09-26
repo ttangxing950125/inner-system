@@ -1,6 +1,8 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -17,6 +19,7 @@ public class EntityNameHis implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
+    @TableId(type = IdType.AUTO)
     /** $column.columnComment */
     private Long id;
 
