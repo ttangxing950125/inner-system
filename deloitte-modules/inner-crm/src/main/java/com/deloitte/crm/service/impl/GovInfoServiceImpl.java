@@ -21,6 +21,7 @@ import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.HttpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -108,6 +109,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return govInfoMapper.deleteGovInfoById(id);
     }
 
+    @Transactional
     @Override
     public R updateInfoList(List<GovInfo> list) {
         list.stream().forEach(o -> {
@@ -231,6 +233,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Autowired
     private HttpUtils httpUtils;
 
+    @Transactional
     @Override
     public R addOldName(GovInfo gov) {
         //获取操作用户
@@ -391,6 +394,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return pageResult;
     }
 
+    @Transactional
     @Override
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表
