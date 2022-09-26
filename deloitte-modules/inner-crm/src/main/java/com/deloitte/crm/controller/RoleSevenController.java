@@ -1,10 +1,12 @@
 package com.deloitte.crm.controller;
 
-import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 正杰
@@ -39,16 +42,16 @@ public class RoleSevenController {
      * @author 正杰
      * @date 2022/9/22
      * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy-mm-dd
-     * @return 当月或者当日的任务情况
+     * @param date 请传入具体日期: yyyy/mm/dd
+     * @return R<List<CrmEntityTask>> 当月或者当日的任务情况
      */
-    @ApiOperation(value="查询指定日期或当月任务情况")
+    @ApiOperation(value="查询指定日期或当月任务情况,返回List<CrmEntityTask> by正杰")
     @ApiImplicitParams({
             @ApiImplicitParam(name="timeUnit",value="请传入时间单位常量 MOUTH || DAY",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="date",value="请传入具体日期: yyyy-mm-dd",paramType = "query",dataType = "Date")})
+            @ApiImplicitParam(name="date",value="请传入具体日期: yyyy/mm/dd",paramType = "query",dataType = "Date")})
     @PostMapping("/getTaskInfo")
     @Log(title = "【查询指定日期或当月任务情况】", businessType = BusinessType.OTHER)
-    public AjaxResult getTaskInfo(String timeUnit,Date date){
+    public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date){
         //TODO 单表查询 角色7当月||当日任务完成情况
         return iCrmEntityTaskService.getTaskInfo(timeUnit,date);
     }
@@ -61,13 +64,13 @@ public class RoleSevenController {
      * @param state 传入 状态 1是忽略 2是新增
      * @return 操作成功与否
      */
-    @ApiOperation(value="确认该任务的主体是新增或是忽略")
+    @ApiOperation(value="确认该任务的主体是新增或是忽略 by正杰")
     @ApiImplicitParams({
             @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer"),
             @ApiImplicitParam(name="state",value="传入 状态 1是忽略 2是新增",paramType = "query",dataType = "Integer")})
     @Log(title = "【确认该任务的主体是新增或是忽略】", businessType = BusinessType.UPDATE)
     @PostMapping("/changeState")
-    public AjaxResult changeState(Integer id,Integer state){
+    public R changeState(Integer id,Integer state){
         //TODO 单表修改 角色7完成任务，选择是否为忽略或者新增
         return iCrmEntityTaskService.changeState(id,state);
     }
@@ -91,7 +94,7 @@ public class RoleSevenController {
      * @param entityName 传入 企业名称
      * @return 比较信息结果
      */
-    @ApiOperation(value="校验该主体是否存在，并做其他判断")
+    @ApiOperation(value="校验该主体是否存在，并做其他判断 by正杰")
     @ApiImplicitParam(name="creditCode,entityName",value="传入 企业统一社会信用代码,传入 企业名称",required = true,paramType = "query",dataType = "String,String")
     @ApiImplicitParams({
             @ApiImplicitParam(name="creditCode",value="传入 企业统一社会信用代码",paramType = "query",dataType = "String"),
@@ -99,7 +102,7 @@ public class RoleSevenController {
     })
     @Log(title = "【校验该主体是否存在，并做其他判断】", businessType = BusinessType.OTHER)
     @PostMapping("/validEntity")
-    public AjaxResult validEntity(String creditCode,String entityName){
+    public R<EntityInfoVo> validEntity(String creditCode, String entityName){
         //TODO 校验数据库是否存在该主体
         return iEntityInfoService.validEntity(creditCode,entityName);
     }
@@ -114,7 +117,7 @@ public class RoleSevenController {
      * @param remarks 备注
      * @return 修改返回信息
      */
-    @ApiOperation(value="修改主体信息中的主体名称 & 汇总曾用名")
+    @ApiOperation(value="修改主体信息中的主体名称 & 汇总曾用名 by正杰")
     @ApiImplicitParams({
             @ApiImplicitParam(name="creditCode",value="统一社会信用代码",paramType = "query",dataType = "String"),
             @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String"),
@@ -122,7 +125,7 @@ public class RoleSevenController {
     })
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
-    public AjaxResult editEntityNameHis(String creditCode,String entityNewName,String remarks){
+    public R editEntityNameHis(String creditCode,String entityNewName,String remarks){
         //TODO 修改主体名称  =>  修改主体曾用名
         return iEntityInfoService.editEntityNameHis(creditCode,entityNewName,remarks);
     }

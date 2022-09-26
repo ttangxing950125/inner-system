@@ -8,6 +8,8 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.vo.EntityInfoVo;
+import com.deloitte.crm.vo.TargetEntityBondsVo;
 
 import java.util.List;
 
@@ -108,7 +110,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @param entityName 传入 企业名称
      * @return 比较信息结果
      */
-    AjaxResult validEntity(String creditCode, String entityName);
+    R<EntityInfoVo> validEntity(String creditCode, String entityName);
 
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
@@ -120,7 +122,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @param remarks 备注
      * @return 修改返回信息
      */
-    AjaxResult editEntityNameHis(String creditCode, String entityNewName,String remarks);
+    R editEntityNameHis(String creditCode, String entityNewName,String remarks);
 
     /**
      * 根据名称查询主体
@@ -134,4 +136,14 @@ public interface IEntityInfoService extends IService<EntityInfo>
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
     R getInfoDetail(EntityInfo entityInfo);
+
+    /**
+     * 查询债卷信息 模糊匹配
+     * @param name    entity_name || bond_short_name
+     * @param keyword 请传入常量 ENTITY || BOND
+     * @return R<List<TargetEntityBondsVo>>
+     * @author 正杰
+     * @date 2022/9/25
+     */
+    R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword);
 }

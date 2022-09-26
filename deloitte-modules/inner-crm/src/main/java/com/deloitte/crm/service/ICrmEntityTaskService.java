@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import java.util.Date;
 import java.util.List;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.CrmEntityTask;
 
@@ -68,9 +69,9 @@ public interface ICrmEntityTaskService
      * @date 2022/9/22
      * @param timeUnit 请传入时间单位常量 MOUTH || DAY
      * @param date 请传入具体日期: yyyy-mm-dd
-     * @return 当月或者当日的任务情况
+     * @return R<List<CrmEntityTask>> 当月或者当日的任务情况
      */
-    AjaxResult getTaskInfo(String timeUnit, Date date);
+    R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date);
 
     /**
      * 确认该任务的主体是新增或是忽略
@@ -80,7 +81,7 @@ public interface ICrmEntityTaskService
      * @param state 传入 状态 1是忽略 2是新增
      * @return 操作成功与否
      */
-    AjaxResult changeState(Integer id,Integer state);
+    R changeState(Integer id,Integer state);
 
     /**
      * 创建任务

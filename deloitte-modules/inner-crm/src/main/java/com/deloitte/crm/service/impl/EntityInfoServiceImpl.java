@@ -1,9 +1,7 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,33 +11,32 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
-import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.EntityBondRel;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
+import com.deloitte.crm.dto.BondsDetailDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.mapper.EntityAttrMapper;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.vo.EntityInfoVo;
+import com.deloitte.crm.vo.TargetEntityBondsVo;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -73,9 +70,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityNameHisMapper nameHisMapper;
 
-    private EntityAttrMapper entityAttrMapper;
-
     private EntityAttrValueMapper entityAttrValueMapper;
+
+    private EntityBondRelMapper entityBondRelMapper;
 
     @Autowired
     private HttpUtils httpUtils;
@@ -265,22 +262,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return entityInfoMapper.deleteEntityInfoById(id);
     }
 
-    private final String CREDIT_CODE = "credit_code";
-
-    private final String ENTITY_NAME = "entity_name";
-
-    private final String DQ_CODE = "dq_code";
-
     /**
      * 传入社会信用代码于企业名称
      * => 存在该社会信用代码 返回 比较信息为 false
-     * ==> 前端跳转调用人工对比信息，并确认
-     * <p>
+     *      ==> 前端跳转调用人工对比信息，并确认
+     *
      * => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     * ==> 前端跳转调用人工对比信息，并确认
-     * <p>
+     *      ==> 前端跳转调用人工对比信息，并确认
+     *
      * => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     * ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
+     *      ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
      *
      * @param creditCode 传入 企业统一社会信用代码
      * @param entityName 传入 企业名称
@@ -289,30 +280,36 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/22
      */
     @Override
-    public AjaxResult validEntity(String creditCode, String entityName) {
+    public R<EntityInfoVo> validEntity(String creditCode, String entityName) {
         //TODO 校验数据库是否存在该主体
-        EntityInfo entityByCode = baseMapper.selectOne(new QueryWrapper<EntityInfo>().eq(CREDIT_CODE, creditCode));
+        EntityInfo entityByCode = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
+                .lambda().eq(EntityInfo::getCreditCode, creditCode));
+        EntityInfo entityByName = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
+                .lambda().eq(EntityInfo::getEntityName, entityName));
         //库内无该社会信用代码
         if (entityByCode == null) {
-            EntityInfo entityByName = baseMapper.selectOne(new QueryWrapper<EntityInfo>().eq(ENTITY_NAME, entityName));
             //库内无该主体 是新增
             if (entityByName == null) {
-                return AjaxResult.success(new EntityInfoVo().setMsg(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()));
-            }
-
+                return R.ok(new EntityInfoVo().setMsg(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()));
             //库内存在该主体 但是不存在该社会信用代码
-            else {
-                return AjaxResult.success(new EntityInfoVo()
+            }else {
+                return R.ok(new EntityInfoVo()
                         .setEntityInfo(entityByName)
                         .setBo(BadInfo.GET)
                         .setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
             }
+        //库内存在该主体 但是主体名称不同
+        }else if(entityByName == null){
+            return R.ok(new EntityInfoVo()
+                    .setEntityInfo(entityByName)
+                    .setBo(BadInfo.GET)
+                    .setMsg(BadInfo.EXITS_ENTITY_DIFFERENT_NAME.getInfo()));
         }
-        //库内已存在该社会信用代码
-        return AjaxResult.success(new EntityInfoVo()
+        //库内已存在该主体
+        return R.ok(new EntityInfoVo()
                 .setEntityInfo(entityByCode)
                 .setBo(BadInfo.GET)
-                .setMsg(BadInfo.EXITS_CREDIT_CODE.getInfo()));
+                .setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo()));
     }
 
     /**
@@ -327,10 +324,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/22
      */
     @Override
-    public AjaxResult editEntityNameHis(String creditCode, String entityNewName, String remarks) {
+    public R editEntityNameHis(String creditCode, String entityNewName, String remarks) {
+        //TODO 获取当前登录用户
+        String username = SecurityUtils.getUsername();
+        if(username==null){return R.fail(BadInfo.VALID_EMPTY_USERNAME.getInfo());}
 
-        //TODO 修改主体
-        EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>().eq(CREDIT_CODE, creditCode));
+        //TODO 修改主体名称
+        EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
+                .lambda().eq(EntityInfo::getCreditCode, creditCode));
+        if(entity==null){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
         String oldName = entity.getEntityName();
 
         //修改主体曾用名 entity_name_his 时 需要用 、 拼接
@@ -346,28 +348,29 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 + remarks
         );
 
+        //TODO 修改主体曾用名列表以及目前名称
         UpdateWrapper<EntityInfo> entityInfoUpdateWrapper = new UpdateWrapper<>();
         entityInfoUpdateWrapper.lambda().eq(EntityInfo::getCreditCode, creditCode)
                 .set(EntityInfo::getEntityName, entityNewName)
                 .set(EntityInfo::getEntityNameHis, entity.getEntityNameHis())
                 .set(EntityInfo::getEntityNameHisRemarks, entity.getEntityNameHisRemarks())
-                .set(EntityInfo::getUpdated, entity.getUpdated());
+                .set(EntityInfo::getUpdated, entity.getUpdated())
+                .set(EntityInfo::getUpdater,username);
         baseMapper.update(entity, entityInfoUpdateWrapper);
 
         //TODO 新增曾用名 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
-        //1-企业主体
+        //EntityType1  => 企业主体
         entityNameHis.setEntityType(1);
         entityNameHis.setDqCode(entity.getEntityCode());
         entityNameHis.setOldName(oldName);
         entityNameHis.setRemarks(remarks);
-        //1-曾用名为自动生曾
+        //Source => 1-曾用名为自动生曾
         entityNameHis.setSource(1);
         entityNameHis.setCreater(SecurityUtils.getUsername());
         entityNameHis.setCreated(new Date());
         iEntityNameHisService.insertEntityNameHis(entityNameHis);
-
-        return AjaxResult.success();
+        return R.ok();
     }
 
     /**
@@ -720,4 +723,84 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return resultMap;
     }
+
+
+    public static final String ENTITY = "ENTITY";
+
+    public static final String BOND = "BOND";
+
+    /**
+     * 查询债卷信息 模糊匹配
+     *
+     * @param name    entity_name || bond_short_name
+     * @param keyword 请传入常量 ENTITY || BOND
+     * @return R<List<TargetEntityBondsVo>>
+     * @author 正杰
+     * @date 2022/9/25
+     */
+    @Override
+    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
+
+        //TODO 正杰任务 模糊匹配 查询主体||债券信息
+        switch (keyword) {
+            //TODO 模糊匹配主体名
+            case ENTITY:
+                List<TargetEntityBondsVo> res = null;
+                List<EntityInfo> entityInfos = null;
+                //主体list
+                entityInfos = baseMapper.selectList(new QueryWrapper<EntityInfo>()
+                        .lambda().like(EntityInfo::getEntityName, name));
+                if(entityInfos==null){return R.ok(res,BadInfo.VALID_EMPTY_TARGET.getInfo());}
+                //找到对应bd_code
+                entityInfos.forEach(row -> {
+                    EntityBondRel entityBondRel = null;
+                    EntityAttrValue entityAttrValue = null;
+                    if (row.getEntityCode() != null) {
+                        entityBondRel = entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>()
+                                .lambda().eq(EntityBondRel::getEntityCode, row.getEntityCode()));
+                    } else if (entityBondRel != null) {
+                        entityAttrValue = entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+                                .lambda().eq(EntityAttrValue::getEntityCode, entityBondRel.getBdCode())
+                                .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID));
+                    }
+                    res.add(new TargetEntityBondsVo()
+                            .setEntityInfo(row)
+                            .setSingleInfo(
+                                    new BondsDetailDto()
+                                            .setName(Common.TRANSACTION_CODE_NAME)
+                                            .setId(entityAttrValue.getId()==null?0:entityAttrValue.getId())
+                                            .setValue(entityAttrValue.getValue()==null?"":entityAttrValue.getValue())));
+                });
+                return R.ok(res);
+            //TODO 模糊匹配债券名
+            case BOND:
+                List<TargetEntityBondsVo> rest = null;
+                List<EntityAttrValue> entityAttrs = null;
+                //债券list
+                entityAttrs = entityAttrValueMapper.selectList(new QueryWrapper<EntityAttrValue>()
+                        .lambda().eq(EntityAttrValue::getAttrId, Common.BOND_SHORT_NAME_ID)
+                        .like(EntityAttrValue::getValue, name));
+                if(entityAttrs==null){return R.ok(rest,BadInfo.VALID_EMPTY_TARGET.getInfo());}
+                //找到对应的主体
+                entityAttrs.forEach(item->{
+                    EntityBondRel entityBondRel = null;
+                    EntityInfo entityInfo = null;
+                    List<BondsDetailDto> bondsDetailDtos = null;
+                    if(item.getEntityCode()!=null){
+                        entityBondRel = entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>()
+                                .lambda().eq(EntityBondRel::getBdCode, item.getEntityCode()));
+                    }else if(entityBondRel != null){
+                        entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
+                                .lambda().eq(EntityInfo::getEntityCode,entityBondRel.getEntityCode()));
+                    }
+
+//                    bondsDetailDtos.add(new BondsDetailDto().setName())
+
+                });
+                return R.ok(rest);
+            default:
+                return R.fail(BadInfo.VALID_PARAM.getInfo());
+        }
+    }
+
 }

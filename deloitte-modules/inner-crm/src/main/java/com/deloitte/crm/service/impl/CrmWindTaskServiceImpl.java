@@ -7,22 +7,17 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.RoleInfo;
-import com.deloitte.crm.domain.BondNewIss;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.service.IBondNewIssService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -35,8 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import javax.annotation.Resource;
 
 /**
  * 角色1的每日任务，导入wind文件的任务Service业务层处理

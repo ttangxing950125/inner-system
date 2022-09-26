@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -118,26 +119,22 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
         return crmEntityTaskMapper.deleteCrmEntityTaskById(id);
     }
 
-
     /**
      * 角色7今日运维模块
      * @author 正杰
      * @date 2022/9/22
      * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy-mm-dd
+     * @param date 请传入具体日期: yyyy/mm/dd
      * @return 当月或者当日的任务情况
      */
     @Override
-    public AjaxResult getTaskInfo(String timeUnit, Date date) {
-
-        CrmEntityTask crmEntityTask = new CrmEntityTask();
+    public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date) {
         switch (timeUnit){
             case Common.DAY:
-                crmEntityTask.setTaskDate(date);
-                CrmEntityTask dayList = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().eq("task_date", date));
-                return AjaxResult.success(SuccessInfo.GET_SUCCESS.getInfo(),dayList);
+                List<CrmEntityTask> res = baseMapper.selectList(new QueryWrapper<CrmEntityTask>()
+                        .lambda().eq(CrmEntityTask::getTaskDate, date));
+                return R.ok(res,SuccessInfo.GET_SUCCESS.getInfo());
             case Common.MOUTH:
-
                 Date first = null;
                 Date last = null;
                 try {
@@ -156,16 +153,14 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
                     String lastString = formatter.format(last);
                     last = formatter.parse(lastString);
                 } catch (ParseException e) {
-                    return AjaxResult.error();
+                    return R.fail();
                 }
                 List<CrmEntityTask> mouthList = crmEntityTaskMapper.selectCrmEntityTaskListThisMouth(first,last);
-                return AjaxResult.success(SuccessInfo.GET_SUCCESS.getInfo(),mouthList);
+                return R.ok(mouthList,SuccessInfo.GET_SUCCESS.getInfo());
             default:
-                return AjaxResult.error(BadInfo.PARAM_EMPTY.getInfo());
+                return R.fail(BadInfo.PARAM_EMPTY.getInfo());
         }
-
     }
-
 
     /**
      * 确认该任务的主体是新增或是忽略
@@ -176,18 +171,16 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
      * @return 操作成功与否
      */
     @Override
-    public AjaxResult changeState(Integer id,Integer state) {
-        try {
-            CrmEntityTask crmEntityTask = new CrmEntityTask();
-            crmEntityTask.setId(id);
-            UpdateWrapper<CrmEntityTask> udWapper = new UpdateWrapper();
-            udWapper.lambda().eq(CrmEntityTask::getId,id)
-                    .set(CrmEntityTask::getState,state);
-            baseMapper.update(crmEntityTask,udWapper);
-        } catch (Exception e) {
-            return AjaxResult.error();
-        }
-        return AjaxResult.success(SuccessInfo.SUCCESS.getInfo());
+    public R changeState(Integer id,Integer state) {
+        //TODO 校验参数
+        CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>()
+                .lambda().eq(CrmEntityTask::getId,id));
+        if(crmEntityTask==null){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        //TODO 修改状态
+        baseMapper.update(crmEntityTask,new UpdateWrapper<CrmEntityTask>()
+                .lambda().eq(CrmEntityTask::getId,id)
+                .set(CrmEntityTask::getState,state));
+        return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
     /**

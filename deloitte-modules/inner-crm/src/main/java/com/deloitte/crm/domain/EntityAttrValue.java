@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import io.swagger.models.auth.In;
 
 import java.io.Serializable;
 
@@ -19,7 +20,7 @@ public class EntityAttrValue implements Serializable
 
     /** $column.columnComment */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     /** entity_attr的id */
     @Excel(name = "entity_attr的id")
@@ -33,12 +34,12 @@ public class EntityAttrValue implements Serializable
     @Excel(name = "属性值")
     private String value;
 
-    public void setId(Long id) 
+    public void setId(Integer id)
     {
         this.id = id;
     }
 
-    public Long getId() 
+    public Integer getId()
     {
         return id;
     }
