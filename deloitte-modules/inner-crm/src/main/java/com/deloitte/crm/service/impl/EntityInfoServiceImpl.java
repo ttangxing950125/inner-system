@@ -1,5 +1,9 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
+import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -30,12 +34,26 @@ import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.vo.EntityInfoVo;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -537,6 +555,77 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         });
         return resultRecords;
     }
+
+    /**
+     *导出政府主体数据
+     *
+     * @return void
+     * @author penTang
+     * @date 2022/9/25 21:19
+     */
+    public void ImportEntityInFor(EntityAttrByDto entityAttrDto){
+        List<EntityInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletResponse response = servletRequestAttributes.getResponse();
+        ExcelWriter writer = ExcelUtil.getWriter(true);
+        ArrayList<Map<String, Object>> rows = new ArrayList<>();
+        AtomicInteger serialNumber = new AtomicInteger();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        listEntityAll.forEach(vo -> {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            EntityInfo info = vo.getEntityInfo();
+            map.put("序号", serialNumber.incrementAndGet());
+            map.put("德勤主体代码", info.getEntityCode());
+            map.put("主体名称", info.getEntityName());
+            map.put("续存状态", info.getStatus());
+            map.put("统一社会性代码", info.getCreditCode());
+            map.put("创建日期", info.getCreated());
+            map.put("创建人", info.getCreater());
+            vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
+            rows.add(map);
+        });
+        //一次性写出内容，强制输出标题
+        writer.write(rows, true);
+        // 设置自适应
+        Sheet sheet = writer.getSheet();
+        // 循环设置列宽
+        for (int columnIndex = 0; columnIndex < writer.getColumnCount(); columnIndex++) {
+            int width = sheet.getColumnWidth(columnIndex) / 256;
+            // 获取最大行宽
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row currentRow = sheet.getRow(rowIndex);
+                if (Objects.isNull(currentRow)) {
+                    currentRow = sheet.createRow(rowIndex);
+                }
+                Cell currentCell = currentRow.getCell(columnIndex);
+                if (Objects.isNull(currentCell)) {
+                    continue;
+                } else if (currentCell.getCellType() == CellType.STRING) {
+                    int length = currentCell.getStringCellValue().getBytes().length;
+                    width = width < length ? length : width;
+                }
+            }
+            sheet.setColumnWidth(columnIndex, width * 256);
+        }
+        // response为HttpServletResponse对象
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setCharacterEncoding("utf-8");
+        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("排班列表导出", "UTF-8")) + ".xls");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        try (ServletOutputStream out = response.getOutputStream()) {
+            writer.flush(out, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 关闭writer，释放内存
+        writer.close();
+    }
+
+
 
     /**
      * 分页查询

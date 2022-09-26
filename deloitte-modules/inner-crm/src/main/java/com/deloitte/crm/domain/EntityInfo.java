@@ -75,6 +75,10 @@ public class EntityInfo implements Serializable
     @Excel(name = "最后一次更新这条数据的用户")
     private String updater;
 
+    /** 主体状态 是否生效 0-失效 1-生效 */
+    @Excel(name = "主体状态")
+    private Integer  status;
+
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;
@@ -82,6 +86,14 @@ public class EntityInfo implements Serializable
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated = new Date();
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public void setId(Integer id)
     {

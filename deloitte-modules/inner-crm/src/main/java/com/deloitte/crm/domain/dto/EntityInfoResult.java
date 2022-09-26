@@ -1,8 +1,10 @@
 package com.deloitte.crm.domain.dto;
 
+import cn.hutool.core.lang.hash.Hash;
 import com.deloitte.crm.domain.EntityInfo;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,9 @@ import java.util.Map;
  */
 @Data
 public class EntityInfoResult {
+
     private EntityInfo entityInfo;
+
     private List<Map<String,Object>> more;
+
 }

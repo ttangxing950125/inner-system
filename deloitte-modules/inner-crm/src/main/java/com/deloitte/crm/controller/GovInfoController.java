@@ -341,4 +341,30 @@ public class GovInfoController extends BaseController {
         System.out.println("测试成功");
         return R.ok("测试成功");
     }
+
+    /**
+    *导出导出全部企业主体Excel表
+    *
+    * @param govAttrDto
+    * @return R
+    * @author penTang
+    * @date 2022/9/25 17:48
+   */
+    @ApiOperation(value = "导出全部企业主体Excel表")
+    @ApiImplicitParam(
+            // 参数名
+            name = "entityAttrDto",
+            // 参数描述
+            value = "包含表中gov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+            paramType = "body",
+            // 示例值
+            example = "",
+            //参数类型
+            dataTypeClass = EntityAttrByDto.class)
+    @PostMapping("/getListEntity")
+    public R ImportListEntity(@RequestBody EntityAttrByDto govAttrDto){
+        return R.ok(govInfoService.getListEntityByPage(govAttrDto));
+    }
+
 }

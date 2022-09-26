@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,10 +39,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> implements IGovInfoService {
-    @Autowired
+    @Resource
     private GovInfoMapper govInfoMapper;
 
-    @Autowired
+    @Resource
     private EntityNameHisMapper nameHisMapper;
 
     /**
