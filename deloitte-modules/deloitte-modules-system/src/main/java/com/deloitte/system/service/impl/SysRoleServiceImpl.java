@@ -28,6 +28,8 @@ import com.deloitte.system.service.ISysRoleService;
 
 import javax.annotation.Resource;
 
+import static com.alibaba.nacos.common.utils.CollectionUtils.list;
+
 /**
  * 角色 业务层处理
  * 

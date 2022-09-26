@@ -24,7 +24,7 @@ public interface CrmDailyTaskMapper extends BaseMapper<CrmDailyTask>
      * @author penTang
      * @date 2022/9/22 13:56
      */
-    List<CrmDailyTask> selectCrmDailyTaskListByDate(@Param("startDate") String startDate, @Param("endDate") String endDate);
+    List<CrmDailyTask> selectCrmDailyTaskListByDate(@Param("startDate") String startDate, @Param("endDate") String endDate,@Param("taskRoleType")Integer taskRoleType);
 
 
 }

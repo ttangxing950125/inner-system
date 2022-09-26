@@ -68,7 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <select id="selectCrmDailyTaskListByDate" resultType="com.deloitte.crm.domain.CrmDailyTask">
-        select  * from crm_daily_task where task_role_type =3 AND task_date BETWEEN #{startDate} AND #{endDate}
+        select  * from crm_daily_task where task_role_type =#{taskRoleType} AND task_date BETWEEN #{startDate} AND #{endDate}
     </select>
 
     <delete id="deleteCrmDailyTaskByIds" parameterType="String">

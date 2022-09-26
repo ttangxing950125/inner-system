@@ -50,7 +50,6 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "{统计整体企业主体情况}", response = EntityInfoDto.class)
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query"
-
             )
     })
 

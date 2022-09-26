@@ -7,6 +7,10 @@ import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.system.api.RemoteUserService;
+import com.deloitte.system.api.RoleService;
+import com.deloitte.system.api.domain.SysDictData;
+import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +18,13 @@ import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
 
 /**
  * 每日生产角色任务的service业务实现层
@@ -27,6 +36,9 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
     @Resource
     private  CrmDailyTaskMapper mapper;
+    @Resource
+    public  RoleService roleService;
+
 
     /***
      *根据指定日期查询当月的任务
@@ -44,7 +56,26 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         LocalDate endDay = today.with(TemporalAdjusters.lastDayOfMonth());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String endTime = endDay.format(formatter);
-        return mapper.selectCrmDailyTaskListByDate(startDate, endTime);
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        Set<String> roles = loginUser.getRoles();
+        ArrayList<String> roleKey = new ArrayList<String>();
+        roleKey.add("role1");
+        roleKey.add("role2");
+        roleKey.add("role3");
+        roleKey.add("role4");
+        roleKey.add("role5");
+        roleKey.add("role6");
+        roles.forEach(o->{
+            boolean contains = roleKey.contains(o);
+            if (contains){
+                SysRole sysRole = roleService.selectRoleList().stream().filter(row -> row.getRoleKey().equals(o)).collect(Collectors.toList()).get(0);
+
+                mapper.selectCrmDailyTaskListByDate(startDate, endTime,sysRole.getRoleId().intValue());
+
+            }
+
+        });
+        return null;
     }
 
     /**

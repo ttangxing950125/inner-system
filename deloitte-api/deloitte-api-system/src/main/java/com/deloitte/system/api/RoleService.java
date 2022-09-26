@@ -2,6 +2,7 @@ package com.deloitte.system.api;
 import com.deloitte.common.core.constant.SecurityConstants;
 import com.deloitte.common.core.constant.ServiceNameConstants;
 import com.deloitte.system.api.domain.SysDictData;
+import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,14 @@ import java.util.List;
 public interface RoleService {
 
     /**
-     *查询角色
+     * 查询角色
      *
      * @return List<SysDictData>
      * @author penTang
      * @date 2022/9/22 19:40
-    */
+     */
     @PostMapping("/dict/data/queryRoles")
-     List<SysDictData> getRoleByType();
+   List<SysDictData> getRoleByType();
 
 
 
@@ -43,5 +44,15 @@ public interface RoleService {
     @PostMapping("/role/roleById")
     List<SysUser> selectUserListById(@RequestParam("RoleId") Integer RoleId);
 
+    /**
+     *查询所有的角色(SysRole)
+     *
+     *
+     * @return List<SysRole>
+     * @author penTang
+     * @date 2022/9/26 17:49
+    */
+    @PostMapping("/role/roleList")
+    List<SysRole> selectRoleList();
 
 }

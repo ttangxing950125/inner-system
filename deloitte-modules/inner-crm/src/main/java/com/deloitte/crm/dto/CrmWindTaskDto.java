@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel(value = "CrmWindTaskDtos",description = "用于返回当天统计任务完成率")
 public class CrmWindTaskDto {
+    @ApiModelProperty(value = "任务描述")
+    private Integer taskCateId;
     /** 任务描述 */
     @ApiModelProperty(value = "任务描述")
     private String  taskDesc;
@@ -19,6 +21,14 @@ public class CrmWindTaskDto {
     /** 未完成任务数(指定日期) */
     @ApiModelProperty(value = "未完成任务数(指定日期)")
     private String notComplete;
+
+    public Integer getTaskCateId() {
+        return taskCateId;
+    }
+
+    public void setTaskCateId(Integer taskCateId) {
+        this.taskCateId = taskCateId;
+    }
 
     public String getTaskDesc() {
         return taskDesc;

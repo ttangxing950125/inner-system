@@ -46,6 +46,12 @@ public class SysRoleController extends BaseController
         return roleService.getUserByRole(roleId);
     }
 
+    @PostMapping("/roleList")
+     public List<SysRole> selectRoleListByRoleKey(){
+        return roleService.selectRoleAll();
+     };
+
+
     @RequiresPermissions("system:role:list")
     @GetMapping("/list")
     public TableDataInfo list(SysRole role)

@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectComWindByDate" resultType="com.deloitte.crm.dto.CrmWindTaskDto" parameterType="string">
-        SELECT task_desc,COUNT(id) as taskCount,COUNT(if(complete = 0,TRUE,NULL))
+        SELECT task_cate_id,task_desc,COUNT(id) as taskCount,COUNT(if(complete = 0,TRUE,NULL))
          as notComplete FROM crm_wind_task WHERE task_date = #{crmWindTask}  GROUP BY task_cate_id
     </select>
 

@@ -28,6 +28,7 @@ public class QuartzTask {
      * @date 2022/9/22 14:22
      */
    @Scheduled(cron = "0 0 0 * * ?" )
+//   @Scheduled(cron = "30 * * * * ?" )
     public void StartRuleTask() {
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();
