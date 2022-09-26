@@ -25,10 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -113,7 +110,27 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public R updateInfoList(List<GovInfo> list) {
-        list.stream().forEach(o -> govInfoMapper.updateById(o));
+        list.stream().forEach(o -> {
+            GovInfo govInfo = govInfoMapper.selectById(o.getId());
+            govInfoMapper.updateById(o);
+            //修改政府主体名称时，需要添加曾用名
+            if (!ObjectUtils.isEmpty(o.getGovName())){
+                String oldName = govInfo.getGovName();
+                GovInfo addOldName = new GovInfo();
+                addOldName.setId(o.getId());
+                addOldName.setGovNameHis(oldName);
+                addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
+                addOldName(addOldName);
+            }
+            //修改政府主体代码时，需要修改主体历史表中的政府主体代码
+            if (!ObjectUtils.isEmpty(o.getDqGovCode())){
+                String oldDqCode = govInfo.getDqGovCode();
+                QueryWrapper<EntityNameHis>wrapper=new QueryWrapper<>();
+                EntityNameHis nameHis = new EntityNameHis();
+                nameHis.setDqCode(o.getDqGovCode());
+                nameHisMapper.update(nameHis,wrapper.lambda().eq(EntityNameHis::getDqCode,oldDqCode));
+            }
+        });
         return R.ok(list.size());
     }
 
@@ -121,8 +138,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public R getInfoDetail(GovInfo govInfo) {
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>(govInfo);
         List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
-        if (!CollectionUtils.isEmpty(govInfos) && govInfos.size() > 1) {
-            return R.fail();
+        if (CollectionUtils.isEmpty(govInfos)){
+            return R.fail("异常查询，数据为空");
+        }
+        if (govInfos.size() > 1) {
+            return R.fail("异常查询，唯一识别码查出多条数据");
         }
         //TODO  查询上级行政code
         String preGovCode = govInfos.get(0).getPreGovCode();
@@ -217,18 +237,27 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         String remoter = httpUtils.getRemoter();
 
         GovInfo govInfo = govInfoMapper.selectById(gov.getId());
+
+        String govCode = govInfo.getGovCode();
+        String nameHis = gov.getGovNameHis();
+        QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
+        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda().eq(EntityNameHis::getDqCode, govCode).eq(EntityNameHis::getOldName, nameHis));
+        if (aLong>0){
+            return R.fail("曾用名重复，请重新输入");
+        }
+
         //修改曾用名记录
         String govNameHis = govInfo.getGovNameHis();
         if (ObjectUtils.isEmpty(govNameHis)) {
-            govInfo.setGovNameHis(gov.getGovNameHis());
+            govInfo.setGovNameHis(nameHis);
         } else {
-            govInfo.setGovNameHis(govNameHis + EntityUtils.NAME_USED_SIGN + gov.getGovNameHis());
+            govInfo.setGovNameHis(govNameHis + EntityUtils.NAME_USED_SIGN + nameHis);
         }
         String nameHisRemarks = gov.getEntityNameHisRemarks();
         if (ObjectUtils.isEmpty(nameHisRemarks)) {
-            govInfo.setEntityNameHisRemarks(gov.getUpdated() + remoter + gov.getEntityNameHisRemarks());
+            govInfo.setEntityNameHisRemarks(new Date() + remoter + gov.getEntityNameHisRemarks());
         } else {
-            govInfo.setEntityNameHisRemarks(govNameHis + EntityUtils.NAME_USED_REMARK_SIGN + gov.getUpdated() + remoter + gov.getEntityNameHisRemarks());
+            govInfo.setEntityNameHisRemarks(govNameHis + EntityUtils.NAME_USED_REMARK_SIGN + new Date() + remoter + gov.getEntityNameHisRemarks());
         }
         govInfoMapper.updateById(govInfo);
 
@@ -409,10 +438,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return R.ok();
     }
 
-    @Override
-    public R getNameList(String param) {
-        return null;
-    }
 
     /**
      * 字段对应的名称

@@ -1,12 +1,11 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityNameHis;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -63,4 +62,8 @@ public interface EntityNameHisMapper extends BaseMapper<EntityNameHis>
      * @return 结果
      */
     public int deleteEntityNameHisByIds(Long[] ids);
+
+    List<Map<String, Object>> getGovHisNameList(@Param("param") String param);
+
+    List<Map<String, Object>> getEntityHisNameList(@Param("param")String param);
 }

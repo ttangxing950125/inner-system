@@ -1,9 +1,6 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.GovInfo;
 
 import java.util.List;
@@ -63,4 +60,5 @@ public interface GovInfoMapper extends BaseMapper<GovInfo>
      * @return 结果
      */
     public int deleteGovInfoByIds(Long[] ids);
+
 }

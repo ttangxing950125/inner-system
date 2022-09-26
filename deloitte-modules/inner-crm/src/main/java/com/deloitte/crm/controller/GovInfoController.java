@@ -128,17 +128,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 15:24
      */
     @ApiOperation(value = "政府主题批量修改")
-    @ApiImplicitParam(
-            // 参数名
-            name = "govInfoList",
-            // 参数描述
-            value = "包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = GovInfo.class)
+    @ApiImplicitParam(name = "govInfoList", value = "可包含表中除 govName 外 gov_info的所有字段", paramType = "body", example = "",dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
     public R updateInfoList(List<GovInfo> govInfoList) {
         return R.ok(govInfoService.updateInfoList(govInfoList));
@@ -153,17 +143,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "查询政府名称，或者编码，是否重复")
-    @ApiImplicitParam(
-            // 参数名
-            name = "govInfo",
-            // 参数描述
-            value = "包含表中egov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = GovInfo.class)
+    @ApiImplicitParam(name = "govInfo", value = "包含表中egov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/checkGov")
     public R checkGov(@RequestBody GovInfo govInfo) {
         return R.ok(govInfoService.checkGov(govInfo));
@@ -178,17 +158,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "政府主体分页查询")
-    @ApiImplicitParam(
-            // 参数名
-            name = "govInfo",
-            // 参数描述
-            value = "包含表中gov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = GovInfoByDto.class)
+    @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfoByDto.class)
     @PostMapping("/getInfoList")
     public R getInfoList(@RequestBody GovInfoByDto govInfo) {
         return govInfoService.getInfoList(govInfo);
@@ -203,24 +173,14 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/23 8:44
      */
     @ApiOperation(value = "新增政府主体的曾用名")
-    @ApiImplicitParam(
-            // 参数名
-            name = "govInfo",
-            // 参数描述
-            value = "包含表中gov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = GovInfo.class)
+    @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/addOldName")
     public R addOldName(@RequestBody GovInfo govInfo) {
         return govInfoService.addOldName(govInfo);
     }
 
     /**
-     * 修改政府主体的曾用名
+     * 修改,停用政府主体的曾用名
      *
      * @param dqCode
      * @param oldName
@@ -230,53 +190,12 @@ public class GovInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/25 13:22
      */
-    @ApiOperation(value = "修改政府主体的曾用名")
+    @ApiOperation(value = "修改,停用政府主体的曾用名")
     @ApiImplicitParams({
-            @ApiImplicitParam(
-                    // 参数名
-                    name = "dqCode",
-                    // 参数描述
-                    value = "德勤统一识别码",
-                    // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                    paramType = "query",
-                    // 示例值
-                    example = "1",
-                    //参数类型
-                    dataType = "String"),
-            @ApiImplicitParam(
-                    // 参数名
-                    name = "oldName",
-                    // 参数描述
-                    value = "原本的曾用名",
-                    // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                    paramType = "query",
-                    // 示例值
-                    example = "原始曾用名",
-                    //参数类型
-                    dataType = "String"),
-            @ApiImplicitParam(
-                    // 参数名
-                    name = "newOldName",
-                    // 参数描述
-                    value = "修改后的曾用名",
-                    // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                    paramType = "query",
-                    // 示例值
-                    example = "新的曾用名",
-                    //参数类型
-                    dataType = "String"),
-            @ApiImplicitParam(
-                    // 参数名
-                    name = "status",
-                    // 参数描述
-                    value = "是否停用曾用名",
-                    // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                    paramType = "query",
-                    // 示例值
-                    example = "新的曾用名",
-                    //参数类型
-                    dataType = "String"
-            )
+            @ApiImplicitParam(name = "dqCode", value = "德勤统一识别码", paramType = "query", example = "1", dataType = "String"),
+            @ApiImplicitParam(name = "oldName", value = "原本的曾用名", paramType = "query", example = "原始曾用名", dataType = "String"),
+            @ApiImplicitParam(name = "newOldName", value = "修改后的曾用名", paramType = "query", example = "新的曾用名", dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "是否停用曾用名",paramType = "query", example = "新的曾用名", dataType = "String")
     })
     @PostMapping("/updateOldName")
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
@@ -292,17 +211,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "根据 dqCode 查询政府主体")
-    @ApiImplicitParam(
-            // 参数名
-            name = "govInfo",
-            // 参数描述
-            value = "包含表中gov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = GovInfo.class)
+    @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/getInfoDetail")
     public R getInfoDetail(@RequestBody GovInfo govInfo) {
         return govInfoService.getInfoDetail(govInfo);
@@ -315,26 +224,11 @@ public class GovInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
-    @ApiOperation(value = "分页查询全部上市主体")
-    @ApiImplicitParam(
-            // 参数名
-            name = "entityAttrDto",
-            // 参数描述
-            value = "包含表中gov_info的所有字段和分页参数 pageSize pageNum",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = EntityAttrByDto.class)
+    @ApiOperation(value = "分页查询全部政府主体")
+    @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto) {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
-    }
-
-    @GetMapping("/getNameList/{param}")
-    public R getNameList(@PathVariable("param") String param){
-        return govInfoService.getNameList(param);
     }
     @GetMapping("/test")
     public R test(){
@@ -351,17 +245,7 @@ public class GovInfoController extends BaseController {
     * @date 2022/9/25 17:48
    */
     @ApiOperation(value = "导出全部企业主体Excel表")
-    @ApiImplicitParam(
-            // 参数名
-            name = "entityAttrDto",
-            // 参数描述
-            value = "包含表中gov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataTypeClass = EntityAttrByDto.class)
+    @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntity")
     public R ImportListEntity(@RequestBody EntityAttrByDto govAttrDto){
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));

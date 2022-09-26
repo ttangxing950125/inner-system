@@ -2,15 +2,14 @@ package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.service.IEntityNameHisService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -104,11 +103,15 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                         .eq(EntityNameHis::getDqCode,dqCode));
     }
 
+    @Override
+    public List<Map<String, Object>> getGovHisNameList(String param) {
+        return entityNameHisMapper.getGovHisNameList(param);
+    }
 
-
-
-
-
+    @Override
+    public List<Map<String, Object>> getEntityHisNameList(String param) {
+        return entityNameHisMapper.getEntityHisNameList(param);
+    }
 
 
 }

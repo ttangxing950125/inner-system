@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import com.deloitte.crm.domain.EntityNameHis;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service接口
@@ -69,5 +70,7 @@ public interface IEntityNameHisService
      */
     List<EntityNameHis> getNameListByDqCoded(String dqCode);
 
+    List<Map<String,Object>> getGovHisNameList(String param);
 
+    List<Map<String,Object>> getEntityHisNameList(String param);
 }

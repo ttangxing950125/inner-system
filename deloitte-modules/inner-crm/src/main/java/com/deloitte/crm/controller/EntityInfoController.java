@@ -141,17 +141,7 @@ public class EntityInfoController extends BaseController
        * @date 2022/9/22 15:24
        */
       @ApiOperation(value = "企业主体批量修改")
-      @ApiImplicitParam(
-              // 参数名
-              name="entityInfoList",
-              // 参数描述
-              value="包含表中entity_info的所有字段",
-              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-              paramType = "body",
-              // 示例值
-              example = "",
-              //参数类型
-              dataTypeClass = EntityInfo.class)
+      @ApiImplicitParam(name="entityInfoList", value="包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
       @PostMapping("/updateInfoList")
       public R updateInfoList(List<EntityInfo>entityInfoList)
       {
@@ -165,17 +155,7 @@ public class EntityInfoController extends BaseController
        * @date 2022/9/22 17:49
        */
       @ApiOperation(value = "查询企业名称，或者编码，是否重复")
-      @ApiImplicitParam(
-              // 参数名
-              name="entityInfo",
-              // 参数描述
-              value="包含表中eentity_info的所有字段",
-              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-              paramType = "body",
-              // 示例值
-              example = "",
-              //参数类型
-              dataTypeClass = EntityInfo.class)
+      @ApiImplicitParam(name="entityInfo", value="包含表中eentity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
       @PostMapping("/checkEntity")
       public R checkEntity(@RequestBody EntityInfo entityInfo)
       {
@@ -189,17 +169,7 @@ public class EntityInfoController extends BaseController
        * @date 2022/9/22 17:49
        */
       @ApiOperation(value = "企业主体分页查询")
-      @ApiImplicitParam(
-              // 参数名
-              name="entityInfo",
-              // 参数描述
-              value="包含表中eentity_info的所有字段",
-              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-              paramType = "body",
-              // 示例值
-              example = "",
-              //参数类型
-              dataTypeClass = EntityInfoByDto.class)
+      @ApiImplicitParam(name="entityInfo", value="包含表中eentity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfoByDto.class)
       @PostMapping("/getInfoList")
       public R getInfoList(@RequestBody EntityInfoByDto entityInfo)
       {
@@ -213,17 +183,7 @@ public class EntityInfoController extends BaseController
        * @date 2022/9/23 8:44
        */
       @ApiOperation(value = "新增企业主体的曾用名")
-      @ApiImplicitParam(
-              // 参数名
-              name="entityInfo",
-              // 参数描述
-              value="包含表中entity_info的所有字段",
-              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-              paramType = "body",
-              // 示例值
-              example = "",
-              //参数类型
-              dataTypeClass = EntityInfo.class)
+      @ApiImplicitParam(name="entityInfo", value="包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
       @PostMapping("/addOldName")
       public R addOldName(@RequestBody EntityInfo entityInfo)
       {
@@ -242,50 +202,10 @@ public class EntityInfoController extends BaseController
        */
       @ApiOperation(value = "修改企业主体的曾用名")
       @ApiImplicitParams({
-              @ApiImplicitParam(
-                      // 参数名
-                      name = "dqCode",
-                      // 参数描述
-                      value = "德勤统一识别码",
-                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                      paramType = "query",
-                      // 示例值
-                      example = "1",
-                      //参数类型
-                      dataType = "String"),
-              @ApiImplicitParam(
-                      // 参数名
-                      name = "oldName",
-                      // 参数描述
-                      value = "原本的曾用名",
-                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                      paramType = "query",
-                      // 示例值
-                      example = "原始曾用名",
-                      //参数类型
-                      dataType = "String"),
-              @ApiImplicitParam(
-                      // 参数名
-                      name = "newOldName",
-                      // 参数描述
-                      value = "修改后的曾用名",
-                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                      paramType = "query",
-                      // 示例值
-                      example = "新的曾用名",
-                      //参数类型
-                      dataType = "String"),
-              @ApiImplicitParam(
-                      // 参数名
-                      name = "status",
-                      // 参数描述
-                      value = "是否停用曾用名",
-                      // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-                      paramType = "query",
-                      // 示例值
-                      example = "新的曾用名",
-                      //参数类型
-                      dataType = "String")
+              @ApiImplicitParam(name = "dqCode", value = "德勤统一识别码", paramType = "query", example = "1", dataType = "String"),
+              @ApiImplicitParam(name = "oldName", value = "原本的曾用名", paramType = "query", example = "原始曾用名", dataType = "String"),
+              @ApiImplicitParam(name = "newOldName", value = "修改后的曾用名", paramType = "query", example = "新的曾用名", dataType = "String"),
+              @ApiImplicitParam(name = "status", value = "是否停用曾用名", paramType = "query", example = "新的曾用名", dataType = "String")
       })
       @PostMapping("/updateOldName")
       public R updateOldName(String dqCode,String oldName, String newOldName,String status)
@@ -300,17 +220,7 @@ public class EntityInfoController extends BaseController
        * @date 2022/9/23 8:59
        */
       @ApiOperation(value = "根据 dqCode 查询企业主体")
-      @ApiImplicitParam(
-              // 参数名
-              name="entityInfo",
-              // 参数描述
-              value="包含表中eentity_info的所有字段",
-              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-              paramType = "body",
-              // 示例值
-              example = "",
-              //参数类型
-              dataTypeClass = EntityInfo.class)
+      @ApiImplicitParam(name="entityInfo", value="包含表中eentity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
       @PostMapping("/getInfoDetail")
       public R getInfoDetail(@RequestBody EntityInfo entityInfo){
           return entityInfoService.getInfoDetail(entityInfo);
@@ -322,17 +232,7 @@ public class EntityInfoController extends BaseController
        * @date 2022/9/23 10:56
        */
       @ApiOperation(value = "分页查询全部上市主体")
-      @ApiImplicitParam(
-              // 参数名
-              name="entityAttrDto",
-              // 参数描述
-              value="包含表中entity_info的所有字段和分页参数 pageSize pageNum",
-              // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-              paramType = "body",
-              // 示例值
-              example = "",
-              //参数
-              dataTypeClass = EntityAttrByDto.class)
+      @ApiImplicitParam(name="entityAttrDto", value="包含表中entity_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
       @PostMapping("/getListEntityByPage")
       public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto)
       {

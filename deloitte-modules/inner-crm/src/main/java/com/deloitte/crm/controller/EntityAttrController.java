@@ -111,6 +111,7 @@ public class EntityAttrController extends BaseController
     @PostMapping("/getAllByGroup")
     public R getAllByGroup()
     {
+
         return entityAttrService.getAllByGroup();
     }
     /**

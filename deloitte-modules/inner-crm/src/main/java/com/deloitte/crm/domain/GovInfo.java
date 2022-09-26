@@ -2,6 +2,8 @@ package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.annotation.Excel;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +14,8 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@Accessors(chain = true)
+@Data
 public class GovInfo implements Serializable
 {
     private static final long serialVersionUID = 1L;

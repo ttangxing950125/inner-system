@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -109,21 +110,49 @@ public class EntityNameHisController extends BaseController
      * @date 2022/9/22 23:50
     */
     @ApiOperation(value = "根据德勤code查询曾用名列表")
-    @ApiImplicitParam(
-            // 参数名
-            name="dqCode",
-            // 参数描述
-            value="德勤自动生成得唯一识别码",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "query",
-            // 示例值
-            example = "1",
-            //参数类型
-            dataType = "String")
+    @ApiImplicitParam(name="dqCode", value="德勤自动生成得唯一识别码", paramType = "query", example = "1", dataType = "String")
     @PostMapping("/getNameListByDqCoded")
     public R getNameListByDqCoded(String dqCode)
     {
         return R.ok(entityNameHisService.getNameListByDqCoded(dqCode));
     }
-
+    /**
+     * 查询政府主体曾用名列表
+     *
+     * @param param
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/26 11:16
+     */
+    @ApiOperation(value = "查询政府曾用名列表")
+    @ApiImplicitParam(name="param", value="模糊查询得条件，匹配政府主体名称，政府主体代码，政府主体行政编码", paramType = "query", example = "Gv", dataType = "String")
+    @PostMapping("/getGovHisNameList")
+    public R getGovHisNameList(String param){
+        if (ObjectUtils.isEmpty(param)){
+            return R.fail("参数不能为空");
+        }
+        return R.ok(entityNameHisService.getGovHisNameList(param));
+    }
+    /**
+     * 查询企业主体曾用名列表
+     *
+     * @param param
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/26 11:16
+     */
+    @ApiOperation(value = "查询企业主体曾用名列表")
+    @ApiImplicitParam(
+            name="param",
+            value="模糊查询得条件，匹配企业主体名称，企业主体代码，企业主体社会统一识别码",
+            paramType = "query",
+            example = "te",
+            dataType = "String")
+    @PostMapping("/getEntityHisNameList")
+    public R getEntityHisNameList(String param){
+        if (ObjectUtils.isEmpty(param)){
+            return R.fail("参数不能为空");
+        }
+        return R.ok(entityNameHisService.getEntityHisNameList(param));
+    }
 }
