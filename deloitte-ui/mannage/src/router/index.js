@@ -128,8 +128,7 @@ export const constantRoutes = [
       },
       {
         path: "/subjectManagement/indexGovernment",
-        component: () =>
-          import("@/views/subjectManagement/indexGovernment.vue"),
+        component: () => import("@/views/subjectManagement/indexGovernment"),
         name: "indexGovernment",
         meta: { title: "政府主体更多指标" },
         hidden: true,
@@ -163,6 +162,31 @@ export const constantRoutes = [
         name: "indexEnterprise",
         meta: { title: "企业主体更多指标" },
         hidden: true,
+      },
+    ],
+  },
+  {
+    path: "/subTable",
+    component: Layout,
+    redirect: "subTable",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/subTable/index.vue"),
+        name: "subTable",
+        meta: { title: "曾用名管理" },
+      },
+      {
+        path: "work1",
+        component: () => import("@/views/dashboard/work.vue"),
+        name: "1",
+        meta: { title: "债券信息管理" },
+      },
+      {
+        path: "work2",
+        component: () => import("@/views/dashboard/work.vue"),
+        name: "2",
+        meta: { title: "主体敞口划分管理" },
       },
     ],
   },

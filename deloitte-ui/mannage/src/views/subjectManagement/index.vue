@@ -204,6 +204,7 @@
 </template>
 
 <script>
+import { govList, entityInfoList } from "@/api/subject";
 export default {
   name: "Index",
   data() {
@@ -292,7 +293,20 @@ export default {
       loading: false,
     };
   },
+  mounted() {
+    this.init();
+  },
   methods: {
+    init() {
+      try {
+        govList({}).then((res) => {
+          console.log(res);
+        });
+        entityInfoList({}).then((res) => {
+          console.log(res);
+        });
+      } catch (error) {}
+    },
     goTarget(href) {
       window.open(href, "_blank");
     },

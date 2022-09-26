@@ -5,152 +5,110 @@
       <h3 class="title">新上市-导入任务清单</h3>
     </div>
     <el-row>
-      <el-col :sm="24" :lg="23" class="form-card">
-        <div class="flex1">
-          <h3 class="title1">wind内地股票-IPO-新股发行资料</h3>
-          <el-button class="back" type="text">下载导入模板</el-button>
-          <el-upload
-            class="upload-demo back"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :before-remove="beforeRemove"
-            multiple
-            :limit="3"
-            :on-exceed="handleExceed"
-            :file-list="fileList"
-          >
-            <el-button type="text">导入今日更新文件</el-button>
-          </el-upload>
-        </div>
-        <div>【 <span style="color: red">暂未导入今日更新文件</span> 】</div>
-      </el-col>
-      <el-col
-        :sm="24"
-        :lg="23"
-        class="mt20 form-card"
-        style="padding-left: 20px; margin-top: -28px"
-      >
-        <div class="flex1">
-          <h3 class="title1">
-            新增待确认记录( <span style="color: red">0</span> )
-          </h3>
-        </div>
-        <el-table
-          class="table-content"
-          :data="list"
-          style="width: 98%; margin-top: 15px"
-          height="300"
-          empty-text="暂无确认记录，请导入今日更新文件"
-        >
-          <el-table-column prop="date" label="导入日期"> </el-table-column>
-          <el-table-column prop="name" label="交易代码"> </el-table-column>
-          <el-table-column prop="province" label="起息日"> </el-table-column>
-          <el-table-column prop="city" label="到期日"> </el-table-column>
-          <el-table-column prop="address" label="债券全称"> </el-table-column>
-          <el-table-column prop="address" label="发行人全称"> </el-table-column>
-          <el-table-column prop="address" label="新增信息备注">
-          </el-table-column>
-        </el-table>
-      </el-col>
-      <el-col :sm="24" :lg="23" class="form-card">
-        <div class="flex1">
-          <h3 class="title1">wind港台股票-证券发行股票发行-首次发行明细</h3>
-          <el-button class="back" type="text">下载导入模板</el-button>
-          <el-upload
-            class="upload-demo back"
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :before-remove="beforeRemove"
-            multiple
-            :limit="3"
-            :on-exceed="handleExceed"
-            :file-list="fileList"
-          >
-            <el-button type="text">导入今日更新文件</el-button>
-          </el-upload>
-        </div>
-        <div>【 <span style="color: red">暂未导入今日更新文件</span> 】</div>
-      </el-col>
-      <el-col
-        :sm="24"
-        :lg="23"
-        class="mt20 form-card"
-        style="padding-left: 20px; margin-top: -28px"
-      >
-        <div class="flex1">
-          <h3 class="title1">
-            新增待确认记录( <span style="color: red">0</span> )
-          </h3>
-          <div class="g-desc flex1">
-            <a
-              :class="currentTab === '确认全部修改信息' ? 'g-select' : ''"
-              @click="changeTab('确认全部修改信息')"
-              >确认全部修改信息</a
-            >
-            <a
-              :class="currentTab === '确认全部新增记录' ? 'g-select' : ''"
-              @click="changeTab('确认全部新增记录')"
-              >确认全部新增记录</a
-            >
+      <div v-for="(item, index) in contentData" :key="index">
+        <el-col :sm="24" :lg="23" class="form-card">
+          <div class="flex1">
+            <h3 class="title1">{{ item.taskFileName }}</h3>
+            <el-button class="back" type="text">下载导入模板</el-button>
+            <fileUpload
+              :uploadUrl="'/crm/windTask/doTask/' + 13"
+              ref="fileUpload"
+            />
           </div>
-        </div>
-        <el-table
-          class="table-content"
-          :data="list"
-          style="width: 98%; margin-top: 15px"
-          height="300"
-          empty-text="暂无确认记录，请导入今日更新文件"
+          <div v-if="item.taskStatus === 0">
+            【 <span style="color: red">暂未导入今日更新文件</span> 】
+          </div>
+          <div v-if="item.taskStatus === 1">
+            【 <span style="color: greenyellow">已导入更新文件</span> 】
+          </div>
+          <div v-if="item.taskStatus === 2">
+            【 <span style="color: yellow">导入中</span> 】
+          </div>
+        </el-col>
+        <el-col
+          :sm="24"
+          :lg="23"
+          class="mt20 form-card"
+          style="padding-left: 20px; margin-top: -28px"
         >
-          <el-table-column prop="date" label="导入日期"> </el-table-column>
-          <el-table-column prop="name" label="交易代码"> </el-table-column>
-          <el-table-column prop="province" label="起息日"> </el-table-column>
-          <el-table-column prop="city" label="到期日"> </el-table-column>
-          <el-table-column prop="address" label="债券全称"> </el-table-column>
-          <el-table-column prop="address" label="发行人全称"> </el-table-column>
-          <el-table-column prop="address" label="新增信息备注">
-          </el-table-column>
-          <el-table-column prop="province" label="任务操作">
-            <template slot-scope="scope">
-              <el-button
-                @click="handleClick(scope.row)"
-                type="text"
-                size="small"
-                >添加</el-button
-              >
-              <el-button
-                @click="handleClick(scope.row)"
-                type="text"
-                size="small"
-                >忽略</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-col>
+          <div class="flex1">
+            <h3 class="title1">
+              新增待确认记录( <span style="color: red">0</span> )
+            </h3>
+          </div>
+          <el-table
+            class="table-content"
+            :data="item.data"
+            style="width: 98%; margin-top: 15px"
+            height="300"
+            empty-text="暂无确认记录，请导入今日更新文件"
+          >
+            <el-table-column
+              v-for="(e, index) in item.header"
+              :key="index"
+              :prop="e"
+              :label="e"
+            >
+            </el-table-column>
+          </el-table>
+        </el-col>
+      </div>
     </el-row>
   </div>
 </template>
 
 <script>
+import { findTaskDetails } from "@/api/task";
+import fileUpload from "../../components/FileUpload";
 export default {
   name: "work",
+  components: {
+    fileUpload,
+  },
   data() {
     return {
       list: [],
+      currentTab: "",
+      fileList: [],
+      contentData: [],
+      taskCateId: this.$route.query.taskCateId,
     };
   },
-  mounted() {},
+  created() {
+    this.init();
+  },
   methods: {
+    init() {
+      try {
+        const params = {
+          taskDate: this.$route.query.taskDate,
+          taskCateId: this.$route.query.taskCateId,
+        };
+        findTaskDetails(params).then((res) => {
+          const { data } = res;
+          this.contentData = data;
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
     goTarget(href) {
       window.open(href, "_blank");
+    },
+    handlePreview() {
+      console.log(1);
+    },
+    handleExceed() {
+      console.log(1);
     },
     handleClick() {
       console.log(1);
     },
     back() {
       this.$router.back();
+    },
+    changeTab(tab) {
+      this.currentTab = tab;
     },
   },
 };

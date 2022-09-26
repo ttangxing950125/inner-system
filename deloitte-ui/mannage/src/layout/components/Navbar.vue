@@ -19,7 +19,7 @@
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
-          <span>admin</span>
+          <span class="el-span-caret-bottom">admin</span>
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/user/profile">
@@ -111,6 +111,9 @@ export default {
   }
 }
 .navbar {
+  position: fixed !important;
+  width: 100%;
+  z-index: 100;
   display: flex;
   justify-content: space-between;
   height: 50px;
@@ -187,15 +190,22 @@ export default {
           cursor: pointer;
           width: 40px;
           height: 40px;
-          border-radius: 10px;
+          border-radius: 30px;
+          position: absolute;
+          right: 56px;
         }
 
         .el-icon-caret-bottom {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 15px;
           font-size: 12px;
+        }
+        .el-span-caret-bottom {
+          position: absolute;
+          right: -3px;
+          top: 0px;
         }
       }
     }
