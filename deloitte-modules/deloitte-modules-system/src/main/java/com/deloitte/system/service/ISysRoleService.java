@@ -182,4 +182,14 @@ public interface ISysRoleService
      * @return 结果
      */
     public int insertAuthUsers(Long roleId, Long[] userIds);
+
+
+    /**
+     * 获取用户的角色
+     * @param userId
+     * @return
+     * EditeBy 正杰
+     * @Date 2022.9.26
+     */
+    SysRole getRoleInfo(Long userId);
 }

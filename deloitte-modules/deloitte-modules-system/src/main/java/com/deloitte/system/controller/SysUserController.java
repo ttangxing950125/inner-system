@@ -52,6 +52,10 @@ public class SysUserController extends BaseController {
     @Autowired
     private ISysConfigService configService;
 
+    @Autowired
+    private ISysRoleService iSysRoleService;
+
+
     /**
      * 获取用户列表
      */
@@ -130,6 +134,8 @@ public class SysUserController extends BaseController {
      * 获取用户信息
      *
      * @return 用户信息
+     * EditeBy 正杰
+     * @Date 2022.9.26
      */
     @GetMapping("getInfo")
     public AjaxResult getInfo() {
@@ -138,10 +144,13 @@ public class SysUserController extends BaseController {
         Set<String> roles = permissionService.getRolePermission(userId);
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(userId);
+        // 角色权限
+        SysRole roleInfo = iSysRoleService.getRoleInfo(userId);
         AjaxResult ajax = AjaxResult.success();
         ajax.put("user", userService.selectUserById(userId));
         ajax.put("roles", roles);
         ajax.put("permissions", permissions);
+        ajax.put("roleInfo",roleInfo);
         return ajax;
     }
 

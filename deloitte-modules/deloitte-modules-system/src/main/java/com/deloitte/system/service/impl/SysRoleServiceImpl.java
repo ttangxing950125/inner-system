@@ -442,4 +442,16 @@ public class SysRoleServiceImpl implements ISysRoleService
         }
         return userRoleMapper.batchUserRole(list);
     }
+
+    /**
+     * 获取用户的角色
+     * @param userId
+     * @return
+     * EditeBy 正杰
+     * @Date 2022.9.26
+     */
+    @Override
+    public SysRole getRoleInfo(Long userId) {
+        return roleMapper.getRoleInfo(userId);
+    }
 }

@@ -1,6 +1,8 @@
 package com.deloitte.system.mapper;
 
 import java.util.List;
+import java.util.Map;
+
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 
@@ -118,4 +120,12 @@ public interface SysRoleMapper
      * @return 结果
      */
     public int deleteRoleByIds(Long[] roleIds);
+
+    /**
+     * 获取用户的角色
+     * @param userId
+     * @return
+     */
+    SysRole getRoleInfo(Long userId);
+
 }
