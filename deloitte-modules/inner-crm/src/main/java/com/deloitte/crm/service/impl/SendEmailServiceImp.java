@@ -17,6 +17,7 @@ public class SendEmailServiceImp implements SendEmailService {
 
     @Autowired
     private RoleService roleService ;
+
  /**
   *根据角色id发送给相关用户实现
   *

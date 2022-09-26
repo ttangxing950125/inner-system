@@ -52,7 +52,7 @@ public class RoleSevenController {
     @PostMapping("/getTaskInfo")
     @Log(title = "【查询指定日期或当月任务情况】", businessType = BusinessType.OTHER)
     public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date){
-        //TODO 单表查询 角色7当月||当日任务完成情况
+        //单表查询 角色7当月||当日任务完成情况
         return iCrmEntityTaskService.getTaskInfo(timeUnit,date);
     }
 
@@ -71,7 +71,8 @@ public class RoleSevenController {
     @Log(title = "【确认该任务的主体是新增或是忽略】", businessType = BusinessType.UPDATE)
     @PostMapping("/changeState")
     public R changeState(Integer id,Integer state){
-        //TODO 单表修改 角色7完成任务，选择是否为忽略或者新增
+        //单表修改 角色7完成任务，选择是否为忽略或者新增
+        //TODO 修改 关联大表 crm_daily_task 的 task_status
         return iCrmEntityTaskService.changeState(id,state);
     }
 
@@ -103,7 +104,7 @@ public class RoleSevenController {
     @Log(title = "【校验该主体是否存在，并做其他判断】", businessType = BusinessType.OTHER)
     @PostMapping("/validEntity")
     public R<EntityInfoVo> validEntity(String creditCode, String entityName){
-        //TODO 校验数据库是否存在该主体
+        //校验数据库是否存在该主体
         return iEntityInfoService.validEntity(creditCode,entityName);
     }
 
@@ -126,7 +127,7 @@ public class RoleSevenController {
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
     public R editEntityNameHis(String creditCode,String entityNewName,String remarks){
-        //TODO 修改主体名称  =>  修改主体曾用名
+        //修改主体名称  =>  修改主体曾用名
         return iEntityInfoService.editEntityNameHis(creditCode,entityNewName,remarks);
     }
 
