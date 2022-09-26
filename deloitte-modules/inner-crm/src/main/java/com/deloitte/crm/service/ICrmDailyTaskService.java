@@ -2,6 +2,7 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.domain.CrmWindTask;
 
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,17 @@ import java.util.List;
  * @date 2022/09/22 15:34
  */
 public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
+
+
+    /**
+     *根据指定日期查询当月的任务(当前登录用户)
+     *
+     * @param TaskDate
+     * @return List<CrmWindTask>
+     * @author penTang
+     * @date 2022/9/22 10:48
+     */
+    List<CrmDailyTask> selectCrmDailyTaskListByDate(String TaskDate);
 
    /**
     *保存每日的角色相关任务

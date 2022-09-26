@@ -191,24 +191,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 .eq(CrmWindTask :: getTaskCateId,TaskCateId));
     }
 
-    /***
-     *根据指定日期查询当月的任务
-     *
-     * @param TaskDate
-     * @return List<CrmWindTask>
-     * @author penTang
-     * @date 2022/9/22 10:46
-    */
-    @Override
-    public List<CrmWindTask> selectCrmWindTaskByDate(String TaskDate){
 
-        String startDate=  TaskDate+"-01";
-        LocalDate today = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        LocalDate endDay = today.with(TemporalAdjusters.lastDayOfMonth());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String endTime = endDay.format(formatter);
-        return crmWindTaskMapper.selectCrmWindTaskListByDate(startDate,endTime) ;
-    }
     /**
      *根据指定日期查询任务完成度实现
      *

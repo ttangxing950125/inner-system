@@ -31,15 +31,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
     */
     List<CrmWindTask> selectCrmWindTask(@RequestBody String TaskDate, String TaskCateId);
 
-    /**
-     *根据指定日期查询当月的任务
-     *
-     * @param TaskDate
-     * @return List<CrmWindTask>
-     * @author penTang
-     * @date 2022/9/22 10:48
-    */
-    List<CrmWindTask> selectCrmWindTaskByDate(String TaskDate);
+
 
     /**
      * 根据指定日期查询任务完成度接口

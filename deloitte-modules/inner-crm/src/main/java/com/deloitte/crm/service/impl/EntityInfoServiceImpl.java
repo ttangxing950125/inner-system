@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.security.utils.SecurityUtils;
@@ -570,7 +571,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         ExcelWriter writer = ExcelUtil.getWriter(true);
         ArrayList<Map<String, Object>> rows = new ArrayList<>();
         AtomicInteger serialNumber = new AtomicInteger();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         listEntityAll.forEach(vo -> {
             LinkedHashMap<String, Object> map = new LinkedHashMap<>();
             EntityInfo info = vo.getEntityInfo();
@@ -579,7 +579,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("主体名称", info.getEntityName());
             map.put("续存状态", info.getStatus());
             map.put("统一社会性代码", info.getCreditCode());
-            map.put("创建日期", info.getCreated());
+            map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
             rows.add(map);
@@ -612,7 +612,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         response.setCharacterEncoding("utf-8");
         //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
         try {
-            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("排班列表导出", "UTF-8")) + ".xls");
+            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("企业主体", "UTF-8")) + ".xls");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

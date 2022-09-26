@@ -48,9 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCrmWindTaskVo"/>
         where id = #{id}
     </select>
-    <select id="selectCrmWindTaskListByDate" resultType="com.deloitte.crm.domain.CrmWindTask">
-        select  * from crm_daily_task where task_role_type =3 AND task_date BETWEEN #{startDate} AND #{endDate}
-    </select>
+
     <select id="selectComWindByDate" resultType="com.deloitte.crm.dto.CrmWindTaskDto" parameterType="string">
         SELECT task_desc,COUNT(id) as taskCount,COUNT(if(complete = 0,TRUE,NULL))
          as notComplete FROM crm_wind_task WHERE task_date = #{crmWindTask}  GROUP BY task_cate_id

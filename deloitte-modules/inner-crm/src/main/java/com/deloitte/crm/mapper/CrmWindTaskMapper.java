@@ -23,16 +23,7 @@ public interface CrmWindTaskMapper extends BaseMapper<CrmWindTask>
      */
     public CrmWindTask selectCrmWindTaskById(Long id);
 
-   /**
-    *根据月份查询当前运维任务状态
-    *
-    * @param startDate
-    * @param endDate
-    * @return List<CrmWindTask>
-    * @author penTang
-    * @date 2022/9/22 13:56
-   */
-    List<CrmWindTask> selectCrmWindTaskListByDate(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
 
     /**
      * 根据指定月份查询角色1的任务完成度

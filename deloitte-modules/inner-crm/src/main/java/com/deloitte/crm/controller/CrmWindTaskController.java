@@ -3,6 +3,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
 import io.swagger.annotations.*;
 import com.deloitte.common.core.domain.R;
@@ -36,6 +38,8 @@ public class CrmWindTaskController extends BaseController
 {
     @Autowired
     private ICrmWindTaskService crmWindTaskService;
+    @Autowired
+    private ICrmDailyTaskService crmDailyTaskService;
 
 
     @GetMapping("/findTaskDetails")
@@ -121,7 +125,7 @@ public class CrmWindTaskController extends BaseController
     }
 
   /**
-   *根据月份获取当月的任务信息
+   *根据月份获取当月的任务信息(当前登录用户)
    *
    * @return R
    * @author penTang
@@ -132,14 +136,14 @@ public class CrmWindTaskController extends BaseController
     @ApiOperation(value = "{根据指定TaskDate,获取当月的任务信息}",response = CrmWindTask.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name ="TaskDate",
-                    value = "Crm_wind_task task_date,任务日期",
+                    value = "Crm_Daily_task task_date,任务日期",
                     paramType = "query",
                     example = "2022-09-23",
                     dataType = "String"
             )
     })
-    public R<List<CrmWindTask>> getDataTable(String TaskDate) {
-      return R.ok(crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
+    public R<List<CrmDailyTask>> getDataTable(String TaskDate) {
+      return R.ok(crmDailyTaskService.selectCrmDailyTaskListByDate(TaskDate));
     }
     /**
      *根据指定日期查询任务完成度
@@ -152,7 +156,7 @@ public class CrmWindTaskController extends BaseController
     @GetMapping("/getTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate查询任务完成度}",response = CrmWindTaskDto.class)
     @ApiImplicitParams({@ApiImplicitParam(
-            name = "taskDate",
+            name = "TaskDate",
             value = "Crm_wind_task task_date,任务日期",
             paramType = "query",
             example = "2022-09-23",
@@ -175,7 +179,7 @@ public class CrmWindTaskController extends BaseController
     @GetMapping("/queryTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate,指定的TaskCateId}")
     @ApiImplicitParams({@ApiImplicitParam(
-            name = "taskDate",
+            name = "TaskDate",
             value = " Crm_wind_task  task_date,任务日期",
             paramType = "query",
             example = "2022-09-23",
