@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -116,10 +117,12 @@ public class EntityNameHisController extends BaseController
             // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
             paramType = "query",
             // 示例值
-            example = "1")
+            example = "1",
+            //参数类型
+            dataType = "String")
     @PostMapping("/getNameListByDqCoded")
-    public AjaxResult getNameListByDqCoded(String dqCode)
+    public R getNameListByDqCoded(String dqCode)
     {
-        return AjaxResult.success(entityNameHisService.getNameListByDqCoded(dqCode));
+        return R.ok(entityNameHisService.getNameListByDqCoded(dqCode));
     }
 }

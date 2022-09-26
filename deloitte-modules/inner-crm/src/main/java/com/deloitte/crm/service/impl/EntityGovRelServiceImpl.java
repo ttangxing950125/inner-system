@@ -1,11 +1,13 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.crm.domain.EntityGovRel;
+import com.deloitte.crm.mapper.EntityGovRelMapper;
+import com.deloitte.crm.service.IEntityGovRelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityGovRelMapper;
-import com.deloitte.crm.domain.EntityGovRel;
-import com.deloitte.crm.service.IEntityGovRelService;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -89,5 +91,11 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
     public int deleteEntityGovRelById(Long id)
     {
         return entityGovRelMapper.deleteEntityGovRelById(id);
+    }
+
+    @Override
+    public Long getEntityGovCount(String dqCode) {
+        QueryWrapper<EntityGovRel>govRelQuery=new QueryWrapper<>();
+        return entityGovRelMapper.selectCount(govRelQuery.lambda().eq(EntityGovRel::getDqGovCode,dqCode));
     }
 }

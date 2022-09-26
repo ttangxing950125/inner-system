@@ -202,13 +202,12 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Override
     public List<CrmWindTask> selectCrmWindTaskByDate(String TaskDate){
 
-        String firstDay=  TaskDate+"-01";
-        LocalDate today = LocalDate.parse(firstDay, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String startDate=  TaskDate+"-01";
+        LocalDate today = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate endDay = today.with(TemporalAdjusters.lastDayOfMonth());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String endTime = endDay.format(formatter);
-
-        return null;
+        return crmWindTaskMapper.selectCrmWindTaskListByDate(startDate,endTime) ;
     }
     /**
      *根据指定日期查询任务完成度实现

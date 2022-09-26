@@ -6,15 +6,19 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.*;
+import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
+import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.mapper.EntityAttrMapper;
@@ -357,7 +361,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
     }
 
     @Override
-    public AjaxResult addOldName(EntityInfo entity) {
+    public R addOldName(EntityInfo entity) {
         //获取操作用户
         String remoter = httpUtils.getRemoter();
 
@@ -386,11 +390,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         nameHis.setRemarks(entity.getEntityNameHisRemarks());
         nameHis.setSource(2);
         nameHisMapper.insert(nameHis);
-        return AjaxResult.success();
+        return R.ok();
     }
 
     @Override
-    public AjaxResult updateOldName(String dqCode, String oldName, String newOldName, String status) {
+    public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表
         QueryWrapper<EntityInfo>infoQuery=new QueryWrapper<>();
         EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, dqCode));
@@ -407,7 +411,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
             //修改曾用名表中的数据
             nameHis.setOldName(newOldName);
             nameHisMapper.updateById(nameHis);
-            return AjaxResult.success();
+            return R.ok();
         }
 
         //修改主体表中的数据
@@ -433,30 +437,29 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         //修改曾用名表中的数据
         nameHis.setStatus(EntityUtils.INVALID);
         nameHisMapper.updateById(nameHis);
-        return AjaxResult.success();
+        return R.ok();
     }
 
     @Override
-    public AjaxResult getInfoDetail(EntityInfo entityInfo) {
+    public R getInfoDetail(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>(entityInfo);
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(entityInfos)&&entityInfos.size()>1){
-            return AjaxResult.error();
+            return R.fail();
         }
         //TODO  添加主体其余详细信息
 
-
-        return AjaxResult.success(entityInfos.get(0));
+        return R.ok(entityInfos.get(0));
     }
 
     @Override
-    public AjaxResult getInfoList(EntityInfoByDto entityInfoDto) {
+    public R getInfoList(EntityInfoByDto entityInfoDto) {
         entityInfoDto.setEntityInfo();
         EntityInfo entityInfo = entityInfoDto.getEntityInfo();
         Integer pageNum = entityInfoDto.getPageNum();
         Integer pageSize = entityInfoDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum)){
-            return AjaxResult.error("请输入页码");
+            return R.fail("请输入页码");
         }
         if (ObjectUtils.isEmpty(pageSize)){
             pageSize= EntityUtils.DEFAULT_PAGE_SIZE;
@@ -471,11 +474,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
         //封装结果集
         List<Map<String,Object>> records = new ArrayList<>();
-        entityInfoPage.getRecords().stream().forEach(o-> {
-            records.add(getResultMap(o));
-        });
+        entityInfoPage.getRecords().stream().forEach(o->
+            records.add(getResultMap(o))
+        );
         pageResult.setRecords(records);
-        return AjaxResult.success(pageResult);
+        return R.ok(pageResult);
     }
 
     @Override
@@ -489,9 +492,73 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper(entityInfo);
         return entityInfoMapper.selectList(queryWrapper);
     }
-
     @Override
-    public AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto) {
+    public Object getListEntityByPage(EntityAttrByDto entityAttrDto) {
+        Integer pageNum = entityAttrDto.getPageNum();
+        Integer pageSize = entityAttrDto.getPageSize();
+        if (ObjectUtils.isEmpty(pageNum)&&ObjectUtils.isEmpty(pageSize)){
+            return getListEntityAll(entityAttrDto);
+        } else{
+            return getListEntityPage(entityAttrDto);
+        }
+    }
+    /**
+     * 全量导出
+     *
+     * @param entityAttrDto
+     * @return List<EntityInfoResult>
+     * @author 冉浩岑
+     * @date 2022/9/25 17:04
+    */
+    public List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
+
+        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
+        List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
+
+        //封装新的结果集
+        List<EntityInfoResult> resultRecords = new ArrayList<>();
+
+        entityInfos.stream().forEach(o->{
+
+            EntityInfoResult entityInfoResult=new EntityInfoResult();
+            entityInfoResult.setEntityInfo(o);
+
+            if (!CollectionUtils.isEmpty(mapList)){
+                List<Map<String, Object>> more = new ArrayList<>();
+                for (Map<String,String> map:mapList){
+                    QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
+                    EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                            .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                            .eq(EntityAttrValue::getEntityCode,o.getEntityCode()));
+
+                    Map<String, Object> mapMore = new HashMap<>();
+                    //新增指标栏
+                    mapMore.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
+                    if (attrValue==null){
+                        mapMore.put(MORE_ENTITY_KPI_VALUE,null);
+                    }else {
+                        mapMore.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                    }
+                    more.add(mapMore);
+                }
+                entityInfoResult.setMore(more);
+            }
+
+            resultRecords.add(entityInfoResult);
+        });
+        return resultRecords;
+    }
+    /**
+     * 分页查询
+     *
+     * @param entityAttrDto
+     * @return List<EntityInfoResult>
+     * @author 冉浩岑
+     * @date 2022/9/25 17:04
+     */
+    public Page<EntityInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
 
@@ -499,40 +566,45 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper,EntityIn
 
         Page<EntityInfo>pageInfo=new Page<>(pageNum,pageSize);
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
-        queryWrapper.lambda().eq(EntityInfo::getList,1);
         Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
 
         //查询分页数据集
-        Page<Map<String, Object>> pageResult=new Page<>();
+        Page<EntityInfoResult> pageResult=new Page<>();
         pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
 
         //封装新的结果集
-        List<Map<String,Object>> resultRecords = new ArrayList<>();
+        List<EntityInfoResult> resultRecords = new ArrayList<>();
         //添加指标栏位
         List<EntityInfo> records = entityInfoPage.getRecords();
         records.stream().forEach(o->{
-            Map<String, Object> resultMap = JSON.parseObject(JSON.toJSONString(o), new TypeReference<Map<String, String>>() {});
+            EntityInfoResult entityInfoResult = new EntityInfoResult();
+            entityInfoResult.setEntityInfo(o);
+
+
             if (!CollectionUtils.isEmpty(mapList)){
+                List<Map<String, Object>> more = new ArrayList<>();
                 for (Map<String,String> map:mapList){
                     QueryWrapper<EntityAttrValue>valueQuer=new QueryWrapper<>();
                     EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
                             .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
                             .eq(EntityAttrValue::getEntityCode,o.getEntityCode()));
+
+                    Map<String,Object>moreMap=new HashMap<>();
                     //新增指标栏
-                    Map<String,Object> more=new HashMap<>();
-                    more.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
+                    moreMap.put(MORE_ENTITY_KPI_KEY,map.get(MORE_ENTITY_KPI_NAME));
                     if (attrValue==null){
-                        more.put(MORE_ENTITY_KPI_VALUE,null);
+                        moreMap.put(MORE_ENTITY_KPI_VALUE,null);
                     }else {
-                        more.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
+                        moreMap.put(MORE_ENTITY_KPI_KEY, attrValue.getValue());
                     }
-                    resultMap.put(MORE_ENTITY_KPI_MORE, more);
+                    more.add(moreMap);
                 }
+                entityInfoResult.setMore(more);
             }
-            resultRecords.add(resultMap);
+            resultRecords.add(entityInfoResult);
         });
         pageResult.setRecords(resultRecords);
-        return AjaxResult.success(pageResult);
+        return pageResult;
     }
 
     /**

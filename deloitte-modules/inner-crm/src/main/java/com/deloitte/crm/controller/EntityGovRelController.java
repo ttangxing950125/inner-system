@@ -1,28 +1,22 @@
 package com.deloitte.crm.controller;
 
-import java.util.List;
-import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.Api;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.common.core.web.controller.BaseController;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.service.IEntityGovRelService;
-import com.deloitte.common.core.web.controller.BaseController;
-import com.deloitte.common.core.web.domain.AjaxResult;
-import com.deloitte.common.core.utils.poi.ExcelUtil;
-import com.deloitte.common.core.web.page.TableDataInfo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Controller
@@ -104,5 +98,30 @@ public class EntityGovRelController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(entityGovRelService.deleteEntityGovRelByIds(ids));
+    }
+
+    /**
+     * 根据 dqCode 查询城投主体数量
+     *
+     * @param dqCode
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/23 8:59
+     */
+    @ApiOperation(value = "根据 dqCode 查询城投主体数量")
+    @ApiImplicitParam(
+            // 参数名
+            name = "dqCode",
+            // 参数描述
+            value = "包含表中gov_info的所有字段",
+            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
+            paramType = "body",
+            // 示例值
+            example = "",
+            //参数类型
+            dataType = "String")
+    @PostMapping("/getEntityGovCount")
+    public R getEntityGovCount(String dqCode) {
+        return R.ok(entityGovRelService.getEntityGovCount(dqCode));
     }
 }

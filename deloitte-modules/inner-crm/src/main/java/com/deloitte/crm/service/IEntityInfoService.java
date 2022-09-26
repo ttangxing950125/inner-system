@@ -1,11 +1,12 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
+import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 
 import java.util.List;
@@ -82,13 +83,13 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @author 冉浩岑
      * @date 2022/9/22 14:14
     */
-    AjaxResult getInfoList(EntityInfoByDto entityInfo);
+    R getInfoList(EntityInfoByDto entityInfo);
 
     Integer updateInfoList(List<EntityInfo> list);
 
     List<EntityInfo> checkEntity(EntityInfo entityInfo);
 
-    AjaxResult getListEntityByPage(EntityAttrByDto entityAttrDto);
+    Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
     /**
      * 传入社会信用代码于企业名称
@@ -128,9 +129,9 @@ public interface IEntityInfoService extends IService<EntityInfo>
      */
     List<EntityInfo> findByName(String entityName);
 
-    AjaxResult addOldName(EntityInfo entityInfo);
+    R addOldName(EntityInfo entityInfo);
 
-    AjaxResult updateOldName(String dqCode, String oldName, String newOldName, String status);
+    R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
-    AjaxResult getInfoDetail(EntityInfo entityInfo);
+    R getInfoDetail(EntityInfo entityInfo);
 }

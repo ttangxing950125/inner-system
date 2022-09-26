@@ -1,6 +1,7 @@
 package com.deloitte.crm.quartz.service.impl;
 
-import com.deloitte.common.core.constant.SecurityConstants;
+import cn.hutool.core.date.DateTime;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindDict;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -49,18 +50,15 @@ public class QuarzRoleTaskImp implements QuarzRoleTaskService {
     @Override
     public void executeQuarzRoleTask() {
         List<SysDictData> roleByType = getRole.getRoleByType();
-        ArrayList<CrmDailyTask> crmDailyTasks = new ArrayList<>();
-        ArrayList<CrmWindTask> crmWindTasks = new ArrayList<>();
-        Date currentTime = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateString = formatter.format(currentTime);
-
+        ArrayList<CrmDailyTask> crmDailyTasks = new ArrayList<CrmDailyTask>();
+        ArrayList<CrmWindTask> crmWindTasks = new ArrayList<CrmWindTask>();
+        Date timeNow = DateUtil.parseDate(DateUtil.getDate());
 
         for (SysDictData sysDictData : roleByType) {
             CrmDailyTask crmDailyTask = new CrmDailyTask();
             crmDailyTask.setTaskRoleType(sysDictData.getDictValue());
             crmDailyTask.setTaskStatus(1);
-            crmDailyTask.setTaskDate(currentTime);
+            crmDailyTask.setTaskDate(timeNow);
             crmDailyTasks.add(crmDailyTask);
         }
         if (crmDailyTaskService.saveCrmDailyTask(crmDailyTasks)) {
@@ -71,13 +69,13 @@ public class QuarzRoleTaskImp implements QuarzRoleTaskService {
                 crmWindTask.setTaskCateId(crmWindDict.getCateId());
                 crmWindTask.setTaskDictId(crmWindDict.getId());
                 crmWindTask.setTaskDesc(crmWindDict.getTaskDesc());
-                crmWindTask.setTaskDate(currentTime);
+                crmWindTask.setTaskDate(timeNow);
                 crmWindTask.setTaskFileName(crmWindDict.getWindFileName());
                 crmWindTask.setTaskCategory(crmWindDict.getCateName());
                 crmWindTasks.add(crmWindTask);
             }
             if (crmWindTaskService.saveCrmWindTas(crmWindTasks)) {
-                if (crmDailyTaskService.updateByType(currentTime)) {
+                if (crmDailyTaskService.updateByType(timeNow)) {
                     log.info("修改状态成功");
                 }
 

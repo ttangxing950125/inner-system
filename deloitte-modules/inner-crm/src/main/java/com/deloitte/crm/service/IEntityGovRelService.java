@@ -1,7 +1,8 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
 import com.deloitte.crm.domain.EntityGovRel;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -58,4 +59,6 @@ public interface IEntityGovRelService
      * @return 结果
      */
     public int deleteEntityGovRelById(Long id);
+
+    Long getEntityGovCount(String dqCode);
 }

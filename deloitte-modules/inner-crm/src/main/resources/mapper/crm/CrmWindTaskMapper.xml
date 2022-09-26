@@ -48,7 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCrmWindTaskVo"/>
         where id = #{id}
     </select>
-    <select id="selectCrmWindTaskListByDate" resultType="com.deloitte.crm.domain.CrmWindTask" parameterType="string">
+    <select id="selectCrmWindTaskListByDate" resultType="com.deloitte.crm.domain.CrmWindTask">
         select  * from crm_daily_task where task_role_type =3 AND task_date BETWEEN #{startDate} AND #{endDate}
     </select>
     <select id="selectComWindByDate" resultType="com.deloitte.crm.dto.CrmWindTaskDto" parameterType="string">

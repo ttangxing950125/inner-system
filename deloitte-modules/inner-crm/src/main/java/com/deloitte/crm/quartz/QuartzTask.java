@@ -1,5 +1,4 @@
 package com.deloitte.crm.quartz;
-
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class QuartzTask {
     public void StartRuleTask() {
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();
-        log.info("同步任务失败 =============");
+        log.info("同步任务结束 =============");
     }
 
 }

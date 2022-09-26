@@ -128,7 +128,7 @@ public class CrmWindTaskController extends BaseController
    * @date 2022/9/21 18:06
   */
 
-    @PostMapping("/queryList")
+    @GetMapping("/queryList")
     @ApiOperation(value = "{根据指定TaskDate,获取当月的任务信息}",response = CrmWindTask.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name ="TaskDate",
@@ -138,7 +138,7 @@ public class CrmWindTaskController extends BaseController
                     dataType = "String"
             )
     })
-    public R<List<CrmWindTask>> getDataTable(@RequestBody String TaskDate) {
+    public R<List<CrmWindTask>> getDataTable(String TaskDate) {
       return R.ok(crmWindTaskService.selectCrmWindTaskByDate(TaskDate));
     }
     /**
@@ -149,7 +149,7 @@ public class CrmWindTaskController extends BaseController
      * @author penTang
      * @date 2022/9/22 10:45
     */
-    @PostMapping("/getTaskByDate")
+    @GetMapping("/getTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate查询任务完成度}",response = CrmWindTaskDto.class)
     @ApiImplicitParams({@ApiImplicitParam(
             name = "taskDate",
@@ -172,7 +172,7 @@ public class CrmWindTaskController extends BaseController
      * @author penTang
      * @date 2022/9/22 17:02
     */
-    @PostMapping("/queryTaskByDate")
+    @GetMapping("/queryTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate,指定的TaskCateId}")
     @ApiImplicitParams({@ApiImplicitParam(
             name = "taskDate",
@@ -188,7 +188,7 @@ public class CrmWindTaskController extends BaseController
             dataType = "String"
 
     )})
-    public R selectCrmWindTask(@RequestBody String TaskDate,String TaskCateId) {
+    public R selectCrmWindTask(String TaskDate,String TaskCateId) {
         return R.ok(crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
     }
 
