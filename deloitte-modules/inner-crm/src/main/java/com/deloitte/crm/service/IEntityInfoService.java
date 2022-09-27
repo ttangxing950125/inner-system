@@ -6,6 +6,7 @@ import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
+import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.vo.EntityInfoVo;
@@ -136,6 +137,17 @@ public interface IEntityInfoService extends IService<EntityInfo>
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
     R getInfoDetail(EntityInfo entityInfo);
+
+    List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto);
+    /**
+     *导出企业主体excel表格
+     *
+     * @param entityAttrDto
+     * @return void
+     * @author penTang
+     * @date 2022/9/26 18:24
+    */
+     R ExportEntityInFor(EntityAttrByDto entityAttrDto);
 
     /**
      * 查询债卷信息 模糊匹配

@@ -28,6 +28,7 @@ import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
 
 /**
  * 每日生产角色任务的service业务实现层
+ *
  * @author PenTang
  * @date 2022/09/22 15:35
  */
@@ -35,9 +36,9 @@ import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
 public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, CrmDailyTask> implements ICrmDailyTaskService {
 
     @Resource
-    private  CrmDailyTaskMapper mapper;
+    private CrmDailyTaskMapper mapper;
     @Resource
-    public  RoleService roleService;
+    public RoleService roleService;
 
 
     /***
@@ -49,9 +50,9 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @date 2022/9/22 10:46
      */
     @Override
-    public List<CrmDailyTask> selectCrmDailyTaskListByDate(String TaskDate){
+    public List<CrmDailyTask> selectCrmDailyTaskListByDate(String TaskDate) {
 
-        String startDate=  TaskDate+"-01";
+        String startDate = TaskDate + "-01";
         LocalDate today = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate endDay = today.with(TemporalAdjusters.lastDayOfMonth());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -65,12 +66,14 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         roleKey.add("role4");
         roleKey.add("role5");
         roleKey.add("role6");
-        roles.forEach(o->{
+        roles.forEach(o -> {
             boolean contains = roleKey.contains(o);
-            if (contains){
-                SysRole sysRole = roleService.selectRoleList().stream().filter(row -> row.getRoleKey().equals(o)).collect(Collectors.toList()).get(0);
-
-                mapper.selectCrmDailyTaskListByDate(startDate, endTime,sysRole.getRoleId().intValue());
+            if (contains) {
+                SysRole sysRole = roleService.selectRoleList().stream()
+                        .filter(row -> row.getRoleKey().equals(o))
+                        .collect(Collectors.toList())
+                        .get(0);
+                mapper.selectCrmDailyTaskListByDate(startDate, endTime, sysRole.getRoleId().intValue());
 
             }
 
@@ -85,10 +88,10 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @return Boolean
      * @author penTang
      * @date 2022/9/22 20:24
-    */
+     */
     @Override
     public Boolean saveCrmDailyTask(List<CrmDailyTask> tasks) {
-     return  saveBatch(tasks);
+        return saveBatch(tasks);
     }
 
     /**
@@ -100,11 +103,11 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @date 2022/9/22 20:24
      */
     @Override
-    public Boolean updateByType(Date dateTime){
+    public Boolean updateByType(Date dateTime) {
         return update(new LambdaUpdateWrapper<CrmDailyTask>()
-                .eq(CrmDailyTask::getTaskRoleType,3)
-                .eq(CrmDailyTask::getTaskDate,dateTime)
-                .set(CrmDailyTask::getTaskStatus,2)
+                .eq(CrmDailyTask::getTaskRoleType, 3)
+                .eq(CrmDailyTask::getTaskDate, dateTime)
+                .set(CrmDailyTask::getTaskStatus, 2)
 
         );
     }

@@ -3,14 +3,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.deloitte.common.core.constant.UserConstants;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
@@ -42,8 +35,8 @@ public class SysRoleController extends BaseController
 
 
     @PostMapping("/roleById")
-    public List<SysUser> getRoleUserByRoleId(Integer roleId){
-        return roleService.getUserByRole(roleId);
+    public List<SysUser> getRoleUserByRoleId(@RequestParam("RoleId") Integer RoleId){
+        return roleService.getUserByRole(RoleId);
     }
 
     @PostMapping("/roleList")

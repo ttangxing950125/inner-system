@@ -1,5 +1,6 @@
 package com.deloitte.crm.domain;
 
+import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSON;
 
 
@@ -352,7 +353,57 @@ public class CnIpoInfo extends BaseEntity
     @Excel(name = "交易所")
     private String bourse;
 
-    public void setId(Long id) 
+    /**
+     * wind_task 的id
+     */
+    @Excel(name = "wind_task 的id")
+    private Integer  taskId ;
+
+    /**
+     * 导入日期 yyyy-mm-dd
+     */
+    @Excel(name = "导入日期 yyyy-mm-dd")
+    private DateTime importTime;
+
+    /**
+     * 数据变化类型 1-新增 2-更新
+     */
+    @Excel(name = "数据变化类型 1-新增 2-更新")
+    private Integer  changeType;
+
+    public BigDecimal getFundNetAmount() {
+        return fundNetAmount;
+    }
+
+    public void setFundNetAmount(BigDecimal fundNetAmount) {
+        this.fundNetAmount = fundNetAmount;
+    }
+
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    public DateTime getImportTime() {
+        return importTime;
+    }
+
+    public void setImportTime(DateTime importTime) {
+        this.importTime = importTime;
+    }
+
+    public Integer getChangeType() {
+        return changeType;
+    }
+
+    public void setChangeType(Integer changeType) {
+        this.changeType = changeType;
+    }
+
+    public void setId(Long id)
     {
         this.id = id;
     }

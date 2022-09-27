@@ -100,6 +100,9 @@ public class GovInfo implements Serializable
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
+    /** 主体状态 是否生效 0-失效 1-生效 */
+    @Excel(name = "主体状态")
+    private Integer  status;
 
     public void setId(Long id) 
     {
@@ -262,6 +265,14 @@ public class GovInfo implements Serializable
     public Date getUpdated() 
     {
         return updated;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Override

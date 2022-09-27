@@ -1,6 +1,7 @@
 package com.deloitte.crm.controller;
 
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -16,6 +17,7 @@ import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.SendEmailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -38,6 +40,8 @@ import java.util.List;
 public class EntityInfoController extends BaseController {
     @Autowired
     private IEntityInfoService entityInfoService;
+    @Autowired
+    private SendEmailService service;
 
     /**
      * 统计整体企业主体情况
@@ -56,6 +60,24 @@ public class EntityInfoController extends BaseController {
     public R getList() {
         return R.ok(entityInfoService.getEntityInfo());
     }
+
+    /**
+     * 导出整体企业主体情况
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/9/22 22:41
+     */
+
+    @ApiOperation(value = "{导出整体企业主体情况}", response = EntityInfoDto.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "body",name = "entityAttrDto", value = "包含表中gov_info的所有字段")
+    })
+    @PostMapping("/Export")
+    public R ImporEntityInfo(EntityAttrByDto entityAttrDto) {
+        return R.ok( entityInfoService.ExportEntityInFor(entityAttrDto));
+    }
+
 
     /**
      * 查询【请填写功能名称】列表
@@ -235,6 +257,12 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto) {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
+    }
+
+
+    @GetMapping("/send")
+    public void send(){
+        service.SendEmail(3,"发了","发友尽");
     }
 
 }

@@ -116,7 +116,7 @@ public class EmailUtil {
             //落款处需要时间则加上
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String date = sdf.format(new Date());
-            String inscription="智慧股票"+"&nbsp;&nbsp;"+"日期:"+date;
+            String inscription="主体管理"+"&nbsp;&nbsp;"+"日期:"+date;
             String htmlText = MessageFormat.format(buffer.toString (),companyName,context ,inscription );
             return htmlText;
 

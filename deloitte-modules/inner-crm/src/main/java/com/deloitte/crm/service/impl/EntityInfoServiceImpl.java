@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -433,7 +434,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return R.ok();
     }
 
-    @Transactional
     @Override
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表
@@ -585,6 +585,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 冉浩岑
      * @date 2022/9/25 17:04
      */
+    @Override
     public List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
 
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
@@ -616,7 +617,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author penTang
      * @date 2022/9/25 21:19
      */
-    public void ImportEntityInFor(EntityAttrByDto entityAttrDto) {
+    @Override
+    public R ExportEntityInFor(EntityAttrByDto entityAttrDto) {
         List<EntityInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletResponse response = servletRequestAttributes.getResponse();
@@ -633,7 +635,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("统一社会性代码", info.getCreditCode());
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
-            vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
+            if (CollectionUtils.isEmpty(vo.getMore())){
+                vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
+            }
             rows.add(map);
         });
         //一次性写出内容，强制输出标题
@@ -667,15 +671,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("企业主体", "UTF-8")) + ".xls");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return R.fail("导出异常");
         }
         try (ServletOutputStream out = response.getOutputStream()) {
             writer.flush(out, true);
         } catch (IOException e) {
             e.printStackTrace();
+            return R.fail("导出异常");
         }
         // 关闭writer，释放内存
         writer.close();
+        return R.ok("导出结束");
     }
+
 
 
     /**

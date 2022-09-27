@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import cn.hutool.core.date.DateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -101,6 +102,24 @@ public class CnIpoFail implements Serializable {
      */
     @Excel(name = "公司简介")
     private String entityDes;
+
+    /**
+     * wind_task 的id
+     */
+    @Excel(name = "wind_task 的id")
+    private Integer  taskId ;
+
+    /**
+     * 导入日期 yyyy-mm-dd
+     */
+    @Excel(name = "导入日期 yyyy-mm-dd")
+    private DateTime importTime;
+
+    /**
+     * 数据变化类型 1-新增 2-更新
+     */
+    @Excel(name = "数据变化类型 1-新增 2-更新")
+    private Integer  changeType;
 
 
 }

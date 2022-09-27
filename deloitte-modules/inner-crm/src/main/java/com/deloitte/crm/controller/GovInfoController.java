@@ -56,6 +56,25 @@ public class GovInfoController extends BaseController {
         return R.ok(govInfoService.getGovInfo());
 
     }
+    /**
+     * 统计政府信息
+     *
+     * @return GovInfoDto
+     * @author penTang
+     * @date 2022/9/22 23:21
+     */
+    @PostMapping("/govExport")
+    @ApiOperation(value = "{导出政府信息}", response = GovInfoDto.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "body",name = "entityAttrDto",value = "包含表中gov_info的所有字段"
+
+            )
+    })
+    public R importGovInfo(EntityAttrByDto entityAttrDto)
+    {
+
+        return R.ok(govInfoService.ExportEntityGov(entityAttrDto));
+    }
 
     /**
      * 查询【请填写功能名称】列表
