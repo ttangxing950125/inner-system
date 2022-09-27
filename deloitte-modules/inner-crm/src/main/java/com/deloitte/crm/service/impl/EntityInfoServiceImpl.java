@@ -16,7 +16,10 @@ import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.*;
+import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.EntityBondRel;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
@@ -50,7 +53,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -127,29 +129,29 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         //TODO issue_bonds 是否发债 0-未发债 1-已发债
         List<EntityInfo> bonds = list().stream()
-                .filter(row ->row.getIssueBonds()!=null && row.getIssueBonds() == 1)
+                .filter(row -> row.getIssueBonds() != null && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //TODO finance 是否金融机构
         List<EntityInfo> finance = list().stream()
-                .filter(row -> row.getFinance()!=null && row.getFinance() == 1)
+                .filter(row -> row.getFinance() != null && row.getFinance() == 1)
                 .collect(Collectors.toList());
 
         //TODO list 是否上市 0-未上市 1-已上市
         List<EntityInfo> entityInfoList = list().stream()
-                .filter(row ->row.getList()!=null && row.getList() == 1)
+                .filter(row -> row.getList() != null && row.getList() == 1)
                 .collect(Collectors.toList());
 
         //TODO 即是上市又是发债
         List<EntityInfo> listAndBonds = list().stream()
-                .filter(row ->row.getList()!=null && row.getList() == 1)
-                .filter(row ->row.getFinance()!=null && row.getIssueBonds() == 1)
+                .filter(row -> row.getList() != null && row.getList() == 1)
+                .filter(row -> row.getFinance() != null && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //TODO !即是上市又是发债
         List<EntityInfo> notListAndBonds = list().stream()
-                .filter(row -> row.getList()!=null && row.getList() == 0)
-                .filter(row -> row.getFinance()!=null && row.getIssueBonds() == 0)
+                .filter(row -> row.getList() != null && row.getList() == 0)
+                .filter(row -> row.getFinance() != null && row.getIssueBonds() == 0)
                 .collect(Collectors.toList());
         entityInfoDto.setIssueBonds(bonds.size());
         entityInfoDto.setEntitySum(list.size());
@@ -266,13 +268,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 传入社会信用代码于企业名称
      * => 存在该社会信用代码 返回 比较信息为 false
-     *      ==> 前端跳转调用人工对比信息，并确认
-     *
+     * ==> 前端跳转调用人工对比信息，并确认
+     * <p>
      * => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     *      ==> 前端跳转调用人工对比信息，并确认
-     *
+     * ==> 前端跳转调用人工对比信息，并确认
+     * <p>
      * => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     *      ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
+     * ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
      *
      * @param creditCode 传入 企业统一社会信用代码
      * @param entityName 传入 企业名称
@@ -328,12 +330,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R editEntityNameHis(String creditCode, String entityNewName, String remarks) {
         //获取当前登录用户
         String username = SecurityUtils.getUsername();
-        if(username==null){return R.fail(BadInfo.VALID_EMPTY_USERNAME.getInfo());}
+        if (username == null) {
+            return R.fail(BadInfo.VALID_EMPTY_USERNAME.getInfo());
+        }
 
         //修改主体名称
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
                 .lambda().eq(EntityInfo::getCreditCode, creditCode));
-        if(entity==null){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        if (entity == null) {
+            return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());
+        }
 
         String oldName = entity.getEntityName();
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
@@ -363,7 +369,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<String> collect = Arrays.asList(entity.getEntityNameHis().split("，"))
                 .stream().filter(row -> row.equals(entityNewName))
                 .collect(Collectors.toList());
-        if (collect.size()==0) {
+        if (collect.size() == 0) {
             //新增曾用名 entity_name_his
             EntityNameHis entityNameHis = new EntityNameHis();
             //EntityType1  => 企业主体
@@ -397,12 +403,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
         //校验曾用名是否存在
         String entityCode = entityInfo.getEntityCode();
-        QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityNameHis> queryWrapper = new QueryWrapper<>();
         String nameHis = entity.getEntityNameHis();
         Long aLong = nameHisMapper.selectCount(queryWrapper.lambda()
-                                  .eq(EntityNameHis::getDqCode, entityCode)
-                                  .eq(EntityNameHis::getOldName, nameHis));
-        if (aLong>0){
+                .eq(EntityNameHis::getDqCode, entityCode)
+                .eq(EntityNameHis::getOldName, nameHis));
+        if (aLong > 0) {
             return R.fail("曾用名重复，请重新输入");
         }
         //获取操作用户
@@ -450,7 +456,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             Long aLong = nameHisMapper.selectCount(hisQuery.lambda()
                     .eq(EntityNameHis::getDqCode, dqCode)
                     .eq(EntityNameHis::getOldName, newOldName));
-            if (aLong>0){
+            if (aLong > 0) {
                 return R.ok("曾用名已经存在，请重新输入");
             }
             //修改主体表中的数据
@@ -493,7 +499,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R getInfoDetail(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>(entityInfo);
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
-        if (CollectionUtils.isEmpty(entityInfos)){
+        if (CollectionUtils.isEmpty(entityInfos)) {
             return R.fail("异常查询，数据为空");
         }
         if (entityInfos.size() > 1) {
@@ -635,7 +641,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("统一社会性代码", info.getCreditCode());
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
-            if (!CollectionUtils.isEmpty(vo.getMore())){
+            if (!CollectionUtils.isEmpty(vo.getMore())) {
                 vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
             }
             rows.add(map);
@@ -683,7 +689,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         writer.close();
         return R.ok("导出结束");
     }
-
 
 
     /**
@@ -806,7 +811,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //主体list
                 entityInfos = baseMapper.selectList(new QueryWrapper<EntityInfo>()
                         .lambda().like(EntityInfo::getEntityName, name));
-                if(entityInfos==null){return R.ok(res,BadInfo.VALID_EMPTY_TARGET.getInfo());}
+                if (entityInfos == null) {
+                    return R.ok(res, BadInfo.VALID_EMPTY_TARGET.getInfo());
+                }
                 //找到对应bd_code
                 entityInfos.forEach(row -> {
                     EntityBondRel entityBondRel = null;
@@ -824,8 +831,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                             .setSingleInfo(
                                     new BondsDetailDto()
                                             .setName(Common.TRANSACTION_CODE_NAME)
-                                            .setId(entityAttrValue.getId()==null?0:entityAttrValue.getId())
-                                            .setValue(entityAttrValue.getValue()==null?"":entityAttrValue.getValue())));
+                                            .setId(entityAttrValue.getId() == null ? 0 : entityAttrValue.getId())
+                                            .setValue(entityAttrValue.getValue() == null ? "" : entityAttrValue.getValue())));
                 });
                 return R.ok(res);
             //TODO 模糊匹配债券名
@@ -836,18 +843,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 entityAttrs = entityAttrValueMapper.selectList(new QueryWrapper<EntityAttrValue>()
                         .lambda().eq(EntityAttrValue::getAttrId, Common.BOND_SHORT_NAME_ID)
                         .like(EntityAttrValue::getValue, name));
-                if(entityAttrs==null){return R.ok(rest,BadInfo.VALID_EMPTY_TARGET.getInfo());}
+                if (entityAttrs == null) {
+                    return R.ok(rest, BadInfo.VALID_EMPTY_TARGET.getInfo());
+                }
                 //找到对应的主体
-                entityAttrs.forEach(item->{
+                entityAttrs.forEach(item -> {
                     EntityBondRel entityBondRel = null;
                     EntityInfo entityInfo = null;
                     List<BondsDetailDto> bondsDetailDtos = null;
-                    if(item.getEntityCode()!=null){
+                    if (item.getEntityCode() != null) {
                         entityBondRel = entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>()
                                 .lambda().eq(EntityBondRel::getBdCode, item.getEntityCode()));
-                    }else if(entityBondRel != null){
+                    } else if (entityBondRel != null) {
                         entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
-                                .lambda().eq(EntityInfo::getEntityCode,entityBondRel.getEntityCode()));
+                                .lambda().eq(EntityInfo::getEntityCode, entityBondRel.getEntityCode()));
                     }
 
 //                    bondsDetailDtos.add(new BondsDetailDto().setName())

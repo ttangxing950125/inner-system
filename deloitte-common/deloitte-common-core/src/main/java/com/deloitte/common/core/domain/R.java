@@ -1,7 +1,8 @@
 package com.deloitte.common.core.domain;
 
-import java.io.Serializable;
 import com.deloitte.common.core.constant.Constants;
+
+import java.io.Serializable;
 
 /**
  * 响应信息主体
