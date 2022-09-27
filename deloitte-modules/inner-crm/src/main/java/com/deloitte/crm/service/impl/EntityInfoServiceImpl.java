@@ -635,7 +635,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("统一社会性代码", info.getCreditCode());
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
-            if (CollectionUtils.isEmpty(vo.getMore())){
+            if (!CollectionUtils.isEmpty(vo.getMore())){
                 vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
             }
             rows.add(map);

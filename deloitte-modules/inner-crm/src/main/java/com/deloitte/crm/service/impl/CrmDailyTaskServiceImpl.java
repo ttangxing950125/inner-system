@@ -66,6 +66,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         roleKey.add("role4");
         roleKey.add("role5");
         roleKey.add("role6");
+        List<CrmDailyTask> crmDailyTasks = null;
         roles.forEach(o -> {
             boolean contains = roleKey.contains(o);
             if (contains) {
@@ -73,12 +74,10 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
                         .filter(row -> row.getRoleKey().equals(o))
                         .collect(Collectors.toList())
                         .get(0);
-                mapper.selectCrmDailyTaskListByDate(startDate, endTime, sysRole.getRoleId().intValue());
-
+                crmDailyTasks.addAll(mapper.selectCrmDailyTaskListByDate(startDate, endTime, sysRole.getRoleId().intValue()));
             }
-
         });
-        return null;
+        return crmDailyTasks;
     }
 
     /**
