@@ -14,17 +14,14 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.EntityBondRel;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
-import com.deloitte.crm.dto.EntityAttrDetailDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
@@ -82,40 +79,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Autowired
     private HttpUtils httpUtils;
-
-    /**
-     * 字段对应的名称
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
-     */
-    public static final String MORE_ENTITY_KPI_NAME = "name";
-    /**
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
-     */
-    public static final String MORE_ENTITY_KPI_ID = "id";
-    /**
-     * 添加的指标封装的字段
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
-     */
-    public static final String MORE_ENTITY_KPI_MORE = "more";
-    /**
-     * 新增指标的字段名称
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
-     */
-    public static final String MORE_ENTITY_KPI_KEY = "key";
-    /**
-     * 新增指标的字段值
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
-     */
-    public static final String MORE_ENTITY_KPI_VALUE = "value";
 
     /**
      * 统计企业主体信息
@@ -271,13 +234,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 传入社会信用代码于企业名称
      * => 存在该社会信用代码 返回 比较信息为 false
-     *      ==> 前端跳转调用人工对比信息，并确认
-     *
+     * ==> 前端跳转调用人工对比信息，并确认
+     * <p>
      * => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     *      ==> 前端跳转调用人工对比信息，并确认
-     *
+     * ==> 前端跳转调用人工对比信息，并确认
+     * <p>
      * => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     *      ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
+     * ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
      *
      * @param creditCode 传入 企业统一社会信用代码
      * @param entityName 传入 企业名称
@@ -749,16 +712,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         for (Map<String, String> map : mapList) {
             QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
             EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                    .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                    .eq(EntityAttrValue::getAttrId, map.get(EntityUtils.MORE_ENTITY_KPI_ID))
                     .eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
 
             Map<String, Object> moreMap = new HashMap<>();
             //新增指标栏
-            moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
+            moreMap.put(EntityUtils.MORE_ENTITY_KPI_KEY, map.get(EntityUtils.MORE_ENTITY_KPI_NAME));
             if (ObjectUtils.isEmpty(attrValue)) {
-                moreMap.put(MORE_ENTITY_KPI_VALUE, null);
+                moreMap.put(EntityUtils.MORE_ENTITY_KPI_VALUE, null);
             } else {
-                moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
+                moreMap.put(EntityUtils.MORE_ENTITY_KPI_VALUE, attrValue.getValue());
             }
             more.add(moreMap);
         }
@@ -867,9 +830,23 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 return R.fail(BadInfo.VALID_PARAM.getInfo());
         }
     }*/
-
     @Override
     public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
+        return null;
+    }
+
+    @Override
+    public R supplyNormalInformation(EntityAttrByDto entityAttrDto) {
+        return null;
+    }
+
+    @Override
+    public R supplyFinInformation(EntityAttrByDto entityAttrDto) {
+        return null;
+    }
+
+    @Override
+    public R supplyUIInformation(EntityAttrByDto entityAttrDto) {
         return null;
     }
 }

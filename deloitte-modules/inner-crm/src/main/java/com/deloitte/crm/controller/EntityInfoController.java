@@ -1,7 +1,6 @@
 package com.deloitte.crm.controller;
 
 import com.deloitte.common.core.domain.R;
-import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -10,10 +9,8 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
-
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
-
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -258,6 +255,24 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto) {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
+    }
+
+    @ApiOperation(value = "补充录入财报手术等其他相关信息")
+    @PostMapping("/supplyNormalInformation")
+    public R supplyNormalInformation(@RequestBody EntityAttrByDto entityAttrDto) {
+        return entityInfoService.supplyNormalInformation(entityAttrDto);
+    }
+
+    @ApiOperation(value = "补充录入金融机构相关信息")
+    @PostMapping("/supplyFinInformation")
+    public R supplyFinInformation(@RequestBody EntityAttrByDto entityAttrDto) {
+        return entityInfoService.supplyFinInformation(entityAttrDto);
+    }
+
+    @ApiOperation(value = "补充录入城投及政府相关信息")
+    @PostMapping("/supplyUIInformation")
+    public R supplyUIInformation(@RequestBody EntityAttrByDto entityAttrDto) {
+        return entityInfoService.supplyUIInformation(entityAttrDto);
     }
 
 

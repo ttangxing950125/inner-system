@@ -2,7 +2,6 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
-import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
@@ -160,4 +159,10 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @date 2022/9/25
      */
     R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword);
+
+    R supplyNormalInformation(EntityAttrByDto entityAttrDto);
+
+    R supplyFinInformation(EntityAttrByDto entityAttrDto);
+
+    R supplyUIInformation(EntityAttrByDto entityAttrDto);
 }

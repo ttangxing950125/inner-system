@@ -33,4 +33,30 @@ public class EntityUtils {
      * 曾用名备注分隔符
      */
     public static final String NAME_USED_REMARK_SIGN=";";
+    /**
+     * 字段对应的名称
+     *
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_NAME = "name";
+    /**
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_ID = "id";
+    /**
+     * 新增指标的字段名称
+     *
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_KEY = "key";
+    /**
+     * 新增指标的字段值
+     *
+     * @author 冉浩岑
+     * @date 2022/9/23 15:24
+     */
+    public static final String MORE_ENTITY_KPI_VALUE = "value";
 }

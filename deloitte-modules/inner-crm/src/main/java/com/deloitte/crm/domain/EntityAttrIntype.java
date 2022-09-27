@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * @author 正杰
  * @description: EntityAttrIntype
@@ -45,6 +47,6 @@ public class EntityAttrIntype {
      */
     @ApiModelProperty(value = "属性的子集")
     @TableField(exist = false)
-    private EntityAttrIntype children;
+    private List<EntityAttrIntype> children;
 
 }
