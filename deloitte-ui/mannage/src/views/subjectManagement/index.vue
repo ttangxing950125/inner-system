@@ -6,23 +6,28 @@
           <div class="top-left">
             <div class="title">整体情况</div>
             <div class="body">
-              截止今日起，平台已手机主体
-              <span>222222</span
-              >个，其中，政府主体<span>222222</span>个，子夜主题<span>222222</span>个
+              截止今日起，平台已收录主体
+              <span>{{ goveSum + entitySum }}</span> 个，其中，政府主体
+              <span>{{ goveSum }}</span> 个，企业主体
+              <span> {{ entitySum }} </span> 个
             </div>
           </div>
           <div class="top-right">
             <div
               class="box1"
-              style="background: green; width: 30%; text-align: center"
+              :style="{
+                background: 'green',
+                width: govePercent + '%',
+                'text-align': 'center',
+              }"
             >
-              <div style="margin-top: 37%">政府 30%</div>
+              <div style="margin-top: 37%">政府 {{ govePercent }}</div>
             </div>
             <div
               class="box2"
               style="background: greenyellow; width: 70%; text-align: center"
             >
-              <div style="margin-top: 16.5%">企业 70%</div>
+              <div style="margin-top: 16.5%">企业 {{ entityPercent }}</div>
             </div>
           </div>
         </el-card>
@@ -291,6 +296,8 @@ export default {
       ],
       value1: [],
       loading: false,
+      goveSum: 0,
+      entitySum: 0,
     };
   },
   mounted() {
@@ -300,10 +307,12 @@ export default {
     init() {
       try {
         govList({}).then((res) => {
-          console.log(res);
+          const { data } = res;
+          this.goveSum = data.govSum;
         });
         entityInfoList({}).then((res) => {
-          console.log(res);
+          const { data } = res;
+          this.entitySum = data.entitySum;
         });
       } catch (error) {}
     },
@@ -315,6 +324,16 @@ export default {
       setTimeout(() => {
         this.loading = false;
       }, 2000);
+    },
+  },
+  computed: {
+    govePercent() {
+      const res = (this.goveSum / (this.goveSum + this.entitySum)).toFixed(4);
+      return res * 100;
+    },
+    entityPercent() {
+      const res = (this.entitySum / (this.goveSum + this.entitySum)).toFixed(4);
+      return res * 100;
     },
   },
 };
