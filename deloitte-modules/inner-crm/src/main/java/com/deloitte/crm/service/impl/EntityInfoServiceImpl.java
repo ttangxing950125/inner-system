@@ -20,7 +20,7 @@ import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
-import com.deloitte.crm.dto.BondsDetailDto;
+import com.deloitte.crm.dto.EntityAttrDetailDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
@@ -794,12 +794,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 正杰
      * @date 2022/9/25
      */
-    @Override
+ /*   @Override
     public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
 
-        // 正杰任务 模糊匹配 查询主体||债券信息
+        //TODO 正杰任务 模糊匹配 查询主体||债券信息
         switch (keyword) {
-            // 模糊匹配主体名
+            //TODO 模糊匹配主体名
             case ENTITY:
                 List<TargetEntityBondsVo> res = null;
                 List<EntityInfo> entityInfos = null;
@@ -822,7 +822,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     res.add(new TargetEntityBondsVo()
                             .setEntityInfo(row)
                             .setSingleInfo(
-                                    new BondsDetailDto()
+                                    new EntityAttrDetailDto()
                                             .setName(Common.TRANSACTION_CODE_NAME)
                                             .setId(entityAttrValue.getId()==null?0:entityAttrValue.getId())
                                             .setValue(entityAttrValue.getValue()==null?"":entityAttrValue.getValue())));
@@ -841,7 +841,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 entityAttrs.forEach(item->{
                     EntityBondRel entityBondRel = null;
                     EntityInfo entityInfo = null;
-                    List<BondsDetailDto> bondsDetailDtos = null;
+                    List<EntityAttrDetailDto> entityAttrDetailDtos = null;
                     if(item.getEntityCode()!=null){
                         entityBondRel = entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>()
                                 .lambda().eq(EntityBondRel::getBdCode, item.getEntityCode()));
@@ -857,6 +857,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             default:
                 return R.fail(BadInfo.VALID_PARAM.getInfo());
         }
-    }
+    }*/
 
+    @Override
+    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
+        return null;
+    }
 }

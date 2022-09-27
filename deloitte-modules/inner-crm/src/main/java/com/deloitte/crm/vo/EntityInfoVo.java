@@ -2,6 +2,7 @@ package com.deloitte.crm.vo;
 
 import com.deloitte.crm.domain.EntityInfo;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 该类为 EntityInfoService 接口的 Vo 传输对象
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date 2022/9/22
  */
 @Data
+@Accessors(chain = true)
 public class EntityInfoVo {
 
     /**
@@ -27,18 +29,4 @@ public class EntityInfoVo {
      */
     private String msg;
 
-    public EntityInfoVo setEntityInfo(EntityInfo entityInfo) {
-        this.entityInfo = entityInfo;
-        return this;
-    }
-
-    public EntityInfoVo setBo(Boolean bo) {
-        this.bo = bo;
-        return this;
-    }
-
-    public EntityInfoVo setMsg(String msg) {
-        this.msg = msg;
-        return this;
-    }
 }

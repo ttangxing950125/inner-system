@@ -1,12 +1,10 @@
 package com.deloitte.crm.vo;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.dto.BondsDetailDto;
-import io.swagger.annotations.Api;
+import com.deloitte.crm.dto.EntityAttrDetailDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 
@@ -33,16 +31,16 @@ public class TargetEntityBondsVo {
     private String bondsCode;
 
     /**
-     * BondsDetailDto
+     * EntityAttrDetailDto
      * 债卷具体信息
      */
     @ApiModelProperty(value="债卷具体信息")
-    private List<BondsDetailDto> info;
+    private List<EntityAttrDetailDto> info;
 
     /**
      * 债券单个信息
      */
     @ApiModelProperty(value="债卷的单个信息")
-    private BondsDetailDto singleInfo;
+    private EntityAttrDetailDto singleInfo;
 
 }

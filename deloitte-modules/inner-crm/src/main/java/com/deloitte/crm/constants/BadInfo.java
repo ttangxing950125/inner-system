@@ -15,7 +15,9 @@ public enum BadInfo {
     ,EXITS_ENTITY_CODE("该主体已存在，无法新增")
     ,VALID_EMPTY_TARGET("未查询到有效数据"),VALID_PARAM("参数无效")
     ,VALID_EMPTY_USERNAME("未查到当前登录用户名")
-    ,EXITS_ENTITY_OLD_NAME("该主体已使用过曾用名");
+    ,EXITS_ENTITY_OLD_NAME("该主体已使用过曾用名")
+    ,EXITS_TASK_FINISH("该任务已经完成")
+    ,EMPTY_TASK_TABLE("为查询到当日任务列表");
 
 
     public static final Boolean GET = false;

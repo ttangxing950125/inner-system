@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
+import lombok.Data;
 
 /**
  * 【请填写功能名称】对象 bond_info
@@ -13,6 +14,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-23
  */
+@Data
 public class BondInfo extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -32,6 +34,18 @@ public class BondInfo extends BaseEntity
     @Excel(name = "债券简称")
     private String bondShortName;
 
+    /**
+     * 公私募类型 0_公募 1_私募
+     */
+    @Excel(name="公私募类型 0_公募 1_私募")
+    private Integer raiseType;
+
+    /**
+     * 债卷状态 0_存续 1_违约 2_已兑付
+     */
+    @Excel(name="债卷状态 0_存续 1_违约 2_已兑付")
+    private Integer bondState;
+
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;
@@ -39,61 +53,6 @@ public class BondInfo extends BaseEntity
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
-
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setBondStatus(Integer bondStatus)
-    {
-        this.bondStatus = bondStatus;
-    }
-
-    public Integer getBondStatus()
-    {
-        return bondStatus;
-    }
-    public void setBondCode(String bondCode) 
-    {
-        this.bondCode = bondCode;
-    }
-
-    public String getBondCode() 
-    {
-        return bondCode;
-    }
-    public void setBondShortName(String bondShortName) 
-    {
-        this.bondShortName = bondShortName;
-    }
-
-    public String getBondShortName() 
-    {
-        return bondShortName;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdated(Date updated) 
-    {
-        this.updated = updated;
-    }
-
-    public Date getUpdated() 
-    {
-        return updated;
-    }
 
     @Override
     public String toString() {

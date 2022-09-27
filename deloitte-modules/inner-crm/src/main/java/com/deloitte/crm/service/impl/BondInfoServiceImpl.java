@@ -25,7 +25,7 @@ import javax.annotation.Resource;
 @Service
 public class BondInfoServiceImpl implements IBondInfoService 
 {
-    @Autowired
+    @Resource
     private BondInfoMapper bondInfoMapper;
 
     @Resource

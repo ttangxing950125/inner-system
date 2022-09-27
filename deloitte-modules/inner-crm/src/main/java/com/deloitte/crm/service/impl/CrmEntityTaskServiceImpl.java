@@ -172,11 +172,11 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
      */
     @Override
     public R changeState(Integer id,Integer state) {
-        //TODO 校验参数
+        // 校验参数
         CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getId,id));
         if(crmEntityTask==null){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        //TODO 修改状态
+        // 修改状态
         baseMapper.update(crmEntityTask,new UpdateWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getId,id)
                 .set(CrmEntityTask::getState,state));

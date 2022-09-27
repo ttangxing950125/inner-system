@@ -1,9 +1,12 @@
 package com.deloitte.crm.mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -60,4 +63,12 @@ public interface CrmMasTaskMapper extends BaseMapper<CrmMasTask>
      * @return 结果
      */
     public int deleteCrmMasTaskByIds(Long[] ids);
+
+    /**
+     * 查询当月任务接口
+     * @param first
+     * @param last
+     * @return
+     */
+    List<CrmMasTask> selectCrmMasTaskListThisMouth(@Param("first") Date first, @Param("last") Date last);
 }
