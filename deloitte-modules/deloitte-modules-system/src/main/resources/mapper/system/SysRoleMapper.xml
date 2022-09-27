@@ -155,7 +155,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach> 
  	</delete>
 
-	<select id="getRoleInfo" resultType="com.deloitte.system.api.domain.SysUser" parameterType="java.lang.Long">
+	<select id="getRoleInfo" resultType="SysRole" parameterType="java.lang.Long">
 		select r.*
 		from sys_role r
 				 left join sys_user_role ur on ur.role_id = r.role_id
