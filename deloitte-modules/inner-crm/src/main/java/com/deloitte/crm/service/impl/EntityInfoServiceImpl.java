@@ -301,7 +301,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //库内存在该主体 但是主体名称不同
         } else if (entityByName == null) {
             return R.ok(new EntityInfoVo()
-                    .setEntityInfo(entityByName)
+                    .setEntityInfo(entityByCode)
                     .setBo(BadInfo.GET)
                     .setMsg(BadInfo.EXITS_ENTITY_DIFFERENT_NAME.getInfo()));
         }

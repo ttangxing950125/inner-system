@@ -3,12 +3,15 @@ package com.deloitte.crm.controller;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -104,6 +107,8 @@ public class RoleSevenController {
     @Log(title = "【校验该主体是否存在，并做其他判断】", businessType = BusinessType.OTHER)
     @PostMapping("/validEntity")
     public R<EntityInfoVo> validEntity(String creditCode, String entityName){
+        Assert.isTrue(StringUtils.hasText(creditCode), BadInfo.PARAM_EMPTY.getInfo());
+        Assert.isTrue(StringUtils.hasText(entityName), BadInfo.PARAM_EMPTY.getInfo());
         //校验数据库是否存在该主体
         return iEntityInfoService.validEntity(creditCode,entityName);
     }
