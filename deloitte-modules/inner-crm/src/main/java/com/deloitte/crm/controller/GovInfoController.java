@@ -72,8 +72,8 @@ public class GovInfoController extends BaseController {
     })
     public R importGovInfo(EntityAttrByDto entityAttrDto)
     {
-
-        return R.ok(govInfoService.ExportEntityGov(entityAttrDto));
+        govInfoService.ExportEntityGov(entityAttrDto);
+        return R.ok();
     }
 
     /**

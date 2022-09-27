@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
@@ -43,6 +44,8 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static java.lang.System.out;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -365,7 +368,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/26 18:58
     */
     @Override
-     public R ExportEntityGov(EntityAttrByDto entityAttrDto){
+     public void ExportEntityGov(EntityAttrByDto entityAttrDto){
          List<GovInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
          ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
          HttpServletResponse response = servletRequestAttributes.getResponse();
@@ -382,7 +385,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
              map.put("统一社会性代码", info.getGovCode());
              map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
              map.put("创建人", info.getCreater());
-             if (CollectionUtils.isEmpty(vo.getMore())){
+             if (!CollectionUtils.isEmpty(vo.getMore())){
                  vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
              }
              rows.add(map);
@@ -415,20 +418,20 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
          response.setCharacterEncoding("utf-8");
          //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
          try {
-             response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("企业主体", "UTF-8")) + ".xls");
+             response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("政府主体", "UTF-8")) + ".xlsx");
          } catch (UnsupportedEncodingException e) {
              e.printStackTrace();
-             R.fail("导出错误");
+
          }
          try (ServletOutputStream out = response.getOutputStream()) {
              writer.flush(out, true);
          } catch (IOException e) {
              e.printStackTrace();
-             R.fail("导出错误");
+
          }
          // 关闭writer，释放内存
          writer.close();
-         return R.ok("导出成功");
+        IoUtil.close(out);
 
 
      }

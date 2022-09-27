@@ -147,7 +147,9 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @author penTang
      * @date 2022/9/26 18:24
     */
-     R ExportEntityInFor(EntityAttrByDto entityAttrDto);
+    void ExportEntityInFor(EntityAttrByDto entityAttrDto);
+
+
 
     /**
      * 查询债卷信息 模糊匹配

@@ -75,7 +75,8 @@ public class EntityInfoController extends BaseController {
     })
     @PostMapping("/exportEntity")
     public R ImporEntityInfo(EntityAttrByDto entityAttrDto) {
-        return R.ok( entityInfoService.ExportEntityInFor(entityAttrDto));
+        entityInfoService.ExportEntityInFor(entityAttrDto);
+        return R.ok( );
     }
 
 

@@ -88,7 +88,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     Object getListEntityByPage(EntityAttrByDto govAttrDto);
 
-    R ExportEntityGov(EntityAttrByDto entityAttrDto);
+    void ExportEntityGov(EntityAttrByDto entityAttrDto);
 
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 

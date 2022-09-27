@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
@@ -56,6 +57,8 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static java.lang.System.out;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -617,14 +620,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
-     * 导出政府主体数据
+     * 导出企业主体数据
      *
      * @return void
      * @author penTang
      * @date 2022/9/25 21:19
      */
     @Override
-    public R ExportEntityInFor(EntityAttrByDto entityAttrDto) {
+    public void ExportEntityInFor(EntityAttrByDto entityAttrDto) {
         List<EntityInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletResponse response = servletRequestAttributes.getResponse();
@@ -674,20 +677,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         response.setCharacterEncoding("utf-8");
         //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
         try {
-            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("企业主体", "UTF-8")) + ".xls");
+            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("企业主体", "UTF-8")) + ".xlsx");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return R.fail("导出异常");
+
         }
         try (ServletOutputStream out = response.getOutputStream()) {
             writer.flush(out, true);
         } catch (IOException e) {
             e.printStackTrace();
-            return R.fail("导出异常");
+
         }
         // 关闭writer，释放内存
         writer.close();
-        return R.ok("导出结束");
+        IoUtil.close(out);
+
     }
 
 
