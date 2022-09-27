@@ -68,12 +68,12 @@ public class EntityInfoController extends BaseController {
 
     @ApiOperation(value = "{导出整体企业主体情况}", response = EntityInfoDto.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "body",name = "entityAttrDto", value = "包含表中gov_info的所有字段")
+            @ApiImplicitParam(paramType = "body", name = "entityAttrDto", value = "包含表中gov_info的所有字段")
     })
     @PostMapping("/exportEntity")
     public R ImporEntityInfo(EntityAttrByDto entityAttrDto) {
         entityInfoService.ExportEntityInFor(entityAttrDto);
-        return R.ok( );
+        return R.ok();
     }
 
 
@@ -277,8 +277,8 @@ public class EntityInfoController extends BaseController {
 
 
     @GetMapping("/send")
-    public void send(){
-        service.SendEmail(3,"发了","发友尽");
+    public void send() {
+        service.SendEmail(3, "发了", "发友尽");
     }
 
 }

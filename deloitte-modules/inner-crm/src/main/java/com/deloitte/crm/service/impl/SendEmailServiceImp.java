@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 
-import com.deloitte.common.core.constant.SecurityConstants;
 import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.system.api.RoleService;
@@ -12,6 +11,7 @@ import java.util.List;
 
 /**
  * 发邮件接口
+ *
  * @author PenTang
  * @date 2022/09/23 15:46
  */
@@ -21,16 +21,16 @@ public class SendEmailServiceImp implements SendEmailService {
     @Autowired
     private RoleService roleService;
 
- /**
-  *根据角色id发送给相关用户实现
-  *
-  * @param id
-  * @param title
-  * @param content
-  * @return String
-  * @author penTang
-  * @date 2022/9/23 15:58
- */
+    /**
+     * 根据角色id发送给相关用户实现
+     *
+     * @param id
+     * @param title
+     * @param content
+     * @return String
+     * @author penTang
+     * @date 2022/9/23 15:58
+     */
     @Override
     public String SendEmail(Integer id, String title, String content) {
         List<SysUser> sysUsers = roleService.selectUserListById(id);
@@ -42,5 +42,5 @@ public class SendEmailServiceImp implements SendEmailService {
 
 
         return null;
-     }
+    }
 }
