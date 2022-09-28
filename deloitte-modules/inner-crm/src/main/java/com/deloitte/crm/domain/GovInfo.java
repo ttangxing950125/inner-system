@@ -14,8 +14,8 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
-@Accessors(chain = true)
 @Data
+@Accessors(chain = true)
 public class GovInfo implements Serializable
 {
     private static final long serialVersionUID = 1L;

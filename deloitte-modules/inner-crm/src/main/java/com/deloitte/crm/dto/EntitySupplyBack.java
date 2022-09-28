@@ -3,6 +3,7 @@ package com.deloitte.crm.dto;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.GovInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,6 +23,8 @@ import java.util.List;
 public class EntitySupplyBack {
     @ApiModelProperty(value = "企业基本信息")
     private EntityInfo entityInfo;
+    @ApiModelProperty(value = "城投企业基本信息")
+    private GovInfo govInfo;
     @ApiModelProperty(value = "企业属性信息")
     private List<EntityAttr> entityAttrList;
     @ApiModelProperty(value = "角色身份")

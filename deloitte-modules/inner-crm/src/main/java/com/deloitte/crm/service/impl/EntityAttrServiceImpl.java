@@ -8,10 +8,12 @@ import com.deloitte.crm.constants.CacheName;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.dto.EntitySupplyBack;
 import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
+import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,7 +141,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
         List<Map<String, Object>> result = new ArrayList<>();
         for (String key : listMap.keySet()) {
             Map<String, Object> map = new HashMap<>();
-            map.put("key", key);
+            map.put("name", key);
             map.put("value", listMap.get(key));
             result.add(map);
         }
@@ -186,42 +188,70 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
      * @return List<EntityAttrValue>
      * @author 冉浩岑
      * @date 2022/9/28 9:38
-    */
+     */
     public List<EntityAttrValue> getAttrValue(String entityCode) {
         QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
         return valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
     }
 
+    @Autowired
+    private GovInfoMapper govInfoMapper;
+
     @Override
     public R getTaskByEntityCode(String entityCode, Integer roleId) {
-        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
-        //获取基础信息
-        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+        //封装企业返回信息
+        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
+
+        switch (roleId) {
+            case 5:
+                //获取城投企业基础信息
+                QueryWrapper<GovInfo> govInfoQuery = new QueryWrapper<>();
+                GovInfo govInfo = govInfoMapper.selectOne(govInfoQuery.lambda().eq(GovInfo::getDqGovCode, entityCode));
+                entitySupplyBack.setGovInfo(govInfo);
+                break;
+            default:
+                //获取企业基础信息
+                QueryWrapper<EntityInfo> entityuInfoQuery = new QueryWrapper<>();
+                EntityInfo entityInfo = entityInfoMapper.selectOne(entityuInfoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+                entitySupplyBack.setEntityInfo(entityInfo);
+                break;
+        }
+
         //获取属性信息
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(new QueryWrapper<>());
         //获取属性值信息
         List<EntityAttrValue> attrByDqCode = getAttrValue(entityCode);
 
-        //封装企业返回信息
-        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
-        entitySupplyBack.setEntityInfo(entityInfo)
-                        .setRoleId(roleId)
-                        .setEntityAttrList(entityAttrs)
-                        .setAttrValueList(attrByDqCode);
+        entitySupplyBack.setRoleId(roleId)
+                .setEntityAttrList(entityAttrs)
+                .setAttrValueList(attrByDqCode);
 
         return R.ok(entitySupplyBack);
     }
 
     @Override
     public R saveAttrValueByCode(List<EntityAttrValue> list) {
-        list.stream().forEach(o->{
+        list.stream().forEach(o -> {
             Integer id = o.getId();
-            if (ObjectUtils.isEmpty(id)){
+            if (ObjectUtils.isEmpty(id)) {
                 valueMapper.insert(o);
-            }else {
+            } else {
                 valueMapper.updateById(o);
             }
         });
         return R.ok();
+    }
+
+    @Override
+    public R saveGovInfoByCode(String entityCode, String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall) {
+        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
+        GovInfo govInfo = new GovInfo();
+        govInfo.setGovName(govName);
+        govInfo.setPreGovCode(preGovCode);
+        govInfo.setGovCode(govCode);
+        govInfo.setGovLevelBig(govLevelBig);
+        govInfo.setGovLevelSmall(govLevelSmall);
+        govInfo.setStatus(1);
+        return R.ok(govInfoMapper.update(govInfo, queryWrapper.lambda().eq(GovInfo::getDqGovCode, entityCode)));
     }
 }
