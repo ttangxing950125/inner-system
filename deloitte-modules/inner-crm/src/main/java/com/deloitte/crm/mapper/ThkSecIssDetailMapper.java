@@ -60,4 +60,11 @@ public interface ThkSecIssDetailMapper extends BaseMapper<ThkSecIssDetail>
      * @return 结果
      */
     public int deleteThkSecIssDetailByIds(Long[] ids);
+
+    /**
+     * 根据code查询表中最后一条记录
+     * @param code
+     * @return
+     */
+    ThkSecIssDetail findLastByCode(String code);
 }

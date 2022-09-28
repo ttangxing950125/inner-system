@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
+import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.service.BondDelIssService;
@@ -66,14 +67,14 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             //查询有没有这条数据
             List<BondDelIss> bondDelIsses = bondDelIssService.findByBondName(shortName);
             if (CollUtil.isEmpty(bondDelIsses)){
-                changeType = 1;
+                changeType = DataChangeType.INSERT.getId();
             }
 
 
             //当债券进入 推迟或取消发行债券表 时，记为“推迟发行”
-            bondInfo.setBondStatus(5);
-            if (Objects.equals(delIss.getEvent(), BondStatus.ISSUE_FAIL.getName())){
-                bondInfo.setBondStatus(6);
+            bondInfo.setBondStatus(BondStatus.DELAY_ISSUE.getId());
+            if (Objects.equals(delIss.getEvent(), BondStatus.ISSUE_FAIL.getName() )){
+                bondInfo.setBondStatus(BondStatus.ISSUE_FAIL.getId());
             }
             bondInfo = bondInfoService.saveOrUpdate(bondInfo);
 
@@ -81,7 +82,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             //更新当前债券属性
             int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), delIss);
             if (changeType==null && updateCount>0){
-                changeType = 2;
+                changeType = DataChangeType.UPDATE.getId();
             }
 
 
@@ -121,7 +122,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<BondDelIss> util = new ExcelUtil<BondDelIss>(BondDelIss.class);
-        List<BondDelIss> delIsses = util.importExcel(file.getInputStream());
+        List<BondDelIss> delIsses = util.importExcel(file.getInputStream(), true);
 
 
         return bondDelIssService.doTask(windTask, delIsses);
@@ -138,6 +139,10 @@ public class BondDelIssStrategy implements WindTaskStrategy {
         //证券代码
         //证券简称
         //公司中文名称
+        arr.add("导入日期");
+        arr.add("变化状态");
+
+
         arr.add("债券代码");
         arr.add("债券简称");
         arr.add("发行人简称");

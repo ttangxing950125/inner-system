@@ -13,4 +13,10 @@ import com.deloitte.crm.domain.CnApprdWaitIss;
 @Mapper
 public interface CnApprdWaitIssMapper extends BaseMapper<CnApprdWaitIss> {
 
+    /**
+     * 查询IPO-审核通过尚未发行(CnApprdWaitIss)表最后一条记录
+     * @param entityName
+     * @return
+     */
+    CnApprdWaitIss findLastByEntityName(String entityName);
 }

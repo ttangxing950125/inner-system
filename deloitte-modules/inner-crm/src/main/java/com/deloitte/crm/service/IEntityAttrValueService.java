@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.crm.domain.CnApprdWaitIss;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.ThkSecIssInfo;
 
@@ -97,5 +98,13 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      * @param secIssInfo ThkSecIssInfo 对象
      * @return
      */
-    int updateStockThkAttr(String stockDqCode, ThkSecIssInfo secIssInfo);
+    int updateStockThkAttr(String stockDqCode, Object secIssInfo);
+
+    /**
+     * 更新entityAttrValue表中a股的相关信息
+     * @param code a股德勤code
+     * @param item a股相关表任意对象
+     * @return
+     */
+    int updateStockCnAttr(String code, Object item);
 }

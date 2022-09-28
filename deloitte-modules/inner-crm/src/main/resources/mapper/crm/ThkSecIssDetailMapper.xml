@@ -32,8 +32,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectThkSecIssDetailVo">
-        select id, name, ipo_date, ipo_board, iss_type, iss_price, iss_count_real, iss_count_plan, iss_placing_exceed, iss_fund_count, iss_fund_net, iss_fund_exceed, main_unw, sponsor, first_denom, first_currency, first_unit, prosp_date, prosp_price_max, prosp_price_min, bel_wind, bel_modle, stock_belong, entity_des from thk_sec_iss_detail
+         select id, task_id, import_time, change_type, code, name, ipo_date, ipo_board, iss_type, iss_price, iss_count_real, iss_count_plan, iss_placing_exceed, iss_fund_count, iss_fund_net, iss_fund_exceed, main_unw, sponsor, first_denom, first_currency, first_unit, prosp_date, prosp_price_max, prosp_price_min, bel_wind, bel_modle, stock_belong, entity_des
+         from thk_sec_iss_detail
     </sql>
+
+    <select id="findLastByCode" resultType="thkSecIssDetail">
+        <include refid="selectThkSecIssDetailVo"/>
+        where code = #{code}
+        order by id desc
+        limit 1
+    </select>
 
     <select id="selectThkSecIssDetailList" parameterType="ThkSecIssDetail" resultMap="ThkSecIssDetailResult">
         <include refid="selectThkSecIssDetailVo"/>

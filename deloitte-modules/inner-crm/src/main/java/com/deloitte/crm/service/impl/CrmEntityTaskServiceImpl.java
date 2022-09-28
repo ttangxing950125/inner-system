@@ -197,14 +197,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
 
         crmEntityTaskMapper.insert(crmEntityTask);
 
-        //修改今天角色6的任务为有任务未处理
-        LambdaUpdateWrapper<CrmDailyTask> updateDaily = Wrappers.<CrmDailyTask>lambdaUpdate()
-                .eq(CrmDailyTask::getTaskDate, taskDate)
-                .eq(CrmDailyTask::getTaskRoleType, RoleInfo.ROLE6.getId())
-                .eq(CrmDailyTask::getTaskStatus, 1)
-                .set(CrmDailyTask::getTaskStatus, 2);
 
-        crmDailyTaskService.update(updateDaily);
+        //修改今天角色6的任务为有任务未处理
+        crmDailyTaskService.updateToUnhandled(taskDate, RoleInfo.ROLE6);
 
         return crmEntityTask;
     }

@@ -21,6 +21,7 @@ public class CrmDailyTask implements Serializable {
      */
     @TableId(type = IdType.AUTO)
     private Integer id;
+
     /**
      * 3crm角色1
      * 4	crm角色2

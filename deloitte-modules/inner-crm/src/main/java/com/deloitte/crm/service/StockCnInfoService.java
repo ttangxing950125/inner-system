@@ -11,4 +11,17 @@ import com.deloitte.crm.domain.StockCnInfo;
  */
 public interface StockCnInfoService extends IService<StockCnInfo> {
 
+    /**
+     * 根据code查询 大陆股票
+     * @param code
+     * @return
+     */
+    StockCnInfo findByCode(String code);
+
+    /**
+     * 保存或更新，会删缓存
+     * @param stockCnInfo
+     * @return
+     */
+    StockCnInfo saveOrUpdateNew(StockCnInfo stockCnInfo);
 }

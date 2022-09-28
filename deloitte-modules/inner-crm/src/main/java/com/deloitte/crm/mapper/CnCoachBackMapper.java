@@ -13,4 +13,10 @@ import com.deloitte.crm.domain.CnCoachBack;
 @Mapper
 public interface CnCoachBackMapper extends BaseMapper<CnCoachBack> {
 
+    /**
+     * 查询最后一条 IPO-辅导备案(CnCoachBack)
+     * @param entityName
+     * @return
+     */
+    CnCoachBack findLastByEntityName(String entityName);
 }

@@ -151,6 +151,13 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
 
     /**
+     * 根据多个主体code查询
+     * @param entityCodes
+     * @return
+     */
+    List<EntityInfo> findListByEntityCodes(List<String> entityCodes);
+
+    /**
      * 查询债卷信息 模糊匹配
      * @param name    entity_name || bond_short_name
      * @param keyword 请传入常量 ENTITY || BOND

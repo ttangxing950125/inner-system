@@ -1,8 +1,10 @@
 package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
@@ -34,6 +36,22 @@ import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
  */
 @Service
 public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, CrmDailyTask> implements ICrmDailyTaskService {
+    /**
+     * 更新状态为 2-有任务未全部处理完
+     *
+     * @param timeNow
+     * @param roleInfo
+     * @return
+     */
+    @Override
+    public boolean updateToUnhandled(Date timeNow, RoleInfo roleInfo) {
+
+        return this.update(Wrappers.<CrmDailyTask>lambdaUpdate()
+                .eq(CrmDailyTask::getTaskDate, timeNow)
+                .eq(CrmDailyTask::getTaskRoleType, roleInfo.getId())
+                .set(CrmDailyTask::getTaskStatus, 2));
+    }
+
 
     @Resource
     private CrmDailyTaskMapper mapper;

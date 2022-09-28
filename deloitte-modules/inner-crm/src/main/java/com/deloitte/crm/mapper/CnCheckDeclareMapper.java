@@ -13,4 +13,10 @@ import com.deloitte.crm.domain.CnCheckDeclare;
 @Mapper
 public interface CnCheckDeclareMapper extends BaseMapper<CnCheckDeclare> {
 
+    /**
+     * 根据企业名查询 IPO-审核申报(CnCheckDeclare) 最后一条记录
+     * @param entityName
+     * @return
+     */
+    CnCheckDeclare findLastByEntityName(String entityName);
 }
