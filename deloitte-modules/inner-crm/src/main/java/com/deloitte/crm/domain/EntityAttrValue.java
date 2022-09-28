@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import io.swagger.models.auth.In;
+import lombok.Data;
 
 import java.io.Serializable;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
  * @author deloitte
  * @date 2022-09-21
  */
+@Data
 public class EntityAttrValue implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -33,43 +35,6 @@ public class EntityAttrValue implements Serializable
     /** 属性值 */
     @Excel(name = "属性值")
     private String value;
-
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    public Integer getId()
-    {
-        return id;
-    }
-    public void setAttrId(Long attrId) 
-    {
-        this.attrId = attrId;
-    }
-
-    public Long getAttrId() 
-    {
-        return attrId;
-    }
-    public void setEntityCode(String entityCode) 
-    {
-        this.entityCode = entityCode;
-    }
-
-    public String getEntityCode() 
-    {
-        return entityCode;
-    }
-    public void setValue(String value) 
-    {
-        this.value = value;
-    }
-
-    public String getValue() 
-    {
-        return value;
-    }
 
     @Override
     public String toString() {

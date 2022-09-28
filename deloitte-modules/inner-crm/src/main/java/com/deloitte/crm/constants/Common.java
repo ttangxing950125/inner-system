@@ -23,11 +23,6 @@ public enum Common {
     public static final Integer TRANSACTION_CODE_ID = 804;
 
 
-
-    public static final String BOND_SHORT_NAME = "债券简称";
-    public static final Integer BOND_SHORT_NAME_ID = 803;
-
-
     public static final String WHETHER_COLLECTIVE_BONDS = "是否发行集合债";
     public static final Integer WHETHER_COLLECTIVE_BONDS_ID = 58;
 

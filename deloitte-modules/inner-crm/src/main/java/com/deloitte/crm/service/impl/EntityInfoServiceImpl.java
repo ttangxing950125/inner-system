@@ -17,26 +17,29 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.mapper.EntityBondRelMapper;
-import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
+import com.deloitte.crm.vo.BondVo;
 import com.deloitte.crm.vo.EntityInfoVo;
+import com.deloitte.crm.vo.EntityVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -44,6 +47,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -51,11 +55,15 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.html.parser.Entity;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.System.out;
@@ -80,8 +88,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityBondRelMapper entityBondRelMapper;
 
+    private BondInfoMapper bondInfoMapper;
+
     @Autowired
     private HttpUtils httpUtils;
+
+    private EntityNameHisMapper entityNameHisMapper;
 
     /**
      * 统计企业主体信息
@@ -310,20 +322,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());
         }
 
-        String oldName = entity.getEntityName();
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
-        entity.setEntityNameHis(entity.getEntityNameHis() + "，" + oldName);
-        //修改主体曾用名 entity_name_his_remarks 时 需要用 日期+更新人+备注;
-        entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
-                + "\r\n"
-                + "；"
-                + new Date()
-                + " "
-                + SecurityUtils.getUsername()
-                + " "
-                + remarks
-        );
-
+        String oldName = entity.getEntityName();
+        if(!Arrays.stream(oldName.split("，")).collect(Collectors.toMap(row->row,row->row)).containsKey(entityNewName)){
+                entity.setEntityNameHis(entity.getEntityNameHis() + "，" + oldName);
+                //修改主体曾用名 entity_name_his_remarks 时 需要用 日期+更新人+备注;
+                entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
+                        + "\r\n"
+                        + "；"
+                        + new Date()
+                        + " "
+                        + SecurityUtils.getUsername()
+                        + " "
+                        + remarks
+                );
+            }
         //修改主体曾用名列表以及目前名称
         UpdateWrapper<EntityInfo> entityInfoUpdateWrapper = new UpdateWrapper<>();
         entityInfoUpdateWrapper.lambda().eq(EntityInfo::getCreditCode, creditCode)
@@ -335,10 +348,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         baseMapper.update(entity, entityInfoUpdateWrapper);
 
         //查询新名称是否与曾用名重复
-        List<String> collect = Arrays.asList(entity.getEntityNameHis().split("，"))
-                .stream().filter(row -> row.equals(entityNewName))
-                .collect(Collectors.toList());
-        if (collect.size() == 0) {
+        List<EntityNameHis> entityNameHis1 = entityNameHisMapper.selectList(new QueryWrapper<EntityNameHis>().lambda()
+                .eq(EntityNameHis::getDqCode, entity.getEntityCode())
+                .eq(EntityNameHis::getOldName, oldName));
+        if (entityNameHis1.size() == 0) {
             //新增曾用名 entity_name_his
             EntityNameHis entityNameHis = new EntityNameHis();
             //EntityType1  => 企业主体
@@ -350,7 +363,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             entityNameHis.setSource(1);
             entityNameHis.setCreater(SecurityUtils.getUsername());
             entityNameHis.setCreated(new Date());
-            iEntityNameHisService.insertEntityNameHis(entityNameHis);
+            entityNameHisMapper.insertEntityNameHis(entityNameHis);
         }
         return R.ok();
     }
@@ -788,10 +801,83 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return resultMap;
     }
 
-
     public static final String ENTITY = "ENTITY";
 
     public static final String BOND = "BOND";
+
+    public static final String ENTITY_CODE = "ENTITY_CODE";
+
+    public static final String BOND_CODE = "BOND_CODE";
+
+    /**
+     * 传入 bondInfo 查询返回 bondVo
+     * @param bondInfo
+     * @return bondVo
+     */
+    public TargetEntityBondsVo matchingBondInfo(BondInfo bondInfo){
+        TargetEntityBondsVo result = new TargetEntityBondsVo();
+        BondVo bondVo = new BondVo();
+        //债券id => bond_info
+        bondVo.setId(bondInfo.getId());
+        //债券代码 => bond_code
+        bondVo.setBondCode(bondInfo.getBondCode());
+        //债券交易代码
+        bondVo.setTransactionCode(
+                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
+                        .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID)).getValue()
+        );
+        //债券全称
+        bondVo.setFullName(
+                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
+                        .eq(EntityAttrValue::getAttrId, Common.BOND_NAME_ID)).getValue()
+        );
+        //债券简称
+        bondVo.setShortName(bondInfo.getBondShortName());
+        //TODO 存续状态
+        //TODO 债募类型
+        //公私募类型
+        bondVo.setRaiseType(bondInfo.getRaiseType());
+        //是否违约
+        bondVo.setBondState(bondInfo.getBondState());
+        result.setBondVo(bondVo);
+        return result;
+    }
+
+    /**
+     * 传入entityInfo 查询返回 entityVo
+     * @param entityInfo
+     * @return
+     */
+    public TargetEntityBondsVo matchingEntityInfo(EntityInfo entityInfo){
+        TargetEntityBondsVo result = new TargetEntityBondsVo();
+        if (entityInfo.getEntityCode() != null) {
+            //取任意一个 bd_code都相等
+            List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
+                    .lambda().eq(EntityBondRel::getEntityCode, entityInfo.getEntityCode()));
+            if(entityBondRels.size()!=0){
+                EntityBondRel entityBondRel = entityBondRels.get(0);
+                EntityAttrValue byAttrCode = entityAttrValueMapper.findTradCode(entityBondRel.getBdCode());
+                result.setEntityVo((new EntityVo()
+                                .setId(entityInfo.getId())
+                                .setEntityName(entityInfo.getEntityName())
+                                .setEntityCode(entityInfo.getEntityCode())
+                                .setCreditCode(entityInfo.getCreditCode())
+                                .setBondCode(byAttrCode.getValue())
+                        )
+                    );
+            }else{
+                result.setEntityVo((new EntityVo()
+                        .setId(entityInfo.getId())
+                        .setEntityName(entityInfo.getEntityName())
+                        .setEntityCode(entityInfo.getEntityCode())
+                        .setCreditCode(entityInfo.getCreditCode())
+                        ));
+            }
+        }
+        return result;
+    }
 
     /**
      * 查询债卷信息 模糊匹配
@@ -802,74 +888,88 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 正杰
      * @date 2022/9/25
      */
- /*   @Override
+    @Override
     public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
-
-        //TODO 正杰任务 模糊匹配 查询主体||债券信息
+        //模糊匹配 查询主体||债券信息
         switch (keyword) {
-            //TODO 模糊匹配主体名
+            //模糊匹配主体名
             case ENTITY:
-                List<TargetEntityBondsVo> res = null;
-                List<EntityInfo> entityInfos = null;
-                //主体list
-                entityInfos = baseMapper.selectList(new QueryWrapper<EntityInfo>()
+                List<TargetEntityBondsVo> res = new ArrayList<>();
+                //模糊匹配后的主体list
+                List<EntityInfo> entityInfos = baseMapper.selectList(new QueryWrapper<EntityInfo>()
                         .lambda().like(EntityInfo::getEntityName, name));
-                if(entityInfos==null){return R.ok(res,BadInfo.VALID_EMPTY_TARGET.getInfo());}
+                if(entityInfos.size()==0){return R.ok(null,BadInfo.VALID_EMPTY_TARGET.getInfo());}
                 //找到对应bd_code
                 entityInfos.forEach(row -> {
-                    EntityBondRel entityBondRel = null;
-                    EntityAttrValue entityAttrValue = null;
-                    if (row.getEntityCode() != null) {
-                        entityBondRel = entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>()
-                                .lambda().eq(EntityBondRel::getEntityCode, row.getEntityCode()));
-                    } else if (entityBondRel != null) {
-                        entityAttrValue = entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                                .lambda().eq(EntityAttrValue::getEntityCode, entityBondRel.getBdCode())
-                                .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID));
-                    }
-                    res.add(new TargetEntityBondsVo()
-                            .setEntityInfo(row)
-                            .setSingleInfo(
-                                    new EntityAttrDetailDto()
-                                            .setName(Common.TRANSACTION_CODE_NAME)
-                                            .setId(entityAttrValue.getId()==null?0:entityAttrValue.getId())
-                                            .setValue(entityAttrValue.getValue()==null?"":entityAttrValue.getValue())));
+                    res.add(this.matchingEntityInfo(row));
                 });
                 return R.ok(res);
-            //TODO 模糊匹配债券名
+            // 模糊匹配债券名
             case BOND:
-                List<TargetEntityBondsVo> rest = null;
-                List<EntityAttrValue> entityAttrs = null;
-                //债券list
-                entityAttrs = entityAttrValueMapper.selectList(new QueryWrapper<EntityAttrValue>()
-                        .lambda().eq(EntityAttrValue::getAttrId, Common.BOND_SHORT_NAME_ID)
-                        .like(EntityAttrValue::getValue, name));
-                if(entityAttrs==null){return R.ok(rest,BadInfo.VALID_EMPTY_TARGET.getInfo());}
-                //找到对应的主体
-                entityAttrs.forEach(item->{
-                    EntityBondRel entityBondRel = null;
-                    EntityInfo entityInfo = null;
-                    List<EntityAttrDetailDto> entityAttrDetailDtos = null;
-                    if(item.getEntityCode()!=null){
-                        entityBondRel = entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>()
-                                .lambda().eq(EntityBondRel::getBdCode, item.getEntityCode()));
-                    }else if(entityBondRel != null){
-                        entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
-                                .lambda().eq(EntityInfo::getEntityCode,entityBondRel.getEntityCode()));
-                    }
+                List<TargetEntityBondsVo> rest = new ArrayList<>();
+                List<EntityAttrValue> entityAttrs;
+                //模糊匹配全名 债券list
+                entityAttrs = entityAttrValueMapper.matchingNameByBondName(name);
+                //模糊匹配短名 债券list
+                List<BondInfo> bondInfos = bondInfoMapper.selectList(new QueryWrapper<BondInfo>().lambda()
+                        .like(BondInfo::getBondShortName, name));
+                if(entityAttrs.size()==0&&bondInfos.size()==0){return R.ok(null,BadInfo.VALID_EMPTY_TARGET.getInfo());}
 
-//                    bondsDetailDtos.add(new BondsDetailDto().setName())
+                Map<String, String> collect = bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName));
+                List<EntityAttrValue> targetList = entityAttrs.stream().filter(row -> !collect.containsKey(row.getEntityCode())).collect(Collectors.toList());
 
+                targetList.forEach(row->{
+                    BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
+                            .eq(BondInfo::getBondCode, row.getEntityCode()));
+                    bondInfos.add(bondInfo);
+                });
+                if(bondInfos.size()==0){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+
+                //查找属性数据 组装
+                bondInfos.forEach(row->{
+                    rest.add(this.matchingBondInfo(row));
                 });
                 return R.ok(rest);
             default:
                 return R.fail(BadInfo.VALID_PARAM.getInfo());
         }
-    }*/
-    @Override
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
-        return null;
     }
+
+    /**
+     * 查询债券或是主体下相关的主体或是债券信息 by正杰
+     * @param code
+     * @param keyword
+     * @return
+     * @author 正杰
+     * @date 2022/9/25
+     */
+    @Override
+    public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(String code, String keyword) {
+        List<TargetEntityBondsVo> result = new ArrayList<>();
+        switch (keyword){
+            case ENTITY_CODE:
+                List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
+                        .lambda().eq(EntityBondRel::getEntityCode, code));
+                entityBondRels.forEach(row->{
+                    BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
+                            .eq(BondInfo::getBondCode, row.getBdCode()));
+                    result.add(this.matchingBondInfo(bondInfo));
+                });
+                return R.ok(result);
+            case BOND_CODE:
+                List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
+                        .eq(EntityBondRel::getBdCode, code));
+                entityBondRels1.forEach(item->{
+                    EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda()
+                            .eq(EntityInfo::getEntityCode, item.getEntityCode()));
+                    result.add(this.matchingEntityInfo(entityInfo));
+                });
+                return R.ok(result);
+            default:
+                return R.ok(result);
+        }
+    }
+
 
     @Override
     public R supplyNormalInformation(EntityAttrByDto entityAttrDto) {

@@ -6,6 +6,7 @@ import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
+import com.deloitte.crm.dto.EntityAttrDetailDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.vo.EntityInfoVo;
@@ -173,6 +174,18 @@ public interface IEntityInfoService extends IService<EntityInfo>
     R supplyFinInformation(EntityAttrByDto entityAttrDto);
 
     R supplyUIInformation(EntityAttrByDto entityAttrDto);
+
+
+    /**
+     * 查询债券或是主体下相关的主体或是债券信息 by正杰
+     * @param code
+     * @param keyword
+     * @return
+     * @author 正杰
+     * @date 2022/9/25
+     */
+    R<List<TargetEntityBondsVo>> findRelationEntityOrBond(String code, String keyword);
+
 
     Map<String,Object> getOverview();
 

@@ -1,7 +1,10 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.BondInfo;
+import com.deloitte.crm.dto.EntityAttrDetailDto;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -9,7 +12,7 @@ import com.deloitte.crm.domain.BondInfo;
  * @author deloitte
  * @date 2022-09-23
  */
-public interface BondInfoMapper 
+public interface BondInfoMapper extends BaseMapper<BondInfo>
 {
     /**
      * 查询【请填写功能名称】
@@ -61,4 +64,11 @@ public interface BondInfoMapper
 
 
     BondInfo findByShortName(String shortName);
+
+    /**
+     * 单表查询并封装进对象
+     * @param bondCode
+     * @return
+     */
+    EntityAttrDetailDto findByQualName(String bondCode);
 }

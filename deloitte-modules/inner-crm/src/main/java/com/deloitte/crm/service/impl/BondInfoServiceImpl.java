@@ -3,8 +3,12 @@ package com.deloitte.crm.service.impl;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.CacheName;
+import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.dto.EntityAttrDetailDto;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,6 +158,23 @@ public class BondInfoServiceImpl implements IBondInfoService
 
 
         return bondInfo;
+    }
+
+    private Integer BOND_INFO_NUM = 48;
+
+    /**
+     *  查询选择的债券 查询债券的具体信息 by正杰
+     * @param bondCode
+     * @return
+     * @author 正杰
+     * @date 2022/9/28
+     */
+    @Override
+    public R<EntityAttrDetailDto> findAllDetail(String bondCode) {
+        List<EntityAttr> entityAttrs = entityAttrService.getBaseMapper().selectList(new QueryWrapper<EntityAttr>().lambda()
+                .eq(EntityAttr::getAttrCateId, BOND_INFO_NUM));
+
+        return null;
     }
 
 }

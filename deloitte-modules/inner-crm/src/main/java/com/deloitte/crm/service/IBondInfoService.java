@@ -1,7 +1,10 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.BondInfo;
+import com.deloitte.crm.dto.EntityAttrDetailDto;
 
 /**
  * 【请填写功能名称】Service接口
@@ -73,4 +76,12 @@ public interface IBondInfoService
      */
     BondInfo saveOrUpdate(BondInfo bondInfo);
 
+    /**
+     *  查询选择的债券 查询债券的具体信息 by正杰
+     * @param bondCode
+     * @return
+     * @author 正杰
+     * @date 2022/9/28
+     */
+    R<EntityAttrDetailDto> findAllDetail(String bondCode);
 }
