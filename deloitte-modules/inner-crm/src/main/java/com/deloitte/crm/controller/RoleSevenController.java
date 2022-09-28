@@ -1,9 +1,9 @@
 package com.deloitte.crm.controller;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -15,8 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,20 +41,31 @@ public class RoleSevenController {
     /**
      * 角色7今日运维模块
      * @author 正杰
+     * @param date 请传入参数 yyyy-mm
      * @date 2022/9/22
-     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy/mm/dd
-     * @return R<List<CrmEntityTask>> 当月或者当日的任务情况
+     * @return R<List<CrmEntityTask>> 当月任务情况
      */
-    @ApiOperation(value="查询指定日期或当月任务情况,返回List<CrmEntityTask> by正杰")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="timeUnit",value="请传入时间单位常量 MOUTH || DAY",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="date",value="请传入具体日期: yyyy/mm/dd",paramType = "query",dataType = "Date")})
-    @PostMapping("/getTaskInfo")
-    @Log(title = "【查询指定日期或当月任务情况】", businessType = BusinessType.OTHER)
-    public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date){
-        //单表查询 角色7当月||当日任务完成情况
-        return iCrmEntityTaskService.getTaskInfo(timeUnit,date);
+    @ApiOperation(value="查询当月任务 by正杰")
+    @ApiImplicitParam(name="timeUnit",value="请传入参数 yyyy-mm",paramType = "query",dataType = "String")
+    @PostMapping("/getMouthTaskInfo")
+    @Log(title = "【 查询当月任务情况 】", businessType = BusinessType.OTHER)
+    public R<List<CrmEntityTask>> getMouthTaskInfo(String date){
+        return iCrmEntityTaskService.getTaskInfo(Common.MOUTH,date);
+    }
+
+    /**
+     * 角色7今日运维模块
+     * @author 正杰
+     * @param date 请传入参数 yyyy-mm-dd
+     * @date 2022/9/22
+     * @return R<List<CrmEntityTask>> 当日任务情况
+     */
+    @ApiOperation(value="查询当日任务 by正杰")
+    @ApiImplicitParam(name="timeUnit",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String")
+    @PostMapping("/getDayTaskInfo")
+    @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
+    public R<List<CrmEntityTask>> getDayTaskInfo(String date){
+        return iCrmEntityTaskService.getTaskInfo(Common.DAY,date);
     }
 
     /**
