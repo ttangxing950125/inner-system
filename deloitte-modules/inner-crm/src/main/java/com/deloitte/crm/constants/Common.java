@@ -1,5 +1,8 @@
 package com.deloitte.crm.constants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author 正杰
  * @description: common
@@ -33,11 +36,5 @@ public enum Common {
 
     public static final String WHETHER_VIOLATION = "是否违约";
     public static final Integer WHETHER_VIOLATION_ID = 108;
-
-
-
-
-
-
 
 }

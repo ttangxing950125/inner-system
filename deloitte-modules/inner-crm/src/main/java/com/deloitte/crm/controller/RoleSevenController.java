@@ -145,4 +145,37 @@ public class RoleSevenController {
         return iEntityInfoService.editEntityNameHis(creditCode,entityNewName,remarks);
     }
 
+
+    /**
+     * 校验统一社会信用代码是否存在 by正杰
+     * @author 正杰
+     * @date 2022/9/28
+     * @param creditCode
+     * @return R
+     */
+    @ApiOperation(value="校验统一社会信用代码是否存在 by正杰")
+    @ApiImplicitParam(name="creditCode",value="传入 企业统一社会信用代码",required = true , paramType = "query",dataType = "String")
+    @Log(title = "【 校验统一社会信用代码是否存在 】", businessType = BusinessType.OTHER)
+    @PostMapping("/checkCreditCode")
+    public R<EntityInfoVo> checkCreditCode(String creditCode){
+        return iEntityInfoService.checkCreditCode(creditCode);
+    }
+
+    /**
+     * 校验主体名称是否存在
+     * @author 正杰
+     * @date 2022/9/28
+     * @param entityName
+     * @return R
+     */
+    @ApiOperation(value="校验主体名称是否存在 by正杰")
+    @ApiImplicitParam(name="entityName",value="传入 主体名称",required = true , paramType = "query",dataType = "String")
+    @Log(title = "【 校验主体名称是否存在 】", businessType = BusinessType.OTHER)
+    @PostMapping("/checkEntityName")
+    public R<EntityInfoVo> checkEntityName(String entityName){
+        return iEntityInfoService.checkEntityName(entityName);
+    }
+
+    
+
 }

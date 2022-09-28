@@ -78,4 +78,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT * FROM entity_attr_value WHERE attr_id = 57 AND value LIKE #{name}
     </select>
 
+    <select id="checkEntityBondFullName" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 57 AND value = #{fullName}
+    </select>
+
+    <select id="checkEntityBondTradCode" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 804 AND value = #{fullName}
+    </select>
+
+    <select id="checkEntityBondTradCode" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 804 AND value = #{fullName}
+    </select>
+
+    <select id="checkEntityBondValue" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = #{key} AND value = #{value}
+    </select>
+
 </mapper>

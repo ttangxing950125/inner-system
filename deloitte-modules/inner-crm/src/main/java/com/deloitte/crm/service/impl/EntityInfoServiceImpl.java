@@ -1017,4 +1017,42 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         result.put("finance",finance);
         return result;
     }
+
+    /**
+     * 校验统一社会信用代码是否存在 by正杰
+     * @author 正杰
+     * @date 2022/9/28
+     * @param creditCode
+     * @return
+     */
+    @Override
+    public R<EntityInfoVo> checkCreditCode(String creditCode) {
+        List<EntityInfo> entityInfos = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>().lambda()
+                .eq(EntityInfo::getCreditCode, creditCode));
+        if(entityInfos.size()==0){return R.ok(new EntityInfoVo().setBo(true)
+                    .setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));}
+        return R.fail(new EntityInfoVo().setBo(false)
+                .setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo())
+                .setEntityInfo(entityInfos.get(0)));
+    }
+
+    /**
+     * 校验主体名称是否存在
+     * @author 正杰
+     * @date 2022/9/28
+     * @param entityName
+     * @return R
+     */
+    @Override
+    public R<EntityInfoVo> checkEntityName(String entityName) {
+        List<EntityInfo> entName = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>().lambda()
+                .eq(EntityInfo::getEntityName, entityName));
+        if(entName.size()!=0){return R.ok(new EntityInfoVo()
+                .setBo(false).setEntityInfo(entName.get(0)));}
+        return R.ok(new EntityInfoVo()
+                .setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
+    }
+
+
+
 }

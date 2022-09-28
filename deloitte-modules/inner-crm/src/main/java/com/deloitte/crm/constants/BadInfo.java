@@ -17,8 +17,8 @@ public enum BadInfo {
     ,VALID_EMPTY_USERNAME("未查到当前登录用户名")
     ,EXITS_ENTITY_OLD_NAME("该主体已使用过曾用名")
     ,EXITS_TASK_FINISH("该任务已经完成")
-    ,EMPTY_TASK_TABLE("为查询到当日任务列表");
-
+    ,EMPTY_TASK_TABLE("为查询到当日任务列表")
+    ,UNABLE_CREAT("查询到重复数据");
 
     public static final Boolean GET = false;
 

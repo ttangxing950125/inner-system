@@ -1,13 +1,16 @@
 package com.deloitte.crm.service.impl;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
-import com.deloitte.crm.constants.CacheName;
+import com.deloitte.crm.constants.*;
 import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.dto.EntityAttrDetailDto;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
@@ -40,6 +43,7 @@ public class BondInfoServiceImpl implements IBondInfoService
 
     @Resource
     private RedisService redisService;
+
 
 
 
@@ -114,6 +118,63 @@ public class BondInfoServiceImpl implements IBondInfoService
     {
         return bondInfoMapper.deleteBondInfoById(id);
     }
+
+    /**
+     * 检查企业债券全称
+     * @param fullName
+     * @return
+     */
+    public R checkEntityBondFullName(String fullName){
+        List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondFullName(fullName);
+        if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+        return R.ok(BadInfo.UNABLE_CREAT.getInfo());
+    }
+
+    /**
+     * 检查企业债券代码
+     * @param tradCode
+     * @return
+     */
+    public R checkEntityBondTradCode(String tradCode){
+        List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondTradCode(tradCode);
+        if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+        return R.ok(BadInfo.UNABLE_CREAT.getInfo());
+    }
+
+    /**
+     * 检查企业债券简称
+     * @param shortName
+     * @return
+     */
+    public R checkEntityBondShortName(String shortName){
+        List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondShortName(shortName);
+        if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+        return R.ok(BadInfo.UNABLE_CREAT.getInfo());
+    }
+
+    /**
+     * keyword 为需要校验的键
+     * value 为需要比较的值
+     * @param keyword
+     * @param value
+     * @return
+     */
+    public R checkEntityBondValue(String keyword,String value){
+        HashMap<String, Integer> map = new HashMap<>();
+        map.putAll(AttrValueMappingMap.BOND_FULL_NAME.get());
+        map.putAll(AttrValueMappingMap.COLLECTIVE_BONDS.get());
+        map.putAll(AttrValueMappingMap.BOND_FULL_NAME.get());
+        map.putAll(AttrValueMappingMap.WHETHER_VIOLATION_ID.get());
+
+        Integer key = map.get(keyword);
+        if(key!=null){
+            List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondValue(key,value);
+            if(entityAttrValue.size()!=0){return R.ok(BadInfo.UNABLE_CREAT.getInfo());}
+            return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+        }
+        return R.fail(BadInfo.VALID_EMPTY_TARGET);
+    }
+
 
 
     /**

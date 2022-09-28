@@ -40,9 +40,8 @@ public class BondInfoManagerController {
      */
     @ApiOperation(value="模糊匹配 查询债券信息 by正杰")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="name",value="请传入主体名||债券名 entity_name || bond_short_name",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String"),
-            @ApiImplicitParam(name="pageSize",value="请输入页码 例如 1，2，3 页码  默认200条",paramType="query",dataType = "Integer")
+        @ApiImplicitParam(name="name",value="请传入主体名||债券名 entity_name || bond_short_name",paramType = "query",dataType = "String"),
+        @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String")
     })
     @PostMapping("/findBondOrEntity")
     public R<List<TargetEntityBondsVo>> findBondOrEntity(String name,String keyword) {

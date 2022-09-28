@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CnApprdWaitIss;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.ThkSecIssInfo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 【请填写功能名称】Service接口
@@ -107,4 +108,33 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      * @return
      */
     int updateStockCnAttr(String code, Object item);
+
+    /**
+     * 检查企业债券全称
+     * @param fullName
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondFullName(String fullName);
+
+    /**
+     * 检查企业债券代码
+     * @param tradCode
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondTradCode(String tradCode);
+
+    /**
+     * 检查企业债券简称
+     * @param shortName
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondShortName(String shortName);
+
+    /**
+     * value查询
+     * @param key
+     * @param value
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondValue(@Param("key") Integer key, @Param("value") String value);
 }

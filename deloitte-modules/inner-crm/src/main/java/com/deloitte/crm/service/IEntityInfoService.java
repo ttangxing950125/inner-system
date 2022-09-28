@@ -189,4 +189,21 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     Map<String,Object> getOverview();
 
+    /**
+     * 校验统一社会信用代码是否存在 by正杰
+     * @author 正杰
+     * @date 2022/9/28
+     * @param creditCode
+     * @return
+     */
+    R<EntityInfoVo> checkCreditCode(String creditCode);
+
+    /**
+     * 校验主体名称是否存在
+     * @author 正杰
+     * @date 2022/9/28
+     * @param entityName
+     * @return R
+     */
+    R<EntityInfoVo> checkEntityName(String entityName);
 }
