@@ -378,7 +378,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return R.fail("曾用名重复，请重新输入");
         }
         //获取操作用户
-        String remoter = httpUtils.getRemoter();
+        String remoter = HttpUtils.getRemoter();
         //修改曾用名记录
         String entityNameHis = entityInfo.getEntityNameHis();
         if (ObjectUtils.isEmpty(entityNameHis)) {

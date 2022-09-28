@@ -1,7 +1,9 @@
 package com.deloitte.crm.mapper;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.CrmSupplyTask;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.CrmSupplyTask;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface CrmSupplyTaskMapper 
+public interface CrmSupplyTaskMapper extends BaseMapper<CrmSupplyTask>
 {
     /**
      * 查询【请填写功能名称】

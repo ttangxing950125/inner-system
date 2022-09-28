@@ -9,8 +9,10 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.service.IEntityAttrService;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -139,4 +141,35 @@ public class EntityAttrController extends BaseController
         return R.ok(entityAttrService.getAttrByDqCode(dqCode));
     }
 
+    /**
+     * 根据任务id查询补充信息
+     *
+     * @param entityCode
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/28 9:14
+     */
+    @ApiOperation(value="根据任务id查询补充信息")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name="entityCode",value="传入 entityCode",paramType = "query",dataType = "String"),
+        @ApiImplicitParam(name="roleId",value="传入 roleId",paramType = "query",dataType = "Integer")
+    })
+    @PostMapping("/getTaskByEntityCode")
+    public R getTaskByEntityCode(String entityCode, Integer roleId){
+        return entityAttrService.getTaskByEntityCode(entityCode,roleId);
+    }
+    /**
+     * 补充录入信息
+     *
+     * @param list
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/28 9:14
+     */
+    @ApiOperation(value="补充录入信息")
+    @ApiImplicitParam(name="list",value="传入 EntityAttrValue属性值集合",paramType = "body",dataTypeClass = EntityAttrValue.class)
+    @PostMapping("/saveAttrValueByCode")
+    public R saveAttrValueByCode(List<EntityAttrValue>list){
+        return entityAttrService.saveAttrValueByCode(list);
+    }
 }

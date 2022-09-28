@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.EntityAttrValue;
 
 import java.util.List;
 
@@ -80,4 +81,8 @@ public interface IEntityAttrService extends IService<EntityAttr>
     EntityAttr findByNameType(String name, int attrType);
 
     List<EntityAttr> getAttrByDqCode(String dqCode);
+
+    R getTaskByEntityCode(String entityCode, Integer roleId);
+
+    R saveAttrValueByCode(List<EntityAttrValue> list);
 }

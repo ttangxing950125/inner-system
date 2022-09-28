@@ -257,6 +257,8 @@ public class EntityInfoController extends BaseController {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
     }
 
+
+
     @ApiOperation(value = "补充录入财报手术等其他相关信息")
     @PostMapping("/supplyNormalInformation")
     public R supplyNormalInformation(@RequestBody EntityAttrByDto entityAttrDto) {

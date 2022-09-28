@@ -18,7 +18,7 @@ public class HttpUtils {
      * @author 冉浩岑
      * @date 2022/9/25 12:37
      */
-    public String getRemoter(){
+    public static String getRemoter(){
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
 

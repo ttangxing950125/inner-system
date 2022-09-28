@@ -1,11 +1,19 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
+import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.domain.CrmSupplyTask;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
+import com.deloitte.crm.mapper.SysUserRoleMapper;
+import com.deloitte.crm.service.ICrmSupplyTaskService;
+import com.deloitte.system.api.domain.SysUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
-import com.deloitte.crm.domain.CrmSupplyTask;
-import com.deloitte.crm.service.ICrmSupplyTaskService;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -14,11 +22,13 @@ import com.deloitte.crm.service.ICrmSupplyTaskService;
  * @date 2022-09-21
  */
 @Service
-public class CrmSupplyTaskServiceImpl implements ICrmSupplyTaskService 
+public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, CrmSupplyTask> implements ICrmSupplyTaskService
 {
     @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
+    @Autowired
+    private SysUserRoleMapper sysUserRoleMapper;
     /**
      * 查询【请填写功能名称】
      * 
@@ -90,4 +100,24 @@ public class CrmSupplyTaskServiceImpl implements ICrmSupplyTaskService
     {
         return crmSupplyTaskMapper.deleteCrmSupplyTaskById(id);
     }
+    @Override
+    public R getRoleSupplyTask() {
+        //获取登录用户
+        Long userId = SecurityUtils.getUserId();
+        QueryWrapper<SysUserRole>userRleQuery=new QueryWrapper<>();
+        List<SysUserRole> sysUserRoles = sysUserRoleMapper.selectList(userRleQuery.lambda()
+                .eq(SysUserRole::getUserId, userId)
+                .in(SysUserRole::getRoleId, "5", "6", "7")
+        );
+        //不是 角色 3 4 5则不返回信息
+        if (CollectionUtils.isEmpty(sysUserRoles)){
+            return R.ok();
+        }
+        Long roleId = sysUserRoles.get(0).getRoleId();
+        QueryWrapper<CrmSupplyTask>taskQuery=new QueryWrapper<>();
+        return R.ok(crmSupplyTaskMapper.selectList(taskQuery.lambda().eq(CrmSupplyTask::getRoleId, roleId)));
+    }
+
+
+
 }

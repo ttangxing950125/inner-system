@@ -7,12 +7,16 @@ import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.CacheName;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.dto.EntitySupplyBack;
 import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
+import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -38,6 +42,9 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
     @Resource
     private RedisService redisService;
+
+    @Autowired
+    private EntityInfoMapper entityInfoMapper;
 
     /**
      * 缓存全部数据
@@ -160,15 +167,61 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     @Override
     public List<EntityAttr> getAttrByDqCode(String dqCode) {
 
-        QueryWrapper<EntityAttrValue>valueQuery=new QueryWrapper<>();
+        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
         List<EntityAttrValue> attrValues = valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, dqCode));
-        if (CollectionUtils.isEmpty(attrValues)){
+        if (CollectionUtils.isEmpty(attrValues)) {
             return null;
         }
-        List<EntityAttr>result=new ArrayList<>();
-        attrValues.stream().forEach(o->result.add(entityAttrMapper.selectById(o.getAttrId())));
+        List<EntityAttr> result = new ArrayList<>();
+        attrValues.stream().forEach(o -> result.add(entityAttrMapper.selectById(o.getAttrId())));
 
         //TODO 需要分组返回
         return result;
+    }
+
+    /**
+     * 获取属性信息
+     *
+     * @param entityCode
+     * @return List<EntityAttrValue>
+     * @author 冉浩岑
+     * @date 2022/9/28 9:38
+    */
+    public List<EntityAttrValue> getAttrValue(String entityCode) {
+        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+        return valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
+    }
+
+    @Override
+    public R getTaskByEntityCode(String entityCode, Integer roleId) {
+        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
+        //获取基础信息
+        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+        //获取属性信息
+        List<EntityAttr> entityAttrs = entityAttrMapper.selectList(new QueryWrapper<>());
+        //获取属性值信息
+        List<EntityAttrValue> attrByDqCode = getAttrValue(entityCode);
+
+        //封装企业返回信息
+        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
+        entitySupplyBack.setEntityInfo(entityInfo)
+                        .setRoleId(roleId)
+                        .setEntityAttrList(entityAttrs)
+                        .setAttrValueList(attrByDqCode);
+
+        return R.ok(entitySupplyBack);
+    }
+
+    @Override
+    public R saveAttrValueByCode(List<EntityAttrValue> list) {
+        list.stream().forEach(o->{
+            Integer id = o.getId();
+            if (ObjectUtils.isEmpty(id)){
+                valueMapper.insert(o);
+            }else {
+                valueMapper.updateById(o);
+            }
+        });
+        return R.ok();
     }
 }

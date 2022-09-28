@@ -27,7 +27,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -248,14 +247,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return R.ok(pageResult);
     }
 
-    @Autowired
-    private HttpUtils httpUtils;
-
     @Transactional
     @Override
     public R addOldName(GovInfo gov) {
         //获取操作用户
-        String remoter = httpUtils.getRemoter();
+        String remoter = HttpUtils.getRemoter();
 
         GovInfo govInfo = govInfoMapper.selectById(gov.getId());
 
