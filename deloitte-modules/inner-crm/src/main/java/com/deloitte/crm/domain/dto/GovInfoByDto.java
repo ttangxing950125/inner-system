@@ -2,6 +2,7 @@ package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.deloitte.crm.domain.GovInfo;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@Data
 public class GovInfoByDto implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -47,6 +49,8 @@ public class GovInfoByDto implements Serializable
     private Long id;
 
     private String govName;
+
+    private String param;
 
     private String govCode;
 

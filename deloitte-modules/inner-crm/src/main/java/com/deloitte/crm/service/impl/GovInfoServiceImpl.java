@@ -15,7 +15,6 @@ import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.domain.dto.GovInfoResult;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
@@ -27,6 +26,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +56,9 @@ import static java.lang.System.out;
 public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> implements IGovInfoService {
     @Resource
     private GovInfoMapper govInfoMapper;
+
+    @Autowired
+    private EntityAttrValueMapper entityAttrValueMapper;
 
     @Resource
     private EntityNameHisMapper nameHisMapper;
@@ -191,22 +194,22 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         GovInfoDto govInfoDto = new GovInfoDto();
 //TODO gov_level_big 是否 省  1-是
         List<GovInfo> province = list().stream()
-                .filter(row -> row.getGovLevelBig()!=null && row.getGovLevelBig() == 1)
+                .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 1)
                 .collect(Collectors.toList());
 
 //TODO gov_level_big 是否 市  2-是
         List<GovInfo> city = list().stream()
-                .filter(row -> row.getGovLevelBig()!=null && row.getGovLevelBig() == 2)
+                .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 2)
                 .collect(Collectors.toList());
 
 //TODO gov_level_big 是否 县  3-是
         List<GovInfo> county = list().stream()
-                .filter(row ->row.getGovLevelBig()!=null && row.getGovLevelBig() == 3)
+                .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 3)
                 .collect(Collectors.toList());
 
 //TODO gov_level_big 是否 经开  4-是
         List<GovInfo> open = list().stream()
-                .filter(row -> row.getGovLevelBig()!=null && row.getGovLevelBig() == 4)
+                .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 4)
 
                 .collect(Collectors.toList());
 
@@ -219,32 +222,48 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public R getInfoList(GovInfoByDto govInfodto) {
-        govInfodto.setGovInfo();
-        GovInfo govInfo = govInfodto.getGovInfo();
-        Integer pageNum = govInfodto.getPageNum();
-        Integer pageSize = govInfodto.getPageSize();
-        if (ObjectUtils.isEmpty(pageNum)) {
-            return R.fail("请输入页码");
-        }
-        if (ObjectUtils.isEmpty(pageSize)) {
-            pageSize = EntityUtils.DEFAULT_PAGE_SIZE;
-        }
-        Page<GovInfo> pageInfo = new Page<>(pageNum, pageSize);
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>(govInfo);
+    public R getInfoList(String param) {
 
-        Page<GovInfo> govInfoPage = govInfoMapper.selectPage(pageInfo, queryWrapper);
+//        String param = govInfodto.getParam();
+//        Integer pageNum = govInfodto.getPageNum();
+//        Integer pageSize = govInfodto.getPageSize();
+//        if (ObjectUtils.isEmpty(pageNum)) {
+//            return R.fail("请输入页码");
+//        }
+//        if (ObjectUtils.isEmpty(pageSize)) {
+//            pageSize = EntityUtils.DEFAULT_PAGE_SIZE;
+//        }
+//        Page<GovInfo> pageInfo = new Page<>(pageNum, pageSize);
+        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
 
-        //创建结果集
-        Page<Map<String, Object>> pageResult = new Page<>();
-        pageResult.setTotal(govInfoPage.getTotal()).setPages(govInfoPage.getPages()).setCurrent(govInfoPage.getCurrent());
+//        Page<GovInfo> govInfoPage =   govInfoMapper.selectPage(pageInf,
+//                queryWrapper.lambda()
+//                        .like(GovInfo::getDqGovCode, param)
+//                        .or().like(GovInfo::getGovName,param)
+//        );
+//        //创建结果集
+//        Page<Map<String, Object>> pageResult = new Page<>();
+//        pageResult.setTotal(govInfoPage.getTotal()).setPages(govInfoPage.getPages()).setCurrent(govInfoPage.getCurrent());
+//        //封装结果集
+//        List<Map<String, Object>> records = new ArrayList<>();
+//        govInfoPage.getRecords().stream().forEach(o -> {
+//            records.add(getResultMap(o));
+//        });
+//        pageResult.setRecords(records);
+        if (!ObjectUtils.isEmpty(param)) {
+            queryWrapper.lambda()
+                    .like(GovInfo::getDqGovCode, param)
+                    .or().like(GovInfo::getGovName, param);
+        }
+        List<GovInfo> govInfoPage = govInfoMapper.selectList(
+                queryWrapper);
+
         //封装结果集
         List<Map<String, Object>> records = new ArrayList<>();
-        govInfoPage.getRecords().stream().forEach(o -> {
+        govInfoPage.stream().forEach(o -> {
             records.add(getResultMap(o));
         });
-        pageResult.setRecords(records);
-        return R.ok(pageResult);
+        return R.ok(records);
     }
 
     @Transactional
@@ -328,109 +347,89 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<GovInfoResult> resultRecords = new ArrayList<>();
 
         govInfos.stream().forEach(o -> {
-            GovInfoResult govInfoResult = new GovInfoResult();
-            govInfoResult.setGovInfo(o);
-
-            if (!CollectionUtils.isEmpty(mapList)) {
-                List<Map<String, Object>> more = new ArrayList<>();
-
-                for (Map<String, String> map : mapList) {
-                    QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
-                    EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                            .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
-                            .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
-                    Map<String, Object> moreMap = new HashMap<>();
-                    //新增指标栏
-                    moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
-                    if (ObjectUtils.isEmpty(attrValue)) {
-                        moreMap.put(MORE_ENTITY_KPI_VALUE, null);
-                    } else {
-                        moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
-                    }
-                    more.add(moreMap);
-                }
-                govInfoResult.setMore(more);
-            }
+            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
             resultRecords.add(govInfoResult);
         });
         return resultRecords;
     }
+
     /**
-     *导出政府主体数据
+     * 导出政府主体数据
      *
      * @param entityAttrDto
      * @return R
      * @author penTang
      * @date 2022/9/26 18:58
-    */
+     */
     @Override
-     public void ExportEntityGov(EntityAttrByDto entityAttrDto){
-         List<GovInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
-         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-         HttpServletResponse response = servletRequestAttributes.getResponse();
-         ExcelWriter writer = ExcelUtil.getWriter(true);
-         ArrayList<Map<String, Object>> rows = new ArrayList<>();
-         AtomicInteger serialNumber = new AtomicInteger();
-         listEntityAll.forEach(vo -> {
-             LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-             GovInfo info = vo.getGovInfo();
-             map.put("序号", serialNumber.incrementAndGet());
-             map.put("德勤主体代码", info.getDqGovCode());
-             map.put("主体名称", info.getGovName());
-             map.put("续存状态", info.getStatus());
-             map.put("统一社会性代码", info.getGovCode());
-             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
-             map.put("创建人", info.getCreater());
-             if (!CollectionUtils.isEmpty(vo.getMore())){
-                 vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
-             }
-             rows.add(map);
-         });
-         //一次性写出内容，强制输出标题
-         writer.write(rows, true);
-         // 设置自适应
-         Sheet sheet = writer.getSheet();
-         // 循环设置列宽
-         for (int columnIndex = 0; columnIndex < writer.getColumnCount(); columnIndex++) {
-             int width = sheet.getColumnWidth(columnIndex) / 256;
-             // 获取最大行宽
-             for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
-                 Row currentRow = sheet.getRow(rowIndex);
-                 if (Objects.isNull(currentRow)) {
-                     currentRow = sheet.createRow(rowIndex);
-                 }
-                 Cell currentCell = currentRow.getCell(columnIndex);
-                 if (Objects.isNull(currentCell)) {
-                     continue;
-                 } else if (currentCell.getCellType() == CellType.STRING) {
-                     int length = currentCell.getStringCellValue().getBytes().length;
-                     width = width < length ? length : width;
-                 }
-             }
-             sheet.setColumnWidth(columnIndex, width * 256);
-         }
-         // response为HttpServletResponse对象
-         response.setContentType("application/vnd.ms-excel;charset=utf-8");
-         response.setCharacterEncoding("utf-8");
-         //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
-         try {
-             response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("政府主体", "UTF-8")) + ".xlsx");
-         } catch (UnsupportedEncodingException e) {
-             e.printStackTrace();
+    public void ExportEntityGov(EntityAttrByDto entityAttrDto) {
+        List<GovInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletResponse response = servletRequestAttributes.getResponse();
+        ExcelWriter writer = ExcelUtil.getWriter(true);
+        ArrayList<Map<String, Object>> rows = new ArrayList<>();
+        AtomicInteger serialNumber = new AtomicInteger();
+        listEntityAll.forEach(vo -> {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            GovInfo info = vo.getGovInfo();
+            map.put("序号", serialNumber.incrementAndGet());
+            map.put("德勤主体代码", info.getDqGovCode());
+            map.put("主体名称", info.getGovName());
+            map.put("续存状态", info.getStatus());
+            map.put("统一社会性代码", info.getGovCode());
+            map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
+            map.put("创建人", info.getCreater());
+            if (!CollectionUtils.isEmpty(vo.getMore())) {
+                vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
+            }
+            rows.add(map);
+        });
+        //一次性写出内容，强制输出标题
+        writer.write(rows, true);
+        // 设置自适应
+        Sheet sheet = writer.getSheet();
+        // 循环设置列宽
+        for (int columnIndex = 0; columnIndex < writer.getColumnCount(); columnIndex++) {
+            int width = sheet.getColumnWidth(columnIndex) / 256;
+            // 获取最大行宽
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row currentRow = sheet.getRow(rowIndex);
+                if (Objects.isNull(currentRow)) {
+                    currentRow = sheet.createRow(rowIndex);
+                }
+                Cell currentCell = currentRow.getCell(columnIndex);
+                if (Objects.isNull(currentCell)) {
+                    continue;
+                } else if (currentCell.getCellType() == CellType.STRING) {
+                    int length = currentCell.getStringCellValue().getBytes().length;
+                    width = width < length ? length : width;
+                }
+            }
+            sheet.setColumnWidth(columnIndex, width * 256);
+        }
+        // response为HttpServletResponse对象
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setCharacterEncoding("utf-8");
+        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("政府主体", "UTF-8")) + ".xlsx");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
 
-         }
-         try (ServletOutputStream out = response.getOutputStream()) {
-             writer.flush(out, true);
-         } catch (IOException e) {
-             e.printStackTrace();
+        }
+        try (ServletOutputStream out = response.getOutputStream()) {
+            writer.flush(out, true);
+        } catch (IOException e) {
+            e.printStackTrace();
 
-         }
-         // 关闭writer，释放内存
-         writer.close();
+        }
+        // 关闭writer，释放内存
+        writer.close();
         IoUtil.close(out);
 
 
-     }
+    }
+
     /**
      * 分页查询
      *
@@ -450,6 +449,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         Page<GovInfo> entityInfoPage = govInfoMapper.selectPage(pageInfo, queryWrapper);
 
         //查询分页数据集
+//        Page<Map<String, Object>> pageResult = new Page<>();
         Page<GovInfoResult> pageResult = new Page<>();
         pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
 
@@ -457,32 +457,44 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<GovInfoResult> resultRecords = new ArrayList<>();
         //添加指标栏位
         List<GovInfo> records = entityInfoPage.getRecords();
+
         records.stream().forEach(o -> {
-            GovInfoResult govInfoResult = new GovInfoResult();
-            govInfoResult.setGovInfo(o);
-            if (!CollectionUtils.isEmpty(mapList)) {
-                List<Map<String, Object>> more = new ArrayList<>();
-                for (Map<String, String> map : mapList) {
-                    QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
-                    EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                            .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
-                            .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
-                    //新增指标栏
-                    Map<String, Object> moreMap = new HashMap<>();
-                    moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
-                    if (ObjectUtils.isEmpty(attrValue)) {
-                        moreMap.put(MORE_ENTITY_KPI_VALUE, null);
-                    } else {
-                        moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
-                    }
-                    more.add(moreMap);
-                }
-                govInfoResult.setMore(more);
-            }
+            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
             resultRecords.add(govInfoResult);
         });
         pageResult.setRecords(resultRecords);
         return pageResult;
+    }
+
+    private GovInfoResult getGovInfoResult(GovInfo o, List<Map<String, String>> mapList) {
+        GovInfoResult govInfoResult = new GovInfoResult();
+        govInfoResult.setGovInfo(o);
+        List<String> header = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<Map<String, Object>> more = new ArrayList<>();
+            for (Map<String, String> map : mapList) {
+                QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
+                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                        .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                        .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
+                //新增指标栏
+                Map<String, Object> moreMap = new HashMap<>();
+                moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
+                header.add(map.get(MORE_ENTITY_KPI_NAME));
+                if (ObjectUtils.isEmpty(attrValue)) {
+                    values.add(null);
+                    moreMap.put(MORE_ENTITY_KPI_VALUE, null);
+                } else {
+                    values.add(attrValue.getValue());
+                    moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
+                }
+                more.add(moreMap);
+
+            }
+            govInfoResult.setMore(more).setHeader(header).setValues(values);
+        }
+        return govInfoResult;
     }
 
     @Transactional
@@ -541,6 +553,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return R.ok();
     }
 
+    @Override
+    public Object getOverview() {
+        QueryWrapper<GovInfo>query=new QueryWrapper<>();
+        Long count = govInfoMapper.selectCount(query);
+        Long aLong = govInfoMapper.selectCount(query.lambda().eq(GovInfo::getInvalid, 0));
+        Map<String,Object>result=new HashMap<>();
+        result.put("count",count);
+        result.put("invalid",aLong);
+        result.put("unInvalid",count-aLong);
+        return result;
+    }
+
 
     /**
      * 字段对应的名称
@@ -576,7 +600,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     public static final String MORE_ENTITY_KPI_VALUE = "value";
 
-    private EntityAttrValueMapper entityAttrValueMapper;
 
     /**
      * GovInfo 对象转 map,并查询 曾用名条数

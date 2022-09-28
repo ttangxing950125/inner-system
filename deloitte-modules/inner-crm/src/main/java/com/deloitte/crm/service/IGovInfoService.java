@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 
 import java.util.List;
@@ -80,7 +79,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R getInfoDetail(GovInfo govInfo);
 
-    R getInfoList(GovInfoByDto govInfo);
+    R getInfoList(String param);
 
     R addOldName(GovInfo govInfo);
 
@@ -93,4 +92,5 @@ public interface IGovInfoService  extends IService<GovInfo>
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
 
+    Object getOverview();
 }

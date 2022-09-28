@@ -134,8 +134,9 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
-    public R getAllByGroup() {
-        List<EntityAttr> entityAttrs = entityAttrMapper.selectList(new QueryWrapper<>());
+    public R getAllByGroup(Integer type) {
+        QueryWrapper<EntityAttr> query = new QueryWrapper<>();
+        List<EntityAttr> entityAttrs = entityAttrMapper.selectList((query.lambda().eq(EntityAttr::getAttrType,type)));
 
         Map<String, List<EntityAttr>> listMap = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getAttrCateName));
         List<Map<String, Object>> result = new ArrayList<>();

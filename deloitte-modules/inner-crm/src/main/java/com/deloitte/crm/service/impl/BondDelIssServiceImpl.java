@@ -6,11 +6,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
-import com.deloitte.crm.domain.BondNewIss;
+import com.deloitte.crm.domain.BondDelIss;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.mapper.BondDelIssMapper;
-import com.deloitte.crm.domain.BondDelIss;
 import com.deloitte.crm.service.BondDelIssService;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.strategy.impl.BondDelIssStrategy;
@@ -28,7 +27,7 @@ import java.util.concurrent.Future;
  * @author 吴鹏鹏ppp
  * @since 2022-09-25 12:11:32
  */
-@Service("bondDelIssService")
+@Service
 public class BondDelIssServiceImpl extends ServiceImpl<BondDelIssMapper, BondDelIss> implements BondDelIssService {
 
     @Resource

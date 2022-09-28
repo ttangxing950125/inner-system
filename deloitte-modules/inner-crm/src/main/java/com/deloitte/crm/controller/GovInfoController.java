@@ -171,7 +171,7 @@ public class GovInfoController extends BaseController {
     /**
      * 政府主体分页查询
      *
-     * @param govInfo
+     * @param param
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 17:49
@@ -179,8 +179,8 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "政府主体分页查询")
     @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfoByDto.class)
     @PostMapping("/getInfoList")
-    public R getInfoList(@RequestBody GovInfoByDto govInfo) {
-        return govInfoService.getInfoList(govInfo);
+    public R getInfoList(String param) {
+        return govInfoService.getInfoList(param);
     }
 
     /**
@@ -249,10 +249,19 @@ public class GovInfoController extends BaseController {
     public R getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto) {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
-    @GetMapping("/test")
-    public R test(){
-        System.out.println("测试成功");
-        return R.ok("测试成功");
+
+    /**
+     * 查询政府主体概览
+     *
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/28 10:56
+     */
+    @ApiOperation(value = "查询政府主体概览")
+    @ApiImplicitParam(name = "", value = "", paramType = "body", example = "", dataType = "")
+    @PostMapping("/getOverview")
+    public R getOverview() {
+        return R.ok(govInfoService.getOverview());
     }
 
     /**

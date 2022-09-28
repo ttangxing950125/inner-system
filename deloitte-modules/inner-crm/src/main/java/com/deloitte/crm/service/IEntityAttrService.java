@@ -70,7 +70,7 @@ public interface IEntityAttrService extends IService<EntityAttr>
      */
     public int deleteEntityAttrById(Long id);
 
-    R getAllByGroup();
+    R getAllByGroup(Integer type);
 
     /**
      * 根据名称和属性分类查询

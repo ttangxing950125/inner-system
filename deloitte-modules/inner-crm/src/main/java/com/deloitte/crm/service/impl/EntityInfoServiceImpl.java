@@ -478,8 +478,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R getInfoList(EntityInfoByDto entityInfoDto) {
-        entityInfoDto.setEntityInfo();
-        EntityInfo entityInfo = entityInfoDto.getEntityInfo();
+        String param = entityInfoDto.getParam();
         Integer pageNum = entityInfoDto.getPageNum();
         Integer pageSize = entityInfoDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum)) {
@@ -489,10 +488,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             pageSize = EntityUtils.DEFAULT_PAGE_SIZE;
         }
         Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
-        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>(entityInfo);
+        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
 
-        Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
-
+        Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo,
+                queryWrapper.lambda()
+                        .like(EntityInfo::getEntityCode, param)
+                        .or().like(EntityInfo::getEntityName, param)
+        );
         //创建结果集
         Page<Map<String, Object>> pageResult = new Page<>();
         pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
@@ -569,14 +571,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
         entityInfos.stream().forEach(o -> {
-
-            EntityInfoResult entityInfoResult = new EntityInfoResult();
-            entityInfoResult.setEntityInfo(o);
-
-            if (!CollectionUtils.isEmpty(mapList)) {
-                List<Map<String, Object>> more = getEntityAttrValue(mapList, o);
-                entityInfoResult.setMore(more);
-            }
+            EntityInfoResult entityInfoResult = getEntityInfoResult(o, mapList);
             resultRecords.add(entityInfoResult);
         });
         return resultRecords;
@@ -684,19 +679,43 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfoResult> resultRecords = new ArrayList<>();
         //添加指标栏位
         List<EntityInfo> records = entityInfoPage.getRecords();
-        records.stream().forEach(o -> {
-            EntityInfoResult entityInfoResult = new EntityInfoResult();
-            entityInfoResult.setEntityInfo(o);
 
-            //获取额外的列数据信息
-            if (!CollectionUtils.isEmpty(mapList)) {
-                List<Map<String, Object>> more = getEntityAttrValue(mapList, o);
-                entityInfoResult.setMore(more);
-            }
+        records.stream().forEach(o -> {
+            EntityInfoResult entityInfoResult = getEntityInfoResult(o, mapList);
             resultRecords.add(entityInfoResult);
         });
         pageResult.setRecords(resultRecords);
         return pageResult;
+    }
+
+    private EntityInfoResult getEntityInfoResult(EntityInfo o, List<Map<String, String>> mapList) {
+        EntityInfoResult entityInfoResult = new EntityInfoResult();
+        entityInfoResult.setEntityInfo(o);
+        List<String> header = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<Map<String, Object>> more = new ArrayList<>();
+            for (Map<String, String> map : mapList) {
+                QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
+                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
+                        .eq(EntityAttrValue::getAttrId, map.get(EntityUtils.MORE_ENTITY_KPI_ID))
+                        .eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+                //新增指标栏
+                Map<String, Object> moreMap = new HashMap<>();
+                moreMap.put(EntityUtils.MORE_ENTITY_KPI_KEY, map.get(EntityUtils.MORE_ENTITY_KPI_NAME));
+                header.add(map.get(EntityUtils.MORE_ENTITY_KPI_NAME));
+                if (ObjectUtils.isEmpty(attrValue)) {
+                    values.add(null);
+                    moreMap.put(EntityUtils.MORE_ENTITY_KPI_VALUE, null);
+                } else {
+                    values.add(attrValue.getValue());
+                    moreMap.put(EntityUtils.MORE_ENTITY_KPI_VALUE, attrValue.getValue());
+                }
+                more.add(moreMap);
+            }
+            entityInfoResult.setMore(more).setHeader(header).setValues(values);
+        }
+        return entityInfoResult;
     }
 
     /**
@@ -848,5 +867,37 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public R supplyUIInformation(EntityAttrByDto entityAttrDto) {
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getOverview() {
+        QueryWrapper<EntityInfo>query=new QueryWrapper<>();
+//        list	是否上市 0-未上市 1-已上市
+//        finance		0	是否金融机构
+//        issue_bonds		是否发债 0-未发债 1-已发债
+        Long count = entityInfoMapper.selectCount(query);
+        //上市主体
+        Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList,1));
+        query.clear();
+        //发债主体
+        Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds,1));
+        query.clear();
+        //既上市主体又发债主体
+        Long unListBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList,1).eq(EntityInfo::getIssueBonds,1));
+        query.clear();
+        //既没上市主体又不发债主体
+        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList,0).eq(EntityInfo::getIssueBonds,0));
+        query.clear();
+        //金融
+        Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance,1));
+
+        Map<String,Object>result=new HashMap<>();
+        result.put("count",count);
+        result.put("list",list);
+        result.put("bonds",bonds);
+        result.put("listBonds",listBonds);
+        result.put("unListBonds",unListBonds);
+        result.put("finance",finance);
+        return result;
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * 【请填写功能名称】Controller
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
@@ -110,10 +110,10 @@ public class EntityAttrController extends BaseController
      * @date 2022/9/23 10:56
     */
     @ApiOperation(value = "分组查询全部---构造父子级关系")
-    @PostMapping("/getAllByGroup")
-    public R getAllByGroup()
+    @GetMapping("/getAllByGroup/{type}")
+    public R getAllByGroup(@PathVariable("type") Integer type)
     {
-        return entityAttrService.getAllByGroup();
+        return entityAttrService.getAllByGroup(type);
     }
     /**
      * 根据dqCode查询详细信息
@@ -123,17 +123,7 @@ public class EntityAttrController extends BaseController
      * @date 2022/9/25 13:56
      */
     @ApiOperation(value = "根据dqCode查询详细信息")
-    @ApiImplicitParam(
-            // 参数名
-            name="dqCode",
-            // 参数描述
-            value="德勤唯一识别码",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "query",
-            // 示例值
-            example = "",
-            //参数类型
-            dataType = "String")
+    @ApiImplicitParam(name="dqCode", value="德勤唯一识别码", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getAttrByDqCode")
     public R getAttrByDqCode(String dqCode)
     {
@@ -157,6 +147,7 @@ public class EntityAttrController extends BaseController
     public R getTaskByEntityCode(String entityCode, Integer roleId){
         return entityAttrService.getTaskByEntityCode(entityCode,roleId);
     }
+
     /**
      * 根据entityCode补充录入副表信息
      *

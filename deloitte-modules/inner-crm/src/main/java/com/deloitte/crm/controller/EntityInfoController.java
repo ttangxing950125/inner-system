@@ -184,7 +184,7 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "企业主体分页查询")
-    @ApiImplicitParam(name = "entityInfo", value = "包含表中eentity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfoByDto.class)
+    @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfoByDto.class)
     @PostMapping("/getInfoList")
     public R getInfoList(@RequestBody EntityInfoByDto entityInfo) {
         return entityInfoService.getInfoList(entityInfo);
@@ -257,7 +257,19 @@ public class EntityInfoController extends BaseController {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
     }
 
-
+    /**
+     * 查询企业主体概览
+     *
+     * @return AjaxResult
+     * @author 冉浩岑
+     * @date 2022/9/28 10:56
+     */
+    @ApiOperation(value = "查询政府主体概览")
+    @ApiImplicitParam(name = "", value = "", paramType = "body", example = "", dataType = "")
+    @PostMapping("/getOverview")
+    public R getOverview() {
+        return R.ok(entityInfoService.getOverview());
+    }
 
     @ApiOperation(value = "补充录入财报手术等其他相关信息")
     @PostMapping("/supplyNormalInformation")

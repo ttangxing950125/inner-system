@@ -1,10 +1,9 @@
 package com.deloitte.crm.domain.dto;
 
-import cn.hutool.core.lang.hash.Hash;
 import com.deloitte.crm.domain.EntityInfo;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +12,13 @@ import java.util.Map;
  * @date 2022/09/25 16:42
  */
 @Data
+@Accessors(chain = true)
 public class EntityInfoResult {
 
     private EntityInfo entityInfo;
 
     private List<Map<String,Object>> more;
+    private List<String> header;
+    private List<String> values;
 
 }

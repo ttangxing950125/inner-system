@@ -2,6 +2,7 @@ package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.deloitte.crm.domain.EntityInfo;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@Data
 public class EntityInfoByDto implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -19,6 +21,8 @@ public class EntityInfoByDto implements Serializable
     private Long id;
 
     private EntityInfo entityInfo;
+
+    private String param;
 
     private String entityName;
 

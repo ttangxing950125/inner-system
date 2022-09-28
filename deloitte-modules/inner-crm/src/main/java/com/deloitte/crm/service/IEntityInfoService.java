@@ -12,6 +12,7 @@ import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service接口
@@ -165,4 +166,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
     R supplyFinInformation(EntityAttrByDto entityAttrDto);
 
     R supplyUIInformation(EntityAttrByDto entityAttrDto);
+
+    Map<String,Object> getOverview();
+
 }
