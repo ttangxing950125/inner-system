@@ -3,6 +3,8 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,20 +23,26 @@ import lombok.Builder;
 @Builder
 public class CnCoachBack implements Serializable {
     private static final long serialVersionUID = 305269337251744593L;
-    /**
-     * 主键
-     */
-    @Excel(name = "主键")
-    private Integer id;
+
+    /** 主键 */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    private Integer taskId;
+
+    private Date importTime;
+
+    private Integer changeType;
+
     /**
      * 代码
      */
     @Excel(name = "代码")
     private String code;
     /**
-     * 最新公告日 yyyy-mm-dd
+     * 最新公告日
      */
-    @Excel(name = "最新公告日 yyyy-mm-dd")
+    @Excel(name = "最新公告日")
     private Date annoDate;
     /**
      * 企业名称
@@ -127,9 +135,9 @@ public class CnCoachBack implements Serializable {
     @Excel(name = "本次审核状态变更")
     private String auditStatusChange;
     /**
-     * 首次公告日 yyyy-mm-dd
+     * 首次公告日
      */
-    @Excel(name = "首次公告日 yyyy-mm-dd")
+    @Excel(name = "首次公告日")
     private Date firstAnnoDate;
     /**
      * IPO申报预披露日
@@ -179,7 +187,7 @@ public class CnCoachBack implements Serializable {
     /**
      * Wind行业
      */
-    @Excel(name = " Wind行业")
+    @Excel(name = "Wind行业")
     private String windIndustry;
 
 

@@ -5,6 +5,7 @@ import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.annotation.Excel.ColumnType;
 import com.deloitte.common.core.annotation.Excel.Type;
 import com.deloitte.common.core.annotation.Excels;
+import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.text.Convert;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.ReUtil;
@@ -155,7 +156,17 @@ public class ExcelUtil<T> {
      * @return 转换后集合
      */
     public List<T> importExcel(InputStream is) throws Exception {
-        return importExcel(is, 0);
+        return importExcel(is, 0, false);
+    }
+
+    /**
+     * 对excel表单默认第一个索引名转换成list
+     *
+     * @param is 输入流
+     * @return 转换后集合
+     */
+    public List<T> importExcel(InputStream is, boolean checkCol) throws Exception {
+        return importExcel(is, 0, checkCol);
     }
 
     /**
@@ -165,8 +176,8 @@ public class ExcelUtil<T> {
      * @param titleNum 标题占用行数
      * @return 转换后集合
      */
-    public List<T> importExcel(InputStream is, int titleNum) throws Exception {
-        return importExcel(StrUtil.EMPTY, is, titleNum);
+    public List<T> importExcel(InputStream is, int titleNum, boolean checkCol) throws Exception {
+        return importExcel(StrUtil.EMPTY, is, titleNum, checkCol);
     }
 
     /**
@@ -177,7 +188,7 @@ public class ExcelUtil<T> {
      * @param is        输入流
      * @return 转换后集合
      */
-    public List<T> importExcel(String sheetName, InputStream is, int titleNum) throws Exception {
+    public List<T> importExcel(String sheetName, InputStream is, int titleNum, boolean checkClo) throws Exception {
         this.type = Type.IMPORT;
         this.wb = WorkbookFactory.create(is);
         List<T> list = new ArrayList<T>();
@@ -212,6 +223,8 @@ public class ExcelUtil<T> {
                 Integer column = cellMap.get(attr.name());
                 if (column != null) {
                     fieldsMap.put(column, objects);
+                }else if (checkClo){
+                    throw new GlobalException("模板不对应,模板中缺少列:"+attr.name());
                 }
             }
             for (int i = titleNum + 1; i <= rows; i++) {

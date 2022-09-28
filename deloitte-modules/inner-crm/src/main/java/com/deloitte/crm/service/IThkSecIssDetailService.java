@@ -69,4 +69,11 @@ public interface IThkSecIssDetailService extends IService<ThkSecIssDetail>
      * @return
      */
     Object doTask(CrmWindTask windTask, List<ThkSecIssDetail> thkSecIssInfos);
+
+    /**
+     * 根据code查询表中最后一条记录
+     * @param code
+     * @return
+     */
+    ThkSecIssDetail findLastByCode(String code);
 }

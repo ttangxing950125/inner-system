@@ -13,4 +13,10 @@ import com.deloitte.crm.domain.CnIecSmpcCheckResult;
 @Mapper
 public interface CnIecSmpcCheckResultMapper extends BaseMapper<CnIecSmpcCheckResult> {
 
+    /**
+     * 根据公司名称查询 IPO-发审委上市委审核结果(CnIecSmpcCheckResult))执行导入任务 表的最后一条记录
+     * @param entityName
+     * @return
+     */
+    CnIecSmpcCheckResult findLastByEntityName(String entityName);
 }

@@ -11,9 +11,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -22,6 +24,7 @@ import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.ICrmDailyTaskService;
 import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.service.ICrmMasTaskService;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import org.springframework.util.Assert;
 
 /**
@@ -44,6 +50,9 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
     private final CrmMasTaskMapper crmMasTaskMapper;
 
     private final ICrmDailyTaskService iCrmDailyTaskService;
+
+//    @Resource
+    private ICrmDailyTaskService dailyTaskService;
 
     /**
      * 查询【请填写功能名称】
@@ -126,7 +135,12 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean createTasks(List<EntityInfo> entityInfos, String taskCategory, Date taskDate) {
+        if (CollUtil.isEmpty(entityInfos)){
+            return false;
+        }
+
         List<CrmMasTask> masTasks = entityInfos.stream().map(item -> {
             CrmMasTask masTask = new CrmMasTask();
             masTask.setSourceName(taskCategory);
@@ -137,6 +151,9 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
         //保存进库
         this.saveBatch(masTasks);
+
+        //修改当天任务状态
+        dailyTaskService.updateToUnhandled(taskDate, RoleInfo.ROLE2);
 
         return true;
     }

@@ -3,6 +3,8 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +23,7 @@ import lombok.Builder;
 @Builder
 public class StockCnInfo implements Serializable {
     private static final long serialVersionUID = -67604867285400904L;
-    @Excel(name = "${column.comment}")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 港股状态

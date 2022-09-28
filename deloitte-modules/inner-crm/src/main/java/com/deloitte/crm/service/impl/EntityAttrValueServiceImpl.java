@@ -120,40 +120,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateBondAttr(String bondCode, Object obj) {
-        //更新成功的条数
-        int updateCount = 0;
-
-        Map<String, Object> data = new HashMap<>();
-        try {
-            data = AttrValueUtils.parseObj(obj, Excel.class, "name");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new GlobalException(e.getMessage());
-        }
-
-
-        Set<String> keySet = data.keySet();
-        for (String key : keySet) {
-            Object value = data.get(key);
-            if (StrUtil.isBlankCast(value)){
-                continue;
-            }
-            EntityAttr attr = entityAttrService.findByNameType(key, 3);
-            if (attr==null){
-                continue;
-            }
-            Long id = attr.getId();
-
-            EntityAttrValue attrValue = new EntityAttrValue();
-            attrValue.setEntityCode(bondCode);
-            attrValue.setValue(value.toString());
-            attrValue.setAttrId(id);
-            int upCount = this.insertUpdateCondition(attrValue);
-            updateCount += upCount;
-        }
-
-
-        return updateCount;
+        return this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
     }
 
     /**
@@ -215,8 +182,20 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @return
      */
     @Override
-    public int updateStockThkAttr(String stockDqCode, ThkSecIssInfo secIssInfo) {
+    public int updateStockThkAttr(String stockDqCode, Object secIssInfo) {
         return this.updateAttrValue(stockDqCode, secIssInfo, 4, Excel.class, "name");
+    }
+
+    /**
+     * 更新entityAttrValue表中a股的相关信息
+     *
+     * @param code a股德勤code
+     * @param item a股相关表任意对象
+     * @return
+     */
+    @Override
+    public int updateStockCnAttr(String code, Object item) {
+        return this.updateAttrValue(code, item, 5, Excel.class, "name");
     }
 
     /**

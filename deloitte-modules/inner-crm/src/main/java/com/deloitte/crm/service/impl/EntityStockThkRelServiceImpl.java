@@ -1,6 +1,9 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityStockThkRelMapper;
@@ -11,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * (EntityStockThkRel)表服务实现类
@@ -64,7 +69,6 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
         }
 
         //是否绑定过关联关系
-        //是否绑定过关联关系
         for (EntityInfo info : entityInfos) {
             String entityCode = info.getEntityCode();
             String stockDqCode = stockThkInfo.getStockDqCode();
@@ -96,5 +100,32 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
     @Override
     public EntityStockThkRel findByEntityStockDeCode(String entityCode, String stockDqCode) {
         return baseMapper.findByEntityStockDeCode(entityCode, stockDqCode);
+    }
+
+    /**
+     * 查询港股所属主体，只查询关联关系启用状态的
+     * @param stockDqCode
+     * @return
+     */
+    @Override
+    public List<EntityInfo> findEntityByStockDqCode(String stockDqCode) {
+        ArrayList<EntityInfo> infos = new ArrayList<>();
+
+        //查询关联关系表
+        Wrapper<EntityStockThkRel> wrapper = Wrappers.<EntityStockThkRel>lambdaQuery()
+                .eq(EntityStockThkRel::getStockDqCode, stockDqCode)
+                .eq(EntityStockThkRel::getStatus, 1);
+
+        List<EntityStockThkRel> thkRels = this.list(wrapper);
+
+        if (CollUtil.isEmpty(thkRels)){
+            return infos;
+        }
+
+        //取出code
+        List<String> entityCodes = thkRels.stream().map(EntityStockThkRel::getEntityCode).collect(Collectors.toList());
+
+        //查询主体
+        return entityInfoService.findListByEntityCodes(entityCodes);
     }
 }

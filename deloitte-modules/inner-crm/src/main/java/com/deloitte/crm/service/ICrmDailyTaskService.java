@@ -1,6 +1,7 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
 
@@ -13,6 +14,14 @@ import java.util.List;
  * @date 2022/09/22 15:34
  */
 public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
+
+    /**
+     * 更新状态为 2-有任务未全部处理完
+     * @param timeNow
+     * @param roleInfo
+     * @return
+     */
+    boolean updateToUnhandled(Date timeNow, RoleInfo roleInfo);
 
 
     /**

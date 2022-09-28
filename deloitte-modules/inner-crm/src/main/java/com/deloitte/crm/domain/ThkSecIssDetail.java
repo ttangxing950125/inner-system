@@ -6,12 +6,16 @@ import com.alibaba.fastjson.JSON;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 证券发行-股票发行-首次发行明细对象 thk_sec_iss_detail
@@ -19,6 +23,9 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
+@Getter
+@Setter
+@ToString
 public class ThkSecIssDetail implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -26,6 +33,15 @@ public class ThkSecIssDetail implements Serializable
     /** 主键 */
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    private Integer taskId;
+
+    private Date importTime;
+
+    private Integer changeType;
+
+    @Excel(name = "代码")
+    private String code;
 
     /** 名称 */
     @Excel(name = "名称")
@@ -121,225 +137,39 @@ public class ThkSecIssDetail implements Serializable
     @Excel(name = "公司介绍")
     private String entityDes;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setName(String name) 
-    {
-        this.name = name;
-    }
-
-    public String getName() 
-    {
-        return name;
-    }
-    public void setIpoDate(Date ipoDate) 
-    {
-        this.ipoDate = ipoDate;
-    }
-
-    public Date getIpoDate() 
-    {
-        return ipoDate;
-    }
-    public void setIpoBoard(String ipoBoard) 
-    {
-        this.ipoBoard = ipoBoard;
-    }
-
-    public String getIpoBoard() 
-    {
-        return ipoBoard;
-    }
-    public void setIssType(String issType) 
-    {
-        this.issType = issType;
-    }
-
-    public String getIssType() 
-    {
-        return issType;
-    }
-    public void setIssPrice(BigDecimal issPrice) 
-    {
-        this.issPrice = issPrice;
-    }
-
-    public BigDecimal getIssPrice() 
-    {
-        return issPrice;
-    }
-    public void setIssCountReal(BigDecimal issCountReal) 
-    {
-        this.issCountReal = issCountReal;
-    }
-
-    public BigDecimal getIssCountReal() 
-    {
-        return issCountReal;
-    }
-    public void setIssCountPlan(BigDecimal issCountPlan) 
-    {
-        this.issCountPlan = issCountPlan;
-    }
-
-    public BigDecimal getIssCountPlan() 
-    {
-        return issCountPlan;
-    }
-    public void setIssPlacingExceed(BigDecimal issPlacingExceed) 
-    {
-        this.issPlacingExceed = issPlacingExceed;
-    }
-
-    public BigDecimal getIssPlacingExceed() 
-    {
-        return issPlacingExceed;
-    }
-    public void setIssFundCount(BigDecimal issFundCount) 
-    {
-        this.issFundCount = issFundCount;
-    }
-
-    public BigDecimal getIssFundCount() 
-    {
-        return issFundCount;
-    }
-    public void setIssFundNet(BigDecimal issFundNet) 
-    {
-        this.issFundNet = issFundNet;
-    }
-
-    public BigDecimal getIssFundNet() 
-    {
-        return issFundNet;
-    }
-    public void setIssFundExceed(BigDecimal issFundExceed) 
-    {
-        this.issFundExceed = issFundExceed;
-    }
-
-    public BigDecimal getIssFundExceed() 
-    {
-        return issFundExceed;
-    }
-    public void setMainUnw(String mainUnw) 
-    {
-        this.mainUnw = mainUnw;
-    }
-
-    public String getMainUnw() 
-    {
-        return mainUnw;
-    }
-    public void setSponsor(String sponsor) 
-    {
-        this.sponsor = sponsor;
-    }
-
-    public String getSponsor() 
-    {
-        return sponsor;
-    }
-    public void setFirstDenom(BigDecimal firstDenom) 
-    {
-        this.firstDenom = firstDenom;
-    }
-
-    public BigDecimal getFirstDenom() 
-    {
-        return firstDenom;
-    }
-    public void setFirstCurrency(String firstCurrency) 
-    {
-        this.firstCurrency = firstCurrency;
-    }
-
-    public String getFirstCurrency() 
-    {
-        return firstCurrency;
-    }
-    public void setFirstUnit(String firstUnit) 
-    {
-        this.firstUnit = firstUnit;
-    }
-
-    public String getFirstUnit() 
-    {
-        return firstUnit;
-    }
-    public void setProspDate(Date prospDate) 
-    {
-        this.prospDate = prospDate;
-    }
-
-    public Date getProspDate() 
-    {
-        return prospDate;
-    }
-    public void setProspPriceMax(BigDecimal prospPriceMax) 
-    {
-        this.prospPriceMax = prospPriceMax;
-    }
-
-    public BigDecimal getProspPriceMax() 
-    {
-        return prospPriceMax;
-    }
-    public void setProspPriceMin(BigDecimal prospPriceMin) 
-    {
-        this.prospPriceMin = prospPriceMin;
-    }
-
-    public BigDecimal getProspPriceMin() 
-    {
-        return prospPriceMin;
-    }
-    public void setBelWind(String belWind) 
-    {
-        this.belWind = belWind;
-    }
-
-    public String getBelWind() 
-    {
-        return belWind;
-    }
-    public void setBelModle(String belModle) 
-    {
-        this.belModle = belModle;
-    }
-
-    public String getBelModle() 
-    {
-        return belModle;
-    }
-    public void setStockBelong(String stockBelong) 
-    {
-        this.stockBelong = stockBelong;
-    }
-
-    public String getStockBelong() 
-    {
-        return stockBelong;
-    }
-    public void setEntityDes(String entityDes) 
-    {
-        this.entityDes = entityDes;
-    }
-
-    public String getEntityDes() 
-    {
-        return entityDes;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ThkSecIssDetail that = (ThkSecIssDetail) o;
+        return Objects.equals(code, that.code) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(ipoDate, that.ipoDate) &&
+                Objects.equals(ipoBoard, that.ipoBoard) &&
+                Objects.equals(issType, that.issType) &&
+                Objects.equals(issPrice, that.issPrice) &&
+                Objects.equals(issCountReal, that.issCountReal) &&
+                Objects.equals(issCountPlan, that.issCountPlan) &&
+                Objects.equals(issPlacingExceed, that.issPlacingExceed) &&
+                Objects.equals(issFundCount, that.issFundCount) &&
+                Objects.equals(issFundNet, that.issFundNet) &&
+                Objects.equals(issFundExceed, that.issFundExceed) &&
+                Objects.equals(mainUnw, that.mainUnw) &&
+                Objects.equals(sponsor, that.sponsor) &&
+                Objects.equals(firstDenom, that.firstDenom) &&
+                Objects.equals(firstCurrency, that.firstCurrency) &&
+                Objects.equals(firstUnit, that.firstUnit) &&
+                Objects.equals(prospDate, that.prospDate) &&
+                Objects.equals(prospPriceMax, that.prospPriceMax) &&
+                Objects.equals(prospPriceMin, that.prospPriceMin) &&
+                Objects.equals(belWind, that.belWind) &&
+                Objects.equals(belModle, that.belModle) &&
+                Objects.equals(stockBelong, that.stockBelong) &&
+                Objects.equals(entityDes, that.entityDes);
     }
 
     @Override
-    public String toString() {
-        return this.getClass().getName() + JSON.toJSONString(this);
+    public int hashCode() {
+        return Objects.hash(code, name, ipoDate, ipoBoard, issType, issPrice, issCountReal, issCountPlan, issPlacingExceed, issFundCount, issFundNet, issFundExceed, mainUnw, sponsor, firstDenom, firstCurrency, firstUnit, prospDate, prospPriceMax, prospPriceMin, belWind, belModle, stockBelong, entityDes);
     }
 }

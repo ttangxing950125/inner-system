@@ -5,8 +5,11 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
@@ -474,6 +477,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //TODO  添加主体其余详细信息
 
         return R.ok(entityInfos.get(0));
+    }
+
+    /**
+     * 根据多个主体code查询
+     *
+     * @param entityCodes
+     * @return
+     */
+    @Override
+    public List<EntityInfo> findListByEntityCodes(List<String> entityCodes) {
+        Wrapper<EntityInfo> wrapper = Wrappers.<EntityInfo>lambdaQuery()
+                .in(EntityInfo::getEntityCode, entityCodes);
+
+        return this.list(wrapper);
     }
 
     @Override

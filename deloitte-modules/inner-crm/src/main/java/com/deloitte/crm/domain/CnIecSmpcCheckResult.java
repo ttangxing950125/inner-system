@@ -2,13 +2,17 @@ package com.deloitte.crm.domain;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import cn.hutool.core.date.DateTime;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Builder;
+import nonapi.io.github.classgraph.json.Id;
 
 /**
  * IPO-发审委上市委审核结果(CnIecSmpcCheckResult)表实体类
@@ -22,7 +26,8 @@ import lombok.Builder;
 @Builder
 public class CnIecSmpcCheckResult implements Serializable {
     private static final long serialVersionUID = 187504378729991655L;
-    @Excel(name = "${column.comment}")
+    
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 临时代码
@@ -75,9 +80,9 @@ public class CnIecSmpcCheckResult implements Serializable {
     @Excel(name = "会议届次")
     private Integer meetingSession;
     /**
-     * 会议日期 yyyy-MM-dd
+     * 会议日期
      */
-    @Excel(name = "会议日期 yyyy-MM-dd")
+    @Excel(name = "会议日期")
     private Date meetingDate;
     /**
      * 审核委员
@@ -138,20 +143,49 @@ public class CnIecSmpcCheckResult implements Serializable {
     /**
      * wind_task 的id
      */
-    @Excel(name = "wind_task 的id")
-    private Integer  taskId ;
+    private Integer taskId;
 
     /**
-     * 导入日期 yyyy-mm-dd
+     * 导入日期
      */
-    @Excel(name = "导入日期 yyyy-mm-dd")
     private DateTime importTime;
 
     /**
      * 数据变化类型 1-新增 2-更新
      */
-    @Excel(name = "数据变化类型 1-新增 2-更新")
     private Integer  changeType;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CnIecSmpcCheckResult that = (CnIecSmpcCheckResult) o;
+        return Objects.equals(tempCode, that.tempCode) &&
+                Objects.equals(entityName, that.entityName) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(ipoBoard, that.ipoBoard) &&
+                Objects.equals(checkResult, that.checkResult) &&
+                Objects.equals(estIssNum, that.estIssNum) &&
+                Objects.equals(estIssTotalEquity, that.estIssTotalEquity) &&
+                Objects.equals(estFundNum, that.estFundNum) &&
+                Objects.equals(meetingYear, that.meetingYear) &&
+                Objects.equals(meetingSession, that.meetingSession) &&
+                Objects.equals(meetingDate, that.meetingDate) &&
+                Objects.equals(reviewers, that.reviewers) &&
+                Objects.equals(iecQuestion, that.iecQuestion) &&
+                Objects.equals(sponsor, that.sponsor) &&
+                Objects.equals(accountingFirm, that.accountingFirm) &&
+                Objects.equals(lawFirm, that.lawFirm) &&
+                Objects.equals(province, that.province) &&
+                Objects.equals(regCapital, that.regCapital) &&
+                Objects.equals(prodBusiness, that.prodBusiness) &&
+                Objects.equals(exchange, that.exchange) &&
+                Objects.equals(csrcIndustry, that.csrcIndustry) &&
+                Objects.equals(refuseReason, that.refuseReason);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(tempCode, entityName, type, ipoBoard, checkResult, estIssNum, estIssTotalEquity, estFundNum, meetingYear, meetingSession, meetingDate, reviewers, iecQuestion, sponsor, accountingFirm, lawFirm, province, regCapital, prodBusiness, exchange, csrcIndustry, refuseReason);
+    }
 }

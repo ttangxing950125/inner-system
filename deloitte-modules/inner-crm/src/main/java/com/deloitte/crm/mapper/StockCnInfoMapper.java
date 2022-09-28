@@ -13,4 +13,10 @@ import com.deloitte.crm.domain.StockCnInfo;
 @Mapper
 public interface StockCnInfoMapper extends BaseMapper<StockCnInfo> {
 
+    /**
+     * 查询大陆股票信息
+     * @param code
+     * @return
+     */
+    StockCnInfo findByCode(String code);
 }

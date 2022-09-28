@@ -22,6 +22,7 @@ import com.deloitte.crm.vo.WindTaskDetailsVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.dto.CrmWindTaskDto;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -84,20 +85,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         taskContext.setWindTask(windTask);
 
         return windTaskStrategyManage.doTask(taskContext);
-        //改任务未完成，读取文件
-        //暂时不做枚举和策略模式了。。。先跑起来
-        /*if (Objects.equals(windTask.getTaskDictId(), 15L)){
-            //读取文件
-            ExcelUtil<BondNewIss> util = new ExcelUtil<BondNewIss>(BondNewIss.class);
-            List<BondNewIss> isses = util.importExcel(file.getInputStream());
-            return bondNewIssService.doTask(windTask, isses);
-        }else {
-            throw new GlobalException("暂不支持:"+windTask.getTaskFileName());
-        }*/
-
-
-
-//        return true;
     }
 
     /**

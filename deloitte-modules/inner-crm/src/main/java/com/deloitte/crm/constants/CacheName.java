@@ -12,4 +12,6 @@ public class CacheName {
 
     public static final String STOCK_THK_INFO = "stock_thk_info";
 
+    public static final String STOCK_CN_INFO = "stock_cn_info";
+
 }
