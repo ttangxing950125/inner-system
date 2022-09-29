@@ -164,4 +164,14 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         });
         return R.ok(taskList);
     }
+
+    @Override
+    public Integer completeRoleSupplyTask(Long id) {
+        String username = SecurityUtils.getUsername();
+        CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
+        crmSupplyTask.setId(id);
+        crmSupplyTask.setState(1);
+        crmSupplyTask.setHandleUser(username);
+        return crmSupplyTaskMapper.updateById(crmSupplyTask);
+    }
 }
