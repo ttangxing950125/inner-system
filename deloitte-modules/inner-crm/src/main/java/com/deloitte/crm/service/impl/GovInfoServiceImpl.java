@@ -43,7 +43,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.System.out;
@@ -559,22 +558,39 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
 //        地级政府为“GV+官方行政代码”
         List<GovInfo> govInfosList = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_PRIVINCE_CODE);
+        QueryWrapper<GovInfo> query = new QueryWrapper<>();
+//        省级
+        List<GovInfo> provinceInfos = govInfoMapper.selectList(query.lambda().eq(GovInfo::getGovLevelBig, 1));
+        query.clear();
+        Integer province = provinceInfos.size();
+//        市
+        List<String> dqCodeList = new ArrayList<>();
+        Integer city = 0;
+        if (!CollectionUtils.isEmpty(provinceInfos)) {
+            provinceInfos.stream().forEach(o -> {
+                dqCodeList.add(o.getDqGovCode());
+            });
+            List<GovInfo> cityList = govInfoMapper.selectList(query.lambda().in(GovInfo::getPreGovCode, dqCodeList));
+            city = cityList.size();
+        }
+//        区
+        Integer area = govInfosList.size() - province - city;
 //        县级政府为“GV+官方行政代码”
-        AtomicReference<Integer> province = new AtomicReference<>(0);
-        AtomicReference<Integer> city = new AtomicReference<>(0);
-        AtomicReference<Integer> area = new AtomicReference<>(0);
-        govInfosList.stream().forEach(o -> {
-            String govName = o.getGovName();
-            if (!ObjectUtils.isEmpty(govName)) {
-                if (govName.contains(Common.DOV_INFO_TYPE_PRIVINCE_NAME)) {
-                    province.getAndSet(province.get() + 1);
-                } else if (govName.contains(Common.DOV_INFO_TYPE_CITY_NAME)) {
-                    city.getAndSet(city.get() + 1);
-                } else {
-                    area.getAndSet(area.get() + 1);
-                }
-            }
-        });
+//        AtomicReference<Integer> province = new AtomicReference<>(0);
+//        AtomicReference<Integer> city = new AtomicReference<>(0);
+//        AtomicReference<Integer> area = new AtomicReference<>(0);
+//        govInfosList.stream().forEach(o -> {
+//            String govName = o.getGovName();
+//            if (!ObjectUtils.isEmpty(govName)) {
+//                if (govName.contains(Common.DOV_INFO_TYPE_PRIVINCE_NAME)) {
+//                    province.getAndSet(province.get() + 1);
+//                } else if (govName.contains(Common.DOV_INFO_TYPE_CITY_NAME)) {
+//                    city.getAndSet(city.get() + 1);
+//                } else {
+//                    area.getAndSet(area.get() + 1);
+//                }
+//            }
+//        });
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
         result.put("JK", JK);
@@ -589,13 +605,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public List<GovInfo> getGovLevel(String preGovCode) {
-        List<GovInfo> govInfos=new ArrayList<>();
+        List<GovInfo> govInfos = new ArrayList<>();
 
         QueryWrapper<GovInfo> govQuery = new QueryWrapper();
 
-        if (ObjectUtils.isEmpty(preGovCode)){
+        if (ObjectUtils.isEmpty(preGovCode)) {
             govInfos = govInfoMapper.selectList(govQuery.lambda().eq(GovInfo::getGovLevelBig, 1));
-        }else {
+        } else {
             govInfos = govInfoMapper.selectList(govQuery.lambda().eq(GovInfo::getPreGovCode, preGovCode));
         }
 
