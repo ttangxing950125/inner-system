@@ -86,16 +86,11 @@ export default {
       window.open(href, "_blank");
     },
     add() {
-      console.log(1);
       this.$router.psuh({ path: "subjectManagement/enterprise" });
     },
-    select() {
-      console.log(1);
-    },
+    select() {},
     changeTab(tab) {
       this.tab = tab;
-      console.log(this.tab);
-      console.log(tab === 1 ? "g-select" : "");
     },
   },
 };

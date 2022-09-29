@@ -14,11 +14,11 @@
       </el-date-picker>
     </div>
     <div class="table-box">
-      <table border="1" id="table"></table>
+      <table border="1" id="table" @click="getDay"></table>
     </div>
     <h3 class="g-title">每日运维任务</h3>
     <div class="list-box">
-      <el-table
+      <!-- <el-table
         v-loading="loading"
         class="table-content"
         :data="list"
@@ -29,7 +29,7 @@
         <el-table-column prop="taskDesc" label="任务说明"> </el-table-column>
         <el-table-column prop="name" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.notComplete > 0 ? 'red' : 'green'">{{ scope.row.notComplete > 0 ? '待完成( '+scope.row.notComplete+'/'+scope.row.taskCount+ ')' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ')' }}</span>
+            <span :class="scope.row.notComplete > 0 ? 'red' : 'green'">{{ scope.row.notComplete > 0 ? '待完成( '+scope.row.notComplete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
           </template>
         </el-table-column>
         </el-table-column>
@@ -37,6 +37,37 @@
           <template slot-scope="scope">
             <el-button @click="work(scope.row)" type="text" size="small"
               >开始工作</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table> -->
+      <el-table
+        v-loading="loading"
+        class="table-content"
+        :data="list"
+        align="center"
+        style="width: 98%; margin-top: 15px"
+      >
+        <el-table-column type="index" sortable label="序号"> </el-table-column>
+        <el-table-column prop="taskCategory" label="捕获渠道"> </el-table-column>
+        <el-table-column prop="dataShow" label="任务说明"> 
+        </el-table-column>
+        <el-table-column prop="state" label="任务状态"> 
+          <template slot-scope="scope">
+            <span :class="scope.row.state === 0 ? 'red' : 'green'">{{ stateArr[scope.row.state] }}</span>
+          </template>
+        </el-table-column>
+        </el-table-column>
+        <el-table-column prop="province" label="任务操作">
+          <template slot-scope="scope">
+            <el-button @click="addBody(scope.row)" type="text" size="small"
+              >添加</el-button
+            >
+            <el-button @click="changeAddState(scope.row.id, 1)" type="text" size="small"
+              >忽略</el-button
+            >
+            <el-button @click="work(scope.row)" type="text" size="small"
+              >查看详情</el-button
             >
           </template>
         </el-table-column>
@@ -601,7 +632,7 @@
       </span>
     </el-dialog>
     <el-dialog
-      title="补充财报收数等其他相关信息"
+      title="IB"
       :visible.sync="ibDig"
       width="50%"
     >
@@ -609,7 +640,7 @@
         :model="ruleForm"
         :rules="rules"
         ref="ruleForm"
-        label-width="135px"
+        label-width="200px"
         label-position="left"
       >
         <el-form-item label="企业名称" prop="region">
@@ -739,15 +770,118 @@
         <el-button type="primary" @click="ibDig = false">确认新增</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="新增主体"
+      :visible.sync="bodyDig"
+      width="50%"
+    >
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="200px"
+        label-position="left"
+      >
+        <el-form-item label="导入日期">
+          <span>{{ ruleForm.created }}</span>
+        </el-form-item>
+        <el-form-item label="债券简称">
+          <span>{{ ruleForm.bondShortName }}</span>
+        </el-form-item>
+        <el-form-item label="债券全称">
+          <span>{{ ruleForm.bondFullName }}</span>
+        </el-form-item>
+        <el-form-item label="其他信息">
+          <el-button
+            style="margin-left: 5px"
+            type="text"
+            >查看详情</el-button
+          >
+        </el-form-item>
+        <el-divider></el-divider>
+        <el-form-item label="新增主体统一社会信用代码" prop="creditCode">
+          <el-input
+            class="t-input"
+            v-model="ruleForm.creditCode"
+            @change="changeInput"
+            ></el-input>
+            <el-button
+            v-if="!creditCodePass"
+            style="margin-left: 5px"
+            type="text"
+            @click="check(ruleForm.creditCode)"
+            >{{ "查重" }}</el-button>
+            <span v-if="creditCodePass === 2" style="color:greenyellow">无重复，可新增</span>
+            <span v-if="creditCodePass === 1" style="color:red">存在重复 无法新增</span>
+        </el-form-item>
+        <div class="notUse">
+          <el-checkbox class="mr60" v-model="ruleForm.notUse">不适用</el-checkbox>
+          <span class="mr10" >不适用原因</span>
+          <el-select v-model="ruleForm.notUseReason" placeholder="请选择">
+            <el-option
+              v-for="item in notUseoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <el-form-item label="新增主体名称" prop="entityNewName">
+          <el-input
+            class="t-input"
+            v-model="ruleForm.entityNewName"
+            @change="entityNamePass = false"
+          ></el-input>
+          <el-button
+            v-if="!entityNamePass"
+            style="margin-left: 5px"
+            type="text"
+            @click="check(ruleForm.entityNewName)"
+            >{{ "查重" }}</el-button>
+            <span v-if="entityNamePass === 2" style="color:greenyellow; margin-left: 5px">无重复，可新增</span>
+            <span v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</span>
+        </el-form-item>
+      </el-form>
+      <el-button class="ml40" type="success" plain :disabled="disabled" @click="submitAdd">确认新增</el-button>
+    </el-dialog>
+    <el-dialog
+      class="replace-title"
+      title="库内已存重复主体"
+      :visible.sync="replaceDig"
+      width="40%">
+      <div class="dig-width">
+        <el-col :sm="24" :lg="12" class="form-card">
+          <div class="flex1 mt10">
+            <div class="first">统一社会信用代码</div>
+            <div class="content">{{ replaceData.creditCode }}</div>
+          </div>
+          <div class="flex1 mt10">
+            <div class="first">企业名称</div>
+            <div class="content">{{ replaceData.entityName }}</div>
+          </div>
+          <div class="flex1 mt10">
+            <div class="first">企业曾用名</div>
+            <div class="content">{{ replaceData.entityNameHis }}</div>
+          </div>
+          <div class="flex1 mt10">
+            <div class="first">德勤内部主体代码</div>
+            <div class="content">{{ replaceData.entityCode }}</div>
+          </div>
+        </el-col>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getTaskByDate, queryList } from "@/api/task";
+import { getTaskByDate, queryList, getDayTaskInfo, getMouthTaskInfo, checkCreditCode, editEntityNameHis, changeState } from "@/api/task";
 export default {
   name: "Index",
   data() {
     return {
+      bodyDig: false,
+      replaceDig: false,
+      role2NowTime: '',
       list: [],
       fsDig: false,
       ibDig: false,
@@ -804,6 +938,12 @@ export default {
         resource: [
           { required: true, message: "请选择活动资源", trigger: "change" },
         ],
+        creditCode: [
+          { required: true, message: "请输入统一社会信用代码", trigger: "blur" },
+        ],
+        entityNewName: [
+          { required: true, message: "请输入新建主体名称", trigger: "blur" },
+        ],
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
       },
       edit2: false,
@@ -811,6 +951,11 @@ export default {
       addGovernmentDig: false,
       remarkDig: false,
       governmentDig: false,
+      stateArr: {
+        0: '未处理',
+        1: '已有主体',
+        2: '新增主体',
+      },
       options: [
         {
           value: "选项1",
@@ -833,7 +978,14 @@ export default {
           label: "北京烤鸭",
         },
       ],
-      month: ''
+      month: '',
+      monthMm: '',
+      notUseoptions: [],
+      replaceData: {},
+      entityNewNameCheck: false,
+      entityNamePass: false,
+      creditCodePass: false,
+      addBodyId: ''
     };
   },
   mounted() {
@@ -841,10 +993,31 @@ export default {
     this.getDaysInfo();
     this.init();
   },
+  computed: {
+    disabled () {
+      return this.creditCodePass !== 2 && this.entityNamePass !== 2
+    }
+  },
   methods: {
     init() {
       try {
         this.loading = true;
+        const role2date = {
+          date:this.nowTime
+        }
+        const role2MonthDate = {
+          date:this.monthDate
+        }
+        // 角色7相关接口
+        getMouthTaskInfo(role2MonthDate).then((res) => {
+          const { data } = res
+          this.showMsg(data)
+        });
+        getDayTaskInfo(role2date).then(res => {
+          const { data } = res
+          this.list = data
+        })
+        // 角色1相关接口
         const params = {
           taskDate: this.nowTime,
         };
@@ -856,7 +1029,8 @@ export default {
           this.list = data
         });
         queryList(paramsMonth).then((res)=> {
-          console.log(res)
+          const { data } = res
+          this.showMsg(data)
         })
       } catch (error) {
         console.log(error);
@@ -906,10 +1080,11 @@ export default {
       // eslint-disable-next-line no-unused-vars
       this.currentTime = yy + "年" + mm + "月" + dd + "日";
       this.monthDate = yy + "-" + mm;
-      this.month = mm
+      this.monthMm = mm
       this.year = yy
       this.currentDay = dd;
       this.nowTime = yy + "-" + mm + "-" + dd;
+      this.role2NowTime = yy + "/" + mm + "/" + dd;
       let myDate = new Date();
       let wk = myDate.getDay();
       let weeks = [
@@ -957,8 +1132,8 @@ export default {
         date_str = "",
         isRed = "",
         hasMsg = "";
-      for (var i = 0; i < _this.tr_str; i++) {
-        str += "<tr>";
+        for (var i = 0; i < _this.tr_str; i++) {
+          str += "<tr>";
         for (var k = 0; k < 7; k++) {
           idx = i * 7 + k;
           isRed = k === 0 || k === 6 ? "isRed" : "";
@@ -1023,13 +1198,13 @@ export default {
       table.innerHTML = str;
     },
     //两个参数代表的含义分别是this对象以及判断当前的操作是不是在进行月份的修改
-    sureDate(_this, other, year, month) {
+    sureDate(_this, other, year, month, now) {
       this.newDate = new Date();
       this.ynow = year || this.newDate.getFullYear();
       if (!other) {
         this.mnow = month || this.newDate.getMonth(); //月份
       }
-      this.dnow = this.newDate.getDate(); //今日日期
+      this.dnow = now || this.newDate.getDate(); //今日日期
       this.firstDay = new Date(this.ynow, this.mnow, 1);
       this.firstnow = this.firstDay.getDay();
       this.m_days = [
@@ -1050,7 +1225,7 @@ export default {
       this.showMsg();
     },
     //通过接口返回的是我们当前的月份对应在日历中需要处理的事项
-    showMsg() {
+    showMsg(flagData) {
       var jsonHtml = [
         {
           date: 2,
@@ -1081,14 +1256,113 @@ export default {
           msg: "找豆豆",
         },
       ];
-      this.drawTable(jsonHtml);
+      this.drawTable(jsonHtml || flagData);
     },
     addGovernment() {
       this.addGovernmentDig = true;
     },
     work(row) {
       this.$router.push({ path: 'work', query: { taskCateId: 2, taskDate: this.nowTime } });
+    },
+    getDay(row) {
+      if (!row.path[0].innerText) {
+        return
+      }
+      const clickDay = row.path[0].innerText > 10 ? row.path[0].innerText : '0'+row.path[0].innerText
+      const tbodyObj = row.path[3].localName === 'tbody' ? row.path[3].children : row.path[4].children
+      const tbodyArr = Array.from(tbodyObj)
+      tbodyArr.forEach(e => {
+        const tr = Array.from(e.children)
+        tr.forEach(i => {
+          i.className = ''
+        })
+      });
+      row.path[1].localName === 'td' ? row.path[1].className = 'thisDay' : row.path[2].className = 'thisDay'
+      try {
+        this.$modal.loading("loading...");
+        const parmas = {
+          taskDate: this.monthDate+ '-' +clickDay,
+        };
+        getDayTaskInfo({date: this.monthDate+ '-' +clickDay}).then((res) => {
+          const { data } = res
+          this.list = data
+          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+        });
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    // 角色7 流程开始 
+    addBody(row) {
+      this.bodyDig = true
+      this.addBodyId = row.id
+      this.ruleForm.created = (row.created).substr(0, 10)
+      this.ruleForm.bondFullName = row.bondFullName
+      this.ruleForm.bondShortName = row.bondShortName
+    },
+    check(row) {
+      this.$modal.loading("loading...");
+      try {
+        checkCreditCode({creditCode: row}).then(res => {
+          const { data } = res
+          if (data.bo === false) {
+            this.replaceDig = true
+            this.replaceData = data.entityInfo
+            this.creditCodePass = 1 // 信用代码查重没过
+            this.entityNamePass = 1 // 新增主体名称查重没过
+          } else {
+            this.creditCodePass = 2 // 信用代码查重通过
+            this.entityNamePass = 2 // 新增主体名称查重通过
+          }
+        })
+      } catch (error) {
+        console.log(error)
+      } finally{
+        this.$modal.closeLoading();
+      }
+    },
+    changeInput() {
+      this.creditCodePass = false
+      this.entityNamePass = false
+    },
+    submitAdd() {
+      this.$modal.loading("loading...");
+      try {
+        editEntityNameHis(this.ruleForm).then(res => {
+          console.log(res)
+          changeAddState(2)
+        })
+      } catch (error) {
+        console.log(error)
+      } finally{
+        this.$modal.closeLoading();
+      }
+    },
+    // 角色7修改状态 1忽略 2新增
+    changeAddState(id, state) {
+      try {
+        this.$modal.loading("loading...");
+        const params = {
+          id: id || this.addBodyId,
+          state: state,
+        }
+        changeState(params).then(res => {
+          const { data } = res
+          this.$message({
+            message: data,
+            type: 'success'
+          });
+          this.init()
+        })
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$modal.closeLoading();
+      }
     }
+    // 角色7流程结束
   },
 };
 </script>
@@ -1101,7 +1375,7 @@ export default {
 }
 
 .t-input {
-  width: 220px;
+  width: 310px;
 }
 .g-title {
   padding-left: 20px;
@@ -1120,14 +1394,19 @@ export default {
   padding-left: 15px;
 }
 ::v-deep {
+  td {
+    div {
+      cursor: pointer;
+    }
+  }
   .content-day {
-    width: 80px;
+    width: 85px;
     height: 50px;
     text-align: center;
     line-height: 52px;
   }
   .isRedcontent-day {
-    width: 80px;
+    width: 85px;
     height: 50px;
     text-align: center;
     line-height: 52px;
@@ -1177,5 +1456,43 @@ export default {
 }
 .red {
    color: red
+}
+.notUse {
+  margin-left:82px;
+  margin-bottom: 20px;
+  .mr60 {
+    margin-right: 60px;
+  }
+}
+.dig-width {
+  height: 160px;
+}
+.form-card {
+  padding-left: 20px;
+  margin-bottom: 30px;
+  /* margin: 0 auto; */
+  margin-top: 1%;
+  width: 100%;
+}
+.edit-btn {
+  margin-top: -3px;
+  margin-left: 5px;
+}
+.flex1 {
+  .first {
+    width: 200px;
+  }
+  .content {
+    color: #a7a7a7;
+    margin-top: 3px;
+  }
+}
+.replace-title {
+  ::v-deep .el-dialog__title{
+    color: red
+  }
+}
+.ml40 {
+  margin-left: 42%
 }
 </style>

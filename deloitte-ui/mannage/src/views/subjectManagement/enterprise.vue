@@ -303,6 +303,7 @@ export default {
     display: flex;
     padding: 20px 20px;
     width: 40%;
+    height: 150px;
   }
   .right-number {
     position: relative;

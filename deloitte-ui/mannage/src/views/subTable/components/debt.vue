@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container home">
+  <div class="home">
     <div class="mt20">
       <div class="flex1 between">
         <h3 class="g-t-title">债券交易信息表</h3>
@@ -34,12 +34,13 @@
       </div>
       <el-table class="table-content" :data="list" style="margin-top: 15px">
         <el-table-column type="index" sortable label="序号"> </el-table-column>
-        <el-table-column prop="date" label="德勤主体代码" sortable>
+        <el-table-column prop="entityCode" label="德勤主体代码" sortable>
         </el-table-column>
-        <el-table-column prop="name" label="企业名称"> </el-table-column>
-        <el-table-column prop="province" label="统一社会信用代码">
+        <el-table-column prop="entityName" label="企业名称"> </el-table-column>
+        <el-table-column prop="creditCode" label="统一社会信用代码">
         </el-table-column>
-        <el-table-column prop="city" label="债券交易代码"> </el-table-column>
+        <el-table-column prop="bondCode" label="债券交易代码">
+        </el-table-column>
         <el-table-column prop="zip" label="操作">
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row)" type="text" size="small"
@@ -68,7 +69,7 @@
         <el-table-column prop="address" label="是否违约"> </el-table-column>
         <el-table-column prop="zip" label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
+            <el-button @click="setTarget(scope.row)" type="text" size="small"
               >设为目标</el-button
             >
           </template></el-table-column
@@ -204,6 +205,7 @@
 </template>
 
 <script>
+import { findBondOrEntity, findRelationEntityOrBond } from "@/api/bond";
 export default {
   name: "government",
   data() {
@@ -292,21 +294,64 @@ export default {
         ],
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
       },
-      tab: "",
+      tab: 1,
     };
   },
+  created() {},
   methods: {
+    getBondOrEntity() {
+      this.$modal.loading("loading...");
+      try {
+        const parmas = {
+          keyword: this.tab === 1 ? "ENTITY" : "BOND",
+          name: this.input,
+        };
+        findBondOrEntity(parmas).then((res) => {
+          const { data } = res;
+          this.list = [];
+          data.forEach((e) => {
+            this.list.push(e.entityVo);
+          });
+          console.log(this.list);
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
     goTarget(href) {
       window.open(href, "_blank");
     },
     select() {
-      console.log(1);
+      this.getBondOrEntity();
     },
     addNew() {
       this.dialogVisible = true;
     },
     changeTab(tab) {
       this.tab = tab;
+    },
+    setTarget(row) {
+      this.$modal.loading("loading...");
+      try {
+        const parmas = {
+          keyword: this.tab === 1 ? "BOND_CODE" : "ENTITY_CODE ",
+          code: this.input,
+        };
+        findRelationEntityOrBond(parmas).then((res) => {
+          const { data } = res;
+          this.list = [];
+          data.forEach((e) => {
+            this.list.push(e.entityVo);
+          });
+          console.log(this.list);
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
   },
 };

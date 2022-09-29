@@ -40,6 +40,18 @@ export function findTaskDetails(taskDate) {
   });
 }
 
+// 查询指定日期或当月任务情况,返回 List
+export function getTaskInfo(taskDate) {
+  return request({
+    url: "/crm//roleTwo/getTaskInfo",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: taskDate,
+  });
+}
+
 // 进行wind任务
 export function doTask(params) {
   return request({
@@ -49,6 +61,76 @@ export function doTask(params) {
     },
     method: "post",
     data: { params },
+  });
+}
+
+// 查询当日任务
+export function getDayTaskInfo(date) {
+  return request({
+    url: "/crm/roleSeven/getDayTaskInfo?date=" + date.date,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: date,
+  });
+}
+
+// 查询当月任务
+export function getMouthTaskInfo(date) {
+  return request({
+    url: "/crm/roleSeven/getMouthTaskInfo?date=" + date.date,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: date,
+  });
+}
+
+// 校验统一社会信用代码是否存在
+export function checkCreditCode(date) {
+  return request({
+    url: "/crm/roleSeven/checkCreditCode?creditCode=" + date.creditCode,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: date,
+  });
+}
+
+// 修改主体信息中的主体名称
+export function editEntityNameHis(params) {
+  return request({
+    url:
+      "/crm/roleSeven/editEntityNameHis?creditCode=" +
+      params.creditCode +
+      "&entityNewName=" +
+      params.entityNewName,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 确认该任务的主体是新增或是忽略
+export function changeState(params) {
+  return request({
+    url:
+      "/crm/roleSeven/changeState?id=" + params.id + "&state=" + params.state,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: params,
   });
 }
 

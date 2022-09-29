@@ -12,7 +12,7 @@
               <span> {{ entitySum }} </span> 个
             </div>
           </div>
-          <div class="top-right">
+          <div v-loading="loadingData" class="top-right">
             <div
               class="box1"
               :style="{
@@ -21,13 +21,21 @@
                 'text-align': 'center',
               }"
             >
-              <div style="margin-top: 37%">政府 {{ govePercent }}</div>
+              <div style="margin-top: 35px">
+                {{ govePercent ? "政府" + govePercent + "%" : "" }}
+              </div>
             </div>
             <div
               class="box2"
-              style="background: greenyellow; width: 70%; text-align: center"
+              :style="{
+                background: 'greenyellow',
+                width: entityPercent + '%',
+                'text-align': 'center',
+              }"
             >
-              <div style="margin-top: 16.5%">企业 {{ entityPercent }}</div>
+              <div style="margin-top: 45px">
+                {{ entityPercent ? "企业" + entityPercent + "%" : "" }}
+              </div>
             </div>
           </div>
         </el-card>
@@ -39,33 +47,87 @@
             <div class="flex1 top-left">
               <div class="title mr20">政府主体</div>
               <el-button type="text ">导出全部</el-button>
-              <div class="right-number">30303</div>
+              <div class="right-number">{{ goveSum }}</div>
             </div>
           </div>
           <div class="title1">
             <div class="flex1">
               <div>
-                <div v-for="o in 4" :key="o" class="text item">
-                  {{ "政府 " + o }}
+                <div class="text item">
+                  {{ "地方政府 " }}
+                </div>
+                <div class="text item">
+                  {{ "省级 " }}
+                </div>
+                <div class="text item">
+                  {{ "市级 " }}
+                </div>
+                <div class="text item">
+                  {{ "县级 " }}
+                </div>
+                <div class="text item">
+                  {{ "经开高新区 " }}
                 </div>
               </div>
-              <div style="width: 77%">
+              <div style="width: 70%; margin-right: 10px">
                 <div
-                  v-for="o in 4"
-                  :key="o"
                   class="text item number-font"
                   :style="{
                     background: 'green',
-                    width: 30 + o + '%',
+                    width: govSumPercent + '%',
                     'text-align': 'center',
                   }"
                 >
-                  {{ 3 + o + "%" }}
+                  {{ govSumPercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: provincePercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ provincePercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: cityPercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ cityPercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: countyPercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ countyPercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: openPercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ openPercent + "%" }}
                 </div>
               </div>
               <div>
-                <div v-for="o in 4" :key="o" class="text item number-font">
-                  <div>1020</div>
+                <div class="text item number-font" style="width: 60px">
+                  <div>{{ goverment.govSum || "" }}</div>
+                  <div>{{ goverment.province || "" }}</div>
+                  <div>{{ goverment.city || "" }}</div>
+                  <div>{{ goverment.county || "" }}</div>
+                  <div>{{ goverment.open || "" }}</div>
                 </div>
               </div>
             </div>
@@ -78,33 +140,87 @@
             <div class="flex1 top-left">
               <div class="title mr20">企业主体</div>
               <el-button type="text ">导出全部</el-button>
-              <div class="right-number">30303</div>
+              <div class="right-number">{{ entitySum }}</div>
             </div>
           </div>
           <div class="title1">
             <div class="flex1">
               <div>
-                <div v-for="o in 4" :key="o" class="text item">
-                  {{ "政府 " + o }}
+                <div class="text item">
+                  {{ "上市企业 " }}
+                </div>
+                <div class="text item">
+                  {{ "发债企业 " }}
+                </div>
+                <div class="text item">
+                  {{ "即上市又发债 " }}
+                </div>
+                <div class="text item">
+                  {{ "金融机构 " }}
+                </div>
+                <div class="text item">
+                  {{ "非上市非发债 " }}
                 </div>
               </div>
-              <div style="width: 77%">
+              <div style="width: 70%; margin-right: 10px">
                 <div
-                  v-for="o in 4"
-                  :key="o"
                   class="text item number-font"
                   :style="{
                     background: 'green',
-                    width: 30 + o + '%',
+                    width: listPercent + '%',
                     'text-align': 'center',
                   }"
                 >
-                  {{ 3 + o + "%" }}
+                  {{ listPercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: issueBondsPercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ issueBondsPercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: bondsAndListPercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ bondsAndListPercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: financePercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ financePercent + "%" }}
+                </div>
+                <div
+                  class="text item number-font"
+                  :style="{
+                    background: 'green',
+                    width: notBondsAndListPercent + '%',
+                    'text-align': 'center',
+                  }"
+                >
+                  {{ notBondsAndListPercent + "%" }}
                 </div>
               </div>
               <div>
-                <div v-for="o in 4" :key="o" class="text item number-font">
-                  <div>1020</div>
+                <div class="text item number-font" style="width: 60px">
+                  <div>{{ entity.list || "" }}</div>
+                  <div>{{ entity.issueBonds || "" }}</div>
+                  <div>{{ entity.bondsAndList || "" }}</div>
+                  <div>{{ entity.finance || "" }}</div>
+                  <div>{{ entity.notBondsAndList || "" }}</div>
                 </div>
               </div>
             </div>
@@ -298,6 +414,20 @@ export default {
       loading: false,
       goveSum: 0,
       entitySum: 0,
+      govSumPercent: 0,
+      provincePercent: 0,
+      cityPercent: 0,
+      countyPercent: 0,
+      openPercent: 0,
+      goverment: {},
+      entity: {},
+      entitySumPercent: 0,
+      listPercent: 0,
+      issueBondsPercent: 0,
+      financePercent: 0,
+      bondsAndListPercent: 0,
+      notBondsAndListPercent: 0,
+      loadingData: false,
     };
   },
   mounted() {
@@ -306,15 +436,53 @@ export default {
   methods: {
     init() {
       try {
+        this.$modal.loading("loading...");
+        this.loadingData = true;
         govList({}).then((res) => {
           const { data } = res;
-          this.goveSum = data.govSum;
+          this.goverment = data;
+          this.goveSum = eval(Object.values(data).join("+"));
+          this.govSumPercent = this.getPercent(data.govSum, this.goveSum);
+          this.provincePercent = this.getPercent(data.province, this.goveSum);
+          this.cityPercent = this.getPercent(data.city, this.goveSum);
+          this.countyPercent = this.getPercent(data.county, this.goveSum);
+          this.openPercent = this.getPercent(data.open, this.goveSum);
         });
         entityInfoList({}).then((res) => {
           const { data } = res;
-          this.entitySum = data.entitySum;
+          this.entity = data;
+          this.entitySum = eval(Object.values(data).join("+"));
+          this.entitySumPercent = this.getPercent(
+            data.entitySum,
+            this.entitySum
+          );
+          this.listPercent = this.getPercent(data.list, this.entitySum);
+          this.issueBondsPercent = this.getPercent(
+            data.issueBonds,
+            this.entitySum
+          );
+          this.financePercent = this.getPercent(data.finance, this.entitySum);
+          this.bondsAndListPercent = this.getPercent(
+            data.bondsAndList,
+            this.entitySum
+          );
+          this.notBondsAndListPercent = this.getPercent(
+            data.notBondsAndList,
+            this.entitySum
+          );
         });
-      } catch (error) {}
+        setTimeout(() => {
+          this.loadingData = false;
+        }, 2000);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getPercent(newObj, sum) {
+      const res = (newObj / sum).toFixed(4);
+      return res * 100;
     },
     goTarget(href) {
       window.open(href, "_blank");
@@ -362,6 +530,7 @@ export default {
     display: flex;
     padding: 20px 20px;
     width: 40%;
+    height: 150px;
   }
   .right-number {
     position: relative;
@@ -379,6 +548,7 @@ export default {
   .item {
     margin-top: 13px;
     margin-right: 15px;
+    width: 105px;
   }
   .number-font {
     font-size: 18px;

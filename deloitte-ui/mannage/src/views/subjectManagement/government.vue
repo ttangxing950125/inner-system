@@ -7,23 +7,37 @@
           <div class="top-left">
             <div class="title">整体情况</div>
             <div class="body">
-              截止今日起，平台已手机主体
-              <span>222222</span
-              >个，其中，政府主体<span>222222</span>个，失效主题<span>222222</span>个
+              截止今日起，平台已收录主体
+              <span>{{ count }}</span
+              >个，其中，生效主体<span>{{ invalid }}</span
+              >个，未生效主题<span>{{ unInvalid }}</span
+              >个
             </div>
           </div>
           <div class="top-right">
             <div
               class="box1"
-              style="background: green; width: 15%; text-align: center"
+              :style="{
+                background: 'green',
+                width: unInvalidPercent + '%',
+                'text-align': 'center',
+              }"
             >
-              <div style="margin-top: 50%">失效 15%</div>
+              <div style="margin-top: 45px">
+                {{ unInvalidPercent ? "未生效" + unInvalidPercent + "%" : "" }}
+              </div>
             </div>
             <div
               class="box2"
-              style="background: greenyellow; width: 94%; text-align: center"
+              :style="{
+                background: 'greenyellow',
+                width: invalidPercent + '%',
+                'text-align': 'center',
+              }"
             >
-              <div style="margin-top: 11.5%">企业 94%</div>
+              <div style="margin-top: 45px">
+                {{ invalidPercent ? "生效" + invalidPercent + "%" : "" }}
+              </div>
             </div>
           </div>
         </el-card>
@@ -53,7 +67,11 @@
             截止日期，会计收录<span>xxxx</span>个地方政府主体，其中<span>xxxx</span>个省级行政区，<span>xxxx</span>个地市级行政区，<span>xxxx</span>个县级行政区，<span>xxxx</span>个经开高新区，
           </div>
           <div class="g-desc flex1">
-            <a href="">更多指标</a>
+            <router-link
+              :to="{ name: 'indexGovernment', query: { name: currentTab } }"
+            >
+              <a href="">更多指标</a>
+            </router-link>
             <router-link :to="{ name: 'addGovernment' }">
               <a href="">新增主体</a>
             </router-link>
@@ -67,6 +85,7 @@
               class="select-x"
               v-model="input"
               placeholder="搜索的亲主体代码/主体名称"
+              @change="selectTable"
             ></el-input>
           </div>
           <el-table
@@ -74,30 +93,93 @@
             :data="list"
             style="width: 98%; margin-top: 15px"
           >
-            <el-table-column type="index" sortable label="生效状态">
+            <el-table-column
+              type="index"
+              sortable
+              label="生效状态"
+              width="100px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.invalid === "0" ? "N" : "Y" }}</span>
+              </template>
             </el-table-column>
-            <el-table-column prop="date" label="行政级别" sortable>
+            <el-table-column prop="govLevel" label="行政级别" sortable>
             </el-table-column>
-            <el-table-column prop="name" label="德勤主体代码">
+            <el-table-column prop="dqGovCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="province" label="主体名称">
+            <el-table-column prop="govName" label="主体名称"> </el-table-column>
+            <el-table-column prop="nameUsedNum" label="曾用名或别称">
+              <template slot-scope="scope">
+                <el-button
+                  type="text"
+                  style="color: rgb(181 182 184)"
+                  @click="usedName"
+                  >{{ 1 }}</el-button
+                >
+              </template>
             </el-table-column>
-            <el-table-column prop="city" label="曾用名或别称">
+            <el-table-column prop="entityNameHisRemarks" label="备注">
             </el-table-column>
-            <el-table-column prop="address" label="备注"> </el-table-column>
-            <el-table-column prop="zip" label="更新记录"> </el-table-column>
+            <el-table-column prop="updated" label="更新记录">
+              <template slot-scope="scope">
+                <span>{{ getLocalTime(scope.row.updated) }}</span>
+              </template>
+            </el-table-column>
           </el-table>
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog
+      title="曾用名或别称管理"
+      :visible.sync="usedDig"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-table
+        class="table-content"
+        :data="list"
+        style="width: 98%; margin-top: 15px"
+      >
+        <el-table-column type="index" sortable label="序号" width="100px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.invalid === "0" ? "N" : "Y" }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="govLevel" label="行政级别" sortable>
+        </el-table-column>
+        <el-table-column prop="dqGovCode" label="德勤主体代码">
+        </el-table-column>
+        <el-table-column prop="govName" label="主体名称"> </el-table-column>
+        <el-table-column prop="nameUsedNum" label="曾用名或别称">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              style="color: rgb(181 182 184)"
+              @click="usedName"
+              >{{ 1 }}</el-button
+            >
+          </template>
+        </el-table-column>
+        <el-table-column prop="entityNameHisRemarks" label="备注">
+        </el-table-column>
+        <el-table-column prop="updated" label="更新记录">
+          <template slot-scope="scope">
+            <span>{{ getLocalTime(scope.row.updated) }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { getInfoList, getOverview } from "@/api/common";
+import { formatDate } from "@/utils/index";
 export default {
   name: "government",
   data() {
     return {
+      usedDig: false,
       input: "",
       activeName: "frist",
       list: [
@@ -136,9 +218,39 @@ export default {
       ],
       loading: false,
       currentTab: "地方政府",
+      count: 0,
+      invalid: 0,
+      unInvalid: 0,
     };
   },
+  created() {
+    this.init();
+  },
+  computed: {
+    invalidPercent() {
+      const res = (this.invalid / this.count).toFixed(4);
+      return res * 100;
+    },
+    unInvalidPercent() {
+      const res = (this.unInvalid / this.count).toFixed(4);
+      return res * 100;
+    },
+  },
   methods: {
+    init() {
+      const parmas = {
+        parmas: this.input,
+      };
+      // getInfoList(parmas).then((res) => {
+      //   console.log(res);
+      // });
+      getOverview({}).then((res) => {
+        const { data } = res;
+        this.count = data.count;
+        this.invalid = data.invalid;
+        this.unInvalid = data.unInvalid;
+      });
+    },
     goTarget(href) {
       window.open(href, "_blank");
     },
@@ -149,6 +261,21 @@ export default {
       console.log(1);
       this.$router.psuh({ path: "subjectManagement/enterprise" });
     },
+    selectTable() {
+      const parmas = {
+        parmas: this.input,
+      };
+      getInfoList(parmas).then((res) => {
+        console.log(res);
+      });
+    },
+    getLocalTime(nS) {
+      return formatDate(1664363715);
+      // return new Date(parseInt(1664363715) * 1000)
+      //   .toLocaleString()
+      //   .replace(/:\d{1,2}$/, " ");
+    },
+    usedName(row) {},
   },
 };
 </script>
@@ -187,6 +314,7 @@ export default {
     display: flex;
     padding: 20px 20px;
     width: 40%;
+    height: 150px;
   }
   .right-number {
     position: relative;
@@ -210,7 +338,7 @@ export default {
 .select-x {
   width: 24%;
   position: relative;
-  left: 50%;
+  left: 49%;
 }
 .g-tab {
   margin-left: 1.5%;
