@@ -106,4 +106,6 @@ public interface IEntityAttrService extends IService<EntityAttr>
      * @date 2022/9/28 10:29
      */
     R saveGovInfoByCode(String entityCode,String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall);
+
+    List<EntityAttr> getAttrByOrganName(String organName);
 }

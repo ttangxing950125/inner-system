@@ -255,4 +255,11 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
         govInfo.setStatus(1);
         return R.ok(govInfoMapper.update(govInfo, queryWrapper.lambda().eq(GovInfo::getDqGovCode, entityCode)));
     }
+
+    @Override
+    public List<EntityAttr> getAttrByOrganName(String organName) {
+        QueryWrapper<EntityAttr>query=new QueryWrapper<>();
+        List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));
+        return entityAttrs;
+    }
 }

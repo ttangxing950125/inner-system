@@ -1,25 +1,28 @@
 package com.deloitte.crm.service.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.ThkSecIssInfo;
-import com.deloitte.crm.mapper.EntityAttrMapper;
+import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.dto.EntityAttrValueDto;
+import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.IEntityAttrService;
+import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.utils.AttrValueUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.service.IEntityAttrValueService;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -196,6 +199,24 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     public int updateStockCnAttr(String code, Object item) {
         return this.updateAttrValue(code, item, 5, Excel.class, "name");
+    }
+
+    @Override
+    public Integer addEntityAttrValues(EntityAttrValueDto valueDto) {
+        String entityCode = valueDto.getEntityCode();
+        List<EntityAttrValue> attrValueList = valueDto.getAttrValueList();
+        attrValueList.stream().forEach(o->{
+            QueryWrapper<EntityAttrValue>query=new QueryWrapper<>();
+            o.setEntityCode(entityCode);
+            String attrId = o.getAttrId().toString();
+            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID.toString())
+                    ||attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID.toString())){
+                entityAttrValueMapper.update(o,query.lambda().eq(EntityAttrValue::getEntityCode,entityCode));
+            }else {
+                entityAttrValueMapper.insert(o);
+            }
+        });
+        return attrValueList.size();
     }
 
     /**

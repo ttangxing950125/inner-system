@@ -24,6 +24,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.EntitySupplyBack;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
@@ -981,17 +982,45 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
 
     @Override
-    public R supplyNormalInformation(EntityAttrByDto entityAttrDto) {
-        return null;
+    public EntitySupplyBack supplyNormalInformation(String entityCode) {
+        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
+        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+        List<EntityAttrValue> attrValueList=new ArrayList<>();
+        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, entityCode)
+                .eq(EntityAttrValue::getAttrId, Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID)
+        ));
+        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, entityCode)
+                .eq(EntityAttrValue::getAttrId, Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID)
+        ));
+
+        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
+        return entitySupplyBack;
     }
 
     @Override
-    public R supplyFinInformation(EntityAttrByDto entityAttrDto) {
-        return null;
+    public EntitySupplyBack supplyFinInformation(String entityCode) {
+        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
+        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+        List<EntityAttrValue> attrValueList=new ArrayList<>();
+        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, entityCode)
+                .eq(EntityAttrValue::getAttrId, Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID)
+        ));
+        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, entityCode)
+                .eq(EntityAttrValue::getAttrId, Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID)
+        ));
+        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
+        entitySupplyBack.setEntityInfo(entityInfo).setAttrValueList(attrValueList);
+        return entitySupplyBack;
     }
 
     @Override
-    public R supplyUIInformation(EntityAttrByDto entityAttrDto) {
+    public EntitySupplyBack supplyUIInformation(EntityAttrByDto entityAttrDto) {
         return null;
     }
 

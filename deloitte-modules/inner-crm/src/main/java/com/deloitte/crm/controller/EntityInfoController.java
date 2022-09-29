@@ -290,30 +290,10 @@ public class EntityInfoController extends BaseController {
         return R.ok(entityInfoService.getOverviewByGroup());
     }
 
-    @ApiOperation(value = "补充录入财报手术等其他相关信息")
-    @PostMapping("/supplyNormalInformation")
-    public R supplyNormalInformation(@RequestBody EntityAttrByDto entityAttrDto) {
-        return entityInfoService.supplyNormalInformation(entityAttrDto);
-    }
-
-    @ApiOperation(value = "补充录入金融机构相关信息")
-    @PostMapping("/supplyFinInformation")
-    public R supplyFinInformation(@RequestBody EntityAttrByDto entityAttrDto) {
-        return entityInfoService.supplyFinInformation(entityAttrDto);
-    }
-
-    @ApiOperation(value = "补充录入城投及政府相关信息")
-    @PostMapping("/supplyUIInformation")
-    public R supplyUIInformation(@RequestBody EntityAttrByDto entityAttrDto) {
-        return entityInfoService.supplyUIInformation(entityAttrDto);
-    }
-
-
     @GetMapping("/send")
     public void send() {
         service.SendEmail(3, "发了", "发友尽");
     }
-
 
     /**
      * 主体整体概览
@@ -328,4 +308,23 @@ public class EntityInfoController extends BaseController {
     public R getOverviewByAll() {
         return R.ok(entityInfoService.getOverviewByAll());
     }
+
+    @ApiOperation(value = "补充录入财报手术等其他相关信息")
+    @PostMapping("/supplyNormalInformation")
+    public R supplyNormalInformation(String entityCode) {
+        return R.ok(entityInfoService.supplyNormalInformation(entityCode));
+    }
+
+    @ApiOperation(value = "补充录入金融机构相关信息")
+    @PostMapping("/supplyFinInformation")
+    public R supplyFinInformation(String entityCode) {
+        return R.ok(entityInfoService.supplyFinInformation( entityCode));
+    }
+
+    @ApiOperation(value = "补充录入城投及政府相关信息")
+    @PostMapping("/supplyUIInformation")
+    public R supplyUIInformation(@RequestBody EntityAttrByDto entityAttrDto) {
+        return R.ok(entityInfoService.supplyUIInformation(entityAttrDto));
+    }
+
 }

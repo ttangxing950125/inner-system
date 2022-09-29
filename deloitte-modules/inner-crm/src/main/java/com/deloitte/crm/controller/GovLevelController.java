@@ -88,4 +88,5 @@ public class GovLevelController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(govLevelService.deleteGovLevelByIds(ids));
     }
+
 }

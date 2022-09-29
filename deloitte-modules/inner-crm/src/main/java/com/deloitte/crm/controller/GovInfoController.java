@@ -296,4 +296,52 @@ public class GovInfoController extends BaseController {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
 
+
+    /**
+     * 获取省市级数据
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/29 15:49
+     */
+    @ApiOperation(value = "获取省市级数据")
+    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
+    @PostMapping("/getGovLevel")
+    public R getGovLevel(String preGovCode) {
+        return R.ok(govInfoService.getGovLevel(preGovCode));
+    }
+
+    /**
+     * 获取所属辖区
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/29 15:49
+     */
+    @ApiOperation(value = "获取所属辖区")
+    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
+    @PostMapping("/getJurisdiction")
+    public R getJurisdiction(String preGovCode) {
+        //        //TODO 所属辖区
+        //
+        //        //TODO 对口监管机构
+        return null;
+//        return R.ok(govInfoService.getJurisdiction(preGovCode));
+    }
+
+    /**
+     * 获取对口监管机构
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/29 15:49
+     */
+    @ApiOperation(value = "获取对口监管机构")
+    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
+    @PostMapping("/getRegulators")
+    public R getRegulators(String preGovCode) {
+        //        //TODO 对口监管机构
+        return null;
+//        return R.ok(govInfoService.getRegulators(preGovCode));
+    }
 }

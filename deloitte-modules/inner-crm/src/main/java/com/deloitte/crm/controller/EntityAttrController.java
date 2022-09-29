@@ -28,8 +28,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/attr")
-public class EntityAttrController extends BaseController
-{
+public class EntityAttrController extends BaseController {
     @Autowired
     private IEntityAttrService entityAttrService;
 
@@ -38,8 +37,7 @@ public class EntityAttrController extends BaseController
      */
     @RequiresPermissions("crm:attr:list")
     @GetMapping("/list")
-    public TableDataInfo list(EntityAttr entityAttr)
-    {
+    public TableDataInfo list(EntityAttr entityAttr) {
         startPage();
         List<EntityAttr> list = entityAttrService.selectEntityAttrList(entityAttr);
         return getDataTable(list);
@@ -51,8 +49,7 @@ public class EntityAttrController extends BaseController
     @RequiresPermissions("crm:attr:export")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, EntityAttr entityAttr)
-    {
+    public void export(HttpServletResponse response, EntityAttr entityAttr) {
         List<EntityAttr> list = entityAttrService.selectEntityAttrList(entityAttr);
         ExcelUtil<EntityAttr> util = new ExcelUtil<EntityAttr>(EntityAttr.class);
         util.exportExcel(response, list, "【请填写功能名称】数据");
@@ -63,8 +60,7 @@ public class EntityAttrController extends BaseController
      */
     @RequiresPermissions("crm:attr:query")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(entityAttrService.selectEntityAttrById(id));
     }
 
@@ -74,8 +70,7 @@ public class EntityAttrController extends BaseController
     @RequiresPermissions("crm:attr:add")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody EntityAttr entityAttr)
-    {
+    public AjaxResult add(@RequestBody EntityAttr entityAttr) {
         return toAjax(entityAttrService.insertEntityAttr(entityAttr));
     }
 
@@ -85,8 +80,7 @@ public class EntityAttrController extends BaseController
     @RequiresPermissions("crm:attr:edit")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody EntityAttr entityAttr)
-    {
+    public AjaxResult edit(@RequestBody EntityAttr entityAttr) {
         return toAjax(entityAttrService.updateEntityAttr(entityAttr));
     }
 
@@ -95,9 +89,8 @@ public class EntityAttrController extends BaseController
      */
     @RequiresPermissions("crm:attr:remove")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(entityAttrService.deleteEntityAttrByIds(ids));
     }
 
@@ -108,13 +101,13 @@ public class EntityAttrController extends BaseController
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/23 10:56
-    */
+     */
     @ApiOperation(value = "分组查询全部---构造父子级关系")
     @GetMapping("/getAllByGroup/{type}")
-    public R getAllByGroup(@PathVariable("type") Integer type)
-    {
+    public R getAllByGroup(@PathVariable("type") Integer type) {
         return entityAttrService.getAllByGroup(type);
     }
+
     /**
      * 根据dqCode查询详细信息
      *
@@ -123,10 +116,9 @@ public class EntityAttrController extends BaseController
      * @date 2022/9/25 13:56
      */
     @ApiOperation(value = "根据dqCode查询详细信息")
-    @ApiImplicitParam(name="dqCode", value="德勤唯一识别码", paramType = "query", example = "", dataType = "String")
+    @ApiImplicitParam(name = "dqCode", value = "德勤唯一识别码", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getAttrByDqCode")
-    public R getAttrByDqCode(String dqCode)
-    {
+    public R getAttrByDqCode(String dqCode) {
         return R.ok(entityAttrService.getAttrByDqCode(dqCode));
     }
 
@@ -138,14 +130,14 @@ public class EntityAttrController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/28 9:14
      */
-    @ApiOperation(value="根据任务id查询补充信息")
+    @ApiOperation(value = "根据任务id查询补充信息")
     @ApiImplicitParams({
-        @ApiImplicitParam(name="entityCode",value="传入 entityCode",paramType = "query",dataType = "String"),
-        @ApiImplicitParam(name="roleId",value="传入 roleId",paramType = "query",dataType = "Integer")
+            @ApiImplicitParam(name = "entityCode", value = "传入 entityCode", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "roleId", value = "传入 roleId", paramType = "query", dataType = "Integer")
     })
     @PostMapping("/getTaskByEntityCode")
-    public R getTaskByEntityCode(String entityCode, Integer roleId){
-        return entityAttrService.getTaskByEntityCode(entityCode,roleId);
+    public R getTaskByEntityCode(String entityCode, Integer roleId) {
+        return entityAttrService.getTaskByEntityCode(entityCode, roleId);
     }
 
     /**
@@ -156,12 +148,13 @@ public class EntityAttrController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/28 9:14
      */
-    @ApiOperation(value="补充录入信息")
-    @ApiImplicitParam(name="list",value="传入 EntityAttrValue属性值集合",paramType = "body",dataTypeClass = EntityAttrValue.class)
+    @ApiOperation(value = "补充录入信息")
+    @ApiImplicitParam(name = "list", value = "传入 EntityAttrValue属性值集合", paramType = "body", dataTypeClass = EntityAttrValue.class)
     @PostMapping("/saveAttrValueByCode")
-    public R saveAttrValueByCode(List<EntityAttrValue>list){
+    public R saveAttrValueByCode(List<EntityAttrValue> list) {
         return entityAttrService.saveAttrValueByCode(list);
     }
+
     /**
      * 城投机构补充录入基础信息
      *
@@ -174,20 +167,21 @@ public class EntityAttrController extends BaseController
      * @return R
      * @author 冉浩岑
      * @date 2022/9/28 10:29
-    */
-    @ApiOperation(value="补充录入信息")
+     */
+    @ApiOperation(value = "补充录入信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="entityCode",value="德勤唯一识别码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="govCode",value="政府主体官方行政代码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="preGovCode",value="上级政府代码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="govName",value="政府主体名称",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="govLevelBig",value="政府行政大类",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="govLevelSmall",value="政府行政小类",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name = "entityCode", value = "德勤唯一识别码", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "govCode", value = "政府主体官方行政代码", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "preGovCode", value = "上级政府代码", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "govLevelBig", value = "政府行政大类", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "govLevelSmall", value = "政府行政小类", paramType = "query", dataType = "String"),
     })
     @PostMapping("/saveGovInfoByCode")
-    public R saveGovInfoByCode(String entityCode,String govCode,String preGovCode,String govName,Integer govLevelBig,Integer govLevelSmall){
-        return entityAttrService.saveGovInfoByCode(entityCode,govCode,preGovCode,govName,govLevelBig,govLevelSmall);
+    public R saveGovInfoByCode(String entityCode, String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall) {
+        return entityAttrService.saveGovInfoByCode(entityCode, govCode, preGovCode, govName, govLevelBig, govLevelSmall);
     }
+
     /**
      * 一般机构补充录入基础信息
      *
@@ -201,15 +195,30 @@ public class EntityAttrController extends BaseController
      * @author 冉浩岑
      * @date 2022/9/28 10:29
      */
-    @ApiOperation(value="补充录入信息")
+    @ApiOperation(value = "补充录入信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="entityCode",value="德勤唯一识别码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="creditCode",value="统一社会信用代码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="entityName",value="企业名称",paramType = "query",dataType = "String")
+            @ApiImplicitParam(name = "entityCode", value = "德勤唯一识别码", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "creditCode", value = "统一社会信用代码", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "entityName", value = "企业名称", paramType = "query", dataType = "String")
     })
     @PostMapping("/saveEntityInfoByCode")
-    public R saveEntityInfoByCode(String entityCode,String govCode,String preGovCode,String govName,Integer govLevelBig,Integer govLevelSmall){
+    public R saveEntityInfoByCode(String entityCode, String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall) {
         return null;
 //        return entityAttrService.saveEntityInfoByCode(entityCode,govCode,preGovCode,govName,govLevelBig,govLevelSmall);
+    }
+
+    /**
+     * 根据机构类型查询需要补充录入的信息
+     *
+     * @param organName
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/29 10:29
+     */
+    @ApiOperation(value = "根据机构类型查询需要补充录入的信息")
+    @ApiImplicitParam(name = "organName", value = "机构类型", paramType = "query", dataType = "String")
+    @PostMapping("/getAttrByOrganName")
+    public R getAttrByOrganName(String organName) {
+        return R.ok(entityAttrService.getAttrByOrganName(organName));
     }
 }

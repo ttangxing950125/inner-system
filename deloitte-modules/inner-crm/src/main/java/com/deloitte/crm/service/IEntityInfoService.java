@@ -7,6 +7,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.EntitySupplyBack;
 import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 
@@ -163,11 +164,11 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword);
 
-    R supplyNormalInformation(EntityAttrByDto entityAttrDto);
+    EntitySupplyBack supplyNormalInformation(String entityCode);
 
-    R supplyFinInformation(EntityAttrByDto entityAttrDto);
+    EntitySupplyBack supplyFinInformation(String entityCode);
 
-    R supplyUIInformation(EntityAttrByDto entityAttrDto);
+    EntitySupplyBack supplyUIInformation(EntityAttrByDto entityAttrDto);
 
 
     /**

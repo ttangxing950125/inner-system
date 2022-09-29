@@ -587,6 +587,22 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return result;
     }
 
+    @Override
+    public List<GovInfo> getGovLevel(String preGovCode) {
+        List<GovInfo> govInfos=new ArrayList<>();
+
+        QueryWrapper<GovInfo> govQuery = new QueryWrapper();
+
+        if (ObjectUtils.isEmpty(preGovCode)){
+            govInfos = govInfoMapper.selectList(govQuery.lambda().eq(GovInfo::getGovLevelBig, 1));
+        }else {
+            govInfos = govInfoMapper.selectList(govQuery.lambda().eq(GovInfo::getPreGovCode, preGovCode));
+        }
+
+
+        return govInfos;
+    }
+
 
     /**
      * 字段对应的名称
