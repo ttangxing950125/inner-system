@@ -141,7 +141,7 @@ public class GovInfoController extends BaseController {
      * 政府主体批量修改
      *
      * @param govInfoList
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 15:24
      */
@@ -156,7 +156,7 @@ public class GovInfoController extends BaseController {
      * 查询政府名称，或者编码，是否重复
      *
      * @param govInfo
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
@@ -172,7 +172,7 @@ public class GovInfoController extends BaseController {
      *
      * @param type  政府主体类型 1、地方政府2、地方主管部门3、其他
      * @param param 筛选条件
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
@@ -204,7 +204,7 @@ public class GovInfoController extends BaseController {
      * 新增政府主体的曾用名
      *
      * @param govInfo
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:44
      */
@@ -222,7 +222,7 @@ public class GovInfoController extends BaseController {
      * @param oldName
      * @param newOldName
      * @param status
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/25 13:22
      */
@@ -309,39 +309,5 @@ public class GovInfoController extends BaseController {
     @PostMapping("/getGovLevel")
     public R getGovLevel(String preGovCode) {
         return R.ok(govInfoService.getGovLevel(preGovCode));
-    }
-
-    /**
-     * 获取所属辖区
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/29 15:49
-     */
-    @ApiOperation(value = "获取所属辖区")
-    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
-    @PostMapping("/getJurisdiction")
-    public R getJurisdiction(String preGovCode) {
-        //        //TODO 所属辖区
-        //
-        //        //TODO 对口监管机构
-        return null;
-//        return R.ok(govInfoService.getJurisdiction(preGovCode));
-    }
-
-    /**
-     * 获取对口监管机构
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/29 15:49
-     */
-    @ApiOperation(value = "获取对口监管机构")
-    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
-    @PostMapping("/getRegulators")
-    public R getRegulators(String preGovCode) {
-        //        //TODO 对口监管机构
-        return null;
-//        return R.ok(govInfoService.getRegulators(preGovCode));
     }
 }

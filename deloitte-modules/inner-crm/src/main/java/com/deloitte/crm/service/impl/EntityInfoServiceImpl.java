@@ -980,50 +980,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
     }
 
-
-    @Override
-    public EntitySupplyBack supplyNormalInformation(String entityCode) {
-        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
-        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
-        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-        List<EntityAttrValue> attrValueList=new ArrayList<>();
-        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
-                .eq(EntityAttrValue::getEntityCode, entityCode)
-                .eq(EntityAttrValue::getAttrId, Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID)
-        ));
-        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
-                .eq(EntityAttrValue::getEntityCode, entityCode)
-                .eq(EntityAttrValue::getAttrId, Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID)
-        ));
-
-        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
-        return entitySupplyBack;
-    }
-
-    @Override
-    public EntitySupplyBack supplyFinInformation(String entityCode) {
-        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
-        EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
-        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-        List<EntityAttrValue> attrValueList=new ArrayList<>();
-        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
-                .eq(EntityAttrValue::getEntityCode, entityCode)
-                .eq(EntityAttrValue::getAttrId, Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID)
-        ));
-        attrValueList.add(entityAttrValueMapper.selectOne(valueQuery.lambda()
-                .eq(EntityAttrValue::getEntityCode, entityCode)
-                .eq(EntityAttrValue::getAttrId, Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID)
-        ));
-        EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
-        entitySupplyBack.setEntityInfo(entityInfo).setAttrValueList(attrValueList);
-        return entitySupplyBack;
-    }
-
-    @Override
-    public EntitySupplyBack supplyUIInformation(EntityAttrByDto entityAttrDto) {
-        return null;
-    }
-
     @Override
     public Map<String, Object> getOverview() {
         QueryWrapper<EntityInfo> query = new QueryWrapper<>();

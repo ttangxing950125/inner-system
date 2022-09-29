@@ -231,32 +231,6 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
-    public R saveAttrValueByCode(List<EntityAttrValue> list) {
-        list.stream().forEach(o -> {
-            Integer id = o.getId();
-            if (ObjectUtils.isEmpty(id)) {
-                valueMapper.insert(o);
-            } else {
-                valueMapper.updateById(o);
-            }
-        });
-        return R.ok();
-    }
-
-    @Override
-    public R saveGovInfoByCode(String entityCode, String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall) {
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
-        GovInfo govInfo = new GovInfo();
-        govInfo.setGovName(govName);
-        govInfo.setPreGovCode(preGovCode);
-        govInfo.setGovCode(govCode);
-        govInfo.setGovLevelBig(govLevelBig);
-        govInfo.setGovLevelSmall(govLevelSmall);
-        govInfo.setStatus(1);
-        return R.ok(govInfoMapper.update(govInfo, queryWrapper.lambda().eq(GovInfo::getDqGovCode, entityCode)));
-    }
-
-    @Override
     public List<EntityAttr> getAttrByOrganName(String organName) {
         QueryWrapper<EntityAttr>query=new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));

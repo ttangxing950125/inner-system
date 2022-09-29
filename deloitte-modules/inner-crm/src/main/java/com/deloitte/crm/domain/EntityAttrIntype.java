@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 @ApiModel(value = "BondsDetailDto", description = "entity_attr_intype")
-public class EntityAttrIntype {
+public class EntityAttrIntype implements Serializable {
 
     /**
      * 主键id

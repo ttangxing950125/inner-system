@@ -98,4 +98,5 @@ public interface IGovInfoService  extends IService<GovInfo>
     Map<String, Object> getOverviewByGroup();
 
     List<GovInfo> getGovLevel(String preGovCode);
+
 }

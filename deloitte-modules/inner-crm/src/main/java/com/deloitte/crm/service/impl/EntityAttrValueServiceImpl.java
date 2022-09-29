@@ -8,7 +8,6 @@ import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.dto.EntityAttrValueDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
@@ -26,13 +25,12 @@ import java.util.Set;
 
 /**
  * 【请填写功能名称】Service业务层处理
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
 @Service
-public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMapper, EntityAttrValue> implements IEntityAttrValueService
-{
+public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMapper, EntityAttrValue> implements IEntityAttrValueService {
     @Autowired
     private EntityAttrValueMapper entityAttrValueMapper;
 
@@ -41,73 +39,67 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     /**
      * 查询【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
     @Override
-    public EntityAttrValue selectEntityAttrValueById(Long id)
-    {
+    public EntityAttrValue selectEntityAttrValueById(Long id) {
         return entityAttrValueMapper.selectEntityAttrValueById(id);
     }
 
     /**
      * 查询【请填写功能名称】列表
-     * 
+     *
      * @param entityAttrValue 【请填写功能名称】
      * @return 【请填写功能名称】
      */
     @Override
-    public List<EntityAttrValue> selectEntityAttrValueList(EntityAttrValue entityAttrValue)
-    {
+    public List<EntityAttrValue> selectEntityAttrValueList(EntityAttrValue entityAttrValue) {
         return entityAttrValueMapper.selectEntityAttrValueList(entityAttrValue);
     }
 
     /**
      * 新增【请填写功能名称】
-     * 
+     *
      * @param entityAttrValue 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int insertEntityAttrValue(EntityAttrValue entityAttrValue)
-    {
+    public int insertEntityAttrValue(EntityAttrValue entityAttrValue) {
         return entityAttrValueMapper.insertEntityAttrValue(entityAttrValue);
     }
 
     /**
      * 修改【请填写功能名称】
-     * 
+     *
      * @param entityAttrValue 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int updateEntityAttrValue(EntityAttrValue entityAttrValue)
-    {
+    public int updateEntityAttrValue(EntityAttrValue entityAttrValue) {
         return entityAttrValueMapper.updateEntityAttrValue(entityAttrValue);
     }
 
     /**
      * 批量删除【请填写功能名称】
-     * 
+     *
      * @param ids 需要删除的【请填写功能名称】主键
      * @return 结果
      */
     @Override
-    public int deleteEntityAttrValueByIds(Long[] ids)
-    {
+    public int deleteEntityAttrValueByIds(Long[] ids) {
         return entityAttrValueMapper.deleteEntityAttrValueByIds(ids);
     }
 
     /**
      * 删除【请填写功能名称】信息
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
     @Override
-    public int deleteEntityAttrValueById(Long id)
-    {
+    public int deleteEntityAttrValueById(Long id) {
         return entityAttrValueMapper.deleteEntityAttrValueById(id);
     }
 
@@ -134,10 +126,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @param attrType
      * @param anno
      * @param annoFiled
+     * @return
      * @Param anno         anno 中的 annoFiled的值作为entityAttr的name
      * @Param annoFiled
      * @Param entityAttr - attrType
-     * @return
      */
     @Override
     public int updateAttrValue(String entityCode, Object obj, Integer attrType, Class<? extends Annotation> anno, String annoFiled) {
@@ -156,11 +148,11 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         Set<String> keySet = data.keySet();
         for (String key : keySet) {
             Object value = data.get(key);
-            if (StrUtil.isBlankCast(value)){
+            if (StrUtil.isBlankCast(value)) {
                 continue;
             }
             EntityAttr attr = entityAttrService.findByNameType(key, attrType);
-            if (attr==null){
+            if (attr == null) {
                 continue;
             }
             Long id = attr.getId();
@@ -202,25 +194,23 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     }
 
     @Override
-    public Integer addEntityAttrValues(EntityAttrValueDto valueDto) {
-        String entityCode = valueDto.getEntityCode();
-        List<EntityAttrValue> attrValueList = valueDto.getAttrValueList();
-        attrValueList.stream().forEach(o->{
-            QueryWrapper<EntityAttrValue>query=new QueryWrapper<>();
-            o.setEntityCode(entityCode);
+    public Integer addEntityAttrValues(List<EntityAttrValue> valueList) {
+        valueList.stream().forEach(o -> {
+            QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
             String attrId = o.getAttrId().toString();
             if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID.toString())
-                    ||attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID.toString())){
-                entityAttrValueMapper.update(o,query.lambda().eq(EntityAttrValue::getEntityCode,entityCode));
-            }else {
+                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID.toString())) {
+                entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+            } else {
                 entityAttrValueMapper.insert(o);
             }
         });
-        return attrValueList.size();
+        return valueList.size();
     }
 
     /**
      * 新增或修改
+     *
      * @return
      */
     @Override
@@ -229,7 +219,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
         EntityAttrValue dbAttrValue = entityAttrValueMapper.findByAttrCode(attrValue);
 
-        if (dbAttrValue==null){
+        if (dbAttrValue == null) {
             return entityAttrValueMapper.insert(attrValue);
         }
 

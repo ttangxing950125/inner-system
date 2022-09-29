@@ -93,18 +93,17 @@ public class EntityAttrValueController extends BaseController {
         return toAjax(entityAttrValueService.deleteEntityAttrValueByIds(ids));
     }
 
-
     /**
-     * 增加或者修改value信息
+     * 根据entityCode补充录入副表信息
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/25 13:56
      */
-    @ApiOperation(value = "增加或者修改value信息")
-    @ApiImplicitParam(name = "valueDto", value = "增改数据", paramType = "body", example = "", dataTypeClass =EntityAttrValueDto.class)
+    @ApiOperation(value = "根据entityCode补充录入副表信息")
+    @ApiImplicitParam(name = "valueList", value = "增改数据", paramType = "body", example = "", dataTypeClass = EntityAttrValueDto.class)
     @PostMapping("/addEntityAttrValues")
-    public R addEntityAttrValues(@RequestBody EntityAttrValueDto valueDto) {
-        return R.ok(entityAttrValueService.addEntityAttrValues(valueDto));
+    public R addEntityAttrValues(List<EntityAttrValue> valueList) {
+        return R.ok(entityAttrValueService.addEntityAttrValues(valueList));
     }
 }

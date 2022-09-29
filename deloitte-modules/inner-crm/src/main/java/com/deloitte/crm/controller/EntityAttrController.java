@@ -9,7 +9,6 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.service.IEntityAttrService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -138,73 +137,6 @@ public class EntityAttrController extends BaseController {
     @PostMapping("/getTaskByEntityCode")
     public R getTaskByEntityCode(String entityCode, Integer roleId) {
         return entityAttrService.getTaskByEntityCode(entityCode, roleId);
-    }
-
-    /**
-     * 根据entityCode补充录入副表信息
-     *
-     * @param list
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/28 9:14
-     */
-    @ApiOperation(value = "补充录入信息")
-    @ApiImplicitParam(name = "list", value = "传入 EntityAttrValue属性值集合", paramType = "body", dataTypeClass = EntityAttrValue.class)
-    @PostMapping("/saveAttrValueByCode")
-    public R saveAttrValueByCode(List<EntityAttrValue> list) {
-        return entityAttrService.saveAttrValueByCode(list);
-    }
-
-    /**
-     * 城投机构补充录入基础信息
-     *
-     * @param entityCode
-     * @param govCode
-     * @param preGovCode
-     * @param govName
-     * @param govLevelBig
-     * @param govLevelSmall
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/28 10:29
-     */
-    @ApiOperation(value = "补充录入信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "entityCode", value = "德勤唯一识别码", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "govCode", value = "政府主体官方行政代码", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "preGovCode", value = "上级政府代码", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "govLevelBig", value = "政府行政大类", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "govLevelSmall", value = "政府行政小类", paramType = "query", dataType = "String"),
-    })
-    @PostMapping("/saveGovInfoByCode")
-    public R saveGovInfoByCode(String entityCode, String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall) {
-        return entityAttrService.saveGovInfoByCode(entityCode, govCode, preGovCode, govName, govLevelBig, govLevelSmall);
-    }
-
-    /**
-     * 一般机构补充录入基础信息
-     *
-     * @param entityCode
-     * @param govCode
-     * @param preGovCode
-     * @param govName
-     * @param govLevelBig
-     * @param govLevelSmall
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/28 10:29
-     */
-    @ApiOperation(value = "补充录入信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "entityCode", value = "德勤唯一识别码", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "creditCode", value = "统一社会信用代码", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "entityName", value = "企业名称", paramType = "query", dataType = "String")
-    })
-    @PostMapping("/saveEntityInfoByCode")
-    public R saveEntityInfoByCode(String entityCode, String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall) {
-        return null;
-//        return entityAttrService.saveEntityInfoByCode(entityCode,govCode,preGovCode,govName,govLevelBig,govLevelSmall);
     }
 
     /**

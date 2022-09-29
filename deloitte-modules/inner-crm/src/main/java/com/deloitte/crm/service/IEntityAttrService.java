@@ -3,7 +3,6 @@ package com.deloitte.crm.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.EntityAttrValue;
 
 import java.util.List;
 
@@ -83,29 +82,6 @@ public interface IEntityAttrService extends IService<EntityAttr>
     List<EntityAttr> getAttrByDqCode(String dqCode);
 
     R getTaskByEntityCode(String entityCode, Integer roleId);
-    /**
-     * 根据entityCode补充录入副表信息
-     *
-     * @param list
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/28 9:14
-     */
-    R saveAttrValueByCode(List<EntityAttrValue> list);
-    /**
-     * 城投机构补充录入信息
-     *
-     * @param entityCode
-     * @param govCode
-     * @param preGovCode
-     * @param govName
-     * @param govLevelBig
-     * @param govLevelSmall
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/28 10:29
-     */
-    R saveGovInfoByCode(String entityCode,String govCode, String preGovCode, String govName, Integer govLevelBig, Integer govLevelSmall);
 
     List<EntityAttr> getAttrByOrganName(String organName);
 }

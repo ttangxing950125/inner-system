@@ -242,7 +242,7 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "根据 dqCode 查询企业主体")
-    @ApiImplicitParam(name = "entityInfo", value = "包含表中eentity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
+    @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
     @PostMapping("/getInfoDetail")
     public R getInfoDetail(@RequestBody EntityInfo entityInfo) {
         return entityInfoService.getInfoDetail(entityInfo);
@@ -308,23 +308,4 @@ public class EntityInfoController extends BaseController {
     public R getOverviewByAll() {
         return R.ok(entityInfoService.getOverviewByAll());
     }
-
-    @ApiOperation(value = "补充录入财报手术等其他相关信息")
-    @PostMapping("/supplyNormalInformation")
-    public R supplyNormalInformation(String entityCode) {
-        return R.ok(entityInfoService.supplyNormalInformation(entityCode));
-    }
-
-    @ApiOperation(value = "补充录入金融机构相关信息")
-    @PostMapping("/supplyFinInformation")
-    public R supplyFinInformation(String entityCode) {
-        return R.ok(entityInfoService.supplyFinInformation( entityCode));
-    }
-
-    @ApiOperation(value = "补充录入城投及政府相关信息")
-    @PostMapping("/supplyUIInformation")
-    public R supplyUIInformation(@RequestBody EntityAttrByDto entityAttrDto) {
-        return R.ok(entityInfoService.supplyUIInformation(entityAttrDto));
-    }
-
 }

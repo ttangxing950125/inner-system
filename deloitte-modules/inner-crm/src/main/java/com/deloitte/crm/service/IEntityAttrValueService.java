@@ -107,5 +107,5 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      */
     int updateStockCnAttr(String code, Object item);
 
-    Integer addEntityAttrValues(EntityAttrValueDto valueDto);
+    Integer addEntityAttrValues(List<EntityAttrValue> valueList);
 }
