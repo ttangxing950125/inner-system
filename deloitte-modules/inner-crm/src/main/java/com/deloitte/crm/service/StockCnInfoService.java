@@ -1,6 +1,7 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.StockCnInfo;
 
 /**
@@ -11,6 +12,9 @@ import com.deloitte.crm.domain.StockCnInfo;
  */
 public interface StockCnInfoService extends IService<StockCnInfo> {
 
+    R checkStockCnInfo(String StockBode);
+
+    R checkSortName(String SortName);
     /**
      * 根据code查询 大陆股票
      * @param code

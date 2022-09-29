@@ -63,6 +63,12 @@ public interface IBondInfoService
      */
     public int deleteBondInfoById(Long id);
 
+    R checkEntityBondFullName(String fullName);
+
+    R checkEntityBondTradCode(String tradCode);
+
+    R checkEntityBondShortName(String shortName);
+
     /**
      * 根据债券简称查询
      * @param shortName

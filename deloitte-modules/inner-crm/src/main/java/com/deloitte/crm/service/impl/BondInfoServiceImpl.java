@@ -15,6 +15,8 @@ import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
+import com.deloitte.crm.service.IEntityAttrService;
+import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.BondEntityInfoVo;
 import org.springframework.stereotype.Service;
@@ -133,6 +135,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @param fullName
      * @return
      */
+    @Override
     public R checkEntityBondFullName(String fullName){
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondFullName(fullName);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
@@ -144,6 +147,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @param tradCode
      * @return
      */
+    @Override
     public R checkEntityBondTradCode(String tradCode){
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondTradCode(tradCode);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
@@ -155,6 +159,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @param shortName
      * @return
      */
+    @Override
     public R checkEntityBondShortName(String shortName){
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondShortName(shortName);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}

@@ -1,6 +1,8 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 
 import java.io.Serializable;
@@ -17,6 +19,7 @@ public class EntityInfo implements Serializable
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /** 企业名 */
@@ -47,6 +50,9 @@ public class EntityInfo implements Serializable
     /** 统一社会信用代码是否异常 0-正常 1-异常 */
     @Excel(name = "统一社会信用代码是否异常 0-正常 1-异常")
     private Integer creditError;
+
+    /** 社会信用代码异常备注 */
+    private Integer creditErrorRemark;
 
     /** 若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：
     1、吊销
@@ -86,6 +92,14 @@ public class EntityInfo implements Serializable
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated = new Date();
+
+    public Integer getCreditErrorRemark() {
+        return creditErrorRemark;
+    }
+
+    public void setCreditErrorRemark(Integer creditErrorRemark) {
+        this.creditErrorRemark = creditErrorRemark;
+    }
 
     public Integer getStatus() {
         return status;

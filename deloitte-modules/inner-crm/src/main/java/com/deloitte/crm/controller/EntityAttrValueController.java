@@ -1,5 +1,25 @@
 package com.deloitte.crm.controller;
 
+import java.util.List;
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+
+import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.vo.EntityByIondVo;
+import com.deloitte.crm.vo.EntityStockInfoVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
@@ -106,4 +126,44 @@ public class EntityAttrValueController extends BaseController {
     public R addEntityAttrValues(List<EntityAttrValue> valueList) {
         return R.ok(entityAttrValueService.addEntityAttrValues(valueList));
     }
+
+
+    @PostMapping("/createBE")
+    @ApiOperation(value = "新增债券主体")
+    @ApiImplicitParam(name = "entityByIondVo", value = "", paramType = "body", example = "", dataTypeClass = EntityByIondVo.class)
+    /**
+     *新增债券主体
+     *
+     * @param entityByIondVo
+     * @return R
+     * @author penTang
+     * @date 2022/9/27 20:40
+     */
+    public R createBondEntity(@Validated @RequestBody EntityByIondVo entityByIondVo){
+
+        return entityAttrValueService.createBondEntity(entityByIondVo);
+
+    }
+
+
+    @PostMapping("/createST")
+    @ApiOperation(value = "新增股票主体")
+    @ApiImplicitParam(name = "entityStockInfoVo", value = "", paramType = "body", example = "", dataTypeClass = EntityStockInfoVo.class)
+    /**
+     *创建股票主体(根据股票状态 A -A股 G -港股)
+     *
+     * @param entityStockInfoVo
+     * @return R
+     * @author penTang
+     * @date 2022/9/28 23:09
+    */
+    public R createStockEntity(@Validated @RequestBody EntityStockInfoVo entityStockInfoVo){
+           if (ObjectUtils.equals(entityStockInfoVo.getStockType(),"A")){
+               return entityAttrValueService.createStockEntity(entityStockInfoVo);
+        } else if(ObjectUtils.equals(entityStockInfoVo.getStockType(),"G")){
+               return entityAttrValueService.createStockEntityG(entityStockInfoVo);
+           }
+        return null;
+    }
+
 }

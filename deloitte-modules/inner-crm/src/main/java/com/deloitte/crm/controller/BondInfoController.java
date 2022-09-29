@@ -3,15 +3,10 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import com.deloitte.common.core.domain.R;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
@@ -102,5 +97,44 @@ public class BondInfoController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(bondInfoService.deleteBondInfoByIds(ids));
+    }
+    /**
+     *企业债券全称
+     *
+     * @param
+     * @return R
+     * @author penTang
+     * @date 2022/9/29 16:10
+    */
+    @GetMapping("/checkBondFullName")
+    public R checkBondFullName(@RequestParam("BondFullName") String BondFullName ){
+        return R.ok(bondInfoService.checkEntityBondFullName(BondFullName));
+    }
+
+
+    /**
+     *企业债券简称查重
+     *
+     * @param
+     * @return R
+     * @author penTang
+     * @date 2022/9/29 16:10
+     */
+    @GetMapping("/BondShortName")
+    public R checkBondShortName(@RequestParam("BondShortName") String BondShortName ){
+        return R.ok(bondInfoService.checkEntityBondShortName(BondShortName));
+    }
+
+    /**
+     *企业债券代码查重
+     *
+     * @param
+     * @return R
+     * @author penTang
+     * @date 2022/9/29 16:10
+     */
+    @GetMapping("/BondCode")
+    public R checkBondCode(@RequestParam("BondShortName") String BondCode ){
+        return R.ok(bondInfoService.checkEntityBondTradCode(BondCode));
     }
 }

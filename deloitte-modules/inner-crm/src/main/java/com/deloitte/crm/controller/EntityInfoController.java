@@ -1,5 +1,4 @@
 package com.deloitte.crm.controller;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
@@ -283,10 +282,7 @@ public class EntityInfoController extends BaseController {
         return R.ok(entityInfoService.getOverviewByGroup());
     }
 
-    @GetMapping("/send")
-    public void send() {
-        service.SendEmail(3, "发了", "发友尽");
-    }
+
 
     /**
      * 主体整体概览

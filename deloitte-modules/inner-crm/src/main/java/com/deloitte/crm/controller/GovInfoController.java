@@ -57,7 +57,7 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 统计政府信息
+     * 导出政府信息
      *
      * @return GovInfoDto
      * @author penTang
