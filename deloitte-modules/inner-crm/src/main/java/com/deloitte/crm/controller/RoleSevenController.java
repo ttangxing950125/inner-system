@@ -1,18 +1,23 @@
 package com.deloitte.crm.controller;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmEntityTask;
+import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.vo.CrmEntityTaskVo;
 import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
@@ -46,10 +51,10 @@ public class RoleSevenController {
      * @return R<List<CrmEntityTask>> 当月任务情况
      */
     @ApiOperation(value="查询当月任务 by正杰")
-    @ApiImplicitParam(name="timeUnit",value="请传入参数 yyyy-mm",paramType = "query",dataType = "String")
+    @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm",paramType = "query",dataType = "String")
     @PostMapping("/getMouthTaskInfo")
     @Log(title = "【 查询当月任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmEntityTask>> getMouthTaskInfo(String date){
+    public R<List<CrmEntityTaskVo>> getMouthTaskInfo(String date){
         return iCrmEntityTaskService.getTaskInfo(Common.MOUTH,date);
     }
 
@@ -61,10 +66,10 @@ public class RoleSevenController {
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @ApiOperation(value="查询当日任务 by正杰")
-    @ApiImplicitParam(name="timeUnit",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String")
+    @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmEntityTask>> getDayTaskInfo(String date){
+    public R<List<CrmEntityTaskVo>> getDayTaskInfo(String date){
         return iCrmEntityTaskService.getTaskInfo(Common.DAY,date);
     }
 
@@ -108,19 +113,36 @@ public class RoleSevenController {
      * @return 比较信息结果
      */
     @ApiOperation(value="校验该主体是否存在，并做其他判断 by正杰")
-    @ApiImplicitParam(name="creditCode,entityName",value="传入 企业统一社会信用代码,传入 企业名称",required = true,paramType = "query",dataType = "String,String")
     @ApiImplicitParams({
             @ApiImplicitParam(name="creditCode",value="传入 企业统一社会信用代码",paramType = "query",dataType = "String"),
             @ApiImplicitParam(name="entityName",value="传入 企业名称",paramType = "query",dataType = "String")
     })
     @Log(title = "【校验该主体是否存在，并做其他判断】", businessType = BusinessType.OTHER)
     @PostMapping("/validEntity")
-    public R<EntityInfoVo> validEntity(String creditCode, String entityName){
+    public R<EntityInfoVo> validEntity(String creditCode, String entityName,Boolean enableCreditCode){
         Assert.isTrue(StringUtils.hasText(creditCode), BadInfo.PARAM_EMPTY.getInfo());
         Assert.isTrue(StringUtils.hasText(entityName), BadInfo.PARAM_EMPTY.getInfo());
         //校验数据库是否存在该主体
         return iEntityInfoService.validEntity(creditCode,entityName);
     }
+
+    /**
+     * @param entityDto
+     * @return
+     * @author 正杰
+     * @date 2022/9/22
+     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
+     */
+    @RequiresPermissions("crm:entityInfo:add")
+    @Log(title = "【确定该主体是新增后,填写具体要新增主体的信息】", businessType = BusinessType.INSERT)
+    @ApiImplicitParam(name = "entityInfoDto", value = "包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段", paramType = "body")
+    @PostMapping("/add")
+    public R addEntity(@RequestBody EntityDto entityDto) {
+        //TODO 新增主体
+        iEntityInfoService.insertEntityInfo(entityDto);
+        return R.ok();
+    }
+
 
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
@@ -175,7 +197,5 @@ public class RoleSevenController {
     public R<EntityInfoVo> checkEntityName(String entityName){
         return iEntityInfoService.checkEntityName(entityName);
     }
-
-    
 
 }

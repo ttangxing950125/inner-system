@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,6 +19,7 @@ import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.vo.CrmEntityTaskVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -129,19 +132,32 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
      * @return R<List<CrmEntityTask>> 当月任务情况
      */
     @Override
-    public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, String date) {
+    public R<List<CrmEntityTaskVo>> getTaskInfo(String timeUnit, String date) {
         switch (timeUnit){
             case Common.DAY:
                 Date dateDay = DateUtil.parseDate(date);
                 List<CrmEntityTask> res = baseMapper.selectList(new QueryWrapper<CrmEntityTask>()
                         .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
-                return R.ok(res,SuccessInfo.GET_SUCCESS.getInfo());
+                //TODO 查询债券代码以及债券信息等
+                List<CrmEntityTaskVo> result = new ArrayList<>();
+                res.forEach(row->{
+                    CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
+                    BeanUtil.copyProperties(row,crmEntityTaskVo);
+                    result.add(crmEntityTaskVo);
+                });
+                return R.ok(result,SuccessInfo.GET_SUCCESS.getInfo());
             case Common.MOUTH:
                 date +="-01";
                 Date dateTime = DateUtil.parseDate(date);
                 Date first = DateUtil.beginOfMonth(dateTime);
                 Date last = DateUtil.endOfMonth(dateTime);
-                List<CrmEntityTask> mouthList = crmEntityTaskMapper.selectCrmEntityTaskListThisMouth(first,last);
+                List<CrmEntityTask> mouth = crmEntityTaskMapper.selectCrmEntityTaskListThisMouth(first,last);
+                List<CrmEntityTaskVo> mouthList = new ArrayList<>();
+                mouth.forEach(row->{
+                    CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
+                    BeanUtil.copyProperties(row,crmEntityTaskVo);
+                    mouthList.add(crmEntityTaskVo);
+                });
                 return R.ok(mouthList,SuccessInfo.GET_SUCCESS.getInfo());
             default:
                 return R.fail(BadInfo.PARAM_EMPTY.getInfo());

@@ -49,11 +49,6 @@ public class EntityInfoController extends BaseController {
      */
     @PostMapping("/entityInfoList")
     @ApiOperation(value = "{统计整体企业主体情况}", response = EntityInfoDto.class)
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "query"
-            )
-    })
-
     public R getList() {
         return R.ok(entityInfoService.getEntityInfo());
     }
@@ -270,7 +265,6 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/28 10:56
      */
     @ApiOperation(value = "查询政府主体概览")
-    @ApiImplicitParam(name = "", value = "", paramType = "body", example = "", dataType = "")
     @PostMapping("/getOverview")
     public R getOverview() {
         return R.ok(entityInfoService.getOverview());
@@ -284,7 +278,6 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "企业主体分类概览")
-    @ApiImplicitParam(name = "", value = " ", paramType = "", example = "", dataType = "")
     @PostMapping("/getOverviewByGroup")
     public R getOverviewByGroup() {
         return R.ok(entityInfoService.getOverviewByGroup());
@@ -303,7 +296,6 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "主体整体概览")
-    @ApiImplicitParam(name = "", value = " ", paramType = "", example = "", dataType = "")
     @PostMapping("/getOverviewByAll")
     public R getOverviewByAll() {
         return R.ok(entityInfoService.getOverviewByAll());

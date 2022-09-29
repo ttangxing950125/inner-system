@@ -5,7 +5,11 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.service.ICrmMasTaskService;
+import com.deloitte.crm.service.IModelMasterService;
+import com.deloitte.crm.vo.CrmMasTaskVo;
+import com.deloitte.crm.vo.ModelMasterInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -31,6 +35,8 @@ public class RoleTwoController {
 
     private final ICrmMasTaskService iCrmMasTaskService;
 
+    private final IModelMasterService iModelMasterService;
+
     /**
      * 角色2今日运维模块
      * @author 正杰
@@ -42,7 +48,7 @@ public class RoleTwoController {
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmMasTask>> getDayTaskInfo(String date){
+    public R<List<CrmMasTaskVo>> getDayTaskInfo(String date){
         //单表查询 角色2当日任务完成情况
         return iCrmMasTaskService.getTaskInfo(Common.DAY,date);
     }
@@ -58,7 +64,7 @@ public class RoleTwoController {
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM",paramType = "query",dataType = "String")
     @PostMapping("/getMouthTaskInfo")
     @Log(title = "【 查询当月任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmMasTask>> getMouthTaskInfo(String date){
+    public R<List<CrmMasTaskVo>> getMouthTaskInfo(String date){
         //单表查询 角色2当月任务完成情况
         return iCrmMasTaskService.getTaskInfo(Common.MOUTH,date);
     }
@@ -79,5 +85,19 @@ public class RoleTwoController {
         //TODO 修改 关联大表 crm_daily_task 的 task_status
         return iCrmMasTaskService.changeState(id);
     }
+
+    /**
+     * 敞口划分 选中单行开始工作 传入id后返回窗口 by正杰
+     * @param id
+     * @return
+     */
+    @ApiOperation(value="敞口划分，选中单行开始工作 传入id后返回窗口 by正杰")
+    @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer")
+    @Log(title = "确认该任务已完成,修改数据库任务状态", businessType = BusinessType.OTHER)
+    @PostMapping("/getTable")
+    public R<ModelMasterInfoVo> getTable(Integer id){
+        return iModelMasterService.getTable(id);
+    }
+
 
 }

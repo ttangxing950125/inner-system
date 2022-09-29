@@ -1,7 +1,10 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.ModelMaster;
+import com.deloitte.crm.vo.ModelMasterInfoVo;
 
 /**
  * 【请填写功能名称】Service接口
@@ -58,4 +61,11 @@ public interface IModelMasterService
      * @return 结果
      */
     public int deleteModelMasterById(Long id);
+
+    /**
+     * 敞口划分 选中单行开始工作 传入id后返回窗口 by正杰
+     * @param id
+     * @return
+     */
+    R<ModelMasterInfoVo> getTable(Integer id);
 }

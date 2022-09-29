@@ -194,7 +194,6 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "政府主体分类概览")
-    @ApiImplicitParam(name = "", value = " ", paramType = "", example = "", dataType = "")
     @PostMapping("/getOverviewByGroup")
     public R getOverviewByGroup() {
         return R.ok(govInfoService.getOverviewByGroup());
@@ -275,7 +274,6 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/28 10:56
      */
     @ApiOperation(value = "政府主体总概览")
-    @ApiImplicitParam(name = "", value = "", paramType = "body", example = "", dataType = "")
     @PostMapping("/getOverview")
     public R getOverview() {
         return R.ok(govInfoService.getOverview());

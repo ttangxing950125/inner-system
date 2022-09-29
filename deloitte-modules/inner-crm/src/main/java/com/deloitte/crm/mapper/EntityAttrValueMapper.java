@@ -104,4 +104,12 @@ public interface EntityAttrValueMapper extends BaseMapper<EntityAttrValue>
      * @return
      */
     List<EntityAttrValue> checkEntityBondValue(@Param("key") Integer key, @Param("value") String value);
+
+    /**
+     * 传入主体的 bdCode 和 attrId 查询具体属性值
+     * @param attrId attrId
+     * @param bondCode bdCode
+     * @return
+     */
+    EntityAttrValue findValueByCodeAndAttrId(@Param("attrId") Integer attrId,@Param("bondCode") String bondCode);
 }
