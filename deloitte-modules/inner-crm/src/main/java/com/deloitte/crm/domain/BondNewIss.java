@@ -111,17 +111,17 @@ public class BondNewIss implements Serializable
     @Excel(name = "付息频率")
     private Integer payFre;
 
-    /** 公告日期 yyyy-MM-dd */
+    /** 公告日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "公告日期 yyyy-MM-dd", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "公告日期", width = 30, dateFormat = "yyyy-MM-dd")
     private String annoDate;
 
-    /** 发行截止日期 yyyy-MM-dd */
+    /** 发行截止日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "发行截止日", width = 30, dateFormat = "yyyy-MM-dd")
     private String issEndDate;
 
-    /** 上市日期 yyyy-MM-dd */
+    /** 上市日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "上市日期", width = 30, dateFormat = "yyyy-MM-dd")
     private String ipoDate;
@@ -333,11 +333,11 @@ public class BondNewIss implements Serializable
     private BigDecimal denom;
 
     /** 地方政府债新增金额（万） */
-    @Excel(name = "地方政府债新增金额", readConverterExp = "万=")
+    @Excel(name = "地方政府债新增金额（万）")
     private BigDecimal govNewAmount;
 
     /** 地方政府债置换金额（万） */
-    @Excel(name = "地方政府债置换金额", readConverterExp = "万=")
+    @Excel(name = "地方政府债置换金额（万）")
     private BigDecimal govReplaceAmount;
 
 }

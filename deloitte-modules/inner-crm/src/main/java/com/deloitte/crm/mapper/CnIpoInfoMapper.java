@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.CnIpoInfo;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.CnIpoInfo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface CnIpoInfoMapper 
+public interface CnIpoInfoMapper extends BaseMapper<CnIpoInfo>
 {
     /**
      * 查询IPO-新股发行资料-20210914-20221014
@@ -58,4 +60,11 @@ public interface CnIpoInfoMapper
      * @return 结果
      */
     public int deleteCnIpoInfoByIds(Long[] ids);
+
+    /**
+     * 根据code查询最后一个  IPO-新股发行资料
+     * @param code
+     * @return
+     */
+    CnIpoInfo findLastByCode(String code);
 }

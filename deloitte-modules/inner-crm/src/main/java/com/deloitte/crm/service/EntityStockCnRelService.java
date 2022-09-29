@@ -1,10 +1,9 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.deloitte.crm.domain.CnCoachBack;
-import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.EntityStockCnRel;
-import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.domain.*;
+
+import java.util.List;
 
 /**
  * (EntityStockCnRel)表服务接口
@@ -23,4 +22,11 @@ public interface EntityStockCnRelService extends IService<EntityStockCnRel> {
      * @return
      */
     boolean bindRelOrCreateTask(StockCnInfo stockCnInfo, String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack);
+
+    /**
+     * 查询和德勤code的a股所属主体
+     * @param code
+     * @return
+     */
+    List<EntityInfo> findByStockCode(String code);
 }

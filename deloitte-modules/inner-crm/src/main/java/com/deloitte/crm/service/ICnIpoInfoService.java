@@ -1,7 +1,10 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CnIpoInfo;
+import com.deloitte.crm.domain.CrmWindTask;
 
 /**
  * IPO-新股发行资料-20210914-20221014Service接口
@@ -9,7 +12,7 @@ import com.deloitte.crm.domain.CnIpoInfo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICnIpoInfoService 
+public interface ICnIpoInfoService extends IService<CnIpoInfo>
 {
     /**
      * 查询IPO-新股发行资料-20210914-20221014
@@ -58,4 +61,19 @@ public interface ICnIpoInfoService
      * @return 结果
      */
     public int deleteCnIpoInfoById(Long id);
+
+    /**
+     * 根据code查询最后一个  IPO-新股发行资料
+     * @param code
+     * @return
+     */
+    CnIpoInfo findLastByCode(String code);
+
+    /**
+     * 导入完成IPO-新股发行资料 的任务
+     * @param windTask
+     * @param list
+     * @return
+     */
+    Object doTask(CrmWindTask windTask, List<CnIpoInfo> list);
 }

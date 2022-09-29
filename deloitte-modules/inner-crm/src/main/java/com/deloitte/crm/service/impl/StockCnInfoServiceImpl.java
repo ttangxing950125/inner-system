@@ -45,35 +45,6 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
         return stockCnInfo;
     }
 
-    public static void main(String[] args) {
-        String str = "IB_00005256," +
-                "IB_00003631," +
-                "IB_00010710," +
-                "IB_00021925," +
-                "IB_00018105," +
-                "IB_00006221," +
-                "IB_00013139," +
-                "IB_00015540," +
-                "IB_00015540," +
-                "IB_00005677," +
-                "IB_00000730," +
-                "IB_00015106," +
-                "IB_00006800," +
-                "IB_00017838," +
-                "IB_00027590," +
-                "IB_00003345," +
-                "IB_00002707," +
-                "IB_00028181," +
-                "IB_00028180," +
-                "IB_00028132," +
-                "IB_00026576,";
-
-        String[] split = str.split(",");
-        for (String item : split) {
-            System.out.print("'"+item+"',");
-        }
-    }
-
     /**
      * 保存或更新，会删缓存
      * @param cnInfo
@@ -93,7 +64,7 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
             baseMapper.updateById(cnInfo);
         }
 
-        redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_THK_INFO, cnInfo.getStockCode());
+        redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, cnInfo.getStockCode());
 
         return cnInfo;
     }

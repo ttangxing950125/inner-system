@@ -63,6 +63,9 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     public Object doTask(Long taskId, MultipartFile file) throws Exception {
         //查询当前任务
         CrmWindTask windTask = crmWindTaskMapper.selectCrmWindTaskById(taskId);
+        if (windTask==null){
+            throw new GlobalException("没有该任务");
+        }
         //任务是否完成，已完成不允许上传
         if (!Objects.equals(windTask.getComplete(), 0)){
             throw new GlobalException("只能处理未处理的任务");
