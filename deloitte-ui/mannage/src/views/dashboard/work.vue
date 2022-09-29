@@ -11,8 +11,12 @@
             <h3 class="title1">{{ item.taskFileName }}</h3>
             <el-button class="back" type="text">下载导入模板</el-button>
             <fileUpload
-              :uploadUrl="'/crm/windTask/doTask/' + 13"
+              :uploadUrl="'/crm/windTask/doTask/' + item.windTask.id"
+              :index="index"
               ref="fileUpload"
+              @loading="loading"
+              @uploadFail="uploadFail"
+              @uploadPass="uploadPass"
             />
           </div>
           <div v-if="item.taskStatus === 0">
@@ -109,6 +113,15 @@ export default {
     },
     changeTab(tab) {
       this.currentTab = tab;
+    },
+    loading(index) {
+      this.contentData[index].taskStatus = 2;
+    },
+    uploadPass(data, index) {
+      this.contentData[index].taskStatus = 1;
+    },
+    uploadFail(index) {
+      this.contentData[index].taskStatus = 0;
     },
   },
 };
