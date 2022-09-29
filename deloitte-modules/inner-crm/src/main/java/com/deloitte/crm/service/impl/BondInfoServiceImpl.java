@@ -12,6 +12,7 @@ import com.deloitte.crm.constants.*;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.dto.EntityAttrDetailDto;
+import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class BondInfoServiceImpl implements IBondInfoService
 
     @Resource
     private RedisService redisService;
+
+    @Resource
+    private EntityAttrValueMapper entityAttrValueMapper;
 
 
 
@@ -125,7 +129,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @return
      */
     public R checkEntityBondFullName(String fullName){
-        List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondFullName(fullName);
+        List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondFullName(fullName);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
         return R.ok(BadInfo.UNABLE_CREAT.getInfo());
     }
@@ -136,7 +140,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @return
      */
     public R checkEntityBondTradCode(String tradCode){
-        List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondTradCode(tradCode);
+        List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondTradCode(tradCode);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
         return R.ok(BadInfo.UNABLE_CREAT.getInfo());
     }
@@ -147,7 +151,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @return
      */
     public R checkEntityBondShortName(String shortName){
-        List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondShortName(shortName);
+        List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondShortName(shortName);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
         return R.ok(BadInfo.UNABLE_CREAT.getInfo());
     }
@@ -168,7 +172,7 @@ public class BondInfoServiceImpl implements IBondInfoService
 
         Integer key = map.get(keyword);
         if(key!=null){
-            List<EntityAttrValue> entityAttrValue = entityAttrValueService.checkEntityBondValue(key,value);
+            List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondValue(key,value);
             if(entityAttrValue.size()!=0){return R.ok(BadInfo.UNABLE_CREAT.getInfo());}
             return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
         }

@@ -109,32 +109,4 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      */
     int updateStockCnAttr(String code, Object item);
 
-    /**
-     * 检查企业债券全称
-     * @param fullName
-     * @return
-     */
-    List<EntityAttrValue> checkEntityBondFullName(String fullName);
-
-    /**
-     * 检查企业债券代码
-     * @param tradCode
-     * @return
-     */
-    List<EntityAttrValue> checkEntityBondTradCode(String tradCode);
-
-    /**
-     * 检查企业债券简称
-     * @param shortName
-     * @return
-     */
-    List<EntityAttrValue> checkEntityBondShortName(String shortName);
-
-    /**
-     * value查询
-     * @param key
-     * @param value
-     * @return
-     */
-    List<EntityAttrValue> checkEntityBondValue(@Param("key") Integer key, @Param("value") String value);
 }
