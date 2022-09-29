@@ -1,5 +1,7 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -122,39 +124,23 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
     /**
      * 角色7今日运维模块
      * @author 正杰
+     * @param date
      * @date 2022/9/22
-     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy/mm/dd
-     * @return 当月或者当日的任务情况
+     * @return R<List<CrmEntityTask>> 当月任务情况
      */
     @Override
-    public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date) {
+    public R<List<CrmEntityTask>> getTaskInfo(String timeUnit, String date) {
         switch (timeUnit){
             case Common.DAY:
+                Date dateDay = DateUtil.parseDate(date);
                 List<CrmEntityTask> res = baseMapper.selectList(new QueryWrapper<CrmEntityTask>()
-                        .lambda().eq(CrmEntityTask::getTaskDate, date));
+                        .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
                 return R.ok(res,SuccessInfo.GET_SUCCESS.getInfo());
             case Common.MOUTH:
-                Date first = null;
-                Date last = null;
-                try {
-                    LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                    ParsePosition pos = new ParsePosition(8);
-
-                    first = Date.from(localDate.with(TemporalAdjusters.firstDayOfMonth())
-                            .atTime(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
-                    String firstString = formatter.format(first);
-                    first = formatter.parse(firstString);
-
-                    last = Date.from(localDate.with(TemporalAdjusters.lastDayOfMonth())
-                            .atTime(LocalTime.MIN).atZone(ZoneId.systemDefault()).toInstant());
-                    String lastString = formatter.format(last);
-                    last = formatter.parse(lastString);
-                } catch (ParseException e) {
-                    return R.fail();
-                }
+                date +="-01";
+                Date dateTime = DateUtil.parseDate(date);
+                Date first = DateUtil.beginOfMonth(dateTime);
+                Date last = DateUtil.endOfMonth(dateTime);
                 List<CrmEntityTask> mouthList = crmEntityTaskMapper.selectCrmEntityTaskListThisMouth(first,last);
                 return R.ok(mouthList,SuccessInfo.GET_SUCCESS.getInfo());
             default:

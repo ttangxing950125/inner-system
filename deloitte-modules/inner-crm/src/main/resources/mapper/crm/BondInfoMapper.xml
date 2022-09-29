@@ -78,4 +78,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <resultMap type="com.deloitte.crm.dto.EntityAttrDetailDto" id="EntityAttrDetailDto">
+        <result property="name"    column="name" />
+        <result property="value"    column="value" />
+        <result property="attrId"    column="attrId" />
+        <result property="attrValueId"    column="attrValueId" />
+    </resultMap>
+
+    <select id="findByQualName" resultMap="EntityAttrDetailDto">
+        SELECT
+            b.`name`,
+            a.`value`,
+            b.id AS `attrId`,
+            a.id AS `attrValueId`
+        FROM
+            entity_attr_value AS a
+                LEFT JOIN entity_attr AS b ON a.attr_id = b.id
+        WHERE
+            a.entity_code = #{bondCode}
+            a.attr_id = 57
+    </select>
+
 </mapper>

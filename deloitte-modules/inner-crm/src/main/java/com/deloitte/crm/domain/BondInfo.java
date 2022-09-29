@@ -3,9 +3,7 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 import lombok.Data;
 
 /**
@@ -15,7 +13,7 @@ import lombok.Data;
  * @date 2022-09-23
  */
 @Data
-public class BondInfo extends BaseEntity
+public class BondInfo
 {
     private static final long serialVersionUID = 1L;
 

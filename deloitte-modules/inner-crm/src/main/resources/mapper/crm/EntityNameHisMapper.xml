@@ -96,7 +96,7 @@
             <if test="source != null">source,</if>
             <if test="creater != null">creater,</if>
             <if test="created != null">created,</if>
-            <if test="update != null">update,</if>
+            <if test="updated != null">updated,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entityType != null">#{entityType},</if>
@@ -108,7 +108,7 @@
             <if test="source != null">#{source},</if>
             <if test="creater != null">#{creater},</if>
             <if test="created != null">#{created},</if>
-            <if test="update != null">#{update},</if>
+            <if test="updated != null">#{updated},</if>
         </trim>
     </insert>
 

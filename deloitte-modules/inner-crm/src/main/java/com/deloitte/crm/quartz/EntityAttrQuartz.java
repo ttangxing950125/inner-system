@@ -15,8 +15,6 @@ import java.util.List;
 @Component
 public class EntityAttrQuartz {
 
-
-
     @Resource
     private IEntityAttrService entityAttrService;
 

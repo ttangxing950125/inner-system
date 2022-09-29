@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@Data
 public class EntityNameHis implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -63,106 +65,6 @@ public class EntityNameHis implements Serializable
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
-
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setEntityType(Integer entityType) 
-    {
-        this.entityType = entityType;
-    }
-
-    public Integer getEntityType() 
-    {
-        return entityType;
-    }
-    public void setStatus(Integer status) 
-    {
-        this.status = status;
-    }
-
-    public Integer getStatus() 
-    {
-        return status;
-    }
-    public void setDqCode(String dqCode) 
-    {
-        this.dqCode = dqCode;
-    }
-
-    public String getDqCode() 
-    {
-        return dqCode;
-    }
-    public void setHappenDate(Date happenDate) 
-    {
-        this.happenDate = happenDate;
-    }
-
-    public Date getHappenDate() 
-    {
-        return happenDate;
-    }
-    public void setOldName(String oldName) 
-    {
-        this.oldName = oldName;
-    }
-
-    public String getOldName() 
-    {
-        return oldName;
-    }
-    public void setRemarks(String remarks) 
-    {
-        this.remarks = remarks;
-    }
-
-    public String getRemarks() 
-    {
-        return remarks;
-    }
-    public void setSource(Integer source) 
-    {
-        this.source = source;
-    }
-
-    public Integer getSource() 
-    {
-        return source;
-    }
-    public void setCreater(String creater) 
-    {
-        this.creater = creater;
-    }
-
-    public String getCreater() 
-    {
-        return creater;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdated(Date updated)
-    {
-        this.updated = updated;
-    }
-
-    public Date getUpdated()
-    {
-        return updated;
-    }
 
     @Override
     public String toString() {

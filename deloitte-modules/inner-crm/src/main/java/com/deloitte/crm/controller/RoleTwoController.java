@@ -3,6 +3,7 @@ package com.deloitte.crm.controller;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.service.ICrmMasTaskService;
 import io.swagger.annotations.Api;
@@ -34,19 +35,32 @@ public class RoleTwoController {
      * 角色2今日运维模块
      * @author 正杰
      * @date 2022/9/27
-     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy/mm/dd
-     * @return R<List<CrmMasTask>> 当月或者当日的任务情况
+     * @param date 请传入参数 yyyy-MM-dd
+     * @return R<List<CrmMasTask>> 当月任务
      */
-    @ApiOperation(value="查询指定日期或当月任务情况,返回 List<CrmMasTask> by正杰")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="timeUnit",value="请传入时间单位常量 MOUTH || DAY",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="date",value="请传入具体日期: yyyy/mm/dd",paramType = "query",dataType = "Date")})
-    @PostMapping("/getTaskInfo")
-    @Log(title = "【查询指定日期或当月任务情况】", businessType = BusinessType.OTHER)
-    public R<List<CrmMasTask>> getTaskInfo(String timeUnit, Date date){
-        //单表查询 角色2当月||当日任务完成情况
-        return iCrmMasTaskService.getTaskInfo(timeUnit,date);
+    @ApiOperation(value="查询当日任务 by正杰")
+    @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String")
+    @PostMapping("/getDayTaskInfo")
+    @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
+    public R<List<CrmMasTask>> getDayTaskInfo(String date){
+        //单表查询 角色2当日任务完成情况
+        return iCrmMasTaskService.getTaskInfo(Common.DAY,date);
+    }
+
+    /**
+     * 角色2今日运维模块
+     * @author 正杰
+     * @date 2022/9/27
+     * @param date 请传入参数 yyyy-MM
+     * @return R<List<CrmMasTask>> 当日任务
+     */
+    @ApiOperation(value="查询当月任务 by正杰")
+    @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM",paramType = "query",dataType = "String")
+    @PostMapping("/getMouthTaskInfo")
+    @Log(title = "【 查询当月任务情况 】", businessType = BusinessType.OTHER)
+    public R<List<CrmMasTask>> getMouthTaskInfo(String date){
+        //单表查询 角色2当月任务完成情况
+        return iCrmMasTaskService.getTaskInfo(Common.MOUTH,date);
     }
 
     /**

@@ -166,9 +166,38 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     R supplyUIInformation(EntityAttrByDto entityAttrDto);
 
+
+    /**
+     * 查询债券或是主体下相关的主体或是债券信息 by正杰
+     * @param code
+     * @param keyword
+     * @return
+     * @author 正杰
+     * @date 2022/9/25
+     */
+    R<List<TargetEntityBondsVo>> findRelationEntityOrBond(String code, String keyword);
+
+
     Map<String,Object> getOverview();
 
     Map<String,Object> getOverviewByGroup();
 
     Map<String,Object> getOverviewByAll();
+    /**
+     * 校验统一社会信用代码是否存在 by正杰
+     * @author 正杰
+     * @date 2022/9/28
+     * @param creditCode
+     * @return
+     */
+    R<EntityInfoVo> checkCreditCode(String creditCode);
+
+    /**
+     * 校验主体名称是否存在
+     * @author 正杰
+     * @date 2022/9/28
+     * @param entityName
+     * @return R
+     */
+    R<EntityInfoVo> checkEntityName(String entityName);
 }

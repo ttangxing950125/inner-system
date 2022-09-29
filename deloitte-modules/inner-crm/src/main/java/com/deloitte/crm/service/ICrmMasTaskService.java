@@ -81,7 +81,7 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      * @param date 请传入具体日期: yyyy/mm/dd
      * @return R<List<CrmMasTask>> 当月或者当日的任务情况
      */
-    R<List<CrmMasTask>> getTaskInfo(String timeUnit, Date date);
+    R<List<CrmMasTask>> getTaskInfo(String timeUnit, String date);
 
     /**
      * 确认该任务已完成,修改数据库任务状态

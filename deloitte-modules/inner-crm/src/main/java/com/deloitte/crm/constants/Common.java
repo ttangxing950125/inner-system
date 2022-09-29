@@ -1,5 +1,8 @@
 package com.deloitte.crm.constants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author 正杰
  * @description: common
@@ -41,11 +44,6 @@ public enum Common {
     public static final Integer TRANSACTION_CODE_ID = 804;
 
 
-
-    public static final String BOND_SHORT_NAME = "债券简称";
-    public static final Integer BOND_SHORT_NAME_ID = 803;
-
-
     public static final String WHETHER_COLLECTIVE_BONDS = "是否发行集合债";
     public static final Integer WHETHER_COLLECTIVE_BONDS_ID = 58;
 
@@ -56,11 +54,5 @@ public enum Common {
 
     public static final String WHETHER_VIOLATION = "是否违约";
     public static final Integer WHETHER_VIOLATION_ID = 108;
-
-
-
-
-
-
 
 }

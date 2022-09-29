@@ -67,11 +67,12 @@ public interface ICrmEntityTaskService
      * 角色7今日运维模块
      * @author 正杰
      * @date 2022/9/22
-     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy-mm-dd
+     * @param timeUnit 传入时间单位常量 MOUTH || DAY
+     * @param date 请传入具体日期: yyyy-mm || yyyy-mm-dd
      * @return R<List<CrmEntityTask>> 当月或者当日的任务情况
      */
-    R<List<CrmEntityTask>> getTaskInfo(String timeUnit, Date date);
+    R<List<CrmEntityTask>> getTaskInfo(String timeUnit,String date);
+
 
     /**
      * 确认该任务的主体是新增或是忽略
@@ -89,4 +90,5 @@ public interface ICrmEntityTaskService
      * @return
      */
     CrmEntityTask createTask(CrmEntityTask crmEntityTask);
+
 }

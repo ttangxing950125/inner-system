@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CnApprdWaitIss;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.ThkSecIssInfo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 【请填写功能名称】Service接口
@@ -107,4 +108,5 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      * @return
      */
     int updateStockCnAttr(String code, Object item);
+
 }

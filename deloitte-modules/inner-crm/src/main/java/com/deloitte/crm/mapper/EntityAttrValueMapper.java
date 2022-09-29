@@ -3,6 +3,7 @@ package com.deloitte.crm.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -64,4 +65,43 @@ public interface EntityAttrValueMapper extends BaseMapper<EntityAttrValue>
 
 
     EntityAttrValue findByAttrCode(EntityAttrValue attrValue);
+
+    /**
+     * 匹配所有债券 通过全名或者短名
+     * @param name
+     * @return
+     */
+    List<EntityAttrValue> matchingNameByBondName(String name);
+
+
+    EntityAttrValue findTradCode(@Param("entityCode") String entityCode);
+
+    /**
+     * 检查企业债券全称
+     * @param fullName
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondFullName(String fullName);
+
+    /**
+     * 检查企业债券代码
+     * @param tradCode
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondTradCode(String tradCode);
+
+    /**
+     * 检查企业债券简称
+     * @param shortName
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondShortName(String shortName);
+
+    /**
+     * value查询
+     * @param key
+     * @param value
+     * @return
+     */
+    List<EntityAttrValue> checkEntityBondValue(@Param("key") Integer key, @Param("value") String value);
 }
