@@ -8,6 +8,24 @@ package com.deloitte.crm.constants;
 public enum Common {
 
     NULL;
+    //        经开区为“GVA”+000001开始排序
+    public static final String DOV_INFO_TYPE_JK_CODE = "GVA";
+    //        高新区为“GVB”+000001开始排序
+    public static final String DOV_INFO_TYPE_GX_CODE = "GVB";
+    //        新区为“GVC”+000001开始排序
+    public static final String DOV_INFO_TYPE_XQ_CODE = "GVC";
+    //        其他类型区域暂以“GVZ”+000001开始排序
+    public static final String DOV_INFO_TYPE_QT_CODE = "GVZ";
+    //        省级、地级、县级政府为“GV+官方行政代码
+    public static final String DOV_INFO_TYPE_PRIVINCE_CODE = "GV";
+    //        省
+    public static final String DOV_INFO_TYPE_PRIVINCE_NAME = "省";
+    //        市
+    public static final String DOV_INFO_TYPE_CITY_NAME = "市";
+    //        县
+    public static final String DOV_INFO_TYPE_AREAXIAN_NAME = "县";
+    //        区
+    public static final String DOV_INFO_TYPE_AREAQU_NAME = "区";
 
     public static final String DAY = "DAY";
 

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityNameHis;
@@ -42,6 +43,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.System.out;
@@ -222,45 +224,15 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public R getInfoList(String param) {
-
-//        String param = govInfodto.getParam();
-//        Integer pageNum = govInfodto.getPageNum();
-//        Integer pageSize = govInfodto.getPageSize();
-//        if (ObjectUtils.isEmpty(pageNum)) {
-//            return R.fail("请输入页码");
-//        }
-//        if (ObjectUtils.isEmpty(pageSize)) {
-//            pageSize = EntityUtils.DEFAULT_PAGE_SIZE;
-//        }
-//        Page<GovInfo> pageInfo = new Page<>(pageNum, pageSize);
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
-
-//        Page<GovInfo> govInfoPage =   govInfoMapper.selectPage(pageInf,
-//                queryWrapper.lambda()
-//                        .like(GovInfo::getDqGovCode, param)
-//                        .or().like(GovInfo::getGovName,param)
-//        );
-//        //创建结果集
-//        Page<Map<String, Object>> pageResult = new Page<>();
-//        pageResult.setTotal(govInfoPage.getTotal()).setPages(govInfoPage.getPages()).setCurrent(govInfoPage.getCurrent());
-//        //封装结果集
-//        List<Map<String, Object>> records = new ArrayList<>();
-//        govInfoPage.getRecords().stream().forEach(o -> {
-//            records.add(getResultMap(o));
-//        });
-//        pageResult.setRecords(records);
-        if (!ObjectUtils.isEmpty(param)) {
-            queryWrapper.lambda()
-                    .like(GovInfo::getDqGovCode, param)
-                    .or().like(GovInfo::getGovName, param);
-        }
-        List<GovInfo> govInfoPage = govInfoMapper.selectList(
-                queryWrapper);
-
+    public R getInfoList(Integer type, String param) {
+        GovInfo govInfo = new GovInfo();
+        govInfo.setGovType(type);
+        govInfo.setDqGovCode(param);
+        govInfo.setGovName(param);
+        List<GovInfo> govInfoList = govInfoMapper.selectGovInfoListByTypeAndParam(govInfo);
         //封装结果集
         List<Map<String, Object>> records = new ArrayList<>();
-        govInfoPage.stream().forEach(o -> {
+        govInfoList.stream().forEach(o -> {
             records.add(getResultMap(o));
         });
         return R.ok(records);
@@ -554,14 +526,56 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public Object getOverview() {
-        QueryWrapper<GovInfo>query=new QueryWrapper<>();
+    public Map<String, Object> getOverview() {
+        QueryWrapper<GovInfo> query = new QueryWrapper<>();
         Long count = govInfoMapper.selectCount(query);
         Long aLong = govInfoMapper.selectCount(query.lambda().eq(GovInfo::getInvalid, 0));
-        Map<String,Object>result=new HashMap<>();
-        result.put("count",count);
-        result.put("invalid",aLong);
-        result.put("unInvalid",count-aLong);
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", count);
+        result.put("invalid", aLong);
+        result.put("unInvalid", count - aLong);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getOverviewByGroup() {
+        Long count = govInfoMapper.selectCount(new QueryWrapper<>());
+//        经开区为“GVA”+000001开始排序
+        Integer JK = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_JK_CODE).size();
+//        高新区为“GVB”+000001开始排序
+        Integer GX = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_GX_CODE).size();
+//        新区为“GVC”+000001开始排序
+        Integer XQ = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_XQ_CODE).size();
+//        其他类型区域暂以“GVZ”+000001开始排序
+        Integer QT = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_QT_CODE).size();
+
+//        地级政府为“GV+官方行政代码”
+        List<GovInfo> govInfosList = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_PRIVINCE_CODE);
+//        县级政府为“GV+官方行政代码”
+        AtomicReference<Integer> province = new AtomicReference<>(0);
+        AtomicReference<Integer> city = new AtomicReference<>(0);
+        AtomicReference<Integer> area = new AtomicReference<>(0);
+        govInfosList.stream().forEach(o -> {
+            String govName = o.getGovName();
+            if (!ObjectUtils.isEmpty(govName)){
+                if (govName.contains(Common.DOV_INFO_TYPE_PRIVINCE_NAME)){
+                    province.getAndSet(province.get() + 1);
+                }else if (govName.contains(Common.DOV_INFO_TYPE_CITY_NAME)){
+                    city.getAndSet(city.get() + 1);
+                }else {
+                    area.getAndSet(area.get() + 1);
+                }
+            }
+        });
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", count);
+        result.put("JK", JK);
+        result.put("GX", GX);
+        result.put("XQ", XQ);
+        result.put("QT", QT);
+        result.put("city", city);
+        result.put("area", area);
+        result.put("province", province);
         return result;
     }
 

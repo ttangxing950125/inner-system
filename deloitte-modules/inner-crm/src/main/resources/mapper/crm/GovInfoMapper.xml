@@ -118,6 +118,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
+    <select id="selectGovInfoListByTypeAndParam" parameterType="GovInfo" resultMap="GovInfoResult">
+        <include refid="selectGovInfoVo"/>
+        <where>
+            <if test="govType != null "> and gov_type = #{govType}</if>
+            <if test="govName != null  and govName != ''"> and gov_name like concat('%', #{govName}, '%')or dq_gov_code like concat('%', #{dqGovCode}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectCountByGroup" parameterType="java.lang.String" resultMap="GovInfoResult">
+        SELECT * FROM gov_info WHERE dq_gov_code = CONCAT(#{param}, gov_code)
+    </select>
+
     <delete id="deleteGovInfoById" parameterType="Long">
         delete from gov_info where id = #{id}
     </delete>

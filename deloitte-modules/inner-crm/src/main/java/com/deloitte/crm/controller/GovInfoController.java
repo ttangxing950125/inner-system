@@ -10,7 +10,6 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.GovInfoByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.service.IGovInfoService;
 import io.swagger.annotations.Api;
@@ -169,18 +168,35 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 政府主体分页查询
+     * 政府主体分类查询
      *
-     * @param param
+     * @param type  政府主体类型 1、地方政府2、地方主管部门3、其他
+     * @param param 筛选条件
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
-    @ApiOperation(value = "政府主体分页查询")
-    @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfoByDto.class)
+    @ApiOperation(value = "政府主体分类查询")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "政府主体类型 1、地方政府2、地方主管部门3、其他", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
+    })
     @PostMapping("/getInfoList")
-    public R getInfoList(String param) {
-        return govInfoService.getInfoList(param);
+    public R getInfoList(Integer type,String param) {
+        return govInfoService.getInfoList(type,param);
+    }
+
+    /**
+     * 政府主体分类概览
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/22 17:49
+     */
+    @ApiOperation(value = "政府主体分类概览")
+    @ApiImplicitParam(name = "", value = " ", paramType = "", example = "", dataType = "")
+    @PostMapping("/getOverviewByGroup")
+    public R getOverviewByGroup() {
+        return R.ok(govInfoService.getOverviewByGroup());
     }
 
     /**
@@ -251,13 +267,13 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 查询政府主体概览
+     * 政府主体总概览
      *
      * @return AjaxResult
      * @author 冉浩岑
      * @date 2022/9/28 10:56
      */
-    @ApiOperation(value = "查询政府主体概览")
+    @ApiOperation(value = "政府主体总概览")
     @ApiImplicitParam(name = "", value = "", paramType = "body", example = "", dataType = "")
     @PostMapping("/getOverview")
     public R getOverview() {

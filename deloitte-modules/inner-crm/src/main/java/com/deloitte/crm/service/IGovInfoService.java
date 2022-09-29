@@ -7,6 +7,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service接口
@@ -79,7 +80,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R getInfoDetail(GovInfo govInfo);
 
-    R getInfoList(String param);
+    R getInfoList(Integer type,String param);
 
     R addOldName(GovInfo govInfo);
 
@@ -92,5 +93,7 @@ public interface IGovInfoService  extends IService<GovInfo>
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
 
-    Object getOverview();
+    Map<String, Object> getOverview();
+
+    Map<String, Object> getOverviewByGroup();
 }

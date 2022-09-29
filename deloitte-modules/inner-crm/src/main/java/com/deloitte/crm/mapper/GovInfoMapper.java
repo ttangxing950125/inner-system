@@ -2,6 +2,7 @@ package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.GovInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -61,4 +62,7 @@ public interface GovInfoMapper extends BaseMapper<GovInfo>
      */
     public int deleteGovInfoByIds(Long[] ids);
 
+    List<GovInfo> selectGovInfoListByTypeAndParam(GovInfo govInfo);
+
+    List<GovInfo> selectCountByGroup(@Param("param") String param);
 }
