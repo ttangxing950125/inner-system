@@ -4,11 +4,12 @@
       <el-button class="back" type="text" @click="back()"
         >返回企业主体首页</el-button
       >
-      <h3 class="title">{{ tab }}政府-更多指标</h3>
+      <h3 class="title">{{ tab }}-更多指标</h3>
     </div>
     <div class="flex1" style="justify-content: space-between">
       <div class="title-2">
-        当前已添加字段 <span>x</span> 个， 其中必选字段 <span>x</span> 个
+        当前已添加字段 <span>{{ selected }}</span> 个， 其中必选字段
+        <span>5</span> 个
       </div>
       <el-button class="export" type="text" @click="back()">导出数据</el-button>
     </div>
@@ -22,22 +23,24 @@
         <div class="left-box">
           <div class="head">
             <span>指标清单</span>
-            <el-button type="text">清空重置</el-button>
+            <el-button type="text" @click="reset">清空重置</el-button>
           </div>
           <div>
             <el-input
               class="filter"
               placeholder="输入关键字进行过滤"
-              v-model="filterText"
+              v-model="filterTextFirst"
             >
             </el-input>
 
             <el-tree
               class="filter-tree"
               :data="data"
+              :props="{ label: 'name', children: 'value' }"
               show-checkbox
               :filter-node-method="filterNode"
-              ref="tree"
+              ref="tree1"
+              @check-change="handleCheckChange"
             >
             </el-tree>
           </div>
@@ -51,16 +54,18 @@
             <el-input
               class="filter"
               placeholder="输入关键字进行过滤"
-              v-model="filterText"
+              v-model="filterTextScend"
             >
             </el-input>
 
             <el-tree
               class="filter-tree"
               :data="data"
+              :props="{ label: 'name', children: 'value' }"
               show-checkbox
               :filter-node-method="filterNode"
-              ref="tree"
+              ref="tree2"
+              @check-change="handleCheckChange"
             >
             </el-tree>
           </div>
@@ -73,23 +78,38 @@
         style="padding-left: 20px"
       >
         <el-table
+          v-loading="tableLoading"
           class="table-content"
           :data="list"
           border
           style="width: 100%; margin-top: 15px"
         >
-          <el-table-column type="index" fixed sortable label="序号">
+          <el-table-column fixed type="index" fixed sortable label="序号">
           </el-table-column>
-          <el-table-column prop="date" fixed label="德勤主体代码">
+          <el-table-column fixed prop="dqGovCode" fixed label="德勤主体代码">
           </el-table-column>
-          <el-table-column prop="name" fixed label="主体名称">
+          <el-table-column fixed prop="govName" fixed label="主体名称">
           </el-table-column>
-          <el-table-column prop="province" fixed label="生效状态">
+          <el-table-column fixed prop="invalid" fixed label="生效状态">
+            <template slot-scope="scope">
+              <span>{{ scope.row.invalid ? "Y" : "N" }}</span>
+            </template>
           </el-table-column>
-          <el-table-column prop="city" label="证券代码"> </el-table-column>
-          <el-table-column prop="address" label="创建日期"> </el-table-column>
-          <el-table-column prop="zip" label="创建人"> </el-table-column>
-          <el-table-column prop="zip" label="创建类型"> </el-table-column>
+          <el-table-column prop="created" label="创建日期">
+            <template slot-scope="scope">
+              <span>{{
+                scope.row.created && scope.row.created.substr(0, 10)
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="creater" label="创建人"> </el-table-column>
+          <el-table-column
+            v-for="(item, index) in header"
+            :key="index"
+            :prop="item"
+            :label="item"
+          >
+          </el-table-column>
         </el-table>
         <el-pagination
           @size-change="handleSizeChange"
@@ -97,7 +117,7 @@
           :current-page.sync="currentPage1"
           :page-size="100"
           layout="total, prev, pager, next"
-          :total="1000"
+          :total="total"
           class="page"
         >
         </el-pagination>
@@ -107,11 +127,12 @@
 </template>
 
 <script>
+import { getAllByGroup, getListEntityByPage } from "@/api/common";
 export default {
   name: "addGovernment",
   data() {
     return {
-      currentPage1: "",
+      currentPage1: 1,
       currentTime: "",
       list: [
         {
@@ -148,23 +169,24 @@ export default {
         },
       ],
       tab: this.$route.query.name,
-      filterText: "",
+      filterTextFirst: "",
+      filterTextScend: "",
       data: [
         {
           id: 1,
-          label: "一级 1",
-          children: [
+          key: "一级 1",
+          value: [
             {
               id: 4,
-              label: "二级 1-1",
-              children: [
+              key: "二级 1-1",
+              value: [
                 {
                   id: 9,
-                  label: "三级 1-1-1",
+                  key: "三级 1-1-1",
                 },
                 {
                   id: 10,
-                  label: "三级 1-1-2",
+                  key: "三级 1-1-2",
                 },
               ],
             },
@@ -172,44 +194,82 @@ export default {
         },
         {
           id: 2,
-          label: "一级 2",
-          children: [
+          key: "一级 2",
+          value: [
             {
               id: 5,
-              label: "二级 2-1",
+              key: "二级 2-1",
             },
             {
               id: 6,
-              label: "二级 2-2",
+              key: "二级 2-2",
             },
           ],
         },
         {
           id: 3,
-          label: "一级 3",
-          children: [
+          key: "一级 3",
+          value: [
             {
               id: 7,
-              label: "二级 3-1",
+              key: "二级 3-1",
             },
             {
               id: 8,
-              label: "二级 3-2",
+              key: "二级 3-2",
             },
           ],
         },
       ],
+      total: 0,
+      tableLoading: false,
+      mapList: [],
+      moreData: [],
+      header: [],
+      selected: 0,
     };
   },
   watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
+    filterTextFirst(val) {
+      this.$refs.tree1.filter(val);
+    },
+    filterTextScend(val) {
+      this.$refs.tree2.filter(val);
     },
   },
   created() {
-    this.getCurrentTime();
+    this.init();
   },
   methods: {
+    init() {
+      this.$modal.loading("loading...");
+      try {
+        getAllByGroup({ type: 2 }).then((res) => {
+          const { data } = res;
+          this.data = data;
+        });
+        // getAllByGroup({ type: 2 }).then((res) => {
+        //   const { data } = res;
+        //   this.data = data;
+        // });
+        const params = {
+          pageNum: this.currentPage1,
+          pageSize: 10,
+        };
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
     goTarget(href) {
       window.open(href, "_blank");
     },
@@ -221,13 +281,79 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+      return data.name.indexOf(value) !== -1;
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+      try {
+        const params = {
+          pageNum: val,
+          pageSize: 10,
+        };
+        this.tableLoading = true;
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.tableLoading = false;
+      }
+    },
+    handleCheckChange(data, checked, indeterminate) {
+      //获取所有选中的节点 start
+      let res = this.$refs.tree1.getCheckedNodes();
+      let arrDeptId = [];
+      res.forEach((e) => {
+        const item = {
+          id: e.id,
+          name: e.name,
+        };
+        arrDeptId.push(item);
+      });
+      this.selected = arrDeptId.length;
+      this.mapList = arrDeptId;
+      try {
+        this.$modal.loading("loading...");
+        const params = {
+          pageNum: this.currentPage1,
+          pageSize: 10,
+          mapList: this.mapList,
+        };
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          let more = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+            more.forEach((i) => {
+              e[i.key] = i.value;
+            });
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    reset() {
+      getAllByGroup({}).then((res) => {
+        const { data } = res;
+        this.data = data;
+      });
     },
   },
 };
@@ -241,10 +367,13 @@ export default {
     padding: 10px 15px;
   }
   .head {
-    background: #ddd9d9;
+    background: #f8f8f9;
     display: flex;
     justify-content: space-between;
     padding: 0px 10px;
+    span {
+      margin-top: 7px;
+    }
   }
   .filter-tree {
     margin-bottom: 10px;

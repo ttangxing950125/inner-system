@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container home">
+  <div class="home">
     <div class="mt20">
       <div class="flex1 between">
         <h3 class="g-t-title">债券交易信息表</h3>

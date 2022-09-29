@@ -82,14 +82,15 @@ export const constantRoutes = [
     ],
   },
   {
-    path: "/subjectManagement",
+    path: "/subjectManagement/overview",
     component: Layout,
     redirect: "subjectManagement",
+    meta: { title: "主体管理" },
     children: [
       {
         path: "/subjectManagement/overview",
         component: () => import("@/views/subjectManagement/index"),
-        name: "overview",
+        name: "subjectManagement",
         meta: { title: "总览" },
       },
       {
@@ -169,6 +170,7 @@ export const constantRoutes = [
     path: "/subTable",
     component: Layout,
     redirect: "subTable",
+    meta: { title: "副表管理" },
     children: [
       {
         path: "index",
