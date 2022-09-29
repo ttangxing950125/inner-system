@@ -147,7 +147,16 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 taskDto.setGovInfo(govInfo);
             }
             QueryWrapper<EntityAttr> attrQuery = new QueryWrapper<>();
-            List<EntityAttr> entityAttrs = attrMapper.selectList(attrQuery.lambda().eq(EntityAttr::getAttrCateName, Common.ATTR_FIN));
+
+            String value="";
+            if (roleId==5){
+                value=Common.ATTR_FIN;
+            }else if (roleId==6){
+                value=Common.ATTR_CITY;
+            }else if (roleId==7){
+                value=Common.ATTR_ISS;
+            }
+            List<EntityAttr> entityAttrs = attrMapper.selectList(attrQuery.lambda().eq(EntityAttr::getAttrCateName, value));
             if (!CollectionUtils.isEmpty(entityAttrs)) {
                 List<Long> ids = new ArrayList<>();
                 entityAttrs.stream().forEach(x -> {
