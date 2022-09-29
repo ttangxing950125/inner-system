@@ -178,18 +178,22 @@ public class EntityInfoController extends BaseController {
     /**
      * 企业主体分页查询
      *
-     * @param entityInfo
-     * @return AjaxResult
+     * @param type
+     * @param param
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
-    @ApiOperation(value = "企业主体分页查询")
+    @ApiOperation(value = "企业主体分类查询")
     @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfoByDto.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
+    })
     @PostMapping("/getInfoList")
-    public R getInfoList(@RequestBody EntityInfoByDto entityInfo) {
-        return entityInfoService.getInfoList(entityInfo);
+    public R getInfoList(Integer type,String param) {
+        return entityInfoService.getInfoList(type,param);
     }
-
     /**
      * 新增企业主体的曾用名
      *
@@ -271,6 +275,19 @@ public class EntityInfoController extends BaseController {
         return R.ok(entityInfoService.getOverview());
     }
 
+    /**
+     * 企业主体分类概览
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/22 17:49
+     */
+    @ApiOperation(value = "企业主体分类概览")
+    @ApiImplicitParam(name = "", value = " ", paramType = "", example = "", dataType = "")
+    @PostMapping("/getOverviewByGroup")
+    public R getOverviewByGroup() {
+        return R.ok(entityInfoService.getOverviewByGroup());
+    }
+
     @ApiOperation(value = "补充录入财报手术等其他相关信息")
     @PostMapping("/supplyNormalInformation")
     public R supplyNormalInformation(@RequestBody EntityAttrByDto entityAttrDto) {
@@ -295,4 +312,18 @@ public class EntityInfoController extends BaseController {
         service.SendEmail(3, "发了", "发友尽");
     }
 
+
+
+    /**
+     * 主体整体概览
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/22 17:49
+     */
+    @ApiOperation(value = "主体整体概览")
+    @ApiImplicitParam(name = "", value = " ", paramType = "", example = "", dataType = "")
+    @PostMapping("/getOverviewByAll")
+    public R getOverviewByAll() {
+        return R.ok(entityInfoService.getOverviewByAll());
+    }
 }

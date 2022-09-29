@@ -232,8 +232,16 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<GovInfo> govInfoList = govInfoMapper.selectGovInfoListByTypeAndParam(govInfo);
         //封装结果集
         List<Map<String, Object>> records = new ArrayList<>();
+        //查出所有的曾用名
+        QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
+        List<EntityNameHis> nameHisList = nameHisMapper.selectList(hisQuery.lambda().eq(EntityNameHis::getEntityType,2));
+        Map<String, List<EntityNameHis>> hisNameListMap=new HashMap<>();
+        if (!CollectionUtils.isEmpty(nameHisList)){
+            hisNameListMap = nameHisList.stream().collect(Collectors.groupingBy(EntityNameHis::getDqCode));
+        }
+        Map<String, List<EntityNameHis>> finalHisNameListMap = hisNameListMap;
         govInfoList.stream().forEach(o -> {
-            records.add(getResultMap(o));
+            records.add(getResultMap(o, finalHisNameListMap));
         });
         return R.ok(records);
     }
@@ -623,14 +631,19 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @author 冉浩岑
      * @date 2022/9/22 23:45
      */
-    public Map<String, Object> getResultMap(GovInfo govInfo) {
+    public Map<String, Object> getResultMap(GovInfo govInfo,Map<String, List<EntityNameHis>> map) {
         Map<String, Object> resultMap = new HashMap();
         if (null != govInfo) {
             resultMap = JSON.parseObject(JSON.toJSONString(govInfo), new TypeReference<Map<String, String>>() {
             });
             try {
-                QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
-                Long count = nameHisMapper.selectCount(wrapper.lambda().eq(EntityNameHis::getDqCode, govInfo.getDqGovCode()));
+                Integer count = 0;
+                if (!map.isEmpty()){
+                    List<EntityNameHis> nameHisList = map.get(govInfo.getDqGovCode());
+                    if (!CollectionUtils.isEmpty(nameHisList)){
+                        count=nameHisList.size();
+                    }
+                }
                 resultMap.put(EntityUtils.NAME_USED_NUM, count);
             } catch (Exception e) {
                 return resultMap;

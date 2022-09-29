@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
@@ -78,15 +77,8 @@ public interface IEntityInfoService extends IService<EntityInfo>
      * @return 结果
      */
     public int deleteEntityInfoById(Long id);
-    /**
-     *添加方法描述
-     *
-     * @param  entityInfo
-     * @return int
-     * @author 冉浩岑
-     * @date 2022/9/22 14:14
-    */
-    R getInfoList(EntityInfoByDto entityInfo);
+
+    R getInfoList(Integer type,String param);
 
     Integer updateInfoList(List<EntityInfo> list);
 
@@ -176,4 +168,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     Map<String,Object> getOverview();
 
+    Map<String,Object> getOverviewByGroup();
+
+    Map<String,Object> getOverviewByAll();
 }

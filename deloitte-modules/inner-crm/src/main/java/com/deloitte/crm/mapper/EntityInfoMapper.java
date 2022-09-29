@@ -1,9 +1,6 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityInfo;
 
 import java.util.List;
@@ -70,4 +67,6 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @return
      */
     List<EntityInfo> findByName(String entityName);
+
+    List<EntityInfo> selectGovInfoListByTypeAndParam(EntityInfo entityInfo);
 }

@@ -6,7 +6,6 @@ import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,20 +16,18 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.mapper.EntityBondRelMapper;
-import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
@@ -56,6 +53,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.System.out;
@@ -79,6 +77,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityAttrValueMapper entityAttrValueMapper;
 
     private EntityBondRelMapper entityBondRelMapper;
+
+    @Autowired
+    private GovInfoMapper govInfoMapper;
 
     @Autowired
     private HttpUtils httpUtils;
@@ -494,34 +495,37 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    public R getInfoList(EntityInfoByDto entityInfoDto) {
-        String param = entityInfoDto.getParam();
-        Integer pageNum = entityInfoDto.getPageNum();
-        Integer pageSize = entityInfoDto.getPageSize();
-        if (ObjectUtils.isEmpty(pageNum)) {
-            return R.fail("请输入页码");
-        }
-        if (ObjectUtils.isEmpty(pageSize)) {
-            pageSize = EntityUtils.DEFAULT_PAGE_SIZE;
-        }
-        Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
-        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
+    public R getInfoList(Integer type, String param) {
+        EntityInfo entityInfo = new EntityInfo();
+//        企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构
 
-        Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo,
-                queryWrapper.lambda()
-                        .like(EntityInfo::getEntityCode, param)
-                        .or().like(EntityInfo::getEntityName, param)
-        );
-        //创建结果集
-        Page<Map<String, Object>> pageResult = new Page<>();
-        pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
+        if (type==1){
+            entityInfo.setList(1);
+        }else if (type==2){
+            entityInfo.setIssueBonds(1);
+        }else if (type==3){
+            entityInfo.setList(0);
+            entityInfo.setList(0);
+        }else if (type==4){
+            entityInfo.setFinance(1);
+        }
+        entityInfo.setEntityCode(param);
+        entityInfo.setEntityName(param);
+        List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam(entityInfo);
         //封装结果集
         List<Map<String, Object>> records = new ArrayList<>();
-        entityInfoPage.getRecords().stream().forEach(o ->
-                records.add(getResultMap(o))
-        );
-        pageResult.setRecords(records);
-        return R.ok(pageResult);
+        //查出所有的曾用名
+        QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
+        List<EntityNameHis> nameHisList = nameHisMapper.selectList(hisQuery.lambda().eq(EntityNameHis::getEntityType,1));
+        Map<String, List<EntityNameHis>> hisNameListMap=new HashMap<>();
+        if (!CollectionUtils.isEmpty(nameHisList)){
+            hisNameListMap = nameHisList.stream().collect(Collectors.groupingBy(EntityNameHis::getDqCode));
+        }
+        Map<String, List<EntityNameHis>> finalHisNameListMap = hisNameListMap;
+        entityInfoList.stream().forEach(o -> {
+            records.add(getResultMap(o, finalHisNameListMap));
+        });
+        return R.ok(records);
     }
 
     @Transactional
@@ -772,14 +776,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 冉浩岑
      * @date 2022/9/22 23:45
      */
-    public Map<String, Object> getResultMap(EntityInfo entityInfo) {
+    public Map<String, Object> getResultMap(EntityInfo entityInfo,Map<String, List<EntityNameHis>> map) {
         Map<String, Object> resultMap = new HashMap();
         if (null != entityInfo) {
             resultMap = JSON.parseObject(JSON.toJSONString(entityInfo), new TypeReference<Map<String, String>>() {
             });
             try {
-                QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
-                Long count = nameHisMapper.selectCount(wrapper.lambda().eq(EntityNameHis::getDqCode, entityInfo.getEntityCode()));
+                Integer count = 0;
+                if (!map.isEmpty()){
+                    List<EntityNameHis> nameHisList = map.get(entityInfo.getEntityCode());
+                    if (!CollectionUtils.isEmpty(nameHisList)){
+                        count=nameHisList.size();
+                    }
+                }
                 resultMap.put(EntityUtils.NAME_USED_NUM, count);
             } catch (Exception e) {
                 return resultMap;
@@ -787,11 +796,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return resultMap;
     }
-
-
-    public static final String ENTITY = "ENTITY";
-
-    public static final String BOND = "BOND";
 
     /**
      * 查询债卷信息 模糊匹配
@@ -916,5 +920,88 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         result.put("unListBonds",unListBonds);
         result.put("finance",finance);
         return result;
+    }
+
+    @Override
+    public Map<String, Object> getOverviewByGroup() {
+        Long count = entityInfoMapper.selectCount(new QueryWrapper<>());
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getOverviewByAll() {
+        //查询整体概览
+        Long entityCount = entityInfoMapper.selectCount(new QueryWrapper<>());
+        Long govCount = govInfoMapper.selectCount(new QueryWrapper<>());
+
+        //封装政府主体概览
+        Map<String,Object>govOverview=getGovOverview(govCount);
+        //封装企业主体概览
+        Map<String,Object>entityOverview=getOverview();
+        //封装总体概览信息
+        Map<String,Object>overviewAll=new HashMap<>();
+        overviewAll.put("entityCount",entityCount);
+        overviewAll.put("govCount",govCount);
+
+        //封装结果集
+        Map<String,Object>result=new HashMap<>();
+
+        result.put("overviewAll", overviewAll);
+        result.put("govOverview", govOverview);
+        result.put("entityOverview",entityOverview );
+
+        return result;
+    }
+
+    private Map<String, Object> getGovOverview(Long govCount) {
+        QueryWrapper<GovInfo> govQuery = new QueryWrapper<>();
+        //查询政府主体信息
+//        @Excel(name = "sys_dict_data  gov_type1、地方政府2、地方主管部门3、其他")
+//        政府
+        Long govLocal = govInfoMapper.selectCount(govQuery.lambda().eq(GovInfo::getGovType, 1));
+        govQuery.clear();
+//        地方主管部门
+        Long govMan = govInfoMapper.selectCount(govQuery.lambda().eq(GovInfo::getGovType, 2));
+        govQuery.clear();
+
+//        地级政府为“GV+官方行政代码”
+        List<GovInfo> govInfosList = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_PRIVINCE_CODE);
+//        县级政府为“GV+官方行政代码”
+        AtomicReference<Integer> province = new AtomicReference<>(0);
+        AtomicReference<Integer> city = new AtomicReference<>(0);
+        AtomicReference<Integer> area = new AtomicReference<>(0);
+        govInfosList.stream().forEach(o -> {
+            String govName = o.getGovName();
+            if (!ObjectUtils.isEmpty(govName)){
+                if (govName.contains(Common.DOV_INFO_TYPE_PRIVINCE_NAME)){
+                    province.getAndSet(province.get() + 1);
+                }else if (govName.contains(Common.DOV_INFO_TYPE_CITY_NAME)){
+                    city.getAndSet(city.get() + 1);
+                }else {
+                    area.getAndSet(area.get() + 1);
+                }
+            }
+        });
+//        京开高新
+//        经开区为“GVA”+000001开始排序
+        Integer JK = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_JK_CODE).size();
+//        高新区为“GVB”+000001开始排序
+        Integer GX = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_GX_CODE).size();
+//        新区为“GVC”+000001开始排序
+        Integer XQ = govInfoMapper.selectCountByGroup(Common.DOV_INFO_TYPE_XQ_CODE).size();
+        Integer JKGX = JK+GX+XQ;
+//        其他
+        Long other=govCount-govLocal-govMan-province.get()-city.get()-area.get()-JKGX;
+
+        //封装企业主体信息
+        Map<String,Object>govOverview=new HashMap<>();
+        govOverview.put("govLocal", govLocal);
+        govOverview.put("govMan",govMan );
+        govOverview.put("province",province );
+        govOverview.put("city",city );
+        govOverview.put("area", area);
+        govOverview.put("JKGX", JKGX);
+        govOverview.put("other",other );
+        return govOverview;
     }
 }

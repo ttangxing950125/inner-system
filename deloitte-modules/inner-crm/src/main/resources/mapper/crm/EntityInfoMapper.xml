@@ -50,6 +50,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updated != null "> and updated = #{updated}</if>
         </where>
     </select>
+
+    <select id="selectGovInfoListByTypeAndParam" parameterType="EntityInfo" resultMap="EntityInfoResult">
+        <include refid="selectEntityInfoVo"/>
+        <where>
+            <if test="entityName != null  and entityName != ''"> and entity_name like concat('%', #{entityName}, '%')</if>
+            <if test="entityCode != null  and entityCode != ''"> and entity_code like concat('%', #{entityCode}, '%')</if>
+            <if test="creditCode != null  and creditCode != ''"> and credit_code = #{creditCode}</if>
+            <if test="list != null "> and list = #{list}</if>
+            <if test="issueBonds != null "> and issue_bonds = #{issueBonds}</if>
+            <if test="creditError != null "> and credit_error = #{creditError}</if>
+            <if test="creditErrorType != null "> and credit_error_type = #{creditErrorType}</if>
+            <if test="entityNameHis != null  and entityNameHis != ''"> and entity_name_his = #{entityNameHis}</if>
+            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''"> and entity_name_his_remarks = #{entityNameHisRemarks}</if>
+            <if test="creater != null  and creater != ''"> and creater = #{creater}</if>
+            <if test="updater != null  and updater != ''"> and updater = #{updater}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
     
     <select id="selectEntityInfoById" parameterType="Long" resultMap="EntityInfoResult">
         <include refid="selectEntityInfoVo"/>
