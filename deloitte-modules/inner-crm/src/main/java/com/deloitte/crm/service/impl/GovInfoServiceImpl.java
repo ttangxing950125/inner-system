@@ -234,9 +234,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<Map<String, Object>> records = new ArrayList<>();
         //查出所有的曾用名
         QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
-        List<EntityNameHis> nameHisList = nameHisMapper.selectList(hisQuery.lambda().eq(EntityNameHis::getEntityType,2));
-        Map<String, List<EntityNameHis>> hisNameListMap=new HashMap<>();
-        if (!CollectionUtils.isEmpty(nameHisList)){
+        List<EntityNameHis> nameHisList = nameHisMapper.selectList(hisQuery.lambda().eq(EntityNameHis::getEntityType, 2));
+        Map<String, List<EntityNameHis>> hisNameListMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(nameHisList)) {
             hisNameListMap = nameHisList.stream().collect(Collectors.groupingBy(EntityNameHis::getDqCode));
         }
         Map<String, List<EntityNameHis>> finalHisNameListMap = hisNameListMap;
@@ -565,12 +565,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         AtomicReference<Integer> area = new AtomicReference<>(0);
         govInfosList.stream().forEach(o -> {
             String govName = o.getGovName();
-            if (!ObjectUtils.isEmpty(govName)){
-                if (govName.contains(Common.DOV_INFO_TYPE_PRIVINCE_NAME)){
+            if (!ObjectUtils.isEmpty(govName)) {
+                if (govName.contains(Common.DOV_INFO_TYPE_PRIVINCE_NAME)) {
                     province.getAndSet(province.get() + 1);
-                }else if (govName.contains(Common.DOV_INFO_TYPE_CITY_NAME)){
+                } else if (govName.contains(Common.DOV_INFO_TYPE_CITY_NAME)) {
                     city.getAndSet(city.get() + 1);
-                }else {
+                } else {
                     area.getAndSet(area.get() + 1);
                 }
             }
@@ -631,17 +631,17 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @author 冉浩岑
      * @date 2022/9/22 23:45
      */
-    public Map<String, Object> getResultMap(GovInfo govInfo,Map<String, List<EntityNameHis>> map) {
+    public Map<String, Object> getResultMap(GovInfo govInfo, Map<String, List<EntityNameHis>> map) {
         Map<String, Object> resultMap = new HashMap();
         if (null != govInfo) {
             resultMap = JSON.parseObject(JSON.toJSONString(govInfo), new TypeReference<Map<String, String>>() {
             });
             try {
                 Integer count = 0;
-                if (!map.isEmpty()){
+                if (!map.isEmpty()) {
                     List<EntityNameHis> nameHisList = map.get(govInfo.getDqGovCode());
-                    if (!CollectionUtils.isEmpty(nameHisList)){
-                        count=nameHisList.size();
+                    if (!CollectionUtils.isEmpty(nameHisList)) {
+                        count = nameHisList.size();
                     }
                 }
                 resultMap.put(EntityUtils.NAME_USED_NUM, count);

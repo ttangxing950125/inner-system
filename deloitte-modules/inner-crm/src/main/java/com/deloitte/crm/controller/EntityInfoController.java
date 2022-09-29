@@ -191,9 +191,10 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type,String param) {
-        return entityInfoService.getInfoList(type,param);
+    public R getInfoList(Integer type, String param) {
+        return entityInfoService.getInfoList(type, param);
     }
+
     /**
      * 新增企业主体的曾用名
      *
@@ -277,6 +278,7 @@ public class EntityInfoController extends BaseController {
 
     /**
      * 企业主体分类概览
+     *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
@@ -313,9 +315,9 @@ public class EntityInfoController extends BaseController {
     }
 
 
-
     /**
      * 主体整体概览
+     *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49

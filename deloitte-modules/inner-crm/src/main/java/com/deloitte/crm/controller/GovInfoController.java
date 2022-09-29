@@ -55,6 +55,7 @@ public class GovInfoController extends BaseController {
         return R.ok(govInfoService.getGovInfo());
 
     }
+
     /**
      * 统计政府信息
      *
@@ -65,12 +66,11 @@ public class GovInfoController extends BaseController {
     @PostMapping("/govExport")
     @ApiOperation(value = "{导出政府信息}", response = GovInfoDto.class)
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "body",name = "entityAttrDto",value = "包含表中gov_info的所有字段"
+            @ApiImplicitParam(paramType = "body", name = "entityAttrDto", value = "包含表中gov_info的所有字段"
 
             )
     })
-    public R importGovInfo(EntityAttrByDto entityAttrDto)
-    {
+    public R importGovInfo(EntityAttrByDto entityAttrDto) {
         govInfoService.ExportEntityGov(entityAttrDto);
         return R.ok();
     }
@@ -146,7 +146,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 15:24
      */
     @ApiOperation(value = "政府主题批量修改")
-    @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", example = "",dataTypeClass = GovInfo.class)
+    @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
     public R updateInfoList(List<GovInfo> govInfoList) {
         return R.ok(govInfoService.updateInfoList(govInfoList));
@@ -182,12 +182,13 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type,String param) {
-        return govInfoService.getInfoList(type,param);
+    public R getInfoList(Integer type, String param) {
+        return govInfoService.getInfoList(type, param);
     }
 
     /**
      * 政府主体分类概览
+     *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
@@ -230,7 +231,7 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "dqCode", value = "德勤统一识别码", paramType = "query", example = "1", dataType = "String"),
             @ApiImplicitParam(name = "oldName", value = "原本的曾用名", paramType = "query", example = "原始曾用名", dataType = "String"),
             @ApiImplicitParam(name = "newOldName", value = "修改后的曾用名", paramType = "query", example = "新的曾用名", dataType = "String"),
-            @ApiImplicitParam(name = "status", value = "是否停用曾用名",paramType = "query", example = "新的曾用名", dataType = "String")
+            @ApiImplicitParam(name = "status", value = "是否停用曾用名", paramType = "query", example = "新的曾用名", dataType = "String")
     })
     @PostMapping("/updateOldName")
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
@@ -281,17 +282,17 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-    *导出导出全部企业主体Excel表
-    *
-    * @param govAttrDto
-    * @return R
-    * @author penTang
-    * @date 2022/9/25 17:48
-   */
+     * 导出导出全部企业主体Excel表
+     *
+     * @param govAttrDto
+     * @return R
+     * @author penTang
+     * @date 2022/9/25 17:48
+     */
     @ApiOperation(value = "导出全部企业主体Excel表")
     @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntity")
-    public R ImportListEntity(@RequestBody EntityAttrByDto govAttrDto){
+    public R ImportListEntity(@RequestBody EntityAttrByDto govAttrDto) {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
 

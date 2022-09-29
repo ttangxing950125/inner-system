@@ -15,15 +15,14 @@ import java.util.Map;
 
 /**
  * 【请填写功能名称】Service接口
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
-public interface IEntityInfoService extends IService<EntityInfo>
-{
+public interface IEntityInfoService extends IService<EntityInfo> {
     /**
+     * 统计企业主体信息
      *
-     *统计企业主体信息
      * @return List<EntityInfoDto>
      * @author penTang
      * @date 2022/9/22 22:40
@@ -32,7 +31,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 查询【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
@@ -40,7 +39,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 查询【请填写功能名称】列表
-     * 
+     *
      * @param entityInfo 【请填写功能名称】
      * @return 【请填写功能名称】集合
      */
@@ -48,7 +47,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 新增【请填写功能名称】
-     * 
+     *
      * @param entityDto 【请填写功能名称】
      * @return 结果
      */
@@ -56,7 +55,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 修改【请填写功能名称】
-     * 
+     *
      * @param entityInfo 【请填写功能名称】
      * @return 结果
      */
@@ -64,7 +63,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 批量删除【请填写功能名称】
-     * 
+     *
      * @param ids 需要删除的【请填写功能名称】主键集合
      * @return 结果
      */
@@ -72,13 +71,13 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 删除【请填写功能名称】信息
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
     public int deleteEntityInfoById(Long id);
 
-    R getInfoList(Integer type,String param);
+    R getInfoList(Integer type, String param);
 
     Integer updateInfoList(List<EntityInfo> list);
 
@@ -88,37 +87,39 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 传入社会信用代码于企业名称
-     *  => 存在该社会信用代码 返回 比较信息为 false
-     *     ==> 前端跳转调用人工对比信息，并确认
+     * => 存在该社会信用代码 返回 比较信息为 false
+     * ==> 前端跳转调用人工对比信息，并确认
+     * <p>
+     * => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
+     * ==> 前端跳转调用人工对比信息，并确认
+     * <p>
+     * => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
+     * ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
      *
-     *  => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     *     ==> 前端跳转调用人工对比信息，并确认
-     *
-     *  => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     *     ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
-     *
-     * @author 正杰
-     * @date 2022/9/22
      * @param creditCode 传入 企业统一社会信用代码
      * @param entityName 传入 企业名称
      * @return 比较信息结果
+     * @author 正杰
+     * @date 2022/9/22
      */
     R<EntityInfoVo> validEntity(String creditCode, String entityName);
 
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
      * => 新增主体曾用名
+     *
+     * @param creditCode    统一社会信用代码
+     * @param entityNewName 主体新名称
+     * @param remarks       备注
+     * @return 修改返回信息
      * @author 正杰
      * @date 2022/9/22
-     * @param creditCode 统一社会信用代码
-     * @param entityNewName 主体新名称
-     * @param remarks 备注
-     * @return 修改返回信息
      */
-    R editEntityNameHis(String creditCode, String entityNewName,String remarks);
+    R editEntityNameHis(String creditCode, String entityNewName, String remarks);
 
     /**
      * 根据名称查询主体
+     *
      * @param entityName
      * @return
      */
@@ -131,20 +132,21 @@ public interface IEntityInfoService extends IService<EntityInfo>
     R getInfoDetail(EntityInfo entityInfo);
 
     List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto);
+
     /**
-     *导出企业主体excel表格
+     * 导出企业主体excel表格
      *
      * @param entityAttrDto
      * @return void
      * @author penTang
      * @date 2022/9/26 18:24
-    */
+     */
     void ExportEntityInFor(EntityAttrByDto entityAttrDto);
-
 
 
     /**
      * 根据多个主体code查询
+     *
      * @param entityCodes
      * @return
      */
@@ -152,9 +154,10 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 查询债卷信息 模糊匹配
+     *
      * @param name    entity_name || bond_short_name
      * @param keyword 请传入常量 ENTITY || BOND
-     * @return R<List<TargetEntityBondsVo>>
+     * @return R<List < TargetEntityBondsVo>>
      * @author 正杰
      * @date 2022/9/25
      */
@@ -169,6 +172,7 @@ public interface IEntityInfoService extends IService<EntityInfo>
 
     /**
      * 查询债券或是主体下相关的主体或是债券信息 by正杰
+     *
      * @param code
      * @param keyword
      * @return
@@ -178,26 +182,29 @@ public interface IEntityInfoService extends IService<EntityInfo>
     R<List<TargetEntityBondsVo>> findRelationEntityOrBond(String code, String keyword);
 
 
-    Map<String,Object> getOverview();
+    Map<String, Object> getOverview();
 
-    Map<String,Object> getOverviewByGroup();
+    Map<String, Object> getOverviewByGroup();
 
-    Map<String,Object> getOverviewByAll();
+    Map<String, Object> getOverviewByAll();
+
     /**
      * 校验统一社会信用代码是否存在 by正杰
-     * @author 正杰
-     * @date 2022/9/28
+     *
      * @param creditCode
      * @return
+     * @author 正杰
+     * @date 2022/9/28
      */
     R<EntityInfoVo> checkCreditCode(String creditCode);
 
     /**
      * 校验主体名称是否存在
-     * @author 正杰
-     * @date 2022/9/28
+     *
      * @param entityName
      * @return R
+     * @author 正杰
+     * @date 2022/9/28
      */
     R<EntityInfoVo> checkEntityName(String entityName);
 }
