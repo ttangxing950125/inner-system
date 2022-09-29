@@ -6,6 +6,7 @@ import java.util.List;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.CrmEntityTask;
+import com.deloitte.crm.vo.CrmEntityTaskVo;
 
 /**
  * 角色7，根据导入的数据新增主体的任务Service接口
@@ -71,7 +72,7 @@ public interface ICrmEntityTaskService
      * @param date 请传入具体日期: yyyy-mm || yyyy-mm-dd
      * @return R<List<CrmEntityTask>> 当月或者当日的任务情况
      */
-    R<List<CrmEntityTask>> getTaskInfo(String timeUnit,String date);
+    R<List<CrmEntityTaskVo>> getTaskInfo(String timeUnit, String date);
 
 
     /**

@@ -94,4 +94,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT * FROM entity_attr_value WHERE attr_id = #{key} AND value = #{value}
     </select>
 
+    <select id="findValueByCodeAndAttrId" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = #{attrId} AND entity_code = #{bondCode}
+    </select>
+
 </mapper>

@@ -39,6 +39,12 @@ public enum Common {
 
     public static final String SUCCESS = "操作成功";
 
+    public static final String TABLE_ENTITY_INFO = "ENTITY_INFO";
+
+    public static final String TABLE_BOND_INFO = "BOND_INFO";
+
+    public static final String ENTITY_ATTR_VALUE = "ENTITY_ATTR_VALUE";
+
     public static final String TRANSACTION_CODE_NAME = "交易代码";
     public static final Integer TRANSACTION_CODE_ID = 804;
 
@@ -64,4 +70,5 @@ public enum Common {
     public static final Integer WWHETHER_ATTR_NAME_WIND_ID = 652;
     public static final Integer WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID = 99;
 
+    public static final String TABLE_CRM_MAS_TASK = "TABLE_CRM_MAS_TASK";
 }

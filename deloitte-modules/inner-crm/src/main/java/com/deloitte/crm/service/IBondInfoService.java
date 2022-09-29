@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.dto.EntityAttrDetailDto;
+import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.vo.BondEntityInfoVo;
 
 /**
  * 【请填写功能名称】Service接口
@@ -83,5 +84,13 @@ public interface IBondInfoService
      * @author 正杰
      * @date 2022/9/28
      */
-    R<EntityAttrDetailDto> findAllDetail(String bondCode);
+    R<BondEntityInfoVo> findAllDetail(String entityCode, String bondCode);
+
+    /**
+     * 修改具体信息 by正杰
+     * @param bondInfoEditVo
+     * @author 正杰
+     * @date 2022/9/28
+     */
+    R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo);
 }

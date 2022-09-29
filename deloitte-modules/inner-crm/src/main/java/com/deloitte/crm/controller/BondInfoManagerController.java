@@ -1,10 +1,10 @@
 package com.deloitte.crm.controller;
 
 import com.deloitte.common.core.domain.R;
-import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.dto.EntityAttrDetailDto;
+import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.vo.BondEntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -51,7 +51,7 @@ public class BondInfoManagerController {
 
     /**
      * 查询债券或是主体下相关的主体或是债券信息 by正杰
-     * @param code
+     * @param id
      * @param keyword
      * @return
      * @author 正杰
@@ -59,28 +59,42 @@ public class BondInfoManagerController {
      */
     @ApiOperation(value="查询债券或是主体下相关的主体或是债券信息 by正杰")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="code",value="请传入 主体的entityCode || 债券的bondCode ",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY_CODE || BOND_CODE",paramType="query",dataType = "String")
+            @ApiImplicitParam(name="id",value="传入 id ",paramType = "query",dataType = "Integer"),
+            @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String")
     })
     @PostMapping("/findRelationEntityOrBond")
-    public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(String code,String keyword){
-        //TODO 查询主体||债券信息
-        return iEntityInfoService.findRelationEntityOrBond(code,keyword);
+    public R findRelationEntityOrBond(Integer id,String keyword){
+        // 查询主体||债券信息
+        return iEntityInfoService.findRelationEntityOrBond(id,keyword);
     }
 
     /**
-     *  查询选择的债券 查询债券的具体信息 by正杰
+     * 查询债券的具体信息 by正杰
      * @param bondCode
-     * @return
      * @author 正杰
      * @date 2022/9/28
      */
     @ApiOperation(value="查询选择的债券 查询债券的具体信息 by正杰")
-    @ApiImplicitParam(name="bondCode",value="请传入 bondCode ",paramType = "query",dataType = "String")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "entityCode", value = "请传入 主体代码:IB000001 ", paramType = "query", dataType = "String"),
+        @ApiImplicitParam(name = "bondCode", value = "请传入 债券代码:BD000001 ", paramType = "query", dataType = "String")
+    })
     @PostMapping("/findAllDetail")
-    public R<EntityAttrDetailDto> findAllDetail(String bondCode){
-        return iBondInfoService.findAllDetail(bondCode);
+    public R<BondEntityInfoVo> findAllDetail(String entityCode, String bondCode){
+        return iBondInfoService.findAllDetail(entityCode,bondCode);
     }
 
+    /**
+     * 修改具体信息 by正杰
+     * @param bondInfoEditVo
+     * @author 正杰
+     * @date 2022/9/28
+     */
+    @ApiOperation(value="查询选择的债券 查询债券的具体信息 by正杰")
+    @ApiImplicitParam(name = "bondInfoEditVo", value = "传入bondInfoEditVo 中 list需要修改的参数", paramType = "query", dataType = "body",dataTypeClass = BondEntityInfoVo.class)
+    @PostMapping("/editAllDetail")
+    public R<BondEntityInfoVo> editAllDetail(@RequestBody BondEntityInfoVo bondInfoEditVo){
+        return iBondInfoService.editAllDetail(bondInfoEditVo);
+    }
 
 }

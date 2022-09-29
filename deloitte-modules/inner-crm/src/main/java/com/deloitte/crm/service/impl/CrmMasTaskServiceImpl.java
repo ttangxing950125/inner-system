@@ -7,10 +7,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,8 +26,11 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.vo.CrmMasTaskVo;
 import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +59,8 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
 //    @Resource
     private ICrmDailyTaskService dailyTaskService;
+
+    private IEntityInfoService iEntityInfoService;
 
     /**
      * 查询【请填写功能名称】
@@ -168,12 +175,22 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      * @return R<List<CrmMasTask>> 当月或者当日的任务情况
      */
     @Override
-    public R<List<CrmMasTask>> getTaskInfo(String timeUnit, String date) {
+    public R<List<CrmMasTaskVo>> getTaskInfo(String timeUnit, String date) {
+        List<CrmMasTaskVo> res = new ArrayList<>();
         switch (timeUnit) {
             case Common.DAY:
                 Date dateDay = DateUtil.parseDate(date);
-                List<CrmMasTask> res = baseMapper.selectList(new QueryWrapper<CrmMasTask>()
+                List<CrmMasTask> crmMasTasks = baseMapper.selectList(new QueryWrapper<CrmMasTask>()
                         .lambda().eq(CrmMasTask::getTaskDate, dateDay));
+                crmMasTasks.forEach(row->{
+                    CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
+                    EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
+                            .eq(EntityInfo::getEntityCode, row.getEntityCode()));
+                    BeanUtil.copyProperties(row,crmMasTaskVo);
+                    crmMasTaskVo.setEntityName(entityInfo.getEntityName());
+                    crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+                    res.add(crmMasTaskVo);
+                });
                 return R.ok(res, SuccessInfo.GET_SUCCESS.getInfo());
             case Common.MOUTH:
                 date +="-01";
@@ -181,7 +198,16 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
                 Date first = DateUtil.beginOfMonth(dateTime);
                 Date last = DateUtil.endOfMonth(dateTime);
                 List<CrmMasTask> mouthList = baseMapper.selectCrmMasTaskListThisMouth(first, last);
-                return R.ok(mouthList, SuccessInfo.GET_SUCCESS.getInfo());
+                mouthList.forEach(item->{
+                    CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
+                    EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
+                            .eq(EntityInfo::getEntityCode, item.getEntityCode()));
+                    BeanUtil.copyProperties(item,crmMasTaskVo);
+                    crmMasTaskVo.setEntityName(entityInfo.getEntityName());
+                    crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+                    res.add(crmMasTaskVo);
+                });
+                return R.ok(res, SuccessInfo.GET_SUCCESS.getInfo());
             default:
                 return R.fail(BadInfo.PARAM_EMPTY.getInfo());
         }

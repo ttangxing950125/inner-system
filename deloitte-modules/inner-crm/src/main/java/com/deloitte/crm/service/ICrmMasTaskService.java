@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.vo.CrmMasTaskVo;
 
 /**
  * 【请填写功能名称】Service接口
@@ -79,9 +80,9 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      * @date 2022/9/27
      * @param timeUnit 请传入时间单位常量 MOUTH || DAY
      * @param date 请传入具体日期: yyyy/mm/dd
-     * @return R<List<CrmMasTask>> 当月或者当日的任务情况
+     * @return R<List<CrmMasTaskVo>> 当月或者当日的任务情况
      */
-    R<List<CrmMasTask>> getTaskInfo(String timeUnit, String date);
+    R<List<CrmMasTaskVo>> getTaskInfo(String timeUnit, String date);
 
     /**
      * 确认该任务已完成,修改数据库任务状态

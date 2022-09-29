@@ -1,6 +1,7 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -53,4 +54,16 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
      * @date 2022/9/22 20:24
      */
     Boolean updateByType(Date dateTime);
+
+    /**
+     * 指定日期查询各角色当月任务完成情况
+     *
+     * @return R
+     * @author penTang
+     * @editeBy 正杰
+     * @date 2022/9/21 18:06
+     * @editeDate 2022/9/29
+     *
+     */
+    R<List<CrmDailyTask>> queryDailyTask(String taskDate, Long userId);
 }
