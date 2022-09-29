@@ -9,18 +9,18 @@ import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 gov_info
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
 @Data
-public class GovInfoByDto implements Serializable
-{
+public class GovInfoByDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public GovInfo getGovInfo() {
         return govInfo;
     }
+
     public void setGovInfo() {
         GovInfo govInfo = new GovInfo();
         govInfo.setCreated(this.created);
@@ -41,7 +41,7 @@ public class GovInfoByDto implements Serializable
         govInfo.setNewGovCode(this.newGovCode);
         govInfo.setCreater(this.creater);
         govInfo.setUpdater(this.updater);
-        this.govInfo=govInfo;
+        this.govInfo = govInfo;
     }
 
     private GovInfo govInfo;
@@ -105,167 +105,147 @@ public class GovInfoByDto implements Serializable
     private Integer pageNum;
 
 
-
-    public void setId(Long id) 
-    {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getId() 
-    {
+    public Long getId() {
         return id;
     }
-    public void setGovName(String govName) 
-    {
+
+    public void setGovName(String govName) {
         this.govName = govName;
     }
 
-    public String getGovName() 
-    {
+    public String getGovName() {
         return govName;
     }
-    public void setGovCode(String govCode) 
-    {
+
+    public void setGovCode(String govCode) {
         this.govCode = govCode;
     }
 
-    public String getGovCode() 
-    {
+    public String getGovCode() {
         return govCode;
     }
-    public void setDqGovCode(String dqGovCode) 
-    {
+
+    public void setDqGovCode(String dqGovCode) {
         this.dqGovCode = dqGovCode;
     }
 
-    public String getPreGovCode()
-    {
+    public String getPreGovCode() {
         return preGovCode;
     }
-    public void setPreGovCode(String preGovCode)
-    {
+
+    public void setPreGovCode(String preGovCode) {
         this.preGovCode = preGovCode;
     }
 
-    public String getDqGovCode() 
-    {
+    public String getDqGovCode() {
         return dqGovCode;
     }
-    public void setGovType(Integer govType) 
-    {
+
+    public void setGovType(Integer govType) {
         this.govType = govType;
     }
 
-    public Integer getGovType() 
-    {
+    public Integer getGovType() {
         return govType;
     }
-    public void setGovLevelBig(Integer govLevelBig) 
-    {
+
+    public void setGovLevelBig(Integer govLevelBig) {
         this.govLevelBig = govLevelBig;
     }
 
-    public Integer getGovLevelBig() 
-    {
+    public Integer getGovLevelBig() {
         return govLevelBig;
     }
-    public void setGovLevelSmall(Integer govLevelSmall) 
-    {
+
+    public void setGovLevelSmall(Integer govLevelSmall) {
         this.govLevelSmall = govLevelSmall;
     }
 
-    public Integer getGovLevelSmall() 
-    {
+    public Integer getGovLevelSmall() {
         return govLevelSmall;
     }
-    public void setGovNameHis(String govNameHis) 
-    {
+
+    public void setGovNameHis(String govNameHis) {
         this.govNameHis = govNameHis;
     }
 
-    public String getGovNameHis() 
-    {
+    public String getGovNameHis() {
         return govNameHis;
     }
-    public void setEntityNameHisRemarks(String entityNameHisRemarks) 
-    {
+
+    public void setEntityNameHisRemarks(String entityNameHisRemarks) {
         this.entityNameHisRemarks = entityNameHisRemarks;
     }
 
-    public String getEntityNameHisRemarks() 
-    {
+    public String getEntityNameHisRemarks() {
         return entityNameHisRemarks;
     }
-    public void setInvalid(Integer invalid) 
-    {
+
+    public void setInvalid(Integer invalid) {
         this.invalid = invalid;
     }
 
-    public Integer getInvalid() 
-    {
+    public Integer getInvalid() {
         return invalid;
     }
-    public void setNewGovName(String newGovName) 
-    {
+
+    public void setNewGovName(String newGovName) {
         this.newGovName = newGovName;
     }
 
-    public String getNewGovName() 
-    {
+    public String getNewGovName() {
         return newGovName;
     }
-    public void setNewDqCode(String newDqCode) 
-    {
+
+    public void setNewDqCode(String newDqCode) {
         this.newDqCode = newDqCode;
     }
 
-    public String getNewDqCode() 
-    {
+    public String getNewDqCode() {
         return newDqCode;
     }
-    public void setNewGovCode(String newGovCode) 
-    {
+
+    public void setNewGovCode(String newGovCode) {
         this.newGovCode = newGovCode;
     }
 
-    public String getNewGovCode() 
-    {
+    public String getNewGovCode() {
         return newGovCode;
     }
-    public void setCreater(String creater) 
-    {
+
+    public void setCreater(String creater) {
         this.creater = creater;
     }
 
-    public String getCreater() 
-    {
+    public String getCreater() {
         return creater;
     }
-    public void setUpdater(String updater) 
-    {
+
+    public void setUpdater(String updater) {
         this.updater = updater;
     }
 
-    public String getUpdater() 
-    {
+    public String getUpdater() {
         return updater;
     }
-    public void setCreated(Date created) 
-    {
+
+    public void setCreated(Date created) {
         this.created = created;
     }
 
-    public Date getCreated() 
-    {
+    public Date getCreated() {
         return created;
     }
-    public void setUpdated(Date updated) 
-    {
+
+    public void setUpdated(Date updated) {
         this.updated = updated;
     }
 
-    public Date getUpdated() 
-    {
+    public Date getUpdated() {
         return updated;
     }
 

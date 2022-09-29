@@ -31,10 +31,10 @@ public class RoleTFFController {
      * @date 2022/9/27 18:52
     */
     @ApiOperation(value="获取登录用户角色的信息补充任务")
-    @ApiImplicitParam(name="",value="",paramType = "query",dataType = "Integer")
+    @ApiImplicitParam(name="taskDate",value="当天日期 2022-09-29",paramType = "query",dataType = "Integer")
     @PostMapping("/getRoleSupplyTask")
-    public R getRoleSupplyTask(){
-        return iCrmSupplyTaskService.getRoleSupplyTask();
+    public R getRoleSupplyTask(String taskDate){
+        return iCrmSupplyTaskService.getRoleSupplyTask(taskDate);
     }
 
 }

@@ -29,6 +29,8 @@ public enum Common {
 
     public static final String DAY = "DAY";
 
+    public static final String ATTR_FIN = "金融机构表";
+
     public static final String MOUTH = "MOUTH";
 
     public static final Integer FIRST_NUMBER = 0;

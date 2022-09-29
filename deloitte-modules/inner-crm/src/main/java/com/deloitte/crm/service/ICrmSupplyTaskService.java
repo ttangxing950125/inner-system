@@ -61,5 +61,5 @@ public interface ICrmSupplyTaskService
      */
     public int deleteCrmSupplyTaskById(Long id);
 
-    R getRoleSupplyTask();
+    R getRoleSupplyTask(String taskDate);
 }
