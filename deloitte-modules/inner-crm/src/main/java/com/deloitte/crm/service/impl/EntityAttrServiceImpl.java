@@ -18,7 +18,6 @@ import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -231,9 +230,14 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
-    public List<EntityAttr> getAttrByOrganName(String organName) {
+    public Map<String, List<EntityAttr>> getAttrByOrganName(String organName) {
         QueryWrapper<EntityAttr>query=new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));
-        return entityAttrs;
+        if (CollectionUtils.isEmpty(entityAttrs)){
+            return null;
+        }
+        Map<String, List<EntityAttr>> collect = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getName));
+
+        return collect;
     }
 }

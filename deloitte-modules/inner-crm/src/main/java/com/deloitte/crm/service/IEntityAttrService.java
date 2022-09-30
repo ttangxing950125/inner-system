@@ -5,6 +5,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityAttr;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service接口
@@ -83,5 +84,5 @@ public interface IEntityAttrService extends IService<EntityAttr>
 
     R getTaskByEntityCode(String entityCode, Integer roleId);
 
-    List<EntityAttr> getAttrByOrganName(String organName);
+    Map<String, List<EntityAttr>> getAttrByOrganName(String organName);
 }
