@@ -45,7 +45,7 @@ public class RoleTFFController {
      * @author 冉浩岑
      * @date 2022/9/27 18:52
      */
-    @ApiOperation(value = "获取登录用户角色的信息补充任务")
+    @ApiOperation(value = "完成任务")
     @ApiImplicitParam(name = "id", value = "任务id", paramType = "query", dataType = "Long")
     @PostMapping("/completeRoleSupplyTask")
     public R completeRoleSupplyTask(Long id) {

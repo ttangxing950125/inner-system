@@ -18,7 +18,8 @@
     </div>
     <h3 class="g-title">每日运维任务</h3>
     <div class="list-box">
-      <!-- <el-table
+      角色1
+      <el-table
         v-loading="loading"
         class="table-content"
         :data="list"
@@ -40,11 +41,12 @@
             >
           </template>
         </el-table-column>
-      </el-table> -->
+      </el-table>
+      角色7
       <el-table
         v-loading="loading"
         class="table-content"
-        :data="list"
+        :data="list7"
         align="center"
         style="width: 98%; margin-top: 15px"
       >
@@ -72,6 +74,50 @@
           </template>
         </el-table-column>
       </el-table>
+      角色3
+      <el-table
+        v-loading="loading"
+        class="table-content"
+        :data="list3"
+        align="center"
+        style="width: 98%; margin-top: 15px"
+      >
+        <el-table-column type="index" label="序号">
+        </el-table-column>
+        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column prop="taskCategory" label="企业名称">
+          <template slot-scope="scope">
+            <span>{{ scope.row.entityInfo.entityName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="taskCategory" label="统一社会信用代码">
+          <template slot-scope="scope">
+            <span>{{ scope.row.entityInfo.creditCode }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="taskCategory" label="是否为金融机构">
+          <template slot-scope="scope">
+            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
+          <template slot-scope="scope">
+            <span>{{ scope.row.values[0].value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="dataShow" label="任务状态"> 
+          <template slot-scope="scope">
+            <span :class="scope.row.entityInfo.status ? 'green' : 'red'">{{ scope.row.entityInfo.status === 1 ? '已完成' : '未完成' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="province" label="任务操作">
+          <template slot-scope="scope">
+            <el-button @click="workRole3(scope.row)" type="text" size="small"
+              >开始工作</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
     <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%">
       <el-form
@@ -81,16 +127,16 @@
         label-width="135px"
         label-position="left"
       >
-        <el-form-item label="企业名称" prop="region">
+        <el-form-item label="企业名称" >
           <span>xxxxxxxxxxxx</span>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
+        <el-form-item label="统一社会信用代码" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="来源" prop="region">
+        <el-form-item label="来源" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="wind行业划分" prop="region">
+        <el-form-item label="wind行业划分" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -104,7 +150,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="申万行业划分" prop="region">
+        <el-form-item label="申万行业划分" >
           <span v-if="!edit2">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -125,7 +171,7 @@
             <el-radio label="否"></el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="金融细分领域" prop="region">
+        <el-form-item label="金融细分领域" >
           <el-select v-model="ruleForm.region" placeholder="选择新增类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
@@ -221,16 +267,16 @@
         label-width="135px"
         label-position="left"
       >
-        <el-form-item label="企业名称" prop="region">
-          <span>xxxxxxxxxxxx</span>
+        <el-form-item label="企业名称" >
+          <span>{{ ruleForm.entityName }}</span>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
-          <span>xxxxxxx121xxxxx</span>
+        <el-form-item label="统一社会信用代码" >
+          <span>{{ ruleForm.creditCode }}</span>
         </el-form-item>
-        <el-form-item label="来源" prop="region">
-          <span>xxxxxxx121xxxxx</span>
+        <el-form-item label="来源" >
+          <span>{{ ruleForm.source }}</span>
         </el-form-item>
-        <el-form-item label="wind行业划分" prop="region">
+        <el-form-item label="wind行业划分" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -244,7 +290,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="申万行业划分" prop="region">
+        <el-form-item label="申万行业划分" >
           <span v-if="!edit2">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -288,7 +334,7 @@
             </el-form-item>
           </el-col>
         </el-form-item>
-        <el-form-item label="所属辖区" prop="region">
+        <el-form-item label="所属辖区" >
           <el-select v-model="ruleForm.region" placeholder="选择新增类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
@@ -327,19 +373,19 @@
         label-width="170px"
         label-position="left"
       >
-        <el-form-item label="新增地方政府级别-大类" prop="region">
+        <el-form-item label="新增地方政府级别-大类" >
           <el-select v-model="ruleForm.region" placeholder="">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="新增地方政府级别-小类" prop="region">
+        <el-form-item label="新增地方政府级别-小类" >
           <el-select v-model="ruleForm.region" placeholder="">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="新增地方政府名称" prop="region">
+        <el-form-item label="新增地方政府名称" >
           <el-input
             class="t-input"
             v-model="ruleForm.name"
@@ -352,7 +398,7 @@
             >查重</el-button
           >
         </el-form-item>
-        <el-form-item label="新增地方政府行政编码" prop="region">
+        <el-form-item label="新增地方政府行政编码" >
           <el-input
             class="t-input"
             v-model="ruleForm.name"
@@ -402,21 +448,21 @@
         label-width="135px"
         label-position="left"
       >
-        <el-form-item label="企业名称" prop="region">
-          <span>xxxxxxxxxxxx</span>
+      <el-form-item label="企业名称" >
+          <span>{{ ruleForm.entityName }}</span>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
-          <span>xxxxxxx121xxxxx</span>
+        <el-form-item label="统一社会信用代码" >
+          <span>{{ ruleForm.creditCode }}</span>
         </el-form-item>
-        <el-form-item label="来源" prop="region">
-          <span>xxxxxxx121xxxxx</span>
+        <el-form-item label="来源" >
+          <span>{{ ruleForm.source }}</span>
         </el-form-item>
-        <el-form-item label="wind行业划分" prop="region">
-          <span v-if="!edit1">xxxxxxx121xxxxx</span>
+        <el-form-item label="wind行业划分" >
+          <span v-if="!edit1">{{ ruleForm.wind }}</span>
           <el-input
             class="t-input"
             v-if="edit1"
-            v-model="ruleForm.name"
+            v-model="ruleForm.wind"
           ></el-input>
           <el-button
             style="margin-left: 5px"
@@ -425,12 +471,12 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="申万行业划分" prop="region">
-          <span v-if="!edit2">xxxxxxx121xxxxx</span>
+        <el-form-item label="申万行业划分" >
+          <span v-if="!edit2">{{ ruleForm.sw }}</span>
           <el-input
             class="t-input"
             v-if="edit2"
-            v-model="ruleForm.name"
+            v-model="ruleForm.sw"
           ></el-input>
           <el-button
             style="margin-left: 5px"
@@ -440,7 +486,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="政府持股方式" prop="region">
+        <el-form-item label="政府持股方式" >
           <el-select v-model="ruleForm.region" placeholder="选择新增类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
@@ -449,25 +495,22 @@
         <el-form-item label="政府对当前城投支持力度" prop="delivery">
           <el-input
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.desc"
           ></el-input>
         </el-form-item>
         <el-form-item label="政府对当前城投支持力度判断依据" prop="delivery">
           <el-input
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.desc"
           ></el-input>
         </el-form-item>
         <el-form-item label="政府部门实际持股比例" prop="delivery">
           <el-input
             type="textarea"
-            :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.desc"
           ></el-input>
         </el-form-item>
-        <el-form-item label="政府部门实际持股比例年份" prop="region">
+        <el-form-item label="政府部门实际持股比例年份" >
           <el-select v-model="ruleForm.region" placeholder="选择新增类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
@@ -499,16 +542,16 @@
         label-width="135px"
         label-position="left"
       >
-        <el-form-item label="企业名称" prop="region">
+        <el-form-item label="企业名称" >
           <span>xxxxxxxxxxxx</span>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
+        <el-form-item label="统一社会信用代码" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="来源" prop="region">
+        <el-form-item label="来源" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="wind行业划分" prop="region">
+        <el-form-item label="wind行业划分" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -522,7 +565,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="申万行业划分" prop="region">
+        <el-form-item label="申万行业划分" >
           <span v-if="!edit2">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -537,7 +580,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="财报列示类型" prop="region">
+        <el-form-item label="财报列示类型" >
           <el-select v-model="ruleForm.region" placeholder="选择类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
@@ -571,16 +614,16 @@
         label-width="135px"
         label-position="left"
       >
-        <el-form-item label="企业名称" prop="region">
+        <el-form-item label="企业名称" >
           <span>xxxxxxxxxxxx</span>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
+        <el-form-item label="统一社会信用代码" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="来源" prop="region">
+        <el-form-item label="来源" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="wind行业划分" prop="region">
+        <el-form-item label="wind行业划分" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -594,7 +637,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="申万行业划分" prop="region">
+        <el-form-item label="申万行业划分" >
           <span v-if="!edit2">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -609,7 +652,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="财报列示类型" prop="region">
+        <el-form-item label="财报列示类型" >
           <el-select v-model="ruleForm.region" placeholder="选择类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
@@ -643,16 +686,16 @@
         label-width="200px"
         label-position="left"
       >
-        <el-form-item label="企业名称" prop="region">
+        <el-form-item label="企业名称" >
           <span>xxxxxxxxxxxx</span>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
+        <el-form-item label="统一社会信用代码" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="来源" prop="region">
+        <el-form-item label="来源" >
           <span>xxxxxxx121xxxxx</span>
         </el-form-item>
-        <el-form-item label="wind行业划分" prop="region">
+        <el-form-item label="wind行业划分" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -666,7 +709,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="申万行业划分" prop="region">
+        <el-form-item label="申万行业划分" >
           <span v-if="!edit2">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -681,7 +724,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="IB - SaaS - Old" prop="region">
+        <el-form-item label="IB - SaaS - Old" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -695,7 +738,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="IB - SaaS - 2.0" prop="region">
+        <el-form-item label="IB - SaaS - 2.0" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -709,7 +752,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="内评-浙商" prop="region">
+        <el-form-item label="内评-浙商" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -723,7 +766,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="内评-泰隆" prop="region">
+        <el-form-item label="内评-泰隆" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -737,7 +780,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="内评-华金" prop="region">
+        <el-form-item label="内评-华金" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -751,7 +794,7 @@
             >{{ edit1 ? "保存" : "修改" }}</el-button
           >
         </el-form-item>
-        <el-form-item label="内评-华西" prop="region">
+        <el-form-item label="内评-华西" >
           <span v-if="!edit1">xxxxxxx121xxxxx</span>
           <el-input
             class="t-input"
@@ -874,7 +917,9 @@
 </template>
 
 <script>
-import { getTaskByDate, queryList, getDayTaskInfo, getMouthTaskInfo, checkCreditCode, editEntityNameHis, changeState } from "@/api/task";
+import { getTaskByDate,
+   queryList,
+    getDayTaskInfo, getMouthTaskInfo, checkCreditCode, editEntityNameHis, changeState, getRoleSupplyTask, getTaskByEntityCode } from "@/api/task";
 export default {
   name: "Index",
   data() {
@@ -985,7 +1030,9 @@ export default {
       entityNewNameCheck: false,
       entityNamePass: false,
       creditCodePass: false,
-      addBodyId: ''
+      addBodyId: '',
+      list7: [],
+      list3: []
     };
   },
   mounted() {
@@ -1015,7 +1062,7 @@ export default {
         });
         getDayTaskInfo(role2date).then(res => {
           const { data } = res
-          this.list = data
+          this.list7 = data
         })
         // 角色1相关接口
         const params = {
@@ -1031,6 +1078,11 @@ export default {
         queryList(paramsMonth).then((res)=> {
           const { data } = res
           this.showMsg(data)
+        })
+        // 角色 345 相关接口
+        getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
+          const { data } = res
+          this.list3 = data
         })
       } catch (error) {
         console.log(error);
@@ -1262,7 +1314,7 @@ export default {
       this.addGovernmentDig = true;
     },
     work(row) {
-      this.$router.push({ path: 'work', query: { taskCateId: 2, taskDate: this.nowTime } });
+      this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.nowTime } });
     },
     getDay(row) {
       if (!row.path[0].innerText) {
@@ -1285,7 +1337,15 @@ export default {
         };
         getDayTaskInfo({date: this.monthDate+ '-' +clickDay}).then((res) => {
           const { data } = res
-          this.list = data
+          this.list7 = data
+          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+        });
+        const params = {
+          taskDate: this.monthDate+ '-' +clickDay,
+        };
+        getTaskByDate(params).then((res) => {
+          const { data } = res
+          this.list7 = data
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
       } catch (error) {
@@ -1361,8 +1421,43 @@ export default {
       } finally {
         this.$modal.closeLoading();
       }
-    }
+    },
     // 角色7流程结束
+
+    // 角色3流程开始
+    workRole3(row) {
+      try {
+        this.$modal.loading("loading...");
+        const params = {
+          entityCode: row.entityInfo.entityCode,
+          roleId: 5,
+        }
+        getTaskByEntityCode(params).then(res => {
+          const { data } = res
+          let sw = ''
+          let wind = ''
+          data.attrValueList.forEach(e => {
+            if ( e.attrId === 97 ) {
+              sw += e.value // 申万
+            }
+            if ( e.attrId === 99 ) {
+              wind += e.value // wind行业划分明细值
+            }
+          })
+          this.$set(this.ruleForm, 'sw', sw)
+          this.$set(this.ruleForm, 'wind', wind)
+          console.log(this.ruleForm)
+        })
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$modal.closeLoading();
+      }
+      this.governmentDig = true
+      this.ruleForm.entityName = row.entityInfo.entityName
+      this.ruleForm.creditCode = row.entityInfo.creditCode
+      console.log(this.ruleForm)
+    }
   },
 };
 </script>

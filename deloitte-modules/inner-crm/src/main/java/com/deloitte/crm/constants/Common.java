@@ -30,6 +30,8 @@ public enum Common {
     public static final String DAY = "DAY";
 
     public static final String ATTR_FIN = "金融机构表";
+    public static final String ATTR_CITY = "城投机构表";
+    public static final String ATTR_ISS = "财报收数";
 
     public static final String MOUTH = "MOUTH";
 
