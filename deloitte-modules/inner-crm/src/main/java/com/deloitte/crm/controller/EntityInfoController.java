@@ -115,7 +115,7 @@ public class EntityInfoController extends BaseController {
     @ApiImplicitParam(name = "entityInfoDto", value = "包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段", paramType = "body")
     @PostMapping("/add")
     public AjaxResult addEntity(@RequestBody EntityDto entityDto) {
-        //TODO 新增主体
+        //新增主体
         return toAjax(entityInfoService.insertEntityInfo(entityDto));
     }
 

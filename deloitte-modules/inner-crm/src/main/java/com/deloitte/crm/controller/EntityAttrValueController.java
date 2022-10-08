@@ -128,7 +128,7 @@ public class EntityAttrValueController extends BaseController {
     @PostMapping("/addEntityAttrValues")
 //    public R addEntityAttrValues(List<EntityAttrValue> valueList) {
     public R addEntityAttrValues(@RequestBody EntityAttrValue value) {
-        List<EntityAttrValue> valueList=new ArrayList<>();
+        List<EntityAttrValue> valueList = new ArrayList<>();
         valueList.add(value);
         return R.ok(entityAttrValueService.addEntityAttrValues(valueList));
     }
@@ -145,7 +145,7 @@ public class EntityAttrValueController extends BaseController {
      * @author penTang
      * @date 2022/9/27 20:40
      */
-    public R createBondEntity(@Validated @RequestBody EntityByIondVo entityByIondVo){
+    public R createBondEntity(@Validated @RequestBody EntityByIondVo entityByIondVo) {
 
         return entityAttrValueService.createBondEntity(entityByIondVo);
 
@@ -162,17 +162,17 @@ public class EntityAttrValueController extends BaseController {
      * @return R
      * @author penTang
      * @date 2022/9/28 23:09
-    */
-    public R createStockEntity(@Validated @RequestBody EntityStockInfoVo entityStockInfoVo){
-           if (ObjectUtils.equals(entityStockInfoVo.getStockType(),"A")){
-               return entityAttrValueService.createStockEntity(entityStockInfoVo);
-        } else if(ObjectUtils.equals(entityStockInfoVo.getStockType(),"G")){
-               return entityAttrValueService.createStockEntityG(entityStockInfoVo);
-           }
+     */
+    public R createStockEntity(@Validated @RequestBody EntityStockInfoVo entityStockInfoVo) {
+        if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "A")) {
+            return entityAttrValueService.createStockEntity(entityStockInfoVo);
+        } else if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "G")) {
+            return entityAttrValueService.createStockEntityG(entityStockInfoVo);
+        }
         return null;
     }
 
-}
+
 
 
     /**

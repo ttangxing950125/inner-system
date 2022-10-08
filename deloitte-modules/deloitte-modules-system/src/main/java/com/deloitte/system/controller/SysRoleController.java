@@ -1,6 +1,8 @@
 package com.deloitte.system.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.deloitte.system.api.domain.SysUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,6 @@ import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
-import com.deloitte.system.domain.SysUserRole;
 import com.deloitte.system.service.ISysRoleService;
 import com.deloitte.system.service.ISysUserService;
 /**

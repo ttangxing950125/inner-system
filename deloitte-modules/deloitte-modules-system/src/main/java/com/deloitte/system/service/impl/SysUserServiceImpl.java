@@ -3,10 +3,12 @@ package com.deloitte.system.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import javax.validation.Validator;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.deloitte.system.api.domain.SysUserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 import com.deloitte.system.domain.SysPost;
 import com.deloitte.system.domain.SysUserPost;
-import com.deloitte.system.domain.SysUserRole;
 import com.deloitte.system.mapper.SysPostMapper;
 import com.deloitte.system.mapper.SysRoleMapper;
 import com.deloitte.system.mapper.SysUserMapper;
@@ -43,22 +44,22 @@ public class SysUserServiceImpl implements ISysUserService
 {
     private static final Logger log = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
-    @Autowired
+    @Resource
     private SysUserMapper userMapper;
 
-    @Autowired
+    @Resource
     private SysRoleMapper roleMapper;
 
-    @Autowired
+    @Resource
     private SysPostMapper postMapper;
 
-    @Autowired
+    @Resource
     private SysUserRoleMapper userRoleMapper;
 
-    @Autowired
+    @Resource
     private SysUserPostMapper userPostMapper;
 
-    @Autowired
+    @Resource
     private ISysConfigService configService;
 
     @Autowired

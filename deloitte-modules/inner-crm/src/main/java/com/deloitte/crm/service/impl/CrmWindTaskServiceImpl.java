@@ -1,14 +1,10 @@
 package com.deloitte.crm.service.impl;
-
 import java.util.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.stream.Collectors;
-
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.RoleInfo;
@@ -17,18 +13,16 @@ import com.deloitte.crm.service.IBondNewIssService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
+import com.deloitte.crm.vo.CrmTaskVo;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.dto.CrmWindTaskDto;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -130,25 +124,17 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         Wrapper<CrmWindTask> wrapper = Wrappers.<CrmWindTask>lambdaUpdate()
                 .eq(CrmWindTask::getTaskDate, taskDate)
                 .eq(CrmWindTask::getTaskCateId, taskCateId);
-
         List<CrmWindTask> windTasks = this.list(wrapper);
-
         return windTasks.stream().map(item -> {
             WindTaskDetailsVo detailsVo = new WindTaskDetailsVo();
             detailsVo.setWindTask(item);
             detailsVo.setTaskFileName(item.getTaskFileName());
             detailsVo.setTaskStatus(item.getComplete());
-
             List<Map<String, Object>> data = windTaskStrategyManage.getDetail(item);
-
             //查询展示到列表上的信息
-
             List<String> header = windTaskStrategyManage.getDetailHeader(item);
-
-
             detailsVo.setHeader(header);
             detailsVo.setData(data);
-
             return detailsVo;
         }).collect(Collectors.toList());
     }
@@ -165,7 +151,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     */
     @Override
     public List<CrmWindTask> selectCrmWindTask(@RequestBody String TaskDate, String TaskCateId){
-
        return list(new LambdaQueryWrapper<CrmWindTask>()
                 .eq(CrmWindTask ::getTaskDate,TaskDate)
                 .eq(CrmWindTask :: getTaskCateId,TaskCateId));
@@ -180,8 +165,10 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
      * @date 2022/9/22 10:51
     */
     @Override
-    public List<CrmWindTaskDto> selectComTaskByDate(String TaskDate){
-        List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(TaskDate);
+    public List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo){
+        Page<CrmWindTaskDto> page = new Page<>(crmTaskVo.getPageNum(),crmTaskVo.getPageSize());
+
+        List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(page,crmTaskVo.getTaskDate());
 
         return crmWindTaskDtos;
     }

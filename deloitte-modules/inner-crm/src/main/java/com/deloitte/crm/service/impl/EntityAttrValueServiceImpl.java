@@ -26,9 +26,12 @@ import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.utils.AttrValueUtils;
+import com.deloitte.crm.vo.EntityByIondVo;
+import com.deloitte.crm.vo.EntityStockInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
@@ -42,13 +45,13 @@ import java.util.*;
  */
 @Service
 public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMapper, EntityAttrValue> implements IEntityAttrValueService {
-    @Autowired
+    @Resource
     private EntityAttrValueMapper entityAttrValueMapper;
 
     @Resource
     private IEntityAttrService entityAttrService;
 
-    @Autowired
+    @Resource
     private CrmSupplyTaskMapper supplyTaskMapper;
 
 
@@ -281,7 +284,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Transactional
     @Override
     public R createBondEntity(EntityByIondVo entityByIondVo){
-      //creditCode和bondShortName进行查重操作
+       //creditCode和bondShortName进行查重操作
         EntityInfo entityInfo1 = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByIondVo.getCreditCode()));
         BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName());
 
@@ -340,36 +343,36 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增entity_attr_value
         ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
         EntityAttrValue entityAttrValueStockCode = new EntityAttrValue();
-        //TODO 债券全称
+        //债券全称
         entityAttrValueStockCode.setEntityCode("BD"+startZeroStr);
         entityAttrValueStockCode.setAttrId(Common.BOND_NAME_ID.longValue());
         entityAttrValueStockCode.setValue(entityByIondVo.getBondName());
         entityAttrValues.add(entityAttrValueStockCode);
-        //TODO 起息日
+        //起息日
         EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
         entityAttrValueStartDate.setAttrId(Common.START_XI_DATE_ID.longValue());
         entityAttrValueStartDate.setEntityCode("BD"+startZeroStr);
         entityAttrValueStartDate.setValue(entityByIondVo.getStartXiDate());
         entityAttrValues.add(entityAttrValueStartDate);
-        //TODO 到期日
+        //到期日
         EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
         entityAttrValueEndDate.setAttrId(Common.STRING_END_DATE_ID.longValue());
         entityAttrValueEndDate.setEntityCode("BD"+startZeroStr);
         entityAttrValueEndDate.setValue(entityByIondVo.getEndDate());
         entityAttrValues.add(entityAttrValueEndDate);
-        //TODO 债券类型
+        //债券类型
         EntityAttrValue entityAttrValueBondType = new EntityAttrValue();
         entityAttrValueBondType.setAttrId(Common.BOND_TYPE_ID.longValue());
         entityAttrValueBondType.setEntityCode("BD"+startZeroStr);
         entityAttrValueBondType.setValue(entityByIondVo.getBondType());
         entityAttrValues.add(entityAttrValueBondType);
-        //TODO 年报类型
+        //年报类型
         EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
         entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
         entityAttrValueReportType.setEntityCode("BD"+startZeroStr);
         entityAttrValueReportType.setValue(entityByIondVo.getAnRportType());
         entityAttrValues.add(entityAttrValueReportType);
-        //TODO 金融机构子行业
+        //金融机构子行业
         EntityAttrValue financeSubIndu = new EntityAttrValue();
         financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
         financeSubIndu.setEntityCode("BD"+startZeroStr);
@@ -432,7 +435,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
                 .set(EntityInfo::getEntityCode, entityInfoBystock.getEntityCode());
         entityInfoMapper.update(entityInfoBystock, wrapper);
 
-        // 新增 entity_name_his
+        //新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
         entityNameHis.setDqCode(entityInfo.getEntityCode());
@@ -461,25 +464,25 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityStockCnRelMapper.insert(entityStockCnRel);
         //新增entity_attr_value
         ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
-        //TODO 年报类型
+        //年报类型
         EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
         entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
         entityAttrValueReportType.setEntityCode(entityStockInfoVo.getStockCode());
         entityAttrValueReportType.setValue(entityStockInfoVo.getAnRportType());
         entityAttrValues.add(entityAttrValueReportType);
-        //TODO 金融机构子行业
+        //金融机构子行业
         EntityAttrValue financeSubIndu = new EntityAttrValue();
         financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
         financeSubIndu.setEntityCode(entityStockInfoVo.getStockCode());
         financeSubIndu.setValue(entityStockInfoVo.getFinanceSubIndu());
         entityAttrValues.add(financeSubIndu);
-        //TODO 上市日期
+        //上市日期
         EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
         entityAttrValueStartDate.setAttrId(Common.SHANSI_DATE_ID.longValue());
         entityAttrValueStartDate.setEntityCode(entityStockInfoVo.getStockCode());
         entityAttrValueStartDate.setValue(entityStockInfoVo.getStartXiDate());
         entityAttrValues.add(entityAttrValueStartDate);
-        //TODO 退市日期
+        //退市日期
         EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
         entityAttrValueEndDate.setAttrId(Common.TUISI_DATE_ID.longValue());
         entityAttrValueEndDate.setEntityCode(entityStockInfoVo.getStockCode());
@@ -491,7 +494,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
         entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
         entityAttrValues.add(entityAttrValuelisSec);
-        //TODO 交易所
+        //交易所
         EntityAttrValue entityAttrValueExange = new EntityAttrValue();
         entityAttrValueExange.setAttrId(Common.EXCHANGE_ID.longValue());
         entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
@@ -571,25 +574,25 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
            EntityStockThkRelMapper.insert(entityStockThkRel);
             //新增entity_attr_value
             ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
-            //TODO 年报类型
+            //年报类型
             EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
             entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
             entityAttrValueReportType.setEntityCode(entityStockInfoVo.getStockCode());
             entityAttrValueReportType.setValue(entityStockInfoVo.getAnRportType());
             entityAttrValues.add(entityAttrValueReportType);
-            //TODO 金融机构子行业
+            //金融机构子行业
             EntityAttrValue financeSubIndu = new EntityAttrValue();
             financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
             financeSubIndu.setEntityCode(entityStockInfoVo.getStockCode());
             financeSubIndu.setValue(entityStockInfoVo.getFinanceSubIndu());
             entityAttrValues.add(financeSubIndu);
-            //TODO 上市日期
+            //上市日期
             EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
             entityAttrValueStartDate.setAttrId(Common.STOCK_SHANXI_DATE_HK_ID.longValue());
             entityAttrValueStartDate.setEntityCode(entityStockInfoVo.getStockCode());
             entityAttrValueStartDate.setValue(entityStockInfoVo.getStartXiDate());
             entityAttrValues.add(entityAttrValueStartDate);
-            //TODO 退市日期
+            //退市日期
             EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
             entityAttrValueEndDate.setAttrId(Common.TUISI_DATE_HK_ID.longValue());
             entityAttrValueEndDate.setEntityCode(entityStockInfoVo.getStockCode());
@@ -601,12 +604,17 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
             entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
             entityAttrValues.add(entityAttrValuelisSec);
-            //TODO 交易所
+            //交易所
             EntityAttrValue entityAttrValuelisEx = new EntityAttrValue();
             entityAttrValuelisEx.setAttrId(Common.EXCHANGE_HK_ID.longValue());
             entityAttrValuelisEx.setEntityCode(entityStockInfoVo.getStockCode());
             entityAttrValuelisEx.setValue(entityStockInfoVo.getExchange());
             entityAttrValues.add(entityAttrValuelisEx);
+           return R.ok("新增成功");
+    }
+
+    @Override
+    public Object addEntityAttrValuesNew(Map<String, String> valueMap) {
         return null;
     }
 

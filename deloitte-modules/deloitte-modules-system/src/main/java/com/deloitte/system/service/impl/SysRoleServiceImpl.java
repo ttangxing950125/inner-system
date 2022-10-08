@@ -8,6 +8,7 @@ import java.util.Set;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.deloitte.system.api.domain.SysUserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.deloitte.common.core.constant.UserConstants;
@@ -19,7 +20,6 @@ import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 import com.deloitte.system.domain.SysRoleDept;
 import com.deloitte.system.domain.SysRoleMenu;
-import com.deloitte.system.domain.SysUserRole;
 import com.deloitte.system.mapper.SysRoleDeptMapper;
 import com.deloitte.system.mapper.SysRoleMapper;
 import com.deloitte.system.mapper.SysRoleMenuMapper;
@@ -27,8 +27,6 @@ import com.deloitte.system.mapper.SysUserRoleMapper;
 import com.deloitte.system.service.ISysRoleService;
 
 import javax.annotation.Resource;
-
-import static com.alibaba.nacos.common.utils.CollectionUtils.list;
 
 /**
  * 角色 业务层处理

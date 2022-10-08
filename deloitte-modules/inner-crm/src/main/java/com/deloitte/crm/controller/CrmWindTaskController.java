@@ -1,13 +1,12 @@
 package com.deloitte.crm.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.vo.CrmTaskVo;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
 import io.swagger.annotations.*;
-import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.dto.CrmWindTaskDto;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -40,7 +39,6 @@ public class CrmWindTaskController extends BaseController
     private ICrmWindTaskService crmWindTaskService;
     @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
-
 
     @GetMapping("/findTaskDetails")
     @ApiOperation(value = "吴鹏——查询某一天角色1某个分类的wind任务", response = WindTaskDetailsVo.class)
@@ -142,18 +140,18 @@ public class CrmWindTaskController extends BaseController
                     dataType = "String"
             )
     })
-    public R<List<CrmDailyTask>> getDataTable(String TaskDate) {
+    public R<List<CrmDailyTask>> getDataTable(@RequestParam("TaskDate") String TaskDate) {
       return R.ok(crmDailyTaskService.selectCrmDailyTaskListByDate(TaskDate));
     }
     /**
      *根据指定日期查询任务完成度
      *
-     * @param TaskDate
+     * @param crmTaskVo
      * @return R
      * @author penTang
      * @date 2022/9/22 10:45
     */
-    @GetMapping("/getTaskByDate")
+    @PostMapping("/getTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate查询任务完成度}",response = CrmWindTaskDto.class)
     @ApiImplicitParams({@ApiImplicitParam(
             name = "TaskDate",
@@ -163,8 +161,8 @@ public class CrmWindTaskController extends BaseController
             dataType = "String"
 
     )})
-    public R getTaskCompleted(String TaskDate) {
-       return R.ok(crmWindTaskService.selectComTaskByDate(TaskDate));
+    public R getTaskCompleted(@RequestBody CrmTaskVo crmTaskVo) {
+       return R.ok(crmWindTaskService.selectComTaskByDate(crmTaskVo));
     }
 
     /**
@@ -192,7 +190,7 @@ public class CrmWindTaskController extends BaseController
             dataType = "String"
 
     )})
-    public R selectCrmWindTask(String TaskDate,String TaskCateId) {
+    public R selectCrmWindTask(@RequestParam("TaskDate") String TaskDate,@RequestParam("TaskCateId") String TaskCateId) {
         return R.ok(crmWindTaskService.selectCrmWindTask(TaskDate,TaskCateId));
     }
 
