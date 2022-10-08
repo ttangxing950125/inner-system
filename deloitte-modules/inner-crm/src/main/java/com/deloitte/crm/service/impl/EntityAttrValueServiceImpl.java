@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
@@ -8,6 +9,7 @@ import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
@@ -18,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -36,6 +35,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     @Resource
     private IEntityAttrService entityAttrService;
+
+    @Autowired
+    private CrmSupplyTaskMapper supplyTaskMapper;
+
 
     /**
      * 查询【请填写功能名称】
@@ -198,14 +201,89 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         valueList.stream().forEach(o -> {
             QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
             String attrId = o.getAttrId().toString();
-            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID.toString())
-                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID.toString())) {
-                entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ID.toString())
+                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ID.toString())) {
+                int num = entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+                if (num==0){
+                    entityAttrValueMapper.insert(o);
+                }
             } else {
                 entityAttrValueMapper.insert(o);
             }
         });
         return valueList.size();
+    }
+
+    @Override
+    public Object addEntityAttrValuesNew(Map<String, String> valueMap) {
+        String entityCode = valueMap.get("entityCode");
+        List<EntityAttrValue>valueList=new ArrayList<>();
+        //封装存储的值
+        for (String key : valueMap.keySet()) {
+            if (ObjectUtil.equal("entityCode", key)) {
+                continue;
+            }
+            Long attrId = getAttrId(key);
+            if (attrId==0L){
+                continue;
+            }
+            EntityAttrValue attrValue=new EntityAttrValue();
+            attrValue.setEntityCode(entityCode);
+            attrValue.setAttrId(attrId);
+            attrValue.setValue(valueMap.get(key));
+            valueList.add(attrValue);
+        }
+        addEntityAttrValues(valueList);
+        return null;
+    }
+
+    //根据 key 名称，获取 attrId
+    private Long getAttrId(String key) {
+        Long id = 0L;
+        switch (key) {
+            //统一
+            case "wind行业划分":
+                id = 652L;
+                break;
+            case "申万行业划分":
+                id = 650L;
+                break;
+            //金融机构表
+            case "所属地区":
+                id = 983L;
+                break;
+            case "所属辖区":
+                id = 658L;
+                break;
+            case "对口监管机构":
+                id = 657L;
+                break;
+            //城投机构表
+            case "城府持股方式":
+                id = 676L;
+                break;
+            case "政府对当前城投支持力度":
+                id = 677L;
+                break;
+            case "政府对当前城投支持力度判断依据":
+                id = 981L;
+                break;
+            case "政府部门实际持股比例":
+                id = 678L;
+                break;
+            case "政府部门实际持股比例-年份":
+                id = 982L;
+                break;
+            //财报收数
+            case "财报列示类型":
+                id = 855L;
+                break;
+            case "关注报告类":
+                id = 854L;
+                break;
+            default: id=0L;
+        }
+        return id;
     }
 
     /**

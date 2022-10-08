@@ -63,5 +63,5 @@ public interface ICrmSupplyTaskService
 
     R getRoleSupplyTask(String taskDate);
 
-   Integer completeRoleSupplyTask(Long id);
+   Integer completeRoleSupplyTask(Long id,String remark);
 }

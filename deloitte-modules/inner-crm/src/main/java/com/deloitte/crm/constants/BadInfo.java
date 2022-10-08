@@ -1,7 +1,4 @@
 package com.deloitte.crm.constants;
-
-import javax.validation.Valid;
-
 /**
  * @author 正杰
  * @description: 坏 信息常量

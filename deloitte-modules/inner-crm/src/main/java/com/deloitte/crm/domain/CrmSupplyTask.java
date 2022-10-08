@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@Data
 public class CrmSupplyTask implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -49,78 +51,13 @@ public class CrmSupplyTask implements Serializable
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
+    /** 备注 */
+    @Excel(name = "备注")
+    private String remark;
 
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setEntityCode(String entityCode) 
-    {
-        this.entityCode = entityCode;
-    }
-
-    public String getEntityCode() 
-    {
-        return entityCode;
-    }
-    public void setRoleId(Long roleId) 
-    {
-        this.roleId = roleId;
-    }
-
-    public Long getRoleId() 
-    {
-        return roleId;
-    }
-    public void setTaskDate(Date taskDate) 
-    {
-        this.taskDate = taskDate;
-    }
-
-    public Date getTaskDate() 
-    {
-        return taskDate;
-    }
-    public void setState(Integer state) 
-    {
-        this.state = state;
-    }
-
-    public Integer getState() 
-    {
-        return state;
-    }
-    public void setHandleUser(String handleUser) 
-    {
-        this.handleUser = handleUser;
-    }
-
-    public String getHandleUser() 
-    {
-        return handleUser;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdated(Date updated) 
-    {
-        this.updated = updated;
-    }
-
-    public Date getUpdated() 
-    {
-        return updated;
-    }
+    /** 来源 */
+    @Excel(name = "来源")
+    private String from;
 
     @Override
     public String toString() {

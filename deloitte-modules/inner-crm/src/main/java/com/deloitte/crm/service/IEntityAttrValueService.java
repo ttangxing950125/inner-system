@@ -2,10 +2,10 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.dto.EntityAttrValueDto;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service接口
@@ -108,4 +108,6 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
     int updateStockCnAttr(String code, Object item);
 
     Integer addEntityAttrValues(List<EntityAttrValue> valueList);
+
+    Object addEntityAttrValuesNew(Map<String, String> valueMap);
 }

@@ -17,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Controller
@@ -103,7 +106,26 @@ public class EntityAttrValueController extends BaseController {
     @ApiOperation(value = "根据entityCode补充录入副表信息")
     @ApiImplicitParam(name = "valueList", value = "增改数据", paramType = "body", example = "", dataTypeClass = EntityAttrValueDto.class)
     @PostMapping("/addEntityAttrValues")
-    public R addEntityAttrValues(List<EntityAttrValue> valueList) {
+//    public R addEntityAttrValues(List<EntityAttrValue> valueList) {
+    public R addEntityAttrValues(@RequestBody EntityAttrValue value) {
+        List<EntityAttrValue> valueList=new ArrayList<>();
+        valueList.add(value);
         return R.ok(entityAttrValueService.addEntityAttrValues(valueList));
+    }
+
+
+    /**
+     * 根据entityCode补充录入副表信息
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/25 13:56
+     */
+    @ApiOperation(value = "根据 entityCode 补充录入副表信息")
+    @ApiImplicitParam(name = "map", value = "增改数据", paramType = "body", example = "", dataTypeClass = HashMap.class)
+    @PostMapping("/addEntityAttrValuesNew")
+//    public R addEntityAttrValues(List<EntityAttrValue> valueList) {
+    public R addEntityAttrValuesNew(@RequestBody Map<String,String> valueMap) {
+        return R.ok(entityAttrValueService.addEntityAttrValuesNew(valueMap));
     }
 }

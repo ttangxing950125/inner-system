@@ -119,6 +119,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .eq(SysUserRole::getUserId, userId)
                 .in(SysUserRole::getRoleId, "5", "6", "7")
         );
+
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
             return R.ok();
@@ -172,12 +173,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     }
 
     @Override
-    public Integer completeRoleSupplyTask(Long id) {
+    public Integer completeRoleSupplyTask(Long id,String remark) {
         String username = SecurityUtils.getUsername();
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setId(id);
         crmSupplyTask.setState(1);
         crmSupplyTask.setHandleUser(username);
+        crmSupplyTask.setRemark(remark);
         return crmSupplyTaskMapper.updateById(crmSupplyTask);
     }
 }
