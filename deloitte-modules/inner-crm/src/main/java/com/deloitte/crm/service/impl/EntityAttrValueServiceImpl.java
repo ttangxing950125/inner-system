@@ -179,8 +179,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             e.printStackTrace();
             throw new GlobalException(e.getMessage());
         }
-
-
         Set<String> keySet = data.keySet();
         for (String key : keySet) {
             Object value = data.get(key);
@@ -245,6 +243,78 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             }
         });
         return valueList.size();
+    }
+
+    @Override
+    public Object addEntityAttrValuesNew(Map<String, String> valueMap) {
+        String entityCode = valueMap.get("entityCode");
+        List<EntityAttrValue>valueList=new ArrayList<>();
+        //封装存储的值
+        for (String key : valueMap.keySet()) {
+            if (ObjectUtil.equal("entityCode", key)) {
+                continue;
+            }
+            Long attrId = getAttrId(key);
+            if (attrId==0L){
+                continue;
+            }
+            EntityAttrValue attrValue=new EntityAttrValue();
+            attrValue.setEntityCode(entityCode);
+            attrValue.setAttrId(attrId);
+            attrValue.setValue(valueMap.get(key));
+            valueList.add(attrValue);
+        }
+        addEntityAttrValues(valueList);
+        return null;
+    }
+
+    //根据 key 名称，获取 attrId
+    private Long getAttrId(String key) {
+        Long id = 0L;
+        switch (key) {
+            //统一
+            case "wind行业划分":
+                id = 652L;
+                break;
+            case "申万行业划分":
+                id = 650L;
+                break;
+            //金融机构表
+            case "所属地区":
+                id = 983L;
+                break;
+            case "所属辖区":
+                id = 658L;
+                break;
+            case "对口监管机构":
+                id = 657L;
+                break;
+            //城投机构表
+            case "城府持股方式":
+                id = 676L;
+                break;
+            case "政府对当前城投支持力度":
+                id = 677L;
+                break;
+            case "政府对当前城投支持力度判断依据":
+                id = 981L;
+                break;
+            case "政府部门实际持股比例":
+                id = 678L;
+                break;
+            case "政府部门实际持股比例-年份":
+                id = 982L;
+                break;
+            //财报收数
+            case "财报列示类型":
+                id = 855L;
+                break;
+            case "关注报告类":
+                id = 854L;
+                break;
+            default: id=0L;
+        }
+        return id;
     }
 
     /**
@@ -613,9 +683,5 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
            return R.ok("新增成功");
     }
 
-    @Override
-    public Object addEntityAttrValuesNew(Map<String, String> valueMap) {
-        return null;
-    }
 
 }
