@@ -97,7 +97,7 @@ public class EntityAttrController extends BaseController {
     /**
      * 分组查询全部---构造父子级关系
      *
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */

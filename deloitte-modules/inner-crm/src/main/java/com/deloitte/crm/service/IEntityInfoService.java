@@ -197,5 +197,16 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return R
      */
     R<EntityInfoVo> checkEntityName(String entityName);
-
+    /**
+     * 覆盖情况快速查询
+     *
+     * @param entityType
+     * @param param
+     * @param pageNum
+     * @param pageSize
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/8 15:53
+     */
+    R getQuickOfCoverage(String entityType, String param, Integer pageNum,Integer pageSize);
 }

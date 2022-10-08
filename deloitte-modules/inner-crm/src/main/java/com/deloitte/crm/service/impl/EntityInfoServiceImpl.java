@@ -1,6 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
@@ -24,16 +25,12 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.dto.EntitySupplyBack;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
-import com.deloitte.crm.vo.BondVo;
-import com.deloitte.crm.vo.EntityInfoVo;
-import com.deloitte.crm.vo.EntityVo;
-import com.deloitte.crm.vo.TargetEntityBondsVo;
+import com.deloitte.crm.vo.*;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -84,7 +81,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private BondInfoMapper bondInfoMapper;
 
-    private EntityInfoManager entityInfoManager ;
+    private EntityInfoManager entityInfoManager;
 
     @Autowired
     private HttpUtils httpUtils;
@@ -307,7 +304,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R editEntityNameHis(String creditCode, String entityNewName, String remarks) {
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
                 .lambda().eq(EntityInfo::getCreditCode, creditCode));
-        return R.ok(entityInfoManager.updateEntityName(entity,entityNewName,remarks));
+        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, remarks));
     }
 
     /**
@@ -905,11 +902,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public R findRelationEntityOrBond(Integer id, String keyword) {
         List<TargetEntityBondsVo> result = new ArrayList<>();
-        switch (keyword){
+        switch (keyword) {
             case ENTITY:
                 List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
                         .lambda().eq(EntityBondRel::getId, id));
-                entityBondRels.forEach(row->{
+                entityBondRels.forEach(row -> {
                     BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
                             .eq(BondInfo::getBondCode, row.getBdCode()));
                     result.add(this.matchingBondInfo(bondInfo));
@@ -918,7 +915,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             case BOND:
                 List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
                         .eq(EntityBondRel::getId, id));
-                entityBondRels1.forEach(item->{
+                entityBondRels1.forEach(item -> {
                     EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda()
                             .eq(EntityInfo::getEntityCode, item.getEntityCode()));
                     result.add(this.matchingEntityInfo(entityInfo));
@@ -1046,17 +1043,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     /**
      * 校验统一社会信用代码是否存在 by正杰
-     * @author 正杰
-     * @date 2022/9/28
+     *
      * @param creditCode
      * @return
+     * @author 正杰
+     * @date 2022/9/28
      */
     @Override
     public R<EntityInfoVo> checkCreditCode(String creditCode) {
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getCreditCode, creditCode));
-        if(entityInfos.size()==0){return R.ok(new EntityInfoVo().setBo(true)
-                    .setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));}
+        if (entityInfos.size() == 0) {
+            return R.ok(new EntityInfoVo().setBo(true)
+                    .setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
+        }
         return R.ok(new EntityInfoVo().setBo(false)
                 .setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo())
                 .setEntityInfo(entityInfos.get(0)));
@@ -1064,19 +1064,110 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     /**
      * 校验主体名称是否存在
-     * @author 正杰
-     * @date 2022/9/28
+     *
      * @param entityName
      * @return R
+     * @author 正杰
+     * @date 2022/9/28
      */
     @Override
     public R<EntityInfoVo> checkEntityName(String entityName) {
         List<EntityInfo> entName = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getEntityName, entityName));
-        if(entName.size()!=0){return R.ok(new EntityInfoVo()
-                .setBo(false).setEntityInfo(entName.get(0)));}
+        if (entName.size() != 0) {
+            return R.ok(new EntityInfoVo()
+                    .setBo(false).setEntityInfo(entName.get(0)));
+        }
         return R.ok(new EntityInfoVo()
                 .setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
+    }
+
+    /**
+     * 覆盖情况快速查询
+     *
+     * @param entityType
+     * @param param
+     * @param pageNum
+     * @param pageSize
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/8 15:53
+     */
+    @Override
+    public R getQuickOfCoverage(String entityType, String param,  Integer pageNum, Integer pageSize) {
+        if (ObjectUtil.isEmpty(pageNum)) {
+            return R.fail("未输入页码");
+        }
+        if (ObjectUtil.isEmpty(pageSize)) {
+            pageSize = 9;
+        }
+        if ("0".equals(entityType)) {
+            //创建分页对象
+            Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
+
+            QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
+
+            //创建分页结果集
+            List<EntityInfoValueResult> resultList = new ArrayList<>();
+            Page<EntityInfoValueResult> pageResult = new Page<>();
+
+            Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
+                    .like(EntityInfo::getEntityCode, param)
+                    .like(EntityInfo::getEntityName, param)
+                    .like(EntityInfo::getCreditCode, param)
+            );
+            //新的分页结果赋值
+            pageResult.setTotal(page.getTotal()).setPages(page.getPages()).setSize(page.getSize()).setCurrent(page.getCurrent());
+
+            List<EntityInfo> records = page.getRecords();
+            if (CollectionUtils.isEmpty(records)) {
+                pageResult.setRecords(null);
+            } else {
+                records.stream().forEach(o -> {
+                    String entityCode = o.getEntityCode();
+                    QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+                    List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
+                    EntityInfoValueResult result = new EntityInfoValueResult();
+                    result.setEntityInfo(o).setValueList(attrValueList);
+                    resultList.add(result);
+                });
+                pageResult.setRecords(resultList);
+            }
+            return R.ok(pageResult);
+        } else if ("1".equals(entityType)) {
+            QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
+            //创建分页对象
+            Page<GovInfo> pageInfo = new Page<>(pageNum, pageSize);
+            //创建分页结果集
+            List<GovInfoValueResult> resultList = new ArrayList<>();
+            Page<GovInfoValueResult> pageResult = new Page<>();
+
+            Page<GovInfo> page = govInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
+                    .like(GovInfo::getDqGovCode, param)
+                    .like(GovInfo::getGovName, param)
+                    .like(GovInfo::getGovLevelBig, param)
+            );
+            //新的分页结果赋值
+            pageResult.setTotal(page.getTotal()).setPages(page.getPages()).setSize(page.getSize()).setCurrent(page.getCurrent());
+
+            List<GovInfo> records = page.getRecords();
+            if (CollectionUtils.isEmpty(records)) {
+                pageResult.setRecords(null);
+            } else {
+                records.stream().forEach(o -> {
+                    String entityCode = o.getDqGovCode();
+                    QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+                    List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
+                    GovInfoValueResult result = new GovInfoValueResult();
+                    result.setGovInfo(o).setValueList(attrValueList);
+                    resultList.add(result);
+                });
+                pageResult.setRecords(resultList);
+            }
+            return R.ok(pageResult);
+        }
+
+        return null;
     }
 
 }
