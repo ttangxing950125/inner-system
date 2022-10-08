@@ -1,8 +1,9 @@
 package com.deloitte.system.mapper;
 
 import java.util.List;
+
+import com.deloitte.system.api.domain.SysUserRole;
 import org.apache.ibatis.annotations.Param;
-import com.deloitte.system.domain.SysUserRole;
 
 /**
  * 用户与角色关联表 数据层

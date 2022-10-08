@@ -1,29 +1,28 @@
 package com.deloitte.crm.service.impl;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.*;
+import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
+import com.deloitte.crm.service.IEntityAttrService;
+import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.BondEntityInfoVo;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.BondInfoMapper;
-import com.deloitte.crm.domain.BondInfo;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -133,6 +132,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @param fullName
      * @return
      */
+    @Override
     public R checkEntityBondFullName(String fullName){
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondFullName(fullName);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
@@ -144,6 +144,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @param tradCode
      * @return
      */
+    @Override
     public R checkEntityBondTradCode(String tradCode){
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondTradCode(tradCode);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
@@ -155,6 +156,7 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @param shortName
      * @return
      */
+    @Override
     public R checkEntityBondShortName(String shortName){
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondShortName(shortName);
         if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}

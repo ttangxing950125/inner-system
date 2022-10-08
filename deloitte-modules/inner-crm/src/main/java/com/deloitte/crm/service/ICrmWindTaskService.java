@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.vo.CrmTaskVo;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
 import org.springframework.web.multipart.MultipartFile;
 import com.deloitte.crm.dto.CrmWindTaskDto;
@@ -36,12 +37,12 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
     /**
      * 根据指定日期查询任务完成度接口
      *
-     * @param TaskDate
+     * @param crmTaskVo
      * @return List<CrmWindTaskDto>
      * @author penTang
      * @date 2022/9/22 17:06
     */
-    List<CrmWindTaskDto> selectComTaskByDate(String TaskDate);
+    List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo);
 
     Boolean saveCrmWindTas(List<CrmWindTask> crmWind);
 

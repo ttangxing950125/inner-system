@@ -13,16 +13,16 @@ import lombok.Data;
 @Data
 @ApiModel(value = "EntityInfoDto",description = "用于统计主体信息")
 public class EntityInfoDto {
-    /** 是否上市 0-未上市 1-已上市 */
-    @ApiModelProperty(value = "/** 是否上市 0-未上市 1-已上市 */")
+    /** 上市数量 */
+    @ApiModelProperty(value = "上市数量 ")
     private Integer list;
 
-    /** 是否发债 0-未发债 1-已发债 */
-    @ApiModelProperty(value = "是否发债 0-未发债 1-已发债")
+    /** 发债数量 */
+    @ApiModelProperty(value = "发债数量")
     private Integer issueBonds;
 
-    /** 否金融机构 0-否1-是 是 */
-    @ApiModelProperty(value = "否金融机构 0-否1-是 是")
+    /** 金融机构数量 */
+    @ApiModelProperty(value = "金融机构数量 ")
     private Integer finance;
 
     /** 上市又发债*/

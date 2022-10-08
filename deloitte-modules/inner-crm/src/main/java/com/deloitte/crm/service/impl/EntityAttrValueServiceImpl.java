@@ -1,27 +1,41 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.lang.annotation.Annotation;
+import java.text.DecimalFormat;
+import java.util.*;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
+import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.utils.AttrValueUtils;
+import com.deloitte.crm.vo.EntityByIondVo;
+import com.deloitte.crm.vo.EntityStockInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -31,11 +45,33 @@ import java.util.Set;
  */
 @Service
 public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMapper, EntityAttrValue> implements IEntityAttrValueService {
-    @Autowired
+    @Resource
     private EntityAttrValueMapper entityAttrValueMapper;
 
     @Resource
     private IEntityAttrService entityAttrService;
+
+    @Resource
+    private CrmSupplyTaskMapper supplyTaskMapper;
+
+
+    @Resource
+    private EntityInfoMapper entityInfoMapper;
+    @Resource
+    private StockCnInfoMapper stockCnInfoMapper;
+
+    @Resource
+    private BondInfoMapper bondInfoMapper;
+    @Resource
+    private EntityBondRelMapper entityBondRelMapper;
+    @Resource
+    private StockThkInfoMapper stockThkInfoMapper;
+    @Resource
+    private EntityNameHisMapper entityNameHisMapper;
+    @Resource
+    private EntityStockCnRelMapper entityStockCnRelMapper;
+    @Resource
+    private  EntityStockThkRelMapper EntityStockThkRelMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -143,8 +179,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             e.printStackTrace();
             throw new GlobalException(e.getMessage());
         }
-
-
         Set<String> keySet = data.keySet();
         for (String key : keySet) {
             Object value = data.get(key);
@@ -198,14 +232,89 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         valueList.stream().forEach(o -> {
             QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
             String attrId = o.getAttrId().toString();
-            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID.toString())
-                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID.toString())) {
-                entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ID.toString())
+                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ID.toString())) {
+                int num = entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+                if (num==0){
+                    entityAttrValueMapper.insert(o);
+                }
             } else {
                 entityAttrValueMapper.insert(o);
             }
         });
         return valueList.size();
+    }
+
+    @Override
+    public Object addEntityAttrValuesNew(Map<String, String> valueMap) {
+        String entityCode = valueMap.get("entityCode");
+        List<EntityAttrValue>valueList=new ArrayList<>();
+        //封装存储的值
+        for (String key : valueMap.keySet()) {
+            if (ObjectUtil.equal("entityCode", key)) {
+                continue;
+            }
+            Long attrId = getAttrId(key);
+            if (attrId==0L){
+                continue;
+            }
+            EntityAttrValue attrValue=new EntityAttrValue();
+            attrValue.setEntityCode(entityCode);
+            attrValue.setAttrId(attrId);
+            attrValue.setValue(valueMap.get(key));
+            valueList.add(attrValue);
+        }
+        addEntityAttrValues(valueList);
+        return null;
+    }
+
+    //根据 key 名称，获取 attrId
+    private Long getAttrId(String key) {
+        Long id = 0L;
+        switch (key) {
+            //统一
+            case "wind行业划分":
+                id = 652L;
+                break;
+            case "申万行业划分":
+                id = 650L;
+                break;
+            //金融机构表
+            case "所属地区":
+                id = 983L;
+                break;
+            case "所属辖区":
+                id = 658L;
+                break;
+            case "对口监管机构":
+                id = 657L;
+                break;
+            //城投机构表
+            case "城府持股方式":
+                id = 676L;
+                break;
+            case "政府对当前城投支持力度":
+                id = 677L;
+                break;
+            case "政府对当前城投支持力度判断依据":
+                id = 981L;
+                break;
+            case "政府部门实际持股比例":
+                id = 678L;
+                break;
+            case "政府部门实际持股比例-年份":
+                id = 982L;
+                break;
+            //财报收数
+            case "财报列示类型":
+                id = 855L;
+                break;
+            case "关注报告类":
+                id = 854L;
+                break;
+            default: id=0L;
+        }
+        return id;
     }
 
     /**
@@ -227,4 +336,352 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
         return entityAttrValueMapper.updateById(dbAttrValue);
     }
+
+
+    private final String IB = "IB";
+
+    private final String ZERO = "0";
+
+    private final Integer CODE_NUMBER = 6;
+    /**
+     *新增债券主体(社会信用代码和债券简称重复不能进行新增)
+     *
+     * @param entityByIondVo
+     * @return R
+     * @author penTang
+     * @date 2022/9/27 20:40
+     */
+    @Transactional
+    @Override
+    public R createBondEntity(EntityByIondVo entityByIondVo){
+       //creditCode和bondShortName进行查重操作
+        EntityInfo entityInfo1 = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByIondVo.getCreditCode()));
+        BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName());
+
+        if (!ObjectUtils.isEmpty(byShortName) || !ObjectUtils.isEmpty(entityInfo1)) {
+            return R.fail("新增失败：社会信用代码或债券简称重复不能进行新增");
+        }
+        //新增entity_info
+        EntityInfo entityInfo = new EntityInfo();
+        entityInfo.setCreditCode(entityByIondVo.getCreditCode());
+        entityInfo.setEntityName(entityByIondVo.getEntityName());
+        if (Objects.equals(entityByIondVo.getCreditError(),"0")) {
+            entityInfo.setCreditError(0);
+        }
+        entityInfo.setCreditError(1);
+        entityInfo.setCreditErrorRemark(entityByIondVo.getCreditErrorRemark());
+        entityInfo.setFinance(entityByIondVo.getFinance());
+        //曾用名
+        entityInfo.setEntityNameHis(entityByIondVo.getEntityNameHis());
+        //创建人
+        entityInfo.setCreater(SecurityUtils.getUsername());
+        entityInfoMapper.insert(entityInfo);
+        //根据主键id生成code
+        Integer id = entityInfo.getId();
+        StringBuilder sb = new StringBuilder(IB);
+        for (int j = 0; j < CODE_NUMBER - String.valueOf(id).length(); j++) {
+            sb.append(ZERO);
+        }
+        entityInfo.setEntityCode(sb.toString() + id);
+
+        UpdateWrapper<EntityInfo> wrapper = new UpdateWrapper<>();
+        wrapper.lambda()
+                .eq(EntityInfo::getId, id)
+                .set(EntityInfo::getEntityCode, entityInfo.getEntityCode());
+        entityInfoMapper.update(entityInfo, wrapper);
+        //新增bond_info
+        BondInfo bondInfo = new BondInfo();
+        DecimalFormat g1=new DecimalFormat("000000");
+        String startZeroStr = g1.format(bondInfo.getId());
+        bondInfo.setBondCode("BD"+startZeroStr);
+        bondInfo.setBondShortName(entityByIondVo.getBondShortName());
+        bondInfoMapper.insertBondInfo(bondInfo);
+        // 新增 entity_name_his
+        EntityNameHis entityNameHis = new EntityNameHis();
+        entityNameHis.setEntityType(1);
+        entityNameHis.setDqCode(entityInfo.getEntityCode());
+        entityNameHis.setOldName(entityInfo.getEntityNameHis());
+        entityNameHis.setSource(3);
+        entityNameHis.setHappenDate(new Date());
+        entityNameHis.setCreater(SecurityUtils.getUsername());
+        entityNameHisMapper.insertEntityNameHis(entityNameHis);
+        //新增关联关系entity_bond_rel
+        EntityBondRel entityBondRel = new EntityBondRel();
+        entityBondRel.setBdCode("BD"+startZeroStr);
+        entityBondRel.setEntityCode(entityInfo.getEntityCode());
+        entityBondRelMapper.insertEntityBondRel(entityBondRel);
+        //新增entity_attr_value
+        ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
+        EntityAttrValue entityAttrValueStockCode = new EntityAttrValue();
+        //债券全称
+        entityAttrValueStockCode.setEntityCode("BD"+startZeroStr);
+        entityAttrValueStockCode.setAttrId(Common.BOND_NAME_ID.longValue());
+        entityAttrValueStockCode.setValue(entityByIondVo.getBondName());
+        entityAttrValues.add(entityAttrValueStockCode);
+        //起息日
+        EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
+        entityAttrValueStartDate.setAttrId(Common.START_XI_DATE_ID.longValue());
+        entityAttrValueStartDate.setEntityCode("BD"+startZeroStr);
+        entityAttrValueStartDate.setValue(entityByIondVo.getStartXiDate());
+        entityAttrValues.add(entityAttrValueStartDate);
+        //到期日
+        EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
+        entityAttrValueEndDate.setAttrId(Common.STRING_END_DATE_ID.longValue());
+        entityAttrValueEndDate.setEntityCode("BD"+startZeroStr);
+        entityAttrValueEndDate.setValue(entityByIondVo.getEndDate());
+        entityAttrValues.add(entityAttrValueEndDate);
+        //债券类型
+        EntityAttrValue entityAttrValueBondType = new EntityAttrValue();
+        entityAttrValueBondType.setAttrId(Common.BOND_TYPE_ID.longValue());
+        entityAttrValueBondType.setEntityCode("BD"+startZeroStr);
+        entityAttrValueBondType.setValue(entityByIondVo.getBondType());
+        entityAttrValues.add(entityAttrValueBondType);
+        //年报类型
+        EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
+        entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
+        entityAttrValueReportType.setEntityCode("BD"+startZeroStr);
+        entityAttrValueReportType.setValue(entityByIondVo.getAnRportType());
+        entityAttrValues.add(entityAttrValueReportType);
+        //金融机构子行业
+        EntityAttrValue financeSubIndu = new EntityAttrValue();
+        financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
+        financeSubIndu.setEntityCode("BD"+startZeroStr);
+        financeSubIndu.setValue(entityByIondVo.getFinanceSubIndu());
+        entityAttrValues.add(financeSubIndu);
+        // 债券代码
+        EntityAttrValue entityAttrValueBondCode = new EntityAttrValue();
+        entityAttrValueBondCode.setAttrId(Common.STOCK_CODE_ID.longValue());
+        entityAttrValueBondCode.setEntityCode("BD"+startZeroStr);
+        entityAttrValueBondCode.setValue(entityByIondVo.getStockCode());
+        entityAttrValues.add(entityAttrValueBondCode);
+        //入库
+        saveBatch(entityAttrValues);
+        entityAttrValues.clear();
+        return R.ok("新增成功");
+    }
+    /**
+     *A股新增
+     *
+     * @param entityStockInfoVo
+     * @return R
+     * @author penTang
+     * @date 2022/9/29 9:59
+    */
+    @Override
+    public R createStockEntity(EntityStockInfoVo entityStockInfoVo){
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
+        StockCnInfo stockSrotName = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockShortName, entityStockInfoVo.getStockShortName()));
+        StockCnInfo stockCode = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, entityStockInfoVo.getStockCode()));
+        if (!ObjectUtils.isEmpty(entityInfo) || !ObjectUtils.isEmpty(stockSrotName) || !ObjectUtils.isEmpty(stockCode)){
+            return R.fail("新增失败：社会信用代码或股票简称或股票代码重复不能进行新增");
+        }
+
+        //新增entity_info
+        EntityInfo entityInfoBystock = new EntityInfo();
+        entityInfoBystock.setCreditCode(entityStockInfoVo.getCreditCode());
+        entityInfoBystock.setEntityName(entityStockInfoVo.getEntityName());
+        if (!ObjectUtils.isEmpty(entityStockInfoVo.getCreditError())) {
+            entityInfoBystock.setCreditError(0);
+        }
+        //曾用名
+        entityInfo.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
+        //创建人
+        entityInfo.setCreater(SecurityUtils.getUsername());
+        entityInfoBystock.setCreditError(1);
+        entityInfoBystock.setCreditErrorRemark(entityStockInfoVo.getCreditErrorRemark());
+        entityInfoBystock.setFinance(entityStockInfoVo.getFinance());
+        entityInfoMapper.insert(entityInfoBystock);
+        //根据主键id生成code
+        Integer id = entityInfoBystock.getId();
+        StringBuilder sb = new StringBuilder(IB);
+        for (int j = 0; j < CODE_NUMBER - String.valueOf(id).length(); j++) {
+            sb.append(ZERO);
+        }
+        entityInfoBystock.setEntityCode(sb.toString() + id);
+
+        UpdateWrapper<EntityInfo> wrapper = new UpdateWrapper<>();
+        wrapper.lambda()
+                .eq(EntityInfo::getId, id)
+                .set(EntityInfo::getEntityCode, entityInfoBystock.getEntityCode());
+        entityInfoMapper.update(entityInfoBystock, wrapper);
+
+        //新增 entity_name_his
+        EntityNameHis entityNameHis = new EntityNameHis();
+        entityNameHis.setEntityType(1);
+        entityNameHis.setDqCode(entityInfo.getEntityCode());
+        entityNameHis.setOldName(entityInfo.getEntityNameHis());
+        entityNameHis.setSource(3);
+        entityNameHis.setHappenDate(new Date());
+        entityNameHis.setCreater(SecurityUtils.getUsername());
+        entityNameHisMapper.insertEntityNameHis(entityNameHis);
+
+        //新增Stock_cn_info
+        StockCnInfo stockCnInfo = new StockCnInfo();
+        stockCnInfo.setStockShortName(entityStockInfoVo.getStockShortName());
+        stockCnInfo.setStockCode(entityStockInfoVo.getStockCode());
+        int insert = stockCnInfoMapper.insert(stockCnInfo);
+        DecimalFormat g1=new DecimalFormat("000000");
+        String startZeroStr = g1.format(stockCnInfo.getId());
+        stockCnInfo.setStockDqCode("SA"+startZeroStr);
+        LambdaUpdateWrapper<StockCnInfo> Wrapper = new LambdaUpdateWrapper<>();
+        Wrapper.eq(StockCnInfo :: getId,stockCnInfo.getId())
+                .set(StockCnInfo :: getStockDqCode,stockCnInfo.getStockDqCode());
+        stockCnInfoMapper.update(stockCnInfo,Wrapper);
+        //新增关联关系entity_stock_cn_rel
+        EntityStockCnRel entityStockCnRel = new EntityStockCnRel();
+        entityStockCnRel.setStockDqCode("SA"+startZeroStr);
+        entityStockCnRel.setEntityCode(entityInfo.getEntityCode());
+        entityStockCnRelMapper.insert(entityStockCnRel);
+        //新增entity_attr_value
+        ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
+        //年报类型
+        EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
+        entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
+        entityAttrValueReportType.setEntityCode(entityStockInfoVo.getStockCode());
+        entityAttrValueReportType.setValue(entityStockInfoVo.getAnRportType());
+        entityAttrValues.add(entityAttrValueReportType);
+        //金融机构子行业
+        EntityAttrValue financeSubIndu = new EntityAttrValue();
+        financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
+        financeSubIndu.setEntityCode(entityStockInfoVo.getStockCode());
+        financeSubIndu.setValue(entityStockInfoVo.getFinanceSubIndu());
+        entityAttrValues.add(financeSubIndu);
+        //上市日期
+        EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
+        entityAttrValueStartDate.setAttrId(Common.SHANSI_DATE_ID.longValue());
+        entityAttrValueStartDate.setEntityCode(entityStockInfoVo.getStockCode());
+        entityAttrValueStartDate.setValue(entityStockInfoVo.getStartXiDate());
+        entityAttrValues.add(entityAttrValueStartDate);
+        //退市日期
+        EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
+        entityAttrValueEndDate.setAttrId(Common.TUISI_DATE_ID.longValue());
+        entityAttrValueEndDate.setEntityCode(entityStockInfoVo.getStockCode());
+        entityAttrValueEndDate.setValue(entityStockInfoVo.getEndDate());
+        entityAttrValues.add(entityAttrValueEndDate);
+        //上市版
+        EntityAttrValue entityAttrValuelisSec = new EntityAttrValue();
+        entityAttrValuelisSec.setAttrId(Common.STOCK_SHANXI.longValue());
+        entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
+        entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
+        entityAttrValues.add(entityAttrValuelisSec);
+        //交易所
+        EntityAttrValue entityAttrValueExange = new EntityAttrValue();
+        entityAttrValueExange.setAttrId(Common.EXCHANGE_ID.longValue());
+        entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
+        entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
+        entityAttrValues.add(entityAttrValueExange);
+        return R.ok("新增成功");
+    }
+
+       /**
+        *港股新增
+        *
+        * @param entityStockInfoVo
+        * @return R
+        * @author penTang
+        * @date 2022/9/29 9:59
+       */
+       @Override
+        public R createStockEntityG(EntityStockInfoVo entityStockInfoVo){
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
+        StockThkInfo stockThkCode = stockThkInfoMapper.selectOne(new LambdaQueryWrapper<StockThkInfo>().eq(StockThkInfo::getStockCode, entityStockInfoVo.getStockCode()));
+         if (!ObjectUtils.isEmpty(entityInfo) || !ObjectUtils.isEmpty(stockThkCode)){
+             return R.fail("新增失败：社会信用代码或股票代码重复不能进行新增");
+            }
+            //新增entity_info
+            EntityInfo entityInfoBystockHk = new EntityInfo();
+            entityInfoBystockHk.setCreditCode(entityStockInfoVo.getCreditCode());
+            entityInfoBystockHk.setEntityName(entityStockInfoVo.getEntityName());
+            if (!ObjectUtils.isEmpty(entityStockInfoVo.getCreditError())) {
+                entityInfoBystockHk.setCreditError(0);
+            }
+            entityInfoBystockHk.setCreditError(1);
+            entityInfoBystockHk.setCreditErrorRemark(entityStockInfoVo.getCreditErrorRemark());
+            entityInfoBystockHk.setFinance(entityStockInfoVo.getFinance());
+           //曾用名
+           entityInfo.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
+           //创建人
+           entityInfo.setCreater(SecurityUtils.getUsername());
+
+            entityInfoMapper.insert(entityInfoBystockHk);
+            //根据主键id生成code
+            Integer id = entityInfoBystockHk.getId();
+            StringBuilder sb = new StringBuilder(IB);
+            for (int j = 0; j < CODE_NUMBER - String.valueOf(id).length(); j++) {
+                sb.append(ZERO);
+            }
+            entityInfoBystockHk.setEntityCode(sb.toString() + id);
+
+            UpdateWrapper<EntityInfo> wrapper = new UpdateWrapper<>();
+            wrapper.lambda()
+                    .eq(EntityInfo::getId, id)
+                    .set(EntityInfo::getEntityCode, entityInfoBystockHk.getEntityCode());
+            entityInfoMapper.update(entityInfoBystockHk, wrapper);
+           // 新增 entity_name_his
+           EntityNameHis entityNameHis = new EntityNameHis();
+           entityNameHis.setEntityType(1);
+           entityNameHis.setDqCode(entityInfo.getEntityCode());
+           entityNameHis.setOldName(entityInfo.getEntityNameHis());
+           entityNameHis.setSource(3);
+           entityNameHis.setHappenDate(new Date());
+           entityNameHis.setCreater(SecurityUtils.getUsername());
+           entityNameHisMapper.insertEntityNameHis(entityNameHis);
+           // 新增 Stock_Thk_Info
+            StockThkInfo stockThkInfo = new StockThkInfo();
+            stockThkInfo.setStockCode(entityStockInfoVo.getStockCode());
+            int insert = stockThkInfoMapper.insert(stockThkInfo);
+            DecimalFormat g1=new DecimalFormat("000000");
+            String startZeroStr = g1.format(stockThkInfo.getId());
+            stockThkInfo.setStockDqCode("HK"+startZeroStr);
+            LambdaUpdateWrapper<StockThkInfo> Wrapper = new LambdaUpdateWrapper<>();
+            Wrapper.eq(StockThkInfo :: getId,stockThkInfo.getId())
+                    .set(StockThkInfo :: getStockDqCode,stockThkInfo.getStockDqCode());
+            stockThkInfoMapper.update(stockThkInfo,Wrapper);
+            //新增关联关系entity_stock_thk_rel
+           EntityStockThkRel entityStockThkRel = new EntityStockThkRel();
+           entityStockThkRel.setStockDqCode("HK"+startZeroStr);
+           entityStockThkRel.setEntityCode(entityInfo.getEntityCode());
+           EntityStockThkRelMapper.insert(entityStockThkRel);
+            //新增entity_attr_value
+            ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
+            //年报类型
+            EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
+            entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
+            entityAttrValueReportType.setEntityCode(entityStockInfoVo.getStockCode());
+            entityAttrValueReportType.setValue(entityStockInfoVo.getAnRportType());
+            entityAttrValues.add(entityAttrValueReportType);
+            //金融机构子行业
+            EntityAttrValue financeSubIndu = new EntityAttrValue();
+            financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
+            financeSubIndu.setEntityCode(entityStockInfoVo.getStockCode());
+            financeSubIndu.setValue(entityStockInfoVo.getFinanceSubIndu());
+            entityAttrValues.add(financeSubIndu);
+            //上市日期
+            EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
+            entityAttrValueStartDate.setAttrId(Common.STOCK_SHANXI_DATE_HK_ID.longValue());
+            entityAttrValueStartDate.setEntityCode(entityStockInfoVo.getStockCode());
+            entityAttrValueStartDate.setValue(entityStockInfoVo.getStartXiDate());
+            entityAttrValues.add(entityAttrValueStartDate);
+            //退市日期
+            EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
+            entityAttrValueEndDate.setAttrId(Common.TUISI_DATE_HK_ID.longValue());
+            entityAttrValueEndDate.setEntityCode(entityStockInfoVo.getStockCode());
+            entityAttrValueEndDate.setValue(entityStockInfoVo.getEndDate());
+            entityAttrValues.add(entityAttrValueEndDate);
+            //上市版
+            EntityAttrValue entityAttrValuelisSec = new EntityAttrValue();
+            entityAttrValuelisSec.setAttrId(Common.STOCK_SHANXI_DATE_HK_ID.longValue());
+            entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
+            entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
+            entityAttrValues.add(entityAttrValuelisSec);
+            //交易所
+            EntityAttrValue entityAttrValuelisEx = new EntityAttrValue();
+            entityAttrValuelisEx.setAttrId(Common.EXCHANGE_HK_ID.longValue());
+            entityAttrValuelisEx.setEntityCode(entityStockInfoVo.getStockCode());
+            entityAttrValuelisEx.setValue(entityStockInfoVo.getExchange());
+            entityAttrValues.add(entityAttrValuelisEx);
+           return R.ok("新增成功");
+    }
+
+
 }

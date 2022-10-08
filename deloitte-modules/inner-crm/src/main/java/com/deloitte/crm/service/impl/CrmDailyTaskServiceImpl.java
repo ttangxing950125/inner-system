@@ -66,10 +66,6 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
                 .set(CrmDailyTask::getTaskStatus, 2));
     }
 
-
-
-
-
     /***
      *根据指定日期查询当月的任务
      *
@@ -80,7 +76,6 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      */
     @Override
     public List<CrmDailyTask> selectCrmDailyTaskListByDate(String TaskDate) {
-
         String startDate = TaskDate + "-01";
         LocalDate today = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate endDay = today.with(TemporalAdjusters.lastDayOfMonth());
@@ -123,7 +118,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
     }
 
     /**
-     * 根据当天时间和角色1的type更新成有任务未完成(2)
+     * 根据当天时间和角色1的type更新成-有任务未完成(2)
      *
      * @param dateTime
      * @return Boolean
@@ -158,8 +153,6 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
         Date begin = DateUtil.beginOfMonth(date);
         Date end = DateUtil.endOfMonth(date);
-
-
 
         return null;
     }

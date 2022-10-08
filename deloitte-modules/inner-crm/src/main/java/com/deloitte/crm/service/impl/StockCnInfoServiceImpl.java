@@ -1,15 +1,14 @@
 package com.deloitte.crm.service.impl;
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
-import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.CacheName;
-import com.deloitte.crm.domain.StockThkInfo;
 import com.deloitte.crm.mapper.StockCnInfoMapper;
 import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.service.StockCnInfoService;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
 
@@ -21,6 +20,44 @@ import java.text.DecimalFormat;
  */
 @Service("stockCnInfoService")
 public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, StockCnInfo> implements StockCnInfoService {
+
+    @Resource
+    private StockCnInfoMapper mapper;
+    /**
+     *添加股票代码查重
+     *
+     * @param StockBode
+     * @return R
+     * @author penTang
+     * @date 2022/9/28 22:40
+    */
+    @Override
+     public R checkStockCnInfo(String StockBode){
+         LambdaQueryWrapper<StockCnInfo> Wrapper = new LambdaQueryWrapper<StockCnInfo>();
+         StockCnInfo stockCnInfo = mapper.selectOne(Wrapper.eq(StockCnInfo::getStockCode, StockBode));
+         if (ObjectUtils.isEmpty(stockCnInfo)) {
+             return R.ok(stockCnInfo);
+         }
+         return  R.ok(stockCnInfo);
+     }
+     /**
+      *股票简称查重
+      *
+      * @param SortName
+      * @return R
+      * @author penTang
+      * @date 2022/9/28 22:55
+     */
+     @Override
+     public R checkSortName(String SortName){
+         LambdaQueryWrapper<StockCnInfo> Wrapper = new LambdaQueryWrapper<StockCnInfo>();
+         StockCnInfo stockCnInfo = mapper.selectOne(Wrapper.eq(StockCnInfo::getStockShortName, SortName));
+         if (ObjectUtils.isEmpty(stockCnInfo)){
+             return R.ok(stockCnInfo);
+         }
+         return  R.ok(stockCnInfo);
+     }
+
 
     @Resource
     private RedisService redisService;

@@ -3,6 +3,8 @@ package com.deloitte.crm.mapper;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.dto.CrmWindTaskDto;
 import org.apache.ibatis.annotations.Param;
@@ -27,12 +29,12 @@ public interface CrmWindTaskMapper extends BaseMapper<CrmWindTask>
 
     /**
      * 根据指定月份查询角色1的任务完成度
-     * @param crmWindTask
+     * @param taskDate
      * @return List<CrmWindTask>
      * @author penTang
      * @date 2022/9/22 11:45
     */
-    List<CrmWindTaskDto> selectComWindByDate(String crmWindTask);
+    List<CrmWindTaskDto> selectComWindByDate(Page<CrmWindTaskDto> page, @Param("taskDate") String taskDate);
 
     /**
      * 查询角色1的每日任务，导入wind文件的任务列表

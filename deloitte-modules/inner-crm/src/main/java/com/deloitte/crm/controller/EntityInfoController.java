@@ -1,5 +1,4 @@
 package com.deloitte.crm.controller;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
@@ -116,7 +115,7 @@ public class EntityInfoController extends BaseController {
     @ApiImplicitParam(name = "entityInfoDto", value = "包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段", paramType = "body")
     @PostMapping("/add")
     public AjaxResult addEntity(@RequestBody EntityDto entityDto) {
-        //TODO 新增主体
+        //新增主体
         return toAjax(entityInfoService.insertEntityInfo(entityDto));
     }
 
@@ -283,10 +282,7 @@ public class EntityInfoController extends BaseController {
         return R.ok(entityInfoService.getOverviewByGroup());
     }
 
-    @GetMapping("/send")
-    public void send() {
-        service.SendEmail(3, "发了", "发友尽");
-    }
+
 
     /**
      * 主体整体概览
