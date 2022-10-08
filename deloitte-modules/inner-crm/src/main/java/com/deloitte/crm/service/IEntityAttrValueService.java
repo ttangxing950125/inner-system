@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CnApprdWaitIss;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.dto.EntityAttrValueDto;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 import com.deloitte.crm.domain.ThkSecIssInfo;
 import com.deloitte.crm.vo.EntityByIondVo;
 import com.deloitte.crm.vo.EntityStockInfoVo;
@@ -120,4 +120,6 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
     R createStockEntity (EntityStockInfoVo entityStockInfoVo);
 
     R createStockEntityG(EntityStockInfoVo entityStockInfoVo);
+
+    Object addEntityAttrValuesNew(Map<String, String> valueMap);
 }

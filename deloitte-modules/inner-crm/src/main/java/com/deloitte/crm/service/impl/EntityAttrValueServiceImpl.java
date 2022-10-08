@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.lang.annotation.Annotation;
 import java.text.DecimalFormat;
@@ -16,6 +17,7 @@ import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
@@ -24,19 +26,13 @@ import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.utils.AttrValueUtils;
-import com.deloitte.crm.vo.EntityByIondVo;
-import com.deloitte.crm.vo.EntityStockInfoVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.service.IEntityAttrValueService;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -46,13 +42,15 @@ import java.util.Set;
  */
 @Service
 public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMapper, EntityAttrValue> implements IEntityAttrValueService {
-
-
-    @Resource
+    @Autowired
     private EntityAttrValueMapper entityAttrValueMapper;
 
     @Resource
     private IEntityAttrService entityAttrService;
+
+    @Autowired
+    private CrmSupplyTaskMapper supplyTaskMapper;
+
 
     @Resource
     private EntityInfoMapper entityInfoMapper;
@@ -233,9 +231,12 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         valueList.stream().forEach(o -> {
             QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
             String attrId = o.getAttrId().toString();
-            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ATTR_CATE_ID.toString())
-                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID.toString())) {
-                entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ID.toString())
+                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ID.toString())) {
+                int num = entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+                if (num==0){
+                    entityAttrValueMapper.insert(o);
+                }
             } else {
                 entityAttrValueMapper.insert(o);
             }

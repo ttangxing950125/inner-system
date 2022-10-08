@@ -48,7 +48,7 @@ public class RoleTFFController {
     @ApiOperation(value = "完成任务")
     @ApiImplicitParam(name = "id", value = "任务id", paramType = "query", dataType = "Long")
     @PostMapping("/completeRoleSupplyTask")
-    public R completeRoleSupplyTask(Long id) {
-        return R.ok(iCrmSupplyTaskService.completeRoleSupplyTask(id));
+    public R completeRoleSupplyTask(Long id,String remark) {
+        return R.ok(iCrmSupplyTaskService.completeRoleSupplyTask(id,remark));
     }
 }
