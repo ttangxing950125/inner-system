@@ -134,6 +134,36 @@ export function changeState(params) {
   });
 }
 
+// 登录用户角色的信息补充任务 角色6
+export function getRoleSupplyTask(params) {
+  return request({
+    url: "/crm/roletff/getRoleSupplyTask?taskDate=" + params.taskDate,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 根据任务id查询补充信息 角色6
+export function getTaskByEntityCode(params) {
+  return request({
+    url:
+      "/crm/attr/getTaskByEntityCode?entityCode=" +
+      params.entityCode +
+      "&roleId=" +
+      params.roleId,
+    headers: {
+      isToken: true,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    method: "post",
+    data: params,
+  });
+}
+
 // 注册方法
 export function register(data) {
   return request({

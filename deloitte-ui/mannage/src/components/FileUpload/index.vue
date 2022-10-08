@@ -85,6 +85,10 @@ export default {
       type: String,
       default: "",
     },
+    index: {
+      type: Number,
+      default: 0,
+    },
   },
   data() {
     return {
@@ -158,6 +162,7 @@ export default {
         }
       }
       this.$modal.loading("正在上传文件，请稍候...");
+      this.$emit("loading", this.index);
       this.number++;
       return true;
     },
@@ -168,16 +173,32 @@ export default {
     // 上传失败
     handleUploadError(err) {
       this.$modal.msgError("上传图片失败，请重试");
+      this.$emit("uploadFail", this.index);
       this.$modal.closeLoading();
     },
     // 上传成功回调
     handleUploadSuccess(res) {
-      this.uploadList.push({ name: res.data.url, url: res.data.url });
-      if (this.uploadList.length === this.number) {
-        this.fileList = this.fileList.concat(this.uploadList);
-        this.uploadList = [];
-        this.number = 0;
-        this.$emit("input", this.listToString(this.fileList));
+      try {
+        if (res.code === 500) {
+          this.$emit("uploadFail", this.index);
+          this.$message({
+            message: res.msg,
+            type: "error",
+          });
+          return;
+        }
+
+        // this.uploadList.push({ name: res.data.url, url: res.data.url });
+        this.$emit("uploadPass", res.data, this.index);
+        // if (this.uploadList.length === this.number) {
+        //   this.fileList = this.fileList.concat(this.uploadList);
+        //   this.uploadList = [];
+        //   this.number = 0;
+        //   this.$modal.closeLoading();
+        // }
+      } catch (error) {
+        console.log(error);
+      } finally {
         this.$modal.closeLoading();
       }
     },
