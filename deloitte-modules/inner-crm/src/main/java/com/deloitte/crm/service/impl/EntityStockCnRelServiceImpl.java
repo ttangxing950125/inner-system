@@ -1,6 +1,9 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityStockCnRelMapper;
@@ -11,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * (EntityStockCnRel)表服务实现类
@@ -86,5 +91,34 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
 
         return true;
+    }
+
+
+    /**
+     * 查询和德勤code的a股所属主体
+     * @param dqCode
+     * @return
+     */
+    @Override
+    public List<EntityInfo> findByStockCode(String dqCode) {
+        //查询rel对象
+        Wrapper<EntityStockCnRel> wrapper = Wrappers.<EntityStockCnRel>lambdaQuery()
+                .eq(EntityStockCnRel::getStockDqCode, dqCode);
+
+        List<EntityStockCnRel> list = this.list(wrapper);
+
+        if (CollUtil.isEmpty(list)){
+            return new ArrayList<>();
+        }
+
+        //查询主体
+        List<String> entityCodes = list.stream()
+                .map(EntityStockCnRel::getEntityCode)
+                .collect(Collectors.toList());
+
+        Wrapper<EntityInfo> entityWrapper = Wrappers.<EntityInfo>lambdaQuery()
+                .in(EntityInfo::getEntityCode, entityCodes);
+
+        return entityInfoService.list(entityWrapper);
     }
 }

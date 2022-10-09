@@ -89,8 +89,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCnIpoInfoVo">
-        select id, code, stock_name, subs_code, prosp_date, net_iss_date, ipo_date, ipo_board, iss_price, iss_mult, industry_pe, indus_pe_stat, ipo_pe_avg, indus_pe_ttm, total, new_stock_issnub, old_stock_convnub, offlin_placnub, net_issnub, call_issstock_befor, call_issstock_after, call_ratio, offlin_subs_max, net_isssubs_max, predic_fund, fund_total, fund_net_ amount, prs_fund, ipo_iss_fees, ipo_iss_mult, stack_conv_fees, conv_fees, iss_fees_total, iss_rates, unw_sponsor_fees, audit_ver_fees, law_fees, infor_dis_fees, investors_nub, plac_obj_nub, inquire_pur_nub, inquire_subc_mult, valid_quote_placnub, valid_quote_invenub, valid__placsubs_nub, valid_subs_nub, valid_subs_fund, valid_subs_placratio, offlin_subs_mult, tactic_plac_stakeratio, legal_invesnub_a, legal_invesnub_b, legal_invesnub_c, legal_inves_placnub_a, legal_inves_placnub_b, legal_inves_placnub_c, valid_subs_invenub, valid_subs_stakernub, check_ratio, net_check_ratio, iss_way, unw_way, unw_master, sponsor_inst, audit_inst, assets_eva_ins, law_firm, iss_anno_date, offlin_iss_stardate, offlin_iss_enddate, net_iss_freeze, offlin_plac_freeze, unw_subc_balanstock, under_amount, under_ratio, face_value, province, csrc_industry, wind_industry, bond_type, bourse from cn_ipo_info
+        select id, code, stock_name, subs_code, prosp_date, net_iss_date, ipo_date, ipo_board, iss_price, iss_mult, industry_pe, indus_pe_stat, ipo_pe_avg, indus_pe_ttm, total, new_stock_issnub, old_stock_convnub, offline_placnub, net_issnub, call_issstock_befor, call_issstock_after, call_ratio, offline_subs_max, online_isssubs_max, predic_fund, fund_total, fund_net_amount, prs_fund, ipo_iss_fees, ipo_iss_mult, stack_conv_fees, conv_rate, iss_fees_total, iss_rate, unw_sponsor_fees, audit_ver_fees, law_fees, infor_dis_fees, investors_nub, plac_obj_nub, inquire_pur_nub, inquire_subc_mult, valid_quote_placnub, valid_quote_invenub, valid_placsubs_nub, valid_subs_nub, valid_subs_fund, valid_subs_placratio, offline_subs_mult, tactic_plac_stakeratio, legal_invesnub_a, legal_invesnub_b, legal_invesnub_c, legal_inves_placnub_a, legal_inves_placnub_b, legal_inves_placnub_c, valid_subs_invenub, valid_subs_stakernub, check_ratio, net_check_ratio, iss_type, unw_type, main_unw, sponsor_inst, audit_inst, assets_eva_ins, law_firm, iss_anno_date, offline_iss_stardate, offline_iss_enddate, net_iss_freeze, offline_plac_freeze, unw_subc_balanstock, under_amount, under_ratio, face_value, province, csrc_industry, wind_industry, bond_type, bourse, task_id, import_time, change_type
+        from cn_ipo_info
     </sql>
+
+    <select id="findLastByCode" resultType="cnIpoInfo">
+        <include refid="selectCnIpoInfoVo"></include>
+        where code = #{code}
+        order by id desc
+        limit 1
+    </select>
 
     <select id="selectCnIpoInfoList" parameterType="CnIpoInfo" resultMap="CnIpoInfoResult">
         <include refid="selectCnIpoInfoVo"/>

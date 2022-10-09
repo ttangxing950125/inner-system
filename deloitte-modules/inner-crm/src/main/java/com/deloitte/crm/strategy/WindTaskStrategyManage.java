@@ -37,6 +37,7 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
+    @Async("taskExecutor")
     public Object doTask(WindTaskContext windTaskContext) throws Exception {
         CrmWindTask windTask = windTaskContext.getWindTask();
         WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
@@ -49,7 +50,6 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
 
     /**
      * 获得任务详情页，上传的数据的表头
-     *
      * @return
      */
     public List<String> getDetailHeader(CrmWindTask windTask) {

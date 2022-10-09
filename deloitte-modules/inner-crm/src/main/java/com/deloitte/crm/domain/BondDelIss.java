@@ -26,7 +26,6 @@ public class BondDelIss implements Serializable {
     /**
      * 主键
      */
-    @Excel(name = "主键")
     @TableId(type = IdType.AUTO)
     private Integer id;
     /**

@@ -2,13 +2,18 @@ package com.deloitte.crm.strategy.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
-import com.deloitte.crm.domain.*;
-import com.deloitte.crm.service.*;
+import com.deloitte.crm.domain.CnIpoPause;
+import com.deloitte.crm.domain.CnIpoPause;
+import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.service.CnApprdWaitIssService;
+import com.deloitte.crm.service.CnIpoPauseService;
+import com.deloitte.crm.service.IEntityAttrValueService;
+import com.deloitte.crm.service.StockCnInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
@@ -28,10 +33,10 @@ import java.util.stream.Collectors;
  * @date 2022/9/27
  */
 @Component
-public class CnIpoInfoStrategy implements WindTaskStrategy {
+public class CnIpoPauseStrategy implements WindTaskStrategy {
 
     @Resource
-    private ICnIpoInfoService cnIpoInfoService;
+    private CnIpoPauseService cnIpoPauseService;
 
     @Resource
     private StockCnInfoService stockCnInfoService;
@@ -39,11 +44,6 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
-    @Resource
-    private ICrmMasTaskService crmMasTaskService;
-
-    @Resource
-    private EntityStockCnRelService entityStockCnRelService;
 
     /**
      * 处理文件中的每一行
@@ -54,7 +54,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
      */
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
-    public Future<Object> doThkStockImport(CnIpoInfo item, Date timeNow, CrmWindTask windTask) {
+    public Future<Object> doThkStockImport(CnIpoPause item, Date timeNow, CrmWindTask windTask) {
         try {
             //设置属性
             item.setTaskId(windTask.getId());
@@ -69,42 +69,25 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 stockCnInfo.setStockCode(code);
             }
 
+
             //这条CnCoachBack是新增还是修改 1-新增 2-修改
             Integer changeType = null;
-            CnIpoInfo last = cnIpoInfoService.findLastByCode(code);
+            String entityName = item.getEntityName();
+            CnIpoPause last = null;
+//            CnIpoPause last = cnIpoPauseService.findLastByEntityName(entityName);
 
             if (last==null){
                 //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
-                //当股票首次出现在  新股发行 中时，记为“发行中”
-                stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
+                //当股票首次出现在  IPO审核申报表 中时，
+                // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
+                stockCnInfo.setStockStatus(StockCnStatus.APPRD_WAIT_ISS.getId());
+                stockCnInfo.setStatusDesc(StockCnStatus.APPRD_WAIT_ISS.getName());
 
             }else if (!Objects.equals(last, item)){
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
-
-            //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
-            if (
-                    Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getId())
-                    &&
-                    DateUtil.compare(timeNow, item.getIpoDate())==0
-            ){
-                stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getName());
-            }
-
-            //如果是成功上市，发送给敞口划分人
-            if ( Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getId()) ){
-
-                //查询和当前a股绑定关联关系的主体
-                List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
-
-                //新敞口划分任务
-                crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
-            }
-
 
             if (StrUtil.isNotBlank(code)){
                 //保存a股信息
@@ -117,7 +100,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
             item.setChangeType(changeType);
 
-            cnIpoInfoService.save(item);
+            cnIpoPauseService.save(item);
 
             return new AsyncResult(new Object());
         } catch (Exception e) {
@@ -134,7 +117,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
      */
     @Override
     public boolean support(Integer windDictId) {
-        return Objects.equals(WindTaskEnum.CN_IPO_INFO.getId(), windDictId);
+        return Objects.equals(WindTaskEnum.CN_APPRD_WAIT_ISS.getId(), windDictId);
     }
 
     /**
@@ -147,11 +130,11 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
-        ExcelUtil<CnIpoInfo> util = new ExcelUtil<CnIpoInfo>(CnIpoInfo.class);
-        List<CnIpoInfo> list = util.importExcel(null,file.getInputStream(),1, true);
+        ExcelUtil<CnIpoPause> util = new ExcelUtil<CnIpoPause>(CnIpoPause.class);
+        List<CnIpoPause> list = util.importExcel(file.getInputStream(), true);
 
-        return cnIpoInfoService.doTask(windTask, list);
-//        return null;
+        return null;
+//        return cnIpoPauseService.doTask(windTask, list);
     }
 
     /**
@@ -190,19 +173,19 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
         List<Integer> changeStatusArr = Arrays.stream(DataChangeType.values()).map(DataChangeType::getId).collect(Collectors.toList());
 
         Integer taskId = windTask.getId();
-        Wrapper<CnIpoInfo> wrapper = Wrappers.<CnIpoInfo>lambdaQuery()
-                .eq(CnIpoInfo::getTaskId, taskId)
-                .in(CnIpoInfo::getChangeType, changeStatusArr);
+        Wrapper<CnIpoPause> wrapper = Wrappers.<CnIpoPause>lambdaQuery()
+                .eq(CnIpoPause::getTaskId, taskId)
+                .in(CnIpoPause::getChangeType, changeStatusArr);
 
 
-        return cnIpoInfoService.list(wrapper).stream().map(item->{
+        return cnIpoPauseService.list(wrapper).stream().map(item->{
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
             dataMap.put("变化状态", item.getChangeType());
 
             dataMap.put("代码", item.getCode());
-//            dataMap.put("公司名称", item.getEntityName());
+            dataMap.put("公司名称", item.getEntityName());
 
 
             return dataMap;
