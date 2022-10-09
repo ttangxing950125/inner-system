@@ -112,6 +112,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
     @Override
     public R getRoleSupplyTask(String taskDate) {
+
         //获取登录用户
         Long userId = SecurityUtils.getUserId();
         QueryWrapper<SysUserRole> userRleQuery = new QueryWrapper<>();
