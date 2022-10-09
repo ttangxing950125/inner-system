@@ -59,7 +59,7 @@ public class EntityStockInfoVo {
     /** 社会信用代码异常备注 */
     @ApiModelProperty(value="社会信用代码异常备注")
     @NotNull(message = "不能为空")
-    private Integer creditErrorRemark;
+    private String creditErrorRemark;
 
 
     /** 上市日期*/

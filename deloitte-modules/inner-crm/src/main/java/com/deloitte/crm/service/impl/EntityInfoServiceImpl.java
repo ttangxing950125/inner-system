@@ -1113,8 +1113,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
             Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
                     .like(EntityInfo::getEntityCode, param)
-                    .like(EntityInfo::getEntityName, param)
-                    .like(EntityInfo::getCreditCode, param)
+                    .or().like(EntityInfo::getEntityName, param)
+                    .or().like(EntityInfo::getCreditCode, param)
             );
             //新的分页结果赋值
             pageResult.setTotal(page.getTotal()).setPages(page.getPages()).setSize(page.getSize()).setCurrent(page.getCurrent());
@@ -1144,8 +1144,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
             Page<GovInfo> page = govInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
                     .like(GovInfo::getDqGovCode, param)
-                    .like(GovInfo::getGovName, param)
-                    .like(GovInfo::getGovLevelBig, param)
+                    .or().like(GovInfo::getGovName, param)
+                    .or().like(GovInfo::getGovLevelBig, param)
             );
             //新的分页结果赋值
             pageResult.setTotal(page.getTotal()).setPages(page.getPages()).setSize(page.getSize()).setCurrent(page.getCurrent());

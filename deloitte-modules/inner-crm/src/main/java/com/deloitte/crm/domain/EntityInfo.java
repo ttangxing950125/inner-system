@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@Data
 public class EntityInfo implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -52,7 +54,7 @@ public class EntityInfo implements Serializable
     private Integer creditError;
 
     /** 社会信用代码异常备注 */
-    private Integer creditErrorRemark;
+    private String creditErrorRemark;
 
     /** 若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：
     1、吊销
@@ -92,157 +94,6 @@ public class EntityInfo implements Serializable
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated = new Date();
-
-    public Integer getCreditErrorRemark() {
-        return creditErrorRemark;
-    }
-
-    public void setCreditErrorRemark(Integer creditErrorRemark) {
-        this.creditErrorRemark = creditErrorRemark;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    public Integer getId()
-    {
-        return id;
-    }
-    public void setEntityName(String entityName) 
-    {
-        this.entityName = entityName;
-    }
-
-    public String getEntityName() 
-    {
-        return entityName;
-    }
-    public void setEntityCode(String entityCode) 
-    {
-        this.entityCode = entityCode;
-    }
-
-    public String getEntityCode() 
-    {
-        return entityCode;
-    }
-    public void setCreditCode(String creditCode) 
-    {
-        this.creditCode = creditCode;
-    }
-
-    public String getCreditCode() 
-    {
-        return creditCode;
-    }
-    public void setList(Integer list) 
-    {
-        this.list = list;
-    }
-
-    public Integer getList() 
-    {
-        return list;
-    }
-    public void setIssueBonds(Integer issueBonds) 
-    {
-        this.issueBonds = issueBonds;
-    }
-
-    public Integer getIssueBonds() 
-    {
-        return issueBonds;
-    }
-    public void setCreditError(Integer creditError) 
-    {
-        this.creditError = creditError;
-    }
-
-    public Integer getCreditError() 
-    {
-        return creditError;
-    }
-    public void setCreditErrorType(Integer creditErrorType) 
-    {
-        this.creditErrorType = creditErrorType;
-    }
-
-    public Integer getCreditErrorType() 
-    {
-        return creditErrorType;
-    }
-    public void setEntityNameHis(String entityNameHis) 
-    {
-        this.entityNameHis = entityNameHis;
-    }
-
-    public String getEntityNameHis() 
-    {
-        return entityNameHis;
-    }
-    public void setEntityNameHisRemarks(String entityNameHisRemarks) 
-    {
-        this.entityNameHisRemarks = entityNameHisRemarks;
-    }
-
-    public String getEntityNameHisRemarks() 
-    {
-        return entityNameHisRemarks;
-    }
-    public void setCreater(String creater) 
-    {
-        this.creater = creater;
-    }
-
-    public String getCreater() 
-    {
-        return creater;
-    }
-    public void setUpdater(String updater) 
-    {
-        this.updater = updater;
-    }
-
-    public String getUpdater() 
-    {
-        return updater;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdated(Date updated) 
-    {
-        this.updated = updated;
-    }
-
-    public Date getUpdated() 
-    {
-        return updated;
-    }
-
-    public Integer getFinance() {
-        return finance;
-    }
-
-    public void setFinance(Integer finance) {
-        this.finance = finance;
-    }
 
     @Override
     public String toString() {

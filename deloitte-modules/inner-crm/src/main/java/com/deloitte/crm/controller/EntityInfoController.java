@@ -302,7 +302,6 @@ public class EntityInfoController extends BaseController {
      *
      * @param entityType
      * @param param
-     * @param type
      * @param pageNum
      * @param pageSize
      * @return R
