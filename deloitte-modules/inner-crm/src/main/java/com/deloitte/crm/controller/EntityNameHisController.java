@@ -105,7 +105,7 @@ public class EntityNameHisController extends BaseController
      * 根据德勤code查询曾用名列表
      *
      * @param dqCode
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 23:50
     */

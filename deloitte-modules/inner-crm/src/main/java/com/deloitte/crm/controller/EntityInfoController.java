@@ -158,7 +158,7 @@ public class EntityInfoController extends BaseController {
      * 查询企业名称，或者编码，是否重复
      *
      * @param entityInfo
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
@@ -193,7 +193,7 @@ public class EntityInfoController extends BaseController {
      * 新增企业主体的曾用名
      *
      * @param entityInfo
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:44
      */
@@ -211,7 +211,7 @@ public class EntityInfoController extends BaseController {
      * @param oldName
      * @param newOldName
      * @param status
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/25 13:22
      */
@@ -231,7 +231,7 @@ public class EntityInfoController extends BaseController {
      * 根据 dqCode 查询企业主体
      *
      * @param entityInfo
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:59
      */
@@ -295,5 +295,22 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/getOverviewByAll")
     public R getOverviewByAll() {
         return R.ok(entityInfoService.getOverviewByAll());
+    }
+
+    /**
+     * 覆盖情况快速查询
+     *
+     * @param entityType
+     * @param param
+     * @param pageNum
+     * @param pageSize
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/8 15:53
+    */
+    @ApiOperation(value = "覆盖情况快速查询")
+    @PostMapping("/getQuickOfCoverage")
+    public R getQuickOfCoverage(String entityType,String param,Integer pageNum,Integer pageSize) {
+        return entityInfoService.getQuickOfCoverage(entityType,param, pageNum, pageSize);
     }
 }

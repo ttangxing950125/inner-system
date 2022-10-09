@@ -1,7 +1,6 @@
 package com.deloitte.crm.vo;
 
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.crm.domain.StockThkInfo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -58,7 +57,7 @@ public class EntityByIondVo
 
     /** 社会信用代码异常备注 */
     @ApiModelProperty(value="社会信用代码异常备注")
-    private Integer creditErrorRemark;
+    private String creditErrorRemark;
 
     /** 起息日*/
     @ApiModelProperty(value="起息日")
