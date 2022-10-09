@@ -54,7 +54,7 @@ public class DefaultFirstNumberCount implements Serializable {
      * 首次债券违约日期yyyy-MM-dd
      */
     @Excel(name = "首次债券违约日期")
-    private String fristDateCount;
+    private Date fristDateCount;
     /**
      * 违约债券代码
      */

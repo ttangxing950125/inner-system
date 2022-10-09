@@ -53,7 +53,7 @@ public class DefaultMoneyTotal implements Serializable {
      * 违约、展期日期
      */
     @Excel(name = "违约、展期日期")
-    private String defaultDate;
+    private Date defaultDate;
     /**
      * 债券简称
      */
@@ -68,7 +68,7 @@ public class DefaultMoneyTotal implements Serializable {
      * 类型
      */
     @Excel(name = "类型")
-    private Integer type;
+    private String type;
     /**
      * 历程
      */
@@ -103,12 +103,12 @@ public class DefaultMoneyTotal implements Serializable {
      * 到期日 yyyy-MM-dd
      */
     @Excel(name = "到期日")
-    private String dueDate;
+    private Date dueDate;
     /**
      * 起息日 yyyy-MM-dd
      */
     @Excel(name = "起息日")
-    private String valueDate;
+    private Date valueDate;
     /**
      * 剩余期限(年)
      */

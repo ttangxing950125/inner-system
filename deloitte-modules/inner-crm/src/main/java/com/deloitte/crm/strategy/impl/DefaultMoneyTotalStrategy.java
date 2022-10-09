@@ -2,6 +2,7 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -80,12 +81,12 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             } else {
                 bondInfo = bondInfoService.saveOrUpdate(bondInfo);
             }
-            List<EntityInfo> EntityInfoLists = iEntityInfoService.findByName(moneyTotal.getPublisher());
-            log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", moneyTotal.getPublisher(), JSONUtil.toJsonStr(EntityInfoLists));
-            if (CollUtil.isNotEmpty(EntityInfoLists)) {
-                for (EntityInfo entityInfoList : EntityInfoLists) {
+            List<EntityInfo> entityInfoLists = iEntityInfoService.findByName(moneyTotal.getPublisher());
+            log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", moneyTotal.getPublisher(), JSON.toJSONString(entityInfoLists));
+            if (CollUtil.isNotEmpty(entityInfoLists)) {
+                for (EntityInfo entityInfoList : entityInfoLists) {
                     EntityBondRel entityBondRel = entityBondRelMapper.findByEntityBondCode(entityInfoList.getEntityCode(), bondInfo.getBondCode());
-                    log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), JSONUtil.toJsonStr(entityBondRel));
+                    log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), JSON.toJSONString(entityBondRel));
                     if (entityBondRel == null) {
                         EntityBondRel entityBondRelEntity = new EntityBondRel();
                         entityBondRelEntity.setBdCode(bondInfo.getBondCode());
@@ -126,9 +127,10 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultMoneyTotal> util = new ExcelUtil<DefaultMoneyTotal>(DefaultMoneyTotal.class);
-        List<DefaultMoneyTotal> list = util.importExcel(null, file.getInputStream(), 1, true);
+        List<DefaultMoneyTotal> list = util.importExcel(file.getInputStream(), true);
         DefaultMoneyTotalService defaultMoneyTotalService = ApplicationContextHolder.get().getBean(DefaultMoneyTotalService.class);
         return defaultMoneyTotalService.doTask(windTask, list);
+
     }
 
     /**
