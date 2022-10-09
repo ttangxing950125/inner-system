@@ -10,6 +10,7 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.service.IBondInfoService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,13 @@ import java.util.List;
 
 /**
  * 【请填写功能名称】Controller
- * 
+ *
  * @author deloitte
  * @date 2022-09-23
  */
 @RestController
 @RequestMapping("/BondInfo")
-public class BondInfoController extends BaseController
-{
+public class BondInfoController extends BaseController {
     @Autowired
     private IBondInfoService bondInfoService;
 
@@ -35,8 +35,7 @@ public class BondInfoController extends BaseController
      */
     @RequiresPermissions("crm:BondInfo:list")
     @GetMapping("/list")
-    public TableDataInfo list(BondInfo bondInfo)
-    {
+    public TableDataInfo list(BondInfo bondInfo) {
         startPage();
         List<BondInfo> list = bondInfoService.selectBondInfoList(bondInfo);
         return getDataTable(list);
@@ -48,8 +47,7 @@ public class BondInfoController extends BaseController
     @RequiresPermissions("crm:BondInfo:export")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, BondInfo bondInfo)
-    {
+    public void export(HttpServletResponse response, BondInfo bondInfo) {
         List<BondInfo> list = bondInfoService.selectBondInfoList(bondInfo);
         ExcelUtil<BondInfo> util = new ExcelUtil<>(BondInfo.class);
         util.exportExcel(response, list, "【请填写功能名称】数据");
@@ -60,8 +58,7 @@ public class BondInfoController extends BaseController
      */
     @RequiresPermissions("crm:BondInfo:query")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
-    {
+    public AjaxResult getInfo(@PathVariable("id") Long id) {
         return AjaxResult.success(bondInfoService.selectBondInfoById(id));
     }
 
@@ -71,8 +68,7 @@ public class BondInfoController extends BaseController
     @RequiresPermissions("crm:BondInfo:add")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody BondInfo bondInfo)
-    {
+    public AjaxResult add(@RequestBody BondInfo bondInfo) {
         return toAjax(bondInfoService.insertBondInfo(bondInfo));
     }
 
@@ -82,8 +78,7 @@ public class BondInfoController extends BaseController
     @RequiresPermissions("crm:BondInfo:edit")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody BondInfo bondInfo)
-    {
+    public AjaxResult edit(@RequestBody BondInfo bondInfo) {
         return toAjax(bondInfoService.updateBondInfo(bondInfo));
     }
 
@@ -92,27 +87,27 @@ public class BondInfoController extends BaseController
      */
     @RequiresPermissions("crm:BondInfo:remove")
     @Log(title = "【请填写功能名称】", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
-    {
+    @DeleteMapping("/{ids}")
+    public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(bondInfoService.deleteBondInfoByIds(ids));
     }
+
     /**
-     *企业债券全称
+     * 企业债券全称
      *
      * @param
      * @return R
      * @author penTang
      * @date 2022/9/29 16:10
-    */
+     */
     @GetMapping("/checkBondFullName")
-    public R checkBondFullName(@RequestParam("BondFullName") String BondFullName ){
+    public R checkBondFullName(@RequestParam("BondFullName") String BondFullName) {
         return R.ok(bondInfoService.checkEntityBondFullName(BondFullName));
     }
 
 
     /**
-     *企业债券简称查重
+     * 企业债券简称查重
      *
      * @param
      * @return R
@@ -120,12 +115,12 @@ public class BondInfoController extends BaseController
      * @date 2022/9/29 16:10
      */
     @GetMapping("/BondShortName")
-    public R checkBondShortName(@RequestParam("BondShortName") String BondShortName ){
+    public R checkBondShortName(@RequestParam("BondShortName") String BondShortName) {
         return R.ok(bondInfoService.checkEntityBondShortName(BondShortName));
     }
 
     /**
-     *企业债券代码查重
+     * 企业债券代码查重
      *
      * @param
      * @return R
@@ -133,7 +128,20 @@ public class BondInfoController extends BaseController
      * @date 2022/9/29 16:10
      */
     @GetMapping("/BondCode")
-    public R checkBondCode(@RequestParam("BondShortName") String BondCode ){
+    public R checkBondCode(@RequestParam("BondShortName") String BondCode) {
         return R.ok(bondInfoService.checkEntityBondTradCode(BondCode));
+    }
+
+    /**
+     * 查询债券类型
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/9 16:19
+     */
+    @ApiOperation(value = "查询债券类型")
+    @PostMapping("/getBondType")
+    public R getBondType() {
+        return R.ok(bondInfoService.getBondType());
     }
 }

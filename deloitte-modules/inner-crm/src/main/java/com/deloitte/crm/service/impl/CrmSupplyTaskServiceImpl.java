@@ -44,6 +44,9 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     @Autowired
     private EntityAttrValueMapper valueMapper;
 
+    @Autowired
+    private EntityGovRelMapper entityGovRelMapper;
+
     /**
      * 查询【请填写功能名称】
      *
@@ -120,7 +123,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .eq(SysUserRole::getUserId, userId)
                 .in(SysUserRole::getRoleId, "5", "6", "7")
         );
-
+        SysUserRole sysUserRole = new SysUserRole(1L, 5L);
+        sysUserRoles.add(sysUserRole);
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
             return R.ok();
@@ -150,13 +154,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
             }
             QueryWrapper<EntityAttr> attrQuery = new QueryWrapper<>();
 
-            String value="";
-            if (roleId==5){
-                value=Common.ATTR_FIN;
-            }else if (roleId==6){
-                value=Common.ATTR_CITY;
-            }else if (roleId==7){
-                value=Common.ATTR_ISS;
+            String value = "";
+            if (roleId == 5) {
+                value = Common.ATTR_FIN;
+            } else if (roleId == 6) {
+                value = Common.ATTR_CITY;
+            } else if (roleId == 7) {
+                value = Common.ATTR_ISS;
             }
             List<EntityAttr> entityAttrs = attrMapper.selectList(attrQuery.lambda().eq(EntityAttr::getAttrCateName, value));
             if (!CollectionUtils.isEmpty(entityAttrs)) {
@@ -167,14 +171,25 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
                 List<EntityAttrValue> attrValueList = valueMapper.selectList(valueQuery.lambda().in(EntityAttrValue::getAttrId, ids));
                 taskDto.setValues(attrValueList);
+
+                QueryWrapper<EntityGovRel> relQueryWrapper = new QueryWrapper<>();
+                Long aLong = entityGovRelMapper.selectCount(relQueryWrapper.lambda().eq(EntityGovRel::getEntityCode, o.getEntityCode()));
+                if (aLong>0){
+                    taskDto.setIsUi(IS_URBAN_INVESTMENT);
+                }else {
+                    taskDto.setIsUi(NOT_URBAN_INVESTMENT);
+                }
             }
             taskList.add(taskDto);
         });
         return R.ok(taskList);
     }
-
+    //是城投机构
+    private static String IS_URBAN_INVESTMENT="Y";
+    //不是城投机构
+    private static String NOT_URBAN_INVESTMENT="N";
     @Override
-    public Integer completeRoleSupplyTask(Long id,String remark) {
+    public Integer completeRoleSupplyTask(Long id, String remark) {
         String username = SecurityUtils.getUsername();
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setId(id);

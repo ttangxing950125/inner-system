@@ -1,11 +1,10 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.vo.BondEntityInfoVo;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -99,4 +98,6 @@ public interface IBondInfoService
      * @date 2022/9/28
      */
     R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo);
+
+    Object getBondType();
 }
