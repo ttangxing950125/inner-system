@@ -51,6 +51,9 @@ public class BondInfo {
     @Excel(name = "公私募类型 0_公募 1_私募")
     private Integer raiseType;
 
+
+    private Integer bondType;
+
     /**
      * 债卷状态 0_存续 1_违约 2_已兑付
      */
