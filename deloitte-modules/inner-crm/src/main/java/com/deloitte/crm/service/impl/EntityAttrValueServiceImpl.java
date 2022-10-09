@@ -1,12 +1,8 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.lang.annotation.Annotation;
-import java.text.DecimalFormat;
-import java.util.*;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,15 +10,11 @@ import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
-import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
+import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.utils.AttrValueUtils;
@@ -35,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -51,9 +44,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Resource
     private IEntityAttrService entityAttrService;
 
-    @Resource
-    private CrmSupplyTaskMapper supplyTaskMapper;
-
+    @Autowired
+    private ICrmSupplyTaskService iCrmSupplyTaskService;
 
     @Resource
     private EntityInfoMapper entityInfoMapper;
@@ -265,7 +257,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             valueList.add(attrValue);
         }
         addEntityAttrValues(valueList);
-        return null;
+
+        String id = valueMap.get("id");
+        String remark = valueMap.get("备注");
+        return R.ok(iCrmSupplyTaskService.completeRoleSupplyTask(Long.valueOf(id),remark));
     }
 
     //根据 key 名称，获取 attrId
