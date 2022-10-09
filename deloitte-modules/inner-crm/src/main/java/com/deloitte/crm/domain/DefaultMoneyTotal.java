@@ -75,7 +75,7 @@ public class DefaultMoneyTotal implements Serializable {
      * 最新状态
      */
     @Excel(name = "最新状态")
-    private Integer latestStatus;
+    private String latestStatus;
     /**
      * 发行规模(亿元)
      */
