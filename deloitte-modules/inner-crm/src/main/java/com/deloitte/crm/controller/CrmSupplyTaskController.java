@@ -10,6 +10,7 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,7 +90,14 @@ public class CrmSupplyTaskController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(crmSupplyTaskService.deleteCrmSupplyTaskByIds(ids));
     }
-
+    /**
+     *添加方法描述
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/9 18:06
+    */
+    @ApiOperation(value = "查询任务完成情况统计")
     @PostMapping("/getTaskStatistics")
     public R getTaskStatistics() {
         return R.ok(crmSupplyTaskService.getTaskStatistics());
