@@ -1,6 +1,7 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.deloitte.common.core.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -57,6 +58,7 @@ public class CrmSupplyTask implements Serializable
 
     /** 来源 */
     @Excel(name = "来源")
+    @TableField("`from`")
     private String from;
 
     @Override

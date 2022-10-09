@@ -13,4 +13,11 @@ import com.deloitte.crm.domain.CnIpoFail;
 @Mapper
 public interface CnIpoFailMapper extends BaseMapper<CnIpoFail> {
 
+    /**
+     * 根据code查询最新的一条 CnIpoFail
+     *
+     * @param code
+     * @return
+     */
+    CnIpoFail findLastByCode(String code);
 }

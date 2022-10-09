@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.CrmEntityTask;
@@ -14,7 +15,7 @@ import com.deloitte.crm.vo.CrmEntityTaskVo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICrmEntityTaskService 
+public interface ICrmEntityTaskService
 {
     /**
      * 查询角色7，根据导入的数据新增主体的任务

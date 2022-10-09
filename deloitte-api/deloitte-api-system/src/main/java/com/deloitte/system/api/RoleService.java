@@ -18,7 +18,7 @@ import java.util.List;
  * @date 2022/09/22 19:31
  */
 
-@FeignClient(contextId = "RoleService", value = ServiceNameConstants.SYSTEM_SERVICE)
+@FeignClient(contextId = "RoleService", url = "http://localhost:9201",value = ServiceNameConstants.SYSTEM_SERVICE)
 public interface RoleService {
 
     /**
