@@ -34,6 +34,7 @@ import java.util.concurrent.Future;
 @Component
 public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
 
+
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
@@ -158,6 +159,8 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         DefaultFirstNumberCountDto defaultFirstNumberCountDto = new DefaultFirstNumberCountDto();
         defaultFirstNumberCountDto.setInfo(defaultFirstNumberCount);
         defaultFirstNumberCountDto.setResStatus(resStatus);
+
+        defaultFirstNumberCountService.save(defaultFirstNumberCount);
 
         return new AsyncResult(defaultFirstNumberCountDto);
     }
