@@ -15,7 +15,9 @@ import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -46,8 +48,6 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
     private IBondInfoService bondInfoService;
 
     @Resource
-    private DefaultFirstNumberCountService defaultFirstNumberCountService;
-    @Resource
     private IEntityInfoService iEntityInfoService;
 
     @Resource
@@ -76,6 +76,7 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultFirstNumberCount> util = new ExcelUtil<DefaultFirstNumberCount>(DefaultFirstNumberCount.class);
         List<DefaultFirstNumberCount> list = util.importExcel(null, file.getInputStream(), 1, true);
+        DefaultFirstNumberCountService defaultFirstNumberCountService = ApplicationContextHolder.get().getBean(DefaultFirstNumberCountService.class);
         return defaultFirstNumberCountService.doTask(windTask, list);
     }
 
@@ -167,9 +168,8 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         DefaultFirstNumberCountDto defaultFirstNumberCountDto = new DefaultFirstNumberCountDto();
         defaultFirstNumberCountDto.setInfo(defaultFirstNumberCount);
         defaultFirstNumberCountDto.setResStatus(resStatus);
-
+        DefaultFirstNumberCountService defaultFirstNumberCountService = ApplicationContextHolder.get().getBean(DefaultFirstNumberCountService.class);
         defaultFirstNumberCountService.save(defaultFirstNumberCount);
-
         return new AsyncResult(defaultFirstNumberCountDto);
     }
 }

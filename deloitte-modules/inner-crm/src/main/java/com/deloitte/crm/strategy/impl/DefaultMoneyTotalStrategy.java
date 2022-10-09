@@ -13,6 +13,7 @@ import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -36,8 +37,7 @@ import java.util.concurrent.Future;
 public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
     @Resource
     private IBondInfoService bondInfoService;
-    @Resource
-    private DefaultMoneyTotalService defaultMoneyTotalService;
+
     @Resource
     private IEntityInfoService iEntityInfoService;
     @Resource
@@ -110,6 +110,7 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             if (resStatus == null && updateCount > 0) {
                 resStatus = 2;
             }
+            final DefaultMoneyTotalService defaultMoneyTotalService = ApplicationContextHolder.get().getBean(DefaultMoneyTotalService.class);
             defaultMoneyTotalService.save(moneyTotal);
 
             return new AsyncResult<>(new Object());
@@ -125,6 +126,7 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultMoneyTotal> util = new ExcelUtil<DefaultMoneyTotal>(DefaultMoneyTotal.class);
         List<DefaultMoneyTotal> list = util.importExcel(null, file.getInputStream(), 1, true);
+        DefaultMoneyTotalService defaultMoneyTotalService = ApplicationContextHolder.get().getBean(DefaultMoneyTotalService.class);
         return defaultMoneyTotalService.doTask(windTask, list);
     }
 
