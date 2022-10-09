@@ -12,5 +12,4 @@ import com.deloitte.crm.domain.DefaultFirstNumberCount;
  */
 @Mapper
 public interface DefaultFirstNumberCountMapper extends BaseMapper<DefaultFirstNumberCount> {
-
 }

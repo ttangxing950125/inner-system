@@ -3,6 +3,8 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,7 @@ public class DefaultMoneyTotal implements Serializable {
      * id 主键自动递增
      */
 //    @Excel(name = "id 主键自动递增")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * wind_task的id
@@ -47,9 +50,9 @@ public class DefaultMoneyTotal implements Serializable {
     @Excel(name = "债券代码")
     private String bondCode;
     /**
-     * 违约、展期日期 yyyy-MM-dd
+     * 违约、展期日期
      */
-    @Excel(name = "违约、展期日期 yyyy-MM-dd")
+    @Excel(name = "违约、展期日期")
     private String defaultDate;
     /**
      * 债券简称
@@ -99,12 +102,12 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * 到期日 yyyy-MM-dd
      */
-    @Excel(name = "到期日 yyyy-MM-dd")
+    @Excel(name = "到期日")
     private String dueDate;
     /**
      * 起息日 yyyy-MM-dd
      */
-    @Excel(name = "起息日 yyyy-MM-dd")
+    @Excel(name = "起息日")
     private String valueDate;
     /**
      * 剩余期限(年)
@@ -134,7 +137,7 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * 是否上市公司-Y是 N否
      */
-    @Excel(name = "是否上市公司-Y是 N否")
+    @Excel(name = "是否上市公司")
     private String listedCompany;
     /**
      * 所属行业(Wind)

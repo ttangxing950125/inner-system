@@ -98,21 +98,22 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             Integer resStatus = null;
             Integer changeType = null;
             //看之前有没有导入过这个数据 根据 "债券代码"
-            final DefaultMoneyTotal moneyTotalDB = defaultMoneyTotalMapper.selectList(new QueryWrapper<DefaultMoneyTotal>().lambda().eq(DefaultMoneyTotal::getBondCode, moneyTotal.getBondCode())).stream().findFirst().get();
-            if (moneyTotalDB == null) {
+            final List<DefaultMoneyTotal> defaultMoneyTotals = defaultMoneyTotalMapper.selectList(new QueryWrapper<DefaultMoneyTotal>().lambda().eq(DefaultMoneyTotal::getBondCode, moneyTotal.getBondCode()));
+            if (CollUtil.isEmpty(defaultMoneyTotals)) {
                 changeType = DataChangeType.INSERT.getId();
-            } else if (!Objects.equals(moneyTotalDB, moneyTotal)) {
+            } else if (!Objects.equals(defaultMoneyTotals, moneyTotal)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
+
             moneyTotal.setChangeType(changeType);
+            moneyTotal.setTaskId(windTask.getId());
+
             final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), moneyTotal);
             if (resStatus == null && updateCount > 0) {
                 resStatus = 2;
             }
-            final DefaultMoneyTotalService defaultMoneyTotalService = ApplicationContextHolder.get().getBean(DefaultMoneyTotalService.class);
-            defaultMoneyTotalService.save(moneyTotal);
-
+            this.defaultMoneyTotalMapper.insert(moneyTotal);
             return new AsyncResult<>(new Object());
         } catch (Exception e) {
             log.error("执行异常>>>>:{}", e);

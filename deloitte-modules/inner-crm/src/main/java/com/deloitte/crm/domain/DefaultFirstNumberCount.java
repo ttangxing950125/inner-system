@@ -3,6 +3,8 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +28,7 @@ public class DefaultFirstNumberCount implements Serializable {
      * 主键自动增加
      */
 //    @Excel(name = "主键自动增加")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * wind_task的id
@@ -50,7 +53,7 @@ public class DefaultFirstNumberCount implements Serializable {
     /**
      * 首次债券违约日期yyyy-MM-dd
      */
-    @Excel(name = "首次债券违约日期yyyy-MM-dd")
+    @Excel(name = "首次债券违约日期")
     private String fristDateCount;
     /**
      * 违约债券代码
@@ -93,9 +96,9 @@ public class DefaultFirstNumberCount implements Serializable {
     @Excel(name = "担保人")
     private String surety;
     /**
-     * 最新主题评级
+     * 最新主体评级
      */
-    @Excel(name = "最新主题评级")
+    @Excel(name = "最新主体评级")
     private String latestTopicRating;
     /**
      * 发行时主体评级
@@ -115,7 +118,7 @@ public class DefaultFirstNumberCount implements Serializable {
     /**
      * 是否上市公司-Y是 N否
      */
-    @Excel(name = "是否上市公司-Y是 N否")
+    @Excel(name = "是否上市公司")
     private String listedCompany;
     /**
      * 省份

@@ -2,6 +2,7 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -55,8 +56,6 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
 
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
-    @Resource
-    private DefaultMoneyTotalMapper defaultMoneyTotalMapper;
 
 
     /**
@@ -75,7 +74,7 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultFirstNumberCount> util = new ExcelUtil<DefaultFirstNumberCount>(DefaultFirstNumberCount.class);
-        List<DefaultFirstNumberCount> list = util.importExcel(null, file.getInputStream(), 1, true);
+        List<DefaultFirstNumberCount> list = util.importExcel(file.getInputStream(), true);
 
         DefaultFirstNumberCountService defaultFirstNumberCountService = ApplicationContextHolder.get().getBean(DefaultFirstNumberCountService.class);
         return defaultFirstNumberCountService.doTask(windTask, list);
@@ -133,12 +132,12 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         } else {
             bondInfo = bondInfoService.saveOrUpdate(bondInfo);
         }
-        List<EntityInfo> EntityInfoLists = iEntityInfoService.findByName(defaultFirstNumberCount.getPublisher());
-        log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", defaultFirstNumberCount.getPublisher(), JSONUtil.toJsonStr(EntityInfoLists));
-        if (CollUtil.isNotEmpty(EntityInfoLists)) {
-            for (EntityInfo entityInfoList : EntityInfoLists) {
+        List<EntityInfo> entityInfos = iEntityInfoService.findByName(defaultFirstNumberCount.getPublisher());
+        log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", defaultFirstNumberCount.getPublisher(), JSON.toJSONString(entityInfos));
+        if (CollUtil.isNotEmpty(entityInfos)) {
+            for (EntityInfo entityInfoList : entityInfos) {
                 EntityBondRel entityBondRel = entityBondRelMapper.findByEntityBondCode(entityInfoList.getEntityCode(), bondInfo.getBondCode());
-                log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), JSONUtil.toJsonStr(entityBondRel));
+                log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), com.alibaba.fastjson.JSON.toJSONString(entityBondRel));
                 if (entityBondRel == null) {
                     EntityBondRel entityBondRelEntity = new EntityBondRel();
                     entityBondRelEntity.setBdCode(bondInfo.getBondCode());
@@ -151,16 +150,15 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         Integer resStatus = null;
         Integer changeType = null;
         //看之前有没有导入过这个数据 根据 "债券代码"
-        DefaultFirstNumberCount DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>()
-                .lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode())).stream().findFirst().get();
-        if (DBDefaultFirstNumberCount == null) {
+        final List<DefaultFirstNumberCount> DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>().lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode()));
+        if (CollUtil.isEmpty(DBDefaultFirstNumberCount)) {
             changeType = DataChangeType.INSERT.getId();
         } else if (!Objects.equals(DBDefaultFirstNumberCount, defaultFirstNumberCount)) {
             ////如果他们两个不相同，代表有属性修改了
             changeType = DataChangeType.UPDATE.getId();
         }
         defaultFirstNumberCount.setChangeType(changeType);
-
+        defaultFirstNumberCount.setTaskId(windTask.getId());
         final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), defaultFirstNumberCount);
         if (resStatus == null && updateCount > 0) {
             resStatus = 2;
@@ -169,8 +167,57 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         DefaultFirstNumberCountDto defaultFirstNumberCountDto = new DefaultFirstNumberCountDto();
         defaultFirstNumberCountDto.setInfo(defaultFirstNumberCount);
         defaultFirstNumberCountDto.setResStatus(resStatus);
-        DefaultFirstNumberCountService defaultFirstNumberCountService = ApplicationContextHolder.get().getBean(DefaultFirstNumberCountService.class);
-        defaultFirstNumberCountService.save(defaultFirstNumberCount);
+
+        defaultFirstNumberCountMapper.insert(defaultFirstNumberCount);
+
         return new AsyncResult(defaultFirstNumberCountDto);
     }
+/*
+    @Transactional(rollbackFor = Exception.class)
+    public void doBondImport2(DefaultFirstNumberCount defaultFirstNumberCount, Date timeNow, CrmWindTask windTask) {
+        String shortName = defaultFirstNumberCount.getDefaultBondsDesc();
+        BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+        bondInfo.setBondStatus(7);
+        if (bondInfo.getId() != null) {
+            int count = bondInfoService.updateBondInfo(bondInfo);
+        } else {
+            bondInfo = bondInfoService.saveOrUpdate(bondInfo);
+        }
+        List<EntityInfo> entityInfos = iEntityInfoService.findByName(defaultFirstNumberCount.getPublisher());
+        log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", defaultFirstNumberCount.getPublisher(), JSON.toJSONString(entityInfos));
+        if (CollUtil.isNotEmpty(entityInfos)) {
+            for (EntityInfo entityInfoList : entityInfos) {
+                EntityBondRel entityBondRel = entityBondRelMapper.findByEntityBondCode(entityInfoList.getEntityCode(), bondInfo.getBondCode());
+                log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), com.alibaba.fastjson.JSON.toJSONString(entityBondRel));
+                if (entityBondRel == null) {
+                    EntityBondRel entityBondRelEntity = new EntityBondRel();
+                    entityBondRelEntity.setBdCode(bondInfo.getBondCode());
+                    entityBondRelEntity.setEntityCode(entityInfoList.getEntityCode());
+                    entityBondRelEntity.setStatus(1);
+                    iEntityBondRelService.insertEntityBondRel(entityBondRelEntity);
+                }
+            }
+        }
+        Integer resStatus = null;
+        Integer changeType = null;
+        //看之前有没有导入过这个数据 根据 "债券代码"
+        final List<DefaultFirstNumberCount> DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>().lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode()));
+        if (CollUtil.isEmpty(DBDefaultFirstNumberCount)) {
+            changeType = DataChangeType.INSERT.getId();
+        } else if (!Objects.equals(DBDefaultFirstNumberCount, defaultFirstNumberCount)) {
+            ////如果他们两个不相同，代表有属性修改了
+            changeType = DataChangeType.UPDATE.getId();
+        }
+        defaultFirstNumberCount.setTaskId(windTask.getId());
+        defaultFirstNumberCount.setChangeType(changeType);
+        final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), defaultFirstNumberCount);
+        if (resStatus == null && updateCount > 0) {
+            resStatus = 2;
+        }
+        DefaultFirstNumberCountDto defaultFirstNumberCountDto = new DefaultFirstNumberCountDto();
+        defaultFirstNumberCountDto.setInfo(defaultFirstNumberCount);
+        defaultFirstNumberCountDto.setResStatus(resStatus);
+        defaultFirstNumberCountMapper.insert(defaultFirstNumberCount);
+    }
+    */
 }

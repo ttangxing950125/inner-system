@@ -55,7 +55,6 @@ public class DefaultFirstNumberCountServiceImpl extends ServiceImpl<DefaultFirst
             Future<DefaultFirstNumberCountDto> future = defaultFirstNumberCountStrategy.doBondImport(defaultFirstNumberCount, timeNow, windTask);
             futureList.add(future);
         }
-
         while (true) {
             boolean isAllDone = true;
             for (Future future : futureList) {
