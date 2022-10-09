@@ -6,6 +6,7 @@ import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.dto.BondInfoDto;
+import com.deloitte.crm.dto.DefaultFirstNumberCountDto;
 import com.deloitte.crm.mapper.DefaultFirstNumberCountMapper;
 import com.deloitte.crm.domain.DefaultFirstNumberCount;
 import com.deloitte.crm.service.DefaultFirstNumberCountService;
@@ -44,13 +45,14 @@ public class DefaultFirstNumberCountServiceImpl extends ServiceImpl<DefaultFirst
         this.crmWindTaskService.updateById(windTask);
         //获取当前时间
         Date timeNow = DateUtil.parseDate(DateUtil.getDate());
-        //排除 债券简称 为空的
-        final List<DefaultFirstNumberCount> filterDefaultBondsDescIsBlakList = delIsses.stream().filter(e -> StrUtil.isNotBlank(e.getDefaultBondsDesc())).collect(Collectors.toList());
+        //排除 债券简称 为空的 和
+        final List<DefaultFirstNumberCount> filterDefaultBondsDescIsBlakList = delIsses.parallelStream().filter(e -> StrUtil.isNotBlank(e.getDefaultBondsDesc())
+                || !e.getPublisher().contains("数据来源：Wind")).collect(Collectors.toList());
 
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 
         for (DefaultFirstNumberCount defaultFirstNumberCount : filterDefaultBondsDescIsBlakList) {
-            Future<BondInfoDto> future = defaultFirstNumberCountStrategy.doBondImport(defaultFirstNumberCount, timeNow, windTask);
+            Future<DefaultFirstNumberCountDto> future = defaultFirstNumberCountStrategy.doBondImport(defaultFirstNumberCount, timeNow, windTask);
             futureList.add(future);
         }
 

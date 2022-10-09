@@ -27,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -238,8 +239,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     }
 
     @Override
-    public Object addEntityAttrValuesNew(Map<String, String> valueMap) {
-        String entityCode = valueMap.get("entityCode");
+    public Object addEntityAttrValuesNew(Map<String, Object> valueMap) {
+        Object entityCode = valueMap.get("entityCode");
         List<EntityAttrValue>valueList=new ArrayList<>();
         //封装存储的值
         for (String key : valueMap.keySet()) {
@@ -250,18 +251,43 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             if (attrId==0L){
                 continue;
             }
+            if ("关注报告类型".equals(key)){
+                Object value = valueMap.get(key);
+                if (value.getClass().isArray()) {
+                    int len = Array.getLength(value);
+                    Object[] obj = new Object[len];
+                    for(int i = 0; i < len; i++) {
+                        obj[i] = Array.get(obj, i);
+                    }
+                    for (Object o:obj){
+                        EntityAttrValue attrValue=new EntityAttrValue();
+                        attrValue.setEntityCode(entityCode.toString());
+                        attrValue.setAttrId(attrId);
+                        attrValue.setValue(o.toString());
+                        valueList.add(attrValue);
+                    }
+                }
+                continue;
+            }
             EntityAttrValue attrValue=new EntityAttrValue();
-            attrValue.setEntityCode(entityCode);
+            attrValue.setEntityCode(entityCode.toString());
             attrValue.setAttrId(attrId);
-            attrValue.setValue(valueMap.get(key));
+            attrValue.setValue(valueMap.get(key).toString());
             valueList.add(attrValue);
         }
         addEntityAttrValues(valueList);
 
-        String id = valueMap.get("id");
-        String remark = valueMap.get("备注");
+        String id = valueMap.get("id").toString();
+        String remark="";
+        if (!ObjectUtils.isEmpty(valueMap.get("备注"))){
+            remark = valueMap.get("备注").toString();
+        }
         return R.ok(iCrmSupplyTaskService.completeRoleSupplyTask(Long.valueOf(id),remark));
     }
+
+
+
+
 
     //根据 key 名称，获取 attrId
     private Long getAttrId(String key) {
