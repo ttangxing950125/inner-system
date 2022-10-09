@@ -1,4 +1,5 @@
 package com.deloitte.crm.controller;
+
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
@@ -283,7 +284,6 @@ public class EntityInfoController extends BaseController {
     }
 
 
-
     /**
      * 主体整体概览
      *
@@ -307,10 +307,10 @@ public class EntityInfoController extends BaseController {
      * @return R
      * @author 冉浩岑
      * @date 2022/10/8 15:53
-    */
+     */
     @ApiOperation(value = "覆盖情况快速查询")
     @PostMapping("/getQuickOfCoverage")
-    public R getQuickOfCoverage(String entityType,String param,Integer pageNum,Integer pageSize) {
-        return entityInfoService.getQuickOfCoverage(entityType,param, pageNum, pageSize);
+    public R getQuickOfCoverage(String entityType, String param, Integer pageNum, Integer pageSize) {
+        return entityInfoService.getQuickOfCoverage(entityType, param, pageNum, pageSize);
     }
 }

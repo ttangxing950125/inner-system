@@ -20,4 +20,5 @@ public class SupplyTaskDto {
     private EntityInfo entityInfo;
     private List<EntityAttrValue> values;
     private CrmSupplyTask crmSupplyTask;
+    private String isUi;
 }
