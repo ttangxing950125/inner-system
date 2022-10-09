@@ -81,7 +81,9 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         taskContext.setTimeNow(timeNow);
         taskContext.setWindTask(windTask);
 
-        return windTaskStrategyManage.doTask(taskContext);
+        windTaskStrategyManage.doTask(taskContext);
+
+        return true;
     }
 
     /**

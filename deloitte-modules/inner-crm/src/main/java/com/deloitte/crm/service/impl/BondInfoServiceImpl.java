@@ -31,8 +31,7 @@ import java.util.List;
  * @date 2022-09-23
  */
 @Service
-public class BondInfoServiceImpl implements IBondInfoService 
-{
+public class BondInfoServiceImpl implements IBondInfoService {
     @Resource
     private BondInfoMapper bondInfoMapper;
 
@@ -57,78 +56,73 @@ public class BondInfoServiceImpl implements IBondInfoService
 
     /**
      * 查询【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
     @Override
-    public BondInfo selectBondInfoById(Long id)
-    {
+    public BondInfo selectBondInfoById(Long id) {
         return bondInfoMapper.selectBondInfoById(id);
     }
 
     /**
      * 查询【请填写功能名称】列表
-     * 
+     *
      * @param bondInfo 【请填写功能名称】
      * @return 【请填写功能名称】
      */
     @Override
-    public List<BondInfo> selectBondInfoList(BondInfo bondInfo)
-    {
+    public List<BondInfo> selectBondInfoList(BondInfo bondInfo) {
         return bondInfoMapper.selectBondInfoList(bondInfo);
     }
 
     /**
      * 新增【请填写功能名称】
-     * 
+     *
      * @param bondInfo 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int insertBondInfo(BondInfo bondInfo)
-    {
+    public int insertBondInfo(BondInfo bondInfo) {
         return bondInfoMapper.insertBondInfo(bondInfo);
     }
 
     /**
      * 修改【请填写功能名称】
-     * 
+     *
      * @param bondInfo 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int updateBondInfo(BondInfo bondInfo)
-    {
+    public int updateBondInfo(BondInfo bondInfo) {
         return bondInfoMapper.updateBondInfo(bondInfo);
     }
 
     /**
      * 批量删除【请填写功能名称】
-     * 
+     *
      * @param ids 需要删除的【请填写功能名称】主键
      * @return 结果
      */
     @Override
-    public int deleteBondInfoByIds(Long[] ids)
-    {
+    public int deleteBondInfoByIds(Long[] ids) {
         return bondInfoMapper.deleteBondInfoByIds(ids);
     }
 
     /**
      * 删除【请填写功能名称】信息
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
     @Override
-    public int deleteBondInfoById(Long id)
-    {
+    public int deleteBondInfoById(Long id) {
         return bondInfoMapper.deleteBondInfoById(id);
     }
 
     /**
      * 检查企业债券全称
+     *
      * @param fullName
      * @return
      */
@@ -213,15 +207,15 @@ public class BondInfoServiceImpl implements IBondInfoService
     @Override
     @Transactional(rollbackFor = Exception.class)
     public BondInfo saveOrUpdate(BondInfo bondInfo) {
-        if (bondInfo.getId()!=null){
+        if (bondInfo.getId() != null) {
             int count = bondInfoMapper.updateBondInfo(bondInfo);
-            bondInfo = count>0 ? bondInfoMapper.selectBondInfoById(bondInfo.getId()) : bondInfo;
-        }else{
+            bondInfo = count > 0 ? bondInfoMapper.selectBondInfoById(bondInfo.getId()) : bondInfo;
+        } else {
             //新增债券
             bondInfoMapper.insertBondInfo(bondInfo);
-            DecimalFormat g1=new DecimalFormat("000000");
+            DecimalFormat g1 = new DecimalFormat("000000");
             String startZeroStr = g1.format(bondInfo.getId());
-            bondInfo.setBondCode("BD"+startZeroStr);
+            bondInfo.setBondCode("BD" + startZeroStr);
 
             bondInfoMapper.updateBondInfo(bondInfo);
         }
