@@ -2,9 +2,6 @@ package com.deloitte.crm.domain;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 /**
  * @author 冉浩岑
@@ -16,8 +13,7 @@ public class TaskStatistics {
     /**
      * 当前日期
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date todayDate;
+    private String todayDate;
     /**
      * 当前星期几
      */

@@ -2,6 +2,7 @@ package com.deloitte.crm.service;
 
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmSupplyTask;
+import com.deloitte.crm.domain.TaskStatistics;
 
 import java.util.List;
 
@@ -64,4 +65,6 @@ public interface ICrmSupplyTaskService
     R getRoleSupplyTask(String taskDate);
 
    Integer completeRoleSupplyTask(Long id,String remark);
+
+    TaskStatistics getTaskStatistics();
 }
