@@ -13,4 +13,11 @@ import com.deloitte.crm.domain.CnIpoPause;
 @Mapper
 public interface CnIpoPauseMapper extends BaseMapper<CnIpoPause> {
 
+    /**
+     * 根据code查询最后一条记录
+     *
+     * @param code
+     * @return
+     */
+    CnIpoPause findLastByCode(String code);
 }

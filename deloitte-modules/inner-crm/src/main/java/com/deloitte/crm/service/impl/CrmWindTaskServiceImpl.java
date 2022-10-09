@@ -9,8 +9,10 @@ import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.service.IBondNewIssService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
 import com.deloitte.crm.vo.CrmTaskVo;
@@ -46,6 +48,9 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
     @Resource
     private WindTaskStrategyManage windTaskStrategyManage;
+
+    @Resource
+    private ICrmEntityTaskService crmEntityTaskService;
 
     /**
      * 导入wind文件
@@ -105,11 +110,21 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             return false;
         }
 
+        //修改每日任务状态
         LambdaUpdateWrapper<CrmDailyTask> updateDaily = Wrappers.<CrmDailyTask>lambdaUpdate()
                 .eq(CrmDailyTask::getTaskDate, timeNow)
                 .eq(CrmDailyTask::getTaskRoleType, RoleInfo.ROLE1.getId())
                 .eq(CrmDailyTask::getTaskStatus, 2)
                 .set(CrmDailyTask::getTaskStatus, 3);
+
+        //查询今天有多少主体新增的任务
+        Wrapper<CrmEntityTask> entityTaskQue = Wrappers.<CrmEntityTask>lambdaQuery()
+                .eq(CrmEntityTask::getTaskDate, timeNow);
+        //TODO wpp发邮件
+//        crmEntityTaskService
+
+        //发送邮件给角色2
+
 
         dailyTaskService.update(updateDaily);
 

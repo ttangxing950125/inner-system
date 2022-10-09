@@ -4,6 +4,8 @@ import java.util.Date;
 import java.io.Serializable;
 
 import cn.hutool.core.date.DateTime;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +27,7 @@ public class CnIpoPause implements Serializable {
     /**
      * 主键id
      */
-    @Excel(name = "主键id")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 公司名称
@@ -38,14 +40,14 @@ public class CnIpoPause implements Serializable {
     @Excel(name = "代码")
     private String code;
     /**
-     * 招股日期 yyyy-mm-dd
+     * 招股日期
      */
-    @Excel(name = "招股日期 yyyy-mm-dd")
+    @Excel(name = "招股日期")
     private Date prospDate;
     /**
-     * 发行暂缓结果公告日yyyy-mm-dd
+     * 发行暂缓结果公告日
      */
-    @Excel(name = "发行暂缓结果公告日yyyy-mm-dd")
+    @Excel(name = "发行暂缓结果公告日")
     private Date issSusDate;
     /**
      * 发行价格(元)
@@ -88,9 +90,9 @@ public class CnIpoPause implements Serializable {
     @Excel(name = "超额认购倍数")
     private Double exceedSubcMult;
     /**
-     * 网上发行日期yyyy-mm-dd
+     * 网上发行日期
      */
-    @Excel(name = "网上发行日期yyyy-mm-dd")
+    @Excel(name = "网上发行日期")
     private Date netIssDate;
     /**
      * 主承销商
@@ -106,19 +108,16 @@ public class CnIpoPause implements Serializable {
     /**
      * wind_task 的id
      */
-    @Excel(name = "wind_task 的id")
     private Integer  taskId ;
 
     /**
-     * 导入日期 yyyy-mm-dd
+     * 导入日期
      */
-    @Excel(name = "导入日期 yyyy-mm-dd")
     private DateTime importTime;
 
     /**
      * 数据变化类型 1-新增 2-更新
      */
-    @Excel(name = "数据变化类型 1-新增 2-更新")
     private Integer  changeType;
 
 
