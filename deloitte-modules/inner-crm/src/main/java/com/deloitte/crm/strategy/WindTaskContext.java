@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -22,6 +23,12 @@ public class WindTaskContext {
      * 上传的任务附件
      */
     private MultipartFile file;
+
+    /**
+     * 任务附件的流
+     */
+    private InputStream fileStream;
+
     /**
      *今天
      */

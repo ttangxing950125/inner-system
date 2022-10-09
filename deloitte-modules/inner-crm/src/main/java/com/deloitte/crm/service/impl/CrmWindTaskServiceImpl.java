@@ -10,9 +10,8 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
-import com.deloitte.crm.service.IBondNewIssService;
-import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
 import com.deloitte.crm.vo.CrmTaskVo;
@@ -23,7 +22,6 @@ import com.deloitte.crm.dto.CrmWindTaskDto;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.service.ICrmWindTaskService;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,6 +49,12 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
     @Resource
     private ICrmEntityTaskService crmEntityTaskService;
+
+    @Resource
+    private ICrmMasTaskService crmMasTaskService;
+
+    @Resource
+    private SendEmailService sendEmailService;
 
     /**
      * 导入wind文件
@@ -85,6 +89,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         taskContext.setFile(file);
         taskContext.setTimeNow(timeNow);
         taskContext.setWindTask(windTask);
+        taskContext.setFileStream(file.getInputStream());
 
         windTaskStrategyManage.doTask(taskContext);
 
@@ -120,10 +125,25 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         //查询今天有多少主体新增的任务
         Wrapper<CrmEntityTask> entityTaskQue = Wrappers.<CrmEntityTask>lambdaQuery()
                 .eq(CrmEntityTask::getTaskDate, timeNow);
-        //TODO wpp发邮件
-//        crmEntityTaskService
 
-        //发送邮件给角色2
+        //发邮件
+        long entityTaskCount = crmEntityTaskService.count(entityTaskQue);
+
+        //发送邮件给角色6|7
+        sendEmailService.SendEmail(RoleInfo.ROLE6.getId(),"新任务：新增主体"+entityTaskCount+"个待确认",
+                "今日wind导入任务已完成，平台捕获"+entityTaskCount+"个疑似新增主体需要确认。" +
+                "请尽快登陆平台完成相关任务。");
+
+        //发邮件给角色2
+        Wrapper<CrmMasTask> masTaskQue = Wrappers.<CrmMasTask>lambdaQuery()
+                .eq(CrmMasTask::getTaskDate, timeNow);
+
+        long entityMasCount = crmMasTaskService.count(masTaskQue);
+
+        sendEmailService.SendEmail(RoleInfo.ROLE2.getId(),"新任务：待划分敞口主体"+entityMasCount+"个",
+                "今日新增主体确认任务已完成，共计新增 "+entityMasCount+" 个主体需划分敞口。" +
+                        "请尽快登陆平台完成相关任务。" +
+                        "请尽快登陆平台完成相关任务。");
 
 
         dailyTaskService.update(updateDaily);

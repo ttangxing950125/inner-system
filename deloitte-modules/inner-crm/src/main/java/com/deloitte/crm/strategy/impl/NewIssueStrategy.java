@@ -47,7 +47,7 @@ public class NewIssueStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         //读取文件
         ExcelUtil<BondNewIss> util = new ExcelUtil<BondNewIss>(BondNewIss.class);
-        List<BondNewIss> isses = util.importExcel(file.getInputStream(), true);
+        List<BondNewIss> isses = util.importExcel(windTaskContext.getFileStream(), true);;
         return bondNewIssService.doTask(windTask, isses);
     }
 

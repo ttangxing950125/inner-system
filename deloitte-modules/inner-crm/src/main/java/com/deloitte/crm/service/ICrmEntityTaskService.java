@@ -15,7 +15,7 @@ import com.deloitte.crm.vo.CrmEntityTaskVo;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICrmEntityTaskService
+public interface ICrmEntityTaskService extends IService<CrmEntityTask>
 {
     /**
      * 查询角色7，根据导入的数据新增主体的任务

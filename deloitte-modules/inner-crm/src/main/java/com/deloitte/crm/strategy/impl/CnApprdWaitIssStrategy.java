@@ -126,7 +126,7 @@ public class CnApprdWaitIssStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnApprdWaitIss> util = new ExcelUtil<CnApprdWaitIss>(CnApprdWaitIss.class);
-        List<CnApprdWaitIss> list = util.importExcel(file.getInputStream(), true);
+        List<CnApprdWaitIss> list = util.importExcel(windTaskContext.getFileStream(), true);;
 
         return cnApprdWaitIssService.doTask(windTask, list);
     }
