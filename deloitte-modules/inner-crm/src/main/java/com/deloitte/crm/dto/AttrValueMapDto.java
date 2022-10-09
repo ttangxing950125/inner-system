@@ -17,29 +17,43 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttrValueMapDto {
-    private Integer id;
 
-    private String table;
+    /**
+     *  table=> entity_attr 的 id
+     */
+    private Integer attrId;
+
+    /**
+     * table=> entity_attr 的 name
+     */
     private String name;
-    private String value;
 
+    /**
+     * table=> entity_attr 的 remarks
+     */
     private String remarks;
 
+    /**
+     * table=> entity_attr_value 的 id
+     */
+    private Integer valueId;
+
+    /**
+     * table=> entity_attr_value 的 value
+     */
+    private String value;
+
+    /**
+     * 子集
+     */
     private List<AttrValueMapDto> children;
 
-    public AttrValueMapDto(Integer id, String table, String name, String value){
-        this.id = id;
-        this.table = table;
+    public AttrValueMapDto(Integer attrId,String name,String remarks,Integer valueId,String value){
+        this.attrId = attrId;
         this.name = name;
-        this.value = value;
-    }
-
-    public AttrValueMapDto(Integer id, String table, String name, String value,String remarks){
-        this.id = id;
-        this.table = table;
-        this.name = name;
-        this.value = value;
         this.remarks = remarks;
+        this.valueId = valueId;
+        this.value = value;
     }
 
 }

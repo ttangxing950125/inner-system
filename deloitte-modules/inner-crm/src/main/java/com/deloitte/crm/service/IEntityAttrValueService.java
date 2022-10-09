@@ -4,9 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CnApprdWaitIss;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.dto.EntityAttrValueDto;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 import java.util.Map;
 import com.deloitte.crm.domain.ThkSecIssInfo;
 import com.deloitte.crm.vo.EntityByIondVo;
@@ -122,4 +125,30 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
     R createStockEntityG(EntityStockInfoVo entityStockInfoVo);
 
     Object addEntityAttrValuesNew(Map<String, String> valueMap);
+
+    /**
+     *
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 查询 attr&attr_value 的泛用查询
+     * @param entityCode
+     * @param attrId
+     * @return
+     */
+    Map<String,AttrValueMapDto> findAttrValue(String entityCode,Integer attrId);
+
+    /**
+     *
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 修改或新增 attr_value
+     * @param attrValueMapDto
+     * @return
+     */
+    Boolean SaveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto);
+
 }

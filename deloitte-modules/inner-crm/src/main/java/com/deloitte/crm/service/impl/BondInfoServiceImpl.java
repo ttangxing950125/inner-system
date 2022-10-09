@@ -1,9 +1,15 @@
 package com.deloitte.crm.service.impl;
 
+import java.text.DecimalFormat;
+import java.util.*;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.*;
+import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
@@ -31,16 +37,10 @@ import java.util.List;
  * @date 2022-09-23
  */
 @Service
-public class BondInfoServiceImpl implements IBondInfoService 
+public class BondInfoServiceImpl implements IBondInfoService
 {
     @Resource
     private BondInfoMapper bondInfoMapper;
-
-    @Resource
-    private IEntityAttrService entityAttrService;
-
-    @Resource
-    private IEntityAttrValueService entityAttrValueService;
 
     @Resource
     private RedisService redisService;
@@ -52,7 +52,7 @@ public class BondInfoServiceImpl implements IBondInfoService
     private IEntityInfoService iEntityInfoService;
 
     @Resource
-    private EntityInfoManager entityInfoManager;
+    private IEntityAttrValueService iEntityAttrValueService;
 
 
     /**
@@ -241,106 +241,70 @@ public class BondInfoServiceImpl implements IBondInfoService
      */
     @Override
     public R<BondEntityInfoVo> findAllDetail(String entityCode, String bondCode) {
-        List<AttrValueMapDto> result = new ArrayList<>();
-        //组装主体信息 主体属性来自 table = ENTITY_INFO
+        BondEntityInfoVo result = new BondEntityInfoVo();
+        Map<String, AttrValueMapDto> attrs = result.getAttrs();
+        //组装主体信息 主体属性来自 table = entity_info
         EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getEntityCode, entityCode));
-        Integer entityId = entityInfo.getId();
-        result.add(new AttrValueMapDto(entityId,Common.TABLE_ENTITY_INFO,"债务主体德勤代码",entityCode));
-        result.add(new AttrValueMapDto(entityId,Common.TABLE_ENTITY_INFO,"债务主体名称_分离后",entityInfo.getEntityName()));
-        result.add(new AttrValueMapDto(entityId,Common.TABLE_ENTITY_INFO,"债务主体名称_原始",entityInfo.getEntityNameHis()));
-        result.add(new AttrValueMapDto(entityId,Common.TABLE_ENTITY_INFO,"债务主体统一社会信用代码",entityInfo.getCreditCode()));
+        result.setEntityInfo(entityInfo);
 
-        //组装债券信息 债券属性来自 table = BOND_INFO
+        //组装债券信息 债券属性来自 table = bond_info
         BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondCode, bondCode));
-        Integer bondInfoId = bondInfo.getId().intValue();
-        result.add(new AttrValueMapDto(bondInfoId,Common.TABLE_BOND_INFO,"债券简称",bondInfo.getBondShortName()));
-        result.add(new AttrValueMapDto(bondInfoId,Common.TABLE_BOND_INFO,"债券类型",null));
-        result.add(new AttrValueMapDto(bondInfoId,Common.TABLE_BOND_INFO,"债务关系有效性 / 存续状态",bondInfo.getBondState().toString(),"债卷状态 0_存续 1_违约 2_已兑付"));
+        result.setBondInfo(bondInfo);
 
-        //组装主体债券的具体属性信息 属性来自 table = ENTITY_ATTR_VALUE
-
+        //TODO 组装主体债券的具体属性信息 属性来自 table = entity_attr_value
         //是否为ABS
-        EntityAttrValue isABS = entityAttrValueMapper.findValueByCodeAndAttrId(617, bondCode);
-        if(isABS!=null){
-        result.add(new AttrValueMapDto(isABS.getId(),Common.ENTITY_ATTR_VALUE,"是否为ABS",isABS.getValue()
-                ,"1、Y：发过集合债\n" +
-                "2、N：未曾发过集合债"));
-        }else{result.add(new AttrValueMapDto().setName("是否为ABS"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode, 617));
 
         //债券交易代码
-        EntityAttrValue tradCode = entityAttrValueMapper.findValueByCodeAndAttrId(804, bondCode);
-        if(tradCode!=null) {
-            result.add(new AttrValueMapDto(tradCode.getId(), Common.ENTITY_ATTR_VALUE, "债券交易代码", tradCode.getValue()));
-        }else{result.add(new AttrValueMapDto().setName("债券交易代码"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode, 804));
 
         //债券全称
-        EntityAttrValue bondFullName = entityAttrValueMapper.findValueByCodeAndAttrId(48, bondCode);
-        if(bondFullName!=null) {
-            result.add(new AttrValueMapDto(bondFullName.getId(), Common.ENTITY_ATTR_VALUE, "债券全称", bondFullName.getValue(), "会随上传文档内容更新而更新"));
-        }else{result.add(new AttrValueMapDto().setName("债券全称"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode, 48));
 
         //起息日
-        EntityAttrValue valueDate = entityAttrValueMapper.findValueByCodeAndAttrId(52, bondCode);
-        if(valueDate!=null){
-        result.add(new AttrValueMapDto(valueDate.getId(),Common.ENTITY_ATTR_VALUE,"起息日",valueDate.getValue(),"会随上传文档内容更新而更新"));
-        }else{result.add(new AttrValueMapDto().setName("起息日"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode, 52));
 
         //到期兑付日
-        EntityAttrValue dueCashingDate = entityAttrValueMapper.findValueByCodeAndAttrId(53, bondCode);
-        if(dueCashingDate!=null){
-        result.add(new AttrValueMapDto(dueCashingDate.getId(),Common.ENTITY_ATTR_VALUE,"到期兑付日",dueCashingDate.getValue(),"会随上传文档内容更新而更新"));
-        }else{result.add(new AttrValueMapDto().setName("到期兑付日"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode, 53));
+
         //TODO 债务关系来源
-        result.add(new AttrValueMapDto().setName("债务关系来源"));
+        attrs.put("债务关系来源",new AttrValueMapDto().setName("债务关系来源"));
 
         //前发行人名称 此处用的发行人全称
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode, 59));
         EntityAttrValue issuerName = entityAttrValueMapper.findValueByCodeAndAttrId(59, bondCode);
-        result.add(new AttrValueMapDto(issuerName.getId(),Common.ENTITY_ATTR_VALUE,"前发行人名称",issuerName.getValue(),"会随上传文档内容更新而更新"));
 
         /**
          * 通过发行人全称 查找到 发行人
          */
         EntityInfo issuerEntity = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getEntityName, issuerName.getValue()));
-        if(issuerEntity!=null){
-            //前发行人德勤主体代码
-            result.add(new AttrValueMapDto(issuerEntity.getId(),Common.TABLE_ENTITY_INFO,"前发行人德勤主体代码",issuerEntity.getEntityCode()));
-            //前发行人统一社会信用代码
-            result.add(new AttrValueMapDto(issuerEntity.getId(),Common.TABLE_ENTITY_INFO,"前发行人统一社会信用代码",issuerEntity.getCreditCode()));
-        }else{
-            //前发行人德勤主体代码
-            result.add(new AttrValueMapDto().setName("前发行人德勤主体代码"));
-            //前发行人统一社会信用代码
-            result.add(new AttrValueMapDto().setName("前发行人统一社会信用代码"));
-        }
+        //前发行人德勤主体代码
+        attrs.put("前发行人德勤主体代码",new AttrValueMapDto().setValue(issuerEntity.getEntityCode()).setValueId(issuerEntity.getId()));
+        //前发行人统一社会信用代码
+        attrs.put("前发行人统一社会信用代码",new AttrValueMapDto().setValue(issuerEntity.getCreditCode()).setValueId(issuerEntity.getId()));
+
 
         //TODO 接收方名称
-        result.add(new AttrValueMapDto().setName("接收方名称"));
+        attrs.put("接收方名称",new AttrValueMapDto().setName("接收方名称"));
+
         //TODO 接收方德勤主体代码
-        result.add(new AttrValueMapDto().setName("接收方德勤主体代码"));
+        attrs.put("接收方德勤主体代码",new AttrValueMapDto().setName("接收方德勤主体代码"));
+
         //TODO 接收方统一社会信用代码
-        result.add(new AttrValueMapDto().setName("接收方统一社会信用代码"));
+        attrs.put("接收方统一社会信用代码",new AttrValueMapDto().setName("接收方统一社会信用代码"));
 
         //是否违约
-        EntityAttrValue whetherViolation = entityAttrValueMapper.findValueByCodeAndAttrId(108, bondCode);
-        if(whetherViolation!=null){
-        result.add(new AttrValueMapDto(whetherViolation.getId(),Common.ENTITY_ATTR_VALUE,"是否违约",whetherViolation.getValue(),"来自IB违约运维记录，需要和老周确认从wind哪儿来的"));
-        }else{result.add(new AttrValueMapDto().setName("是否违约"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode,108));
 
         //违约类型
-        EntityAttrValue violationType = entityAttrValueMapper.findValueByCodeAndAttrId(111, bondCode);
-        if(violationType!=null){
-        result.add(new AttrValueMapDto(violationType.getId(),Common.ENTITY_ATTR_VALUE,"违约类型",violationType.getValue(),"来自IB违约运维记录，需要和老周确认从wind哪儿来的"));
-        }else{result.add(new AttrValueMapDto().setName("违约类型"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode,111));
 
         //违约日期
-        EntityAttrValue violationDate = entityAttrValueMapper.findValueByCodeAndAttrId(109, bondCode);
-        if(violationDate!=null){
-        result.add(new AttrValueMapDto(violationDate.getId(),Common.ENTITY_ATTR_VALUE,"违约日期",violationDate.getValue(),"来自IB违约运维记录，需要和老周确认从wind哪儿来的"));
-        }else{result.add(new AttrValueMapDto().setName("违约日期"));}
+        attrs.putAll(iEntityAttrValueService.findAttrValue(bondCode,109));
 
-        return R.ok(new BondEntityInfoVo().setList(result));
+        return R.ok(result.setAttrs(attrs));
     }
 
     /**
@@ -350,39 +314,28 @@ public class BondInfoServiceImpl implements IBondInfoService
      * @date 2022/9/28
      */
     @Override
-    public R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo) {
-        List<AttrValueMapDto> list = bondInfoEditVo.getList();
-        if(list.size()==0){return R.ok(bondInfoEditVo,BadInfo.PARAM_PROBABLY_BE_EMPTY.getInfo());}
+    @Transactional(rollbackFor = Exception.class)
+    public R editAllDetail(BondEntityInfoVo bondInfoEditVo) {
+        BondInfo bondInfo = bondInfoEditVo.getBondInfo();
+        Assert.notNull(bondInfo,BadInfo.PARAM_EMPTY.getInfo());
 
+        EntityInfo entityInfo = bondInfoEditVo.getEntityInfo();
+        Assert.notNull(entityInfo,BadInfo.PARAM_EMPTY.getInfo());
 
-        return null;
-    }
+        Map<String, AttrValueMapDto> attrs = bondInfoEditVo.getAttrs();
+        Assert.notNull(attrs,BadInfo.PARAM_EMPTY.getInfo());
 
-    /**
-     * 修改数据通用方法 by正杰
-     * @param attrValueMapDto
-     * @author 正杰
-     * @date 2022/9/28
-     */
-    public String updateAllData(AttrValueMapDto attrValueMapDto){
-        String table = attrValueMapDto.getTable();
-        Integer id = attrValueMapDto.getId();
-        Assert.notNull(table,BadInfo.PARAM_TABLE_COULD_NOT_BE_NULL.getInfo());
-        Assert.notNull(id,BadInfo.PARAM_TABLE_COULD_NOT_BE_NULL.getInfo());
-        switch (table){
-            case Common.TABLE_ENTITY_INFO:
-                EntityInfo entityInfo = iEntityInfoService.getBaseMapper()
-                        .selectOne(new QueryWrapper<EntityInfo>().lambda()
-                        .eq(EntityInfo::getId, id));
-                return entityInfoManager.updateEntityName(entityInfo,attrValueMapDto.getValue(),"");
-            case Common.TABLE_BOND_INFO:
+        bondInfoMapper.updateById(bondInfo);
+        iEntityInfoService.updateById(entityInfo);
 
-            case Common.ENTITY_ATTR_VALUE:
-
-            default:
-                return BadInfo.COULD_NOT_MATCH_TABLE.getInfo();
+        for (Map.Entry<String, AttrValueMapDto> next : attrs.entrySet()) {
+            AttrValueMapDto value = next.getValue();
+            if (value != null) {
+                // 此处只做修改 不做新增 无需 entity_code
+                iEntityAttrValueService.SaveAttrValue(null,value);
+            }
         }
-
+        return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
 }

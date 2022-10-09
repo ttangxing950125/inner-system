@@ -1,10 +1,13 @@
 package com.deloitte.crm.vo;
 
+import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.AttrValueMapDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author 正杰
@@ -15,6 +18,10 @@ import java.util.List;
 @Accessors(chain = true)
 public class ModelMasterInfoVo {
 
-    List<AttrValueMapDto> list;
+    private CrmMasTask crmMasTask;
+
+    private EntityInfo entityInfo;
+
+    private Map<String,AttrValueMapDto> attrs;
 
 }

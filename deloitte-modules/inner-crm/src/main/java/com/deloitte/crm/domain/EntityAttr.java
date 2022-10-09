@@ -45,7 +45,7 @@ public class EntityAttr implements Serializable
 
     /** 是否允许多个值 */
     @Excel(name = "是否允许多个值")
-    private Integer multiple;
+    private Boolean multiple;
 
     /** 1 - 企业主体属性 2 - 政府主体属性 */
     @Excel(name = "1 - 企业主体属性 2 - 政府主体属性")
@@ -126,12 +126,12 @@ public class EntityAttr implements Serializable
     {
         return sourceId;
     }
-    public void setMultiple(Integer multiple) 
+    public void setMultiple(Boolean multiple)
     {
         this.multiple = multiple;
     }
 
-    public Integer getMultiple() 
+    public Boolean getMultiple()
     {
         return multiple;
     }

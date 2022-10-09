@@ -3,22 +3,24 @@ package com.deloitte.crm.controller;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.service.ICrmMasTaskService;
 import com.deloitte.crm.service.IModelMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
+import com.deloitte.system.api.model.LoginUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Security;
 import java.util.Date;
 import java.util.List;
 
@@ -82,7 +84,7 @@ public class RoleTwoController {
     @PostMapping("/changeState")
     public R changeState(Integer id){
         //单表修改 角色2完成任务,确认该任务已完成,修改数据库任务状态
-        //TODO 修改 关联大表 crm_daily_task 的 task_status
+        //TODO 修改 关联大表 crm_daily_task 的 task_statu
         return iCrmMasTaskService.changeState(id);
     }
 
@@ -99,5 +101,16 @@ public class RoleTwoController {
         return iModelMasterService.getTable(id);
     }
 
+    /**
+     *
+     * @param govInfo
+     * @return
+     */
+    @ApiOperation(value="确定新增 by正杰")
+    @ApiImplicitParam(name="govInfo",value="govInfo对象",paramType = "body",dataTypeClass = GovInfo.class )
+    @Log(title = "新增政府", businessType = BusinessType.INSERT)
+    public R insertGov(@RequestBody GovInfo govInfo){
+        return null;
+    }
 
 }

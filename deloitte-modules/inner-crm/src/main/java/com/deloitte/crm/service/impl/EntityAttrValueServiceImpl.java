@@ -14,11 +14,15 @@ import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
+import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
+import com.deloitte.crm.domain.EntityAttrIntype;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
+import com.deloitte.crm.service.EntityAttrIntypeService;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
@@ -26,15 +30,19 @@ import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.utils.AttrValueUtils;
+import lombok.AllArgsConstructor;
 import com.deloitte.crm.vo.EntityByIondVo;
 import com.deloitte.crm.vo.EntityStockInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.*;
 
 /**
@@ -44,11 +52,11 @@ import java.util.*;
  * @date 2022-09-21
  */
 @Service
+@AllArgsConstructor
 public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMapper, EntityAttrValue> implements IEntityAttrValueService {
     @Resource
     private EntityAttrValueMapper entityAttrValueMapper;
 
-    @Resource
     private IEntityAttrService entityAttrService;
 
     @Resource
@@ -72,6 +80,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     private EntityStockCnRelMapper entityStockCnRelMapper;
     @Resource
     private  EntityStockThkRelMapper EntityStockThkRelMapper;
+
+    private EntityAttrIntypeService entityAttrIntypeService;
 
     /**
      * 查询【请填写功能名称】
@@ -243,6 +253,117 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             }
         });
         return valueList.size();
+    }
+
+    /**
+     *
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 查询 attr&attr_value 的泛用查询
+     * @param entityCode
+     * @param attrId
+     * @return
+     */
+    @Override
+    public Map<String,AttrValueMapDto> findAttrValue(String entityCode, Integer attrId) {
+        EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
+        Assert.notNull(entityAttr,BadInfo.VALID_EMPTY_TARGET.getInfo());
+        HashMap<String, AttrValueMapDto> res = null;
+        if(entityAttr.getMultiple()) {
+            List<EntityAttrIntype> entityAttrIntypes = entityAttrIntypeService.getBaseMapper().selectList(new QueryWrapper<EntityAttrIntype>().lambda().eq(EntityAttrIntype::getAttrId, attrId));
+            List<EntityAttrValue> valueList = baseMapper.selectList(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getEntityCode, entityCode));
+            List<EntityAttrIntype> targetList = entityAttrIntypes.stream().filter(item -> valueList.stream().collect(Collectors.toMap(EntityAttrValue::getId, row -> row)).containsKey(item.getId())).collect(Collectors.toList());
+
+            AttrValueMapDto temp = new AttrValueMapDto().setAttrId(attrId).setName(entityAttr.getName()).setRemarks(entityAttr.getRemarks());
+            List<AttrValueMapDto> tempList = targetList.stream().map(row -> temp.setValueId(row.getId()).setValue(row.getValue())).collect(Collectors.toList());
+            Map<Integer, AttrValueMapDto> tempMap = tempList.stream().collect(Collectors.toMap(AttrValueMapDto::getValueId, row -> row));
+            ArrayList<AttrValueMapDto> result = new ArrayList<>();
+            entityAttrIntypes.forEach(row->{
+                if (row.getPId()!=null){
+                    tempMap.get(row.getPId()).getChildren().add(tempMap.get(row.getId()));
+                }else{
+                    result.add(tempMap.get(row.getId()));
+                }
+            });
+            res.put(temp.getName(),temp.setChildren(result));
+        }else{
+            EntityAttrValue entityAttrValue = baseMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getAttrId, attrId).eq(EntityAttrValue::getEntityCode, entityCode));
+            AttrValueMapDto attrValueMapDto = new AttrValueMapDto(attrId, entityAttr.getName(), entityAttr.getRemarks(), entityAttrValue.getId(), entityAttrValue.getValue());
+            res.put(attrValueMapDto.getName(),attrValueMapDto);
+        }
+        return res;
+    }
+
+    /**
+     *
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 修改或新增 attr_value
+     * @param attrValueMapDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean SaveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto) {
+        Integer valueId = attrValueMapDto.getValueId();
+        Integer attrId = attrValueMapDto.getAttrId();
+        EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
+        Assert.notNull(entityAttr,BadInfo.VALID_EMPTY_TARGET.getInfo());
+        if(valueId==null){
+            if(entityAttr.getMultiple()){
+                List<AttrValueMapDto> targetList = new ArrayList<>();
+                targetList.addAll(this.getAllChildrenId(attrValueMapDto,targetList));
+                targetList.forEach(row->{
+                    baseMapper.insertEntityAttrValue(new EntityAttrValue()
+                            .setEntityCode(entityCode)
+                            .setAttrId(row.getAttrId().longValue())
+                            .setValue(row.getValueId().toString()));
+                });
+                return true;
+            }else{
+                baseMapper.insertEntityAttrValue(new EntityAttrValue()
+                        .setEntityCode(entityCode)
+                        .setAttrId(attrValueMapDto.getAttrId().longValue())
+                        .setValue(attrValueMapDto.getValueId().toString()));
+            }
+                return true;
+        }else{
+            if(entityAttr.getMultiple()){
+                List<AttrValueMapDto> targetList = new ArrayList<>();
+                targetList.addAll(this.getAllChildrenId(attrValueMapDto,targetList));
+                targetList.forEach(row->{
+                    EntityAttrValue entityAttrValue = baseMapper.selectById(row.getValueId());
+                    Assert.notNull(entityAttrValue,BadInfo.VALID_EMPTY_TARGET.getInfo());
+                    entityAttrValue.setValue(row.getValueId().toString());
+                    baseMapper.updateById(entityAttrValue);
+                });
+                return true;
+            }else{
+                EntityAttrValue entityAttrValue = baseMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, valueId));
+                entityAttrValue.setValue(attrValueMapDto.getValue());
+                baseMapper.updateById(entityAttrValue);
+                return true;
+            }
+        }
+    }
+
+    public List<AttrValueMapDto> getAllChildrenId(AttrValueMapDto attrValueMapDto,List<AttrValueMapDto> list){
+        List<AttrValueMapDto> children = attrValueMapDto.getChildren();
+        if(children.size()!=0){
+            for (AttrValueMapDto child : children) {
+                list.add(attrValueMapDto);
+                list.addAll(this.getAllChildrenId(child,list));
+                return list;
+            }
+        }else{
+            list.add(attrValueMapDto);
+            return list;
+        }
+        return list;
     }
 
     @Override

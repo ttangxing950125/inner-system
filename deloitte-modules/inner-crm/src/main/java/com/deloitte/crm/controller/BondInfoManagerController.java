@@ -92,7 +92,7 @@ public class BondInfoManagerController {
     @ApiOperation(value="查询选择的债券 查询债券的具体信息 by正杰")
     @ApiImplicitParam(name = "bondInfoEditVo", value = "传入bondInfoEditVo 中 list需要修改的参数", paramType = "query", dataType = "body",dataTypeClass = BondEntityInfoVo.class)
     @PostMapping("/editAllDetail")
-    public R<BondEntityInfoVo> editAllDetail(@RequestBody BondEntityInfoVo bondInfoEditVo){
+    public R editAllDetail(@RequestBody BondEntityInfoVo bondInfoEditVo){
         return iBondInfoService.editAllDetail(bondInfoEditVo);
     }
 

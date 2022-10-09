@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RoleMainController {
 
-    private EntityInfoManager entityInfoManager;
+    private final EntityInfoManager entityInfoManager;
 
     private final ICrmWindTaskService crmWindTaskService;
 
@@ -58,6 +59,14 @@ public class RoleMainController {
         return R.ok(crmDailyTaskService.selectCrmDailyTaskListByDate(taskDate));
     }
 
+    @GetMapping("/queryDailyTaskByDay")
+    @ApiOperation(value = "指定日期查询各角色当月任务完成情况",response = CrmWindTask.class)
+    @ApiImplicitParam(name ="taskDate",value = " taskDate 任务日期 format => yyyy-MM-dd",paramType = "query",example = "2022-09-23",dataType = "String")
+    public R queryDailyTaskByDay(String taskDate){
+        SecurityUtils.getUserId();
+        return null;
+    }
+
     @ApiOperation(value="校验字段 by正杰")
     @ApiImplicitParams({
             @ApiImplicitParam(name="keyword",value="传入 需要校验的信息",paramType = "query",dataType = "String",example = "ENTITY_CODE"),
@@ -65,9 +74,11 @@ public class RoleMainController {
     })
     @Log(title = "【校验字段】", businessType = BusinessType.OTHER)
     @PostMapping("/checkData")
-    public R<CheckVo> checkData(String keyword,String target){
+    public R<CheckVo> checkData(String keyword, String target){
         return R.ok(entityInfoManager.matchByKeyword(keyword,target));
     }
+
+
 
 
 

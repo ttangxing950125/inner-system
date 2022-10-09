@@ -52,6 +52,8 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.System.out;
@@ -870,6 +872,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
                 Map<String, String> collect = bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName));
                 List<EntityAttrValue> targetList = entityAttrs.stream().filter(row -> !collect.containsKey(row.getEntityCode())).collect(Collectors.toList());
+
+
+
+                entityAttrs.stream().filter(row -> !bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName)).containsKey(row.getEntityCode())).collect(Collectors.toList());
 
                 targetList.forEach(row -> {
                     BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
