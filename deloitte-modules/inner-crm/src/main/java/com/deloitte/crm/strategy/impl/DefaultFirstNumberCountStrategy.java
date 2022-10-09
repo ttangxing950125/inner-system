@@ -3,11 +3,13 @@ package com.deloitte.crm.strategy.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.dto.DefaultFirstNumberCountDto;
 import com.deloitte.crm.mapper.DefaultFirstNumberCountMapper;
+import com.deloitte.crm.mapper.DefaultMoneyTotalMapper;
 import com.deloitte.crm.mapper.EntityBondRelMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
@@ -18,6 +20,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -33,7 +36,6 @@ import java.util.concurrent.Future;
 @Slf4j
 @Component
 public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
-
 
     @Resource
     private IEntityAttrValueService entityAttrValueService;
@@ -53,6 +55,8 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
 
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
+    @Resource
+    private DefaultMoneyTotalMapper defaultMoneyTotalMapper;
 
 
     /**
@@ -68,7 +72,11 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
 
     @Override
     public Object doTask(WindTaskContext windTaskContext) throws Exception {
-        return null;
+        MultipartFile file = windTaskContext.getFile();
+        CrmWindTask windTask = windTaskContext.getWindTask();
+        ExcelUtil<DefaultFirstNumberCount> util = new ExcelUtil<DefaultFirstNumberCount>(DefaultFirstNumberCount.class);
+        List<DefaultFirstNumberCount> list = util.importExcel(null, file.getInputStream(), 1, true);
+        return defaultFirstNumberCountService.doTask(windTask, list);
     }
 
     /**
@@ -110,7 +118,7 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
      */
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
-    public Future<BondInfoDto> doBondImport(DefaultFirstNumberCount defaultFirstNumberCount, Date timeNow, CrmWindTask windTask) {
+    public Future<DefaultFirstNumberCountDto> doBondImport(DefaultFirstNumberCount defaultFirstNumberCount, Date timeNow, CrmWindTask windTask) {
         /**
          * 查询债券是否存在 根据 “债券简称” 查询 如果不存在创建对象 并修改 状态为违约 7
          * @see com.deloitte.crm.domain.BondInfo#getBondStatus()
@@ -138,11 +146,11 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
                 }
             }
         }
-
         Integer resStatus = null;
         Integer changeType = null;
         //看之前有没有导入过这个数据 根据 "债券代码"
-        final DefaultFirstNumberCount DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>().lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode())).stream().findFirst().get();
+        DefaultFirstNumberCount DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>()
+                .lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode())).stream().findFirst().get();
         if (DBDefaultFirstNumberCount == null) {
             changeType = DataChangeType.INSERT.getId();
         } else if (!Objects.equals(DBDefaultFirstNumberCount, defaultFirstNumberCount)) {
