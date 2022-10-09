@@ -24,22 +24,22 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * id 主键自动递增
      */
-    @Excel(name = "id 主键自动递增")
+//    @Excel(name = "id 主键自动递增")
     private Integer id;
     /**
      * wind_task的id
      */
-    @Excel(name = "wind_task的id")
+//    @Excel(name = "wind_task的id")
     private Integer taskId;
     /**
      * 导入时间默认当前时间
      */
-    @Excel(name = "导入时间默认当前时间")
+//    @Excel(name = "导入时间默认当前时间")
     private Date importTime;
     /**
      * 1-新增 2-修改
      */
-    @Excel(name = "1-新增 2-修改")
+//    @Excel(name = "1-新增 2-修改")
     private Integer changeType;
     /**
      * 债券代码
@@ -154,12 +154,12 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * 创建时间
      */
-    @Excel(name = "创建时间")
+//    @Excel(name = "创建时间")
     private Date created;
     /**
      * 更新时间
      */
-    @Excel(name = "更新时间")
+//    @Excel(name = "更新时间")
     private Date updated;
 
 

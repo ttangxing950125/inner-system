@@ -25,22 +25,22 @@ public class DefaultFirstNumberCount implements Serializable {
     /**
      * 主键自动增加
      */
-    @Excel(name = "主键自动增加")
+//    @Excel(name = "主键自动增加")
     private Integer id;
     /**
      * wind_task的id
      */
-    @Excel(name = "wind_task的id")
+//    @Excel(name = "wind_task的id")
     private Integer taskId;
     /**
      * 导入时间
      */
-    @Excel(name = "导入时间")
+//    @Excel(name = "导入时间")
     private Date importTime;
     /**
      * 1-新增 2-修改
      */
-    @Excel(name = "1-新增 2-修改")
+//    @Excel(name = "1-新增 2-修改")
     private Integer changeType;
     /**
      * 发行人
@@ -130,12 +130,12 @@ public class DefaultFirstNumberCount implements Serializable {
     /**
      * 创建时间
      */
-    @Excel(name = "创建时间")
+//    @Excel(name = "创建时间")
     private Date created;
     /**
      * 更新时间
      */
-    @Excel(name = "更新时间")
+//    @Excel(name = "更新时间")
     private Date updated;
 
 
