@@ -3,7 +3,13 @@ import request from "@/utils/request";
 // 根据指定TaskDate查询任务完成度
 export function getTaskByDate(taskDate) {
   return request({
-    url: "/crm/windTask/getTaskByDate?TaskDate=" + taskDate.taskDate,
+    url:
+      "/crm/windTask/getTaskByDate?taskDate=" +
+      taskDate.taskDate +
+      "&pageNum=" +
+      taskDate.pageNum +
+      "&pageSize=" +
+      taskDate.pageSize,
     headers: {
       isToken: true,
     },
@@ -209,5 +215,149 @@ export function getCodeImg() {
     },
     method: "get",
     timeout: 20000,
+  });
+}
+
+// 根据 entityCode 补充录入副表信息
+export function addEntityAttrValuesNew(params) {
+  return request({
+    url: "crm/value/addEntityAttrValuesNew",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 查询当日任务 角色2
+export function getDayTaskInfoTwo(params) {
+  return request({
+    url: "crm/roleTwo/getDayTaskInfo?date=" + params.date,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 敞口划分，选中单行开始工作 传入id后返回窗口 角色2
+export function getTable(params) {
+  return request({
+    url: "crm/roleTwo/getTable?id=" + params.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// getFinances 角色2
+export function getFinances(params) {
+  return request({
+    url: "crm/roleTwo/getFinances",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 获取上级地方政府行政编码 角色2
+export function getPreGovName(params) {
+  return request({
+    url: "crm/roleTwo/getPreGovName?govCode=" + params.govCode,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 获取敞口信息 角色2
+export function getModelMaster(params) {
+  return request({
+    url: "crm/roleTwo/getModelMaster",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 提交表单 角色2
+export function insertMas(params) {
+  return request({
+    url: "crm/roleTwo/insertMas",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 获取顶级 角色2
+export function getGovLevelBig(params) {
+  return request({
+    url: "crm/roleTwo/getGovLevelBig",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 获取子集 角色2
+export function getGovLevelSmall(params) {
+  return request({
+    url: "crm/roleTwo/getGovLevelSmall?id=" + params.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 新增政府 角色2
+export function insertGov(params) {
+  return request({
+    url: "crm/roleTwo/insertGov",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 新增 角色7
+export function addSeven(params) {
+  return request({
+    url: "crm/roleSeven/add",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 忽略任务 角色7
+export function ignoreTask(params) {
+  return request({
+    url: "crm/roleSeven/ignoreTask?id=" + params.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
   });
 }

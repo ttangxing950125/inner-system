@@ -49,3 +49,55 @@ export function getOverview(params) {
     data: params,
   });
 }
+
+// 获取省市级数据
+export function getGovLevel(params) {
+  return request({
+    url: "/crm/govInfo/getGovLevel?preGovCode=" + params.preGovCode,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 根据机构类型查询需要补充录入的信息
+export function getAttrByOrganName(params) {
+  return request({
+    url: "/crm/attr/getAttrByOrganName?organName=" + params.organName,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 根据attrId查询选项
+export function getTypeByAttrId(params) {
+  return request({
+    url: "/crm/intype/getTypeByAttrId?attrId=" + params.attrId,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 校验字段
+export function checkData(params) {
+  return request({
+    url:
+      "/crm/roleMain/checkData?keyword=" +
+      params.keyword +
+      "&target=" +
+      params.target,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
