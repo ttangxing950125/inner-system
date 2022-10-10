@@ -35,6 +35,7 @@ public class BondNewIss implements Serializable
 
     private Integer taskId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date importTime;
 
     private Integer changeType;
@@ -49,10 +50,12 @@ public class BondNewIss implements Serializable
 
     /** 发行起始日 */
     @Excel(name = "发行起始日", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String issStartDate;
 
     /** 缴款日 */
     @Excel(name = "缴款日", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String payDate;
 
     /** 计划发行规模(亿) */
@@ -250,6 +253,7 @@ public class BondNewIss implements Serializable
 
     /** 招标日 */
     @Excel(name = "招标日", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private String bidDate;
 
     /** 招标时间 */

@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import com.deloitte.common.core.annotation.Excel;
 
@@ -27,6 +28,7 @@ public class CnIpoInfo implements Serializable {
 
     private Integer taskId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date importTime;
 
     private Integer changeType;

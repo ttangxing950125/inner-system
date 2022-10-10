@@ -36,6 +36,7 @@ public class ThkSecIssDetail implements Serializable
 
     private Integer taskId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date importTime;
 
     private Integer changeType;

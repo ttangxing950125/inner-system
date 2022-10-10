@@ -73,6 +73,7 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
             if (moneyTotal.getLatestStatus().equals("实质违约")) {
                 bondInfo.setBondStatus(7);
+                bondInfo.setBondState(1);
             } else if (moneyTotal.getLatestStatus().equals("展期")) {
                 bondInfo.setBondStatus(8);
             }

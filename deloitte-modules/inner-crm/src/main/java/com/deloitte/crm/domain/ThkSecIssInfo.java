@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import com.deloitte.common.core.annotation.Excel;
 import org.stringtemplate.v4.ST;
@@ -35,6 +36,7 @@ public class ThkSecIssInfo implements Serializable {
     /**
      * 导入时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date importTime;
     /**
      * 新增 2修改

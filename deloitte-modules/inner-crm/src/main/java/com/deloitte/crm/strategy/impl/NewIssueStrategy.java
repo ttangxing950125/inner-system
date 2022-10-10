@@ -61,10 +61,11 @@ public class NewIssueStrategy implements WindTaskStrategy {
         ArrayList<String> arr = new ArrayList<>();
 
         arr.add("导入日期");
+        arr.add("变化状态");
+
         arr.add("债券简称");
         arr.add("交易代码");
         arr.add("发行人全称");
-        arr.add("变化状态");
 
 
         return arr;
@@ -87,9 +88,11 @@ public class NewIssueStrategy implements WindTaskStrategy {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+
             dataMap.put("债券简称", item.getBondShortName());
             dataMap.put("发行人全称", item.getIssorName());
-            dataMap.put("变化状态", item.getChangeType());
 
             return dataMap;
         }).collect(Collectors.toList());

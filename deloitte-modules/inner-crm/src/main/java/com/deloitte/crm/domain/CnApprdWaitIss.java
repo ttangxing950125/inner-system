@@ -4,6 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 import cn.hutool.core.date.DateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ public class CnApprdWaitIss implements Serializable {
     /**
      * 导入日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date importTime;
 
     /**
