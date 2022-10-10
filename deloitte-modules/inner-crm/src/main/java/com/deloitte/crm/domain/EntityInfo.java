@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -89,11 +90,13 @@ public class EntityInfo implements Serializable
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date created;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    private Date updated = new Date();
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date updated ;
 
     @Override
     public String toString() {

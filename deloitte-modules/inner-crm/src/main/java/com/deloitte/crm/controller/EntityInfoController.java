@@ -10,7 +10,6 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -181,7 +180,6 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "企业主体分类查询")
-    @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfoByDto.class)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构", paramType = "query", example = "", dataType = "Integer"),
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
@@ -256,19 +254,6 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto) {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
-    }
-
-    /**
-     * 查询企业主体概览
-     *
-     * @return AjaxResult
-     * @author 冉浩岑
-     * @date 2022/9/28 10:56
-     */
-    @ApiOperation(value = "查询政府主体概览")
-    @PostMapping("/getOverview")
-    public R getOverview() {
-        return R.ok(entityInfoService.getOverview());
     }
 
     /**
