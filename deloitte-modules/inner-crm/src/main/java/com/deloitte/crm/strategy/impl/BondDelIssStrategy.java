@@ -122,7 +122,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<BondDelIss> util = new ExcelUtil<BondDelIss>(BondDelIss.class);
-        List<BondDelIss> delIsses = util.importExcel(file.getInputStream(), true);
+        List<BondDelIss> delIsses = util.importExcel(windTaskContext.getFileStream(), true);
 
 
         return bondDelIssService.doTask(windTask, delIsses);

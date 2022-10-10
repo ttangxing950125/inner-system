@@ -3,6 +3,8 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,22 +26,23 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * id 主键自动递增
      */
-    @Excel(name = "id 主键自动递增")
+//    @Excel(name = "id 主键自动递增")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * wind_task的id
      */
-    @Excel(name = "wind_task的id")
+//    @Excel(name = "wind_task的id")
     private Integer taskId;
     /**
      * 导入时间默认当前时间
      */
-    @Excel(name = "导入时间默认当前时间")
+//    @Excel(name = "导入时间默认当前时间")
     private Date importTime;
     /**
      * 1-新增 2-修改
      */
-    @Excel(name = "1-新增 2-修改")
+//    @Excel(name = "1-新增 2-修改")
     private Integer changeType;
     /**
      * 债券代码
@@ -47,10 +50,10 @@ public class DefaultMoneyTotal implements Serializable {
     @Excel(name = "债券代码")
     private String bondCode;
     /**
-     * 违约、展期日期 yyyy-MM-dd
+     * 违约、展期日期
      */
-    @Excel(name = "违约、展期日期 yyyy-MM-dd")
-    private String defaultDate;
+    @Excel(name = "违约、展期日期")
+    private Date defaultDate;
     /**
      * 债券简称
      */
@@ -65,7 +68,7 @@ public class DefaultMoneyTotal implements Serializable {
      * 类型
      */
     @Excel(name = "类型")
-    private Integer type;
+    private String type;
     /**
      * 历程
      */
@@ -99,13 +102,13 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * 到期日 yyyy-MM-dd
      */
-    @Excel(name = "到期日 yyyy-MM-dd")
-    private String dueDate;
+    @Excel(name = "到期日")
+    private Date dueDate;
     /**
      * 起息日 yyyy-MM-dd
      */
-    @Excel(name = "起息日 yyyy-MM-dd")
-    private String valueDate;
+    @Excel(name = "起息日")
+    private Date valueDate;
     /**
      * 剩余期限(年)
      */
@@ -134,7 +137,7 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * 是否上市公司-Y是 N否
      */
-    @Excel(name = "是否上市公司-Y是 N否")
+    @Excel(name = "是否上市公司")
     private String listedCompany;
     /**
      * 所属行业(Wind)
@@ -154,12 +157,12 @@ public class DefaultMoneyTotal implements Serializable {
     /**
      * 创建时间
      */
-    @Excel(name = "创建时间")
+//    @Excel(name = "创建时间")
     private Date created;
     /**
      * 更新时间
      */
-    @Excel(name = "更新时间")
+//    @Excel(name = "更新时间")
     private Date updated;
 
 

@@ -148,7 +148,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<ThkSecIssDetail> util = new ExcelUtil<ThkSecIssDetail>(ThkSecIssDetail.class);
-        List<ThkSecIssDetail> thkSecIssInfos = util.importExcel(file.getInputStream(), true);
+        List<ThkSecIssDetail> thkSecIssInfos = util.importExcel(windTaskContext.getFileStream(), true);;
 
         return thkSecIssDetailService.doTask(windTask, thkSecIssInfos);
     }

@@ -2,6 +2,7 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -13,6 +14,7 @@ import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -36,8 +38,7 @@ import java.util.concurrent.Future;
 public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
     @Resource
     private IBondInfoService bondInfoService;
-    @Resource
-    private DefaultMoneyTotalService defaultMoneyTotalService;
+
     @Resource
     private IEntityInfoService iEntityInfoService;
     @Resource
@@ -80,12 +81,12 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             } else {
                 bondInfo = bondInfoService.saveOrUpdate(bondInfo);
             }
-            List<EntityInfo> EntityInfoLists = iEntityInfoService.findByName(moneyTotal.getPublisher());
-            log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", moneyTotal.getPublisher(), JSONUtil.toJsonStr(EntityInfoLists));
-            if (CollUtil.isNotEmpty(EntityInfoLists)) {
-                for (EntityInfo entityInfoList : EntityInfoLists) {
+            List<EntityInfo> entityInfoLists = iEntityInfoService.findByName(moneyTotal.getPublisher());
+            log.info(">>>>根据发行人==>{}:查询企业主体信息:==>{}", moneyTotal.getPublisher(), JSON.toJSONString(entityInfoLists));
+            if (CollUtil.isNotEmpty(entityInfoLists)) {
+                for (EntityInfo entityInfoList : entityInfoLists) {
                     EntityBondRel entityBondRel = entityBondRelMapper.findByEntityBondCode(entityInfoList.getEntityCode(), bondInfo.getBondCode());
-                    log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), JSONUtil.toJsonStr(entityBondRel));
+                    log.info(">>>>根据债券code:>>{}和企业code:{}查询中间关联关系返回结果集合:{}", entityInfoList.getEntityCode(), bondInfo.getBondCode(), JSON.toJSONString(entityBondRel));
                     if (entityBondRel == null) {
                         EntityBondRel entityBondRelEntity = new EntityBondRel();
                         entityBondRelEntity.setBdCode(bondInfo.getBondCode());
@@ -98,20 +99,22 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             Integer resStatus = null;
             Integer changeType = null;
             //看之前有没有导入过这个数据 根据 "债券代码"
-            final DefaultMoneyTotal moneyTotalDB = defaultMoneyTotalMapper.selectList(new QueryWrapper<DefaultMoneyTotal>().lambda().eq(DefaultMoneyTotal::getBondCode, moneyTotal.getBondCode())).stream().findFirst().get();
-            if (moneyTotalDB == null) {
+            final List<DefaultMoneyTotal> defaultMoneyTotals = defaultMoneyTotalMapper.selectList(new QueryWrapper<DefaultMoneyTotal>().lambda().eq(DefaultMoneyTotal::getBondCode, moneyTotal.getBondCode()));
+            if (CollUtil.isEmpty(defaultMoneyTotals)) {
                 changeType = DataChangeType.INSERT.getId();
-            } else if (!Objects.equals(moneyTotalDB, moneyTotal)) {
+            } else if (!Objects.equals(defaultMoneyTotals, moneyTotal)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
+
             moneyTotal.setChangeType(changeType);
+            moneyTotal.setTaskId(windTask.getId());
+
             final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), moneyTotal);
             if (resStatus == null && updateCount > 0) {
                 resStatus = 2;
             }
-            defaultMoneyTotalService.save(moneyTotal);
-
+            this.defaultMoneyTotalMapper.insert(moneyTotal);
             return new AsyncResult<>(new Object());
         } catch (Exception e) {
             log.error("执行异常>>>>:{}", e);
@@ -124,8 +127,10 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultMoneyTotal> util = new ExcelUtil<DefaultMoneyTotal>(DefaultMoneyTotal.class);
-        List<DefaultMoneyTotal> list = util.importExcel(null, file.getInputStream(), 1, true);
+        List<DefaultMoneyTotal> list = util.importExcel(file.getInputStream(), true);
+        DefaultMoneyTotalService defaultMoneyTotalService = ApplicationContextHolder.get().getBean(DefaultMoneyTotalService.class);
         return defaultMoneyTotalService.doTask(windTask, list);
+
     }
 
     /**

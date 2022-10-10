@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
- * 
+ *
  * @author deloitte
  * @date 2022-09-23
  */
@@ -127,44 +127,53 @@ public class BondInfoServiceImpl implements IBondInfoService {
      * @return
      */
     @Override
-    public R checkEntityBondFullName(String fullName){
+    public R checkEntityBondFullName(String fullName) {
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondFullName(fullName);
-        if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+        if (entityAttrValue.size() == 0) {
+            return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+        }
         return R.ok(BadInfo.UNABLE_CREAT.getInfo());
     }
 
     /**
      * 检查企业债券代码
+     *
      * @param tradCode
      * @return
      */
     @Override
-    public R checkEntityBondTradCode(String tradCode){
+    public R checkEntityBondTradCode(String tradCode) {
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondTradCode(tradCode);
-        if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+        if (entityAttrValue.size() == 0) {
+            return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+        }
         return R.ok(BadInfo.UNABLE_CREAT.getInfo());
     }
 
     /**
      * 检查企业债券简称
+     *
      * @param shortName
      * @return
      */
     @Override
-    public R checkEntityBondShortName(String shortName){
+    public R checkEntityBondShortName(String shortName) {
         List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondShortName(shortName);
-        if(entityAttrValue.size()==0){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+        if (entityAttrValue.size() == 0) {
+            return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+        }
         return R.ok(BadInfo.UNABLE_CREAT.getInfo());
     }
 
     /**
      * keyword 为需要校验的键
      * value 为需要比较的值
+     *
      * @param keyword
      * @param value
      * @return
      */
-    public R checkEntityBondValue(String keyword,String value){
+    public R checkEntityBondValue(String keyword, String value) {
         HashMap<String, Integer> map = new HashMap<>();
         map.putAll(AttrValueMappingMap.BOND_FULL_NAME.get());
         map.putAll(AttrValueMappingMap.COLLECTIVE_BONDS.get());
@@ -172,25 +181,27 @@ public class BondInfoServiceImpl implements IBondInfoService {
         map.putAll(AttrValueMappingMap.WHETHER_VIOLATION_ID.get());
 
         Integer key = map.get(keyword);
-        if(key!=null){
-            List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondValue(key,value);
-            if(entityAttrValue.size()!=0){return R.ok(BadInfo.UNABLE_CREAT.getInfo());}
+        if (key != null) {
+            List<EntityAttrValue> entityAttrValue = entityAttrValueMapper.checkEntityBondValue(key, value);
+            if (entityAttrValue.size() != 0) {
+                return R.ok(BadInfo.UNABLE_CREAT.getInfo());
+            }
             return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
         }
         return R.fail(BadInfo.VALID_EMPTY_TARGET);
     }
 
 
-
     /**
      * 根据债券简称查询
+     *
      * @param shortName
      * @return
      */
     @Override
     public BondInfo findByShortName(String shortName) {
         BondInfo bondInfo = redisService.getCacheMapValue(CacheName.BOND_CACHE, shortName);
-        if (bondInfo==null){
+        if (bondInfo == null) {
             bondInfo = bondInfoMapper.findByShortName(shortName);
             redisService.setCacheMapValue(CacheName.BOND_CACHE, shortName, bondInfo);
         }
@@ -227,7 +238,8 @@ public class BondInfoServiceImpl implements IBondInfoService {
     }
 
     /**
-     *  查询选择的债券 查询债券的具体信息 by正杰
+     * 查询选择的债券 查询债券的具体信息 by正杰
+     *
      * @param bondCode
      * @return
      * @author 正杰
@@ -303,6 +315,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
     /**
      * 修改具体信息 by正杰
+     *
      * @param bondInfoEditVo
      * @author 正杰
      * @date 2022/9/28

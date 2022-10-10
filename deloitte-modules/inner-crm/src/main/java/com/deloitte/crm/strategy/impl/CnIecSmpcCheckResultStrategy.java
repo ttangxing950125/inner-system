@@ -129,7 +129,7 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnIecSmpcCheckResult> util = new ExcelUtil<CnIecSmpcCheckResult>(CnIecSmpcCheckResult.class);
-        List<CnIecSmpcCheckResult> cnCoachBacks = util.importExcel(file.getInputStream(), true);
+        List<CnIecSmpcCheckResult> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);;
 
         return cnIecSmpcCheckResultService.doTask(windTask, cnCoachBacks);
     }

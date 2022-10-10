@@ -5,8 +5,9 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.vo.BondEntityInfoVo;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -14,7 +15,7 @@ import com.deloitte.crm.vo.BondEntityInfoVo;
  * @author deloitte
  * @date 2022-09-23
  */
-public interface IBondInfoService
+public interface IBondInfoService 
 {
     /**
      * 查询【请填写功能名称】
@@ -99,5 +100,7 @@ public interface IBondInfoService
      * @author 正杰
      * @date 2022/9/28
      */
-    R editAllDetail(BondEntityInfoVo bondInfoEditVo);
+    R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo);
+
+    Object getBondType();
 }

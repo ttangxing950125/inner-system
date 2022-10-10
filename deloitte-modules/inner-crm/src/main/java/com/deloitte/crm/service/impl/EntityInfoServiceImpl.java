@@ -643,6 +643,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
+        //TODO 条件筛选 xml
+
+
+        String AG="1";
+        String GG="1";
+
+//        List<EntityInfo>infoList=entityInfoMapper.selectForPage(pageNum,pageSize,AG,GG);
+
+
         Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
 
         //查询分页数据集
@@ -1100,7 +1109,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/10/8 15:53
      */
     @Override
-    public R getQuickOfCoverage(String entityType, String param,  Integer pageNum, Integer pageSize) {
+    public R getQuickOfCoverage(String entityType, String param, Integer pageNum, Integer pageSize) {
         if (ObjectUtil.isEmpty(pageNum)) {
             return R.fail("未输入页码");
         }
