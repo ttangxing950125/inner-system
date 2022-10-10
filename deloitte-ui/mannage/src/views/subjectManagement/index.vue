@@ -216,11 +216,11 @@
               </div>
               <div>
                 <div class="text item number-font" style="width: 60px">
-                  <div>{{ entity.list || "" }}</div>
-                  <div>{{ entity.issueBonds || "" }}</div>
-                  <div>{{ entity.bondsAndList || "" }}</div>
-                  <div>{{ entity.finance || "" }}</div>
-                  <div>{{ entity.notBondsAndList || "" }}</div>
+                  <div>{{ entity.list || "0" }}</div>
+                  <div>{{ entity.issueBonds || "0" }}</div>
+                  <div>{{ entity.bondsAndList || "0" }}</div>
+                  <div>{{ entity.finance || "0" }}</div>
+                  <div>{{ entity.notBondsAndList || "0" }}</div>
                 </div>
               </div>
             </div>
@@ -481,8 +481,8 @@ export default {
       }
     },
     getPercent(newObj, sum) {
-      const res = (newObj / sum).toFixed(4);
-      return res * 100;
+      const res = ((newObj / sum) * 100).toFixed(2);
+      return res;
     },
     goTarget(href) {
       window.open(href, "_blank");
@@ -552,6 +552,9 @@ export default {
   }
   .number-font {
     font-size: 18px;
+    div {
+      margin-top: 13px;
+    }
   }
 }
 .select-body {

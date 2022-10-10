@@ -82,7 +82,7 @@ export const constantRoutes = [
     ],
   },
   {
-    path: "/subjectManagement/overview",
+    path: "/subjectManagement",
     component: Layout,
     redirect: "subjectManagement",
     meta: { title: "主体管理" },
@@ -195,6 +195,7 @@ export const constantRoutes = [
   {
     path: "/user",
     component: Layout,
+    hidden: true,
     redirect: "noredirect",
     children: [
       {
@@ -212,7 +213,7 @@ export const dynamicRoutes = [
   {
     path: "/system/user-auth",
     component: Layout,
-    hidden: true,
+    hidden: false,
     permissions: ["system:user:edit"],
     children: [
       {
@@ -226,7 +227,7 @@ export const dynamicRoutes = [
   {
     path: "/system/role-auth",
     component: Layout,
-    hidden: true,
+    hidden: false,
     permissions: ["system:role:edit"],
     children: [
       {
@@ -240,7 +241,7 @@ export const dynamicRoutes = [
   {
     path: "/system/dict-data",
     component: Layout,
-    hidden: true,
+    hidden: false,
     permissions: ["system:dict:list"],
     children: [
       {
@@ -254,7 +255,7 @@ export const dynamicRoutes = [
   {
     path: "/tool/gen-edit",
     component: Layout,
-    hidden: true,
+    hidden: false,
     permissions: ["tool:gen:edit"],
     children: [
       {

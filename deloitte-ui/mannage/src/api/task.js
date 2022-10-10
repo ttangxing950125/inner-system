@@ -13,8 +13,8 @@ export function getTaskByDate(taskDate) {
     headers: {
       isToken: true,
     },
-    method: "get",
-    data: { taskDate },
+    method: "post",
+    data: taskDate,
   });
 }
 

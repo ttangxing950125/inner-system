@@ -1444,7 +1444,8 @@ export default {
         });
         const params = {
           taskDate: this.monthDate+ '-' +clickDay,
-          pageNum: 1
+          pageNum: 1,
+          pageSize: 20
         };
         getTaskByDate(params).then((res) => {
           const { data } = res
@@ -1474,6 +1475,7 @@ export default {
       this.ruleForm.created = (row.created).substr(0, 10)
       this.ruleForm.bondFullName = row.bondFullName
       this.ruleForm.bondShortName = row.bondShortName
+      this.ruleForm.id = row.id
     },
     check(row) {
       this.$modal.loading("loading...");
