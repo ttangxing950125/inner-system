@@ -23,3 +23,31 @@ export function entityInfoList(params) {
     data: { params },
   });
 }
+
+// 企业主体分类概览
+export function getOverviewByGroup(params) {
+  return request({
+    url: "/crm/entityInfo/getOverviewByGroup",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 企业主体分类查询
+export function getInfoList(params) {
+  return request({
+    url:
+      "/crm/entityInfo/getInfoList?type=" +
+      params.type +
+      "&param=" +
+      params.param,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
