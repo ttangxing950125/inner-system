@@ -40,6 +40,11 @@ public class BondInfo {
     private String bondCode;
 
     /**
+     * 债券交易代码
+     */
+    private String oriCode;
+
+    /**
      * 债券简称
      */
     @Excel(name = "债券简称")
@@ -52,7 +57,7 @@ public class BondInfo {
     private Integer raiseType;
 
     /**
-     * 1.公募债券 2.私募债 3.ABS 4.集合债
+     * 无效
      */
     private Integer bondType;
 
@@ -61,6 +66,16 @@ public class BondInfo {
      */
     @Excel(name = "债卷状态 0_存续 1_违约 2_已兑付")
     private Integer bondState;
+
+    /**
+     * 是否集合债
+     */
+    private Boolean coll;
+
+    /**
+     * 是否abs债券
+     */
+    private Boolean abs;
 
     /**
      * $column.columnComment

@@ -23,6 +23,7 @@ import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
+import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
@@ -65,6 +66,9 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     private EntityInfoMapper entityInfoMapper;
     @Resource
     private StockCnInfoMapper stockCnInfoMapper;
+
+    @Resource
+    private IBondInfoService bondInfoService;
 
     @Resource
     private BondInfoMapper bondInfoMapper;
@@ -151,7 +155,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     /**
      * 更新entityAttrValue表中债券的相关信息
      * 反射获取obj里的属性，key 为 Excel 注解 的name 属性, value 为实体类的值
-     *
      * @param bondCode
      * @param obj
      * @return
@@ -159,7 +162,11 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateBondAttr(String bondCode, Object obj) {
-        return this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
+        int count = this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
+
+        bondInfoService.updateBondType(bondCode);
+
+        return count;
     }
 
     /**

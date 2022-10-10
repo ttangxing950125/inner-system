@@ -2,6 +2,7 @@ package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.EntityInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -69,4 +70,18 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
     List<EntityInfo> findByName(String entityName);
 
     List<EntityInfo> selectGovInfoListByTypeAndParam(EntityInfo entityInfo);
+
+    List<EntityInfo> getEntityByBondType(@Param("raiseType") Integer raiseType,
+                                         @Param("abs")Integer abs,
+                                         @Param("coll")Integer coll);
+
+    Integer getEntityCountByBondType(@Param("raiseType") Integer raiseType,
+                                     @Param("abs")Integer abs,
+                                     @Param("coll")Integer coll);
+
+    List<EntityInfo> getEntityByBondTypeByPage(@Param("raiseType") Integer raiseType,
+                                               @Param("abs")Integer abs,
+                                               @Param("coll")Integer coll,
+                                               @Param("pageNum")Integer pageNum,
+                                               @Param("pageSize")Integer pageSize);
 }

@@ -269,7 +269,7 @@ public class GovInfoController extends BaseController {
     /**
      * 政府主体总概览
      *
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/28 10:56
      */

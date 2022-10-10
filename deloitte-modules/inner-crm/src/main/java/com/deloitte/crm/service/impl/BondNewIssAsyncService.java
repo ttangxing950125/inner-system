@@ -72,6 +72,7 @@ public class BondNewIssAsyncService {
             if (bondInfo==null){
                 bondInfo = new BondInfo();
                 bondInfo.setBondShortName(shortName);
+                bondInfo.setOriCode(newIss.getTradeCode());
             }
 
             //看之前有没有导入过这个数据

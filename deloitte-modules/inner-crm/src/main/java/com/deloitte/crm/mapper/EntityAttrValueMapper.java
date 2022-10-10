@@ -111,5 +111,5 @@ public interface EntityAttrValueMapper extends BaseMapper<EntityAttrValue>
      * @param bondCode bdCode
      * @return
      */
-    EntityAttrValue findValueByCodeAndAttrId(@Param("attrId") Integer attrId,@Param("bondCode") String bondCode);
+    EntityAttrValue findValueByCodeAndAttrId(@Param("attrId") Integer attrId, @Param("bondCode") String bondCode);
 }

@@ -68,6 +68,7 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
                 stockThkInfo.setStockCode(secIssInfoCode);
                 stockThkInfo.setStockStatus(1);
                 stockThkInfo.setStatusDesc("聆讯中("+secIssInfo.getStatus()+")");
+                stockThkInfo.setStockName(secIssInfo.getName());
             }
 
             //主体名
