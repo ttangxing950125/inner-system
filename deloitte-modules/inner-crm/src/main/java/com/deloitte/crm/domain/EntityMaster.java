@@ -7,6 +7,8 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * 【请填写功能名称】对象 entity_master
@@ -14,7 +16,9 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class EntityMaster extends BaseEntity
+@Data
+@Accessors(chain = true)
+public class EntityMaster
 {
     private static final long serialVersionUID = 1L;
 
@@ -35,53 +39,7 @@ public class EntityMaster extends BaseEntity
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    private Date update;
-
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setMasterCode(String masterCode) 
-    {
-        this.masterCode = masterCode;
-    }
-
-    public String getMasterCode() 
-    {
-        return masterCode;
-    }
-    public void setEntityCode(String entityCode) 
-    {
-        this.entityCode = entityCode;
-    }
-
-    public String getEntityCode() 
-    {
-        return entityCode;
-    }
-    public void setCreated(Date created) 
-    {
-        this.created = created;
-    }
-
-    public Date getCreated() 
-    {
-        return created;
-    }
-    public void setUpdate(Date update) 
-    {
-        this.update = update;
-    }
-
-    public Date getUpdate() 
-    {
-        return update;
-    }
+    private Date update = new Date();
 
     @Override
     public String toString() {

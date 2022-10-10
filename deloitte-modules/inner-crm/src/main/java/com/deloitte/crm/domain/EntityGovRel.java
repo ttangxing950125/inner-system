@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  * 【请填写功能名称】对象 entity_gov_rel
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
@@ -30,36 +30,15 @@ public class EntityGovRel implements Serializable
     @Excel(name = "德勤政府code")
     private String dqGovCode;
 
-    public void setId(Long id) 
-    {
-        this.id = id;
-    }
-
-    public Long getId() 
-    {
-        return id;
-    }
-    public void setEntityCode(String entityCode) 
-    {
-        this.entityCode = entityCode;
-    }
-
-    public String getEntityCode() 
-    {
-        return entityCode;
-    }
-    public void setDqGovCode(String dqGovCode) 
-    {
-        this.dqGovCode = dqGovCode;
-    }
-
-    public String getDqGovCode() 
-    {
-        return dqGovCode;
-    }
-
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);
     }
 }
+
+
+
+
+
+
+

@@ -1,6 +1,8 @@
 package com.deloitte.crm.service;
 
 import java.util.List;
+
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovLevel;
 
 /**
@@ -58,4 +60,17 @@ public interface IGovLevelService
      * @return 结果
      */
     public int deleteGovLevelById(Long id);
+
+    /**
+     * 获取顶级
+     * @return
+     */
+    R<List<GovLevel>> getGovLevelBig();
+
+    /**
+     * 获取子集
+     * @param id
+     * @return
+     */
+    R<List<GovLevel>> getGovLevelSmall(Integer id);
 }

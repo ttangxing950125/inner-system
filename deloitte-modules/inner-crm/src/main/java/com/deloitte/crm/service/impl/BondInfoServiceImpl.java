@@ -252,7 +252,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Override
     public R<BondEntityInfoVo> findAllDetail(String entityCode, String bondCode) {
         BondEntityInfoVo result = new BondEntityInfoVo();
-        Map<String, AttrValueMapDto> attrs = result.getAttrs();
+        Map<String, AttrValueMapDto> attrs = new HashMap<>();
         //组装主体信息 主体属性来自 table = entity_info
         EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getEntityCode, entityCode));
@@ -343,7 +343,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
             AttrValueMapDto value = next.getValue();
             if (value != null) {
                 // 此处只做修改 不做新增 无需 entity_code
-                iEntityAttrValueService.SaveAttrValue(null,value);
+                iEntityAttrValueService.saveAttrValue(null,value);
             }
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
@@ -394,5 +394,10 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
         return true;
     }
+
+//    @Override
+//    public Object getBondType() {
+//        return null;
+//    }
 
 }

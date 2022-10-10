@@ -99,4 +99,11 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     List<GovInfo> getGovLevel(String preGovCode);
 
+
+    /**
+     * 获取上级地方政府行政编码 by正杰
+     * @param govCode
+     * @return
+     */
+    R<String> getPreGovName(String govCode);
 }

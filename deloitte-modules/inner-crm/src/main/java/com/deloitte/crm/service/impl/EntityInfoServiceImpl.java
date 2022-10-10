@@ -27,6 +27,7 @@ import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
+import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
@@ -78,17 +79,17 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityBondRelMapper entityBondRelMapper;
 
-    @Autowired
     private GovInfoMapper govInfoMapper;
 
     private BondInfoMapper bondInfoMapper;
 
     private EntityInfoManager entityInfoManager;
 
-    @Autowired
     private HttpUtils httpUtils;
 
     private EntityNameHisMapper entityNameHisMapper;
+
+    private ICrmEntityTaskService iCrmEntityTaskService;
 
     /**
      * 统计企业主体信息
@@ -162,50 +163,66 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return entityInfoMapper.selectEntityInfoList(entityInfo);
     }
 
-    private final String IB = "IB";
-
-    private final String ZERO = "0";
-
-    private final Integer CODE_NUMBER = 6;
-
     /**
-     * 新增【请填写功能名称】
-     *
-     * @param entityDto 【请填写功能名称】
-     * @return 结果
+     * @param entityDto
+     * @return
+     * @author 正杰
+     * @date 2022/9/22
+     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
      */
     @Override
-    public int insertEntityInfo(EntityDto entityDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public R insertEntityInfo(EntityDto entityDto) {
+        //此处的entityDto的id为 task的id
         EntityInfo entityInfo = new EntityInfo();
+        Integer taskId = entityDto.getId();
+        entityDto.setId(null);
         BeanUtils.copyBeanProp(entityInfo, entityDto);
-
-        // 生成entity_code 那么将该值的 用 IB+0..+id  例 IB000001
+        // 插入后获取id;
         baseMapper.insert(entityInfo);
         Integer id = entityInfo.getId();
-        StringBuilder sb = new StringBuilder(IB);
-        for (int j = 0; j < CODE_NUMBER - String.valueOf(id).length(); j++) {
-            sb.append(ZERO);
+
+        // 生成entity_code 那么将该值的 用 IB+0..+id  例 IB000001
+        String entityCode = "IB"+this.appendPrefix(6, id);
+        entityInfo.setEntityCode(entityCode);
+
+        // 判断社会信用代码是否适用 => 适用为 空 并为其赋值 5 否则有数字
+        Integer creditErrorType = entityDto.getCreditErrorType();
+        if(creditErrorType==null){creditErrorType=5;entityDto.setCreditErrorType(creditErrorType);}
+        switch (creditErrorType){
+            case 1:
+                //注销企业:ZX+企业德勤代码+R+自0000001开始排序。
+                entityInfo.setCreditCode(this.appendCreditCode("ZX", entityCode));
+                break;
+            case 2:
+                //吊销企业:DX+企业德勤代码+R+自0000001开始排序。
+                entityInfo.setCreditCode(this.appendCreditCode("DX", entityCode));
+                break;
+            case 3:
+                //非注册机构:OC+企业德勤代码+R+自0000001开始排序。
+                entityInfo.setCreditCode(this.appendCreditCode("OC", entityCode));
+                break;
+            case 4:
+                //其他未知原因:CU+企业德勤代码+R+自0000001开始排序。
+                entityInfo.setCreditCode(this.appendCreditCode("CU", entityCode));
+                break;
+            case 5:
+                entityInfo.setCreditCode(entityDto.getCreditCode());
+                break;
+            default:
+                return R.fail(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
         }
-        entityInfo.setEntityCode(sb.toString() + id);
 
-        UpdateWrapper<EntityInfo> wrapper = new UpdateWrapper<>();
-        wrapper.lambda()
-                .eq(EntityInfo::getId, id)
-                .set(EntityInfo::getEntityCode, entityInfo.getEntityCode());
+        //添加当前用户
+        String username = SecurityUtils.getUsername();
+        entityInfo.setUpdater(username);
+        //默认生效 代码为 1
+        entityInfo.setStatus(1);
+        //再次修改当条信息
+        baseMapper.updateById(entityInfo);
 
-        // 新增曾用名 entity_name_his
-        EntityNameHis entityNameHis = new EntityNameHis();
-        //1-企业主体
-        entityNameHis.setEntityType(1);
-        entityNameHis.setDqCode(entityInfo.getEntityCode());
-        entityNameHis.setOldName(entityDto.getOldName());
-        //1-曾用名为自动生曾
-        entityNameHis.setSource(1);
-        entityNameHis.setCreater(SecurityUtils.getUsername());
-        entityNameHis.setCreated(new Date());
-        iEntityNameHisService.insertEntityNameHis(entityNameHis);
-
-        return entityInfoMapper.update(entityInfo, wrapper);
+        //修改当日任务 新增主体状态码为 2
+        return iCrmEntityTaskService.finishTask(taskId, 2);
     }
 
     /**
@@ -239,56 +256,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public int deleteEntityInfoById(Long id) {
         return entityInfoMapper.deleteEntityInfoById(id);
-    }
-
-    /**
-     * 传入社会信用代码于企业名称
-     * => 存在该社会信用代码 返回 比较信息为 false
-     * ==> 前端跳转调用人工对比信息，并确认
-     * <p>
-     * => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     * ==> 前端跳转调用人工对比信息，并确认
-     * <p>
-     * => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     * ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
-     *
-     * @param creditCode 传入 企业统一社会信用代码
-     * @param entityName 传入 企业名称
-     * @return 比较信息结果
-     * @author 正杰
-     * @date 2022/9/22
-     */
-    @Override
-    public R<EntityInfoVo> validEntity(String creditCode, String entityName) {
-        // 校验数据库是否存在该主体
-        EntityInfo entityByCode = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
-                .lambda().eq(EntityInfo::getCreditCode, creditCode));
-        EntityInfo entityByName = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
-                .lambda().eq(EntityInfo::getEntityName, entityName));
-        //库内无该社会信用代码
-        if (entityByCode == null) {
-            //库内无该主体 是新增
-            if (entityByName == null) {
-                return R.ok(new EntityInfoVo().setMsg(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()));
-                //库内存在该主体 但是不存在该社会信用代码
-            } else {
-                return R.ok(new EntityInfoVo()
-                        .setEntityInfo(entityByName)
-                        .setBo(BadInfo.GET)
-                        .setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
-            }
-            //库内存在该主体 但是主体名称不同
-        } else if (entityByName == null) {
-            return R.ok(new EntityInfoVo()
-                    .setEntityInfo(entityByCode)
-                    .setBo(BadInfo.GET)
-                    .setMsg(BadInfo.EXITS_ENTITY_DIFFERENT_NAME.getInfo()));
-        }
-        //库内已存在该主体
-        return R.ok(new EntityInfoVo()
-                .setEntityInfo(entityByCode)
-                .setBo(BadInfo.GET)
-                .setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo()));
     }
 
     /**
@@ -1179,5 +1146,52 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return null;
     }
 
+    /**
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 拿到后缀数字
+     * @param suffixLength 后缀长度
+     * @param target 字符
+     */
+    @Override
+    public Integer getSuffixNumber(Integer suffixLength,String target) {
+        return Integer.parseInt(target.substring(target.length()-suffixLength));
+    }
+
+    /**
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 拼接 0
+     * @param prefixLength 前缀长度
+     * @param target 字符
+     * @return
+     */
+    @Override
+    public String appendPrefix(Integer prefixLength, Integer target) {
+        return String.format("%0"+prefixLength+"d",target);
+    }
+
+    /**
+     * 统一社会信用代码不适用是 进行字符拼接
+     * 例如 注销企业:ZX+企业德勤代码+R+自0000001开始排序。
+     * @param prefix
+     * @param entityCode
+     * @return
+     */
+    public String appendCreditCode(String prefix,String entityCode){
+        EntityInfo lastOneByPrefixCredit = baseMapper.findLastOneByPrefixCredit(prefix);
+        String suffixString = null;
+        if(lastOneByPrefixCredit!=null){
+            Integer suffixNumber = this.getSuffixNumber(7, lastOneByPrefixCredit.getCreditCode());
+            suffixString = this.appendPrefix(7, suffixNumber + 1);
+        }else{
+            suffixString = "0000001";
+        }
+        return prefix+entityCode+"R"+suffixString;
+    }
 
 }

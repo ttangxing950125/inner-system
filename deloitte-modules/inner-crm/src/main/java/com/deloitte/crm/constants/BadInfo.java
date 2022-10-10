@@ -15,7 +15,7 @@ public enum BadInfo {
     ,VALID_EMPTY_USERNAME("未查到当前登录用户名")
     ,EXITS_ENTITY_OLD_NAME("该主体已使用过曾用名")
     ,EXITS_TASK_FINISH("该任务已经完成")
-    ,EMPTY_TASK_TABLE("为查询到当日任务列表")
+    ,EMPTY_TASK_TABLE("未查询到当日任务列表")
     ,EMPTY_LOGIN_USER("未能获取到当前角色")
     ,ERROR_PARAM_DATE("参数日期格式格式错误")
     ,PARAM_PROBABLY_BE_EMPTY("参数可能为空")
@@ -23,6 +23,7 @@ public enum BadInfo {
     ,PARAM_TABLE_COULD_NOT_BE_NULL("参数中的数据库表常量不能为空!")
     ,PARAM_ID_COULD_NOT_BE_NULL("参数中的id不能为空!")
     ,COULD_NOT_MATCH_TABLE("未能匹配到数据库表")
+    ,COULD_NOT_FIND_SOURCE("找不到该信息的来源")
     ,UNABLE_CREAT("查询到重复数据");
 
     public static final Boolean GET = false;

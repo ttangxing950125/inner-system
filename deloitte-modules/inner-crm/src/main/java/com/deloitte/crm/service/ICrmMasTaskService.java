@@ -84,12 +84,4 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      */
     R<List<CrmMasTaskVo>> getTaskInfo(String timeUnit, String date);
 
-    /**
-     * 确认该任务已完成,修改数据库任务状态
-     * @author 正杰
-     * @date 2022/9/27
-     * @param id 传入 id
-     * @return 操作成功与否
-     */
-    R changeState(Integer id);
 }

@@ -12,7 +12,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class GovLevel extends BaseEntity
+public class GovLevel
 {
     private static final long serialVersionUID = 1L;
 

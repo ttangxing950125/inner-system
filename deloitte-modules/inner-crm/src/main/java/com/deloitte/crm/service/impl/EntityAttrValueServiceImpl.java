@@ -275,7 +275,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     public Map<String,AttrValueMapDto> findAttrValue(String entityCode, Integer attrId) {
         EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
         Assert.notNull(entityAttr,BadInfo.VALID_EMPTY_TARGET.getInfo());
-        HashMap<String, AttrValueMapDto> res = null;
+        HashMap<String, AttrValueMapDto> res = new HashMap<>();
         if(entityAttr.getMultiple()) {
             List<EntityAttrIntype> entityAttrIntypes = entityAttrIntypeService.getBaseMapper().selectList(new QueryWrapper<EntityAttrIntype>().lambda().eq(EntityAttrIntype::getAttrId, attrId));
             List<EntityAttrValue> valueList = baseMapper.selectList(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getEntityCode, entityCode));
@@ -295,8 +295,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             res.put(temp.getName(),temp.setChildren(result));
         }else{
             EntityAttrValue entityAttrValue = baseMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getAttrId, attrId).eq(EntityAttrValue::getEntityCode, entityCode));
-            AttrValueMapDto attrValueMapDto = new AttrValueMapDto(attrId, entityAttr.getName(), entityAttr.getRemarks(), entityAttrValue.getId(), entityAttrValue.getValue());
-            res.put(attrValueMapDto.getName(),attrValueMapDto);
+            AttrValueMapDto attrValueMapDto = new AttrValueMapDto(attrId, entityAttr.getName(), entityAttr.getRemarks(), entityAttrValue==null?null:entityAttrValue.getId(), entityAttrValue==null?null:entityAttrValue.getValue());
+            res.put(entityAttr.getName(),attrValueMapDto);
         }
         return res;
     }
@@ -313,7 +313,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean SaveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto) {
+    public Boolean saveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto) {
         Integer valueId = attrValueMapDto.getValueId();
         Integer attrId = attrValueMapDto.getAttrId();
         EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));

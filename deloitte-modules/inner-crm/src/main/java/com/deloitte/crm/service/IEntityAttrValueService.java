@@ -119,7 +119,7 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
 
     R createStockEntityG(EntityStockInfoVo entityStockInfoVo);
 
-    Object addEntityAttrValuesNew(Map<String, String> valueMap);
+    Object addEntityAttrValuesNew(Map<String, Object> valueMap);
 
     /**
      *
@@ -140,10 +140,10 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      *   *    通用方法   *
      *   ****************
      *
-     * 修改或新增 attr_value
+     * @param entityCode
      * @param attrValueMapDto
      * @return
      */
-    Boolean SaveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto);
+    Boolean saveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto);
 
 }

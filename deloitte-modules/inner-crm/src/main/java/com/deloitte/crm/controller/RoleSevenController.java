@@ -74,56 +74,20 @@ public class RoleSevenController {
     }
 
     /**
-     * 确认该任务的主体是新增或是忽略
+     * 忽略该任务
      * @author 正杰
      * @date 2022/9/22
      * @param id 传入 id
-     * @param state 传入 状态 1是忽略 2是新增
      * @return 操作成功与否
      */
-    @ApiOperation(value="确认该任务的主体是新增或是忽略 by正杰")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer"),
-            @ApiImplicitParam(name="state",value="传入 状态 1是忽略 2是新增",paramType = "query",dataType = "Integer")})
-    @Log(title = "【确认该任务的主体是新增或是忽略】", businessType = BusinessType.UPDATE)
-    @PostMapping("/changeState")
-    public R changeState(Integer id,Integer state){
-        //单表修改 角色7完成任务，选择是否为忽略或者新增
-        //TODO 修改 关联大表 crm_daily_task 的 task_status
-        return iCrmEntityTaskService.changeState(id,state);
-    }
-
-    /**
-     * 传入社会信用代码于企业名称
-     *  => 存在该社会信用代码 返回 比较信息为 false
-     *     ==> 前端跳转调用人工对比信息，并确认
-     *        ==> 如果判断为库内错误 调用 /entityInfo/edit
-     *
-     *  => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     *     ==> 前端跳转调用人工对比信息，并确认
-     *        ==> 如果判断为 库中企业名称需要修改或需要修改企业曾用名  调用 /roleSeven/editEntityNameHis
-     *
-     *  => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     *     ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
-     *
-     * @author 正杰
-     * @date 2022/9/22
-     * @param creditCode 传入 企业统一社会信用代码
-     * @param entityName 传入 企业名称
-     * @return 比较信息结果
-     */
-    @ApiOperation(value="校验该主体是否存在，并做其他判断 by正杰")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name="creditCode",value="传入 企业统一社会信用代码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="entityName",value="传入 企业名称",paramType = "query",dataType = "String")
-    })
-    @Log(title = "【校验该主体是否存在，并做其他判断】", businessType = BusinessType.OTHER)
-    @PostMapping("/validEntity")
-    public R<EntityInfoVo> validEntity(String creditCode, String entityName,Boolean enableCreditCode){
-        Assert.isTrue(StringUtils.hasText(creditCode), BadInfo.PARAM_EMPTY.getInfo());
-        Assert.isTrue(StringUtils.hasText(entityName), BadInfo.PARAM_EMPTY.getInfo());
-        //校验数据库是否存在该主体
-        return iEntityInfoService.validEntity(creditCode,entityName);
+    @ApiOperation(value="忽略该任务 by正杰")
+    @ApiImplicitParams(
+    @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer"))
+    @Log(title = "【忽略该任务】", businessType = BusinessType.UPDATE)
+    @PostMapping("/ignoreTask")
+    public R ignoreTask(Integer id){
+        // 已有主体状态为 1
+        return iCrmEntityTaskService.finishTask(id,1);
     }
 
     /**
@@ -133,14 +97,13 @@ public class RoleSevenController {
      * @date 2022/9/22
      * 新增【确定该主体是新增后,填写具体要新增主体的信息】
      */
-    @RequiresPermissions("crm:entityInfo:add")
+    //@RequiresPermissions("crm:entityInfo:add")
+    @ApiOperation(value="新增主体 by正杰")
     @Log(title = "【确定该主体是新增后,填写具体要新增主体的信息】", businessType = BusinessType.INSERT)
-    @ApiImplicitParam(name = "entityInfoDto", value = "包含表中entity_info所有字段以及 haveCreditCode oldName 额外两个字段", paramType = "body")
+    @ApiImplicitParam(name = "entityDto", value = "注意 此处id为 当日任务id", paramType = "body" , dataTypeClass = EntityDto.class)
     @PostMapping("/add")
     public R addEntity(@RequestBody EntityDto entityDto) {
-        //TODO 新增主体
-        iEntityInfoService.insertEntityInfo(entityDto);
-        return R.ok();
+        return iEntityInfoService.insertEntityInfo(entityDto);
     }
 
 
@@ -166,7 +129,6 @@ public class RoleSevenController {
         //修改主体名称  =>  修改主体曾用名
         return iEntityInfoService.editEntityNameHis(creditCode,entityNewName,remarks);
     }
-
 
     /**
      * 校验统一社会信用代码是否存在 by正杰

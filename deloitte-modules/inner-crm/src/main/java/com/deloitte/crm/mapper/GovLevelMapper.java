@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.GovLevel;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.GovLevel;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface GovLevelMapper 
+public interface GovLevelMapper extends BaseMapper<GovLevel>
 {
     /**
      * 查询【请填写功能名称】

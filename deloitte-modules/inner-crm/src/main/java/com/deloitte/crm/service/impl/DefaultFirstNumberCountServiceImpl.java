@@ -13,6 +13,7 @@ import com.deloitte.crm.service.DefaultFirstNumberCountService;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.strategy.impl.BondDelIssStrategy;
 import com.deloitte.crm.strategy.impl.DefaultFirstNumberCountStrategy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +36,7 @@ public class DefaultFirstNumberCountServiceImpl extends ServiceImpl<DefaultFirst
     private ICrmWindTaskService crmWindTaskService;
 
     @Resource
+    @Lazy
     private DefaultFirstNumberCountStrategy defaultFirstNumberCountStrategy;
 
 

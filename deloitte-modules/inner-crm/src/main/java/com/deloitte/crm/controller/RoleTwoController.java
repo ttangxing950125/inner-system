@@ -7,8 +7,13 @@ import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.GovLevel;
+import com.deloitte.crm.domain.ModelMaster;
 import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.dto.MasDto;
 import com.deloitte.crm.service.ICrmMasTaskService;
+import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.service.IGovLevelService;
 import com.deloitte.crm.service.IModelMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
@@ -38,6 +43,10 @@ public class RoleTwoController {
     private final ICrmMasTaskService iCrmMasTaskService;
 
     private final IModelMasterService iModelMasterService;
+
+    private final IGovInfoService iGovInfoService;
+
+    private final IGovLevelService iGovLevelService;
 
     /**
      * 角色2今日运维模块
@@ -72,45 +81,103 @@ public class RoleTwoController {
     }
 
     /**
-     * 确认该任务已完成,修改数据库任务状态
-     * @author 正杰
-     * @date 2022/9/27
-     * @param id 传入 id
-     * @return 操作成功与否
-     */
-    @ApiOperation(value="确认该任务已完成 by正杰")
-    @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer")
-    @Log(title = "确认该任务已完成,修改数据库任务状态", businessType = BusinessType.UPDATE)
-    @PostMapping("/changeState")
-    public R changeState(Integer id){
-        //单表修改 角色2完成任务,确认该任务已完成,修改数据库任务状态
-        //TODO 修改 关联大表 crm_daily_task 的 task_statu
-        return iCrmMasTaskService.changeState(id);
-    }
-
-    /**
      * 敞口划分 选中单行开始工作 传入id后返回窗口 by正杰
      * @param id
      * @return
      */
     @ApiOperation(value="敞口划分，选中单行开始工作 传入id后返回窗口 by正杰")
     @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer")
-    @Log(title = "确认该任务已完成,修改数据库任务状态", businessType = BusinessType.OTHER)
+    @Log(title = "敞口划分，选中单行开始工作", businessType = BusinessType.OTHER)
     @PostMapping("/getTable")
     public R<ModelMasterInfoVo> getTable(Integer id){
         return iModelMasterService.getTable(id);
     }
 
     /**
+     * 确定新增 by正杰
      *
      * @param govInfo
      * @return
      */
-    @ApiOperation(value="确定新增 by正杰")
+    @ApiOperation(value="确定新增地方政府 by正杰")
     @ApiImplicitParam(name="govInfo",value="govInfo对象",paramType = "body",dataTypeClass = GovInfo.class )
     @Log(title = "新增政府", businessType = BusinessType.INSERT)
+    @PostMapping("/insertGov")
     public R insertGov(@RequestBody GovInfo govInfo){
-        return null;
+        int i = iGovInfoService.insertGovInfo(govInfo);
+        if (i==0){return R.fail();}
+        return R.ok();
+    }
+
+    /**
+     * 获取上级地方政府行政编码 by正杰
+     * @param govCode
+     * @return
+     */
+    @ApiOperation(value="获取上级地方政府行政编码 by正杰")
+    @ApiImplicitParam(name="govCode",value="上级地方政府名称",paramType = "query",dataType = "String" )
+    @Log(title = "获取上级地方政府行政名称", businessType = BusinessType.OTHER)
+    @PostMapping("/getPreGovName")
+    public R<String> getPreGovName(String govCode){
+        return iGovInfoService.getPreGovName(govCode);
+    }
+
+    /**
+     * 获取金融细分领域多选框
+     * @return
+     */
+    @Log(title = "获取金融细分领域多选框", businessType = BusinessType.OTHER)
+    @PostMapping("/getFinances")
+    public R<List<String>> getFinances(){
+        return iModelMasterService.getFinances();
+    }
+
+    /**
+     * 敞口划分 保存并提交
+     * @param masDto
+     * @return
+     */
+    @ApiOperation(value="提交表单 by正杰")
+    @ApiImplicitParam(name="masDto",value="masDto对象",dataTypeClass = MasDto.class )
+    @Log(title = "提交表单", businessType = BusinessType.INSERT)
+    @PostMapping("/insertMas")
+    public R insertMas(@RequestBody MasDto masDto){
+        return iModelMasterService.insert(masDto);
+    }
+
+    /**
+     * 获取顶级
+     * @return
+     */
+    @ApiOperation(value="获取顶级 by正杰")
+    @Log(title = "获取顶级", businessType = BusinessType.OTHER)
+    @PostMapping("/getGovLevelBig")
+    public R<List<GovLevel>> getGovLevelBig(){
+        return iGovLevelService.getGovLevelBig();
+    }
+
+    /**
+     * 获取子集
+     * @param id
+     * @return
+     */
+    @ApiOperation(value="获取子集 by正杰")
+    @ApiImplicitParam(name="id",value="id",paramType = "query",dataType = "Integer")
+    @Log(title = "获取子集", businessType = BusinessType.OTHER)
+    @PostMapping("/getGovLevelSmall")
+    public R<List<GovLevel>> getGovLevelSmall(Integer id){
+        return iGovLevelService.getGovLevelSmall(id);
+    }
+
+    /**
+     * 获取敞口信息 by正杰
+     * @return
+     */
+    @ApiOperation(value="获取敞口信息 by正杰")
+    @Log(title = "获取敞口信息", businessType = BusinessType.OTHER)
+    @PostMapping("/getModelMaster")
+    public R<List<ModelMaster>> getModelMaster(){
+        return iModelMasterService.getModelMaster();
     }
 
 }

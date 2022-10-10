@@ -18,10 +18,24 @@ import java.util.Map;
 @Accessors(chain = true)
 public class ModelMasterInfoVo {
 
-    private CrmMasTask crmMasTask;
+    /**
+     * 企业名称
+     */
+    private String entityName;
 
-    private EntityInfo entityInfo;
+    /**
+     * 统一社会信用代码
+     */
+    private String creditCode;
 
+    /**
+     * 来源
+     */
+    private String source;
+
+    /**
+     * 用作 wind 和 申万 的值展示与修改
+     */
     private Map<String,AttrValueMapDto> attrs;
 
 }

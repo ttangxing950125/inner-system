@@ -4,13 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.vo.CheckVo;
 import lombok.AllArgsConstructor;
@@ -42,7 +45,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
     private final BondInfoMapper bondInfoMapper;
 
-
+    private final GovInfoMapper govInfoMapper;
 
 
 
@@ -124,6 +127,10 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
     private final String BOND_SHORT_NAME = "BOND_SHORT_NAME";
 
+    private final String GOV_NAME = "GOV_NAME";
+
+    private final String GOV_CODE = "GOV_CODE";
+
 
     /**
      *   *****************
@@ -146,6 +153,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else{return new CheckVo().setData(byCode).setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo());}
                 //主体的统一社会信用代码
             case CREDIT_CODE:
+                if(!keyword.matches(Common.REGEX_CREDIT_CODE)){return new CheckVo().setMsg(BadInfo.VALID_PARAM.getInfo());}
                 EntityInfo byCreditCode = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, target));
                 if(byCreditCode==null){return new CheckVo().setMsg(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
                 }else{return new CheckVo().setData(byCreditCode).setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo());}
@@ -162,6 +170,16 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             //债券简称
             case BOND_FULL_NAME:
                 break;
+            //新地方政府地方名称
+            case GOV_NAME:
+                GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
+                if(govByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else{return new CheckVo().setData(govByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+            //新地方政府行政编码
+            case GOV_CODE:
+                GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
+                if(govByCode==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else{return new CheckVo().setData(govByCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             default:
                 return new CheckVo().setMsg(BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }

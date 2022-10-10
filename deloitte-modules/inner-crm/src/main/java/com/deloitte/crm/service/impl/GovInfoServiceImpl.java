@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.EntityAttrValue;
@@ -23,6 +24,7 @@ import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.HttpUtils;
+import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -30,6 +32,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -54,14 +57,12 @@ import static java.lang.System.out;
  * @date 2022-09-21
  */
 @Service
+@AllArgsConstructor
 public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> implements IGovInfoService {
-    @Resource
     private GovInfoMapper govInfoMapper;
 
-    @Autowired
     private EntityAttrValueMapper entityAttrValueMapper;
 
-    @Resource
     private EntityNameHisMapper nameHisMapper;
 
     /**
@@ -93,6 +94,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int insertGovInfo(GovInfo govInfo) {
         return govInfoMapper.insertGovInfo(govInfo);
     }
@@ -617,6 +619,19 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
 
         return govInfos;
+    }
+
+
+    /**
+     * 获取上级地方政府行政编码 by正杰
+     * @param govCode
+     * @return
+     */
+    @Override
+    public R<String> getPreGovName(String govCode) {
+        GovInfo govInfo = baseMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govCode));
+        Assert.notNull(govInfo, BadInfo.VALID_EMPTY_TARGET.getInfo());
+        return R.ok(govInfo.getGovName());
     }
 
 

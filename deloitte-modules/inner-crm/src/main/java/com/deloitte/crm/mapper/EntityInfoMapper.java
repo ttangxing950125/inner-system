@@ -84,4 +84,11 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
                                                @Param("coll")Integer coll,
                                                @Param("pageNum")Integer pageNum,
                                                @Param("pageSize")Integer pageSize);
+
+    /**
+     * 通过 credit_code 的前缀 查询主体
+     * @param prefix
+     * @return
+     */
+    EntityInfo findLastOneByPrefixCredit(@Param("prefix") String prefix);
 }

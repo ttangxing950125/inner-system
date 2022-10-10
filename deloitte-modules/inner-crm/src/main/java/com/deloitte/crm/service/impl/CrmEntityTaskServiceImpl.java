@@ -1,15 +1,12 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
-import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.RoleInfo;
@@ -25,13 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -138,11 +128,20 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
                 Date dateDay = DateUtil.parseDate(date);
                 List<CrmEntityTask> res = baseMapper.selectList(new QueryWrapper<CrmEntityTask>()
                         .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
-                //TODO 查询债券代码以及债券信息等
+
                 List<CrmEntityTaskVo> result = new ArrayList<>();
                 res.forEach(row->{
+                    String dataShow = row.getDataShow();
+                    //dataShow中的数据 固定格式 以 ，拼接 公司名称以及代码
+                    String[] split = dataShow.split(", ");
+                    //每个值 中间以 : 隔开 例如 dataShow = 公司中文名称:新疆格瑞迪斯石油技术股份有限公司, 代码:A15202.SZ
+                    String bondName = split[0].split(":")[1];
+//                    String bondCode = split[1].split(":")[1];
+
                     CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
                     BeanUtil.copyProperties(row,crmEntityTaskVo);
+                    crmEntityTaskVo.setBondFullName(bondName);
+//                    crmEntityTaskVo.setCreditCode(entityName);
                     result.add(crmEntityTaskVo);
                 });
                 return R.ok(result,SuccessInfo.GET_SUCCESS.getInfo());
@@ -165,25 +164,41 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
     }
 
     /**
-     * 确认该任务的主体是新增或是忽略
-     * @author 正杰
-     * @date 2022/9/22
-     * @param id 传入 id
-     * @param state 传入 状态 1是忽略 2是新增
-     * @return 操作成功与否
+     * 处理当日任务
+     * @param taskId
+     * @param state
+     * @return
      */
     @Override
-    public R changeState(Integer id,Integer state) {
-        // 校验参数
-        CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getId,id));
-        if(crmEntityTask==null){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        // 修改状态
-        baseMapper.update(crmEntityTask,new UpdateWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getId,id)
-                .set(CrmEntityTask::getState,state));
+    @Transactional(rollbackFor = Exception.class)
+    public R finishTask(Integer taskId,Integer state) {
+        CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId));
+        if(crmEntityTask==null){
+            return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());
+        } else if (crmEntityTask.getState()!=0) {
+            return R.fail(BadInfo.EXITS_TASK_FINISH.getInfo());
+        }
+        crmEntityTask.setState(state);
+        baseMapper.updateById(crmEntityTask);
+        Date taskDate = crmEntityTask.getTaskDate();
+
+        List<CrmEntityTask> unFinish = baseMapper
+                .selectList(new QueryWrapper<CrmEntityTask>().lambda()
+                        .eq(CrmEntityTask::getTaskDate, taskDate)
+                        .eq(CrmEntityTask::getState,0));
+        if(unFinish.size()==0){
+            //查询日任务 角色7对应的 task_role_type 为 8
+            CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>()
+                    .lambda().eq(CrmDailyTask::getTaskDate, taskDate).eq(CrmDailyTask::getTaskRoleType,8));
+            if (crmDailyTask==null){return R.fail(BadInfo.EMPTY_TASK_TABLE.getInfo());}
+            // 当日任务处理完毕 状态码为 3
+            crmDailyTask.setTaskStatus(3);
+            crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            return R.ok(SuccessInfo.SUCCESS.getInfo());
+        }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
+
 
     /**
      * 创建任务
@@ -205,4 +220,5 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper,Cr
 
         return crmEntityTask;
     }
+
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.ModelMaster;
+import com.deloitte.crm.dto.MasDto;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
 
 /**
@@ -68,4 +69,23 @@ public interface IModelMasterService
      * @return
      */
     R<ModelMasterInfoVo> getTable(Integer id);
+
+    /**
+     * 获取金融细分领域多选框
+     * @return
+     */
+    R<List<String>> getFinances();
+
+    /**
+     * 敞口划分 保存并提交
+     * @param masDto
+     * @return
+     */
+    R insert(MasDto masDto);
+
+    /**
+     * 获取敞口信息 by正杰
+     * @return
+     */
+    R<List<ModelMaster>> getModelMaster();
 }

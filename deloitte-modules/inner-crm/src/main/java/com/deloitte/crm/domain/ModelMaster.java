@@ -14,7 +14,7 @@ import com.deloitte.common.core.web.domain.BaseEntity;
  * @author deloitte
  * @date 2022-09-21
  */
-public class ModelMaster extends BaseEntity
+public class ModelMaster
 {
     private static final long serialVersionUID = 1L;
 

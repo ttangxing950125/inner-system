@@ -7,9 +7,11 @@ import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmWindTaskService;
+import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.vo.CheckVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,10 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -41,6 +40,8 @@ public class RoleMainController {
     private final ICrmWindTaskService crmWindTaskService;
 
     private final ICrmDailyTaskService crmDailyTaskService;
+
+    private final IEntityAttrValueService iEntityAttrValueService;
 
     /**
      * 指定日期查询各角色当月任务完成情况
@@ -77,9 +78,5 @@ public class RoleMainController {
     public R<CheckVo> checkData(String keyword, String target){
         return R.ok(entityInfoManager.matchByKeyword(keyword,target));
     }
-
-
-
-
 
 }

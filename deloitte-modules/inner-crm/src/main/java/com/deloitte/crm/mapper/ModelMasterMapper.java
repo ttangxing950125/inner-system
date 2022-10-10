@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.ModelMaster;
 
 /**
@@ -9,7 +11,7 @@ import com.deloitte.crm.domain.ModelMaster;
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ModelMasterMapper 
+public interface ModelMasterMapper extends BaseMapper<ModelMaster>
 {
     /**
      * 查询【请填写功能名称】

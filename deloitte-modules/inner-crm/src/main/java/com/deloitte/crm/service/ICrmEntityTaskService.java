@@ -75,17 +75,6 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
      */
     R<List<CrmEntityTaskVo>> getTaskInfo(String timeUnit, String date);
 
-
-    /**
-     * 确认该任务的主体是新增或是忽略
-     * @author 正杰
-     * @date 2022/9/22
-     * @param id 传入 id
-     * @param state 传入 状态 1是忽略 2是新增
-     * @return 操作成功与否
-     */
-    R changeState(Integer id,Integer state);
-
     /**
      * 创建任务
      * @param crmEntityTask
@@ -93,4 +82,11 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
      */
     CrmEntityTask createTask(CrmEntityTask crmEntityTask);
 
+    /**
+     * 处理当日任务
+     * @param taskId
+     * @param state
+     * @return
+     */
+    R finishTask(Integer taskId,Integer state);
 }

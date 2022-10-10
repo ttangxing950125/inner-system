@@ -18,6 +18,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.BadInfo;
@@ -55,9 +56,6 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 {
     private final CrmMasTaskMapper crmMasTaskMapper;
 
-    private final ICrmDailyTaskService iCrmDailyTaskService;
-
-//    @Resource
     private ICrmDailyTaskService dailyTaskService;
 
     private IEntityInfoService iEntityInfoService;
@@ -212,53 +210,5 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
                 return R.fail(BadInfo.PARAM_EMPTY.getInfo());
         }
     }
-
-    /**
-     * 完成任务后修改状态 值为1
-     */
-    private final Integer FINISH_STATE = 1;
-
-    private final Integer UN_FINISH_STATE = 0;
-
-    private final Integer FINISH_DAILY_STATE = 3;
-
-    private final Integer TASK_ROLE_TWO = 4;
-
-    /**
-     * 确认该任务已完成,修改数据库任务状态
-     * @author 正杰
-     * @date 2022/9/27
-     * @param id 传入 id
-     * @return 操作成功与否
-     */
-    @Override
-    public R changeState(Integer id) {
-        // 校验参数
-        CrmMasTask crmMasTask = baseMapper.selectOne(new QueryWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getId,id));
-        Assert.notNull(crmMasTask,BadInfo.VALID_EMPTY_TARGET.getInfo());
-        Assert.isTrue(UN_FINISH_STATE.equals(crmMasTask.getState()),BadInfo.EXITS_TASK_FINISH.getInfo());
-        // 修改状态
-        baseMapper.update(crmMasTask,new UpdateWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getId,id)
-                .set(CrmMasTask::getState,FINISH_STATE));
-        //TODO 查看当日任务情况
-        List<CrmMasTask> crmMasTasks = baseMapper.selectList(new QueryWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getTaskDate, crmMasTask.getTaskDate())
-                .eq(CrmMasTask::getState, UN_FINISH_STATE));
-        if(crmMasTasks.size()==0){
-            CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper()
-                    .selectOne(new QueryWrapper<CrmDailyTask>()
-                            .lambda().eq(CrmDailyTask::getTaskDate, crmMasTask.getTaskDate())
-                            .eq(CrmDailyTask::getTaskRoleType,TASK_ROLE_TWO));
-            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
-            iCrmDailyTaskService.getBaseMapper().update(crmDailyTask,new UpdateWrapper<CrmDailyTask>()
-                    .lambda().eq(CrmDailyTask::getTaskDate, crmMasTask.getTaskDate())
-                    .eq(CrmDailyTask::getTaskRoleType,TASK_ROLE_TWO)
-                    .set(CrmDailyTask::getTaskStatus,FINISH_DAILY_STATE));
-        }
-        return R.ok(SuccessInfo.SUCCESS.getInfo());
-    }
-
 
 }

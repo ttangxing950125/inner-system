@@ -46,12 +46,13 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     public List<EntityInfo> selectEntityInfoList(EntityInfo entityInfo);
 
     /**
-     * 新增【请填写功能名称】
-     *
-     * @param entityDto 【请填写功能名称】
-     * @return 结果
+     * @param entityDto
+     * @return
+     * @author 正杰
+     * @date 2022/9/22
+     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
      */
-    public int insertEntityInfo(EntityDto entityDto);
+    public R insertEntityInfo(EntityDto entityDto);
 
     /**
      * 修改【请填写功能名称】
@@ -85,24 +86,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
-    /**
-     * 传入社会信用代码于企业名称
-     * => 存在该社会信用代码 返回 比较信息为 false
-     * ==> 前端跳转调用人工对比信息，并确认
-     * <p>
-     * => 不存在社会信用代码 但存在相同企业名称 返回 比较信息 false
-     * ==> 前端跳转调用人工对比信息，并确认
-     * <p>
-     * => 不存在社会信用代码 也不存在相同企业名称 返回 比较信息 true
-     * ==> 确认新增主体 生成企业主体德勤代码、统一社会信用代码相关字段
-     *
-     * @param creditCode 传入 企业统一社会信用代码
-     * @param entityName 传入 企业名称
-     * @return 比较信息结果
-     * @author 正杰
-     * @date 2022/9/22
-     */
-    R<EntityInfoVo> validEntity(String creditCode, String entityName);
+
 
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
@@ -209,5 +193,29 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @date 2022/10/8 15:53
      */
     R getQuickOfCoverage(String entityType, String param, Integer pageNum,Integer pageSize);
+
+
+    /**
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 拿到后缀数字
+     * @param suffixLength 后缀长度
+     * @param target 字符
+     */
+    Integer getSuffixNumber(Integer suffixLength,String target);
+
+    /**
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 拼接 0
+     * @param prefixLength 前缀长度
+     * @param target 字符
+     * @return
+     */
+    String appendPrefix(Integer prefixLength,Integer target);
 
 }

@@ -1,11 +1,16 @@
 package com.deloitte.crm.service.impl;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.domain.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.GovLevelMapper;
 import com.deloitte.crm.domain.GovLevel;
 import com.deloitte.crm.service.IGovLevelService;
+
+import javax.annotation.Resource;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -16,7 +21,7 @@ import com.deloitte.crm.service.IGovLevelService;
 @Service
 public class GovLevelServiceImpl implements IGovLevelService 
 {
-    @Autowired
+    @Resource
     private GovLevelMapper govLevelMapper;
 
     /**
@@ -89,5 +94,27 @@ public class GovLevelServiceImpl implements IGovLevelService
     public int deleteGovLevelById(Long id)
     {
         return govLevelMapper.deleteGovLevelById(id);
+    }
+
+    /**
+     * 获取定级
+     * @return
+     */
+    @Override
+    public R<List<GovLevel>> getGovLevelBig() {
+        //此处 1 为顶级
+        List<GovLevel> govLevels = govLevelMapper.selectList(new QueryWrapper<GovLevel>().lambda().eq(GovLevel::getLevel, 1));
+        return R.ok(govLevels);
+    }
+
+    /**
+     * 获取子集
+     * @param id
+     * @return
+     */
+    @Override
+    public R<List<GovLevel>> getGovLevelSmall(Integer id) {
+        List<GovLevel> govLevels = govLevelMapper.selectList(new QueryWrapper<GovLevel>().lambda().eq(GovLevel::getParentId, id));
+        return R.ok(govLevels);
     }
 }

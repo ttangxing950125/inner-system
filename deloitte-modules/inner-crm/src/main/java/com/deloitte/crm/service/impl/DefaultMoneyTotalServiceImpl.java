@@ -13,6 +13,7 @@ import com.deloitte.crm.service.DefaultMoneyTotalService;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.strategy.impl.DefaultFirstNumberCountStrategy;
 import com.deloitte.crm.strategy.impl.DefaultMoneyTotalStrategy;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -35,6 +36,7 @@ public class DefaultMoneyTotalServiceImpl extends ServiceImpl<DefaultMoneyTotalM
     @Resource
     private ICrmWindTaskService crmWindTaskService;
     @Resource
+    @Lazy
     private DefaultMoneyTotalStrategy defaultMoneyTotalStrategy;
 
     @Override

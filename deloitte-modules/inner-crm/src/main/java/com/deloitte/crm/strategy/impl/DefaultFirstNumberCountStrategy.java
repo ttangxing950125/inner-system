@@ -57,6 +57,9 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
 
+    @Resource
+    private DefaultMoneyTotalMapper defaultMoneyTotalMapper;
+
 
     /**
      * 是否支持当前wind任务
