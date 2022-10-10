@@ -113,6 +113,9 @@ public class BondNewIssAsyncService {
             List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
             Integer bondStatus = bondInfo.getBondStatus();
             if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)){
+                newDbBond.setBondState(0);
+                newDbBond = bondInfoService.saveOrUpdate(bondInfo);
+
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }

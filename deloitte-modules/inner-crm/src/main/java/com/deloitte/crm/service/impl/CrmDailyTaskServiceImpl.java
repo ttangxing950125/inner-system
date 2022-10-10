@@ -90,7 +90,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         roleKey.add("role4");
         roleKey.add("role5");
         roleKey.add("role6");
-        List<CrmDailyTask> crmDailyTasks = null;
+        List<CrmDailyTask> crmDailyTasks = new ArrayList<>();
         roles.forEach(o -> {
             boolean contains = roleKey.contains(o);
             if (contains) {

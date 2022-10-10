@@ -130,6 +130,8 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         String shortName = defaultFirstNumberCount.getDefaultBondsDesc();
         BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
         bondInfo.setBondStatus(7);
+        bondInfo.setBondState(1);
+
         if (bondInfo.getId() != null) {
             int count = bondInfoService.updateBondInfo(bondInfo);
         } else {
