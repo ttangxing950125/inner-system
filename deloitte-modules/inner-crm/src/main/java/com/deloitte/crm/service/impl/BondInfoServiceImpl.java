@@ -381,12 +381,6 @@ public class BondInfoServiceImpl implements IBondInfoService {
         return null;
     }
 
-    @Override
-    public Object getBondType() {
-
-        return null;
-    }
-
     /**
      * 修改数据通用方法 by正杰
      *

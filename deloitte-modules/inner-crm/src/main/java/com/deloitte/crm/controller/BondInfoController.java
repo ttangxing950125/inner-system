@@ -10,7 +10,6 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.service.IBondInfoService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -131,18 +130,5 @@ public class BondInfoController extends BaseController {
     @GetMapping("/BondCode")
     public R checkBondCode(@RequestParam("BondShortName") String BondCode) {
         return R.ok(bondInfoService.checkEntityBondTradCode(BondCode));
-    }
-
-    /**
-     * 查询债券类型
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/10/9 16:19
-     */
-    @ApiOperation(value = "查询债券类型")
-    @PostMapping("/getBondType")
-    public R getBondType() {
-        return R.ok(bondInfoService.getBondType());
     }
 }

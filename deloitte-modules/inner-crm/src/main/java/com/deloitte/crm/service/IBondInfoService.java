@@ -99,5 +99,4 @@ public interface IBondInfoService
      */
     R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo);
 
-    Object getBondType();
 }

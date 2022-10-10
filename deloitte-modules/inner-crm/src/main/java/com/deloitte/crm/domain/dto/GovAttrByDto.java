@@ -14,7 +14,7 @@ import java.util.Map;
  * @date 2022-09-21
  */
 @Data
-public class EntityAttrByDto implements Serializable
+public class GovAttrByDto implements Serializable
 {
 
     List<Map<String,String>>mapList;
@@ -23,17 +23,21 @@ public class EntityAttrByDto implements Serializable
 
     private Integer pageNum;
     /**
-     * 0.公募债券 1.私募债券
+     * 公募债券
     */
-    private Integer raiseType;
+    private Integer isPublic;
+    /**
+     * 私募债券
+     */
+    private Integer isPrivate;
     /**
      * ABS
      */
-    private Integer abs;
+    private Integer isABS;
     /**
      * 集合债券
      */
-    private Integer coll;
+    private Integer isMix;
 
     @Override
     public String toString() {

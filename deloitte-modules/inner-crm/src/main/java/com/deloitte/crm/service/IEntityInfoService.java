@@ -209,4 +209,5 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @date 2022/10/8 15:53
      */
     R getQuickOfCoverage(String entityType, String param, Integer pageNum,Integer pageSize);
+
 }
