@@ -200,8 +200,8 @@
     </select>
 
     <select id="getEntityCountByBondType" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        SELECT DISTINCT
-        count(0)
+        SELECT
+        count(DISTINCT a.entity_code)
         FROM
         entity_info a
         LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
