@@ -103,8 +103,8 @@ public interface IBondInfoService
 
     /**
      * 自动更新债券公私募状态、abs状态、集合债状态
-     * @param deBondCode
+     * @param dqBondCode
      * @return
      */
-    boolean updateBondType(String deBondCode);
+    boolean updateBondType(String dqBondCode);
 }

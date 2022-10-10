@@ -20,9 +20,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -219,8 +217,8 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Transactional(rollbackFor = Exception.class)
     public BondInfo saveOrUpdate(BondInfo bondInfo) {
         if (bondInfo.getId() != null) {
-            int count = bondInfoMapper.updateBondInfo(bondInfo);
-            bondInfo = count > 0 ? bondInfoMapper.selectBondInfoById(bondInfo.getId()) : bondInfo;
+            int count = bondInfoMapper.updateById(bondInfo);
+            bondInfo = count > 0 ? bondInfoMapper.selectById(bondInfo.getId()) : bondInfo;
         } else {
             //新增债券
             bondInfoMapper.insertBondInfo(bondInfo);
@@ -228,7 +226,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
             String startZeroStr = g1.format(bondInfo.getId());
             bondInfo.setBondCode("BD" + startZeroStr);
 
-            bondInfoMapper.updateBondInfo(bondInfo);
+            bondInfoMapper.updateById(bondInfo);
         }
 
         redisService.redisTemplate.opsForHash().delete(CacheName.BOND_CACHE, bondInfo.getBondShortName());
@@ -383,22 +381,46 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
     /**
      * 自动更新债券公私募状态、abs状态、集合债状态
-     * @param deBondCode
+     * @param dqBondCode
      * @return
      */
     @Override
-    public boolean updateBondType(String deBondCode) {
+    public boolean updateBondType(String dqBondCode) {
         //根据code查询债券
+        BondInfo bondInfo = bondInfoMapper.findByDqCode(dqBondCode);
+        if (bondInfo==null){
+            return false;
+        }
 
         //59 发行人全称
-        EntityAttrValue publisher = entityAttrValueMapper.findValueByCodeAndAttrId(59, deBondCode);
+        EntityAttrValue publisher = entityAttrValueMapper.findValueByCodeAndAttrId(59, dqBondCode);
         if (publisher!=null){
             //集合债，判断规则：基于34行的【发行人全称】字段识别，如字段内容中包含逗号（“,”），判断为“是”；
             String value = publisher.getValue();
-            if (value.contains(",")){
+            bondInfo.setColl(value.contains(","));
+        }
 
+        //Wind债券类型(二级)  85
+        //ABS，判断规则：基于60行的【Wind债券类型(二级)】字段识别，如字段内容为以下之一的，判断为“是”：“交易商协会ABN”、“证监会主管ABS”、“银保监会主管ABS”、“项目收益票据”；
+        EntityAttrValue abs = entityAttrValueMapper.findValueByCodeAndAttrId(85, dqBondCode);
+        List<String> absList = Arrays.asList("交易商协会ABN", "证监会主管ABS", "银保监会主管ABS", "项目收益票据");
+        if (abs!=null){
+            String value = abs.getValue();
+            bondInfo.setAbs(absList.contains(value));
+        }
+
+        //72	债券信息
+        EntityAttrValue raise = entityAttrValueMapper.findValueByCodeAndAttrId(72, dqBondCode);
+        if (raise!=null){
+            String value = raise.getValue();
+            if (Objects.equals(value,"公募")){
+                bondInfo.setRaiseType(0);
+            }else if (Objects.equals(value,"私募")) {
+                bondInfo.setRaiseType(1);
             }
         }
+
+        this.saveOrUpdate(bondInfo);
 
         return true;
     }
