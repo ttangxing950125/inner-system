@@ -41,4 +41,12 @@ public interface WindTaskStrategy {
      */
     List<Map<String, Object>> getDetail(CrmWindTask windTask);
 
+    /**
+     * 查询详情数据
+     * @param windDictId 分类id
+     * @param rowId 分类所属表的id
+     * @return
+     */
+//    Map<String, Object> findRowDetail(Integer windDictId, Integer rowId);
+
 }

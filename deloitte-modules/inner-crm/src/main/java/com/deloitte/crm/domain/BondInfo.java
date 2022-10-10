@@ -63,6 +63,16 @@ public class BondInfo {
     private Integer bondState;
 
     /**
+     * 是否集合债
+     */
+    private Boolean coll;
+
+    /**
+     * 是否abs债券
+     */
+    private Boolean abs;
+
+    /**
      * $column.columnComment
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")

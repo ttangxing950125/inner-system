@@ -15,7 +15,7 @@ const permission = {
   },
   mutations: {
     SET_ROUTES: (state, routes) => {
-      state.addRoutes = routes
+      state.addRoutes = routes;
       state.routes = constantRoutes.concat(routes)
     },
     SET_DEFAULT_ROUTES: (state, routes) => {
