@@ -36,6 +36,11 @@ public class EntityInfoLogs implements Serializable {
      */
     @Excel(name = "证券简称 | 债券简称")
     private String name;
+
+    /**
+     * 自编股票或债券代码
+     */
+    private String deCode;
     /**
      * 1-a股   2-港股  3-发债
      * 上市： a股 | 港股
