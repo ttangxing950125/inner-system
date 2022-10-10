@@ -876,12 +876,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/25
      */
     @Override
-    public R findRelationEntityOrBond(Integer id, String keyword) {
+    public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id, String keyword) {
         List<TargetEntityBondsVo> result = new ArrayList<>();
         switch (keyword) {
             case ENTITY:
+                EntityInfo entity = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getId, id));
                 List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
-                        .lambda().eq(EntityBondRel::getId, id));
+                        .lambda().eq(EntityBondRel::getEntityCode, entity.getEntityCode()));
                 entityBondRels.forEach(row -> {
                     BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
                             .eq(BondInfo::getBondCode, row.getBdCode()));
@@ -889,8 +890,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 });
                 return R.ok(result);
             case BOND:
+                BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getId, id));
                 List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
-                        .eq(EntityBondRel::getId, id));
+                        .eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
                 entityBondRels1.forEach(item -> {
                     EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda()
                             .eq(EntityInfo::getEntityCode, item.getEntityCode()));

@@ -61,8 +61,8 @@ public class BondInfoManagerController {
             @ApiImplicitParam(name="id",value="传入 id ",paramType = "query",dataType = "Integer"),
             @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String")
     })
-    @PostMapping("/findRelationEntityOrBond")
-    public R findRelationEntityOrBond(Integer id,String keyword){
+        @PostMapping("/findRelationEntityOrBond")
+    public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id,String keyword){
         // 查询主体||债券信息
         return iEntityInfoService.findRelationEntityOrBond(id,keyword);
     }
@@ -90,7 +90,7 @@ public class BondInfoManagerController {
      * @date 2022/9/28
      */
     @ApiOperation(value="查询选择的债券 查询债券的具体信息 by正杰")
-    @ApiImplicitParam(name = "bondInfoEditVo", value = "传入bondInfoEditVo 中 list需要修改的参数", paramType = "query", dataType = "body",dataTypeClass = BondEntityInfoVo.class)
+    @ApiImplicitParam(name = "bondInfoEditVo", value = "传入bondInfoEditVo 中 list需要修改的参数", paramType = "body", dataType = "body",dataTypeClass = BondEntityInfoVo.class)
     @PostMapping("/editAllDetail")
     public R editAllDetail(@RequestBody BondEntityInfoVo bondInfoEditVo){
         return iBondInfoService.editAllDetail(bondInfoEditVo);

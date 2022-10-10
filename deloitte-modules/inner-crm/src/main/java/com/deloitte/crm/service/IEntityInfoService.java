@@ -87,7 +87,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
 
-
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
      * => 新增主体曾用名
@@ -155,7 +154,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @author 正杰
      * @date 2022/9/25
      */
-    R findRelationEntityOrBond(Integer id, String keyword);
+    R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id, String keyword);
 
 
     Map<String, Object> getOverview();
