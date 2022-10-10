@@ -62,6 +62,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             if (bondInfo==null){
                 bondInfo = new BondInfo();
                 bondInfo.setBondShortName(shortName);
+                bondInfo.setOriCode(delIss.getBondCode());
             }
 
             //查询有没有这条数据

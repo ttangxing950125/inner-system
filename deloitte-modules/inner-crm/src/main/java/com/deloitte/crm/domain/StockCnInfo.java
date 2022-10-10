@@ -48,6 +48,7 @@ public class StockCnInfo implements Serializable {
     private String stockDqCode;
 
 
+
     /**
      * 股票简称
      */

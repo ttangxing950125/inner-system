@@ -382,6 +382,28 @@ public class BondInfoServiceImpl implements IBondInfoService {
     }
 
     /**
+     * 自动更新债券公私募状态、abs状态、集合债状态
+     * @param deBondCode
+     * @return
+     */
+    @Override
+    public boolean updateBondType(String deBondCode) {
+        //根据code查询债券
+
+        //59 发行人全称
+        EntityAttrValue publisher = entityAttrValueMapper.findValueByCodeAndAttrId(59, deBondCode);
+        if (publisher!=null){
+            //集合债，判断规则：基于34行的【发行人全称】字段识别，如字段内容中包含逗号（“,”），判断为“是”；
+            String value = publisher.getValue();
+            if (value.contains(",")){
+
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * 修改数据通用方法 by正杰
      *
      * @param attrValueMapDto
