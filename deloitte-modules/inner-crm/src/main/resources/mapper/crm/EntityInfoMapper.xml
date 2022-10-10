@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.deloitte.crm.mapper.EntityInfoMapper">
-    
+
     <resultMap type="EntityInfo" id="EntityInfoResult">
-        <result property="id"    column="id"    />
-        <result property="entityName"    column="entity_name"    />
-        <result property="entityCode"    column="entity_code"    />
-        <result property="creditCode"    column="credit_code"    />
-        <result property="list"    column="list"    />
-        <result property="issueBonds"    column="issue_bonds"    />
-        <result property="creditError"    column="credit_error"    />
-        <result property="creditErrorType"    column="credit_error_type"    />
-        <result property="entityNameHis"    column="entity_name_his"    />
-        <result property="entityNameHisRemarks"    column="entity_name_his_remarks"    />
-        <result property="creater"    column="creater"    />
-        <result property="updater"    column="updater"    />
-        <result property="created"    column="created"    />
-        <result property="updated"    column="updated"    />
+        <result property="id" column="id"/>
+        <result property="entityName" column="entity_name"/>
+        <result property="entityCode" column="entity_code"/>
+        <result property="creditCode" column="credit_code"/>
+        <result property="list" column="list"/>
+        <result property="issueBonds" column="issue_bonds"/>
+        <result property="creditError" column="credit_error"/>
+        <result property="creditErrorType" column="credit_error_type"/>
+        <result property="entityNameHis" column="entity_name_his"/>
+        <result property="entityNameHisRemarks" column="entity_name_his_remarks"/>
+        <result property="creater" column="creater"/>
+        <result property="updater" column="updater"/>
+        <result property="created" column="created"/>
+        <result property="updated" column="updated"/>
     </resultMap>
 
     <sql id="selectEntityInfoVo">
@@ -34,47 +34,54 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectEntityInfoList" parameterType="EntityInfo" resultMap="EntityInfoResult">
         <include refid="selectEntityInfoVo"/>
-        <where>  
-            <if test="entityName != null  and entityName != ''"> and entity_name like concat('%', #{entityName}, '%')</if>
-            <if test="entityCode != null  and entityCode != ''"> and entity_code = #{entityCode}</if>
-            <if test="creditCode != null  and creditCode != ''"> and credit_code = #{creditCode}</if>
-            <if test="list != null "> and list = #{list}</if>
-            <if test="issueBonds != null "> and issue_bonds = #{issueBonds}</if>
-            <if test="creditError != null "> and credit_error = #{creditError}</if>
-            <if test="creditErrorType != null "> and credit_error_type = #{creditErrorType}</if>
-            <if test="entityNameHis != null  and entityNameHis != ''"> and entity_name_his = #{entityNameHis}</if>
-            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''"> and entity_name_his_remarks = #{entityNameHisRemarks}</if>
-            <if test="creater != null  and creater != ''"> and creater = #{creater}</if>
-            <if test="updater != null  and updater != ''"> and updater = #{updater}</if>
-            <if test="created != null "> and created = #{created}</if>
-            <if test="updated != null "> and updated = #{updated}</if>
+        <where>
+            <if test="entityName != null  and entityName != ''">and entity_name like concat('%', #{entityName}, '%')
+            </if>
+            <if test="entityCode != null  and entityCode != ''">and entity_code = #{entityCode}</if>
+            <if test="creditCode != null  and creditCode != ''">and credit_code = #{creditCode}</if>
+            <if test="list != null ">and list = #{list}</if>
+            <if test="issueBonds != null ">and issue_bonds = #{issueBonds}</if>
+            <if test="creditError != null ">and credit_error = #{creditError}</if>
+            <if test="creditErrorType != null ">and credit_error_type = #{creditErrorType}</if>
+            <if test="entityNameHis != null  and entityNameHis != ''">and entity_name_his = #{entityNameHis}</if>
+            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''">and entity_name_his_remarks =
+                #{entityNameHisRemarks}
+            </if>
+            <if test="creater != null  and creater != ''">and creater = #{creater}</if>
+            <if test="updater != null  and updater != ''">and updater = #{updater}</if>
+            <if test="created != null ">and created = #{created}</if>
+            <if test="updated != null ">and updated = #{updated}</if>
         </where>
     </select>
 
     <select id="selectGovInfoListByTypeAndParam" parameterType="EntityInfo" resultMap="EntityInfoResult">
         <include refid="selectEntityInfoVo"/>
         <where>
-            <if test="entityName != null  and entityName != ''"> and entity_name like concat('%', #{entityName}, '%')</if>
-            <if test="entityCode != null  and entityCode != ''"> and entity_code like concat('%', #{entityCode}, '%')</if>
-            <if test="creditCode != null  and creditCode != ''"> and credit_code = #{creditCode}</if>
-            <if test="list != null "> and list = #{list}</if>
-            <if test="issueBonds != null "> and issue_bonds = #{issueBonds}</if>
-            <if test="creditError != null "> and credit_error = #{creditError}</if>
-            <if test="creditErrorType != null "> and credit_error_type = #{creditErrorType}</if>
-            <if test="entityNameHis != null  and entityNameHis != ''"> and entity_name_his = #{entityNameHis}</if>
-            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''"> and entity_name_his_remarks = #{entityNameHisRemarks}</if>
-            <if test="creater != null  and creater != ''"> and creater = #{creater}</if>
-            <if test="updater != null  and updater != ''"> and updater = #{updater}</if>
-            <if test="created != null "> and created = #{created}</if>
-            <if test="updated != null "> and updated = #{updated}</if>
+            <if test="entityName != null  and entityName != ''">and entity_name like concat('%', #{entityName}, '%')
+            </if>
+            <if test="entityCode != null  and entityCode != ''">and entity_code like concat('%', #{entityCode}, '%')
+            </if>
+            <if test="creditCode != null  and creditCode != ''">and credit_code = #{creditCode}</if>
+            <if test="list != null ">and list = #{list}</if>
+            <if test="issueBonds != null ">and issue_bonds = #{issueBonds}</if>
+            <if test="creditError != null ">and credit_error = #{creditError}</if>
+            <if test="creditErrorType != null ">and credit_error_type = #{creditErrorType}</if>
+            <if test="entityNameHis != null  and entityNameHis != ''">and entity_name_his = #{entityNameHis}</if>
+            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''">and entity_name_his_remarks =
+                #{entityNameHisRemarks}
+            </if>
+            <if test="creater != null  and creater != ''">and creater = #{creater}</if>
+            <if test="updater != null  and updater != ''">and updater = #{updater}</if>
+            <if test="created != null ">and created = #{created}</if>
+            <if test="updated != null ">and updated = #{updated}</if>
         </where>
     </select>
-    
+
     <select id="selectEntityInfoById" parameterType="Long" resultMap="EntityInfoResult">
         <include refid="selectEntityInfoVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertEntityInfo" parameterType="EntityInfo" useGeneratedKeys="true" keyProperty="id">
         insert into entity_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -91,7 +98,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updater != null">updater,</if>
             <if test="created != null">created,</if>
             <if test="updated != null">updated,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="entityName != null">#{entityName},</if>
             <if test="entityCode != null">#{entityCode},</if>
@@ -106,7 +113,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updater != null">#{updater},</if>
             <if test="created != null">#{created},</if>
             <if test="updated != null">#{updated},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateEntityInfo" parameterType="EntityInfo">
@@ -134,9 +141,85 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteEntityInfoByIds" parameterType="String">
-        delete from entity_info where id in 
+        delete from entity_info where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
+
+
+    <select id="getEntityByBondType" parameterType="java.lang.Integer" resultMap="EntityInfoResult">
+        SELECT DISTINCT
+        a.*
+        FROM
+        entity_info a
+        LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
+        LEFT JOIN bond_info c ON b.bd_code = c.bond_code
+        <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')">
+            <where>
+                1 = 1 and (
+                <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
+
+                <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
+                <if test="abs != null  and abs != ''">c.abs = #{abs}</if>
+
+                <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != ''))and (coll != null  and coll != '')">
+                    or
+                </if>
+                <if test="coll != null  and coll != ''">c.coll = #{coll}</if>
+                )
+            </where>
+        </if>
+        ORDER BY a.entity_code
+    </select>
+
+    <select id="getEntityByBondTypeByPage" parameterType="java.lang.Integer" resultMap="EntityInfoResult">
+        SELECT DISTINCT
+        a.*
+        FROM
+        entity_info a
+        LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
+        LEFT JOIN bond_info c ON b.bd_code = c.bond_code
+        <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')">
+            <where>
+                1 = 1 and (
+                <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
+
+                <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
+                <if test="abs != null  and abs != ''">c.abs = #{abs}</if>
+
+                <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != ''))and (coll != null  and coll != '')">
+                    or
+                </if>
+                <if test="coll != null  and coll != ''">c.coll = #{coll}</if>
+                )
+            </where>
+        </if>
+        ORDER BY a.entity_code
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="getEntityCountByBondType" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT
+        count(DISTINCT a.entity_code)
+        FROM
+        entity_info a
+        LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
+        LEFT JOIN bond_info c ON b.bd_code = c.bond_code
+        <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')">
+            <where>
+                1 = 1 and (
+                <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
+
+                <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
+                <if test="abs != null  and abs != ''">c.abs = #{abs}</if>
+
+                <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != ''))and (coll != null  and coll != '')">
+                    or
+                </if>
+                <if test="coll != null  and coll != ''">c.coll = #{coll}</if>
+                )
+            </where>
+        </if>
+    </select>
 </mapper>

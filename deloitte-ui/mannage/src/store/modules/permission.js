@@ -17,7 +17,6 @@ const permission = {
     SET_ROUTES: (state, routes) => {
       state.addRoutes = routes;
       state.routes = constantRoutes.concat(routes);
-      console.log(state.routes);
     },
     SET_DEFAULT_ROUTES: (state, routes) => {
       state.defaultRoutes = constantRoutes.concat(routes);
@@ -42,7 +41,6 @@ const permission = {
           const asyncRoutes = filterDynamicRoutes(dynamicRoutes);
           rewriteRoutes.push({ path: "*", redirect: "/404", hidden: true });
           router.addRoutes(asyncRoutes);
-          console.log(constantRoutes.concat(sidebarRoutes));
           commit("SET_ROUTES", rewriteRoutes);
           commit("SET_SIDEBAR_ROUTERS", constantRoutes.concat(sidebarRoutes));
           commit("SET_DEFAULT_ROUTES", sidebarRoutes);

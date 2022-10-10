@@ -99,5 +99,12 @@ public interface IBondInfoService
      */
     R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo);
 
-    Object getBondType();
+//    Object getBondType();
+
+    /**
+     * 自动更新债券公私募状态、abs状态、集合债状态
+     * @param dqBondCode
+     * @return
+     */
+    boolean updateBondType(String dqBondCode);
 }

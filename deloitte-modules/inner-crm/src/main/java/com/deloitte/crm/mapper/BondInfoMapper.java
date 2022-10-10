@@ -71,4 +71,11 @@ public interface BondInfoMapper extends BaseMapper<BondInfo>
      * @return
      */
     EntityAttrDetailDto findByQualName(String bondCode);
+
+    /**
+     * 根据债券code查询
+     * @param dqBondCode
+     * @return
+     */
+    BondInfo findByDqCode(String dqBondCode);
 }

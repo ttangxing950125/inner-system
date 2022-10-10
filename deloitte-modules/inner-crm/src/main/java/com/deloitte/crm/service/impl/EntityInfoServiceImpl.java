@@ -533,12 +533,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
-
+        //获取参数信息
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
-        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
-        List<EntityInfo> entityInfos = entityInfoMapper.selectList(queryWrapper);
+        Integer raiseType = entityAttrDto.getRaiseType();
+        Integer abs = entityAttrDto.getAbs();
+        Integer coll = entityAttrDto.getColl();
 
+        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType,abs,coll);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
@@ -636,30 +638,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public Page<EntityInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
+        Integer raiseType = entityAttrDto.getRaiseType();
+        Integer abs = entityAttrDto.getAbs();
+        Integer coll = entityAttrDto.getColl();
+        if (ObjectUtils.isEmpty(pageSize)){
+            pageSize=9;
+        }
+        Page<EntityInfoResult> pageResult = new Page<>(pageNum, pageSize);
+        //封装新的结果集
+        List<EntityInfoResult> resultRecords = new ArrayList<>();
 
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
-        Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
-        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
-        //TODO 条件筛选 xml
-
-
-        String AG="1";
-        String GG="1";
-
-//        List<EntityInfo>infoList=entityInfoMapper.selectForPage(pageNum,pageSize,AG,GG);
-
-
-        Page<EntityInfo> entityInfoPage = entityInfoMapper.selectPage(pageInfo, queryWrapper);
-
-        //查询分页数据集
-        Page<EntityInfoResult> pageResult = new Page<>();
-        pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
-
-        //封装新的结果集
-        List<EntityInfoResult> resultRecords = new ArrayList<>();
-        //添加指标栏位
-        List<EntityInfo> records = entityInfoPage.getRecords();
+        Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
+        pageNum=pageNum*pageSize-1;
+        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll,pageNum,pageSize);
+        pageResult.setTotal(count);
 
         records.stream().forEach(o -> {
             EntityInfoResult entityInfoResult = getEntityInfoResult(o, mapList);
@@ -1178,5 +1172,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         return null;
     }
+
 
 }

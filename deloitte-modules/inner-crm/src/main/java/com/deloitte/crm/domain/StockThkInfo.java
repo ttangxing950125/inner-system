@@ -44,6 +44,12 @@ public class StockThkInfo implements Serializable {
      */
     @Excel(name = "德勤内部股票代码 ST_0000id 6位数字")
     private String stockDqCode;
+
+    /**
+     * 港股简称
+     */
+    private String stockName;
+
     /**
      * 股票代码
      */
