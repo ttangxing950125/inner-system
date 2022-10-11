@@ -10,18 +10,25 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
+import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +45,8 @@ public class EntityInfoController extends BaseController {
     private IEntityInfoService entityInfoService;
     @Autowired
     private SendEmailService service;
-
+    @Autowired
+    private IGovInfoService iGovInfoService;
     /**
      * 统计整体企业主体情况
      *
@@ -299,4 +307,54 @@ public class EntityInfoController extends BaseController {
     public R getQuickOfCoverage(String entityType, String param, Integer pageNum, Integer pageSize) {
         return entityInfoService.getQuickOfCoverage(entityType, param, pageNum, pageSize);
     }
+
+    /***
+     *批量查询并导出excel结果
+     *
+     * @param file
+     * @param uuid(用于存进度导redis)
+     * @return R
+     * @author penTang
+     * @date 2022/10/9 15:57
+    */
+    @ApiOperation(value = "批量查询并导出excel结果")
+    @PostMapping("/importExcelByEntity")
+    public R importExcelByEntity(@RequestParam("file") MultipartFile file,@RequestParam("uuid") String uuid){
+        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file,uuid);
+        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos);
+        return excelWriter;
+    };
+    /**
+     *查询匹配进度
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 20:33
+    */
+    @ApiOperation(value = "查询匹配进度")
+    @PostMapping("/getChecking")
+    public R getChecking(String uuid){
+      return entityInfoService.getIng(uuid);
+    }
+
+    /***
+     *覆盖查询主体
+     *
+     * @param entityOrGovByAttrVo
+     * @return R
+     * @author penTang
+     * @date 2022/10/9 15:57
+     */
+    @ApiOperation(value = "批量查询并导出excel结果")
+    @PostMapping("/getByEntity")
+    public R getEntity(@RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo){
+        //查询政府
+      if (ObjectUtils.equals(entityOrGovByAttrVo.getEntityType(),"GV")){
+           return iGovInfoService.getGovEntityResult(entityOrGovByAttrVo);
+      }else{
+
+      }
+        return null;
+    }
+
 }

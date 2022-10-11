@@ -7,9 +7,13 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -86,6 +90,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
+    R<EntityInfoVo> validEntity(String creditCode, String entityName);
 
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
@@ -217,4 +222,15 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefix(Integer prefixLength,Integer target);
 
+    /**
+     *批量查询并导出excel结果
+     *
+     * @param file
+     * @return R
+     * @author penTang
+     * @date 2022/10/9 16:12
+    */
+     List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file,String uuid);
+         R getIng(String uuid);
+    R getExcelWriter(List<ExportEntityCheckDto> entityByBatchLis);
 }

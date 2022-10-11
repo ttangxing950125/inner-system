@@ -14,6 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="govLevelSmall"    column="gov_level_small"    />
         <result property="govNameHis"    column="gov_name_his"    />
         <result property="entityNameHisRemarks"    column="entity_name_his_remarks"    />
+        <result property="creditErrorRemark"    column="credit_error_remark"    />
         <result property="invalid"    column="invalid"    />
         <result property="newGovName"    column="new_gov_name"    />
         <result property="newDqCode"    column="new_dq_code"    />
@@ -129,6 +130,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectCountByGroup" parameterType="java.lang.String" resultMap="GovInfoResult">
         SELECT * FROM gov_info WHERE dq_gov_code = CONCAT(#{param}, gov_code)
     </select>
+
+    <select id="getGovByname" parameterType="java.lang.String" resultType="com.deloitte.crm.dto.GovInfoBynameDto">
+        SELECT gv.gov_name,gv.dq_gov_code,gl.`name` FROM gov_info gv INNER JOIN gov_level gl ON gv.gov_level_small=gl.id WHERE gv.gov_name LIKE concat('%', #{govName}, '%')
+    </select>
+
 
     <delete id="deleteGovInfoById" parameterType="Long">
         delete from gov_info where id = #{id}

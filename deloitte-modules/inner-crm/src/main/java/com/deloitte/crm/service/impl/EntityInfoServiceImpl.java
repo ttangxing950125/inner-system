@@ -2,18 +2,23 @@ package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
+import cn.hutool.poi.excel.cell.CellUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
+import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -24,6 +29,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmEntityTaskService;
@@ -32,6 +38,7 @@ import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.*;
+import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -44,14 +51,18 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -89,6 +100,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityNameHisMapper entityNameHisMapper;
 
     private ICrmEntityTaskService iCrmEntityTaskService;
+
+    private RedisService redisService;
 
     /**
      * 统计企业主体信息
@@ -512,6 +525,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         } else {
             return getListEntityPage(entityAttrDto);
         }
+    }
+
+    @Override
+    public R<EntityInfoVo> validEntity(String creditCode, String entityName) {
+
+        return null;
     }
 
     /**
@@ -1377,5 +1396,259 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return prefix+entityCode+"R"+suffixString;
     }
+
+    /**
+     * 批量查询并导出excel结果
+     *
+     * @param file
+     * @return R
+     * @author penTang
+     * @date 2022/10/9 16:12
+     */
+    @Override
+    public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file,String uuid) {
+        try {
+            //读取excel
+            List<EntityByBatchDto> entityByBatchDtos = this.getEntityAndBondInfoV(file);
+            ArrayList<ExportEntityCheckDto> entityByBatchList = new ArrayList<ExportEntityCheckDto>();
+            for (int i = 0; i < entityByBatchDtos.size(); i++) {
+                ExportEntityCheckDto exportEntityCheckDto = new ExportEntityCheckDto();
+                //添加原始数据
+                exportEntityCheckDto.setEntityName(entityByBatchList.get(i).getEntityName());
+                exportEntityCheckDto.setCreditCode(entityByBatchList.get(i).getCreditCode());
+                //统计社会性代码进行检查
+                if (Objects.equals(entityByBatchList.get(i).getCreditCode(), null) || Objects.equals(entityByBatchList.get(i).getCreditCode(), "")) {
+                    exportEntityCheckDto.setCreditCodeByRecord("无法识别");
+                } else {
+                    //校验统一社会性代码
+                    String code = entityByBatchList.get(i).getCreditCode();
+                    String regx = "\\w{18}";
+                    boolean matches = code.matches(regx);
+                    if (!matches) {
+                        exportEntityCheckDto.setCreditCodeByRecord("无法识别");
+                    } else {
+                        //根据统一查询数据库是否已覆盖
+                        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByBatchList.get(i).getCreditCode()));
+                        if (entityInfo != null) {
+                            exportEntityCheckDto.setCreditCodeByRecord("识别成功,已覆盖主体");
+                            exportEntityCheckDto.setCreditCodeByEntityName(entityInfo.getEntityName());
+                            exportEntityCheckDto.setCreditCodeByEntityCode(entityInfo.getEntityCode());
+                            exportEntityCheckDto.setCreditCodeByCreditCode(entityInfo.getCreditCode());
+                        } else {
+                            exportEntityCheckDto.setCreditCodeByRecord("识别成功,未覆盖主体");
+                        }
+                    }
+                }
+                //主体全称进行检查
+                if (Objects.equals(entityByBatchList.get(i).getEntityName(), null) || Objects.equals(entityByBatchList.get(i).getEntityName(), "")) {
+                    exportEntityCheckDto.setEntityNameByRecord("无法识别");
+                } else {
+                    //根据主体全称查询是否未覆盖
+                    EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityName, entityByBatchList.get(i).getEntityName()));
+                    if (entityInfo != null) {
+                        exportEntityCheckDto.setEntityNameByRecord("识别成功,已覆盖主体");
+                        exportEntityCheckDto.setEntityNameByEntityName(entityInfo.getEntityName());
+                        exportEntityCheckDto.setEntityNameByEntityCode(entityInfo.getEntityCode());
+                        exportEntityCheckDto.setEntityNameByCreditCode(entityInfo.getCreditCode());
+                    } else {
+                        exportEntityCheckDto.setEntityNameByRecord("识别成功,未覆盖主体");
+                    }
+                }
+                //冲突检查(不适用情况)
+                if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("识别失败");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("未覆盖");
+                } else if (exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("未覆盖");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("未覆盖");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("已覆盖");
+                    exportEntityCheckDto.setCreditCodeByResult(exportEntityCheckDto.getCreditCodeByCreditCode());
+                    exportEntityCheckDto.setEntityCodeByResult(exportEntityCheckDto.getCreditCodeByEntityCode());
+                    exportEntityCheckDto.setEntityNameByResult(exportEntityCheckDto.getCreditCodeByEntityName());
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("已覆盖");
+                    exportEntityCheckDto.setCreditCodeByResult(exportEntityCheckDto.getEntityNameByCreditCode());
+                    exportEntityCheckDto.setEntityCodeByResult(exportEntityCheckDto.getEntityNameByEntityCode());
+                    exportEntityCheckDto.setEntityNameByResult(exportEntityCheckDto.getEntityNameByEntityName());
+                }
+                //冲突检查(不一致或者一致无冲突)
+                if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
+                    if (exportEntityCheckDto.getCreditCodeByEntityCode().equals(exportEntityCheckDto.getEntityNameByEntityCode())) {
+                        exportEntityCheckDto.setCreditCodeIsEntityName("一致无冲突");
+                        exportEntityCheckDto.setEndByResult("已覆盖");
+                        exportEntityCheckDto.setCreditCodeByResult(exportEntityCheckDto.getEntityNameByCreditCode());
+                        exportEntityCheckDto.setEntityCodeByResult(exportEntityCheckDto.getEntityNameByEntityCode());
+                        exportEntityCheckDto.setEntityNameByResult(exportEntityCheckDto.getEntityNameByEntityName());
+                    } else {
+                        exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
+                        exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
+                    }
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
+                    exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
+                    exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
+                }
+                //数据匹配结束入容器
+                entityByBatchList.add(exportEntityCheckDto);
+                //将当前进度入redis-并设置过期时间为一天
+                double index = (i+1)*1.0;
+                double sum = entityByBatchDtos.size()*1.0;
+                NumberFormat percentInstance = NumberFormat.getPercentInstance();
+                // 设置保留几位小数，这里设置的是保留1位小数
+                percentInstance.setMinimumFractionDigits(1);
+                String format = percentInstance.format(index / sum);
+                redisService.setCacheObject(uuid,format,1L, TimeUnit.DAYS);
+            }
+
+
+
+            return entityByBatchList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+   /**
+    *通过uuid查询当前的进度
+    *
+    * @param uuid
+    * @return R
+    * @author penTang
+    * @date 2022/10/10 20:54
+   */
+    @Override
+    public R getIng(String uuid) {
+        return R.ok(redisService.getCacheObject(uuid));
+    }
+
+    /**
+     * 读取excel文件数据
+     *
+     * @param file
+     * @return List<EntityAndBondInfoVo>
+     * @author penTang
+     * @date 2022/10/9 17:32
+     */
+    public List<EntityByBatchDto> getEntityAndBondInfoV(MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        //读取导入的excel
+        if (Strings.isNullOrEmpty(fileName)) {
+            throw new GlobalException("导入文件不能为空");
+        }
+
+        if (fileName.lastIndexOf(".") != -1 && !".xlsx".equals(fileName.substring(fileName.lastIndexOf(".")))) {
+            throw new GlobalException("文件名格式不正确, 请使用后缀名为.XLSX的文件");
+        }
+
+        InputStream inputStream = file.getInputStream();
+        ExcelReader reader = ExcelUtil.getReader(inputStream);
+        reader.addHeaderAlias("主体统一社会信用代码", "creditCode");
+        reader.addHeaderAlias("主体全称", "entityName");
+
+
+        List<EntityByBatchDto> entityByBatchDtos = reader.readAll(EntityByBatchDto.class);
+        return entityByBatchDtos;
+    }
+
+    /**
+     * 导出匹配的结果(excel)
+     *
+     * @return ExcelWriter
+     * @author penTang
+     * @date 2022/10/10 9:46
+     */
+    @Override
+    public R getExcelWriter(List<ExportEntityCheckDto> entityByBatchList) {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletResponse response = servletRequestAttributes.getResponse();
+        ExcelWriter writer = ExcelUtil.getWriter(true);
+        //合并一级表头
+
+        writer.merge(0, 0, 0, 1, "原始数据", true)
+                .merge(0, 0, 2, 5, "判别1-统一社会信用代码", true)
+                .merge(0, 0, 6, 9, "判别二：企业全称", true)
+                .merge(0, 0, 11, 14, "最终结果", true);
+        writer.passCurrentRow();// 跳过当前行
+        CellUtil.setCellValue(writer.getOrCreateCell(10, 0), "冲突检查", writer.getStyleSet(), true);
+
+        ArrayList<Map<String, Object>> rows = new ArrayList<>();
+        entityByBatchList.forEach(o -> {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("主体统一社会代码", o.getCreditCode());
+            map.put("主体全称", o.getEntityName());
+            map.put("根据统一社会性代码识别结果", o.getCreditCodeByRecord());
+            map.put("根据统一社会信用代码识别主体代码", o.getCreditCodeByEntityCode());
+            map.put("根据统一社会信用代码识别主体的最新名称", o.getCreditCodeByEntityName());
+            map.put("根据统一社会信用代码识别主体的根据统一社会信用代码", o.getCreditCodeByCreditCode());
+            map.put("根据主体全称识别结果", o.getEntityNameByRecord());
+            map.put("根据主体全称识别主体代码", o.getEntityNameByEntityCode());
+            map.put("根据主体全称识别主体名称", o.getEntityNameByEntityName());
+            map.put("根据主体全称识别统一社会信用代码", o.getEntityNameByCreditCode());
+            map.put("根据统一社会信用代码识别主体全称结果是否一致", o.getCreditCodeIsEntityName());
+            map.put("最终结果", o.getEndByResult());
+            map.put("最终匹配主体代码结果", o.getEntityCodeByResult());
+            map.put("最终匹配主体全称结果", o.getEntityNameByResult());
+            map.put("最终统一社会信用代码结果", o.getCreditCodeByResult());
+            rows.add(map);
+        });
+        //一次性写出内容，强制输出标题
+        writer.write(rows, true);
+        // 设置自适应
+        Sheet sheet = writer.getSheet();
+        // 循环设置列宽
+        for (int columnIndex = 0; columnIndex < writer.getColumnCount(); columnIndex++) {
+            int width = sheet.getColumnWidth(columnIndex) / 256;
+            // 获取最大行宽
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row currentRow = sheet.getRow(rowIndex);
+                if (Objects.isNull(currentRow)) {
+                    currentRow = sheet.createRow(rowIndex);
+                }
+                Cell currentCell = currentRow.getCell(columnIndex);
+                if (Objects.isNull(currentCell)) {
+                    continue;
+                } else if (currentCell.getCellType() == CellType.STRING) {
+                    int length = currentCell.getStringCellValue().getBytes().length;
+                    width = width < length ? length : width;
+                }
+            }
+            sheet.setColumnWidth(columnIndex, width * 256);
+        }
+        // response为HttpServletResponse对象
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setCharacterEncoding("utf-8");
+        //test.xlsx是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("最终匹配结果", "UTF-8")) + ".xlsx");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+
+        }
+        try (ServletOutputStream out = response.getOutputStream()) {
+            writer.flush(out, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+        // 关闭writer，释放内存
+        writer.close();
+        IoUtil.close(out);
+        return R.ok("导出成功");
+
+    }
+
 
 }
