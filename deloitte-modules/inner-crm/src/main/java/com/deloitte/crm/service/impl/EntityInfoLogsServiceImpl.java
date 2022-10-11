@@ -79,25 +79,40 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
     @SneakyThrows
     @Override
     public Object findAllByType(String findType) {
+        /***
+         * 处理债券
+         * {@link Common#TYPE_BOND}
+         */
         if (findType.equals(Common.TYPE_BOND)) {
+
+            LambdaQueryWrapper<EntityInfoLogs> entityInfoLogsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+
             CompletableFuture<EntityInfoLogsByBondVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsByBondVo sockVo = new EntityInfoLogsByBondVo();
-                final List<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}));
+                final List<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"3"}));
                 sockVo.setEntityInfoLogs(infoLogs);
                 return sockVo;
             });
+
             final CompletableFuture<Void> getAddTodayCountTask = baskTask.thenAcceptAsync(e -> {
                 String nowStrDate = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
-                final List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).eq(EntityInfoLogs::getCreateTime, nowStrDate));
+                final List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"3"})
+                        .eq(EntityInfoLogs::getCreateTime, nowStrDate));
                 e.setAddToday(totalLists.size());
             });
+
             final CompletableFuture<Void> otherTask = baskTask.thenAcceptAsync(e1 -> {
                 //获取当前日期:nowDayDate 当前日期往前7天的日期:sevenTradingDayDate 当前日期最近一个月的日期:latestMonthDayDate 格式为 yyyy-MM-dd
                 String nowDayDate = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
                 String sevenTradingDayDate = DateUtil.format(DateUtil.offsetDay(new Date(), -7), DatePattern.NORM_DATE_PATTERN);
                 String latestMonthDayDate = DateUtil.format(DateUtil.lastMonth(), DatePattern.NORM_DATE_PATTERN);
                 // sevenTradingDayDate <= createTime <= nowDayDate  查询前7天的排除周六周天的数据 算平均数
-                List<EntityInfoLogs> sevenTradingtotalListsFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate).le(EntityInfoLogs::getCreateTime, nowDayDate)).stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime())).collect(Collectors.toList());
+                List<EntityInfoLogs> sevenTradingtotalListsFilter = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"3"})
+                        .ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate)
+                        .le(EntityInfoLogs::getCreateTime, nowDayDate))
+                        .stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime()))
+                        .collect(Collectors.toList());
+
                 if (CollUtil.isNotEmpty(sevenTradingtotalListsFilter) && sevenTradingtotalListsFilter.size() >= 1) {
                     double x = Long.valueOf(sevenTradingtotalListsFilter.size()).doubleValue();
                     Long betweenDays = DateUtil.between(DateUtil.offsetDay(new Date(), -7), new Date(), DateUnit.DAY);
@@ -106,7 +121,10 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                     e1.setSevenTradingDayAverages(String.valueOf(div));
                 }
                 // latestMonthDayDate <= createTime <= nowDayDate  当前日期最近一个月的日期 算平均数
-                List<EntityInfoLogs> latestMonthDayDateFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).ge(EntityInfoLogs::getCreateTime, latestMonthDayDate).le(EntityInfoLogs::getCreateTime, nowDayDate));
+                List<EntityInfoLogs> latestMonthDayDateFilter = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"3"})
+                        .ge(EntityInfoLogs::getCreateTime, latestMonthDayDate)
+                        .le(EntityInfoLogs::getCreateTime, nowDayDate));
+
                 if (CollUtil.isNotEmpty(latestMonthDayDateFilter) && latestMonthDayDateFilter.size() >= 1) {
                     double x = Long.valueOf(latestMonthDayDateFilter.size()).doubleValue();
                     Long betweenDays = DateUtil.between(DateUtil.lastMonth(), new Date(), DateUnit.DAY);
@@ -114,63 +132,92 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                     final double div = NumberUtil.div(y, x);
                     e1.setAverageDailyLatestMonth(String.valueOf(div));
                 }
+
                 HashMap<String, Object> resultMap = Maps.newHashMap();
                 //拼接7天组装图
-                final Map<String, List<EntityInfoLogsExpand>> collect = latestMonthDayDateFilter.stream().map(e -> {
-                    final EntityInfoLogsExpand entityInfoLogsExpand = BeanUtil.copyProperties(e, EntityInfoLogsExpand.class);
+                latestMonthDayDateFilter.stream().map(e -> {
+                    EntityInfoLogsExpand entityInfoLogsExpand = BeanUtil.copyProperties(e, EntityInfoLogsExpand.class);
                     entityInfoLogsExpand.setCreateTimeStr(DateUtil.format(e.getCreateTime(), DatePattern.NORM_DATE_PATTERN));
                     return entityInfoLogsExpand;
-                }).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(EntityInfoLogsExpand::getCreateTimeStr));
-                collect.forEach((k, v) -> {
-                    final long count = v.stream().count();
+                }).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(EntityInfoLogsExpand::getCreateTimeStr)).forEach((k, v) -> {
+                    long count = v.stream().count();
                     resultMap.put(k, count);
                 });
                 e1.setCylinderDatas(resultMap);
             });
+
             CompletableFuture.allOf(baskTask, getAddTodayCountTask, otherTask).exceptionally((ex) -> {
                 log.error(" 发券企业-历史记录 页面出现异常:[{}]", ex);
                 throw new ServiceException("发券企业-历史记录数据组装组装异常");
             }).join();
             log.info("发券企业-历史记录>>  结束:{} ", JSON.toJSONString(baskTask.get()));
             return baskTask.get();
+            /**
+             * 处理股票
+             *{@link Common#TYPE_STOCK}
+             */
         } else if (Common.TYPE_STOCK.equals(findType)) {
+
+            LambdaQueryWrapper<EntityInfoLogs> entityInfoLogsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+
             CompletableFuture<EntityInfoLogsBySockVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsBySockVo sockVo = new EntityInfoLogsBySockVo();
-                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"}));
+                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"1", "2"}));
                 sockVo.setEntityInfoLogs(entoty);
                 return sockVo;
             });
+
             final CompletableFuture<Void> getAddTodayCountTask = baskTask.thenAcceptAsync(e -> {
-                String nowStrDate = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
-                final List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"}).eq(EntityInfoLogs::getCreateTime, nowStrDate));
+                List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"1", "2"}).eq(EntityInfoLogs::getCreateTime, DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN)));
                 e.setAddToday(totalLists.size());
             });
+
             final CompletableFuture<Void> otherTask = baskTask.thenAcceptAsync(e1 -> {
+
                 String nowStrDate = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
-                String oldTime = DateUtil.format(DateUtil.offsetDay(new Date(), -7), DatePattern.NORM_DATE_PATTERN);
-                String lastMonth = DateUtil.format(DateUtil.lastMonth(), DatePattern.NORM_DATE_PATTERN);
-                List<EntityInfoLogs> sevenTradingDayAveragesEntityInfoLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"}).ge(EntityInfoLogs::getCreateTime, oldTime).le(EntityInfoLogs::getCreateTime, nowStrDate)).stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime())).collect(Collectors.toList());
-                List<EntityInfoLogs> lastMothEntityInfoLogsLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"}).ge(EntityInfoLogs::getCreateTime, lastMonth).le(EntityInfoLogs::getCreateTime, nowStrDate));
-                int lastMothtotalSize = lastMothEntityInfoLogsLists.size();
-                if (lastMothtotalSize >= 1) {
+                String sevenTradingDayDate = DateUtil.format(DateUtil.offsetDay(new Date(), -7), DatePattern.NORM_DATE_PATTERN);
+                String latestMonthDayDate = DateUtil.format(DateUtil.lastMonth(), DatePattern.NORM_DATE_PATTERN);
+                //查询7 天排除周六周天 并计算平均7天的
+                List<EntityInfoLogs> sevenTradingDayAveragesEntityInfoLists = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
+                        .ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate)
+                        .le(EntityInfoLogs::getCreateTime, nowStrDate))
+                        .stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime()))
+                        .collect(Collectors.toList());
+
+                if (CollUtil.isNotEmpty(sevenTradingDayAveragesEntityInfoLists) && sevenTradingDayAveragesEntityInfoLists.size() >= 1) {
+                    double x = Long.valueOf(sevenTradingDayAveragesEntityInfoLists.size()).doubleValue();
+                    Long betweenDays = DateUtil.between(DateUtil.offsetDay(new Date(), -7), new Date(), DateUnit.DAY);
+                    final double y = betweenDays.doubleValue();
+                    final double div = NumberUtil.div(y, x);
+                    e1.setSevenTradingDayAverages(String.valueOf(div));
+                }
+
+                //当前日期最近一个月的 并求平均一个月的
+                List<EntityInfoLogs> lastMothEntityInfoLogsLists = entityInfoLogsMapper.selectList(entityInfoLogsLambdaQueryWrapper.in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
+                        .ge(EntityInfoLogs::getCreateTime, latestMonthDayDate)
+                        .le(EntityInfoLogs::getCreateTime, nowStrDate));
+
+                if (CollUtil.isNotEmpty(lastMothEntityInfoLogsLists) && lastMothEntityInfoLogsLists.size() >= 1) {
                     Long betweenDays = DateUtil.between(DateUtil.lastMonth(), new Date(), DateUnit.DAY);
                     double betweenDaysDouble = betweenDays.doubleValue();
-                    double lastMothtotalSizeDouble = Long.valueOf(lastMothtotalSize).doubleValue();
+                    double lastMothtotalSizeDouble = Long.valueOf(lastMothEntityInfoLogsLists.size()).doubleValue();
                     double averageDailyLatestMonth = NumberUtil.div(betweenDaysDouble, lastMothtotalSizeDouble);
                     e1.setAverageDailyLatestMonth(averageDailyLatestMonth + "");
                 }
-                final Map<String, List<EntityInfoLogsExpand>> collect = sevenTradingDayAveragesEntityInfoLists.stream().map(e -> {
-                    final EntityInfoLogsExpand entityInfoLogsExpand = BeanUtil.copyProperties(e, EntityInfoLogsExpand.class);
+                //绘制柱状体 7天的
+                HashMap<String, Object> resultMap = Maps.newHashMap();
+
+                sevenTradingDayAveragesEntityInfoLists.stream().map(e -> {
+                    EntityInfoLogsExpand entityInfoLogsExpand = BeanUtil.copyProperties(e, EntityInfoLogsExpand.class);
                     entityInfoLogsExpand.setCreateTimeStr(DateUtil.format(e.getCreateTime(), DatePattern.NORM_DATE_PATTERN));
                     return entityInfoLogsExpand;
-                }).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(EntityInfoLogsExpand::getCreateTimeStr));
-                final HashMap<String, Object> resultMap = Maps.newHashMap();
-                collect.forEach((k, v) -> {
-                    final long count = v.stream().count();
+                }).collect(Collectors.toList()).stream().collect(Collectors.groupingBy(EntityInfoLogsExpand::getCreateTimeStr)).forEach((k, v) -> {
+                    long count = v.stream().count();
                     resultMap.put(k, count);
                 });
                 e1.setCylinderDatas(resultMap);
             });
+
             CompletableFuture.allOf(baskTask, getAddTodayCountTask, otherTask).exceptionally((ex) -> {
                 log.error(" 企业主体-历史记录 页面出现异常:[{}]", ex);
                 throw new ServiceException("企业主体-历史记录数据组装组装异常");
