@@ -232,7 +232,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">覆盖情况快速查询</div>
-              <el-button type="text ">批量查询</el-button>
+              <el-button type="text" @click="selectAll">批量查询</el-button>
             </div>
           </div>
           <div class="select-body">
@@ -240,7 +240,7 @@
               <el-select
                 class="mr5 select-only"
                 v-model="value"
-                placeholder="请选择"
+                placeholder="选择主体类型"
               >
                 <el-option
                   v-for="item in options"
@@ -253,13 +253,13 @@
               <el-input
                 class="mr10"
                 v-model="input"
-                placeholder="请输入内容"
+                placeholder="请输入主体名称/行政区划/企业统一社会信用代码"
               ></el-input>
               <el-select
                 class="mr10 selects"
                 v-model="value1"
                 multiple
-                placeholder="请选择"
+                placeholder="选择查询产品范围（可多选）"
               >
                 <el-option
                   v-for="item in options2"
@@ -321,13 +321,45 @@
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog title="批量查询" :visible.sync="dialogVisible" width="30%">
+      <div>
+        <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
+      </div>
+      <el-button type="text" @click="downFile">批量查询匹配模板.xlsx</el-button>
+      <div class="red">
+        <div>特别注意：</div>
+        <div>请不要修改列名！</div>
+        <div>请不要修改列顺序！</div>
+        <div>请不要在行间出现空行！</div>
+      </div>
+      <div>
+        <!-- <fileUpload
+          :uploadUrl="'/crm/windTask/doTask/' + item.windTask.id"
+          :index="index"
+          ref="fileUpload"
+          @loading="loadingFun"
+          @uploadFail="uploadFail"
+          @uploadPass="uploadPass"
+        /> -->
+        上传批量查询输入文件
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { govList, entityInfoList } from "@/api/subject";
+import fileUpload from "../../components/FileUpload";
 export default {
   name: "Index",
+  components: {
+    fileUpload,
+  },
   data() {
     return {
       list: [
@@ -428,6 +460,7 @@ export default {
       bondsAndListPercent: 0,
       notBondsAndListPercent: 0,
       loadingData: false,
+      dialogVisible: false,
     };
   },
   mounted() {
@@ -493,6 +526,21 @@ export default {
         this.loading = false;
       }, 2000);
     },
+    selectAll() {
+      this.dialogVisible = true;
+    },
+    downFile() {
+      console.log("down");
+    },
+    // loadingFun(index) {
+    //   this.contentData[index].taskStatus = 2;
+    // },
+    // uploadPass(data, index) {
+    //   this.contentData[index].taskStatus = 1;
+    // },
+    // uploadFail(index) {
+    //   this.contentData[index].taskStatus = 0;
+    // },
   },
   computed: {
     govePercent() {

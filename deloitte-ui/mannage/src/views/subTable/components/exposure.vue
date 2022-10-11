@@ -33,7 +33,7 @@
         </div>
       </div>
       <el-table class="table-content" :data="list" style="margin-top: 15px">
-        <el-table-column type="index" sortable label="序号"> </el-table-column>
+        <el-table-column type="index" label="序号"> </el-table-column>
         <el-table-column prop="date" label="德勤主体代码" sortable>
         </el-table-column>
         <el-table-column prop="name" label="企业名称"> </el-table-column>
@@ -57,9 +57,8 @@
         </div>
       </div>
       <el-table class="table-content" :data="list" style="margin-top: 15px">
-        <el-table-column type="index" sortable label="序号"> </el-table-column>
-        <el-table-column prop="date" label="债券交易代码" sortable>
-        </el-table-column>
+        <el-table-column type="index" label="序号"> </el-table-column>
+        <el-table-column prop="date" label="债券交易代码"> </el-table-column>
         <el-table-column prop="name" label="债券全称"> </el-table-column>
         <el-table-column prop="province" label="债券简称"> </el-table-column>
         <el-table-column prop="city" label="存续状态"> </el-table-column>
@@ -308,6 +307,7 @@ export default {
     changeTab(tab) {
       this.tab = tab;
     },
+    handleClick(row) {},
   },
 };
 </script>

@@ -34,8 +34,11 @@
         <el-card>
           <div class="flex1">
             <h3 class="g-t-title">近期更新记录</h3>
-            <el-button type="text" style="margin-left: 15px" @click="editData()"
-              >手动编辑</el-button
+            <el-button
+              type="text"
+              style="margin-left: 15px; margin-top: 3px"
+              @click="editData()"
+              >手动新增</el-button
             >
           </div>
           <el-table
@@ -82,143 +85,167 @@
           <span>{{ currentTime }}</span>
         </el-form-item>
         <el-form-item label="新增操作人">
-          <span>admin</span>
+          <span>{{ currentName }}</span>
         </el-form-item>
-        <el-form-item label="企业证券代码" prop="region">
-          <div class="flex1">
-            <el-input
-              class="t-input"
-              v-model="ruleForm.name"
-              placeholder="请输入企业完整证券嗲吗"
-            ></el-input>
-            <el-button
-              style="margin-left: 5px"
-              type="text"
-              @click="check(ruleForm.name)"
-              >查重</el-button
-            >
-          </div>
-        </el-form-item>
-        <el-form-item label="企业证券简称" prop="region">
-          <div class="flex1">
-            <el-input
-              class="t-input"
-              v-model="ruleForm.name"
-              placeholder="请输入企业证券简称"
-            ></el-input>
-            <el-button
-              style="margin-left: 5px"
-              type="text"
-              @click="check(ruleForm.name)"
-              >查重</el-button
-            >
-          </div>
-        </el-form-item>
-        <el-form-item label="企业全称" prop="region">
-          <div class="flex1">
-            <el-input
-              class="t-input"
-              v-model="ruleForm.name"
-              placeholder="请输入企业完整名称"
-            ></el-input>
-            <el-button
-              style="margin-left: 5px"
-              type="text"
-              @click="check(ruleForm.name)"
-              >查重</el-button
-            >
-          </div>
-        </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="region">
-          <div class="flex1">
-            <el-input
-              class="t-input"
-              v-model="ruleForm.name"
-              placeholder="请输入企业统一社会信用代码"
-            ></el-input>
-            <el-button
-              style="margin-left: 5px"
-              type="text"
-              @click="check(ruleForm.name)"
-              >查重</el-button
-            >
-            <el-radio
-              style="margin-left: 5px; margin-top: 9px"
-              v-model="noUse2"
-              label="1"
-              >不适用</el-radio
-            >
-          </div>
-        </el-form-item>
-        <el-form-item label="上市日期" prop="region">
-          <el-date-picker
-            v-model="ruleForm.date1"
-            type="date"
-            placeholder="yyyy-mm-dd"
-            style="width: 100%"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="退市日期" prop="region">
-          <el-date-picker
-            type="date"
-            placeholder="yyyy-mm-dd"
-            v-model="ruleForm.date1"
-            style="width: 100%"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="上市板块与交易所" required>
-          <el-col :span="11">
-            <el-form-item prop="date1">
-              <el-date-picker
-                type="date"
-                placeholder="选择股票上市板块"
-                v-model="ruleForm.date1"
-                style="width: 100%"
-              ></el-date-picker>
-              <el-radio v-model="noUse1" label="1">不适用</el-radio>
-            </el-form-item>
-          </el-col>
-          <el-col class="line" :span="1">-</el-col>
-          <el-col :span="11">
-            <el-form-item prop="date2">
-              <el-time-picker
-                placeholder="选择股票交易所"
-                v-model="ruleForm.date2"
-                style="width: 100%"
-              ></el-time-picker>
-            </el-form-item>
-          </el-col>
-        </el-form-item>
-        <el-form-item label="是否为金融机构" prop="delivery">
-          <el-radio-group v-model="ruleForm.resource">
-            <el-radio label="是"></el-radio>
-            <el-radio label="否"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="年报列示类型" prop="delivery">
-          <el-checkbox-group v-model="ruleForm.type">
-            <el-checkbox label="一般企业" name="type"></el-checkbox>
-            <el-checkbox label="金融机构" name="type"></el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-        <el-form-item label="金融机构子行业" prop="region">
+        <el-form-item label="IB敞口划分" prop="">
           <el-select v-model="ruleForm.region" placeholder="选择新增类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item
-          class="position-add"
-          label="企业曾用名或别称"
-          prop="delivery"
-        >
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="企业股票类型" prop="stockType">
+          <el-select v-model="ruleForm.stockType" placeholder="请选择股票类型">
+            <el-option label="A股" value="A"></el-option>
+            <el-option label="港股" value="G"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="企业证券代码" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.stockCode"
+              placeholder="请输入企业完整证券代码"
+            ></el-input>
+            <el-button
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.stockCode)"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="企业股票简称" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.stockShortName"
+              placeholder="请输入企业证券简称"
+            ></el-input>
+            <el-button
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.stockShortName)"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="企业全称" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.entityName"
+              placeholder="请输入企业完整名称"
+            ></el-input>
+            <el-button
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.entityName)"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="统一社会信用代码" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.creditCode"
+              placeholder="请输入企业统一社会信用代码"
+            ></el-input>
+            <el-button
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.creditCode)"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <div class="notUse">
+          <el-checkbox class="mr60" v-model="ruleForm.notUse"
+            >不适用</el-checkbox
+          >
+          <span class="mr10">不适用原因</span>
+          <el-select v-model="ruleForm.creditErrorType" placeholder="请选择">
+            <el-option
+              v-for="item in notUseoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <el-form-item label="上市日期" prop="">
+          <el-date-picker
+            v-model="ruleForm.startXiDate"
+            type="date"
+            placeholder="yyyy-mm-dd"
+            style="width: 100%"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="退市日期" prop="">
+          <el-date-picker
+            type="date"
+            placeholder="yyyy-mm-dd"
+            v-model="ruleForm.endDate"
+            style="width: 100%"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="上市板块与交易所" required>
+          <el-col :span="11">
+            <el-form-item prop="">
+              <el-select
+                v-model="ruleForm.region"
+                placeholder="选择股票上市板块"
+              >
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" :span="1">-</el-col>
+          <el-col :span="11">
+            <el-form-item prop="date2">
+              <el-select
+                v-model="ruleForm.exchange"
+                placeholder="选择股票交易所"
+              >
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="是否为金融机构" prop="">
+          <el-radio-group v-model="ruleForm.finance">
+            <el-radio label="1">是</el-radio>
+            <el-radio label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年报列示类型" prop="">
+          <el-radio-group v-model="ruleForm.anRportType">
+            <el-radio label="1">一般企业</el-radio>
+            <el-radio label="0">金融机构</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="金融机构子行业" prop="">
+          <el-select
+            v-model="ruleForm.financeSubIndu"
+            placeholder="请选择金融机构子行业"
+          >
+            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option label="区域二" value="beijing"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item class="position-add" label="企业曾用名或别称" prop="">
+          <el-input
+            class="t-input"
+            v-model="ruleForm.name"
+            placeholder="请输入企业曾用名或别称，以顿号区分"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false"
-          >确认新增</el-button
-        >
+        <el-button type="primary" @click="subForm">确认新增</el-button>
       </span>
     </el-dialog>
   </div>
@@ -226,6 +253,7 @@
 
 <script>
 import * as echarts from "echarts";
+import { createST } from "@/api/bond";
 export default {
   name: "addGovernment",
   data() {
@@ -313,9 +341,31 @@ export default {
           { required: true, message: "请选择活动资源", trigger: "change" },
         ],
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
+        stockType: [
+          { required: true, message: "请选择企业股票类型", trigger: "blur" },
+        ],
       },
       currentTime: "",
       tab: this.$route.query.name,
+      currentName: this.$store.state.user.name,
+      notUseoptions: [
+        {
+          value: 1,
+          label: "吊销",
+        },
+        {
+          value: 2,
+          label: "注销",
+        },
+        {
+          value: 3,
+          label: "非大陆注册机构",
+        },
+        {
+          value: 4,
+          label: "其他未知原因",
+        },
+      ],
     };
   },
   mounted() {
@@ -417,6 +467,18 @@ export default {
       };
       myChart.setOption(option);
     },
+    subForm() {
+      try {
+        this.$modal.loading("Loading...");
+        createST(this.ruleForm).then((res) => {
+          console.log(res);
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
   },
 };
 </script>
@@ -509,6 +571,13 @@ export default {
   }
   .g-select {
     color: greenyellow;
+  }
+}
+.notUse {
+  margin-left: 82px;
+  margin-bottom: 20px;
+  .mr60 {
+    margin-right: 60px;
   }
 }
 </style>

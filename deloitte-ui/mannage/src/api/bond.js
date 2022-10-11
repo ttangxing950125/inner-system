@@ -20,14 +20,42 @@ export function findBondOrEntity(parmas) {
 export function findRelationEntityOrBond(parmas) {
   return request({
     url:
-      "/crm/bondInfoManager/bondInfoManager/findRelationEntityOrBond?keyword=" +
+      "/crm/bondInfoManager/findRelationEntityOrBond?keyword=" +
       parmas.keyword +
-      "&code=" +
-      parmas.code,
+      "&id=" +
+      parmas.id,
     headers: {
       isToken: true,
     },
     method: "post",
     data: { parmas },
+  });
+}
+
+// 新增股票主体
+export function createST(parmas) {
+  return request({
+    url: "/crm/value/createST",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询选择的债券 查询债券的具体信息
+export function findAllDetail(parmas) {
+  return request({
+    url:
+      "/crm/bondInfoManager/findAllDetail?bondCode=" +
+      parmas.bondCode +
+      "&entityCode=" +
+      parmas.entityCode,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
   });
 }

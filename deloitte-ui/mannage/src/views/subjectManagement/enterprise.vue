@@ -52,9 +52,9 @@
             <div class="select-body mt20">
               <el-input
                 class="mr10 ml20"
-                v-model="input"
+                v-model="nameInput"
                 style="width: 400px"
-                placeholder="请输入内容"
+                placeholder="搜索主体名称 / 代码 / 统一社会信用代码"
               ></el-input>
               <el-button class="mr10" type="primary" @click="select"
                 >查询</el-button
@@ -77,20 +77,13 @@
                 </el-table-column>
                 <el-table-column prop="date" label="德勤主体代码" sortable>
                 </el-table-column>
-                <el-table-column prop="name" label="证券代码（A）">
+                <el-table-column prop="name" label="统一社会信用代码">
                 </el-table-column>
-                <el-table-column prop="province" label="主体名称">
+                <el-table-column prop="province" label="企业名称">
                 </el-table-column>
-                <el-table-column prop="city" label="曾用名或别称">
+                <el-table-column prop="city" label="上市情况">
                 </el-table-column>
-                <el-table-column prop="city" label="上市日期（A）">
-                </el-table-column>
-                <el-table-column prop="city" label="退市日期（A）">
-                </el-table-column>
-                <el-table-column prop="city" label="更新记录">
-                  <template slot-scope="scope">
-                    <span style="color: gainsboro">{{ scope.row.city }}</span>
-                  </template>
+                <el-table-column prop="city" label="发债情况">
                 </el-table-column>
               </el-table>
               <el-pagination
@@ -110,42 +103,40 @@
       </el-col>
       <h3 class="g-title" style="margin-top: 10px">企业主体清单</h3>
       <div class="g-tab flex1">
-        <a
-          :class="currentTab === '上市' ? 'g-select' : ''"
-          @click="changeTab('上市')"
+        <a :class="currentTab === '1' ? 'g-select' : ''" @click="changeTab('1')"
           >上市</a
         >
-        <a
-          :class="currentTab === '发债' ? 'g-select' : ''"
-          @click="changeTab('发债')"
+        <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
           >发债</a
         >
-        <a
-          :class="currentTab === '非上市非发债' ? 'g-select' : ''"
-          @click="changeTab('非上市非发债')"
+        <a :class="currentTab === '3' ? 'g-select' : ''" @click="changeTab('3')"
           >非上市非发债</a
         >
-        <a
-          :class="currentTab === '金融机构' ? 'g-select' : ''"
-          @click="changeTab('金融机构')"
+        <a :class="currentTab === '4' ? 'g-select' : ''" @click="changeTab('4')"
           >金融机构</a
         >
       </div>
       <el-col :sm="24" :lg="24" class="mt20" style="padding-left: 20px">
         <el-card>
-          <h3 class="g-t-title">{{ currentTab + "企业" }}</h3>
+          <h3 class="g-t-title">{{ tabArr[currentTab] + "企业" }}</h3>
           <div class="g-desc">
             截止日期，会计收录<span>xxxx</span>个地方政府主体，其中
             <span>xxxx</span> 个存续上市， <span>xxxx</span> 个已退市
           </div>
           <div class="g-desc flex1">
             <router-link
-              :to="{ name: 'indexEnterprise', query: { name: currentTab } }"
+              :to="{
+                name: 'indexEnterprise',
+                query: { name: tabArr[currentTab] },
+              }"
             >
               <a href="">更多指标</a>
             </router-link>
             <router-link
-              :to="{ name: 'addEnterprise', query: { name: currentTab } }"
+              :to="{
+                name: 'addEnterprise',
+                query: { name: tabArr[currentTab] },
+              }"
             >
               <a href="">新增主体</a>
             </router-link>
@@ -153,33 +144,60 @@
               <a href="">修改信息</a>
             </router-link>
             <router-link
-              :to="{ name: 'historyEnterprise', query: { name: currentTab } }"
+              :to="{
+                name: 'historyEnterprise',
+                query: { name: tabArr[currentTab] },
+              }"
             >
               <a href="">更新记录</a>
             </router-link>
             <a href="">导出上市主体清单</a>
             <el-input
               class="select-x"
-              v-model="input"
+              v-model="codeInput"
               placeholder="搜索主体名称/代码/统一社会信用代码"
             ></el-input>
           </div>
           <el-table
             class="table-content"
-            :data="list"
+            :data="list2"
             style="width: 98%; margin-top: 15px"
           >
-            <el-table-column type="index" sortable label="生效状态">
+            <el-table-column prop="name" label="存续状态" width="80">
+              <template slot-scope="scope">
+                <a
+                  :class="scope.row.nameUsedNum > 0 ? 'green' : 'red'"
+                  @click="checkName(scope.row)"
+                  >{{
+                    scope.row.nameUsedNum > 0 ? scope.row.nameUsedNum : "暂无"
+                  }}</a
+                >
+              </template>
             </el-table-column>
-            <el-table-column prop="date" label="行政级别" sortable>
+            <el-table-column prop="entityCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="name" label="德勤主体代码">
+            <el-table-column prop="date" label="证券代码（A）">
             </el-table-column>
-            <el-table-column prop="province" label="主体名称">
+            <el-table-column prop="entityName" label="主体名称" width="200">
             </el-table-column>
-            <el-table-column prop="city" label="曾用名或别称">
+            <el-table-column prop="nameUsedNum" label="曾用名或别称">
+              <template slot-scope="scope">
+                <a
+                  :class="scope.row.nameUsedNum > 0 ? 'green' : ''"
+                  @click="checkName(scope.row)"
+                  >{{
+                    scope.row.nameUsedNum > 0 ? scope.row.nameUsedNum : "暂无"
+                  }}</a
+                >
+              </template>
             </el-table-column>
-            <el-table-column prop="address" label="备注"> </el-table-column>
+            <el-table-column prop="date" label="上市日期（A）">
+            </el-table-column>
+            <el-table-column prop="date" label="退市日期（B）">
+              <template slot-scope="scope">
+                <span>{{ scope.row.date || "当前未退市" }}</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="zip" label="更新记录"> </el-table-column>
           </el-table>
         </el-card>
@@ -187,54 +205,52 @@
     </el-row>
   </div>
 </template>
-
 <script>
+import { getOverviewByGroup, getInfoList } from "@/api/subject";
 export default {
   name: "government",
   data() {
     return {
-      input: "",
+      codeInput: "",
+      nameInput: "",
       activeName: "frist",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      tabArr: {
+        1: "上市",
+        2: "发债",
+        3: "非上市非发债",
+        4: "金融机构",
+      },
+      list2: [],
+      list: [],
       loading: false,
-      currentTab: "上市",
+      currentTab: "1",
       currentPage4: 4,
     };
   },
+  created() {
+    this.init();
+  },
   methods: {
+    init() {
+      try {
+        this.$modal.loading("Loading...");
+        getOverviewByGroup({}).then((res) => {
+          console.log(res);
+        });
+        const parmas = {
+          param: "",
+          type: this.currentTab,
+        };
+        getInfoList(parmas).then((res) => {
+          const { data } = res;
+          this.list2 = data;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },
@@ -245,7 +261,22 @@ export default {
       window.open(href, "_blank");
     },
     changeTab(tab) {
-      this.currentTab = tab;
+      try {
+        this.$modal.loading("Loading...");
+        this.currentTab = tab;
+        const parmas = {
+          param: this.codeInput,
+          type: this.currentTab,
+        };
+        getInfoList(parmas).then((res) => {
+          const { data } = res;
+          this.list2 = data;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     add() {
       console.log(1);
@@ -253,6 +284,9 @@ export default {
     },
     select() {
       console.log(1);
+    },
+    checkName(row) {
+      console.log(row);
     },
   },
 };
@@ -279,6 +313,12 @@ export default {
 }
 .g-t-title {
   font-weight: 600;
+}
+.green {
+  color: greenyellow;
+}
+.red {
+  color: red;
 }
 .box-card {
   display: flex;

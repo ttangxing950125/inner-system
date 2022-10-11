@@ -18,8 +18,8 @@
     </div>
     <h3 class="g-title">每日运维任务</h3>
     <div class="list-box">
-      角色1
       <el-table
+        v-if="roleId === 'role1'"
         v-loading="loading"
         class="table-content"
         :data="list"
@@ -42,8 +42,8 @@
           </template>
         </el-table-column>
       </el-table>
-      角色7
       <el-table
+      v-if="roleId === 'role6'"
         v-loading="loading"
         class="table-content"
         :data="list7"
@@ -68,14 +68,14 @@
             <el-button @click="changeAddState(scope.row.id, 1)" type="text" size="small"
               >忽略</el-button
             >
-            <el-button @click="work(scope.row)" type="text" size="small"
+            <el-button @click="detaile(scope.row)" type="text" size="small"
               >查看详情</el-button
             >
           </template>
         </el-table-column>
       </el-table>
-      角色2
       <el-table
+      v-if="roleId === 'role2'"
         v-loading="loading"
         class="table-content"
         :data="list2"
@@ -108,8 +108,8 @@
           </template>
         </el-table-column>
       </el-table>
-      角色3
       <el-table
+      v-if="roleId === 'role3'"
         v-loading="loading"
         class="table-content"
         :data="list3"
@@ -152,8 +152,8 @@
           </template>
         </el-table-column>
       </el-table>
-      角色4
       <el-table
+      v-if="roleId === 'role4'"
         v-loading="loading"
         class="table-content"
         :data="list3"
@@ -196,8 +196,8 @@
           </template>
         </el-table-column>
       </el-table>
-      角色5
       <el-table
+      v-if="roleId === 'role5'"
         v-loading="loading"
         class="table-content"
         :data="list3"
@@ -722,7 +722,7 @@
       </span>
     </el-dialog>
     <el-dialog
-      title="IB"
+      title="IB&内评"
       :visible.sync="ibDig"
       width="50%"
     >
@@ -733,41 +733,41 @@
         label-width="200px"
         label-position="left"
       >
-        <el-form-item label="企业名称" >
-          <span>xxxxxxxxxxxx</span>
+      <el-form-item label="企业名称" >
+          <span>{{ ruleForm.entityName }}</span>
         </el-form-item>
         <el-form-item label="统一社会信用代码" >
-          <span>xxxxxxx121xxxxx</span>
+          <span>{{ ruleForm.creditCode }}</span>
         </el-form-item>
         <el-form-item label="来源" >
-          <span>xxxxxxx121xxxxx</span>
+          <span>{{ ruleForm.source }}</span>
         </el-form-item>
         <el-form-item label="wind行业划分" >
-          <span v-if="!edit1">xxxxxxx121xxxxx</span>
+          <span v-if="!edit1">{{ ruleForm.wind行业划分 }}</span>
           <el-input
             class="t-input"
             v-if="edit1"
-            v-model="ruleForm.name"
+            v-model="ruleForm.wind行业划分"
           ></el-input>
           <el-button
             style="margin-left: 5px"
             type="text"
             @click="edit1 = !edit1"
-            >{{ edit1 ? "保存" : "修改" }}</el-button
+            >{{ edit1 ? "" : "修改" }}</el-button
           >
         </el-form-item>
         <el-form-item label="申万行业划分" >
-          <span v-if="!edit2">xxxxxxx121xxxxx</span>
+          <span v-if="!edit2">{{ ruleForm.申万行业划分 }}</span>
           <el-input
             class="t-input"
             v-if="edit2"
-            v-model="ruleForm.name"
+            v-model="ruleForm.申万行业划分"
           ></el-input>
           <el-button
             style="margin-left: 5px"
             type="text"
             @click="edit2 = !edit2"
-            >{{ edit2 ? "保存" : "修改" }}</el-button
+            >{{ edit2 ? "" : "修改" }}</el-button
           >
         </el-form-item>
         <el-divider></el-divider>
@@ -885,6 +885,7 @@
           <el-button
             style="margin-left: 5px"
             type="text"
+            @click="detaile"
             >查看详情</el-button
           >
         </el-form-item>
@@ -935,8 +936,7 @@
       <el-button class="ml40" type="success" plain :disabled="disabled" @click="submitAdd">确认新增</el-button>
     </el-dialog>
     <el-dialog
-      class="replace-title"
-      title="库内已存重复主体"
+      title="库内重复情况"
       :visible.sync="replaceDig"
       width="40%">
       <div class="dig-width">
@@ -960,6 +960,31 @@
         </el-col>
       </div>
     </el-dialog>
+    <el-dialog
+      title="详情"
+      :visible.sync="detaileDig"
+      width="20%">
+      <div class="dig-width">
+        <el-col :sm="24" :lg="12" class="form-card">
+          <div class="flex1 mt10">
+            <div class="first">统一社会信用代码</div>
+            <div class="content">{{ 111 }}</div>
+          </div>
+          <div class="flex1 mt10">
+            <div class="first">企业名称</div>
+            <div class="content">{{ 222 }}</div>
+          </div>
+          <div class="flex1 mt10">
+            <div class="first">企业曾用名</div>
+            <div class="content">{{ 333 }}</div>
+          </div>
+          <div class="flex1 mt10">
+            <div class="first">德勤内部主体代码</div>
+            <div class="content">{{ 444 }}</div>
+          </div>
+        </el-col>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -970,8 +995,6 @@ import {
           getDayTaskInfo,
           getMouthTaskInfo,
           checkCreditCode,
-          editEntityNameHis,
-          changeState,
           getRoleSupplyTask,
           getTaskByEntityCode,
           addEntityAttrValuesNew,
@@ -1069,28 +1092,7 @@ export default {
         1: '已有主体',
         2: '新增主体',
       },
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕",
-        },
-        {
-          value: "选项2",
-          label: "双皮奶",
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎",
-        },
-        {
-          value: "选项4",
-          label: "龙须面",
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
-      ],
+      options: [],
       month: '',
       monthMm: '',
       notUseoptions: [
@@ -1133,6 +1135,8 @@ export default {
       repalce2: 0,
       govOption2: [],
       govOption1: [],
+      detaileDig: false,
+      roleId: localStorage.getItem('roleId')
     };
   },
   mounted() {
@@ -1538,6 +1542,9 @@ export default {
       } finally {
         this.$modal.closeLoading();
       }
+    },
+    detaile(row) {
+      this.detaileDig = true
     },
     // 角色7流程结束
 

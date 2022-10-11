@@ -107,4 +107,5 @@ public interface IGovInfoService  extends IService<GovInfo>
      */
     R<String> getPreGovName(String govCode);
 
+    R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo);
 }

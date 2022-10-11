@@ -73,49 +73,68 @@ public enum Common {
     public static final Integer WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID = 99;
 
     public static final String TABLE_CRM_MAS_TASK = "TABLE_CRM_MAS_TASK";
-    public static final  String STOCK_CODE = "债券代码";
-    public static final  Integer STOCK_CODE_ID= 49;
+    public static final String STOCK_CODE = "债券代码";
+    public static final Integer STOCK_CODE_ID = 49;
+
+    public static final String  STOCK_TYPE_A= "A";
+
+    public static final String  STOCK_TYPE_G= "G";
+
+    public static final String  CHECK_TYPE1="无法识别";
+    public static final String  CHECK_TYPE2="识别成功,已覆盖主体";
+    public static final String  CHECK_TYPE3="识别成功,未覆盖主体";
+    public static final String  CHECK_TYPE4="一致无冲突";
+    public static final String  CHECK_TYPE5="不一致";
+    public static final String  CHECK_TYPE6="不适用";
+    public static final String  CHECK_TYPE7="未覆盖";
+    public static final String  CHECK_TYPE8="匹配冲突,需人工介入";
+    public static final String  CHECK_TYPE9="识别失败";
 
 
-     //上市日期对应的att_id
-     public static final Integer SHANSI_DATE_ID =583;
+
+    //上市日期对应的att_id
+    public static final Integer SHANSI_DATE_ID = 583;
 
     //退市日期对应的att_id
-    public static final Integer  TUISI_DATE_ID  = 584;
+    public static final Integer TUISI_DATE_ID = 584;
 
     //上市板块
-    public static final Integer  STOCK_SHANXI =893;
+    public static final Integer STOCK_SHANXI = 893;
 
     //交易所
-    public static final Integer  EXCHANGE_ID= 903;
+    public static final Integer EXCHANGE_ID = 903;
 
     //港股上市日期
-    public static final Integer STOCK_SHANXI_DATE_HK_ID =827;
+    public static final Integer STOCK_SHANXI_DATE_HK_ID = 827;
 
     //港股退市日期
-    public static final  Integer  TUISI_DATE_HK_ID =602;
+    public static final Integer TUISI_DATE_HK_ID = 602;
 
     //港股上市版
     public static final Integer STOCK_SHANXI_HK_ID = 828;
 
     //港股交易所
-    public static final Integer EXCHANGE_HK_ID=980;
+    public static final Integer EXCHANGE_HK_ID = 980;
 
-    public static final String START_XI_DATE ="起息日";
-    public static final Integer START_XI_DATE_ID=52;
+    public static final String START_XI_DATE = "起息日";
+    public static final Integer START_XI_DATE_ID = 52;
 
-    public static final String  STRING_END_DATE="到期日";
-    public static final Integer STRING_END_DATE_ID =53;
+    public static final String STRING_END_DATE = "到期日";
+    public static final Integer STRING_END_DATE_ID = 53;
 
+    //股票
+    public static final String TYPE_STOCK = "TYPE_STOCK";
+    //债券
+    public static final String TYPE_BOND = "TYPE_BOND";
 
-    public static final Integer BOND_TYPE_ID= 85;
-    public static final String  BOND_TYPE="债券类型";
+    public static final Integer BOND_TYPE_ID = 85;
+    public static final String BOND_TYPE = "债券类型";
 
-    public static final String  anRportType ="年报列示类型";
-    public static final Integer  AN_RPORT_TYPE =680;
+    public static final String anRportType = "年报列示类型";
+    public static final Integer AN_RPORT_TYPE = 680;
 
-    public static final String  FINANCE_SUB_INDU= "金融机构细分行业";
-    public static final Integer FINANCE_SUB_INDU_ID =656;
+    public static final String FINANCE_SUB_INDU = "金融机构细分行业";
+    public static final Integer FINANCE_SUB_INDU_ID = 656;
 
     /**
      *  匹配社会信用代码的震泽表达式

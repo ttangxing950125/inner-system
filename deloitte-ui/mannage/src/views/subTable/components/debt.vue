@@ -43,7 +43,7 @@
         </el-table-column>
         <el-table-column prop="zip" label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
+            <el-button @click="setTarget(scope.row)" type="text" size="small"
               >设为目标</el-button
             >
           </template></el-table-column
@@ -57,19 +57,34 @@
           【 <span class="font-color">请从上表选定目标主体</span> 】
         </div>
       </div>
-      <el-table class="table-content" :data="list" style="margin-top: 15px">
-        <el-table-column type="index" sortable label="序号"> </el-table-column>
-        <el-table-column prop="date" label="债券交易代码" sortable>
+      <el-table class="table-content" :data="list2" style="margin-top: 15px">
+        <el-table-column type="index" label="序号"> </el-table-column>
+        <el-table-column prop="transactionCode" label="债券交易代码">
         </el-table-column>
-        <el-table-column prop="name" label="债券全称"> </el-table-column>
-        <el-table-column prop="province" label="债券简称"> </el-table-column>
-        <el-table-column prop="city" label="存续状态"> </el-table-column>
-        <el-table-column prop="city" label="债券类型"> </el-table-column>
-        <el-table-column prop="address" label="公私募类型"> </el-table-column>
-        <el-table-column prop="address" label="是否违约"> </el-table-column>
+        <el-table-column prop="fullName" label="债券全称"> </el-table-column>
+        <el-table-column prop="shortName" label="债券简称"> </el-table-column>
+        <!-- <el-table-column prop="bondState" label="存续状态">
+          <template slot-scope="scope">
+            <span>{{ scope.row.bondState === 0 ? "Y" : "N" }}</span>
+          </template>
+        </el-table-column> -->
+        <el-table-column
+          prop="transactionCode"
+          label="债募类型"
+        ></el-table-column>
+        <el-table-column label="公私募类型">
+          <template slot-scope="scope">
+            <span>{{ scope.row.raiseType === 0 ? "公募" : "私募" }}</span>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="是否违约">
+          <template slot-scope="scope">
+            <span>{{ scope.row.bondState === 1 ? "Y" : "N" }}</span>
+          </template>
+        </el-table-column> -->
         <el-table-column prop="zip" label="操作">
           <template slot-scope="scope">
-            <el-button @click="setTarget(scope.row)" type="text" size="small"
+            <el-button @click="setTarget2(scope.row)" type="text" size="small"
               >设为目标</el-button
             >
           </template></el-table-column
@@ -85,45 +100,22 @@
       </div>
       <el-card>
         <el-col :sm="24" :lg="12" class="form-card">
-          <div class="flex1 mt10">
-            <div class="first">德勤主体代码</div>
-            <div class="content">GV304892</div>
-            <el-button class="edit-btn" type="text" size="mini">修改</el-button>
+          <div
+            v-for="(item, index) in xContent"
+            :key="index"
+            class="flex1 mt10"
+          >
+            <div class="first">{{ item.key }}</div>
+            <div class="content">{{ item.value || "-" }}</div>
           </div>
-          <div class="flex1 mt10">
-            <div class="first">德勤主体代码</div>
-            <div class="content">GV304892</div>
-            <el-button class="edit-btn" type="text" size="mini">修改</el-button>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">德勤主体代码</div>
-            <div class="content">GV304892</div>
-            <el-button class="edit-btn" type="text" size="mini">修改</el-button>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">德勤主体代码</div>
-            <div class="content">GV304892</div>
-            <el-button class="edit-btn" type="text" size="mini">修改</el-button>
-          </div>
+          <span v-if="xContent.length === 0">暂无数据</span>
         </el-col>
-        <el-col :sm="24" :lg="12" class="form-card">
-          <div class="flex1 mt10">
-            <div class="first">曾用名或别称备注</div>
-            <div class="content">-</div>
+        <!-- <el-col :sm="24" :lg="12" class="form-card">
+          <div v-for="(item,index) in xContent" :key="index" class="flex1 mt10">
+            <div class="first">{{ item.key }}</div>
+            <div class="content">{{ item.value }}</div>
           </div>
-          <div class="flex1 mt10">
-            <div class="first">曾用名或别称备注</div>
-            <div class="content">-</div>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">曾用名或别称备注</div>
-            <div class="content">-</div>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">曾用名或别称备注</div>
-            <div class="content">-</div>
-          </div>
-        </el-col>
+        </el-col> -->
       </el-card>
     </div>
     <el-dialog
@@ -205,46 +197,18 @@
 </template>
 
 <script>
-import { findBondOrEntity, findRelationEntityOrBond } from "@/api/bond";
+import {
+  findBondOrEntity,
+  findRelationEntityOrBond,
+  findAllDetail,
+} from "@/api/bond";
 export default {
   name: "government",
   data() {
     return {
       input: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
+      list2: [],
       loading: false,
       dialogVisible: false,
       ruleForm: {
@@ -295,6 +259,8 @@ export default {
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
       },
       tab: 1,
+      entityCode: "",
+      xContent: [],
     };
   },
   created() {},
@@ -312,7 +278,6 @@ export default {
           data.forEach((e) => {
             this.list.push(e.entityVo);
           });
-          console.log(this.list);
         });
       } catch (error) {
         console.log(error);
@@ -336,16 +301,41 @@ export default {
       this.$modal.loading("loading...");
       try {
         const parmas = {
-          keyword: this.tab === 1 ? "BOND_CODE" : "ENTITY_CODE ",
-          code: this.input,
+          keyword: this.tab === 1 ? "ENTITY" : "BOND",
+          id: row.id,
         };
+        this.entityCode = row.entityCode;
         findRelationEntityOrBond(parmas).then((res) => {
           const { data } = res;
-          this.list = [];
+          this.list2 = [];
           data.forEach((e) => {
-            this.list.push(e.entityVo);
+            this.list2.push(e.bondVo);
           });
-          console.log(this.list);
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    setTarget2(row) {
+      this.$modal.loading("loading...");
+      try {
+        const parmas = {
+          bondCode: row.bondCode,
+          entityCode: this.entityCode,
+        };
+        findAllDetail(parmas).then((res) => {
+          const { data } = res;
+          this.xContent = [];
+          for (const key in data.attrs) {
+            const x = {
+              key: data.attrs[key].name,
+              value: data.attrs[key].value,
+            };
+            this.xContent.push(x);
+          }
+          console.log(this.xContent);
         });
       } catch (error) {
         console.log(error);
