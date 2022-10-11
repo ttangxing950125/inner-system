@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.dto.EntityAttrDetailDto;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -63,7 +64,7 @@ public interface BondInfoMapper extends BaseMapper<BondInfo>
     public int deleteBondInfoByIds(Long[] ids);
 
 
-    BondInfo findByShortName(String shortName);
+    BondInfo findByShortName(@Param("shortName") String shortName ,@Param("isDeleted") Boolean isDeleted );
 
     /**
      * 单表查询并封装进对象

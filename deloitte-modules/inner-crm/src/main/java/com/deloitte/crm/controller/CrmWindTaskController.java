@@ -3,6 +3,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.dto.TaskDto;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.vo.CrmTaskVo;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
@@ -163,6 +164,30 @@ public class CrmWindTaskController extends BaseController
     )})
     public R getTaskCompleted(@RequestBody CrmTaskVo crmTaskVo) {
        return R.ok(crmWindTaskService.selectComTaskByDate(crmTaskVo));
+    }
+
+    /**
+     *根据指定日期查询任务总完成信息
+     *
+     * @param
+     * @return R
+     * @author penTang
+     * @date 2022/9/22 10:45
+     */
+    @GetMapping("/getTaskCount")
+    @ApiOperation(value = "{根据指定TaskDate查询任务完成信息}",response = TaskDto.class)
+    @ApiImplicitParams({@ApiImplicitParam(
+            name = "TaskDate",
+            value = "Crm_wind_task task_date,任务日期",
+            paramType = "query",
+            example = "2022-09-23",
+            dataType = "String"
+
+    )})
+    public R getTaskCount(@RequestParam("TaskDate") String TaskDate){
+
+
+        return null;
     }
 
     /**

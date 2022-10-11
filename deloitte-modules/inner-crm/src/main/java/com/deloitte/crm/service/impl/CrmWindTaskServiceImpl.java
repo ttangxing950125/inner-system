@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.dto.TaskDto;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
@@ -19,6 +21,7 @@ import com.deloitte.crm.vo.WindTaskDetailsVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.dto.CrmWindTaskDto;
+import com.deloitte.system.api.model.LoginUser;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -210,6 +213,20 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(page,crmTaskVo.getTaskDate());
         return crmWindTaskDtos;
     }
+
+    /**
+     *根据指定日期查询任务完成信息
+     *
+     * @param taskDate
+     * @return List<TaskDto>
+     * @author penTang
+     * @date 2022/10/11 18:56
+    */
+    public List<TaskDto> getTaskCompletedByDate(String taskDate){
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        return null;
+    }
+
 
     /**
      *批量保存每日角色任务信息

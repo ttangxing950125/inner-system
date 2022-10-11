@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -49,6 +51,12 @@ public class EntityInfo implements Serializable
     /** 是否金融机构 0-否 1-是 */
     @Excel(name = "是金融机构 0-否 1-是")
     private Integer finance;
+
+
+    /** 年报示例类型*/
+    @ApiModelProperty(value="年报示例类型")
+    @NotNull(message = "年报示例类型不能为空")
+    private String listType;
 
     /** 统一社会信用代码是否异常 0-正常 1-异常 */
     @Excel(name = "统一社会信用代码是否异常 0-正常 1-异常")
