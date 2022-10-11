@@ -130,11 +130,16 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
     private final String GOV_CODE = "GOV_CODE";
 
+    //债券简称
     private final String BOND_CODE = "BOND_CODE";
-
+    //A股代码
     private final String STOCK_CN_CODE = "STOCK_CN_INFO";
-
+    //港股代码
     private final String STOCK_HK_CODE = "STOCK_HK_INFO";
+    //A股简称
+    private final String STOCK_A_NAME = "STOCK_A_NAME";
+    //港股简称
+    private final String STOCK_HK_NAME = "STOCK_HK_NAME";
 
 
 
@@ -202,6 +207,14 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 StockThkInfo stockTHKInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target));
                 if (stockTHKInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
                 }else {return new CheckVo().setData(stockTHKInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+            case STOCK_A_NAME:
+                StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target));
+                if (stockCnInfoByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else {return new CheckVo().setData(stockCnInfoByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+            case STOCK_HK_NAME:
+                StockThkInfo stockTHKInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target));
+                if (stockTHKInfoByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else {return new CheckVo().setData(stockTHKInfoByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             default:
                 return new CheckVo().setMsg(BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }
