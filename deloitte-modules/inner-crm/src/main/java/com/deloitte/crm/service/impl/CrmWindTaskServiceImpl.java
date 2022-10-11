@@ -207,9 +207,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Override
     public List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo){
         Page<CrmWindTaskDto> page = new Page<>(crmTaskVo.getPageNum(),crmTaskVo.getPageSize());
-
         List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(page,crmTaskVo.getTaskDate());
-
         return crmWindTaskDtos;
     }
 

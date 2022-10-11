@@ -76,6 +76,21 @@ public enum Common {
     public static final String STOCK_CODE = "债券代码";
     public static final Integer STOCK_CODE_ID = 49;
 
+    public static final String  STOCK_TYPE_A= "A";
+
+    public static final String  STOCK_TYPE_G= "G";
+
+    public static final String  CHECK_TYPE1="无法识别";
+    public static final String  CHECK_TYPE2="识别成功,已覆盖主体";
+    public static final String  CHECK_TYPE3="识别成功,未覆盖主体";
+    public static final String  CHECK_TYPE4="一致无冲突";
+    public static final String  CHECK_TYPE5="不一致";
+    public static final String  CHECK_TYPE6="不适用";
+    public static final String  CHECK_TYPE7="未覆盖";
+    public static final String  CHECK_TYPE8="匹配冲突,需人工介入";
+    public static final String  CHECK_TYPE9="识别失败";
+
+
 
     //上市日期对应的att_id
     public static final Integer SHANSI_DATE_ID = 583;

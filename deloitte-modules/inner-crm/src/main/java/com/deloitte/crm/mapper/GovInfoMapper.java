@@ -1,7 +1,9 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.dto.GovInfoBynameDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -65,4 +67,6 @@ public interface GovInfoMapper extends BaseMapper<GovInfo>
     List<GovInfo> selectGovInfoListByTypeAndParam(GovInfo govInfo);
 
     List<GovInfo> selectCountByGroup(@Param("param") String param);
+
+    List<GovInfoBynameDto> getGovByname(Page<GovInfoBynameDto> page,@Param("govName") String govName);
 }

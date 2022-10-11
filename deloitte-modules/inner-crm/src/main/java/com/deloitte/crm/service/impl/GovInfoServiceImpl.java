@@ -18,6 +18,7 @@ import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoResult;
+import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
@@ -25,6 +26,7 @@ import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.HttpUtils;
 import lombok.AllArgsConstructor;
+import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -59,10 +61,13 @@ import static java.lang.System.out;
 @Service
 @AllArgsConstructor
 public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> implements IGovInfoService {
+    @Resource
     private GovInfoMapper govInfoMapper;
 
+    @Autowired
     private EntityAttrValueMapper entityAttrValueMapper;
 
+    @Resource
     private EntityNameHisMapper nameHisMapper;
 
     /**
@@ -697,5 +702,23 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             }
         }
         return resultMap;
+    }
+
+    /**
+     *覆盖查询政府主体
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 14:38
+    */
+    @Override
+    public R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo){
+
+        Page<GovInfoBynameDto> page= new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
+
+        return R.ok( govInfoMapper.getGovByname(page, entityOrGovByAttrVo.getEntityName()));
+
+
+
     }
 }

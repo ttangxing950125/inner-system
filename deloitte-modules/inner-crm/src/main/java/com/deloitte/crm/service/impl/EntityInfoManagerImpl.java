@@ -5,15 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.constants.StockInfo;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.EntityNameHis;
-import com.deloitte.crm.domain.GovInfo;
-import com.deloitte.crm.mapper.BondInfoMapper;
-import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
-import com.deloitte.crm.mapper.GovInfoMapper;
+import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.vo.CheckVo;
 import lombok.AllArgsConstructor;
@@ -46,6 +41,10 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     private final BondInfoMapper bondInfoMapper;
 
     private final GovInfoMapper govInfoMapper;
+
+    private final StockCnInfoMapper stockCnInfoMapper;
+
+    private final StockThkInfoMapper stockThkInfoMapper;
 
 
 
@@ -131,6 +130,14 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
     private final String GOV_CODE = "GOV_CODE";
 
+    private final String BOND_CODE = "BOND_CODE";
+
+    private final String STOCK_CN_CODE = "STOCK_CN_INFO";
+
+    private final String STOCK_HK_CODE = "STOCK_HK_INFO";
+
+
+
 
     /**
      *   *****************
@@ -180,6 +187,21 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
                 if(govByCode==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
                 }else{return new CheckVo().setData(govByCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                //债券代码查重
+            case BOND_CODE:
+                BondInfo bondOriCode = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getOriCode, target));
+                if (bondOriCode==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else{return new CheckVo().setData(bondOriCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                //A股查重
+            case STOCK_CN_CODE:
+                StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockCode, target));
+                if (stockCnInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else {return new CheckVo().setData(stockCnInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                //港股查重
+            case STOCK_HK_CODE:
+                StockThkInfo stockTHKInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target));
+                if (stockTHKInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else {return new CheckVo().setData(stockTHKInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             default:
                 return new CheckVo().setMsg(BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }

@@ -5,6 +5,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.dto.GovInfoDto;
+import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 
 import java.util.List;
 import java.util.Map;
@@ -106,4 +107,5 @@ public interface IGovInfoService  extends IService<GovInfo>
      * @return
      */
     R<String> getPreGovName(String govCode);
+    R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo);
 }

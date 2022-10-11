@@ -1,4 +1,24 @@
 package com.deloitte.crm.controller;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.service.EntityAttrIntypeService;
+import com.deloitte.crm.vo.EntityByIondVo;
+import com.deloitte.crm.vo.EntityStockInfoVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -38,6 +58,8 @@ public class EntityAttrValueController extends BaseController {
     @Autowired
     private IEntityAttrValueService entityAttrValueService;
 
+    @Autowired
+    private EntityAttrIntypeService entityAttrIntypeService;
     /**
      * 查询【请填写功能名称】列表
      */
@@ -155,6 +177,60 @@ public class EntityAttrValueController extends BaseController {
         }
         return null;
     }
+
+    /**
+     *获取上市板块
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 17:22
+    */
+    @GetMapping("/getLisSec")
+    public R getLisSec(String StockType){
+        if (ObjectUtils.equals(StockType,Common.STOCK_TYPE_A)){
+
+
+
+        }else {
+
+
+        }
+        return null;
+
+    }
+    /**
+     *获取交易所
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 17:23
+    */
+    @GetMapping("/getExchange")
+    public R getExchange(String StockType){
+        if (ObjectUtils.equals(StockType,Common.STOCK_TYPE_A)){
+
+
+
+        }else {
+
+
+        }
+        return null;
+
+
+    }
+    /**
+     *获取金融机构子行业
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 17:24
+    */
+    @GetMapping("/getFinanceSubIndu")
+    public R getFinanceSubIndu(Integer attrId){
+        return R.ok(entityAttrIntypeService.getTypeByAttrId(attrId));
+    }
+
 
 
     /**
