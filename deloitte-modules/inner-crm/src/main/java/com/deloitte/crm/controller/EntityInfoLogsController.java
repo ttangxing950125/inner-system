@@ -33,11 +33,19 @@ public class EntityInfoLogsController extends BaseController {
     @Resource
     private EntityInfoLogsService entityInfoLogsService;
 
-    @ApiOperation(value = "查询 企业主体-历史记录")
+    @ApiOperation(value = "查询 企业主体股票-历史记录")
     @RequiresPermissions("crm:entityInfoLogs:list")
     @RequestMapping("/list/{type}")
     public R<Object> list(@PathVariable("type") String type, HttpServletRequest request, HttpServletResponse response) {
         return (R<Object>) entityInfoLogsService.findAllByType(type);
     }
+    @ApiOperation(value = "撤销停用")
+    @RequiresPermissions("crm:entityInfoLogs:cancel")
+    @RequestMapping("/cancel/{id}")
+    public R<Object>  cancel(@PathVariable("code") Integer id){
+        return (R<Object>) entityInfoLogsService.cancel(id);
+    }
+
+
 
 }

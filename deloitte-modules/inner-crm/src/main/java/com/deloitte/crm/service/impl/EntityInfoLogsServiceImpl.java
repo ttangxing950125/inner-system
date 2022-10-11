@@ -12,9 +12,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.domain.BondInfo;
+import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.EntityInfoLogsMapper;
 import com.deloitte.crm.domain.EntityInfoLogs;
 import com.deloitte.crm.service.EntityInfoLogsService;
+import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.vo.EntityInfoLogsByBondVo;
 import com.deloitte.crm.vo.EntityInfoLogsBySockVo;
 import com.deloitte.crm.vo.EntityInfoLogsExpand;
@@ -25,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.record.DVALRecord;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -42,12 +46,15 @@ import java.util.stream.Collectors;
 public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper, EntityInfoLogs> implements EntityInfoLogsService {
     @Resource
     private EntityInfoLogsMapper entityInfoLogsMapper;
+    @Resource
+    private BondInfoMapper bondInfoMapper;
 
     /**
      * 根据类型查询
      * CompletableFuture 使用线程池为ForkJoinPool
      * {@link java.util.concurrent.ForkJoinPool}
      * TODO 后期优化
+     *
      * @param findType 查询类型
      * @return 股票 & 债券
      * @see EntityInfoLogs#operType
@@ -156,5 +163,25 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
         } else {
             throw new ServiceException("参数非法");
         }
+    }
+
+    /**
+     * 撤销
+     *
+     * @param code
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Object cancel(Integer id) {
+        EntityInfoLogs entityInfoLogs = Optional.ofNullable(entityInfoLogsMapper.selectOne(new LambdaQueryWrapper<EntityInfoLogs>().eq(EntityInfoLogs::getId, id))).orElseThrow(() -> new ServiceException("数据不存在"));
+        if (entityInfoLogs.getOperType().equals("3")) {
+            final BondInfo bondInfo = bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getOriCode, entityInfoLogs.getCode()).eq(BondInfo::getBondShortName, entityInfoLogs.getName()));
+            if (bondInfo != null) {
+                bondInfo.setIsDeleted(Boolean.TRUE);
+                bondInfoMapper.updateBondInfo(bondInfo);
+            }
+        }
+        return null;
     }
 }
