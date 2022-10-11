@@ -66,9 +66,10 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             //没有就创建一个
             if (stockThkInfo == null) {
                 stockThkInfo = new StockThkInfo();
-                stockThkInfo.setStockCode(code);
-                stockThkInfo.setStockName(thkSecIssInfos.getName());
             }
+
+            stockThkInfo.setStockCode(code);
+            stockThkInfo.setStockName(thkSecIssInfos.getName());
 
             //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
             Integer changeType = null;
