@@ -97,7 +97,6 @@ public class EntityStockInfoVo {
 
     /** 主体曾用名*/
     @ApiModelProperty(value="主体曾用名")
-    @NotNull(message = "主体曾用名-不能为空")
     private String entityNameHis;
 
 
