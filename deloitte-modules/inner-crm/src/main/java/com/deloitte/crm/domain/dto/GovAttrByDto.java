@@ -22,22 +22,29 @@ public class GovAttrByDto implements Serializable
     private Integer pageSize;
 
     private Integer pageNum;
-    /** 公募债券 */
-    private Integer gov_level;
+
     /** 百强县 */
     private Integer hundred;
     /** 城市规模 */
-    private Integer gov_scale;
+    private List<Integer> govScale;
     /** 城市分级 */
-    private Integer gov_grading;
-//    省级行政区
-//            经开高新区
-//    地级行政区
-//            八大经济区
-//    县级行政区
-//19个城市群
-//        国家中心城市
-//    省会城市
+    private List<Integer> govGrading;
+    /** 省级行政区 */
+    private Integer isProvince;
+    /** 地级行政区 */
+    private Integer isCity;
+    /** 县级行政区 */
+    private Integer isCounty;
+    /** 经开高新区 */
+    private Integer isJKGX;
+    /** 八大经济区 *///    八大经济区 ——> 经济区归属
+    private Integer eightER ;
+    /** 19个城市群 *///    19个城市群 ——> 城市群归属
+    private Integer nineteenCity;
+    /** 国家中心城市 *///    国家中心城市 ——> 是否为国家中心城市
+    private Integer CCity;
+    /** 省会城市 *///    省会城市 ——> 是否为省会城市
+    private Integer provincial;
 
     @Override
     public String toString() {

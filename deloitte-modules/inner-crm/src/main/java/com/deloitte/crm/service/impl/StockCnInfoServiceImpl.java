@@ -1,4 +1,5 @@
 package com.deloitte.crm.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +10,7 @@ import com.deloitte.crm.mapper.StockCnInfoMapper;
 import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.service.StockCnInfoService;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
 
@@ -23,40 +25,42 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
 
     @Resource
     private StockCnInfoMapper mapper;
+
     /**
-     *添加股票代码查重
+     * 添加股票代码查重
      *
      * @param StockBode
      * @return R
      * @author penTang
      * @date 2022/9/28 22:40
-    */
-    @Override
-     public R checkStockCnInfo(String StockBode){
-         LambdaQueryWrapper<StockCnInfo> Wrapper = new LambdaQueryWrapper<StockCnInfo>();
-         StockCnInfo stockCnInfo = mapper.selectOne(Wrapper.eq(StockCnInfo::getStockCode, StockBode));
-         if (ObjectUtils.isEmpty(stockCnInfo)) {
-             return R.ok(stockCnInfo);
-         }
-         return  R.ok(stockCnInfo);
-     }
-     /**
-      *股票简称查重
-      *
-      * @param SortName
-      * @return R
-      * @author penTang
-      * @date 2022/9/28 22:55
      */
-     @Override
-     public R checkSortName(String SortName){
-         LambdaQueryWrapper<StockCnInfo> Wrapper = new LambdaQueryWrapper<StockCnInfo>();
-         StockCnInfo stockCnInfo = mapper.selectOne(Wrapper.eq(StockCnInfo::getStockShortName, SortName));
-         if (ObjectUtils.isEmpty(stockCnInfo)){
-             return R.ok(stockCnInfo);
-         }
-         return  R.ok(stockCnInfo);
-     }
+    @Override
+    public R checkStockCnInfo(String StockBode) {
+        LambdaQueryWrapper<StockCnInfo> Wrapper = new LambdaQueryWrapper<StockCnInfo>();
+        StockCnInfo stockCnInfo = mapper.selectOne(Wrapper.eq(StockCnInfo::getStockCode, StockBode));
+        if (ObjectUtils.isEmpty(stockCnInfo)) {
+            return R.ok(stockCnInfo);
+        }
+        return R.ok(stockCnInfo);
+    }
+
+    /**
+     * 股票简称查重
+     *
+     * @param SortName
+     * @return R
+     * @author penTang
+     * @date 2022/9/28 22:55
+     */
+    @Override
+    public R checkSortName(String SortName) {
+        LambdaQueryWrapper<StockCnInfo> Wrapper = new LambdaQueryWrapper<StockCnInfo>();
+        StockCnInfo stockCnInfo = mapper.selectOne(Wrapper.eq(StockCnInfo::getStockShortName, SortName));
+        if (ObjectUtils.isEmpty(stockCnInfo)) {
+            return R.ok(stockCnInfo);
+        }
+        return R.ok(stockCnInfo);
+    }
 
 
     @Resource
@@ -64,6 +68,7 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
 
     /**
      * 根据code查询 大陆股票
+     *
      * @param code
      * @return
      */
@@ -71,36 +76,32 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
     public StockCnInfo findByCode(String code) {
         //去缓存中查询
         StockCnInfo stockCnInfo = redisService.getCacheMapValue(CacheName.STOCK_CN_INFO, code);
-
-        if (stockCnInfo==null){
+        if (stockCnInfo == null) {
             stockCnInfo = baseMapper.findByCode(code);
             redisService.setCacheMapValue(CacheName.STOCK_CN_INFO, code, stockCnInfo);
         }
-
-
-
         return stockCnInfo;
     }
 
     /**
      * 保存或更新，会删缓存
+     *
      * @param cnInfo
      * @return
      */
     @Override
     public StockCnInfo saveOrUpdateNew(StockCnInfo cnInfo) {
-        if (cnInfo.getId()!=null){
+        if (cnInfo.getId() != null) {
             int count = baseMapper.updateById(cnInfo);
-            cnInfo = count>0 ?  baseMapper.selectById(cnInfo.getId()) : cnInfo;
-        }else {
+            cnInfo = count > 0 ? baseMapper.selectById(cnInfo.getId()) : cnInfo;
+        } else {
             baseMapper.insert(cnInfo);
-            DecimalFormat g1=new DecimalFormat("000000");
+            DecimalFormat g1 = new DecimalFormat("000000");
             String startZeroStr = g1.format(cnInfo.getId());
-            cnInfo.setStockDqCode("SA"+startZeroStr);
+            cnInfo.setStockDqCode("SA" + startZeroStr);
 
             baseMapper.updateById(cnInfo);
         }
-
         redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, cnInfo.getStockCode());
 
         return cnInfo;

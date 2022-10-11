@@ -2,18 +2,23 @@ package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
+import cn.hutool.poi.excel.cell.CellUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
+import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -24,6 +29,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmEntityTaskService;
@@ -32,6 +38,7 @@ import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.*;
+import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -44,14 +51,18 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -69,6 +80,16 @@ import static java.lang.System.out;
 public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityInfo> implements IEntityInfoService {
 
     private IEntityNameHisService iEntityNameHisService;
+
+    @Autowired
+    private EntityStockCnRelMapper cnRelMapper;
+
+    @Autowired
+    private EntityStockThkRelMapper thkRelMapper;
+
+    public static final String ENTITY = "ENTITY";
+
+    public static final String BOND = "BOND";
 
     private EntityInfoMapper entityInfoMapper;
 
@@ -89,6 +110,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityNameHisMapper entityNameHisMapper;
 
     private ICrmEntityTaskService iCrmEntityTaskService;
+
+    private RedisService redisService;
 
     /**
      * 统计企业主体信息
@@ -182,13 +205,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer id = entityInfo.getId();
 
         // 生成entity_code 那么将该值的 用 IB+0..+id  例 IB000001
-        String entityCode = "IB"+this.appendPrefix(6, id);
+        String entityCode = "IB" + this.appendPrefix(6, id);
         entityInfo.setEntityCode(entityCode);
 
         // 判断社会信用代码是否适用 => 适用为 空 并为其赋值 5 否则有数字
         Integer creditErrorType = entityDto.getCreditErrorType();
-        if(creditErrorType==null){creditErrorType=5;entityDto.setCreditErrorType(creditErrorType);}
-        switch (creditErrorType){
+        if (creditErrorType == null) {
+            creditErrorType = 5;
+            entityDto.setCreditErrorType(creditErrorType);
+        }
+        switch (creditErrorType) {
             case 1:
                 //注销企业:ZX+企业德勤代码+R+自0000001开始排序。
                 entityInfo.setCreditCode(this.appendCreditCode("ZX", entityCode));
@@ -417,8 +443,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R getInfoList(Integer type, String param) {
         EntityInfo entityInfo = new EntityInfo();
 //        企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构
-        if (ObjectUtils.isEmpty(type)){
-            type=1;
+        if (ObjectUtils.isEmpty(type)) {
+            type = 1;
         }
         if (type == 1) {
             entityInfo.setList(1);
@@ -433,7 +459,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfo.setEntityCode(param);
         entityInfo.setEntityName(param);
         List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam(entityInfo);
-        if (CollectionUtils.isEmpty(entityInfoList)){
+        if (CollectionUtils.isEmpty(entityInfoList)) {
             return R.ok();
         }
         //封装结果集
@@ -448,24 +474,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         Map<String, List<EntityNameHis>> finalHisNameListMap = hisNameListMap;
         Integer finalType = type;
-        List<String>codeList=new ArrayList<>();
-        entityInfoList.stream().forEach(o->codeList.add(o.getEntityCode()));
+        List<String> codeList = new ArrayList<>();
+        entityInfoList.stream().forEach(o -> codeList.add(o.getEntityCode()));
 
         entityInfoList.stream().forEach(o -> {
             finalRecords.add(getResultMap(o, finalHisNameListMap, finalType));
         });
-        records=finalRecords;
+        records = finalRecords;
         //查询上市特定列----证券代码，上市日期，退市日期，更新记录  1
-        if (type==1){
+        if (type == 1) {
             records = getListSpecial(records, codeList);
         }
         //查询发债特定列----存续债数量 存续债明细  2
-        else if (type==2){
-            records =getIssSpecial(records,codeList);
+        else if (type == 2) {
+            records = getIssSpecial(records, codeList);
         }
         //查询金融机构特定列----细分行业  4  TODO
-        else if (type==4){
-            records=getFinSpecial(records,codeList);
+        else if (type == 4) {
+            records = getFinSpecial(records, codeList);
         }
         return R.ok(records);
     }
@@ -514,6 +540,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
     }
 
+    @Override
+    public R<EntityInfoVo> validEntity(String creditCode, String entityName) {
+
+        return null;
+    }
+
+    /**
+     * 根据统一社会信用代码 查询主体信息
+     * @param creditCode
+     * @return
+     */
+    @Override
+    public EntityInfo getEntityInfoByCreditCode(String creditCode) {
+        return baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode,creditCode));
+    }
+
     /**
      * 全量导出
      *
@@ -531,7 +573,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer abs = entityAttrDto.getAbs();
         Integer coll = entityAttrDto.getColl();
 
-        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType,abs,coll);
+        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
@@ -632,8 +674,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer raiseType = entityAttrDto.getRaiseType();
         Integer abs = entityAttrDto.getAbs();
         Integer coll = entityAttrDto.getColl();
-        if (ObjectUtils.isEmpty(pageSize)){
-            pageSize=9;
+        if (ObjectUtils.isEmpty(pageSize)) {
+            pageSize = 9;
         }
         Page<EntityInfoResult> pageResult = new Page<>(pageNum, pageSize);
         //封装新的结果集
@@ -642,8 +684,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
-        pageNum=pageNum*pageSize-1;
-        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll,pageNum,pageSize);
+        pageNum = pageNum * pageSize - 1;
+        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize);
         pageResult.setTotal(count);
 
         records.stream().forEach(o -> {
@@ -721,14 +763,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 冉浩岑
      * @date 2022/9/22 23:45
      */
-    public Map<String, Object> getResultMap(EntityInfo entityInfo, Map<String, List<EntityNameHis>> map,Integer type) {
+    public Map<String, Object> getResultMap(EntityInfo entityInfo, Map<String, List<EntityNameHis>> map, Integer type) {
         Map<String, Object> resultMap = new HashMap();
         if (null != entityInfo) {
             resultMap = JSON.parseObject(JSON.toJSONString(entityInfo), new TypeReference<Map<String, String>>() {
             });
             SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-            resultMap.put("updated",sdf2.format(entityInfo.getUpdated()) );
-            resultMap.put("created",sdf2.format(entityInfo.getCreated()) );
+            resultMap.put("updated", sdf2.format(entityInfo.getUpdated()));
+            resultMap.put("created", sdf2.format(entityInfo.getCreated()));
             try {
                 Integer count = 0;
                 if (!map.isEmpty()) {
@@ -746,99 +788,104 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return resultMap;
     }
 
-    private List<Map<String, Object>> getFinSpecial(List<Map<String, Object>>record,List<String>codeList) {
-        QueryWrapper<EntityAttrValue>valueQueryWrapper=new QueryWrapper<>();
+    private List<Map<String, Object>> getFinSpecial(List<Map<String, Object>> record, List<String> codeList) {
+        QueryWrapper<EntityAttrValue> valueQueryWrapper = new QueryWrapper<>();
 
         List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQueryWrapper.lambda()
                 .eq(EntityAttrValue::getAttrId, 656)
                 .in(EntityAttrValue::getEntityCode, codeList)
         );
-        if (CollectionUtils.isEmpty(attrValueList)){
+        if (CollectionUtils.isEmpty(attrValueList)) {
             return record;
         }
-        for (int i=0;i<record.size();i++){
+        for (int i = 0; i < record.size(); i++) {
 
             Map<String, Object> result = record.get(i);
             String entityCode = result.get("entityCode").toString();
             List<EntityAttrValue> valueList = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode)).get(entityCode);
-            if (CollectionUtils.isEmpty(valueList)){
-                record.set(i,result);
+            if (CollectionUtils.isEmpty(valueList)) {
+                record.set(i, result);
                 continue;
             }
             //存续债明细 TODO
-            List<String>liveBondDetail=new ArrayList<>();
-            valueList.stream().forEach(o->liveBondDetail.add(o.getValue()));
+            List<String> liveBondDetail = new ArrayList<>();
+            valueList.stream().forEach(o -> liveBondDetail.add(o.getValue()));
             //细分行业
-            result.put("industry",liveBondDetail);
-            record.set(i,result);
+            result.put("industry", liveBondDetail);
+            record.set(i, result);
         }
         return record;
     }
 
-    /** 查询发债特定列----存续债数量 存续债明细  2*/
-    private List<Map<String, Object>> getIssSpecial(List<Map<String, Object>>record,List<String>codeList) {
-        QueryWrapper<EntityBondRel>relQueryWrapper=new QueryWrapper<>();
+    /**
+     * 查询发债特定列----存续债数量 存续债明细  2
+     */
+    private List<Map<String, Object>> getIssSpecial(List<Map<String, Object>> record, List<String> codeList) {
+        QueryWrapper<EntityBondRel> relQueryWrapper = new QueryWrapper<>();
 
         List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(relQueryWrapper.lambda()
-                        .eq(EntityBondRel::getStatus, 1)
-                        .in(EntityBondRel::getEntityCode, codeList)
+                .eq(EntityBondRel::getStatus, 1)
+                .in(EntityBondRel::getEntityCode, codeList)
         );
-        if (CollectionUtils.isEmpty(entityBondRels)){
+        if (CollectionUtils.isEmpty(entityBondRels)) {
             return record;
         }
-        for (int i=0;i<record.size();i++){
-            Integer liveBond=0;
+        for (int i = 0; i < record.size(); i++) {
+            Integer liveBond = 0;
             Map<String, Object> result = record.get(i);
             String entityCode = result.get("entityCode").toString();
             List<EntityBondRel> bondRels = entityBondRels.stream().collect(Collectors.groupingBy(EntityBondRel::getEntityCode)).get(entityCode);
 
             //债券存续数量
-            result.put("liveBond",liveBond);
-            if (CollectionUtils.isEmpty(bondRels)){
-                record.set(i,result);
+            result.put("liveBond", liveBond);
+            if (CollectionUtils.isEmpty(bondRels)) {
+                record.set(i, result);
                 continue;
             }
-            liveBond=bondRels.size();
+            liveBond = bondRels.size();
             //存续债明细 TODO
-            List<String>liveBondDetail=new ArrayList<>();
-            bondRels.stream().forEach(o->liveBondDetail.add(o.getBdCode()));
+            List<String> liveBondDetail = new ArrayList<>();
+            bondRels.stream().forEach(o -> liveBondDetail.add(o.getBdCode()));
             //债券存续数量
-            result.put("liveBond",liveBond);
-            result.put("liveBondDetail",liveBondDetail);
-            record.set(i,result);
+            result.put("liveBond", liveBond);
+            result.put("liveBondDetail", liveBondDetail);
+            record.set(i, result);
         }
         return record;
     }
-    /**查询上市特定列----证券代码，上市日期，退市日期，更新记录  1*/
-    private List<Map<String, Object>> getListSpecial(List<Map<String, Object>> record,List<String>codeList) {
+
+    /**
+     * 查询上市特定列----证券代码，上市日期，退市日期，更新记录  1
+     */
+    private List<Map<String, Object>> getListSpecial(List<Map<String, Object>> record, List<String> codeList) {
 
         //封装退市日期   A股退市 584  港股退市 602
-        QueryWrapper<EntityAttrValue>valueQueryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityAttrValue> valueQueryWrapper = new QueryWrapper<>();
         List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQueryWrapper.lambda()
                 .in(EntityAttrValue::getEntityCode, codeList)
                 .in(EntityAttrValue::getAttrId, 584, 602)
         );
 
-        QueryWrapper<EntityStockCnRel> cnRelQueryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityStockCnRel> cnRelQueryWrapper = new QueryWrapper<>();
         List<EntityStockCnRel> entityStockCnRels = cnRelMapper.selectList(cnRelQueryWrapper.lambda().in(EntityStockCnRel::getEntityCode, codeList));
 
-        QueryWrapper<EntityStockThkRel> thkRelQueryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityStockThkRel> thkRelQueryWrapper = new QueryWrapper<>();
         List<EntityStockThkRel> entityStockthkRels = thkRelMapper.selectList(thkRelQueryWrapper.lambda().in(EntityStockThkRel::getEntityCode, codeList));
         //封装证券代码
-        for (int i=0;i<record.size();i++){
+        for (int i = 0; i < record.size(); i++) {
             Map<String, Object> result = record.get(i);
-            String o=result.get("entityCode").toString();
+            String o = result.get("entityCode").toString();
             //证券代码
-            List<String>stockCodeList=new ArrayList<>();
+            List<String> stockCodeList = new ArrayList<>();
             //上市日期
-            List<String>stockDateList=new ArrayList<>();
+            List<String> stockDateList = new ArrayList<>();
             //退市日期
-            List<String>stockdownDateList=new ArrayList<>();
+            List<String> stockdownDateList = new ArrayList<>();
 
-            if (!CollectionUtils.isEmpty(entityStockCnRels)){
+            if (!CollectionUtils.isEmpty(entityStockCnRels)) {
                 List<EntityStockCnRel> cnRels = entityStockCnRels.stream().collect(Collectors.groupingBy(EntityStockCnRel::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(cnRels)){
-                    cnRels.stream().forEach(x->{
+                if (!CollectionUtils.isEmpty(cnRels)) {
+                    cnRels.stream().forEach(x -> {
                         //证券代码
                         stockCodeList.add(x.getStockDqCode());
                         //上市日期
@@ -846,10 +893,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     });
                 }
             }
-            if (!CollectionUtils.isEmpty(entityStockthkRels)){
+            if (!CollectionUtils.isEmpty(entityStockthkRels)) {
                 List<EntityStockThkRel> thkRels = entityStockthkRels.stream().collect(Collectors.groupingBy(EntityStockThkRel::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(thkRels)){
-                    thkRels.stream().forEach(x->{
+                if (!CollectionUtils.isEmpty(thkRels)) {
+                    thkRels.stream().forEach(x -> {
                         //证券代码
                         stockCodeList.add(x.getStockDqCode());
                         //上市日期
@@ -858,10 +905,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
             }
             //退市日期
-            if (!CollectionUtils.isEmpty(attrValueList)){
+            if (!CollectionUtils.isEmpty(attrValueList)) {
                 List<EntityAttrValue> attrValues = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(attrValues)){
-                    attrValues.stream().forEach(x->{
+                if (!CollectionUtils.isEmpty(attrValues)) {
+                    attrValues.stream().forEach(x -> {
                         stockdownDateList.add(x.getValue());
                     });
                 }
@@ -874,15 +921,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return record;
     }
 
-    @Autowired
-    private EntityStockCnRelMapper cnRelMapper;
-
-    @Autowired
-    private EntityStockThkRelMapper thkRelMapper;
-
-    public static final String ENTITY = "ENTITY";
-
-    public static final String BOND = "BOND";
 
     /**
      * 传入 bondInfo 查询返回 bondVo
@@ -998,7 +1036,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
                 Map<String, String> collect = bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName));
                 List<EntityAttrValue> targetList = entityAttrs.stream().filter(row -> !collect.containsKey(row.getEntityCode())).collect(Collectors.toList());
-
 
 
                 entityAttrs.stream().filter(row -> !bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName)).containsKey(row.getEntityCode())).collect(Collectors.toList());
@@ -1245,7 +1282,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 覆盖情况快速查询
      *
-     * @param entityType
      * @param param
      * @param pageNum
      * @param pageSize
@@ -1254,94 +1290,116 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/10/8 15:53
      */
     @Override
-    public R getQuickOfCoverage(String entityType, String param, Integer pageNum, Integer pageSize) {
+    public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         if (ObjectUtil.isEmpty(pageNum)) {
             return R.fail("未输入页码");
         }
         if (ObjectUtil.isEmpty(pageSize)) {
             pageSize = 9;
         }
-        if ("0".equals(entityType)) {
-            //创建分页对象
-            Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
+        //创建分页对象
+        Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
 
-            QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
 
-            //创建分页结果集
-            List<EntityInfoValueResult> resultList = new ArrayList<>();
-            Page<EntityInfoValueResult> pageResult = new Page<>();
+        //创建分页结果集
+        List<EntityInfoValueResult> resultList = new ArrayList<>();
+        Page<EntityInfoValueResult> pageResult = new Page<>();
 
-            Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
-                    .like(EntityInfo::getEntityCode, param)
-                    .or().like(EntityInfo::getEntityName, param)
-                    .or().like(EntityInfo::getCreditCode, param)
-            );
-            //新的分页结果赋值
-            pageResult.setTotal(page.getTotal()).setPages(page.getPages()).setSize(page.getSize()).setCurrent(page.getCurrent());
+        Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
+                .like(EntityInfo::getEntityCode, param)
+                .or().like(EntityInfo::getEntityName, param)
+                .or().like(EntityInfo::getCreditCode, param)
+        );
+        //新的分页结果赋值
+        pageResult.setTotal(page.getTotal()).setSize(page.getSize());
 
-            List<EntityInfo> records = page.getRecords();
-            if (CollectionUtils.isEmpty(records)) {
-                pageResult.setRecords(null);
-            } else {
-                records.stream().forEach(o -> {
-                    String entityCode = o.getEntityCode();
-                    QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-                    List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
-                    EntityInfoValueResult result = new EntityInfoValueResult();
-                    result.setEntityInfo(o).setValueList(attrValueList);
-                    resultList.add(result);
-                });
-                pageResult.setRecords(resultList);
-            }
-            return R.ok(pageResult);
-        } else if ("1".equals(entityType)) {
-            QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
-            //创建分页对象
-            Page<GovInfo> pageInfo = new Page<>(pageNum, pageSize);
-            //创建分页结果集
-            List<GovInfoValueResult> resultList = new ArrayList<>();
-            Page<GovInfoValueResult> pageResult = new Page<>();
+        List<EntityInfo> records = page.getRecords();
+        if (CollectionUtils.isEmpty(records)) {
+            pageResult.setRecords(null);
+        } else {
+            records.stream().forEach(o -> {
+                //封装后的新结果
+                EntityInfoValueResult result = new EntityInfoValueResult();
+                result.setEntityInfo(o);
+                String entityCode = o.getEntityCode();
+                //获取上市情况
+                String listDetail=getListDetail(o);
+                //获取发债情况
 
-            Page<GovInfo> page = govInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
-                    .like(GovInfo::getDqGovCode, param)
-                    .or().like(GovInfo::getGovName, param)
-                    .or().like(GovInfo::getGovLevelBig, param)
-            );
-            //新的分页结果赋值
-            pageResult.setTotal(page.getTotal()).setPages(page.getPages()).setSize(page.getSize()).setCurrent(page.getCurrent());
 
-            List<GovInfo> records = page.getRecords();
-            if (CollectionUtils.isEmpty(records)) {
-                pageResult.setRecords(null);
-            } else {
-                records.stream().forEach(o -> {
-                    String entityCode = o.getDqGovCode();
-                    QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-                    List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
-                    GovInfoValueResult result = new GovInfoValueResult();
-                    result.setGovInfo(o).setValueList(attrValueList);
-                    resultList.add(result);
-                });
-                pageResult.setRecords(resultList);
-            }
-            return R.ok(pageResult);
+                result.setListDetail(listDetail);
+                resultList.add(result);
+            });
+            pageResult.setRecords(resultList);
         }
+        return R.ok(pageResult);
+    }
+    //获取上市情况
+    private String getListDetail(EntityInfo o) {
+        String listDetail="";
 
-        return null;
+        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+        List<EntityAttrValue> attrValueListA = entityAttrValueMapper.selectList(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
+                .eq(EntityAttrValue::getAttrId, 25)
+        );
+        List<EntityAttrValue> attrValueListG = entityAttrValueMapper.selectList(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
+                .eq(EntityAttrValue::getAttrId, 44)
+        );
+        //                25		A股上市状态		1、存续 2、已退市 3、未曾A股上市
+        if (!CollectionUtils.isEmpty(attrValueListA)){
+            String value = attrValueListA.get(0).getValue();
+            if ("1".equals(value)){
+                listDetail=listDetail+"A股(存续)";
+            }else if("2".equals(value)){
+                listDetail=listDetail+"A股(已退市)";
+            }
+        }
+        //                44		港股上市状态		1、存续 2、已退市
+        if (!CollectionUtils.isEmpty(attrValueListG)){
+            String value = attrValueListG.get(0).getValue();
+            if ("1".equals(value)){
+                if (ObjectUtils.isEmpty(listDetail)){
+                    listDetail="B股";
+                }else {
+                    listDetail=listDetail+",B股";
+                }
+            }
+        }
+        return listDetail;
     }
 
     /**
-     *   ****************
-     *   *    通用方法   *
-     *   ****************
-     *
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
      * 拿到后缀数字
+     *
      * @param suffixLength 后缀长度
-     * @param target 字符
+     * @param target       字符
      */
     @Override
-    public Integer getSuffixNumber(Integer suffixLength,String target) {
-        return Integer.parseInt(target.substring(target.length()-suffixLength));
+    public Integer getSuffixNumber(Integer suffixLength, String target) {
+        return Integer.parseInt(target.substring(target.length() - suffixLength));
+    }
+
+    /**
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
+     * 拼接 0
+     *
+     * @param prefixLength 前缀长度
+     * @param target       字符
+     * @return
+     */
+    @Override
+    public String appendPrefix(Integer prefixLength, Integer target) {
+        return String.format("%0" + prefixLength + "d", target);
     }
 
     /**
@@ -1350,32 +1408,287 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      *   ****************
      *
      * 拼接 0
+     * @param prefixWord 前缀 拼接的字符
      * @param prefixLength 前缀长度
-     * @param target 字符
-     * @return
+     * @param target 目标字符
      */
     @Override
-    public String appendPrefix(Integer prefixLength, Integer target) {
-        return String.format("%0"+prefixLength+"d",target);
+    public String appendPrefixDiy(String prefixWord, Integer prefixLength, Integer target) {
+        return prefixWord+String.format("%0"+prefixLength,target);
     }
 
     /**
      * 统一社会信用代码不适用是 进行字符拼接
      * 例如 注销企业:ZX+企业德勤代码+R+自0000001开始排序。
+     *
      * @param prefix
      * @param entityCode
      * @return
      */
-    public String appendCreditCode(String prefix,String entityCode){
+    public String appendCreditCode(String prefix, String entityCode) {
         EntityInfo lastOneByPrefixCredit = baseMapper.findLastOneByPrefixCredit(prefix);
         String suffixString = null;
-        if(lastOneByPrefixCredit!=null){
+        if (lastOneByPrefixCredit != null) {
             Integer suffixNumber = this.getSuffixNumber(7, lastOneByPrefixCredit.getCreditCode());
             suffixString = this.appendPrefix(7, suffixNumber + 1);
-        }else{
+        } else {
             suffixString = "0000001";
         }
-        return prefix+entityCode+"R"+suffixString;
+        return prefix + entityCode + "R" + suffixString;
     }
+
+    /**
+     * 批量查询并导出excel结果
+     *
+     * @param file
+     * @return R
+     * @author penTang
+     * @date 2022/10/9 16:12
+     */
+    @Override
+    public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, String uuid) {
+        try {
+            //读取excel
+            List<EntityByBatchDto> entityByBatchDtos = this.getEntityAndBondInfoV(file);
+            ArrayList<ExportEntityCheckDto> entityByBatchList = new ArrayList<ExportEntityCheckDto>();
+            for (int i = 0; i < entityByBatchDtos.size(); i++) {
+                ExportEntityCheckDto exportEntityCheckDto = new ExportEntityCheckDto();
+                //添加原始数据
+                exportEntityCheckDto.setEntityName(entityByBatchList.get(i).getEntityName());
+                exportEntityCheckDto.setCreditCode(entityByBatchList.get(i).getCreditCode());
+                //统计社会性代码进行检查
+                if (Objects.equals(entityByBatchList.get(i).getCreditCode(), null) || Objects.equals(entityByBatchList.get(i).getCreditCode(), "")) {
+                    exportEntityCheckDto.setCreditCodeByRecord("无法识别");
+                } else {
+                    //校验统一社会性代码
+                    String code = entityByBatchList.get(i).getCreditCode();
+                    String regx = "\\w{18}";
+                    boolean matches = code.matches(regx);
+                    if (!matches) {
+                        exportEntityCheckDto.setCreditCodeByRecord("无法识别");
+                    } else {
+                        //根据统一查询数据库是否已覆盖
+                        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByBatchList.get(i).getCreditCode()));
+                        if (entityInfo != null) {
+                            exportEntityCheckDto.setCreditCodeByRecord("识别成功,已覆盖主体");
+                            exportEntityCheckDto.setCreditCodeByEntityName(entityInfo.getEntityName());
+                            exportEntityCheckDto.setCreditCodeByEntityCode(entityInfo.getEntityCode());
+                            exportEntityCheckDto.setCreditCodeByCreditCode(entityInfo.getCreditCode());
+                        } else {
+                            exportEntityCheckDto.setCreditCodeByRecord("识别成功,未覆盖主体");
+                        }
+                    }
+                }
+                //主体全称进行检查
+                if (Objects.equals(entityByBatchList.get(i).getEntityName(), null) || Objects.equals(entityByBatchList.get(i).getEntityName(), "")) {
+                    exportEntityCheckDto.setEntityNameByRecord("无法识别");
+                } else {
+                    //根据主体全称查询是否未覆盖
+                    EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityName, entityByBatchList.get(i).getEntityName()));
+                    if (entityInfo != null) {
+                        exportEntityCheckDto.setEntityNameByRecord("识别成功,已覆盖主体");
+                        exportEntityCheckDto.setEntityNameByEntityName(entityInfo.getEntityName());
+                        exportEntityCheckDto.setEntityNameByEntityCode(entityInfo.getEntityCode());
+                        exportEntityCheckDto.setEntityNameByCreditCode(entityInfo.getCreditCode());
+                    } else {
+                        exportEntityCheckDto.setEntityNameByRecord("识别成功,未覆盖主体");
+                    }
+                }
+                //冲突检查(不适用情况)
+                if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("识别失败");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("未覆盖");
+                } else if (exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("未覆盖");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("未覆盖");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("已覆盖");
+                    exportEntityCheckDto.setCreditCodeByResult(exportEntityCheckDto.getCreditCodeByCreditCode());
+                    exportEntityCheckDto.setEntityCodeByResult(exportEntityCheckDto.getCreditCodeByEntityCode());
+                    exportEntityCheckDto.setEntityNameByResult(exportEntityCheckDto.getCreditCodeByEntityName());
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
+                    exportEntityCheckDto.setEndByResult("已覆盖");
+                    exportEntityCheckDto.setCreditCodeByResult(exportEntityCheckDto.getEntityNameByCreditCode());
+                    exportEntityCheckDto.setEntityCodeByResult(exportEntityCheckDto.getEntityNameByEntityCode());
+                    exportEntityCheckDto.setEntityNameByResult(exportEntityCheckDto.getEntityNameByEntityName());
+                }
+                //冲突检查(不一致或者一致无冲突)
+                if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
+                    if (exportEntityCheckDto.getCreditCodeByEntityCode().equals(exportEntityCheckDto.getEntityNameByEntityCode())) {
+                        exportEntityCheckDto.setCreditCodeIsEntityName("一致无冲突");
+                        exportEntityCheckDto.setEndByResult("已覆盖");
+                        exportEntityCheckDto.setCreditCodeByResult(exportEntityCheckDto.getEntityNameByCreditCode());
+                        exportEntityCheckDto.setEntityCodeByResult(exportEntityCheckDto.getEntityNameByEntityCode());
+                        exportEntityCheckDto.setEntityNameByResult(exportEntityCheckDto.getEntityNameByEntityName());
+                    } else {
+                        exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
+                        exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
+                    }
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
+                    exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
+                } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
+                    exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
+                    exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
+                }
+                //数据匹配结束入容器
+                entityByBatchList.add(exportEntityCheckDto);
+                //将当前进度入redis-并设置过期时间为一天
+                double index = (i + 1) * 1.0;
+                double sum = entityByBatchDtos.size() * 1.0;
+                NumberFormat percentInstance = NumberFormat.getPercentInstance();
+                // 设置保留几位小数，这里设置的是保留1位小数
+                percentInstance.setMinimumFractionDigits(1);
+                String format = percentInstance.format(index / sum);
+                redisService.setCacheObject(uuid, format, 1L, TimeUnit.DAYS);
+            }
+
+
+            return entityByBatchList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    /**
+     * 通过uuid查询当前的进度
+     *
+     * @param uuid
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 20:54
+     */
+    @Override
+    public R getIng(String uuid) {
+        return R.ok(redisService.getCacheObject(uuid));
+    }
+
+    /**
+     * 读取excel文件数据
+     *
+     * @param file
+     * @return List<EntityAndBondInfoVo>
+     * @author penTang
+     * @date 2022/10/9 17:32
+     */
+    public List<EntityByBatchDto> getEntityAndBondInfoV(MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        //读取导入的excel
+        if (Strings.isNullOrEmpty(fileName)) {
+            throw new GlobalException("导入文件不能为空");
+        }
+
+        if (fileName.lastIndexOf(".") != -1 && !".xlsx".equals(fileName.substring(fileName.lastIndexOf(".")))) {
+            throw new GlobalException("文件名格式不正确, 请使用后缀名为.XLSX的文件");
+        }
+
+        InputStream inputStream = file.getInputStream();
+        ExcelReader reader = ExcelUtil.getReader(inputStream);
+        reader.addHeaderAlias("主体统一社会信用代码", "creditCode");
+        reader.addHeaderAlias("主体全称", "entityName");
+
+
+        List<EntityByBatchDto> entityByBatchDtos = reader.readAll(EntityByBatchDto.class);
+        return entityByBatchDtos;
+    }
+
+    /**
+     * 导出匹配的结果(excel)
+     *
+     * @return ExcelWriter
+     * @author penTang
+     * @date 2022/10/10 9:46
+     */
+    @Override
+    public R getExcelWriter(List<ExportEntityCheckDto> entityByBatchList) {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletResponse response = servletRequestAttributes.getResponse();
+        ExcelWriter writer = ExcelUtil.getWriter(true);
+        //合并一级表头
+
+        writer.merge(0, 0, 0, 1, "原始数据", true)
+                .merge(0, 0, 2, 5, "判别1-统一社会信用代码", true)
+                .merge(0, 0, 6, 9, "判别二：企业全称", true)
+                .merge(0, 0, 11, 14, "最终结果", true);
+        writer.passCurrentRow();// 跳过当前行
+        CellUtil.setCellValue(writer.getOrCreateCell(10, 0), "冲突检查", writer.getStyleSet(), true);
+
+        ArrayList<Map<String, Object>> rows = new ArrayList<>();
+        entityByBatchList.forEach(o -> {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("主体统一社会代码", o.getCreditCode());
+            map.put("主体全称", o.getEntityName());
+            map.put("根据统一社会性代码识别结果", o.getCreditCodeByRecord());
+            map.put("根据统一社会信用代码识别主体代码", o.getCreditCodeByEntityCode());
+            map.put("根据统一社会信用代码识别主体的最新名称", o.getCreditCodeByEntityName());
+            map.put("根据统一社会信用代码识别主体的根据统一社会信用代码", o.getCreditCodeByCreditCode());
+            map.put("根据主体全称识别结果", o.getEntityNameByRecord());
+            map.put("根据主体全称识别主体代码", o.getEntityNameByEntityCode());
+            map.put("根据主体全称识别主体名称", o.getEntityNameByEntityName());
+            map.put("根据主体全称识别统一社会信用代码", o.getEntityNameByCreditCode());
+            map.put("根据统一社会信用代码识别主体全称结果是否一致", o.getCreditCodeIsEntityName());
+            map.put("最终结果", o.getEndByResult());
+            map.put("最终匹配主体代码结果", o.getEntityCodeByResult());
+            map.put("最终匹配主体全称结果", o.getEntityNameByResult());
+            map.put("最终统一社会信用代码结果", o.getCreditCodeByResult());
+            rows.add(map);
+        });
+        //一次性写出内容，强制输出标题
+        writer.write(rows, true);
+        // 设置自适应
+        Sheet sheet = writer.getSheet();
+        // 循环设置列宽
+        for (int columnIndex = 0; columnIndex < writer.getColumnCount(); columnIndex++) {
+            int width = sheet.getColumnWidth(columnIndex) / 256;
+            // 获取最大行宽
+            for (int rowIndex = 0; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row currentRow = sheet.getRow(rowIndex);
+                if (Objects.isNull(currentRow)) {
+                    currentRow = sheet.createRow(rowIndex);
+                }
+                Cell currentCell = currentRow.getCell(columnIndex);
+                if (Objects.isNull(currentCell)) {
+                    continue;
+                } else if (currentCell.getCellType() == CellType.STRING) {
+                    int length = currentCell.getStringCellValue().getBytes().length;
+                    width = width < length ? length : width;
+                }
+            }
+            sheet.setColumnWidth(columnIndex, width * 256);
+        }
+        // response为HttpServletResponse对象
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setCharacterEncoding("utf-8");
+        //test.xlsx是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + (URLEncoder.encode("最终匹配结果", "UTF-8")) + ".xlsx");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+
+        }
+        try (ServletOutputStream out = response.getOutputStream()) {
+            writer.flush(out, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+        // 关闭writer，释放内存
+        writer.close();
+        IoUtil.close(out);
+        return R.ok("导出成功");
+
+    }
+
 
 }

@@ -1,8 +1,11 @@
 package com.deloitte.crm.service.impl;
-
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.lang.annotation.Annotation;
+import java.text.DecimalFormat;
+import java.util.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -20,7 +23,6 @@ import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.EntityAttrIntypeService;
 import com.deloitte.common.security.utils.SecurityUtils;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IBondInfoService;
@@ -31,12 +33,10 @@ import com.deloitte.crm.utils.AttrValueUtils;
 import lombok.AllArgsConstructor;
 import com.deloitte.crm.vo.EntityByIondVo;
 import com.deloitte.crm.vo.EntityStockInfoVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -59,7 +59,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     private IEntityAttrService entityAttrService;
 
-    @Autowired
+
     private ICrmSupplyTaskService iCrmSupplyTaskService;
 
     @Resource
@@ -155,6 +155,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     /**
      * 更新entityAttrValue表中债券的相关信息
      * 反射获取obj里的属性，key 为 Excel 注解 的name 属性, value 为实体类的值
+     *
      * @param bondCode
      * @param obj
      * @return
@@ -550,6 +551,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         DecimalFormat g1 = new DecimalFormat("000000");
         String startZeroStr = g1.format(bondInfo.getId());
         bondInfo.setBondCode("BD" + startZeroStr);
+        bondInfo.setOriCode(entityByIondVo.getStockCode());
         bondInfo.setBondShortName(entityByIondVo.getBondShortName());
         bondInfoMapper.insertBondInfo(bondInfo);
         // 新增 entity_name_his
@@ -564,6 +566,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增关联关系entity_bond_rel
         EntityBondRel entityBondRel = new EntityBondRel();
         entityBondRel.setBdCode("BD" + startZeroStr);
+
         entityBondRel.setEntityCode(entityInfo.getEntityCode());
         entityBondRelMapper.insertEntityBondRel(entityBondRel);
         //新增entity_attr_value

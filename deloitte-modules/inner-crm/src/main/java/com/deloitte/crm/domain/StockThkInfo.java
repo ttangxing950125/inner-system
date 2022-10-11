@@ -49,14 +49,21 @@ public class StockThkInfo implements Serializable {
      * 港股简称
      */
     private String stockName;
-
+    /**
+     * 状态 1-删除 0-未删除 默认都是未删除
+     */
+    private Boolean isDeleted = Boolean.FALSE;
     /**
      * 股票代码
      */
     @Excel(name = "股票代码")
     private String stockCode;
-
+    /**
+     * 创建时间
+     */
     private Date created;
-
+    /**
+     * 更新时间
+     */
     private Date updated;
 }

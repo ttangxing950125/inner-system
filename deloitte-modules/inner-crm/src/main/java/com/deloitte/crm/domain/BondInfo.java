@@ -78,6 +78,11 @@ public class BondInfo {
     private Boolean abs;
 
     /**
+     * 状态 1-删除 0-未删除 默认都是未删除
+     */
+    private Boolean isDeleted = Boolean.FALSE;
+
+    /**
      * $column.columnComment
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")

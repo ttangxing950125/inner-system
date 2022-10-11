@@ -98,6 +98,157 @@ public class EntityInfo implements Serializable
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date updated ;
 
+    public String getCreditErrorRemark() {
+        return creditErrorRemark;
+    }
+
+    public void setCreditErrorRemark(String creditErrorRemark) {
+        this.creditErrorRemark = creditErrorRemark;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
+    }
+
+    public Integer getId()
+    {
+        return id;
+    }
+    public void setEntityName(String entityName)
+    {
+        this.entityName = entityName;
+    }
+
+    public String getEntityName()
+    {
+        return entityName;
+    }
+    public void setEntityCode(String entityCode)
+    {
+        this.entityCode = entityCode;
+    }
+
+    public String getEntityCode()
+    {
+        return entityCode;
+    }
+    public void setCreditCode(String creditCode)
+    {
+        this.creditCode = creditCode;
+    }
+
+    public String getCreditCode()
+    {
+        return creditCode;
+    }
+    public void setList(Integer list)
+    {
+        this.list = list;
+    }
+
+    public Integer getList()
+    {
+        return list;
+    }
+    public void setIssueBonds(Integer issueBonds)
+    {
+        this.issueBonds = issueBonds;
+    }
+
+    public Integer getIssueBonds()
+    {
+        return issueBonds;
+    }
+    public void setCreditError(Integer creditError)
+    {
+        this.creditError = creditError;
+    }
+
+    public Integer getCreditError()
+    {
+        return creditError;
+    }
+    public void setCreditErrorType(Integer creditErrorType)
+    {
+        this.creditErrorType = creditErrorType;
+    }
+
+    public Integer getCreditErrorType()
+    {
+        return creditErrorType;
+    }
+    public void setEntityNameHis(String entityNameHis)
+    {
+        this.entityNameHis = entityNameHis;
+    }
+
+    public String getEntityNameHis()
+    {
+        return entityNameHis;
+    }
+    public void setEntityNameHisRemarks(String entityNameHisRemarks)
+    {
+        this.entityNameHisRemarks = entityNameHisRemarks;
+    }
+
+    public String getEntityNameHisRemarks()
+    {
+        return entityNameHisRemarks;
+    }
+    public void setCreater(String creater)
+    {
+        this.creater = creater;
+    }
+
+    public String getCreater()
+    {
+        return creater;
+    }
+    public void setUpdater(String updater)
+    {
+        this.updater = updater;
+    }
+
+    public String getUpdater()
+    {
+        return updater;
+    }
+    public void setCreated(Date created)
+    {
+        this.created = created;
+    }
+
+    public Date getCreated()
+    {
+        return created;
+    }
+    public void setUpdated(Date updated)
+    {
+        this.updated = updated;
+    }
+
+    public Date getUpdated()
+    {
+        return updated;
+    }
+
+    public Integer getFinance() {
+        return finance;
+    }
+
+    public void setFinance(Integer finance) {
+        this.finance = finance;
+    }
+
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

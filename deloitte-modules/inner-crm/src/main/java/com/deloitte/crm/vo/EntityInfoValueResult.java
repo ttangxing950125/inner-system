@@ -16,4 +16,8 @@ import java.util.List;
 public class EntityInfoValueResult {
     private EntityInfo entityInfo;
     private List<EntityAttrValue> valueList;
+    //上市情况
+    private String listDetail;
+    //发债情况
+    private String issDetail;
 }

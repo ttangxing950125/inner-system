@@ -103,6 +103,25 @@ public class GovInfo implements Serializable {
      */
     @Excel(name = "失效后的新政府德勤code")
     private String newDqCode;
+    /**
+     * 失效后的新政府德勤code
+     */
+    @Excel(name = "经济区归属")
+    private String economyRegion;    /**
+     * 失效后的新政府德勤code
+     */
+    @Excel(name = "城市群归属")
+    private String cityGroup;
+    /**
+     * 失效后的新政府德勤code
+     */
+    @Excel(name = "是否为省会城市 0.否 1.是")
+    private Integer provincial;
+    /**
+     * 失效后的新政府德勤code
+     */
+    @Excel(name = "是否为国家中心城市 0.否 1.是")
+    private Integer countryCenter;
 
     /**
      * 失效后的新政府code
@@ -138,158 +157,6 @@ public class GovInfo implements Serializable {
      */
     @Excel(name = "主体状态")
     private Integer status;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setGovName(String govName) {
-        this.govName = govName;
-    }
-
-    public String getGovName() {
-        return govName;
-    }
-
-    public void setGovCode(String govCode) {
-        this.govCode = govCode;
-    }
-
-    public String getGovCode() {
-        return govCode;
-    }
-
-    public void setDqGovCode(String dqGovCode) {
-        this.dqGovCode = dqGovCode;
-    }
-
-    public String getPreGovCode() {
-        return preGovCode;
-    }
-
-    public void setPreGovCode(String preGovCode) {
-        this.preGovCode = preGovCode;
-    }
-
-    public String getDqGovCode() {
-        return dqGovCode;
-    }
-
-    public void setGovType(Integer govType) {
-        this.govType = govType;
-    }
-
-    public Integer getGovType() {
-        return govType;
-    }
-
-    public void setGovLevelBig(Integer govLevelBig) {
-        this.govLevelBig = govLevelBig;
-    }
-
-    public Integer getGovLevelBig() {
-        return govLevelBig;
-    }
-
-    public void setGovLevelSmall(Integer govLevelSmall) {
-        this.govLevelSmall = govLevelSmall;
-    }
-
-    public Integer getGovLevelSmall() {
-        return govLevelSmall;
-    }
-
-    public void setGovNameHis(String govNameHis) {
-        this.govNameHis = govNameHis;
-    }
-
-    public String getGovNameHis() {
-        return govNameHis;
-    }
-
-    public void setEntityNameHisRemarks(String entityNameHisRemarks) {
-        this.entityNameHisRemarks = entityNameHisRemarks;
-    }
-
-    public String getEntityNameHisRemarks() {
-        return entityNameHisRemarks;
-    }
-
-    public void setInvalid(Integer invalid) {
-        this.invalid = invalid;
-    }
-
-    public Integer getInvalid() {
-        return invalid;
-    }
-
-    public void setNewGovName(String newGovName) {
-        this.newGovName = newGovName;
-    }
-
-    public String getNewGovName() {
-        return newGovName;
-    }
-
-    public void setNewDqCode(String newDqCode) {
-        this.newDqCode = newDqCode;
-    }
-
-    public String getNewDqCode() {
-        return newDqCode;
-    }
-
-    public void setNewGovCode(String newGovCode) {
-        this.newGovCode = newGovCode;
-    }
-
-    public String getNewGovCode() {
-        return newGovCode;
-    }
-
-    public void setCreater(String creater) {
-        this.creater = creater;
-    }
-
-    public String getCreater() {
-        return creater;
-    }
-
-    public void setUpdater(String updater) {
-        this.updater = updater;
-    }
-
-    public String getUpdater() {
-        return updater;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
-
-    public Date getUpdated() {
-        return updated;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 
     @Override
     public String toString() {

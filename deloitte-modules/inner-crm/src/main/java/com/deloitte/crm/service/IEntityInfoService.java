@@ -7,8 +7,10 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -85,6 +87,14 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     List<EntityInfo> checkEntity(EntityInfo entityInfo);
 
     Object getListEntityByPage(EntityAttrByDto entityAttrDto);
+
+    R<EntityInfoVo> validEntity(String creditCode, String entityName);
+    /**
+     * 根据统一社会信用代码 查询主体信息
+     * @param creditCode
+     * @return
+     */
+    EntityInfo getEntityInfoByCreditCode(String creditCode);
 
 
     /**
@@ -183,7 +193,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     /**
      * 覆盖情况快速查询
      *
-     * @param entityType
      * @param param
      * @param pageNum
      * @param pageSize
@@ -191,7 +200,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
-    R getQuickOfCoverage(String entityType, String param, Integer pageNum,Integer pageSize);
+    R getQuickOfCoverage(String param, Integer pageNum,Integer pageSize);
 
 
     /**
@@ -216,5 +225,29 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return
      */
     String appendPrefix(Integer prefixLength,Integer target);
+
+    /**
+     *批量查询并导出excel结果
+     *
+     * @param file
+     * @return R
+     * @author penTang
+     * @date 2022/10/9 16:12
+     */
+    List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file,String uuid);
+    R getIng(String uuid);
+    R getExcelWriter(List<ExportEntityCheckDto> entityByBatchLis);
+
+    /**
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 拼接 0
+     * @param prefixWord 前缀 拼接的字符
+     * @param prefixLength 前缀长度
+     * @param target 目标字符
+     */
+    String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
 }

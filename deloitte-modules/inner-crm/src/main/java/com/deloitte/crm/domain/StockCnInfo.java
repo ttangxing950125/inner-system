@@ -47,13 +47,15 @@ public class StockCnInfo implements Serializable {
     @Excel(name = "德勤内部股票代码 ST_0000id 6位数字")
     private String stockDqCode;
 
-
-
+    /**
+     * 状态 1-删除 0-未删除 默认都是未删除
+     */
+    private Boolean isDeleted = Boolean.FALSE;
     /**
      * 股票简称
      */
-    @ApiModelProperty(value="股票简称")
-    private  String StockShortName;
+    @ApiModelProperty(value = "股票简称")
+    private String StockShortName;
     /**
      * 股票代码
      */
