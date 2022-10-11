@@ -10,6 +10,7 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.GovAttrByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.service.IGovInfoService;
 import io.swagger.annotations.Api;
@@ -70,8 +71,8 @@ public class GovInfoController extends BaseController {
 
             )
     })
-    public R importGovInfo(EntityAttrByDto entityAttrDto) {
-        govInfoService.ExportEntityGov(entityAttrDto);
+    public R importGovInfo(GovAttrByDto govAttrByDto) {
+        govInfoService.ExportEntityGov(govAttrByDto);
         return R.ok();
     }
 
@@ -255,14 +256,14 @@ public class GovInfoController extends BaseController {
     /**
      * 分页查询全部政府主体
      *
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
     @ApiOperation(value = "分页查询全部政府主体")
     @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntityByPage")
-    public R getListEntityByPage(@RequestBody EntityAttrByDto govAttrDto) {
+    public R getListEntityByPage(@RequestBody GovAttrByDto govAttrDto) {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
 
@@ -290,7 +291,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "导出全部企业主体Excel表")
     @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntity")
-    public R ImportListEntity(@RequestBody EntityAttrByDto govAttrDto) {
+    public R ImportListEntity(@RequestBody GovAttrByDto govAttrDto) {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
     }
 

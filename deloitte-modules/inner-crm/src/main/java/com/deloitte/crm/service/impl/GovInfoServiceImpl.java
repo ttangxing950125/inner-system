@@ -16,7 +16,7 @@ import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityNameHis;
 import com.deloitte.crm.domain.GovInfo;
-import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.GovAttrByDto;
 import com.deloitte.crm.domain.dto.GovInfoResult;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
@@ -29,7 +29,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -38,7 +37,6 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -299,7 +297,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public Object getListEntityByPage(EntityAttrByDto entityAttrDto) {
+    public Object getListEntityByPage(GovAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
@@ -312,17 +310,17 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     /**
      * 全量导出
      *
-     * @param entityAttrDto
+     * @param govAttrByDto
      * @return List<GovInfoResult>
      * @author 冉浩岑
      * @date 2022/9/26 00:35
      */
-    public List<GovInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
+    public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
 
-        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+        //获取基础参数信息
+        List<Map<String, String>> mapList = govAttrByDto.getMapList();
 
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
-        List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
+        List<GovInfo> govInfos  = govInfoMapper.getGovByAttrValue(govAttrByDto);
 
         //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
@@ -337,14 +335,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     /**
      * 导出政府主体数据
      *
-     * @param entityAttrDto
+     * @param govAttrByDto
      * @return R
      * @author penTang
      * @date 2022/9/26 18:58
      */
     @Override
-    public void ExportEntityGov(EntityAttrByDto entityAttrDto) {
-        List<GovInfoResult> listEntityAll = this.getListEntityAll(entityAttrDto);
+    public void ExportEntityGov(GovAttrByDto govAttrByDto) {
+        List<GovInfoResult> listEntityAll = this.getListEntityAll(govAttrByDto);
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletResponse response = servletRequestAttributes.getResponse();
         ExcelWriter writer = ExcelUtil.getWriter(true);
@@ -419,25 +417,24 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @author 冉浩岑
      * @date 2022/9/25 17:05
      */
-    public Page<GovInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
+    public Page<GovInfoResult> getListEntityPage(GovAttrByDto entityAttrDto) {
+
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
 
+        Page<GovInfoResult> pageResult = new Page<>(pageNum,pageSize);
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
-        Page<GovInfo> pageInfo = new Page<>(pageNum, pageSize);
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>();
-        Page<GovInfo> entityInfoPage = govInfoMapper.selectPage(pageInfo, queryWrapper);
+        pageNum=(pageNum-1)*pageSize;
+        entityAttrDto.setPageNum(pageNum);
+        //查询条数
+        List<GovInfo> records=govInfoMapper.getGovByAttrValueByPage(entityAttrDto);
+        Integer count=govInfoMapper.getGovCountByAttrValue(entityAttrDto);
 
-        //查询分页数据集
-//        Page<Map<String, Object>> pageResult = new Page<>();
-        Page<GovInfoResult> pageResult = new Page<>();
-        pageResult.setTotal(entityInfoPage.getTotal()).setPages(entityInfoPage.getPages()).setCurrent(entityInfoPage.getCurrent());
+        pageResult.setTotal(count);
 
         //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
-        //添加指标栏位
-        List<GovInfo> records = entityInfoPage.getRecords();
 
         records.stream().forEach(o -> {
             GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
@@ -624,6 +621,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     /**
      * 获取上级地方政府行政编码 by正杰
+     *
      * @param govCode
      * @return
      */
@@ -634,41 +632,22 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return R.ok(govInfo.getGovName());
     }
 
-
     /**
      * 字段对应的名称
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
      */
     public static final String MORE_ENTITY_KPI_NAME = "name";
     /**
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
+     * id
      */
     public static final String MORE_ENTITY_KPI_ID = "id";
     /**
-     * 添加的指标封装的字段
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
-     */
-    public static final String MORE_ENTITY_KPI_MORE = "more";
-    /**
      * 新增指标的字段名称
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
      */
     public static final String MORE_ENTITY_KPI_KEY = "key";
     /**
      * 新增指标的字段值
-     *
-     * @author 冉浩岑
-     * @date 2022/9/23 15:24
      */
     public static final String MORE_ENTITY_KPI_VALUE = "value";
-
 
     /**
      * GovInfo 对象转 map,并查询 曾用名条数
