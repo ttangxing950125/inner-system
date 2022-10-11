@@ -117,6 +117,7 @@ public class GovInfo implements Serializable {
      */
     @Excel(name = "是否为省会城市 0.否 1.是")
     private Integer provincial;
+
     /**
      * 失效后的新政府德勤code
      */
