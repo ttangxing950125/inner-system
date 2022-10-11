@@ -1282,7 +1282,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 覆盖情况快速查询
      *
-     * @param entityType
      * @param param
      * @param pageNum
      * @param pageSize
@@ -1320,19 +1319,56 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             pageResult.setRecords(null);
         } else {
             records.stream().forEach(o -> {
-                String entityCode = o.getEntityCode();
-                //获取上市情况
-
-                //获取发债情况
-                QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-//                List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
+                //封装后的新结果
                 EntityInfoValueResult result = new EntityInfoValueResult();
                 result.setEntityInfo(o);
+                String entityCode = o.getEntityCode();
+                //获取上市情况
+                String listDetail=getListDetail(o);
+                //获取发债情况
+
+
+                result.setListDetail(listDetail);
                 resultList.add(result);
             });
             pageResult.setRecords(resultList);
         }
         return R.ok(pageResult);
+    }
+    //获取上市情况
+    private String getListDetail(EntityInfo o) {
+        String listDetail="";
+
+        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
+        List<EntityAttrValue> attrValueListA = entityAttrValueMapper.selectList(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
+                .eq(EntityAttrValue::getAttrId, 25)
+        );
+        List<EntityAttrValue> attrValueListG = entityAttrValueMapper.selectList(valueQuery.lambda()
+                .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
+                .eq(EntityAttrValue::getAttrId, 44)
+        );
+        //                25		A股上市状态		1、存续 2、已退市 3、未曾A股上市
+        if (!CollectionUtils.isEmpty(attrValueListA)){
+            String value = attrValueListA.get(0).getValue();
+            if ("1".equals(value)){
+                listDetail=listDetail+"A股(存续)";
+            }else if("2".equals(value)){
+                listDetail=listDetail+"A股(已退市)";
+            }
+        }
+        //                44		港股上市状态		1、存续 2、已退市
+        if (!CollectionUtils.isEmpty(attrValueListG)){
+            String value = attrValueListG.get(0).getValue();
+            if ("1".equals(value)){
+                if (ObjectUtils.isEmpty(listDetail)){
+                    listDetail="B股";
+                }else {
+                    listDetail=listDetail+",B股";
+                }
+            }
+        }
+        return listDetail;
     }
 
     /**
