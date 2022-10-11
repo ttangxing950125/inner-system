@@ -14,14 +14,8 @@ import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.CacheName;
 import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.domain.StockCnInfo;
-import com.deloitte.crm.domain.StockThkInfo;
-import com.deloitte.crm.mapper.BondInfoMapper;
-import com.deloitte.crm.mapper.EntityInfoLogsMapper;
-import com.deloitte.crm.domain.EntityInfoLogs;
-import com.deloitte.crm.mapper.StockCnInfoMapper;
-import com.deloitte.crm.mapper.StockThkInfoMapper;
+import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsService;
 import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.vo.EntityInfoLogsByBondVo;
@@ -62,10 +56,21 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
     @Resource
     private RedisService redisService;
 
+    @Resource
+    private EntityBondRelMapper entityBondRelMapper;
+
+    @Resource
+    private EntityStockCnRelMapper entityStockCnRelMapper;
+
+    @Resource
+    private EntityStockThkRelMapper entityStockThkRelMapper;
+
+
     /**
      * 根据类型查询
      * CompletableFuture 使用线程池为ForkJoinPool
      * {@link java.util.concurrent.ForkJoinPool}
+     *
      * @param findType 查询类型
      * @return 股票 & 债券
      * @see EntityInfoLogs#operType
@@ -199,10 +204,23 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
             if (bondInfo != null) {
                 bondInfo.setIsDeleted(Boolean.TRUE);
                 result = bondInfoMapper.updateById(bondInfo);
+                final LambdaQueryWrapper<EntityBondRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                final EntityBondRel entityBondRel = entityBondRelMapper.selectOne(lambdaQueryWrapper.eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
+                if (entityBondRel != null) {
+                    entityBondRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
+                    entityBondRelMapper.updateEntityBondRel(entityBondRel);
+                }
             }
         } else if (entityInfoLogs.getOperType().equals("1")) {
             final StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockCnInfo != null) {
+                String stockDqCode = stockCnInfo.getStockDqCode();
+                final LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                final EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockDqCode));
+                if (entityStockCnRel != null) {
+                    entityStockCnRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
+                    entityStockCnRelMapper.updateById(entityStockCnRel);
+                }
                 /**
                  * {@link StockCnInfoServiceImpl#saveOrUpdateNew(StockCnInfo)} (Object)}
                  */
@@ -211,9 +229,11 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 result = stockCnInfoMapper.updateById(stockCnInfo);
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, stockCnInfo.getStockCode());
+
             }
         } else if (entityInfoLogs.getOperType().equals("2")) {
-            final StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(new LambdaQueryWrapper<StockThkInfo>().eq(StockThkInfo::getStockDqCode, entityInfoLogs.getDeCode()));
+            final LambdaQueryWrapper<StockThkInfo> stockThkInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            final StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(stockThkInfoLambdaQueryWrapper.eq(StockThkInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockThkInfo != null) {
                 /**
                  * {@link StockCnInfoServiceImpl#saveOrUpdateNew(StockCnInfo)}
@@ -223,6 +243,13 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 result = stockThkInfoMapper.updateById(stockThkInfo);
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_THK_INFO, stockThkInfo.getStockCode());
+                String stockDqCode = stockThkInfo.getStockDqCode();
+                final LambdaQueryWrapper<EntityStockThkRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                EntityStockThkRel entityStockThkRel = entityStockThkRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockThkRel::getStockDqCode, stockDqCode));
+                if (entityStockThkRel != null) {
+                    entityStockThkRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
+                    entityStockThkRelMapper.updateById(entityStockThkRel);
+                }
             }
         }
         return result;

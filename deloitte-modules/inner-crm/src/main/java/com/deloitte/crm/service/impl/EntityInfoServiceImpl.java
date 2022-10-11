@@ -195,13 +195,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer id = entityInfo.getId();
 
         // 生成entity_code 那么将该值的 用 IB+0..+id  例 IB000001
-        String entityCode = "IB"+this.appendPrefix(6, id);
+        String entityCode = "IB" + this.appendPrefix(6, id);
         entityInfo.setEntityCode(entityCode);
 
         // 判断社会信用代码是否适用 => 适用为 空 并为其赋值 5 否则有数字
         Integer creditErrorType = entityDto.getCreditErrorType();
-        if(creditErrorType==null){creditErrorType=5;entityDto.setCreditErrorType(creditErrorType);}
-        switch (creditErrorType){
+        if (creditErrorType == null) {
+            creditErrorType = 5;
+            entityDto.setCreditErrorType(creditErrorType);
+        }
+        switch (creditErrorType) {
             case 1:
                 //注销企业:ZX+企业德勤代码+R+自0000001开始排序。
                 entityInfo.setCreditCode(this.appendCreditCode("ZX", entityCode));
@@ -430,8 +433,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R getInfoList(Integer type, String param) {
         EntityInfo entityInfo = new EntityInfo();
 //        企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构
-        if (ObjectUtils.isEmpty(type)){
-            type=1;
+        if (ObjectUtils.isEmpty(type)) {
+            type = 1;
         }
         if (type == 1) {
             entityInfo.setList(1);
@@ -446,7 +449,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfo.setEntityCode(param);
         entityInfo.setEntityName(param);
         List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam(entityInfo);
-        if (CollectionUtils.isEmpty(entityInfoList)){
+        if (CollectionUtils.isEmpty(entityInfoList)) {
             return R.ok();
         }
         //封装结果集
@@ -461,24 +464,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         Map<String, List<EntityNameHis>> finalHisNameListMap = hisNameListMap;
         Integer finalType = type;
-        List<String>codeList=new ArrayList<>();
-        entityInfoList.stream().forEach(o->codeList.add(o.getEntityCode()));
+        List<String> codeList = new ArrayList<>();
+        entityInfoList.stream().forEach(o -> codeList.add(o.getEntityCode()));
 
         entityInfoList.stream().forEach(o -> {
             finalRecords.add(getResultMap(o, finalHisNameListMap, finalType));
         });
-        records=finalRecords;
+        records = finalRecords;
         //查询上市特定列----证券代码，上市日期，退市日期，更新记录  1
-        if (type==1){
+        if (type == 1) {
             records = getListSpecial(records, codeList);
         }
         //查询发债特定列----存续债数量 存续债明细  2
-        else if (type==2){
-            records =getIssSpecial(records,codeList);
+        else if (type == 2) {
+            records = getIssSpecial(records, codeList);
         }
         //查询金融机构特定列----细分行业  4  TODO
-        else if (type==4){
-            records=getFinSpecial(records,codeList);
+        else if (type == 4) {
+            records = getFinSpecial(records, codeList);
         }
         return R.ok(records);
     }
@@ -550,7 +553,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer abs = entityAttrDto.getAbs();
         Integer coll = entityAttrDto.getColl();
 
-        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType,abs,coll);
+        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
@@ -651,8 +654,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer raiseType = entityAttrDto.getRaiseType();
         Integer abs = entityAttrDto.getAbs();
         Integer coll = entityAttrDto.getColl();
-        if (ObjectUtils.isEmpty(pageSize)){
-            pageSize=9;
+        if (ObjectUtils.isEmpty(pageSize)) {
+            pageSize = 9;
         }
         Page<EntityInfoResult> pageResult = new Page<>(pageNum, pageSize);
         //封装新的结果集
@@ -661,8 +664,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
-        pageNum=pageNum*pageSize-1;
-        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll,pageNum,pageSize);
+        pageNum = pageNum * pageSize - 1;
+        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize);
         pageResult.setTotal(count);
 
         records.stream().forEach(o -> {
@@ -740,14 +743,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 冉浩岑
      * @date 2022/9/22 23:45
      */
-    public Map<String, Object> getResultMap(EntityInfo entityInfo, Map<String, List<EntityNameHis>> map,Integer type) {
+    public Map<String, Object> getResultMap(EntityInfo entityInfo, Map<String, List<EntityNameHis>> map, Integer type) {
         Map<String, Object> resultMap = new HashMap();
         if (null != entityInfo) {
             resultMap = JSON.parseObject(JSON.toJSONString(entityInfo), new TypeReference<Map<String, String>>() {
             });
             SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-            resultMap.put("updated",sdf2.format(entityInfo.getUpdated()) );
-            resultMap.put("created",sdf2.format(entityInfo.getCreated()) );
+            resultMap.put("updated", sdf2.format(entityInfo.getUpdated()));
+            resultMap.put("created", sdf2.format(entityInfo.getCreated()));
             try {
                 Integer count = 0;
                 if (!map.isEmpty()) {
@@ -765,99 +768,104 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return resultMap;
     }
 
-    private List<Map<String, Object>> getFinSpecial(List<Map<String, Object>>record,List<String>codeList) {
-        QueryWrapper<EntityAttrValue>valueQueryWrapper=new QueryWrapper<>();
+    private List<Map<String, Object>> getFinSpecial(List<Map<String, Object>> record, List<String> codeList) {
+        QueryWrapper<EntityAttrValue> valueQueryWrapper = new QueryWrapper<>();
 
         List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQueryWrapper.lambda()
                 .eq(EntityAttrValue::getAttrId, 656)
                 .in(EntityAttrValue::getEntityCode, codeList)
         );
-        if (CollectionUtils.isEmpty(attrValueList)){
+        if (CollectionUtils.isEmpty(attrValueList)) {
             return record;
         }
-        for (int i=0;i<record.size();i++){
+        for (int i = 0; i < record.size(); i++) {
 
             Map<String, Object> result = record.get(i);
             String entityCode = result.get("entityCode").toString();
             List<EntityAttrValue> valueList = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode)).get(entityCode);
-            if (CollectionUtils.isEmpty(valueList)){
-                record.set(i,result);
+            if (CollectionUtils.isEmpty(valueList)) {
+                record.set(i, result);
                 continue;
             }
             //存续债明细 TODO
-            List<String>liveBondDetail=new ArrayList<>();
-            valueList.stream().forEach(o->liveBondDetail.add(o.getValue()));
+            List<String> liveBondDetail = new ArrayList<>();
+            valueList.stream().forEach(o -> liveBondDetail.add(o.getValue()));
             //细分行业
-            result.put("industry",liveBondDetail);
-            record.set(i,result);
+            result.put("industry", liveBondDetail);
+            record.set(i, result);
         }
         return record;
     }
 
-    /** 查询发债特定列----存续债数量 存续债明细  2*/
-    private List<Map<String, Object>> getIssSpecial(List<Map<String, Object>>record,List<String>codeList) {
-        QueryWrapper<EntityBondRel>relQueryWrapper=new QueryWrapper<>();
+    /**
+     * 查询发债特定列----存续债数量 存续债明细  2
+     */
+    private List<Map<String, Object>> getIssSpecial(List<Map<String, Object>> record, List<String> codeList) {
+        QueryWrapper<EntityBondRel> relQueryWrapper = new QueryWrapper<>();
 
         List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(relQueryWrapper.lambda()
-                        .eq(EntityBondRel::getStatus, 1)
-                        .in(EntityBondRel::getEntityCode, codeList)
+                .eq(EntityBondRel::getStatus, 1)
+                .in(EntityBondRel::getEntityCode, codeList)
         );
-        if (CollectionUtils.isEmpty(entityBondRels)){
+        if (CollectionUtils.isEmpty(entityBondRels)) {
             return record;
         }
-        for (int i=0;i<record.size();i++){
-            Integer liveBond=0;
+        for (int i = 0; i < record.size(); i++) {
+            Integer liveBond = 0;
             Map<String, Object> result = record.get(i);
             String entityCode = result.get("entityCode").toString();
             List<EntityBondRel> bondRels = entityBondRels.stream().collect(Collectors.groupingBy(EntityBondRel::getEntityCode)).get(entityCode);
 
             //债券存续数量
-            result.put("liveBond",liveBond);
-            if (CollectionUtils.isEmpty(bondRels)){
-                record.set(i,result);
+            result.put("liveBond", liveBond);
+            if (CollectionUtils.isEmpty(bondRels)) {
+                record.set(i, result);
                 continue;
             }
-            liveBond=bondRels.size();
+            liveBond = bondRels.size();
             //存续债明细 TODO
-            List<String>liveBondDetail=new ArrayList<>();
-            bondRels.stream().forEach(o->liveBondDetail.add(o.getBdCode()));
+            List<String> liveBondDetail = new ArrayList<>();
+            bondRels.stream().forEach(o -> liveBondDetail.add(o.getBdCode()));
             //债券存续数量
-            result.put("liveBond",liveBond);
-            result.put("liveBondDetail",liveBondDetail);
-            record.set(i,result);
+            result.put("liveBond", liveBond);
+            result.put("liveBondDetail", liveBondDetail);
+            record.set(i, result);
         }
         return record;
     }
-    /**查询上市特定列----证券代码，上市日期，退市日期，更新记录  1*/
-    private List<Map<String, Object>> getListSpecial(List<Map<String, Object>> record,List<String>codeList) {
+
+    /**
+     * 查询上市特定列----证券代码，上市日期，退市日期，更新记录  1
+     */
+    private List<Map<String, Object>> getListSpecial(List<Map<String, Object>> record, List<String> codeList) {
 
         //封装退市日期   A股退市 584  港股退市 602
-        QueryWrapper<EntityAttrValue>valueQueryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityAttrValue> valueQueryWrapper = new QueryWrapper<>();
         List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQueryWrapper.lambda()
                 .in(EntityAttrValue::getEntityCode, codeList)
                 .in(EntityAttrValue::getAttrId, 584, 602)
         );
 
-        QueryWrapper<EntityStockCnRel> cnRelQueryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityStockCnRel> cnRelQueryWrapper = new QueryWrapper<>();
         List<EntityStockCnRel> entityStockCnRels = cnRelMapper.selectList(cnRelQueryWrapper.lambda().in(EntityStockCnRel::getEntityCode, codeList));
 
-        QueryWrapper<EntityStockThkRel> thkRelQueryWrapper=new QueryWrapper<>();
+        QueryWrapper<EntityStockThkRel> thkRelQueryWrapper = new QueryWrapper<>();
         List<EntityStockThkRel> entityStockthkRels = thkRelMapper.selectList(thkRelQueryWrapper.lambda().in(EntityStockThkRel::getEntityCode, codeList));
         //封装证券代码
-        for (int i=0;i<record.size();i++){
+        for (int i = 0; i < record.size(); i++) {
             Map<String, Object> result = record.get(i);
-            String o=result.get("entityCode").toString();
+            String o = result.get("entityCode").toString();
             //证券代码
-            List<String>stockCodeList=new ArrayList<>();
+            List<String> stockCodeList = new ArrayList<>();
             //上市日期
-            List<String>stockDateList=new ArrayList<>();
+            List<String> stockDateList = new ArrayList<>();
             //退市日期
-            List<String>stockdownDateList=new ArrayList<>();
+            List<String> stockdownDateList = new ArrayList<>();
 
-            if (!CollectionUtils.isEmpty(entityStockCnRels)){
+            if (!CollectionUtils.isEmpty(entityStockCnRels)) {
                 List<EntityStockCnRel> cnRels = entityStockCnRels.stream().collect(Collectors.groupingBy(EntityStockCnRel::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(cnRels)){
-                    cnRels.stream().forEach(x->{
+                if (!CollectionUtils.isEmpty(cnRels)) {
+                    cnRels.stream().forEach(x -> {
                         //证券代码
                         stockCodeList.add(x.getStockDqCode());
                         //上市日期
@@ -865,10 +873,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     });
                 }
             }
-            if (!CollectionUtils.isEmpty(entityStockthkRels)){
+            if (!CollectionUtils.isEmpty(entityStockthkRels)) {
                 List<EntityStockThkRel> thkRels = entityStockthkRels.stream().collect(Collectors.groupingBy(EntityStockThkRel::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(thkRels)){
-                    thkRels.stream().forEach(x->{
+                if (!CollectionUtils.isEmpty(thkRels)) {
+                    thkRels.stream().forEach(x -> {
                         //证券代码
                         stockCodeList.add(x.getStockDqCode());
                         //上市日期
@@ -877,10 +885,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
             }
             //退市日期
-            if (!CollectionUtils.isEmpty(attrValueList)){
+            if (!CollectionUtils.isEmpty(attrValueList)) {
                 List<EntityAttrValue> attrValues = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(attrValues)){
-                    attrValues.stream().forEach(x->{
+                if (!CollectionUtils.isEmpty(attrValues)) {
+                    attrValues.stream().forEach(x -> {
                         stockdownDateList.add(x.getValue());
                     });
                 }
@@ -1017,7 +1025,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
                 Map<String, String> collect = bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName));
                 List<EntityAttrValue> targetList = entityAttrs.stream().filter(row -> !collect.containsKey(row.getEntityCode())).collect(Collectors.toList());
-
 
 
                 entityAttrs.stream().filter(row -> !bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName)).containsKey(row.getEntityCode())).collect(Collectors.toList());
@@ -1350,51 +1357,54 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
-     *   ****************
-     *   *    通用方法   *
-     *   ****************
-     *
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
      * 拿到后缀数字
+     *
      * @param suffixLength 后缀长度
-     * @param target 字符
+     * @param target       字符
      */
     @Override
-    public Integer getSuffixNumber(Integer suffixLength,String target) {
-        return Integer.parseInt(target.substring(target.length()-suffixLength));
+    public Integer getSuffixNumber(Integer suffixLength, String target) {
+        return Integer.parseInt(target.substring(target.length() - suffixLength));
     }
 
     /**
-     *   ****************
-     *   *    通用方法   *
-     *   ****************
-     *
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
      * 拼接 0
+     *
      * @param prefixLength 前缀长度
-     * @param target 字符
+     * @param target       字符
      * @return
      */
     @Override
     public String appendPrefix(Integer prefixLength, Integer target) {
-        return String.format("%0"+prefixLength+"d",target);
+        return String.format("%0" + prefixLength + "d", target);
     }
 
     /**
      * 统一社会信用代码不适用是 进行字符拼接
      * 例如 注销企业:ZX+企业德勤代码+R+自0000001开始排序。
+     *
      * @param prefix
      * @param entityCode
      * @return
      */
-    public String appendCreditCode(String prefix,String entityCode){
+    public String appendCreditCode(String prefix, String entityCode) {
         EntityInfo lastOneByPrefixCredit = baseMapper.findLastOneByPrefixCredit(prefix);
         String suffixString = null;
-        if(lastOneByPrefixCredit!=null){
+        if (lastOneByPrefixCredit != null) {
             Integer suffixNumber = this.getSuffixNumber(7, lastOneByPrefixCredit.getCreditCode());
             suffixString = this.appendPrefix(7, suffixNumber + 1);
-        }else{
+        } else {
             suffixString = "0000001";
         }
-        return prefix+entityCode+"R"+suffixString;
+        return prefix + entityCode + "R" + suffixString;
     }
 
     /**
@@ -1406,7 +1416,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/10/9 16:12
      */
     @Override
-    public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file,String uuid) {
+    public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, String uuid) {
         try {
             //读取excel
             List<EntityByBatchDto> entityByBatchDtos = this.getEntityAndBondInfoV(file);
@@ -1502,15 +1512,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //数据匹配结束入容器
                 entityByBatchList.add(exportEntityCheckDto);
                 //将当前进度入redis-并设置过期时间为一天
-                double index = (i+1)*1.0;
-                double sum = entityByBatchDtos.size()*1.0;
+                double index = (i + 1) * 1.0;
+                double sum = entityByBatchDtos.size() * 1.0;
                 NumberFormat percentInstance = NumberFormat.getPercentInstance();
                 // 设置保留几位小数，这里设置的是保留1位小数
                 percentInstance.setMinimumFractionDigits(1);
                 String format = percentInstance.format(index / sum);
-                redisService.setCacheObject(uuid,format,1L, TimeUnit.DAYS);
+                redisService.setCacheObject(uuid, format, 1L, TimeUnit.DAYS);
             }
-
 
 
             return entityByBatchList;
@@ -1521,14 +1530,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return null;
 
     }
-   /**
-    *通过uuid查询当前的进度
-    *
-    * @param uuid
-    * @return R
-    * @author penTang
-    * @date 2022/10/10 20:54
-   */
+
+    /**
+     * 通过uuid查询当前的进度
+     *
+     * @param uuid
+     * @return R
+     * @author penTang
+     * @date 2022/10/10 20:54
+     */
     @Override
     public R getIng(String uuid) {
         return R.ok(redisService.getCacheObject(uuid));
