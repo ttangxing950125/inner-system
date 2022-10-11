@@ -1319,7 +1319,7 @@ export default {
                 '"><div class="' +
                 isRed +
                 'content-day">' +
-                "<div class=''>" +
+                '<div class="'+ (date_str !== ' ' ? 'shadow' : '') +'">'+
                 date_str +
                 "</div>" +
                 "</div></td>");
@@ -1333,7 +1333,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='shadow-green'>" +
+                    "<div class='"+(jsonHtml[l].bad ? 'shadow-yellow' : 'shadow-green')+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1344,7 +1344,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='shadow-green'>" +
+                    "<div class='"+(jsonHtml[l].bad ? 'shadow-yellow' : 'shadow-green')+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1414,6 +1414,7 @@ export default {
         },
         {
           date: 20,
+          bad: true,
           msg: "找豆豆",
         },
       ];
@@ -1945,38 +1946,55 @@ export default {
   .shadow {
     display: inline-block;
     min-width: 10px;
-    padding: 3px 7px;
+    width:20px;
+    padding: 3px 3px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 100;
     line-height: 1;
-    color: #ccc;
+    color: #666666;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
-    background-color: #777;
+    background-color: #D8D8D8;
     border-radius: 15px;
   }
   .shadow-green {
     display: inline-block;
     min-width: 10px;
-    padding: 3px 7px;
+    width:20px;
+    padding: 3px 3px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 100;
     line-height: 1;
-    color: #fff;
+    color: #666666;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
-    background-color: rgb(107, 244, 112);
+    background-color: #86BC25;
+    border-radius: 15px;
+  }
+  .shadow-yellow {
+    display: inline-block;
+    min-width: 10px;
+    width:20px;
+    padding: 3px 3px;
+    font-size: 12px;
+    font-weight: 100;
+    line-height: 1;
+    color: #666666;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #FFCD01;
     border-radius: 15px;
   }
   .xiqi {
-    border-bottom: 1px solid #52ff00bd;
+    border-bottom: 1px solid #86BC25;
     text-align: center;
     height: 40px;
   }
   .thisDay {
-    background: #52ff00bd;
+    background: #86BC25;
     .shadow {
       background-color: #fff;
     }
@@ -1984,7 +2002,7 @@ export default {
 }
 .green {
   margin-left: 5px;
-   color: #52ff00bd
+   color: #86BC25
 }
 .red {
   margin-left: 5px;

@@ -412,3 +412,16 @@ export function getCurrentTime() {
   gettime = yy + "/" + mm + "/" + dd + " " + hh + ":" + mf + ":" + ss;
   return gettime;
 }
+
+/**
+ * 实现搜索关键词高亮显示
+ * @param {*} row //被替换字符串
+ * @param {*} keywork //替换关键字
+ * @returns
+ */
+export function replaceStr(row, keywork) {
+  let replaceReg = new RegExp(keywork, "ig");
+  let replaceString = `<span style="color: #ed4014">${keywork}</span>`;
+  row = row.replace(replaceReg, replaceString);
+  return row;
+}
