@@ -16,7 +16,6 @@ import java.util.Map;
 @Data
 public class GovAttrByDto implements Serializable
 {
-
     List<Map<String,String>>mapList;
 
     private Integer pageSize;

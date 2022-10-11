@@ -254,13 +254,13 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 分页查询全部政府主体
+     * 地方政府-更多指标
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
-    @ApiOperation(value = "分页查询全部政府主体")
+    @ApiOperation(value = "地方政府-更多指标")
     @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody GovAttrByDto govAttrDto) {
