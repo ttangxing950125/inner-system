@@ -43,7 +43,7 @@ public class EntityBondRel {
      * 关系状态
      */
     @Excel(name = "关系状态")
-    private Boolean status = Boolean.TRUE;
+    private Integer status;
 
     /**
      * 新发行人名称

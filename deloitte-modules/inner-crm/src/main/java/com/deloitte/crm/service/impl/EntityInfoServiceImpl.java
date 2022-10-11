@@ -547,6 +547,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
+     * 根据统一社会信用代码 查询主体信息
+     * @param creditCode
+     * @return
+     */
+    @Override
+    public EntityInfo getEntityInfoByCreditCode(String creditCode) {
+        return baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode,creditCode));
+    }
+
+    /**
      * 全量导出
      *
      * @param entityAttrDto
@@ -1354,6 +1364,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public String appendPrefix(Integer prefixLength, Integer target) {
         return String.format("%0" + prefixLength + "d", target);
+    }
+
+    /**
+     *   ****************
+     *   *    通用方法   *
+     *   ****************
+     *
+     * 拼接 0
+     * @param prefixWord 前缀 拼接的字符
+     * @param prefixLength 前缀长度
+     * @param target 目标字符
+     */
+    @Override
+    public String appendPrefixDiy(String prefixWord, Integer prefixLength, Integer target) {
+        return prefixWord+String.format("%0"+prefixLength,target);
     }
 
     /**
