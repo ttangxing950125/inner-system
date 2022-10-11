@@ -39,7 +39,7 @@ public class CnCheckDeclare implements Serializable {
     /**
      * 导入日期
      */
-    private DateTime importTime;
+    private Date importTime;
 
     /**
      * 数据变化类型 1-新增 2-更新

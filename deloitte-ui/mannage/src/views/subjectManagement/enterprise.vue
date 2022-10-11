@@ -8,40 +8,126 @@
             <div class="top-left">
               <div class="title">整体情况</div>
               <div class="body">
-                截止今日起，平台已手机主体
-                <span>222222</span>个，其中：
+                截止今日起，平台已收集主体
+                <span>{{ overviewData.count }}</span
+                >个，其中：
                 <div>
-                  -上市主体 <span>xxx</span> 个， 发债主体 <span>xxx</span> 个
+                  -上市主体 <span>{{ overviewData.list }}</span> 个， 发债主体
+                  <span>{{ overviewData.bonds }}</span> 个
                 </div>
-                <div>-即上市又发债主体 <span>xxx</span> 个</div>
-                <div>-非上市非发债企业 <span>xxx</span> 个</div>
-                <div>-金融机构 <span>xxx</span> 个</div>
+                <div>
+                  -即上市又发债主体 <span>{{ overviewData.listBonds }}</span> 个
+                </div>
+                <div>
+                  -非上市非发债企业
+                  <span>{{ overviewData.unListBonds }}</span> 个
+                </div>
+                <div>
+                  -金融机构 <span>{{ overviewData.finance }}</span> 个
+                </div>
               </div>
             </div>
             <div class="top-right">
               <div
                 class="box1"
-                style="background: gainsboro; width: 15%; text-align: center"
+                :style="{
+                  background: '#d8d8d8',
+                  width: unListBonds + '%',
+                  'text-align': 'center',
+                  opacity: 0.5,
+                }"
               >
-                <div style="margin-top: 50%">非上市非发债15%</div>
+                <el-tooltip
+                  v-if="unListBonds < 5"
+                  class="item"
+                  effect="dark"
+                  :content="'非上市非发债' + unListBonds + '%'"
+                  placement="top-start"
+                >
+                  <div class="max"></div>
+                </el-tooltip>
+                <div v-else>
+                  <div class="desc-center">
+                    {{ unListBonds ? "非上市非发债" : "" }}
+                  </div>
+                  <div>{{ unListBonds ? unListBonds + "%" : "" }}</div>
+                </div>
               </div>
               <div
                 class="box2"
-                style="background: greenyellow; width: 20%; text-align: center"
+                :style="{
+                  background: '#86bc25',
+                  width: bondsList + '%',
+                  'text-align': 'center',
+                  opacity: 0.3,
+                }"
               >
-                <div style="margin-top: 11.5%">单纯上市 20%</div>
+                <el-tooltip
+                  v-if="bondsList < 5"
+                  class="item"
+                  effect="dark"
+                  :content="'单纯上市' + bondsList + '%'"
+                  placement="top-start"
+                >
+                  <div class="max"></div>
+                </el-tooltip>
+                <div v-else>
+                  <div class="desc-center">
+                    {{ bondsList ? "单纯上市" : "" }}
+                  </div>
+                  <div>{{ bondsList ? bondsList + "%" : "" }}</div>
+                </div>
+              </div>
+
+              <div
+                class="box2"
+                :style="{
+                  background: '#86bc25',
+                  width: listBonds + '%',
+                  'text-align': 'center',
+                  opacity: 0.5,
+                }"
+              >
+                <el-tooltip
+                  v-if="listBonds < 5"
+                  class="item"
+                  effect="dark"
+                  :content="'即上市又发债' + listBonds + '%'"
+                  placement="top-start"
+                >
+                  <div class="max"></div>
+                </el-tooltip>
+                <div v-else>
+                  <div class="desc-center">
+                    {{ listBonds ? "即上市又发债" : "" }}
+                  </div>
+                  <div>{{ listBonds ? listBonds + "%" : "" }}</div>
+                </div>
               </div>
               <div
                 class="box2"
-                style="background: green; width: 30%; text-align: center"
+                :style="{
+                  background: '#86bc25',
+                  width: bonds + '%',
+                  'text-align': 'center',
+                  opacity: 0.3,
+                }"
               >
-                <div style="margin-top: 11.5%">即上市又发债 30%</div>
-              </div>
-              <div
-                class="box2"
-                style="background: greenyellow; width: 35%; text-align: center"
-              >
-                <div style="margin-top: 11.5%">单纯发债 35%</div>
+                <el-tooltip
+                  v-if="bonds < 5"
+                  class="item"
+                  effect="dark"
+                  :content="'即上市又发债' + listBonds + '%'"
+                  placement="top-start"
+                >
+                  <div class="max"></div>
+                </el-tooltip>
+                <div v-else>
+                  <div class="desc-center">
+                    {{ bonds ? "单纯发债" : "" }}
+                  </div>
+                  <div>{{ bonds ? bonds + "%" : "" }}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -80,6 +166,9 @@
                 <el-table-column prop="name" label="统一社会信用代码">
                 </el-table-column>
                 <el-table-column prop="province" label="企业名称">
+                  <template slot-scope="scope">
+                    <div v-html="replaceFun(scope.row.province)"></div>
+                  </template>
                 </el-table-column>
                 <el-table-column prop="city" label="上市情况">
                 </el-table-column>
@@ -207,6 +296,7 @@
 </template>
 <script>
 import { getOverviewByGroup, getInfoList } from "@/api/subject";
+import { replaceStr } from "@/utils/index";
 export default {
   name: "government",
   data() {
@@ -221,10 +311,44 @@ export default {
         4: "金融机构",
       },
       list2: [],
-      list: [],
+      list: [
+        {
+          date: "2016-05-02",
+          name: "王小虎",
+          province: "上海",
+          city: "普陀区",
+          address: "上海市普陀区金沙江路 1518 弄",
+          zip: 200333,
+        },
+        {
+          date: "2016-05-04",
+          name: "王小虎",
+          province: "上海",
+          city: "普陀区",
+          address: "上海市普陀区金沙江路 1517 弄",
+          zip: 200333,
+        },
+        {
+          date: "2016-05-01",
+          name: "王小虎",
+          province: "上海",
+          city: "普陀区",
+          address: "上海市普陀区金沙江路 1519 弄",
+          zip: 200333,
+        },
+        {
+          date: "2016-05-03",
+          name: "王小虎",
+          province: "上海xxxxxxx",
+          city: "普陀区",
+          address: "上海市普陀区金沙江路 1516 弄",
+          zip: 200333,
+        },
+      ],
       loading: false,
       currentTab: "1",
       currentPage4: 4,
+      overviewData: {},
     };
   },
   created() {
@@ -235,7 +359,8 @@ export default {
       try {
         this.$modal.loading("Loading...");
         getOverviewByGroup({}).then((res) => {
-          console.log(res);
+          const { data } = res;
+          this.overviewData = data;
         });
         const parmas = {
           param: "",
@@ -288,6 +413,41 @@ export default {
     checkName(row) {
       console.log(row);
     },
+    replaceFun(row) {
+      return replaceStr(row, this.nameInput);
+    },
+  },
+  computed: {
+    sumCount() {
+      return (
+        this.overviewData.unListBonds +
+        this.overviewData.bonds +
+        this.overviewData.bonds +
+        this.overviewData.list +
+        this.overviewData.listBonds
+      );
+    },
+    unListBonds() {
+      const res = (
+        (this.overviewData.unListBonds / this.sumCount) *
+        100
+      ).toFixed(2);
+      return res;
+    },
+    bonds() {
+      const res = ((this.overviewData.bonds / this.sumCount) * 100).toFixed(2);
+      return res;
+    },
+    bondsList() {
+      const res = ((this.overviewData.list / this.sumCount) * 100).toFixed(2);
+      return res;
+    },
+    listBonds() {
+      const res = ((this.overviewData.listBonds / this.sumCount) * 100).toFixed(
+        2
+      );
+      return res;
+    },
   },
 };
 </script>
@@ -296,7 +456,7 @@ export default {
 .font {
   font-size: 13px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .page-t {
@@ -315,7 +475,7 @@ export default {
   font-weight: 600;
 }
 .green {
-  color: greenyellow;
+  color: #86bc25;
 }
 .red {
   color: red;
@@ -330,10 +490,10 @@ export default {
     font-size: 20px;
   }
   .body {
-    width: 330px;
+    width: 350px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
     div {
       margin-top: 5px;
@@ -342,20 +502,21 @@ export default {
   .top-right {
     display: flex;
     padding: 20px 20px;
-    width: 40%;
+    width: 600px;
     height: 150px;
+    margin-top: 5%;
   }
   .right-number {
     position: relative;
     left: 167%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .g-desc {
   margin-top: 15px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -378,7 +539,23 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
+}
+.desc-center {
+  width: 50px;
+  margin: 0 auto;
+  margin-top: 30px;
+  font-weight: 600;
+}
+.desc-center2 {
+  width: 45px;
+  margin: 0 auto;
+  margin-top: 30px;
+  font-weight: 600;
+}
+.max {
+  height: 100%;
+  width: 100%;
 }
 </style>

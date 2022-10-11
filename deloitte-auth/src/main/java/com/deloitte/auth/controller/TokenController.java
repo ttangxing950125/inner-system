@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.deloitte.system.api.domain.SysRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,8 @@ import com.deloitte.common.security.service.TokenService;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.system.api.model.LoginUser;
 
+import java.util.Map;
+
 /**
  * token 控制
  * 
@@ -33,13 +36,19 @@ public class TokenController
     @Autowired
     private SysLoginService sysLoginService;
 
+
     @PostMapping("login")
     public R<?> login(@RequestBody LoginBody form)
     {
         // 用户登录
         LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
         // 获取登录token
-        return R.ok(tokenService.createToken(userInfo));
+        Map<String, Object> token = tokenService.createToken(userInfo);
+//        SysRole roleInfo = iSysRoleService.getRoleInfo(userId);
+//        SecurityUtils.getUserId()
+        token.put("roleInfo", userInfo.getRoleInfo());
+
+        return R.ok(token);
     }
 
     @DeleteMapping("logout")

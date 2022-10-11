@@ -2,6 +2,8 @@ package com.deloitte.system.api.model;
 
 import java.io.Serializable;
 import java.util.Set;
+
+import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 
 /**
@@ -54,9 +56,22 @@ public class LoginUser implements Serializable
     private Set<String> roles;
 
     /**
+     * 角色1-6中的角色
+     */
+    private SysRole roleInfo;
+
+    /**
      * 用户信息
      */
     private SysUser sysUser;
+
+    public SysRole getRoleInfo() {
+        return roleInfo;
+    }
+
+    public void setRoleInfo(SysRole roleInfo) {
+        this.roleInfo = roleInfo;
+    }
 
     public String getToken()
     {
