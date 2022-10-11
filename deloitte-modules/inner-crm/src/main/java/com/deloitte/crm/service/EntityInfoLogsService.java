@@ -18,4 +18,11 @@ public interface EntityInfoLogsService extends IService<EntityInfoLogs> {
      * @return
      */
     Object findAllByType(String type);
+
+    /**
+     * 撤销
+     * @param code
+     * @return
+     */
+    Object cancel(Integer code);
 }
