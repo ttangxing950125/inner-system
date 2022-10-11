@@ -158,6 +158,8 @@ public class GovInfo implements Serializable {
     @Excel(name = "主体状态")
     private Integer status;
 
+
+
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);
