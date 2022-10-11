@@ -25,12 +25,13 @@ import com.deloitte.crm.mapper.EntityNameHisMapper;
 import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.HttpUtils;
-import lombok.AllArgsConstructor;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
+import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -39,6 +40,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -432,8 +434,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         pageNum=(pageNum-1)*pageSize;
         entityAttrDto.setPageNum(pageNum);
-        //查询条数
+        //查询页面数据
         List<GovInfo> records=govInfoMapper.getGovByAttrValueByPage(entityAttrDto);
+        //查询条数
         Integer count=govInfoMapper.getGovCountByAttrValue(entityAttrDto);
 
         pageResult.setTotal(count);

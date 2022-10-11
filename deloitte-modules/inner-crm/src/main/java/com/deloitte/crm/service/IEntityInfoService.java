@@ -12,8 +12,6 @@ import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -188,7 +186,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     /**
      * 覆盖情况快速查询
      *
-     * @param entityType
      * @param param
      * @param pageNum
      * @param pageSize
@@ -196,7 +193,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
-    R getQuickOfCoverage(String entityType, String param, Integer pageNum,Integer pageSize);
+    R getQuickOfCoverage(String param, Integer pageNum,Integer pageSize);
 
 
     /**

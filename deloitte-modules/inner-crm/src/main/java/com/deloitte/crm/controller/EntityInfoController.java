@@ -10,7 +10,6 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.EntityInfoByDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -294,7 +292,6 @@ public class EntityInfoController extends BaseController {
     /**
      * 覆盖情况快速查询
      *
-     * @param entityType
      * @param param
      * @param pageNum
      * @param pageSize
@@ -304,8 +301,8 @@ public class EntityInfoController extends BaseController {
      */
     @ApiOperation(value = "覆盖情况快速查询")
     @PostMapping("/getQuickOfCoverage")
-    public R getQuickOfCoverage(String entityType, String param, Integer pageNum, Integer pageSize) {
-        return entityInfoService.getQuickOfCoverage(entityType, param, pageNum, pageSize);
+    public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
+        return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);
     }
 
     /***
