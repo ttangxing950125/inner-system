@@ -192,36 +192,43 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Object cancel(Integer id) {
-        /***
-         * 1.撤销状态 根据 EntityInfoLogs 查询A股 或者港股 或 债券 数据根据相关关联数据 进行更新删除
-         * 2.本次删除逻辑存在部分bug 在不考虑分布式数据实时一致性的话 延时双删不是最好的最解决方式
-         * 本次用到缓存的表信息包含  StockThkInfo  StockCnInfo
-         */
         int result = 0;
-        EntityInfoLogs entityInfoLogs = Optional.ofNullable(entityInfoLogsMapper.selectOne(new LambdaQueryWrapper<EntityInfoLogs>().eq(EntityInfoLogs::getId, id))).orElseThrow(() -> new ServiceException("数据不存在"));
+        LambdaQueryWrapper<EntityInfoLogs> entityInfoLogsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        EntityInfoLogs entityInfoLogs = Optional.ofNullable(entityInfoLogsMapper.selectOne(entityInfoLogsLambdaQueryWrapper.eq(EntityInfoLogs::getId, id))).orElseThrow(() -> new ServiceException("id为:" + id + "的数据不存在"));
+        /***
+         *  债券的删除逻辑 operType=3
+         * {@link EntityInfoLogs#operType}
+         */
         if (entityInfoLogs.getOperType().equals("3")) {
-            final BondInfo bondInfo = bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getOriCode, entityInfoLogs.getCode()).eq(BondInfo::getBondShortName, entityInfoLogs.getName()));
+            LambdaQueryWrapper<BondInfo> bondInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            final BondInfo bondInfo = bondInfoMapper.selectOne(bondInfoLambdaQueryWrapper.eq(BondInfo::getOriCode, entityInfoLogs.getCode()).eq(BondInfo::getBondShortName, entityInfoLogs.getName()));
             if (bondInfo != null) {
                 bondInfo.setIsDeleted(Boolean.TRUE);
                 result = bondInfoMapper.updateById(bondInfo);
-                final LambdaQueryWrapper<EntityBondRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                LambdaQueryWrapper<EntityBondRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
                 final EntityBondRel entityBondRel = entityBondRelMapper.selectOne(lambdaQueryWrapper.eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
                 if (entityBondRel != null) {
                     entityBondRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
                     entityBondRelMapper.updateEntityBondRel(entityBondRel);
                 }
             }
+            /***
+             *  A股删除逻辑 1 operType=1
+             * {@link EntityInfoLogs#operType}
+             */
         } else if (entityInfoLogs.getOperType().equals("1")) {
-            final StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockDqCode, entityInfoLogs.getDeCode()));
+            LambdaQueryWrapper<StockCnInfo> stockCnInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            final StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(stockCnInfoLambdaQueryWrapper.eq(StockCnInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockCnInfo != null) {
                 String stockDqCode = stockCnInfo.getStockDqCode();
-                final LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-                final EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockDqCode));
+                LambdaQueryWrapper<EntityStockCnRel> EntityStockCnRelLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                final EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(EntityStockCnRelLambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockDqCode));
                 if (entityStockCnRel != null) {
                     entityStockCnRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
                     entityStockCnRelMapper.updateById(entityStockCnRel);
                 }
                 /**
+                 * 本次删除逻辑存在部分bug 在不考虑分布式数据实时一致性的话 延时双删不是最好的最解决方式
                  * {@link StockCnInfoServiceImpl#saveOrUpdateNew(StockCnInfo)} (Object)}
                  */
                 stockCnInfo.setIsDeleted(Boolean.TRUE);
@@ -229,13 +236,17 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 result = stockCnInfoMapper.updateById(stockCnInfo);
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, stockCnInfo.getStockCode());
-
             }
+            /***
+             *  港股 删除逻辑 operType=2
+             * {@link EntityInfoLogs#operType}
+             */
         } else if (entityInfoLogs.getOperType().equals("2")) {
-            final LambdaQueryWrapper<StockThkInfo> stockThkInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            LambdaQueryWrapper<StockThkInfo> stockThkInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(stockThkInfoLambdaQueryWrapper.eq(StockThkInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockThkInfo != null) {
                 /**
+                 * 本次删除逻辑存在部分bug 在不考虑分布式数据实时一致性的话 延时双删不是最好的最解决方式
                  * {@link StockCnInfoServiceImpl#saveOrUpdateNew(StockCnInfo)}
                  */
                 stockThkInfo.setIsDeleted(Boolean.TRUE);
@@ -244,7 +255,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_THK_INFO, stockThkInfo.getStockCode());
                 String stockDqCode = stockThkInfo.getStockDqCode();
-                final LambdaQueryWrapper<EntityStockThkRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+                LambdaQueryWrapper<EntityStockThkRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
                 EntityStockThkRel entityStockThkRel = entityStockThkRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockThkRel::getStockDqCode, stockDqCode));
                 if (entityStockThkRel != null) {
                     entityStockThkRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
