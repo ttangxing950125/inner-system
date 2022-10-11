@@ -70,6 +70,7 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
             }
 
 
+
             //这条CnIpoPause是新增还是修改 1-新增 2-修改
             Integer changeType = null;
             CnIpoPause last = cnIpoPauseService.findLastByCode(code);

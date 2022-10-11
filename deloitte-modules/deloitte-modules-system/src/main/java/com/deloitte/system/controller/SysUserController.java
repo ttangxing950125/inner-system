@@ -107,10 +107,15 @@ public class SysUserController extends BaseController {
         Set<String> roles = permissionService.getRolePermission(sysUser.getUserId());
         // 权限集合
         Set<String> permissions = permissionService.getMenuPermission(sysUser.getUserId());
+
+        SysRole roleInfo = iSysRoleService.getRoleInfo(sysUser.getUserId());
+
         LoginUser sysUserVo = new LoginUser();
         sysUserVo.setSysUser(sysUser);
         sysUserVo.setRoles(roles);
         sysUserVo.setPermissions(permissions);
+        sysUserVo.setRoleInfo(roleInfo);
+
         return R.ok(sysUserVo);
     }
 

@@ -46,6 +46,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
     /**
      * 处理文件中的每一行
+     *
      * @param thkSecIssInfos
      * @param timeNow
      * @param windTask
@@ -63,25 +64,26 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             StockThkInfo stockThkInfo = stockThkInfoService.findByCode(code);
 
             //没有就创建一个
-            if (stockThkInfo==null){
+            if (stockThkInfo == null) {
                 stockThkInfo = new StockThkInfo();
-                stockThkInfo.setStockCode(code);
-                stockThkInfo.setStockName(thkSecIssInfos.getName());
             }
+
+            stockThkInfo.setStockCode(code);
+            stockThkInfo.setStockName(thkSecIssInfos.getName());
 
             //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
             Integer changeType = null;
 
             //查询这条数据有没有
             ThkSecIssDetail lastThkSecIssInfo = thkSecIssDetailService.findLastByCode(code);
-            if (lastThkSecIssInfo==null){
+            if (lastThkSecIssInfo == null) {
 
                 changeType = DataChangeType.INSERT.getId();
 
                 //当股票首次出现在  首次发行明细 中时，记为“发行中”
                 stockThkInfo.setStockStatus(StockThkStatus.ISSUE.getId());
                 stockThkInfo.setStatusDesc(StockThkStatus.ISSUE.getName());
-            }else if (!Objects.equals(lastThkSecIssInfo, thkSecIssInfos)){
+            } else if (!Objects.equals(lastThkSecIssInfo, thkSecIssInfos)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
@@ -95,9 +97,9 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             //当股票状态已经是“发行中”时，当【上市日期】 = 今天 时，状态改为“成功上市”
             if (
                     Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus())
-                    &&
-                    DateUtil.compare(ipoDate, timeNow)==0
-            ){
+                            &&
+                            DateUtil.compare(ipoDate, timeNow) == 0
+            ) {
                 stockThkInfo.setStockStatus(StockThkStatus.LIST.getId());
                 stockThkInfo.setStatusDesc(StockThkStatus.LIST.getName());
 
@@ -129,6 +131,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
     /**
      * 是否支持当前wind任务
+     *
      * @param windDictId
      * @return
      */
@@ -149,7 +152,8 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<ThkSecIssDetail> util = new ExcelUtil<ThkSecIssDetail>(ThkSecIssDetail.class);
-        List<ThkSecIssDetail> thkSecIssInfos = util.importExcel(windTaskContext.getFileStream(), true);;
+        List<ThkSecIssDetail> thkSecIssInfos = util.importExcel(windTaskContext.getFileStream(), true);
+        ;
 
         return thkSecIssDetailService.doTask(windTask, thkSecIssInfos);
     }
@@ -192,7 +196,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
                 .in(ThkSecIssDetail::getChangeType, 1, 2);
 
 
-        return thkSecIssDetailService.list(wrapper).stream().map(item->{
+        return thkSecIssDetailService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

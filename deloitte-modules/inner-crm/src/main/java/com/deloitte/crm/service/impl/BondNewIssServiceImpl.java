@@ -23,8 +23,9 @@ import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.service.*;
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
+import com.deloitte.crm.strategy.impl.NewIssueStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -66,6 +67,10 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
     @Resource
     private BondNewIssAsyncService bondNewIssAsyncService;
 
+    @Resource
+    @Lazy
+    private NewIssueStrategy newIssueStrategy;
+
 
     /**
      * 导入债券任务
@@ -91,7 +96,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
                 continue;
             }
             //多线程保存债券信息，更新attrvalue表
-            Future<BondInfoDto> future = bondNewIssAsyncService.doBondImport(newIss, timeNow, windTask);
+            Future<BondInfoDto> future = newIssueStrategy.doBondImport(newIss, timeNow, windTask);
 
             futureList.add(future);
         }

@@ -2,7 +2,8 @@ package com.deloitte.crm.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovInfo;
-import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.GovAttrByDto;
+import com.deloitte.crm.domain.dto.GovAttrByDtoBack;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import java.util.List;
@@ -85,9 +86,9 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R checkGov(GovInfo govInfo);
 
-    Object getListEntityByPage(EntityAttrByDto govAttrDto);
+    Object getListEntityByPage(GovAttrByDto govAttrDto);
 
-    void ExportEntityGov(EntityAttrByDto entityAttrDto);
+    void ExportEntityGov(GovAttrByDto govAttrByDto);
 
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
@@ -105,5 +106,8 @@ public interface IGovInfoService  extends IService<GovInfo>
      * @return
      */
     R<String> getPreGovName(String govCode);
+
     R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo);
+
+    GovAttrByDtoBack getGovRange();
 }

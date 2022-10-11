@@ -15,7 +15,7 @@
       ref="upload"
     >
       <!-- 上传按钮 -->
-      <el-button class="btn" type="text">选取文件</el-button>
+      <el-button class="btn" type="text">{{ uploadStr }}</el-button>
       <!-- 上传提示 -->
       <!-- <div class="el-upload__tip" slot="tip" v-if="showTip">
         请上传
@@ -88,6 +88,10 @@ export default {
     index: {
       type: Number,
       default: 0,
+    },
+    uploadStr: {
+      type: String,
+      default: "选取文件",
     },
   },
   data() {

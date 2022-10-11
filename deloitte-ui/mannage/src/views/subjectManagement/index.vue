@@ -16,26 +16,31 @@
             <div
               class="box1"
               :style="{
-                background: 'green',
+                background: '#86BC25',
                 width: govePercent + '%',
                 'text-align': 'center',
               }"
             >
               <div style="margin-top: 35px">
-                {{ govePercent ? "政府" + govePercent + "%" : "" }}
+                {{ govePercent ? "政府" : "" }}
               </div>
+              <div>{{ govePercent ? govePercent + "%" : "" }}</div>
             </div>
             <div
               class="box2"
               :style="{
-                background: 'greenyellow',
+                background: '#D7ECB8',
                 width: entityPercent + '%',
                 'text-align': 'center',
               }"
             >
-              <div style="margin-top: 45px">
+              <!-- <div style="margin-top: 45px">
                 {{ entityPercent ? "企业" + entityPercent + "%" : "" }}
+              </div> -->
+              <div style="margin-top: 35px">
+                {{ entityPercent ? "企业" : "" }}
               </div>
+              <div>{{ entityPercent ? entityPercent + "%" : "" }}</div>
             </div>
           </div>
         </el-card>
@@ -73,7 +78,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#86BC25',
                     width: govSumPercent + '%',
                     'text-align': 'center',
                   }"
@@ -83,7 +88,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#86BC25',
                     width: provincePercent + '%',
                     'text-align': 'center',
                   }"
@@ -93,7 +98,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#86BC25',
                     width: cityPercent + '%',
                     'text-align': 'center',
                   }"
@@ -103,7 +108,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#86BC25',
                     width: countyPercent + '%',
                     'text-align': 'center',
                   }"
@@ -113,7 +118,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#86BC25',
                     width: openPercent + '%',
                     'text-align': 'center',
                   }"
@@ -166,7 +171,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#D7ECB8',
                     width: listPercent + '%',
                     'text-align': 'center',
                   }"
@@ -176,7 +181,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#D7ECB8',
                     width: issueBondsPercent + '%',
                     'text-align': 'center',
                   }"
@@ -186,7 +191,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#D7ECB8',
                     width: bondsAndListPercent + '%',
                     'text-align': 'center',
                   }"
@@ -196,7 +201,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#D7ECB8',
                     width: financePercent + '%',
                     'text-align': 'center',
                   }"
@@ -206,7 +211,7 @@
                 <div
                   class="text item number-font"
                   :style="{
-                    background: 'green',
+                    background: '#D7ECB8',
                     width: notBondsAndListPercent + '%',
                     'text-align': 'center',
                   }"
@@ -322,32 +327,47 @@
       </el-col>
     </el-row>
     <el-dialog title="批量查询" :visible.sync="dialogVisible" width="30%">
-      <div>
+      <div class="p-top">
         <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
       </div>
-      <el-button type="text" @click="downFile">批量查询匹配模板.xlsx</el-button>
-      <div class="red">
+      <el-button type="text" class="p-top" @click="downFile"
+        >批量查询匹配模板.xlsx</el-button
+      >
+      <div class="p-red">
         <div>特别注意：</div>
         <div>请不要修改列名！</div>
         <div>请不要修改列顺序！</div>
         <div>请不要在行间出现空行！</div>
       </div>
-      <div>
-        <!-- <fileUpload
-          :uploadUrl="'/crm/windTask/doTask/' + item.windTask.id"
-          :index="index"
+      <div :class="uploadStatus ? 'upload-success' : 'upload-background'">
+        <div class="upload-font">上传批量查询输入文件</div>
+        <fileUpload
+          :uploadUrl="'xxx'"
+          :uploadStr="'+ 点击上传文件'"
           ref="fileUpload"
           @loading="loadingFun"
           @uploadFail="uploadFail"
           @uploadPass="uploadPass"
-        /> -->
-        上传批量查询输入文件
+        />
       </div>
-      <span slot="footer" class="dialog-footer">
+      <div>
+        <div class="flex1">
+          <div class="upload-font">匹配进度</div>
+          <div class="upload-font2">[暂未开始匹配]</div>
+        </div>
+        <el-progress
+          class="percentage"
+          :percentage="percentage"
+          color="#86BC25"
+          :text-inside="true"
+          :stroke-width="15"
+        ></el-progress>
+      </div>
+      <div slot="footer" class="dialog-footer center">
         <el-button type="primary" @click="dialogVisible = false"
           >确 定</el-button
         >
-      </span>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -461,6 +481,8 @@ export default {
       notBondsAndListPercent: 0,
       loadingData: false,
       dialogVisible: false,
+      percentage: 20,
+      uploadStatus: false,
     };
   },
   mounted() {
@@ -530,17 +552,23 @@ export default {
       this.dialogVisible = true;
     },
     downFile() {
-      console.log("down");
+      var a = document.createElement("a"); // 创建一个<a></a>标签
+      a.href = "/批量查询匹配模板.xlsx";
+      a.download = "批量查询匹配模板.xlsx"; // 设置下载文件文件名
+      a.style.display = "none"; // 隐藏a标签
+      document.body.appendChild(a); // 将a标签追加到文档对象中
+      a.click(); // 模拟点击了a标签，会触发a标签的href的读取，浏览器就会自动下载了
+      a.remove(); // 一次性的，用完就删除a标签
     },
-    // loadingFun(index) {
-    //   this.contentData[index].taskStatus = 2;
-    // },
-    // uploadPass(data, index) {
-    //   this.contentData[index].taskStatus = 1;
-    // },
-    // uploadFail(index) {
-    //   this.contentData[index].taskStatus = 0;
-    // },
+    loadingFun(index) {
+      console.log(1);
+    },
+    uploadPass(data, index) {
+      console.log(2);
+    },
+    uploadFail(index) {
+      console.log(3);
+    },
   },
   computed: {
     govePercent() {
@@ -571,7 +599,7 @@ export default {
     width: 330px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
   }
   .top-right {
@@ -581,10 +609,11 @@ export default {
     height: 150px;
   }
   .right-number {
+    width: 50px;
     position: relative;
-    left: 167%;
+    left: 156%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .box-card1 {
@@ -614,12 +643,10 @@ export default {
 .select-table {
   margin-top: 25px;
   min-height: 80px;
-  background: gainsboro;
+  background: #f6f6f6;
   padding: 10px;
   width: 98%;
   margin-left: 14px;
-}
-.table-title {
 }
 .select-only {
   width: 30%;
@@ -633,7 +660,7 @@ export default {
   margin-top: 10px;
   width: 150px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .page {
@@ -642,5 +669,69 @@ export default {
 }
 .table-content {
   margin-top: 10px;
+}
+.p-top {
+  margin-bottom: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  span {
+    color: #75787a;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+.p-red {
+  margin-bottom: 35px;
+  div {
+    color: red;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+.upload-success {
+  ::v-deep .upload-file {
+    text-align: center;
+    background: #86bc25;
+  }
+}
+.upload-background {
+  margin-bottom: 5px;
+  font-weight: 800;
+  font-size: 12px;
+  ::v-deep .upload-file {
+    background: #e7f0d9;
+    text-align: center;
+  }
+  ::v-deep .el-button--text {
+    color: #86bc25;
+  }
+}
+.upload-font {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.flex1 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  .upload-font2 {
+    font-size: 12px;
+  }
+}
+.percentage {
+  ::v-deep .el-progress-bar__outer {
+    border-radius: 0px !important;
+  }
+  ::v-deep .el-progress-bar__inner {
+    border-radius: 0px !important;
+  }
+}
+.center {
+  text-align: center !important;
+  ::v-deep .el-button--primary {
+    background: #86bc25;
+    border-color: #86bc25;
+  }
 }
 </style>

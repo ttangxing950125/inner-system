@@ -1,4 +1,5 @@
 package com.deloitte.crm.service.impl;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -92,7 +93,10 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         taskContext.setFile(file);
         taskContext.setTimeNow(timeNow);
         taskContext.setWindTask(windTask);
-        taskContext.setFileStream(file.getInputStream());
+//        taskContext.setFileStream(file.getInputStream());
+        byte[] dataBytes = file.getBytes();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(dataBytes);
+        taskContext.setFileStream(inputStream);
 
         windTaskStrategyManage.doTask(taskContext);
 

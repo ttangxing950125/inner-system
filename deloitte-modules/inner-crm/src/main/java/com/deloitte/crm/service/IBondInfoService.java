@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.BondInfo;
+import com.deloitte.crm.dto.BondInfoManualDto;
 import com.deloitte.crm.vo.BondEntityInfoVo;
 
 import java.util.List;
@@ -110,4 +111,13 @@ public interface IBondInfoService
      * @return
      */
     boolean updateBondType(String dqBondCode);
+
+    /**
+     * 手动添加债券信息
+     * @author 正杰
+     * @date 2022/10/11
+     * @param bondInfoManualDto
+     * @return 操作成功与否信息
+     */
+    R insertBondInfoManual(BondInfoManualDto bondInfoManualDto);
 }

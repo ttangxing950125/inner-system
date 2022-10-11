@@ -16,9 +16,9 @@ public class SpringAsyncConfig {
     @Bean("taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        int i = Runtime.getRuntime().availableProcessors();
+//        int i = Runtime.getRuntime().availableProcessors();
         // 设置核心线程数
-        executor.setCorePoolSize(i+1);
+        executor.setCorePoolSize(16);
         // 设置最大线程数
         executor.setMaxPoolSize(64);
         //配置队列大小

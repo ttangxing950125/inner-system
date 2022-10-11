@@ -44,6 +44,10 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
+    public static void main(String[] args) {
+        System.out.println(Integer.MAX_VALUE);
+    }
+
     /**
      * 导入ThkSecIssInfo表的数据
      * @param secIssInfo
@@ -68,8 +72,11 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
                 stockThkInfo.setStockCode(secIssInfoCode);
                 stockThkInfo.setStockStatus(1);
                 stockThkInfo.setStatusDesc("聆讯中("+secIssInfo.getStatus()+")");
-                stockThkInfo.setStockName(secIssInfo.getName());
             }
+
+            stockThkInfo.setStockName(secIssInfo.getName());
+
+
 
             //主体名
             String entityName = secIssInfo.getEntityCnName();

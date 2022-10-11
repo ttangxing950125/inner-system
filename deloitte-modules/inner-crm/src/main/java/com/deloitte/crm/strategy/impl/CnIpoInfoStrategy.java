@@ -66,8 +66,10 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             //没有就创建一个
             if (stockCnInfo==null){
                 stockCnInfo = new StockCnInfo();
-                stockCnInfo.setStockCode(code);
             }
+
+            stockCnInfo.setStockCode(code);
+            stockCnInfo.setStockShortName(item.getStockName());
 
             //这条CnCoachBack是新增还是修改 1-新增 2-修改
             Integer changeType = null;

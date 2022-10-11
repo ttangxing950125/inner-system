@@ -27,25 +27,24 @@ public class StockThkInfoServiceImpl extends ServiceImpl<StockThkInfoMapper, Sto
     @Override
     @Transactional(rollbackFor = Exception.class)
     public StockThkInfo saveOrUpdateNew(StockThkInfo thkInfo) {
-        if (thkInfo.getId()!=null){
+        if (thkInfo.getId() != null) {
             int count = baseMapper.updateById(thkInfo);
-            thkInfo = count>0 ?  baseMapper.selectById(thkInfo.getId()) : thkInfo;
-        }else {
+            thkInfo = count > 0 ? baseMapper.selectById(thkInfo.getId()) : thkInfo;
+        } else {
             baseMapper.insert(thkInfo);
-            DecimalFormat g1=new DecimalFormat("000000");
+            DecimalFormat g1 = new DecimalFormat("000000");
             String startZeroStr = g1.format(thkInfo.getId());
-            thkInfo.setStockDqCode("HK"+startZeroStr);
+            thkInfo.setStockDqCode("HK" + startZeroStr);
 
             baseMapper.updateById(thkInfo);
         }
-
         redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_THK_INFO, thkInfo.getStockCode());
-
         return thkInfo;
     }
 
     /**
      * 根据证券代码查询港股信息（StockThkInfo）
+     *
      * @param secIssInfoCode
      * @return
      */
@@ -53,12 +52,10 @@ public class StockThkInfoServiceImpl extends ServiceImpl<StockThkInfoMapper, Sto
     public StockThkInfo findByCode(String secIssInfoCode) {
         //去缓存中查询
         StockThkInfo stockThkInfo = redisService.getCacheMapValue(CacheName.STOCK_THK_INFO, secIssInfoCode);
-        if (stockThkInfo==null){
+        if (stockThkInfo == null) {
             stockThkInfo = baseMapper.findByCode(secIssInfoCode);
             redisService.setCacheMapValue(CacheName.STOCK_THK_INFO, secIssInfoCode, stockThkInfo);
         }
-
-
         return stockThkInfo;
     }
 }
