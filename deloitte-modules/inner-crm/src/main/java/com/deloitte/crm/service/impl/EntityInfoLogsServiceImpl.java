@@ -255,7 +255,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 LambdaQueryWrapper<EntityBondRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
                 final EntityBondRel entityBondRel = entityBondRelMapper.selectOne(lambdaQueryWrapper.eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
                 if (entityBondRel != null) {
-                    entityBondRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
+                    entityBondRel.setStatus(0);//TODO 0 是禁用 1是启用
                     entityBondRelMapper.updateEntityBondRel(entityBondRel);
                 }
             }

@@ -3,17 +3,17 @@ package com.deloitte.crm.service.impl;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.*;
-import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.dto.BondInfoManualDto;
 import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.service.IEntityAttrService;
@@ -56,6 +56,9 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
     @Resource
     private IEntityAttrValueService iEntityAttrValueService;
+
+    @Resource
+    private IEntityBondRelService iEntityBondRelService;
 
 
     /**
@@ -290,11 +293,11 @@ public class BondInfoServiceImpl implements IBondInfoService {
          */
         EntityInfo issuerEntity = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getEntityName, issuerName.getValue()));
+
         //前发行人德勤主体代码
         attrs.put("前发行人德勤主体代码",new AttrValueMapDto().setValue(issuerEntity.getEntityCode()).setValueId(issuerEntity.getId()));
         //前发行人统一社会信用代码
         attrs.put("前发行人统一社会信用代码",new AttrValueMapDto().setValue(issuerEntity.getCreditCode()).setValueId(issuerEntity.getId()));
-
 
         //TODO 接收方名称
         attrs.put("接收方名称",new AttrValueMapDto().setName("接收方名称"));
@@ -393,6 +396,50 @@ public class BondInfoServiceImpl implements IBondInfoService {
         this.saveOrUpdate(bondInfo);
 
         return true;
+    }
+
+    /**
+     * 手动添加债券信息
+     * @author 正杰
+     * @date 2022/10/11
+     * @param bondInfoManualDto
+     * @return 操作成功与否信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R insertBondInfoManual(BondInfoManualDto bondInfoManualDto) {
+        BondInfo bondInfo = new BondInfo();
+        BeanUtil.copyProperties(bondInfoManualDto,bondInfo);
+        bondInfoMapper.insertBondInfo(bondInfo);
+
+        //生成bond_info的 bondCode 长度为8位 用id拼接若干个0
+        String bondCode = iEntityInfoService.appendPrefixDiy("BD", 6, bondInfo.getId().intValue());
+        bondInfoMapper.updateById(bondInfo);
+
+        //债券全称 id 57
+        iEntityAttrValueService.insertEntityAttrValue(new EntityAttrValue().setAttrId(57L).setEntityCode(bondCode).setValue(bondInfoManualDto.getBondFullName()));
+
+        //债券交易代码 id 804
+        iEntityAttrValueService.insertEntityAttrValue(new EntityAttrValue().setAttrId(804L).setEntityCode(bondCode).setValue(bondInfoManualDto.getOriCode()));
+
+        //债券wind债务类型 一级 id 92
+        iEntityAttrValueService.insertEntityAttrValue(new EntityAttrValue().setAttrId(92L).setEntityCode(bondCode).setValue(bondInfoManualDto.getWindTypeOne()));
+
+        //债券wind债务类型 二级 id 85
+        iEntityAttrValueService.insertEntityAttrValue(new EntityAttrValue().setAttrId(85L).setEntityCode(bondCode).setValue(bondInfoManualDto.getWindTypeTwo()));
+
+        //起息日 id 52
+        iEntityAttrValueService.insertEntityAttrValue(new EntityAttrValue().setAttrId(52L).setEntityCode(bondCode).setValue(bondInfoManualDto.getValueDate()));
+
+        //TODO 到期兑付日 id
+
+        //新增一条关联关系至 entity_bond_rel
+        EntityBondRel entityBondRel = new EntityBondRel();
+        entityBondRel.setEntityCode(bondInfoManualDto.getEntityCode());
+        entityBondRel.setBdCode(bondCode);
+        iEntityBondRelService.insertEntityBondRel(entityBondRel);
+
+        return R.ok();
     }
 
 //    @Override
