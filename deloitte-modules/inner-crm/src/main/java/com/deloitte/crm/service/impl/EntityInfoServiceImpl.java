@@ -31,10 +31,7 @@ import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.mapper.*;
-import com.deloitte.crm.service.EntityInfoManager;
-import com.deloitte.crm.service.ICrmEntityTaskService;
-import com.deloitte.crm.service.IEntityInfoService;
-import com.deloitte.crm.service.IEntityNameHisService;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.*;
@@ -112,6 +109,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private ICrmEntityTaskService iCrmEntityTaskService;
 
     private RedisService redisService;
+
+    private EntityInfoLogsService entityInfoLogsService;
 
     /**
      * 统计企业主体信息
@@ -248,13 +247,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         baseMapper.updateById(entityInfo);
 
         //TODO 将新增的信息保存至 entity_info_logs
-        EntityInfoLogs temp = new EntityInfoLogs();
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
         //数据装配新增基础信息
-        temp.setEntityCode(entityCode)
+        entityInfoLogs.setEntityCode(entityCode)
                 .setEntityName(entityInfo.getEntityName())
-                .setOperName(username)
-                .setRemarks("");
-
+                .setOperName(username);
+        entityInfoLogsService.getBaseMapper().insert(entityInfoLogs);
 
         //修改当日任务 新增主体状态码为 2
         return iCrmEntityTaskService.finishTask(taskId, 2);

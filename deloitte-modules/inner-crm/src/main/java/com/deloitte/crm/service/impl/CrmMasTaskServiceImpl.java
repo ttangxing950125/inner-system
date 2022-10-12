@@ -17,6 +17,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.RoleInfo;
@@ -168,47 +169,31 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      * 角色2今日运维模块
      * @author 正杰
      * @date 2022/9/27
-     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy/mm/dd
-     * @return R<List<CrmMasTask>> 当月或者当日的任务情况
+     * @param date 请传入参数 yyyy-MM
+     * @return R<Page<CrmMasTaskVo>> 当日任务
      */
     @Override
-    public R<List<CrmMasTaskVo>> getTaskInfo(String timeUnit, String date) {
+    public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
         List<CrmMasTaskVo> res = new ArrayList<>();
-        switch (timeUnit) {
-            case Common.DAY:
-                Date dateDay = DateUtil.parseDate(date);
-                List<CrmMasTask> crmMasTasks = baseMapper.selectList(new QueryWrapper<CrmMasTask>()
-                        .lambda().eq(CrmMasTask::getTaskDate, dateDay));
-                crmMasTasks.forEach(row->{
-                    CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
-                    EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
-                            .eq(EntityInfo::getEntityCode, row.getEntityCode()));
-                    BeanUtil.copyProperties(row,crmMasTaskVo);
-                    crmMasTaskVo.setEntityName(entityInfo.getEntityName());
-                    crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
-                    res.add(crmMasTaskVo);
-                });
-                return R.ok(res, SuccessInfo.GET_SUCCESS.getInfo());
-            case Common.MOUTH:
-                date +="-01";
-                Date dateTime = DateUtil.parseDate(date);
-                Date first = DateUtil.beginOfMonth(dateTime);
-                Date last = DateUtil.endOfMonth(dateTime);
-                List<CrmMasTask> mouthList = baseMapper.selectCrmMasTaskListThisMouth(first, last);
-                mouthList.forEach(item->{
-                    CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
-                    EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
-                            .eq(EntityInfo::getEntityCode, item.getEntityCode()));
-                    BeanUtil.copyProperties(item,crmMasTaskVo);
-                    crmMasTaskVo.setEntityName(entityInfo.getEntityName());
-                    crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
-                    res.add(crmMasTaskVo);
-                });
-                return R.ok(res, SuccessInfo.GET_SUCCESS.getInfo());
-            default:
-                return R.fail(BadInfo.PARAM_EMPTY.getInfo());
-        }
-    }
+        Date dateDay = DateUtil.parseDate(date);
+        Page<CrmMasTask> crmMasTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmMasTask>()
+                .lambda().eq(CrmMasTask::getTaskDate, dateDay));
+        List<CrmMasTask> crmMasTasks = crmMasTaskPage.getRecords();
 
+        Page<CrmMasTaskVo> result = new Page<>(pageNum,pageSize,crmMasTaskPage.getTotal());
+        ArrayList<CrmMasTaskVo> crmMasTaskVos = new ArrayList<>();
+        crmMasTasks.forEach(row->{
+            CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
+            EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
+                    .eq(EntityInfo::getEntityCode, row.getEntityCode()));
+            BeanUtil.copyProperties(row,crmMasTaskVo);
+            crmMasTaskVo.setEntityName(entityInfo.getEntityName());
+            crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+            crmMasTaskVos.add(crmMasTaskVo);
+        });
+        result.setRecords(crmMasTaskVos);
+
+        return R.ok(result, SuccessInfo.GET_SUCCESS.getInfo());
+
+    }
 }

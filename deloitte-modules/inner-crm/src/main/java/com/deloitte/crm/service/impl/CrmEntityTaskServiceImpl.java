@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
@@ -109,52 +110,39 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     /**
      * 角色7今日运维模块
-     *
-     * @param date
-     * @return R<List < CrmEntityTask>> 当月任务情况
      * @author 正杰
+     * @param date 请传入参数 yyyy-mm-dd
+     * @param pageNum
+     * @param pageSize
      * @date 2022/9/22
+     * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @Override
-    public R<List<CrmEntityTaskVo>> getTaskInfo(String timeUnit, String date) {
-        switch (timeUnit) {
-            case Common.DAY:
-                Date dateDay = DateUtil.parseDate(date);
-                List<CrmEntityTask> res = baseMapper.selectList(new QueryWrapper<CrmEntityTask>()
-                        .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
+    public R<Page<CrmEntityTaskVo>> getTaskInfo(String date,Integer pageNum,Integer pageSize) {
+        Date dateDay = DateUtil.parseDate(date);
 
-                List<CrmEntityTaskVo> result = new ArrayList<>();
-                res.forEach(row -> {
-                    String dataShow = row.getDataShow();
-                    //dataShow中的数据 固定格式 以 ，拼接 公司名称以及代码
-                    String[] split = dataShow.split(", ");
-                    //每个值 中间以 : 隔开 例如 dataShow = 公司中文名称:新疆格瑞迪斯石油技术股份有限公司, 代码:A15202.SZ
-                    String bondName = split[0].split(":")[1];
-//                    String bondCode = split[1].split(":")[1];
-
-                    CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
-                    BeanUtil.copyProperties(row, crmEntityTaskVo);
-                    crmEntityTaskVo.setBondFullName(bondName);
-//                    crmEntityTaskVo.setCreditCode(entityName);
-                    result.add(crmEntityTaskVo);
-                });
-                return R.ok(result, SuccessInfo.GET_SUCCESS.getInfo());
-            case Common.MOUTH:
-                date += "-01";
-                Date dateTime = DateUtil.parseDate(date);
-                Date first = DateUtil.beginOfMonth(dateTime);
-                Date last = DateUtil.endOfMonth(dateTime);
-                List<CrmEntityTask> mouth = crmEntityTaskMapper.selectCrmEntityTaskListThisMouth(first, last);
-                List<CrmEntityTaskVo> mouthList = new ArrayList<>();
-                mouth.forEach(row -> {
-                    CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
-                    BeanUtil.copyProperties(row, crmEntityTaskVo);
-                    mouthList.add(crmEntityTaskVo);
-                });
-                return R.ok(mouthList, SuccessInfo.GET_SUCCESS.getInfo());
-            default:
-                return R.fail(BadInfo.PARAM_EMPTY.getInfo());
-        }
+        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
+                .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
+        List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
+        Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum,pageSize,crmEntityTaskPage.getTotal());
+        ArrayList<CrmEntityTaskVo> crmEntityTaskVos = new ArrayList<>();
+        res.forEach(row -> {
+            CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
+            if(row.getDataShow()!=null) {
+                String dataShow = row.getDataShow();
+                //dataShow中的数据 固定格式 以 ，拼接 公司名称以及代码
+                String[] split = dataShow.split(", ");
+                //每个值 中间以 : 隔开 例如 dataShow = 发行人全称:湖南省人民政府, 交易代码:Z22092924.IB, 债券简称:22湖南债一般(八期)IB
+                String bondFullName = split[0].split(":")[1];
+                String bondShortName = split[2].split(":")[1];
+                crmEntityTaskVo.setBondFullName(bondFullName);
+                crmEntityTaskVo.setBondShortName(bondShortName);
+            }
+            BeanUtil.copyProperties(row, crmEntityTaskVo);
+            crmEntityTaskVos.add(crmEntityTaskVo);
+        });
+        crmEntityTaskVoPage.setRecords(crmEntityTaskVos);
+        return R.ok(crmEntityTaskVoPage, SuccessInfo.GET_SUCCESS.getInfo());
     }
 
     /**
