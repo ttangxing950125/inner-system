@@ -46,7 +46,7 @@ import javax.annotation.Resource;
 @Service
 public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNewIss> implements IBondNewIssService
 {
-    @Autowired
+    @Resource
     private BondNewIssMapper bondNewIssMapper;
 
     @Resource
@@ -64,12 +64,10 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
     @Resource
     private IEntityInfoService entityInfoService;
 
-    @Resource
-    private BondNewIssAsyncService bondNewIssAsyncService;
 
     @Resource
     @Lazy
-    private BondNewIssueStrategy newIssueStrategy;
+    private BondNewIssueStrategy bondNewIssueStrategy;
 
 
     /**
@@ -96,7 +94,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
                 continue;
             }
             //多线程保存债券信息，更新attrvalue表
-            Future<BondInfoDto> future = newIssueStrategy.doBondImport(newIss, timeNow, windTask);
+            Future<BondInfoDto> future = bondNewIssueStrategy.doBondImport(newIss, timeNow, windTask);
 
             futureList.add(future);
         }
