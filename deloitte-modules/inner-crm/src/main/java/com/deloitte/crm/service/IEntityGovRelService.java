@@ -61,4 +61,6 @@ public interface IEntityGovRelService
     public int deleteEntityGovRelById(Long id);
 
     Long getEntityGovCount(String dqCode);
+
+    void addGovEntitySubtableMsg(EntityGovRel entityGovRel);
 }

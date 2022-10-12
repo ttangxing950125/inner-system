@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.vo.EntityByIondVo;
+import com.deloitte.crm.vo.EntityStockInfoVo;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
-import com.deloitte.crm.vo.EntityByIondVo;
-import com.deloitte.crm.vo.EntityStockInfoVo;
 
 /**
  * 【请填写功能名称】Service接口
@@ -111,15 +111,11 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      */
     int updateStockCnAttr(String code, Object item);
 
-    Integer addEntityAttrValues(List<EntityAttrValue> valueList);
-
     R createBondEntity(EntityByIondVo entityByIondVo);
 
     R createStockEntity (EntityStockInfoVo entityStockInfoVo);
 
     R createStockEntityG(EntityStockInfoVo entityStockInfoVo);
-
-    Object addEntityAttrValuesNew(Map<String, Object> valueMap);
 
     /**
      *

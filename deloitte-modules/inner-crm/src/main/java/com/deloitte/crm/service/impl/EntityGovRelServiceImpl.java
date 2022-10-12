@@ -98,4 +98,21 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
         QueryWrapper<EntityGovRel>govRelQuery=new QueryWrapper<>();
         return entityGovRelMapper.selectCount(govRelQuery.lambda().eq(EntityGovRel::getDqGovCode,dqCode));
     }
+
+    /**
+     * 城投机构根据entityCode补充录入副表信息
+     *
+     * @param entityGovRel
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/12 9:56
+     */
+    @Override
+    public void addGovEntitySubtableMsg(EntityGovRel entityGovRel) {
+        QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
+        int update = entityGovRelMapper.update(entityGovRel, govQuery.lambda().eq(EntityGovRel::getEntityCode, entityGovRel.getEntityCode()));
+        if (update<1){
+            entityGovRelMapper.insert(entityGovRel);
+        }
+    }
 }
