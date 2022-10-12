@@ -110,12 +110,17 @@ public class GovInfoController extends BaseController {
 
     /**
      * 新增地方政府
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/12 17:10
      */
-    @RequiresPermissions("crm:govInfo:add")
+//    @RequiresPermissions("crm:govInfo:add")
     @Log(title = "【新增地方政府】", businessType = BusinessType.INSERT)
     @PostMapping("/add")
-    public AjaxResult add(@RequestBody GovInfo govInfo) {
-        return toAjax(govInfoService.insertGovInfo(govInfo));
+    public R add(@RequestBody GovInfo govInfo) {
+        govInfoService.insertGovInfo(govInfo);
+        return R.ok();
     }
 
     /**
@@ -317,12 +322,11 @@ public class GovInfoController extends BaseController {
      * @return R
      * @author 冉浩岑
      * @date 2022/10/11 17:10
-    */
+     */
     @ApiOperation(value = "地方政府-更多指标-主体范围")
     @PostMapping("/getGovRange")
     public R getGovRange() {
         return R.ok(govInfoService.getGovRange());
     }
-
 
 }
