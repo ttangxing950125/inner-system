@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.dto.TaskDto;
 import com.deloitte.crm.vo.CrmTaskVo;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,24 +15,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 角色1的每日任务，导入wind文件的任务Service接口
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
-public interface ICrmWindTaskService extends IService<CrmWindTask>
-
-{
+public interface ICrmWindTaskService extends IService<CrmWindTask> {
     /**
-     *查询某组任务信息详情的接口
+     * 查询某组任务信息详情的接口
      *
      * @param TaskDate
      * @param TaskCateId
      * @return List<CrmWindTask>
      * @author penTang
      * @date 2022/9/22 17:05
-    */
+     */
     List<CrmWindTask> selectCrmWindTask(@RequestBody String TaskDate, String TaskCateId);
-
 
 
     /**
@@ -41,14 +39,16 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
      * @return List<CrmWindTaskDto>
      * @author penTang
      * @date 2022/9/22 17:06
-    */
+     */
     List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo);
+
+    List<TaskDto> getTaskCompletedByDate(String taskDate);
 
     Boolean saveCrmWindTas(List<CrmWindTask> crmWind);
 
     /**
      * 查询角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param id 角色1的每日任务，导入wind文件的任务主键
      * @return 角色1的每日任务，导入wind文件的任务
      */
@@ -56,7 +56,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 查询角色1的每日任务，导入wind文件的任务列表
-     * 
+     *
      * @param crmWindTask 角色1的每日任务，导入wind文件的任务
      * @return 角色1的每日任务，导入wind文件的任务集合
      */
@@ -64,7 +64,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 新增角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param crmWindTask 角色1的每日任务，导入wind文件的任务
      * @return 结果
      */
@@ -72,7 +72,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 修改角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param crmWindTask 角色1的每日任务，导入wind文件的任务
      * @return 结果
      */
@@ -80,7 +80,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 批量删除角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param ids 需要删除的角色1的每日任务，导入wind文件的任务主键集合
      * @return 结果
      */
@@ -88,7 +88,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 删除角色1的每日任务，导入wind文件的任务信息
-     * 
+     *
      * @param id 角色1的每日任务，导入wind文件的任务主键
      * @return 结果
      */
@@ -99,6 +99,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 检查指定日期任务完成状态，如果全部都是已完成，那么更改今天角色3的日常任务状态
+     *
      * @param timeNow
      * @return
      */
@@ -106,6 +107,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask>
 
     /**
      * 角色1 任务详情页面需要的数据
+     *
      * @param taskCateId
      * @param taskDate
      * @return

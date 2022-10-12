@@ -5,11 +5,14 @@ import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Builder;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 股票信息表(StockThkInfo)表实体类
@@ -44,6 +47,18 @@ public class StockThkInfo implements Serializable {
      */
     @Excel(name = "德勤内部股票代码 ST_0000id 6位数字")
     private String stockDqCode;
+
+    /** 上市日期*/
+    @ApiModelProperty(value="上市日期")
+    private String  listDate ;
+
+    /** 退市日期*/
+    @ApiModelProperty(value="退市日期")
+    private  String  delistingDate ;
+
+    /** 交易所*/
+    @ApiModelProperty(value="交易所")
+    private  String  exchange ;
 
     /**
      * 港股简称

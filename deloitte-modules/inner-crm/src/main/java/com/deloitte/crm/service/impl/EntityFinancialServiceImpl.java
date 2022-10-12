@@ -2,6 +2,7 @@ package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.crm.mapper.EntityFinancialmapper;
 import com.deloitte.crm.domain.EntityFinancial;
 import com.deloitte.crm.mapper.EntityFinancialMapper;
 import com.deloitte.crm.service.EntityFinancialService;

@@ -9,6 +9,13 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
+import lombok.Data;
+
+import java.io.Serializable;
+
 /**
  * (EntityFinancial)表实体类
  *

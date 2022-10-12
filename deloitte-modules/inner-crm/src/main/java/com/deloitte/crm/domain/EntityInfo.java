@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -50,11 +47,6 @@ public class EntityInfo implements Serializable {
     @Excel(name = "报告类型")
     private String reportType;
 
-    /**
-     * 财报列示类型
-     */
-    @Excel(name = "财报列示类型")
-    private String listType;
 
     /**
      * 统一社会信用代码
@@ -84,6 +76,13 @@ public class EntityInfo implements Serializable {
     /**
      * 统一社会信用代码是否异常 0-正常 1-异常
      */
+
+    /** 年报示例类型*/
+    @ApiModelProperty(value="年报示例类型")
+    @NotNull(message = "年报示例类型不能为空")
+    private String listType;
+
+    /** 统一社会信用代码是否异常 0-正常 1-异常 */
     @Excel(name = "统一社会信用代码是否异常 0-正常 1-异常")
     private Integer creditError;
 

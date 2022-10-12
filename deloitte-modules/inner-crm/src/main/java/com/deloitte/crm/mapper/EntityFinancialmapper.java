@@ -11,6 +11,6 @@ import com.deloitte.crm.domain.EntityFinancial;
  * @since 2022-10-11 17:11:57
  */
 @Mapper
-public interface EntityFinancialMapper extends BaseMapper<EntityFinancial> {
+public interface EntityFinancialmapper extends BaseMapper<EntityFinancial> {
 
 }
