@@ -16,8 +16,16 @@
           :class="{ 'submenu-title-noDropdown': !isNest }"
         >
           <item
-            :icon="onlyOneChild.meta.icon || (item.meta && item.meta.icon)"
-            :title="onlyOneChild.meta.title"
+            :icon="
+              (onlyOneChild.meta.title === '每日运维' &&
+                onlyOneChild.meta.icon) ||
+              (item.meta && item.meta.icon)
+            "
+            :title="
+              onlyOneChild.meta.title !== '每日运维'
+                ? '- ' + onlyOneChild.meta.title
+                : onlyOneChild.meta.title
+            "
           />
         </el-menu-item>
       </app-link>
@@ -129,13 +137,37 @@ export default {
     background: black !important;
   }
   .el-menu-item {
-    background: black !important;
+    // color: rgb(134, 188, 37) !important;
+    // background-color: none !important;
+    background-color: black !important;
+    color: #fff !important;
   }
   .el-submenu {
     background: black !important;
+    color: #fff !important;
   }
   .el-submenu :hover {
     background: black !important;
+    color: #fff !important;
+  }
+  .submenu-title-noDropdown {
+    color: #fff !important;
+  }
+
+  .is-active {
+    color: rgb(134, 188, 37) !important;
+  }
+
+  .el-submenu__title :hover {
+    background-color: black !important;
+    color: #fff !important;
+  }
+  .el-submenu__title {
+    background-color: black !important;
+    color: #fff !important;
+  }
+  .svg-icon {
+    margin-left: 20px;
   }
 }
 </style>

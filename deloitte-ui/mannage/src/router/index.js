@@ -65,6 +65,7 @@ export const constantRoutes = [
     path: "",
     component: Layout,
     redirect: "index",
+    meta: { title: "每日运维", icon: "system" },
     children: [
       {
         path: "index",

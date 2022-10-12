@@ -101,3 +101,15 @@ export function checkData(params) {
     data: params,
   });
 }
+
+// 校验字段
+export function getFinanceSubIndu(params) {
+  return request({
+    url: "/crm/value/getFinanceSubIndu?attrId=" + params.attrId,
+    headers: {
+      isToken: true,
+    },
+    method: "get",
+    data: params,
+  });
+}

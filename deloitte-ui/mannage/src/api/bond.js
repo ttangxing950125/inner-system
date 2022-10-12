@@ -44,6 +44,18 @@ export function createST(parmas) {
   });
 }
 
+// 新增债券主体
+export function createBE(parmas) {
+  return request({
+    url: "/crm/value/createBE",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
 // 查询选择的债券 查询债券的具体信息
 export function findAllDetail(parmas) {
   return request({

@@ -109,7 +109,7 @@
             <el-button
               style="margin-left: 5px"
               type="text"
-              @click="check(ruleForm.stockCode)"
+              @click="check(ruleForm.stockCode, '')"
               >查重</el-button
             >
           </div>
@@ -239,7 +239,201 @@
         <el-form-item class="position-add" label="企业曾用名或别称" prop="">
           <el-input
             class="t-input"
+            style="width: 320px"
             v-model="ruleForm.name"
+            placeholder="请输入企业曾用名或别称，以顿号区分"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="subForm">确认新增</el-button>
+      </span>
+    </el-dialog>
+    <!-- 债券新增主体 -->
+    <el-dialog
+      title="手动新增企业主体"
+      :visible.sync="dialogVisible2"
+      width="50%"
+    >
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="135px"
+        label-position="left"
+      >
+        <el-form-item label="新增日期">
+          <span>{{ currentTime }}</span>
+        </el-form-item>
+        <el-form-item label="新增操作人">
+          <span>{{ currentName }}</span>
+        </el-form-item>
+        <el-form-item label="企业债券全称" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.bondName"
+              placeholder="请输入企业债券全称"
+            ></el-input>
+            <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce1 === 1">无重复，可新增</span>
+            <el-button
+              v-if="!repalce1"
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.bondName, 'BOND_FULL_NAME')"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="企业债券代码" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.stockCode"
+              placeholder="请输入企业债券代码"
+            ></el-input>
+            <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
+            <el-button
+              v-if="!repalce2"
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.stockCode, 'BOND_CODE')"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="企业债券简称" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.bondShortName"
+              placeholder="请输入企业债券简称"
+            ></el-input>
+            <span class="red" v-if="repalce3 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce3 === 1">无重复，可新增</span>
+            <el-button
+              v-if="!repalce3"
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.bondShortName, 'BOND_SHORT_NAME')"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="企业全称" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              v-model="ruleForm.entityName"
+              placeholder="请输入企业完整名称"
+            ></el-input>
+            <span class="red" v-if="repalce4 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce4 === 1">无重复，可新增</span>
+            <el-button
+              v-if="!repalce4"
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.entityName, 'ENTITY_NAME')"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <el-form-item label="统一社会信用代码" prop="">
+          <div class="flex1">
+            <el-input
+              class="t-input"
+              :disabled="!disabeld"
+              v-model="ruleForm.creditCode"
+              placeholder="请输入企业统一社会信用代码"
+            ></el-input>
+            <span class="red" v-if="repalce5 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce5 === 1">无重复，可新增</span>
+            <el-button
+              v-if="!repalce5"
+              style="margin-left: 5px"
+              type="text"
+              @click="check(ruleForm.creditCode, 'CREDIT_CODE')"
+              >查重</el-button
+            >
+          </div>
+        </el-form-item>
+        <div class="notUse">
+          <el-checkbox class="mr60" v-model="ruleForm.notUse" label="1"
+            >不适用</el-checkbox
+          >
+          <span class="mr10">不适用原因</span>
+          <el-select
+            v-model="ruleForm.creditErrorRemark"
+            :disabled="disabeld"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in notUseoptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </div>
+        <el-form-item label="起息日" prop="">
+          <el-date-picker
+            v-model="ruleForm.startXiDate"
+            type="date"
+            class="t-input"
+            placeholder="yyyy-mm-dd"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="到期日" prop="">
+          <el-date-picker
+            type="date"
+            class="t-input"
+            placeholder="yyyy-mm-dd"
+            v-model="ruleForm.endDate"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="债券类型" required>
+          <el-col :span="11">
+            <el-form-item prop="">
+              <el-select v-model="ruleForm.bondType" placeholder="选择债券类型">
+                <el-option label="公募" value="0"></el-option>
+                <el-option label="私募" value="1"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+        <el-form-item label="是否为金融机构" prop="">
+          <el-radio-group v-model="ruleForm.finance">
+            <el-radio label="1">是</el-radio>
+            <el-radio label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年报列示类型" prop="">
+          <el-radio-group v-model="ruleForm.anRportType">
+            <el-radio label="1">一般企业</el-radio>
+            <el-radio label="0">金融机构</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="金融机构子行业" prop="">
+          <el-select
+            v-model="ruleForm.financeSubIndu"
+            placeholder="请选择金融机构子行业"
+          >
+            <el-option
+              v-for="(item, index) in financeSubIndu"
+              :key="index"
+              :label="item.value"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item class="position-add" label="企业曾用名或别称" prop="">
+          <el-input
+            class="t-input"
+            style="width: 320px"
+            v-model="ruleForm.entityNameHis"
             placeholder="请输入企业曾用名或别称，以顿号区分"
           ></el-input>
         </el-form-item>
@@ -253,11 +447,13 @@
 
 <script>
 import * as echarts from "echarts";
-import { createST } from "@/api/bond";
+import { createST, createBE } from "@/api/bond";
+import { checkData, getFinanceSubIndu } from "@/api/common";
 export default {
   name: "addGovernment",
   data() {
     return {
+      dialogVisible2: false,
       noUse2: "",
       noUse1: "",
       list: [
@@ -295,16 +491,7 @@ export default {
         },
       ],
       dialogVisible: false,
-      ruleForm: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
-      },
+      ruleForm: {},
       rules: {
         name: [
           { required: true, message: "请输入活动名称", trigger: "blur" },
@@ -366,11 +553,30 @@ export default {
           label: "其他未知原因",
         },
       ],
+      repalce1: false,
+      repalce2: false,
+      repalce3: false,
+      repalce4: false,
+      repalce5: false,
+      disabeld: true,
+      financeSubIndu: [],
     };
   },
   mounted() {
     this.xEcharts();
     this.getCurrentTime();
+  },
+  watch: {
+    ruleForm: {
+      handler(newData, old) {
+        if (newData.notUse) {
+          this.ruleForm.creditCode = "";
+        }
+        this.disabeld = newData.notUse ? false : true;
+      },
+      immediate: true,
+      deep: true,
+    },
   },
   methods: {
     getCurrentTime() {
@@ -401,8 +607,15 @@ export default {
       this.$router.back();
     },
     editData() {
-      this.dialogVisible = true;
-      console.log(1);
+      if (this.tab === "发债") {
+        this.dialogVisible2 = true;
+      } else {
+        this.dialogVisible = true;
+      }
+      getFinanceSubIndu({ attrId: 656 }).then((res) => {
+        const { data } = res;
+        this.financeSubIndu = data;
+      });
     },
     xEcharts() {
       const myChart = echarts.init(document.getElementById("xchart"));
@@ -470,8 +683,66 @@ export default {
     subForm() {
       try {
         this.$modal.loading("Loading...");
-        createST(this.ruleForm).then((res) => {
-          console.log(res);
+        // createST(this.ruleForm).then((res) => {
+        //   console.log(res);
+        // });
+        this.ruleForm.creditError = this.ruleForm.notUse ? 1 : 0;
+        createBE(this.ruleForm).then((res) => {
+          const { data } = res;
+          if (data === null) {
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success",
+            });
+          }
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    check(row, keyword) {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          target: row,
+          keyword: keyword,
+        };
+        checkData(parmas).then((res) => {
+          const { data } = res;
+          let ret = false;
+          if (!data) {
+            ret = 1;
+          } else {
+            ret = 2;
+          }
+          switch (keyword) {
+            case "BOND_FULL_NAME":
+              this.repalce1 = ret;
+              break;
+            case "BOND_CODE":
+              this.repalce2 = ret;
+              break;
+            case "BOND_SHORT_NAME":
+              this.repalce3 = ret;
+              break;
+            case "ENTITY_NAME":
+              this.repalce4 = ret;
+              break;
+            case "ENTITY_NAME":
+              this.repalce5 = ret;
+              break;
+            default:
+              break;
+          }
+          if (!data) {
+          }
         });
       } catch (error) {
         console.log(error);
@@ -579,5 +850,13 @@ export default {
   .mr60 {
     margin-right: 60px;
   }
+}
+.red {
+  margin-left: 5px;
+  color: red;
+}
+.green {
+  margin-left: 5px;
+  color: greenyellow;
 }
 </style>
