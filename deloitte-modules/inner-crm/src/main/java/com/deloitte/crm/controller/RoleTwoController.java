@@ -59,7 +59,7 @@ public class RoleTwoController {
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmMasTaskVo>> getDayTaskInfo(String date){
+    public R<List<CrmMasTaskVo>> getDayTaskInfo(String date,Integer pageNum,Integer pageSize){
         //单表查询 角色2当日任务完成情况
         return iCrmMasTaskService.getTaskInfo(Common.DAY,date);
     }

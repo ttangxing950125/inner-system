@@ -29,6 +29,17 @@ public class CrmEntityTaskVo {
 
     private String dataShow;
 
+    /**
+     * 引发主体新增的文件记录json
+     */
+    private String details;
+
+    /**
+     * 债券代码，债券简称
+     * 股票代码，股票简称之类
+     */
+    private String infos;
+
     @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     private Date taskDate;
 

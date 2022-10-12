@@ -54,7 +54,7 @@ public class EntityDto {
     /** 统一社会信用代码是否异常 0-正常 1-异常 */
     @Excel(name = "统一社会信用代码是否异常 0-正常 1-异常")
     @ApiModelProperty(name="creditError",value="统一社会信用代码是否异常 0-正常 1-异常")
-    private Integer creditError;
+    private Integer creditError = 1;
 
     /** 若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：
      1、吊销

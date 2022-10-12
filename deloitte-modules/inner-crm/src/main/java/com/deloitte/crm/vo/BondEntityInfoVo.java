@@ -3,6 +3,8 @@ package com.deloitte.crm.vo;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.AttrValueMapDto;
+import com.deloitte.crm.dto.BondInfoDto;
+import com.deloitte.crm.dto.EntityInfoDto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -18,11 +20,16 @@ import java.util.Map;
 @Data
 @Accessors(chain = true)
 public class BondEntityInfoVo {
-
-    private EntityInfo entityInfo;
-
     private BondInfo bondInfo;
+    private EntityInfo entityInfo;
+    /**
+     * 是否允许修改
+     */
+    private Boolean enableEdite;
 
+    /**
+     * 具体属性值
+     */
     private Map<String,AttrValueMapDto> attrs;
 
 }
