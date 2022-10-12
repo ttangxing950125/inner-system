@@ -516,6 +516,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @date 2022/9/29 9:59
      */
     @Override
+    @Transactional
     public R createStockEntity(EntityStockInfoVo entityStockInfoVo) {
         EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
         StockCnInfo stockSrotName = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockShortName, entityStockInfoVo.getStockShortName())
@@ -561,8 +562,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
-        entityNameHis.setDqCode(entityInfo.getEntityCode());
-        entityNameHis.setOldName(entityInfo.getEntityNameHis());
+        entityNameHis.setDqCode(entityInfoBystock.getEntityCode());
+        entityNameHis.setOldName(entityInfoBystock.getEntityNameHis());
         entityNameHis.setSource(3);
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
@@ -586,7 +587,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增关联关系entity_stock_cn_rel
         EntityStockCnRel entityStockCnRel = new EntityStockCnRel();
         entityStockCnRel.setStockDqCode("SA" + startZeroStr);
-        entityStockCnRel.setEntityCode(entityInfo.getEntityCode());
+        entityStockCnRel.setEntityCode(entityInfoBystock.getEntityCode());
         entityStockCnRelMapper.insert(entityStockCnRel);
 
         //新增entityfinancal
@@ -617,6 +618,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @date 2022/9/29 9:59
      */
     @Override
+    @Transactional
     public R createStockEntityG(EntityStockInfoVo entityStockInfoVo) {
         EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
         StockThkInfo stockThkCode = stockThkInfoMapper.selectOne(new LambdaQueryWrapper<StockThkInfo>().eq(StockThkInfo::getStockCode, entityStockInfoVo.getStockCode()));
@@ -637,9 +639,9 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //年报示例类型*
         entityInfoBystockHk.setListType(entityStockInfoVo.getAnRportType());
         //曾用名
-        entityInfo.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
+        entityInfoBystockHk.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
         //创建人
-        entityInfo.setCreater(SecurityUtils.getUsername());
+        entityInfoBystockHk.setCreater(SecurityUtils.getUsername());
 
         entityInfoMapper.insert(entityInfoBystockHk);
         //根据主键id生成code
@@ -658,8 +660,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         // 新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
-        entityNameHis.setDqCode(entityInfo.getEntityCode());
-        entityNameHis.setOldName(entityInfo.getEntityNameHis());
+        entityNameHis.setDqCode(entityInfoBystockHk.getEntityCode());
+        entityNameHis.setOldName(entityInfoBystockHk.getEntityNameHis());
         entityNameHis.setSource(3);
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
@@ -684,7 +686,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增关联关系entity_stock_thk_rel
         EntityStockThkRel entityStockThkRel = new EntityStockThkRel();
         entityStockThkRel.setStockDqCode("HK" + startZeroStr);
-        entityStockThkRel.setEntityCode(entityInfo.getEntityCode());
+        entityStockThkRel.setEntityCode(entityInfoBystockHk.getEntityCode());
         EntityStockThkRelMapper.insert(entityStockThkRel);
         //金融机构子行业
         EntityFinancial entityFinancial = new EntityFinancial();
