@@ -15,6 +15,13 @@ import javax.validation.constraints.NotNull;
 public class EntityStockInfoVo {
 
     /**
+     * 敞口划分
+     */
+    @ApiModelProperty(value="敞口划分")
+    @NotNull(message = "敞口划分-不能为空")
+    private String masterCode;
+
+    /**
      * 股票类型
      */
     @ApiModelProperty(value="股票类型")

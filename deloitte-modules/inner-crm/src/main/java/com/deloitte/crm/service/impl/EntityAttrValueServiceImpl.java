@@ -70,6 +70,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     private EntityInfoLogsMapper entityInfoLogsMapper;
 
+    private EntityMasterMapper entityMasterMapper;
+
     /**
      * 查询【请填写功能名称】
      *
@@ -595,6 +597,11 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityFinancial.setEntityCode(sb.toString() + id);
         entityFinancial.setMince(entityStockInfoVo.getFinanceSubIndu());
         entityFinancialmapper.insert(entityFinancial);
+        //新增masterCode
+        EntityMaster entityMaster = new EntityMaster();
+        entityMaster.setEntityCode(sb.toString() + id);
+        entityMaster.setMasterCode(entityStockInfoVo.getMasterCode());
+        entityMasterMapper.insert(entityMaster);
 
         //日志入库
         EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
@@ -693,7 +700,11 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityFinancial.setEntityCode(sb.toString() + id);
         entityFinancial.setMince(entityStockInfoVo.getFinanceSubIndu());
         entityFinancialmapper.insert(entityFinancial);
-
+        //新增masterCode
+        EntityMaster entityMaster = new EntityMaster();
+        entityMaster.setEntityCode(sb.toString() + id);
+        entityMaster.setMasterCode(entityStockInfoVo.getMasterCode());
+        entityMasterMapper.insert(entityMaster);
         //日志入库
         EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
         entityInfoLogs.setEntityCode(sb.toString() + id);
