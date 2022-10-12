@@ -68,6 +68,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     private EntityFinancialMapper entityFinancialmapper;
 
+    private EntityInfoLogsMapper entityInfoLogsMapper;
+
     /**
      * 查询【请填写功能名称】
      *
@@ -492,7 +494,16 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityFinancial.setEntityCode(sb.toString() + id);
         entityFinancial.setMince(entityByIondVo.getFinanceSubIndu());
         entityFinancialmapper.insert(entityFinancial);
-
+        //日志入库
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
+        entityInfoLogs.setEntityCode(sb.toString() + id);
+        entityInfoLogs.setDeCode("BD" + startZeroStr);
+        entityInfoLogs.setCode(entityByIondVo.getStockCode());
+        entityInfoLogs.setOperType(3);
+        entityInfoLogs.setEntityName(entityByIondVo.getEntityName());
+        entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setSource(1);
+        entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
     }
 
@@ -583,6 +594,17 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityFinancial.setEntityCode(sb.toString() + id);
         entityFinancial.setMince(entityStockInfoVo.getFinanceSubIndu());
         entityFinancialmapper.insert(entityFinancial);
+
+        //日志入库
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
+        entityInfoLogs.setEntityCode(sb.toString() + id);
+        entityInfoLogs.setDeCode("SA" + startZeroStr);
+        entityInfoLogs.setCode(entityStockInfoVo.getStockCode());
+        entityInfoLogs.setOperType(1);
+        entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
+        entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setSource(2);
+        entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
     }
 
@@ -670,6 +692,16 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityFinancial.setMince(entityStockInfoVo.getFinanceSubIndu());
         entityFinancialmapper.insert(entityFinancial);
 
+        //日志入库
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
+        entityInfoLogs.setEntityCode(sb.toString() + id);
+        entityInfoLogs.setDeCode("HK" + startZeroStr);
+        entityInfoLogs.setCode(entityStockInfoVo.getStockCode());
+        entityInfoLogs.setOperType(1);
+        entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
+        entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setSource(2);
+        entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
     }
 

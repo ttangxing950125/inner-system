@@ -72,5 +72,5 @@ public interface CrmEntityTaskMapper extends BaseMapper<CrmEntityTask>
      */
     List<CrmEntityTask> selectCrmEntityTaskListThisMouth(@Param("first") Date first, @Param("last") Date last);
 
-    List<TaskDto> selctCrmEntityTaskCount(String taskDate);
+    TaskDto selctCrmEntityTaskCount(String taskDate);
 }

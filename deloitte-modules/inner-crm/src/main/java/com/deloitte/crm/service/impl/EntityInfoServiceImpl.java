@@ -252,7 +252,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer creditErrorType = entityDto.getCreditErrorType();
         if (creditErrorType == null) {
             creditErrorType = 5;
-            entityDto.setCreditErrorType(creditErrorType);
+            entityInfo.setCreditError(0);
+            entityInfo.setCreditErrorType(creditErrorType);
         }
         switch (creditErrorType) {
             case 1:
@@ -285,6 +286,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfo.setStatus(1);
         //再次修改当条信息
         baseMapper.updateById(entityInfo);
+
+        //TODO 将新增的信息保存至 entity_info_logs
+        EntityInfoLogs temp = new EntityInfoLogs();
+        //数据装配新增基础信息
+        temp.setEntityCode(entityCode)
+                .setEntityName(entityInfo.getEntityName())
+                .setOperName(username)
+                .setRemarks("");
+
 
         //修改当日任务 新增主体状态码为 2
         return iCrmEntityTaskService.finishTask(taskId, 2);
@@ -1045,15 +1055,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/25
      */
     @Override
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword) {
+    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword,Integer pageNum,Integer pageSize) {
         //模糊匹配 查询主体||债券信息
         switch (keyword) {
             //模糊匹配主体名
             case ENTITY:
                 List<TargetEntityBondsVo> res = new ArrayList<>();
                 //模糊匹配后的主体list
-                List<EntityInfo> entityInfos = baseMapper.selectList(new QueryWrapper<EntityInfo>()
+                Page<EntityInfo> entityInfoPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<EntityInfo>()
                         .lambda().like(EntityInfo::getEntityName, name));
+                List<EntityInfo> entityInfos = entityInfoPage.getRecords();
                 if (entityInfos.size() == 0) {
                     return R.ok(null, BadInfo.VALID_EMPTY_TARGET.getInfo());
                 }
@@ -1067,25 +1078,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<TargetEntityBondsVo> rest = new ArrayList<>();
                 List<EntityAttrValue> entityAttrs;
                 //模糊匹配全名 债券list
-                entityAttrs = entityAttrValueMapper.matchingNameByBondName(name);
                 //模糊匹配短名 债券list
-                List<BondInfo> bondInfos = bondInfoMapper.selectList(new QueryWrapper<BondInfo>().lambda()
-                        .like(BondInfo::getBondShortName, name));
-                if (entityAttrs.size() == 0 && bondInfos.size() == 0) {
-                    return R.ok(null, BadInfo.VALID_EMPTY_TARGET.getInfo());
-                }
-
-                Map<String, String> collect = bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName));
-                List<EntityAttrValue> targetList = entityAttrs.stream().filter(row -> !collect.containsKey(row.getEntityCode())).collect(Collectors.toList());
-
-
-                entityAttrs.stream().filter(row -> !bondInfos.stream().collect(Collectors.toMap(BondInfo::getBondCode, BondInfo::getBondShortName)).containsKey(row.getEntityCode())).collect(Collectors.toList());
-
-                targetList.forEach(row -> {
-                    BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
-                            .eq(BondInfo::getBondCode, row.getEntityCode()));
-                    bondInfos.add(bondInfo);
-                });
+                Page<BondInfo> bondInfoPage = bondInfoMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<BondInfo>().lambda()
+                        .like(BondInfo::getBondName, name).like(BondInfo::getBondShortName, name));
+                List<BondInfo> bondInfos = bondInfoPage.getRecords();
                 if (bondInfos.size() == 0) {
                     return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());
                 }
