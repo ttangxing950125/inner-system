@@ -6,6 +6,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.dto.TaskDto;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -71,4 +72,15 @@ public interface CrmMasTaskMapper extends BaseMapper<CrmMasTask>
      * @return
      */
     List<CrmMasTask> selectCrmMasTaskListThisMouth(@Param("first") Date first, @Param("last") Date last);
+
+    /**
+     *查询当前角色任务完成信息
+     *
+     * @param taskDate
+     * @return List<TaskDto>
+     * @author penTang
+     * @date 2022/10/11 19:40
+    */
+    List<TaskDto> selectCrmMasTaskCount(String taskDate);
+
 }

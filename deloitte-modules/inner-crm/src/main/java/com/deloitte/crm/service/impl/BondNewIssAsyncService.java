@@ -47,39 +47,6 @@ public class BondNewIssAsyncService {
     @Resource
     private IEntityInfoService entityInfoService;
 
-    /**
-     * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
-     * @param newIss
-     * @param timeNow
-     * @return 如果这条 newIss 是新增的，返回1
-     *         如果这条 newIss 是原有基础上有修改，返回2
-     */
-    @Async("taskExecutor")
-    @Transactional(rollbackFor = Exception.class)
-    public Future<BondInfoDto> doBondImport(BondNewIss newIss, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置任务相关信息进临时表
-//            newIss.setImportTime(new Date());
-            newIss.setTaskId(windTask.getId());
-
-            Integer resStatus = null;
-
-            //查询债券是否存在
-            String shortName = newIss.getBondShortName();
-
-            //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(shortName,Boolean.FALSE);
-            if (bondInfo==null){
-                bondInfo = new BondInfo();
-                bondInfo.setBondShortName(shortName);
-                bondInfo.setOriCode(newIss.getTradeCode());
-            }
-
-            //看之前有没有导入过这个数据
-            List<BondNewIss> bondNewIsses = bondNewIssMapper.findByShortName(shortName);
-            if (CollUtil.isEmpty(bondNewIsses)){
-                resStatus = 1;
-            }
 
 
 }

@@ -76,7 +76,7 @@ public class NewIssueStrategy implements WindTaskStrategy {
             String shortName = newIss.getBondShortName();
 
             //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(shortName);
+            BondInfo bondInfo = bondInfoService.findByShortName(shortName,Boolean.FALSE);
             if (bondInfo==null){
                 bondInfo = new BondInfo();
             }
