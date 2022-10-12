@@ -1,6 +1,5 @@
 package com.deloitte.crm.controller;
 
-import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -10,9 +9,6 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityMaster;
 import com.deloitte.crm.service.IEntityMasterService;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -98,25 +94,5 @@ public class EntityMasterController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(entityMasterService.deleteEntityMasterByIds(ids));
-    }
-
-    /**
-     * 角色345修改行业划分
-     *
-     * @param entityMaster
-     * @return void
-     * @author 冉浩岑
-     * @date 2022/10/12 9:51
-     */
-    @ApiOperation(value = "角色345修改行业划分")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "shenWanMaster", value = "申万行业划分", paramType = "body", example = "", dataType = "String")
-    })
-    @PostMapping("/addEntityeMsg")
-    public R addEntityeMasterMsg(@RequestBody EntityMaster entityMaster) {
-        entityMasterService.addEntityeMasterMsg(entityMaster);
-        return R.ok();
     }
 }

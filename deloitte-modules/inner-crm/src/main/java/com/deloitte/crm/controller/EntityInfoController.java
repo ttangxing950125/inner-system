@@ -306,7 +306,7 @@ public class EntityInfoController extends BaseController {
         return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);
     }
 
-    /***
+    /**
      *批量查询并导出excel结果
      *
      * @param file
@@ -370,7 +370,9 @@ public class EntityInfoController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "reportType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "listType", value = "财报列示类型", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "listType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shenWanMaster", value = "申万行业划分", paramType = "body", example = "", dataType = "String")
     })
     @PostMapping("/addEntityeMsg")
     public R addEntityeMsg(@RequestBody EntityInfo entityInfo) {
