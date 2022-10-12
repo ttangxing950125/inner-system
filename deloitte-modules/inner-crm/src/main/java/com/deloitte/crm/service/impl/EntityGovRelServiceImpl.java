@@ -5,6 +5,7 @@ import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityGovRelDto;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
+import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityGovRelService;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,10 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
 {
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
-
+    @Autowired
+    private ICrmSupplyTaskService crmSupplyTaskService;
+    @Autowired
+    private IEntityInfoService entityInfoService;
     /**
      * 查询【请填写功能名称】
      * 
@@ -112,7 +116,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
      */
     @Override
     public void addGovEntitySubtableMsg(EntityGovRelDto entityGovRelDto) {
-
+        crmSupplyTaskService.completeTaskById(entityGovRelDto.getId());
         EntityGovRel entityGovRel = entityGovRelDto.getEntityGovRel();
         QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
         int update = entityGovRelMapper.update(entityGovRel, govQuery.lambda().eq(EntityGovRel::getEntityCode, entityGovRel.getEntityCode()));
@@ -122,6 +126,5 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
         EntityInfo entityInfo = entityGovRelDto.getEntityInfo();
         entityInfoService.updateOrInsertEntityInfoByEntityCode(entityInfo);
     }
-    @Autowired
-    private IEntityInfoService entityInfoService;
+
 }

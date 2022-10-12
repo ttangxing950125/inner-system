@@ -7,6 +7,7 @@ import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityFinancialDto;
 import com.deloitte.crm.mapper.EntityFinancialMapper;
 import com.deloitte.crm.service.EntityFinancialService;
+import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
      */
     @Override
     public void addFinEntitySubtableMsg(EntityFinancialDto entityFinancialDto) {
+        crmSupplyTaskService.completeTaskById(entityFinancialDto.getId());
         //保存
         EntityFinancial entityFinancial = entityFinancialDto.getEntityFinancial();
         QueryWrapper<EntityFinancial> financialQuery = new QueryWrapper<>();
@@ -45,4 +47,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         EntityInfo entityInfo = entityFinancialDto.getEntityInfo();
         entityInfoService.updateOrInsertEntityInfoByEntityCode(entityInfo);
     }
+
+    @Autowired
+    private ICrmSupplyTaskService crmSupplyTaskService;
 }

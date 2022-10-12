@@ -134,7 +134,8 @@ public class EntityGovRelController extends BaseController
             @ApiImplicitParam(name = "judgment", value = "支持力度判断依据", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shareRatio", value = "持股比例", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shareRatioYear", value = "持股比例年份", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
     })
     @PostMapping("/addGovEntitySubtableMsg")
     public R addGovEntitySubtableMsg(@RequestBody EntityGovRelDto entityGovRel) {

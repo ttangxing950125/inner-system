@@ -24,7 +24,7 @@ public class EntityGovRelDto implements Serializable
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Integer id;
 
     /** 城投主体code */
     @Excel(name = "城投主体code")
@@ -56,7 +56,6 @@ public class EntityGovRelDto implements Serializable
                 .setDqGovCode(this.dqGovCode)
                 .setShareMethod(this.shareMethod)
                 .setSupport(this.support)
-                .setId(this.id)
                 .setJudgment(this.judgment)
                 .setShareRatio(this.shareRatio)
                 .setShareRatioYear(this.shareRatioYear)

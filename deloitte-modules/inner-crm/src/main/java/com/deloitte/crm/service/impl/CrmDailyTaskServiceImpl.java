@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -10,19 +9,15 @@ import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
-import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
 import com.deloitte.crm.mapper.SysUserRoleMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.system.api.RemoteUserService;
 import com.deloitte.system.api.RoleService;
-import com.deloitte.system.api.domain.SysDictData;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
@@ -31,8 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.role;
 
 /**
  * 每日生产角色任务的service业务实现层
@@ -156,5 +149,4 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
         return null;
     }
-
 }

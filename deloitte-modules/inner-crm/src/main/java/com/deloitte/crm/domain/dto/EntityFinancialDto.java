@@ -71,7 +71,6 @@ public class EntityFinancialDto implements Serializable {
                        .setMince(this.mince)
                        .setBelJurisdiction(this.belJurisdiction)
                        .setBelPlace(this.belPlace)
-                       .setId(this.id)
                        .setRegion(this.region)
                        .setRegulators(this.regulators)
                        .setRemarks(this.remarks);

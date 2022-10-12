@@ -84,6 +84,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private EntityStockThkRelMapper thkRelMapper;
 
+    @Autowired
+    private ICrmSupplyTaskService crmSupplyTaskService;
+
     private EntityInfoMapper entityInfoMapper;
 
     private EntityNameHisMapper nameHisMapper;
@@ -318,6 +321,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
+        //设置主键为空，防止修改主键
+        entityInfo.setId(null);
         QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
         int update = entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
         if (update<1){
@@ -1579,6 +1584,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public void addEntityeMsg(EntityInfo entityInfo) {
+        Integer id = entityInfo.getId();
+        crmSupplyTaskService.completeTaskById(id);
+        updateOrInsertEntityInfoByEntityCode(entityInfo);
+
         QueryWrapper<EntityInfo> entityQuery = new QueryWrapper<>();
         int update = entityInfoMapper.update(entityInfo, entityQuery.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
         if (update < 1) {
