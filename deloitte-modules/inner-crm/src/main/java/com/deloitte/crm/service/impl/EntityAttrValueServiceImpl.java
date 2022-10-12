@@ -10,7 +10,6 @@ import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.mapper.*;
@@ -67,7 +66,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     private EntityAttrIntypeService entityAttrIntypeService;
 
-    private EntityFinancialmapper entityFinancialmapper;
+    private EntityFinancialMapper entityFinancialmapper;
 
     /**
      * 查询【请填写功能名称】
