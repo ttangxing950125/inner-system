@@ -5,28 +5,32 @@
 <mapper namespace="com.deloitte.crm.mapper.GovInfoMapper">
 
     <resultMap type="GovInfo" id="GovInfoResult">
-        <result property="id"    column="id"    />
-        <result property="govName"    column="gov_name"    />
-        <result property="govCode"    column="gov_code"    />
-        <result property="dqGovCode"    column="dq_gov_code"    />
-        <result property="govType"    column="gov_type"    />
-        <result property="govLevelBig"    column="gov_level_big"    />
-        <result property="govLevelSmall"    column="gov_level_small"    />
-        <result property="govNameHis"    column="gov_name_his"    />
-        <result property="entityNameHisRemarks"    column="entity_name_his_remarks"    />
-        <result property="creditErrorRemark"    column="credit_error_remark"    />
-        <result property="invalid"    column="invalid"    />
-        <result property="newGovName"    column="new_gov_name"    />
-        <result property="newDqCode"    column="new_dq_code"    />
-        <result property="newGovCode"    column="new_gov_code"    />
-        <result property="creater"    column="creater"    />
-        <result property="updater"    column="updater"    />
-        <result property="created"    column="created"    />
-        <result property="updated"    column="updated"    />
+        <result property="id" column="id"/>
+        <result property="govName" column="gov_name"/>
+        <result property="govCode" column="gov_code"/>
+        <result property="dqGovCode" column="dq_gov_code"/>
+        <result property="govType" column="gov_type"/>
+        <result property="provincial" column="provincial"/>
+        <result property="cityGroup" column="city_group"/>
+        <result property="countryCenter" column="country_center"/>
+        <result property="economyRegion" column="economy_region"/>
+        <result property="govLevelBig" column="gov_level_big"/>
+        <result property="govLevelSmall" column="gov_level_small"/>
+        <result property="govNameHis" column="gov_name_his"/>
+        <result property="entityNameHisRemarks" column="entity_name_his_remarks"/>
+        <result property="creditErrorRemark" column="credit_error_remark"/>
+        <result property="invalid" column="invalid"/>
+        <result property="newGovName" column="new_gov_name"/>
+        <result property="newDqCode" column="new_dq_code"/>
+        <result property="newGovCode" column="new_gov_code"/>
+        <result property="creater" column="creater"/>
+        <result property="updater" column="updater"/>
+        <result property="created" column="created"/>
+        <result property="updated" column="updated"/>
     </resultMap>
 
     <sql id="selectGovInfoVo">
-        select id, gov_name, gov_code, dq_gov_code, gov_type, gov_level_big, gov_level_small, gov_name_his, entity_name_his_remarks, invalid, new_gov_name, new_dq_code, new_gov_code, creater, updater, created, updated from gov_info
+        select id, gov_name, gov_code, dq_gov_code,   economyRegion,provincial,cityGroup,countryCenter, gov_type, gov_level_big, gov_level_small, gov_name_his, entity_name_his_remarks, invalid, new_gov_name, new_dq_code, new_gov_code, creater, updater, created, updated from gov_info
     </sql>
 
     <select id="selectGovInfoList" parameterType="GovInfo" resultMap="GovInfoResult">
@@ -167,7 +171,7 @@
 
                 <if test="isProvince != null  and isProvince != ''and isCity != null  and isCity != ''">or</if>
                 <if test="isCity != null  and isCity != ''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isCity" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -177,7 +181,7 @@
                     or
                 </if>
                 <if test="isCounty != null  and isCounty!= ''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isCounty" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -187,7 +191,7 @@
                     or
                 </if>
                 <if test="isJKGX != null  and isJKGX !=''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isJKGX" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -202,7 +206,7 @@
                     or
                 </if>
                 <if test="govScale != null  and govScale !=''">
-                gov_scale IN
+                    gov_scale IN
                     <foreach item="item" collection="govScale" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -271,7 +275,7 @@
 
                 <if test="isProvince != null  and isProvince != ''and isCity != null  and isCity != ''">or</if>
                 <if test="isCity != null  and isCity != ''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isCity" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -281,7 +285,7 @@
                     or
                 </if>
                 <if test="isCounty != null  and isCounty!= ''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isCounty" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -291,7 +295,7 @@
                     or
                 </if>
                 <if test="isJKGX != null  and isJKGX !=''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isJKGX" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -376,7 +380,7 @@
 
                 <if test="isProvince != null  and isProvince != ''and isCity != null  and isCity != ''">or</if>
                 <if test="isCity != null  and isCity != ''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isCity" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -386,7 +390,7 @@
                     or
                 </if>
                 <if test="isCounty != null  and isCounty!= ''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isCounty" open="(" separator="," close=")">
                         #{item}
                     </foreach>
@@ -396,7 +400,7 @@
                     or
                 </if>
                 <if test="isJKGX != null  and isJKGX !=''">
-                    gov_level_small  in
+                    gov_level_small in
                     <foreach item="item" collection="isJKGX" open="(" separator="," close=")">
                         #{item}
                     </foreach>

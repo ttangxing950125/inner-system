@@ -6,10 +6,10 @@ package com.deloitte.crm.constants;
  */
 public enum StockCnStatus {
 
-    COACH_BACK(1, "ipo辅导备案中"),
+    COACH_BACK(1, "IPO辅导备案中"),
     CHECK_DECLARE(2,"审核申报中"),
-    IEC_SMPC_CHECK(3,"法审上市委审核中"),
-    APPRD_WAIT_ISS(4,"审核通过尚未发行"),
+    IEC_SMPC_CHECK(3,"IPO法审上市委审核中"),
+    APPRD_WAIT_ISS(4,"IPO审核通过尚未发行"),
     ISSUE(5,"发行中"),
     IPO_INFO(6, "成功上市"),
     IPO_PAUSE(7, "发行暂缓"),

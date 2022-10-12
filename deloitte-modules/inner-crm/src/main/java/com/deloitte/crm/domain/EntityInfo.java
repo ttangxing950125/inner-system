@@ -35,6 +35,18 @@ public class EntityInfo implements Serializable
     @Excel(name = "IB+自000001开始排序，每个企业唯一")
     private String entityCode;
 
+    /**
+     * 报告类型
+     */
+    @Excel(name = "报告类型")
+    private String reportType;
+
+    /**
+     * 财报列示类型
+     */
+    @Excel(name = "财报列示类型")
+    private String listType;
+
     /** 统一社会信用代码 */
     @Excel(name = "统一社会信用代码")
     private String creditCode;

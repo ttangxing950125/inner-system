@@ -46,7 +46,7 @@ const user = {
             commit("SET_TOKEN", data.access_token);
             setExpiresIn(data.expires_in);
             commit("SET_EXPIRES_IN", data.expires_in);
-            localStorage.setItem("roleId", data.roleInfo.roleKey[0]);
+            localStorage.setItem("roleId", data.roleInfo.roleKey);
             resolve();
           })
           .catch((error) => {
@@ -72,6 +72,11 @@ const user = {
             } else {
               commit("SET_ROLES", ["ROLE_DEFAULT"]);
             }
+
+            // localStorage.setItem("roleId", res.roleInfo.roleKey);
+
+            console.log("store")
+            console.log(res.roleInfo.roleKey)
             commit("SET_NAME", user.userName);
             commit("SET_AVATAR", avatar);
             resolve(res);

@@ -5,17 +5,22 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityStockThkRelMapper;
 import com.deloitte.crm.service.EntityStockThkRelService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.utils.AttrValueUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +37,9 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
     @Resource
     private ICrmEntityTaskService entityTaskService;
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     /**
      * 绑定港股和主体的关联关系
@@ -59,9 +67,24 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
             entityTask.setSourceId(secIssInfo.getId());
             entityTask.setTaskDate(windTask.getTaskDate());
             String showData = "公司中文名称:"+entityName;
-            showData += ", 证券代码:"+secIssInfo.getCode()+", 债券简称:"+secIssInfo.getName();
+            showData += ", 证券代码:"+secIssInfo.getCode()+", 证券简称:"+secIssInfo.getName();
 
             entityTask.setDataShow(showData);
+
+            //infoMap
+            HashMap<String, Object> infoMap = new HashMap<>();
+            infoMap.put("证券代码", stockThkInfo.getStockCode());
+            infoMap.put("证券简称", stockThkInfo.getStockName());
+
+
+            try {
+                Map<String, Object> data = AttrValueUtils.parseObj(secIssInfo, Excel.class, "name");
+
+                entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
+                entityTask.setDetails(objectMapper.writeValueAsString(data));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             entityTaskService.createTask(entityTask);
 

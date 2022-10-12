@@ -23,7 +23,7 @@ import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.service.*;
-import com.deloitte.crm.strategy.impl.NewIssueStrategy;
+import com.deloitte.crm.strategy.impl.BondNewIssueStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
@@ -69,7 +69,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
 
     @Resource
     @Lazy
-    private NewIssueStrategy newIssueStrategy;
+    private BondNewIssueStrategy newIssueStrategy;
 
 
     /**

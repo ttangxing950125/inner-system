@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @date 2022/9/25
  */
 @Component
-public class NewIssueStrategy implements WindTaskStrategy {
+public class BondNewIssueStrategy implements WindTaskStrategy {
 
     @Resource
     private IBondNewIssService bondNewIssService;
@@ -83,6 +83,7 @@ public class NewIssueStrategy implements WindTaskStrategy {
 
             bondInfo.setBondShortName(shortName);
             bondInfo.setOriCode(newIss.getTradeCode());
+            bondInfo.setBondName(newIss.getBondName());
 
             //看之前有没有导入过这个数据
             List<BondNewIss> bondNewIsses = bondNewIssMapper.findByShortName(shortName);

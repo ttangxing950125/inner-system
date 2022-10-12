@@ -42,6 +42,9 @@ public class BondInfo {
     @Excel(name = "债券状态")
     private Integer bondStatus;
 
+
+    private String bondName;
+
     /**
      * 德勤内部债券代码 bond_0000id 6位数字
      */

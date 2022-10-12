@@ -684,7 +684,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
-        pageNum = pageNum * pageSize - 1;
+        pageNum = (pageNum-1) * pageSize;
         List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize);
         pageResult.setTotal(count);
 
