@@ -1055,7 +1055,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/25
      */
     @Override
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword,Integer pageNum,Integer pageSize) {
+    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
         //模糊匹配 查询主体||债券信息
         switch (keyword) {
             //模糊匹配主体名
@@ -1347,7 +1347,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
                 .like(EntityInfo::getEntityCode, param)
                 .or().like(EntityInfo::getEntityName, param)
-                .or().like(EntityInfo::getCreditCode, param)
+                .or().like(EntityInfo::getCreditCode, param).orderByAsc(EntityInfo::getEntityCode)
         );
         //新的分页结果赋值
         pageResult.setTotal(page.getTotal()).setSize(page.getSize());
@@ -1364,12 +1364,91 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //获取上市情况
                 String listDetail = getListDetail(o);
                 //获取发债情况
+                String bondDetail = getBondDetail(o);
+
                 result.setListDetail(listDetail);
+                result.setBondDetail(bondDetail);
                 resultList.add(result);
             });
             pageResult.setRecords(resultList);
         }
         return R.ok(pageResult);
+    }
+
+    private String getBondDetail(EntityInfo o) {
+        String bondDetail = "";
+
+        //查询债券主体关联表
+        QueryWrapper<EntityBondRel> relQuery = new QueryWrapper<>();
+        List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(relQuery.lambda()
+                .eq(EntityBondRel::getEntityCode, o.getEntityCode())
+        );
+        //没有关联关系  返回 null
+        if (CollectionUtils.isEmpty(entityBondRels)) {
+            return bondDetail;
+        }
+        //有关联关系    查询债券表 获取债券信息 识别并去重汇总每一条债券信息
+        List<String> bondCodes = new ArrayList<>();
+        entityBondRels.stream().forEach(x -> bondCodes.add(x.getBdCode()));
+        QueryWrapper<BondInfo> bondQuery = new QueryWrapper<>();
+        List<BondInfo> bondInfos = bondInfoMapper.selectList(bondQuery.lambda().in(BondInfo::getBondCode, bondCodes));
+        //创建所有债券类型的字段  公(私)募债 集合债 abs
+        AtomicReference<String> privateMsg = new AtomicReference<>("");
+        AtomicReference<String> publicMsg = new AtomicReference<>("");
+        AtomicReference<String> collMsg = new AtomicReference<>("");
+        AtomicReference<String> absMsg = new AtomicReference<>("");
+        //遍历所有债券信息
+        bondInfos.stream().forEach(x -> {
+            String status = "";
+            // 债卷状态 0_存续 1_违约 2_已兑付
+            Integer bondState = x.getBondState();
+            if (!ObjectUtils.isEmpty(bondState) && bondState == 0) {
+                status = "(存续)";
+            } else if (!ObjectUtils.isEmpty(bondState) && bondState == 1) {
+                status = "(违约)";
+            }
+            //公私募类型 0_公募 1_私募
+            Integer raiseType = x.getRaiseType();
+
+            if (!ObjectUtils.isEmpty(raiseType) && raiseType == 0 && !"公募债(存续)".equals(publicMsg.get())) {
+                publicMsg.set("公募债" + status);
+            } else if (!ObjectUtils.isEmpty(raiseType) && raiseType == 1 && !"私募债(存续)".equals(privateMsg.get())) {
+                privateMsg.set("私募债" + status);
+            }
+            Boolean abs = x.getAbs();
+            if (!ObjectUtils.isEmpty(abs) && abs && !"ABS(存续)".equals(absMsg.get())) {
+                absMsg.set("ABS" + status);
+            }
+            Boolean coll = x.getColl();
+            if (!ObjectUtils.isEmpty(coll) && coll && !"集合债(存续)".equals(collMsg.get())) {
+                collMsg.set("集合债" + status);
+            }
+        });
+        if (!ObjectUtil.isEmpty(privateMsg.get())) {
+            bondDetail = privateMsg.get();
+        }
+        if (!ObjectUtil.isEmpty(publicMsg.get())) {
+            if (ObjectUtil.isEmpty(bondDetail)) {
+                bondDetail = publicMsg.get();
+            } else {
+                bondDetail = bondDetail + "," + publicMsg.get();
+            }
+        }
+        if (!ObjectUtil.isEmpty(absMsg.get())) {
+            if (ObjectUtil.isEmpty(bondDetail)) {
+                bondDetail = absMsg.get();
+            } else {
+                bondDetail = bondDetail + "," + absMsg.get();
+            }
+        }
+        if (!ObjectUtil.isEmpty(collMsg.get())) {
+            if (ObjectUtil.isEmpty(bondDetail)) {
+                bondDetail = collMsg.get();
+            } else {
+                bondDetail = bondDetail + "," + collMsg.get();
+            }
+        }
+        return bondDetail;
     }
 
     //获取上市情况

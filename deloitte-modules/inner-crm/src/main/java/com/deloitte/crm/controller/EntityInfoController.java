@@ -291,7 +291,7 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 覆盖情况快速查询
+     * 快速查询企业上市或发债情况
      *
      * @param param
      * @param pageNum
@@ -300,7 +300,7 @@ public class EntityInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
-    @ApiOperation(value = "覆盖情况快速查询")
+    @ApiOperation(value = "快速查询企业上市或发债情况")
     @PostMapping("/getQuickOfCoverage")
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);

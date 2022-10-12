@@ -19,5 +19,5 @@ public class EntityInfoValueResult {
     //上市情况
     private String listDetail;
     //发债情况
-    private String issDetail;
+    private String bondDetail;
 }
