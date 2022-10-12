@@ -99,7 +99,8 @@ export default {
       number: 0,
       uploadList: [],
       uploadFileUrl:
-        this.uploadUrl || process.env.VUE_APP_BASE_API + "/file/upload", // 上传的图片服务器地址
+        process.env.VUE_APP_BASE_API + this.uploadUrl ||
+        process.env.VUE_APP_BASE_API + "/file/upload", // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
       },
