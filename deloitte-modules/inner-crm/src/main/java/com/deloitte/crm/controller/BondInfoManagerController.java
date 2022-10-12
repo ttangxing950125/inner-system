@@ -47,12 +47,13 @@ public class BondInfoManagerController {
     @ApiOperation(value="一级匹配 by正杰")
     @ApiImplicitParams({
         @ApiImplicitParam(name="name",value="请传入主体名||债券名 entity_name || bond_short_name",paramType = "query",dataType = "String"),
-        @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String")
+        @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String"),
+        @ApiImplicitParam(name="pageNum",value="翻页控制",paramType="query",dataType = "Integer")
     })
     @PostMapping("/findBondOrEntity")
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name,String keyword) {
+    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name,String keyword,Integer pageNum,Integer pageSize) {
         //模糊匹配 查询主体||债券信息
-        return iEntityInfoService.findBondOrEntity(name,keyword);
+        return iEntityInfoService.findBondOrEntity(name,keyword,pageNum,pageSize);
     }
 
     /**
