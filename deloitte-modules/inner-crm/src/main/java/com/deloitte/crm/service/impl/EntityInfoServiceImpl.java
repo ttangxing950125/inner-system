@@ -309,6 +309,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return entityInfoMapper.updateEntityInfo(entityInfo);
     }
 
+
+    /**
+     * 修改【请填写功能名称】
+     *
+     * @param entityInfo 【请填写功能名称】
+     * @return 结果
+     */
+    @Override
+    public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
+        QueryWrapper<EntityInfo>queryWrapper=new QueryWrapper<>();
+        int update = entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+        if (update<1){
+            return entityInfoMapper.insert(entityInfo);
+        }
+        return update;
+    }
     /**
      * 批量删除【请填写功能名称】
      *

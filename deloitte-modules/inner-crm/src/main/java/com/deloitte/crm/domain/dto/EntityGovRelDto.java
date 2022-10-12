@@ -2,6 +2,8 @@ package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.domain.EntityGovRel;
+import com.deloitte.crm.domain.EntityInfo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,8 +50,30 @@ public class EntityGovRelDto implements Serializable
     @Excel(name = "持股比例")
     private String shareRatio;
 
+    public EntityGovRel getEntityGovRel(){
+        EntityGovRel entityGovRel = new EntityGovRel();
+        entityGovRel.setEntityCode(this.entityCode)
+                .setDqGovCode(this.dqGovCode)
+                .setShareMethod(this.shareMethod)
+                .setSupport(this.support)
+                .setId(this.id)
+                .setJudgment(this.judgment)
+                .setShareRatio(this.shareRatio)
+                .setShareRatioYear(this.shareRatioYear)
+                .setStatus(this.status)
+                .setCreated(this.created)
+                .setUpdated(this.updated)
+                .setRemarks(this.remarks);
+        return entityGovRel;
+    }
 
-
+    public EntityInfo getEntityInfo(){
+        EntityInfo entityInfo = new EntityInfo();
+        entityInfo.setEntityCode(this.entityCode)
+                .setWindMaster(this.windMaster)
+                .setShenWanMaster(this.shenWanMaster);
+        return entityInfo;
+    }
 
     /**
      * entity_info的entity_code

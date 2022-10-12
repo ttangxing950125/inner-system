@@ -1,6 +1,8 @@
 package com.deloitte.crm.domain.dto;
 
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.domain.EntityFinancial;
+import com.deloitte.crm.domain.EntityInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,8 +65,26 @@ public class EntityFinancialDto implements Serializable {
     @Excel(name = "备注")
     private String remarks;
 
+    public EntityFinancial getEntityFinancial(){
+        EntityFinancial entityFinancial = new EntityFinancial();
+        entityFinancial.setEntityCode(this.entityCode)
+                       .setMince(this.mince)
+                       .setBelJurisdiction(this.belJurisdiction)
+                       .setBelPlace(this.belPlace)
+                       .setId(this.id)
+                       .setRegion(this.region)
+                       .setRegulators(this.regulators)
+                       .setRemarks(this.remarks);
+        return entityFinancial;
+    }
 
-
+    public EntityInfo getEntityInfo(){
+        EntityInfo entityInfo = new EntityInfo();
+        entityInfo.setEntityCode(this.entityCode)
+                  .setWindMaster(this.windMaster)
+                  .setShenWanMaster(this.shenWanMaster);
+        return entityInfo;
+    }
 
     /**
      * entity_info的entity_code

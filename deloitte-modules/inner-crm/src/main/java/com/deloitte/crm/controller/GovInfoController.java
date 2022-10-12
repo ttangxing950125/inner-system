@@ -304,7 +304,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/29 15:49
      */
     @ApiOperation(value = "获取省市级数据")
-    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
+    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "query", example = "GV10110", dataType = "Integer")
     @PostMapping("/getGovLevel")
     public R getGovLevel(String preGovCode) {
         return R.ok(govInfoService.getGovLevel(preGovCode));
