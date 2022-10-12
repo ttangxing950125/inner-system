@@ -1,5 +1,6 @@
 package com.deloitte.crm.vo;
 
+import com.deloitte.crm.domain.Products;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,7 +18,7 @@ public class EntityOrGovByAttrVo {
     /***
      *用于添加的列
     */
-    List<Map<String,String>> mapList;
+      List<Products> ProductsList;
 
     /***
      *政府主体-"GV"  企业主体-"Q"

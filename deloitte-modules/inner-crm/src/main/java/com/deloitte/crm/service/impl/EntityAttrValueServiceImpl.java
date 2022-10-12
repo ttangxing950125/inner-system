@@ -1,4 +1,5 @@
 package com.deloitte.crm.service.impl;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -231,22 +232,22 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     }
 
     /**
-     *
-     *   ****************
-     *   *    通用方法   *
-     *   ****************
-     *
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
      * 查询 attr&attr_value 的泛用查询
+     *
      * @param entityCode
      * @param attrId
      * @return
      */
     @Override
-    public Map<String,AttrValueMapDto> findAttrValue(String entityCode, Integer attrId) {
+    public Map<String, AttrValueMapDto> findAttrValue(String entityCode, Integer attrId) {
         EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
-        Assert.notNull(entityAttr,BadInfo.VALID_EMPTY_TARGET.getInfo());
+        Assert.notNull(entityAttr, BadInfo.VALID_EMPTY_TARGET.getInfo());
         HashMap<String, AttrValueMapDto> res = new HashMap<>();
-        if(entityAttr.getMultiple()) {
+        if (entityAttr.getMultiple()) {
             List<EntityAttrIntype> entityAttrIntypes = entityAttrIntypeService.getBaseMapper().selectList(new QueryWrapper<EntityAttrIntype>().lambda().eq(EntityAttrIntype::getAttrId, attrId));
             List<EntityAttrValue> valueList = baseMapper.selectList(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getEntityCode, entityCode));
             List<EntityAttrIntype> targetList = entityAttrIntypes.stream().filter(item -> valueList.stream().collect(Collectors.toMap(EntityAttrValue::getId, row -> row)).containsKey(item.getId())).collect(Collectors.toList());
@@ -255,69 +256,69 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             List<AttrValueMapDto> tempList = targetList.stream().map(row -> temp.setValueId(row.getId()).setValue(row.getValue())).collect(Collectors.toList());
             Map<Integer, AttrValueMapDto> tempMap = tempList.stream().collect(Collectors.toMap(AttrValueMapDto::getValueId, row -> row));
             ArrayList<AttrValueMapDto> result = new ArrayList<>();
-            entityAttrIntypes.forEach(row->{
-                if (row.getPId()!=null){
+            entityAttrIntypes.forEach(row -> {
+                if (row.getPId() != null) {
                     tempMap.get(row.getPId()).getChildren().add(tempMap.get(row.getId()));
-                }else{
+                } else {
                     result.add(tempMap.get(row.getId()));
                 }
             });
-            res.put(temp.getName(),temp.setChildren(result));
-        }else{
+            res.put(temp.getName(), temp.setChildren(result));
+        } else {
             EntityAttrValue entityAttrValue = baseMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getAttrId, attrId).eq(EntityAttrValue::getEntityCode, entityCode));
-            AttrValueMapDto attrValueMapDto = new AttrValueMapDto(attrId, entityAttr.getName(), entityAttr.getRemarks(), entityAttrValue==null?null:entityAttrValue.getId(), entityAttrValue==null?null:entityAttrValue.getValue());
-            res.put(entityAttr.getName(),attrValueMapDto);
+            AttrValueMapDto attrValueMapDto = new AttrValueMapDto(attrId, entityAttr.getName(), entityAttr.getRemarks(), entityAttrValue == null ? null : entityAttrValue.getId(), entityAttrValue == null ? null : entityAttrValue.getValue());
+            res.put(entityAttr.getName(), attrValueMapDto);
         }
         return res;
     }
 
     /**
-     *
-     *   ****************
-     *   *    通用方法   *
-     *   ****************
-     *
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
      * 修改或新增 attr_value
+     *
      * @param attrValueMapDto
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean saveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto) {
+    public Boolean saveAttrValue(String entityCode, AttrValueMapDto attrValueMapDto) {
         Integer valueId = attrValueMapDto.getValueId();
         Integer attrId = attrValueMapDto.getAttrId();
         EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
-        Assert.notNull(entityAttr,BadInfo.VALID_EMPTY_TARGET.getInfo());
-        if(valueId==null){
-            if(entityAttr.getMultiple()){
+        Assert.notNull(entityAttr, BadInfo.VALID_EMPTY_TARGET.getInfo());
+        if (valueId == null) {
+            if (entityAttr.getMultiple()) {
                 List<AttrValueMapDto> targetList = new ArrayList<>();
-                targetList.addAll(this.getAllChildrenId(attrValueMapDto,targetList));
-                targetList.forEach(row->{
+                targetList.addAll(this.getAllChildrenId(attrValueMapDto, targetList));
+                targetList.forEach(row -> {
                     baseMapper.insertEntityAttrValue(new EntityAttrValue()
                             .setEntityCode(entityCode)
                             .setAttrId(row.getAttrId().longValue())
                             .setValue(row.getValueId().toString()));
                 });
                 return true;
-            }else{
+            } else {
                 baseMapper.insertEntityAttrValue(new EntityAttrValue()
                         .setEntityCode(entityCode)
                         .setAttrId(attrValueMapDto.getAttrId().longValue())
                         .setValue(attrValueMapDto.getValueId().toString()));
             }
-                return true;
-        }else{
-            if(entityAttr.getMultiple()){
+            return true;
+        } else {
+            if (entityAttr.getMultiple()) {
                 List<AttrValueMapDto> targetList = new ArrayList<>();
-                targetList.addAll(this.getAllChildrenId(attrValueMapDto,targetList));
-                targetList.forEach(row->{
+                targetList.addAll(this.getAllChildrenId(attrValueMapDto, targetList));
+                targetList.forEach(row -> {
                     EntityAttrValue entityAttrValue = baseMapper.selectById(row.getValueId());
-                    Assert.notNull(entityAttrValue,BadInfo.VALID_EMPTY_TARGET.getInfo());
+                    Assert.notNull(entityAttrValue, BadInfo.VALID_EMPTY_TARGET.getInfo());
                     entityAttrValue.setValue(row.getValueId().toString());
                     baseMapper.updateById(entityAttrValue);
                 });
                 return true;
-            }else{
+            } else {
                 EntityAttrValue entityAttrValue = baseMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, valueId));
                 entityAttrValue.setValue(attrValueMapDto.getValue());
                 baseMapper.updateById(entityAttrValue);
@@ -326,15 +327,15 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         }
     }
 
-    public List<AttrValueMapDto> getAllChildrenId(AttrValueMapDto attrValueMapDto,List<AttrValueMapDto> list){
+    public List<AttrValueMapDto> getAllChildrenId(AttrValueMapDto attrValueMapDto, List<AttrValueMapDto> list) {
         List<AttrValueMapDto> children = attrValueMapDto.getChildren();
-        if(children.size()!=0){
+        if (children.size() != 0) {
             for (AttrValueMapDto child : children) {
                 list.add(attrValueMapDto);
-                list.addAll(this.getAllChildrenId(child,list));
+                list.addAll(this.getAllChildrenId(child, list));
                 return list;
             }
-        }else{
+        } else {
             list.add(attrValueMapDto);
             return list;
         }
@@ -430,10 +431,19 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     public R createBondEntity(EntityByIondVo entityByIondVo) {
         //creditCode和bondShortName进行查重操作
-        EntityInfo entityInfo1 = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByIondVo.getCreditCode()));
-        BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName(),Boolean.FALSE);
-        if (!ObjectUtils.isEmpty(byShortName) || !ObjectUtils.isEmpty(entityInfo1)) {
-            return R.fail("新增失败：社会信用代码或债券简称重复不能进行新增");
+        if (entityByIondVo.getCreditCode()!=null){
+            EntityInfo entityInfo1 = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByIondVo.getCreditCode()));
+                if (!ObjectUtils.isEmpty(entityInfo1)){
+                    return R.fail("社会信用代码或债券简称重复不能进行新增");
+                }
+        }
+
+        if (entityByIondVo.getCreditCode()==null&& entityByIondVo.getCreditError()==0 ){
+            return R.fail("社会信用代码不能为空");
+        }
+        BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName(), Boolean.FALSE);
+        if (!ObjectUtils.isEmpty(byShortName)) {
+            return R.fail("债券简称重复不能进行新增");
         }
         //新增entity_info
         EntityInfo entityInfo = new EntityInfo();
@@ -466,9 +476,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityInfoMapper.update(entityInfo, wrapper);
         //新增bond_info
         BondInfo bondInfo = new BondInfo();
-        DecimalFormat g1 = new DecimalFormat("000000");
-        String startZeroStr = g1.format(bondInfo.getId());
-        bondInfo.setBondCode("BD" + startZeroStr);
+
         bondInfo.setOriCode(entityByIondVo.getStockCode());
         bondInfo.setBondShortName(entityByIondVo.getBondShortName());
         bondInfo.setBondName(entityByIondVo.getBondName());
@@ -476,6 +484,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         bondInfo.setDueDate(entityByIondVo.getEndDate());
         bondInfo.setRaiseType(entityByIondVo.getBondType());
         bondInfoMapper.insertBondInfo(bondInfo);
+        DecimalFormat g1 = new DecimalFormat("000000");
+        String startZeroStr = g1.format(bondInfo.getId());
+        bondInfo.setBondCode("BD" + startZeroStr);
+        bondInfoMapper.updateById(bondInfo);
         // 新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
@@ -520,15 +532,25 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     @Transactional
     public R createStockEntity(EntityStockInfoVo entityStockInfoVo) {
-        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
+        if (entityStockInfoVo.getCreditCode()!=null){
+            EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
+            if (!ObjectUtils.isEmpty(entityInfo)){
+                return R.fail("新增失败：统一社会性代码重复");
+            }
+
+        }
+        if (entityStockInfoVo.getCreditCode()==null&& entityStockInfoVo.getCreditError()==0 ){
+            return R.fail("社会信用代码不能为空");
+        }
+
         StockCnInfo stockSrotName = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockShortName, entityStockInfoVo.getStockShortName())
-                                                                                                        .eq(StockCnInfo ::getIsDeleted,Boolean.FALSE)
+                .eq(StockCnInfo::getIsDeleted, Boolean.FALSE)
         );
         StockCnInfo stockCode = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, entityStockInfoVo.getStockCode())
-                                                                                                 .eq(StockCnInfo ::getIsDeleted,Boolean.FALSE)
+                .eq(StockCnInfo::getIsDeleted, Boolean.FALSE)
         );
-        if (!ObjectUtils.isEmpty(entityInfo) || !ObjectUtils.isEmpty(stockSrotName) || !ObjectUtils.isEmpty(stockCode)) {
-            return R.fail("新增失败：社会信用代码或股票简称或股票代码重复不能进行新增");
+        if (!ObjectUtils.isEmpty(stockSrotName) || !ObjectUtils.isEmpty(stockCode)) {
+            return R.fail("新增失败:股票简称或股票代码重复不能进行新增");
         }
 
         //新增entity_info
@@ -560,7 +582,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
                 .eq(EntityInfo::getId, id)
                 .set(EntityInfo::getEntityCode, entityInfoBystock.getEntityCode());
         entityInfoMapper.update(entityInfoBystock, wrapper);
-
         //新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
@@ -570,7 +591,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
         entityNameHisMapper.insertEntityNameHis(entityNameHis);
-
         //新增Stock_cn_info
         StockCnInfo stockCnInfo = new StockCnInfo();
         stockCnInfo.setStockShortName(entityStockInfoVo.getStockShortName());
@@ -591,7 +611,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityStockCnRel.setStockDqCode("SA" + startZeroStr);
         entityStockCnRel.setEntityCode(entityInfoBystock.getEntityCode());
         entityStockCnRelMapper.insert(entityStockCnRel);
-
         //新增entityfinancal
         EntityFinancial entityFinancial = new EntityFinancial();
         entityFinancial.setEntityCode(sb.toString() + id);
@@ -602,7 +621,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityMaster.setEntityCode(sb.toString() + id);
         entityMaster.setMasterCode(entityStockInfoVo.getMasterCode());
         entityMasterMapper.insert(entityMaster);
-
         //日志入库
         EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
         entityInfoLogs.setEntityCode(sb.toString() + id);
