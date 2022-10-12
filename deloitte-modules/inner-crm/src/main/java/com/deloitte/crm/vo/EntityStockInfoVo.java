@@ -15,25 +15,32 @@ import javax.validation.constraints.NotNull;
 public class EntityStockInfoVo {
 
     /**
+     * 敞口划分
+     */
+    @ApiModelProperty(value="敞口划分")
+    @NotNull(message = "敞口划分-不能为空")
+    private String masterCode;
+
+    /**
      * 股票类型
      */
     @ApiModelProperty(value="股票类型")
     @NotNull(message = "股票类型-不能为空")
-    private  String StockType;
+    private  String stockType;
 
     /**
      * 股票代码
      */
     @ApiModelProperty(value="股票代码")
     @NotNull(message = "股票代码-不能为空")
-    private  String StockCode;
+    private  String stockCode;
 
     /**
      * 股票简称
      */
     @ApiModelProperty(value="股票简称")
     @NotNull(message = "股票简称-不能为空")
-    private  String StockShortName;
+    private  String stockShortName;
 
 
     /** 企业全称 */
@@ -62,11 +69,10 @@ public class EntityStockInfoVo {
     /** 上市日期*/
     @ApiModelProperty(value="上市日期")
     @NotNull(message = "上市日期-不能为空")
-    private String  StartXiDate ;
+    private String  startXiDate ;
 
     /** 退市日期*/
     @ApiModelProperty(value="退市日期")
-    @NotNull(message = "退市日期-不能为空")
     private  String  endDate ;
 
     /** 上市板块*/

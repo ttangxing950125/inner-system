@@ -131,12 +131,12 @@ public class EntityAttrValueController extends BaseController {
      * @date 2022/9/28 23:09
      */
     public R createStockEntity(@Validated @RequestBody EntityStockInfoVo entityStockInfoVo) {
-        if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "A")) {
+        if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "STOCK_CN_INFO")) {
             return entityAttrValueService.createStockEntity(entityStockInfoVo);
-        } else if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "G")) {
+        } else if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "STOCK_HK_INFO")) {
             return entityAttrValueService.createStockEntityG(entityStockInfoVo);
         }
-        return null;
+        return R.fail("股票代码错误");
     }
 
     /**

@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmMasTask;
@@ -78,10 +79,9 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      * 角色2今日运维模块
      * @author 正杰
      * @date 2022/9/27
-     * @param timeUnit 请传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy/mm/dd
-     * @return R<List<CrmMasTaskVo>> 当月或者当日的任务情况
+     * @param date 请传入参数 yyyy-MM
+     * @return R<Page<CrmMasTaskVo>> 当日任务
      */
-    R<List<CrmMasTaskVo>> getTaskInfo(String timeUnit, String date);
+    R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
 
 }
