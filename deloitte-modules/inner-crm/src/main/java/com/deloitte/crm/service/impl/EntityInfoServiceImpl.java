@@ -87,10 +87,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private EntityStockThkRelMapper thkRelMapper;
 
-    public static final String ENTITY = "ENTITY";
-
-    public static final String BOND = "BOND";
-
     private EntityInfoMapper entityInfoMapper;
 
     private EntityNameHisMapper nameHisMapper;
@@ -112,6 +108,50 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private ICrmEntityTaskService iCrmEntityTaskService;
 
     private RedisService redisService;
+    /**
+     * 主体
+     */
+    public static final String ENTITY = "ENTITY";
+    /**
+     * 债券
+     */
+    public static final String BOND = "BOND";
+    /**
+     * 未输入页码
+     */
+    private static final String NO_PAGENUM_ERROR = "未输入页码";
+    /**
+     * 默认页面size
+     */
+    private static final Integer DEFAULT_PAGESIZE = 9;
+    /**
+     * A股上市状态attrId
+     */
+    private static final Integer A_LIST_ATTRID = 25;
+    /**
+     * G股上市状态attrId
+     */
+    private static final Integer G_LIST_ATTRID = 44;
+    /**
+     * 曾用名重复
+     */
+    private static final String REPET_OLD_NAME = "曾用名重复，请重新输入";
+    /**
+     * 记录新增来源  2-政府
+     */
+    private static final Integer ENTITY_INFO_TYPE = 2;
+    /**
+     * 记录新增来源  1-企业主体 2-政府
+     */
+    private static final Integer GOV_INFO_TYPE = 1;
+    /**
+     * 记录新增来源  2-曾用名管理中操作
+     */
+    private static final Integer OLD_NAME_FROM_MAN = 2;
+    /**
+     * 记录新增来源 1-修改主体名称自动生成
+     */
+    private static final Integer OLD_NAME_FROM_AUTO = 1;
 
     /**
      * 统计企业主体信息
@@ -324,7 +364,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 .eq(EntityNameHis::getDqCode, entityCode)
                 .eq(EntityNameHis::getOldName, nameHis));
         if (aLong > 0) {
-            return R.fail("曾用名重复，请重新输入");
+            return R.fail(REPET_OLD_NAME);
         }
         //获取操作用户
         String remoter = HttpUtils.getRemoter();
@@ -347,10 +387,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityNameHis newNameHis = new EntityNameHis();
         newNameHis.setDqCode(entityInfo.getEntityCode());
         newNameHis.setOldName(entity.getEntityNameHis());
-        newNameHis.setEntityType(2);
+        newNameHis.setEntityType(ENTITY_INFO_TYPE);
         newNameHis.setHappenDate(entity.getUpdated());
         newNameHis.setRemarks(entity.getEntityNameHisRemarks());
-        newNameHis.setSource(2);
+        newNameHis.setSource(OLD_NAME_FROM_MAN);
         nameHisMapper.insert(newNameHis);
         return R.ok();
     }
@@ -372,7 +412,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     .eq(EntityNameHis::getDqCode, dqCode)
                     .eq(EntityNameHis::getOldName, newOldName));
             if (aLong > 0) {
-                return R.ok("曾用名已经存在，请重新输入");
+                return R.ok(REPET_OLD_NAME);
             }
             //修改主体表中的数据
             entityInfo.setEntityNameHis(entityInfo.getEntityNameHis().replaceAll(oldName, newOldName));
@@ -548,12 +588,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     /**
      * 根据统一社会信用代码 查询主体信息
+     *
      * @param creditCode
      * @return
      */
     @Override
     public EntityInfo getEntityInfoByCreditCode(String creditCode) {
-        return baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode,creditCode));
+        return baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, creditCode));
     }
 
     /**
@@ -684,7 +725,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
-        pageNum = (pageNum-1) * pageSize;
+        pageNum = (pageNum - 1) * pageSize;
         List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize);
         pageResult.setTotal(count);
 
@@ -1289,13 +1330,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
+
     @Override
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         if (ObjectUtil.isEmpty(pageNum)) {
-            return R.fail("未输入页码");
+            return R.fail(NO_PAGENUM_ERROR);
         }
         if (ObjectUtil.isEmpty(pageSize)) {
-            pageSize = 9;
+            pageSize = DEFAULT_PAGESIZE;
         }
         //创建分页对象
         Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
@@ -1324,10 +1366,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 result.setEntityInfo(o);
                 String entityCode = o.getEntityCode();
                 //获取上市情况
-                String listDetail=getListDetail(o);
+                String listDetail = getListDetail(o);
                 //获取发债情况
-
-
                 result.setListDetail(listDetail);
                 resultList.add(result);
             });
@@ -1335,36 +1375,37 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return R.ok(pageResult);
     }
+
     //获取上市情况
     private String getListDetail(EntityInfo o) {
-        String listDetail="";
+        String listDetail = "";
 
         QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
         List<EntityAttrValue> attrValueListA = entityAttrValueMapper.selectList(valueQuery.lambda()
                 .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
-                .eq(EntityAttrValue::getAttrId, 25)
+                .eq(EntityAttrValue::getAttrId, A_LIST_ATTRID)
         );
         List<EntityAttrValue> attrValueListG = entityAttrValueMapper.selectList(valueQuery.lambda()
                 .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
-                .eq(EntityAttrValue::getAttrId, 44)
+                .eq(EntityAttrValue::getAttrId, G_LIST_ATTRID)
         );
         //                25		A股上市状态		1、存续 2、已退市 3、未曾A股上市
-        if (!CollectionUtils.isEmpty(attrValueListA)){
+        if (!CollectionUtils.isEmpty(attrValueListA)) {
             String value = attrValueListA.get(0).getValue();
-            if ("1".equals(value)){
-                listDetail=listDetail+"A股(存续)";
-            }else if("2".equals(value)){
-                listDetail=listDetail+"A股(已退市)";
+            if ("1".equals(value)) {
+                listDetail = listDetail + "A股(存续)";
+            } else if ("2".equals(value)) {
+                listDetail = listDetail + "A股(已退市)";
             }
         }
         //                44		港股上市状态		1、存续 2、已退市
-        if (!CollectionUtils.isEmpty(attrValueListG)){
+        if (!CollectionUtils.isEmpty(attrValueListG)) {
             String value = attrValueListG.get(0).getValue();
-            if ("1".equals(value)){
-                if (ObjectUtils.isEmpty(listDetail)){
-                    listDetail="B股";
-                }else {
-                    listDetail=listDetail+",B股";
+            if ("1".equals(value)) {
+                if (ObjectUtils.isEmpty(listDetail)) {
+                    listDetail = "B股";
+                } else {
+                    listDetail = listDetail + ",B股";
                 }
             }
         }
@@ -1403,18 +1444,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
-     *   ****************
-     *   *    通用方法   *
-     *   ****************
-     *
+     * ****************
+     * *    通用方法   *
+     * ****************
+     * <p>
      * 拼接 0
-     * @param prefixWord 前缀 拼接的字符
+     *
+     * @param prefixWord   前缀 拼接的字符
      * @param prefixLength 前缀长度
-     * @param target 目标字符
+     * @param target       目标字符
      */
     @Override
     public String appendPrefixDiy(String prefixWord, Integer prefixLength, Integer target) {
-        return prefixWord+String.format("%0"+prefixLength,target);
+        return prefixWord + String.format("%0" + prefixLength, target);
     }
 
     /**
@@ -1450,7 +1492,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public void addEntityeMsg(EntityInfo entityInfo) {
         QueryWrapper<EntityInfo> entityQuery = new QueryWrapper<>();
         int update = entityInfoMapper.update(entityInfo, entityQuery.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-        if (update<1){
+        if (update < 1) {
             entityInfoMapper.insert(entityInfo);
         }
     }

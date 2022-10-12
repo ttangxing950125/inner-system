@@ -111,8 +111,8 @@ public class EntityMasterController extends BaseController
     @ApiOperation(value = "角色345修改行业划分")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "reportType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "listType", value = "财报列示类型", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shenWanMaster", value = "申万行业划分", paramType = "body", example = "", dataType = "String")
     })
     @PostMapping("/addEntityeMsg")
     public R addEntityeMasterMsg(@RequestBody EntityMaster entityMaster) {
