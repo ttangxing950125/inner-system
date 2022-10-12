@@ -63,5 +63,5 @@ public interface CrmSupplyTaskMapper extends BaseMapper<CrmSupplyTask>
     public int deleteCrmSupplyTaskByIds(Long[] ids);
 
 
-    List<TaskDto> selctCrmCount(String taskDate);
+    TaskDto selctCrmCount(String taskDate);
 }

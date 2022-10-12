@@ -3,7 +3,6 @@ import com.deloitte.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import javax.validation.constraints.NotNull;
 
 /**

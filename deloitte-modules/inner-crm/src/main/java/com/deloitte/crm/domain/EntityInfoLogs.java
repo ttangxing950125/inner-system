@@ -59,6 +59,11 @@ public class EntityInfoLogs implements Serializable {
     @Excel(name = "入库时的主体名")
     private String entityName;
     /**
+     * 操作来源
+     */
+    @Excel(name = "操作来源")
+    private Integer source;
+    /**
      * 操作人
      */
     @Excel(name = "操作人")

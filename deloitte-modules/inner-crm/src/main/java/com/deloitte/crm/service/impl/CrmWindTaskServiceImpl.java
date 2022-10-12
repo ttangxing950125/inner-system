@@ -243,7 +243,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
      * @date 2022/10/11 18:56
      */
     @Override
-    public List<TaskDto> getTaskCompletedByDate(String taskDate) {
+    public TaskDto getTaskCompletedByDate(String taskDate) {
         LoginUser loginUser = SecurityUtils.getLoginUser();
         SysRole roleInfo = loginUser.getRoleInfo();
         if (roleInfo != null) {

@@ -81,6 +81,6 @@ public interface CrmMasTaskMapper extends BaseMapper<CrmMasTask>
      * @author penTang
      * @date 2022/10/11 19:40
     */
-    List<TaskDto> selectCrmMasTaskCount(String taskDate);
+    TaskDto selectCrmMasTaskCount(String taskDate);
 
 }

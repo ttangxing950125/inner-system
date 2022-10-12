@@ -42,7 +42,7 @@ public interface ICrmWindTaskService extends IService<CrmWindTask> {
      */
     List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo);
 
-    List<TaskDto> getTaskCompletedByDate(String taskDate);
+    TaskDto getTaskCompletedByDate(String taskDate);
 
     Boolean saveCrmWindTas(List<CrmWindTask> crmWind);
 
