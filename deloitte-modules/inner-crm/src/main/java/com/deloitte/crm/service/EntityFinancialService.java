@@ -11,4 +11,5 @@ import com.deloitte.crm.domain.EntityFinancial;
  */
 public interface EntityFinancialService extends IService<EntityFinancial> {
 
+    void addFinEntitySubtableMsg(EntityFinancial entityFinancial);
 }

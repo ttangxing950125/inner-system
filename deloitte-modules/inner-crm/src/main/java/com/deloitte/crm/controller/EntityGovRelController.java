@@ -11,6 +11,7 @@ import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.service.IEntityGovRelService;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -109,19 +110,34 @@ public class EntityGovRelController extends BaseController
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "根据 dqCode 查询城投主体数量")
-    @ApiImplicitParam(
-            // 参数名
-            name = "dqCode",
-            // 参数描述
-            value = "包含表中gov_info的所有字段",
-            // 参数出现的地方 query-表单数据,body-applicationJson,path-路径
-            paramType = "body",
-            // 示例值
-            example = "",
-            //参数类型
-            dataType = "String")
+    @ApiImplicitParam(name = "dqCode", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataType = "String")
     @PostMapping("/getEntityGovCount")
     public R getEntityGovCount(String dqCode) {
         return R.ok(entityGovRelService.getEntityGovCount(dqCode));
+    }
+
+
+    /**
+     * 城投机构根据entityCode补充录入副表信息
+     *
+     * @param entityGovRel
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/12 9:56
+    */
+    @ApiOperation(value = "城投机构根据entityCode补充录入副表信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shareMethod", value = "持股方式", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "support", value = "支持力度", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "judgment", value = "支持力度判断依据", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shareRatio", value = "持股比例", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shareRatioYear", value = "持股比例年份", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String")
+    })
+    @PostMapping("/addGovEntitySubtableMsg")
+    public R addGovEntitySubtableMsg(@RequestBody EntityGovRel entityGovRel) {
+        entityGovRelService.addGovEntitySubtableMsg(entityGovRel);
+        return R.ok();
     }
 }

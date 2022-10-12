@@ -1,14 +1,12 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
-
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 entity_master
@@ -18,7 +16,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(chain = true)
-public class EntityMaster
+public class EntityMaster implements Serializable
 {
     private static final long serialVersionUID = 1L;
 

@@ -250,4 +250,5 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
+    void addEntityeMsg(EntityInfo entityInfo);
 }

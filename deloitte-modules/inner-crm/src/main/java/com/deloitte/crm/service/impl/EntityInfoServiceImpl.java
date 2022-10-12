@@ -1437,6 +1437,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return prefix + entityCode + "R" + suffixString;
     }
 
+
+    /**
+     * 财报收数根据entityCode补充录入信息--主表
+     *
+     * @param entityInfo
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/12 9:51
+     */
+    @Override
+    public void addEntityeMsg(EntityInfo entityInfo) {
+        QueryWrapper<EntityInfo> entityQuery = new QueryWrapper<>();
+        int update = entityInfoMapper.update(entityInfo, entityQuery.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+        if (update<1){
+            entityInfoMapper.insert(entityInfo);
+        }
+    }
+
     /**
      * 批量查询并导出excel结果
      *
