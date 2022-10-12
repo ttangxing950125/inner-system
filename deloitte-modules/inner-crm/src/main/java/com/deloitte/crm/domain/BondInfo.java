@@ -1,7 +1,6 @@
 package com.deloitte.crm.domain;
 
 import java.util.Date;
-
 import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModelProperty;
@@ -42,9 +41,6 @@ public class BondInfo {
     @Excel(name = "债券状态")
     private Integer bondStatus;
 
-
-    private String bondName;
-
     /**
      * 德勤内部债券代码 bond_0000id 6位数字
      */
@@ -65,12 +61,10 @@ public class BondInfo {
 
     /** 起息日*/
     @ApiModelProperty(value="起息日")
-    @NotNull(message = "起息日或者上市日期不能为空")
     private String  valueDate ;
 
     /** 到期日*/
     @ApiModelProperty(value="到期日")
-    @NotNull(message = "到期日或者退市日期不能为空")
     private  String  dueDate ;
 
 

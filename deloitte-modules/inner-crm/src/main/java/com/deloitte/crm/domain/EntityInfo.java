@@ -41,11 +41,6 @@ public class EntityInfo implements Serializable
     @Excel(name = "报告类型")
     private String reportType;
 
-    /**
-     * 财报列示类型
-     */
-    @Excel(name = "财报列示类型")
-    private String listType;
 
     /** 统一社会信用代码 */
     @Excel(name = "统一社会信用代码")

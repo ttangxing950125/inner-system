@@ -50,17 +50,14 @@ public class StockThkInfo implements Serializable {
 
     /** 上市日期*/
     @ApiModelProperty(value="上市日期")
-    @NotNull(message = "上市日期-不能为空")
     private String  listDate ;
 
     /** 退市日期*/
     @ApiModelProperty(value="退市日期")
-    @NotNull(message = "退市日期-不能为空")
     private  String  delistingDate ;
 
     /** 交易所*/
     @ApiModelProperty(value="交易所")
-    @NotNull(message = "交易所-不能为空")
     private  String  exchange ;
 
     /**
