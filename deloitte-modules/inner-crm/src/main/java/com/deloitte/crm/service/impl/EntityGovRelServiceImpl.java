@@ -2,8 +2,12 @@ package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.crm.domain.EntityGovRel;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.dto.EntityGovRelDto;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
+import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityGovRelService;
+import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +24,10 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
 {
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
-
+    @Autowired
+    private ICrmSupplyTaskService crmSupplyTaskService;
+    @Autowired
+    private IEntityInfoService entityInfoService;
     /**
      * 查询【请填写功能名称】
      * 
@@ -102,17 +109,22 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
     /**
      * 城投机构根据entityCode补充录入副表信息
      *
-     * @param entityGovRel
+     * @param entityGovRelDto
      * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:56
      */
     @Override
-    public void addGovEntitySubtableMsg(EntityGovRel entityGovRel) {
+    public void addGovEntitySubtableMsg(EntityGovRelDto entityGovRelDto) {
+        crmSupplyTaskService.completeTaskById(entityGovRelDto.getId());
+        EntityGovRel entityGovRel = entityGovRelDto.getEntityGovRel();
         QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
         int update = entityGovRelMapper.update(entityGovRel, govQuery.lambda().eq(EntityGovRel::getEntityCode, entityGovRel.getEntityCode()));
         if (update<1){
             entityGovRelMapper.insert(entityGovRel);
         }
+        EntityInfo entityInfo = entityGovRelDto.getEntityInfo();
+        entityInfoService.updateOrInsertEntityInfoByEntityCode(entityInfo);
     }
+
 }

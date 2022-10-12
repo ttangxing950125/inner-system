@@ -2,7 +2,7 @@ package com.deloitte.crm.controller;
 
 
 import com.deloitte.common.core.domain.R;
-import com.deloitte.crm.domain.EntityFinancial;
+import com.deloitte.crm.domain.dto.EntityFinancialDto;
 import com.deloitte.crm.service.EntityFinancialService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -43,10 +43,11 @@ public class EntityFinancialController {
             @ApiImplicitParam(name = "belPlace", value = "所属地区", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "belJurisdiction", value = "所属辖区", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "regulators", value = "对口监管机构", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
     })
     @PostMapping("/addFinEntitySubtableMsg")
-    public R addFinEntitySubtableMsg(@RequestBody EntityFinancial entityFinancial) {
+    public R addFinEntitySubtableMsg(@RequestBody EntityFinancialDto entityFinancial) {
         entityFinancialService.addFinEntitySubtableMsg(entityFinancial);
         return R.ok();
     }

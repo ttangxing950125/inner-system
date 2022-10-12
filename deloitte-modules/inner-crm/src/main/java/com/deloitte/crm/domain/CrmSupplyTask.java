@@ -21,7 +21,7 @@ public class CrmSupplyTask implements Serializable
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Integer id;
 
     /** 德勤code */
     @Excel(name = "德勤code")

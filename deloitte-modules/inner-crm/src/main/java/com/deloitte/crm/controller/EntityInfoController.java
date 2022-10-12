@@ -291,7 +291,7 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 覆盖情况快速查询
+     * 快速查询企业上市或发债情况
      *
      * @param param
      * @param pageNum
@@ -300,13 +300,13 @@ public class EntityInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
-    @ApiOperation(value = "覆盖情况快速查询")
+    @ApiOperation(value = "快速查询企业上市或发债情况")
     @PostMapping("/getQuickOfCoverage")
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);
     }
 
-    /***
+    /**
      *批量查询并导出excel结果
      *
      * @param file
@@ -370,7 +370,10 @@ public class EntityInfoController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "reportType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "listType", value = "财报列示类型", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "listType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shenWanMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
     })
     @PostMapping("/addEntityeMsg")
     public R addEntityeMsg(@RequestBody EntityInfo entityInfo) {

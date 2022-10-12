@@ -37,18 +37,4 @@ public class RoleTFFController {
     public R getRoleSupplyTask(String taskDate) {
         return iCrmSupplyTaskService.getRoleSupplyTask(taskDate);
     }
-
-    /**
-     * 完成任务
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/9/27 18:52
-     */
-    @ApiOperation(value = "完成任务")
-    @ApiImplicitParam(name = "id", value = "任务id", paramType = "query", dataType = "Long")
-    @PostMapping("/completeRoleSupplyTask")
-    public R completeRoleSupplyTask(Long id,String remark) {
-        return R.ok(iCrmSupplyTaskService.completeRoleSupplyTask(id,remark));
-    }
 }

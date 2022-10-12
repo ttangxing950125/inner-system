@@ -9,6 +9,7 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityGovRel;
+import com.deloitte.crm.domain.dto.EntityGovRelDto;
 import com.deloitte.crm.service.IEntityGovRelService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -133,10 +134,11 @@ public class EntityGovRelController extends BaseController
             @ApiImplicitParam(name = "judgment", value = "支持力度判断依据", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shareRatio", value = "持股比例", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shareRatioYear", value = "持股比例年份", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
     })
     @PostMapping("/addGovEntitySubtableMsg")
-    public R addGovEntitySubtableMsg(@RequestBody EntityGovRel entityGovRel) {
+    public R addGovEntitySubtableMsg(@RequestBody EntityGovRelDto entityGovRel) {
         entityGovRelService.addGovEntitySubtableMsg(entityGovRel);
         return R.ok();
     }

@@ -59,6 +59,4 @@ public interface IEntityMasterService
      * @return 结果
      */
     public int deleteEntityMasterById(Long id);
-
-    void addEntityeMasterMsg(EntityMaster entityMaster);
 }

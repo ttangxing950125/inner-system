@@ -1,4 +1,5 @@
 package com.deloitte.crm.controller;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.log.annotation.Log;
@@ -46,31 +47,19 @@ public class RoleSevenController {
     /**
      * 角色7今日运维模块
      * @author 正杰
-     * @param date 请传入参数 yyyy-mm
-     * @date 2022/9/22
-     * @return R<List<CrmEntityTask>> 当月任务情况
-     */
-    @ApiOperation(value="查询当月任务 by正杰")
-    @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm",paramType = "query",dataType = "String")
-    @PostMapping("/getMouthTaskInfo")
-    @Log(title = "【 查询当月任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmEntityTaskVo>> getMouthTaskInfo(String date){
-        return iCrmEntityTaskService.getTaskInfo(Common.MOUTH,date);
-    }
-
-    /**
-     * 角色7今日运维模块
-     * @author 正杰
      * @param date 请传入参数 yyyy-mm-dd
+     * @param pageNum
+     * @param pageSize
      * @date 2022/9/22
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @ApiOperation(value="查询当日任务 by正杰")
+    @ApiResponse(code = 200,message = "操作成功",response = CrmEntityTaskVo.class)
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmEntityTaskVo>> getDayTaskInfo(String date){
-        return iCrmEntityTaskService.getTaskInfo(Common.DAY,date);
+    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(String date, Integer pageNum, Integer pageSize){
+        return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
     }
 
     /**
@@ -105,7 +94,6 @@ public class RoleSevenController {
     public R addEntity(@RequestBody EntityDto entityDto) {
         return iEntityInfoService.insertEntityInfo(entityDto);
     }
-
 
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名

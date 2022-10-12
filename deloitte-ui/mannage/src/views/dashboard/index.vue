@@ -5,9 +5,7 @@
       <div>HELLO!</div>
       <div>今天是 {{ currentTime }}, {{ week }}。</div>
       <div>
-        今日完成任务合计 {{ "5" }} 条, 待完成{{ "3" }}条，已完成{{
-          "2"
-        }}条，请尽快完成！
+        今日完成任务合计 {{ taskCount.taskCount || 0 }} 条, 待完成 {{ taskCount.taskNoCount || 0 }} 条，已完成 {{ taskCount.taskCop || 0 }} 条，请尽快完成！
       </div>
       <span type="text">切换日期：</span>
       <el-date-picker v-model="monthDate" type="month" placeholder="选择月" value-format="yyyy-MM" @change="changeMonth">
@@ -43,7 +41,7 @@
         </el-table-column>
       </el-table>
       <el-table
-      v-if="roleId === 'role6'"
+        v-if="roleId === 'role6'"
         v-loading="loading"
         class="table-content"
         :data="list7"
@@ -885,7 +883,7 @@
           <el-button
             style="margin-left: 5px"
             type="text"
-            @click="detaile"
+            @click="detaile()"
             >查看详情</el-button
           >
         </el-form-item>
@@ -963,24 +961,12 @@
     <el-dialog
       title="详情"
       :visible.sync="detaileDig"
-      width="20%">
-      <div class="dig-width">
+      width="35%">
+      <div class="dig-width7">
         <el-col :sm="24" :lg="12" class="form-card">
-          <div class="flex1 mt10">
-            <div class="first">统一社会信用代码</div>
-            <div class="content">{{ 111 }}</div>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">企业名称</div>
-            <div class="content">{{ 222 }}</div>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">企业曾用名</div>
-            <div class="content">{{ 333 }}</div>
-          </div>
-          <div class="flex1 mt10">
-            <div class="first">德勤内部主体代码</div>
-            <div class="content">{{ 444 }}</div>
+          <div v-for="(item, index) in selectRole7" :key="index" class="flex1 mt10">
+            <div class="first">{{ index }}</div>
+            <div class="content">{{ item || '-' }}</div>
           </div>
         </el-col>
       </div>
@@ -1008,7 +994,8 @@ import {
           getGovLevelSmall,
           insertGov,
           addSeven,
-          ignoreTask
+          ignoreTask,
+          getTaskCount
         } from "@/api/task";
 import { getGovLevel, getAttrByOrganName, getTypeByAttrId, checkData } from '@/api/common'
 export default {
@@ -1136,7 +1123,9 @@ export default {
       govOption2: [],
       govOption1: [],
       detaileDig: false,
-      roleId: localStorage.getItem('roleId')
+      roleId: localStorage.getItem('roleId'),
+      selectRole7: [],
+      taskCount: {}
     };
   },
   mounted() {
@@ -1152,6 +1141,7 @@ export default {
   methods: {
     init() {
       try {
+        this.$modal.loading('Loading...')
         this.loading = true;
         const role2date = {
           date:this.nowTime
@@ -1195,10 +1185,16 @@ export default {
           const { data } = res
           this.list2 = data
         })
+
+        getTaskCount({TaskDate: this.nowTime}).then(res => {
+          const { data } = res
+          this.taskCount = data
+        })
       } catch (error) {
         console.log(error);
       } finally {
         this.loading = false;
+        this.$modal.closeLoading()
       }
     },
     changeMonth(row) {
@@ -1333,7 +1329,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='"+(jsonHtml[l].bad ? 'shadow-yellow' : 'shadow-green')+"'>" +
+                    "<div class='shadow'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1467,6 +1463,10 @@ export default {
           this.list2 = data
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
+        getTaskCount({TaskDate: this.monthDate+ '-' +clickDay}).then(res => {
+          const { data } = res
+          this.taskCount = data
+        })
       } catch (error) {
         console.log(error)
       } finally {
@@ -1478,9 +1478,10 @@ export default {
       this.bodyDig = true
       this.addBodyId = row.id
       this.ruleForm.created = (row.created).substr(0, 10)
-      this.ruleForm.bondFullName = row.bondFullName
-      this.ruleForm.bondShortName = row.bondShortName
+      this.ruleForm.bondFullName = JSON.parse(row.details).债券全称
+      this.ruleForm.bondShortName = JSON.parse(row.details).债券简称
       this.ruleForm.id = row.id
+      this.selectRole7 = JSON.parse(row.details)
     },
     check(row) {
       this.$modal.loading("loading...");
@@ -1546,6 +1547,7 @@ export default {
     },
     detaile(row) {
       this.detaileDig = true
+      this.selectRole7 = row ? JSON.parse(row.details) : this.selectRole7
     },
     // 角色7流程结束
 
@@ -2018,6 +2020,10 @@ export default {
 .dig-width {
   height: 160px;
 }
+.dig-width7 {
+  height:300px;
+  overflow-y:auto
+}
 .form-card {
   padding-left: 20px;
   margin-bottom: 30px;
@@ -2036,6 +2042,7 @@ export default {
   .content {
     color: #a7a7a7;
     margin-top: 3px;
+    width: 240px;
   }
 }
 .replace-title {

@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -68,12 +69,13 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
     /**
      * 角色7今日运维模块
      * @author 正杰
+     * @param date 请传入参数 yyyy-mm-dd
+     * @param pageNum
+     * @param pageSize
      * @date 2022/9/22
-     * @param timeUnit 传入时间单位常量 MOUTH || DAY
-     * @param date 请传入具体日期: yyyy-mm || yyyy-mm-dd
-     * @return R<List<CrmEntityTask>> 当月或者当日的任务情况
+     * @return R<List<CrmEntityTask>> 当日任务情况
      */
-    R<List<CrmEntityTaskVo>> getTaskInfo(String timeUnit, String date);
+    R<Page<CrmEntityTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
 
     /**
      * 创建任务

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
-import com.deloitte.crm.domain.CrmWindTask;
 
 import java.util.Date;
 import java.util.List;
@@ -66,4 +65,5 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
      *
      */
     R<List<CrmDailyTask>> queryDailyTask(String taskDate, Long userId);
+
 }

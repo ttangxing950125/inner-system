@@ -86,20 +86,4 @@ public class EntityMasterServiceImpl implements IEntityMasterService {
         return entityMasterMapper.deleteEntityMasterById(id);
     }
 
-    /**
-     * 角色345修改行业划分
-     *
-     * @param entityMaster
-     * @return void
-     * @author 冉浩岑
-     * @date 2022/10/12 9:51
-     */
-    @Override
-    public void addEntityeMasterMsg(EntityMaster entityMaster) {
-        QueryWrapper<EntityMaster> entityQuery = new QueryWrapper<>();
-        int update = entityMasterMapper.update(entityMaster, entityQuery.lambda().eq(EntityMaster::getEntityCode, entityMaster.getEntityCode()));
-        if (update < 1) {
-            entityMasterMapper.insert(entityMaster);
-        }
-    }
 }

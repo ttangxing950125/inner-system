@@ -194,17 +194,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     //不是城投机构
     private static String NOT_URBAN_INVESTMENT="N";
     @Override
-    public Integer completeRoleSupplyTask(Long id, String remark) {
-        String username = SecurityUtils.getUsername();
-        CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
-        crmSupplyTask.setId(id);
-        crmSupplyTask.setState(1);
-        crmSupplyTask.setHandleUser(username);
-        crmSupplyTask.setRemark(remark);
-        return crmSupplyTaskMapper.updateById(crmSupplyTask);
-    }
-
-    @Override
     public TaskStatistics getTaskStatistics() {
         Long userId = SecurityUtils.getUserId();
         TaskStatistics taskStatistics=new TaskStatistics();
@@ -252,5 +241,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
             taskStatistics.setTaskComplete(complete.get()).setTaskTotal(supplyTasks.size()).setTaskWait(wait.get());
         }
         return taskStatistics;
+    }
+
+    @Override
+    public void completeTaskById(Integer id) {
+        CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
+        crmSupplyTask.setId(id);
+        crmSupplyTask.setState(1);
+        crmSupplyTaskMapper.updateById(crmSupplyTask);
     }
 }

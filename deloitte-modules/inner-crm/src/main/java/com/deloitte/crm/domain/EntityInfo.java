@@ -54,6 +54,19 @@ public class EntityInfo implements Serializable {
 
 
     /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "wind行业划分")
+    private String windMaster;
+
+    /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "申万行业划分")
+    private String shenWanMaster;
+
+
+    /**
      * 统一社会信用代码
      */
     @Excel(name = "统一社会信用代码")

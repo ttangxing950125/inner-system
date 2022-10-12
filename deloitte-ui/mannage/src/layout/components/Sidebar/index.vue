@@ -63,6 +63,7 @@ export default {
       return !this.sidebar.opened;
     },
     allRouter() {
+      console.log(this.$store.state.permission.sidebarRouters);
       return this.$store.state.permission.sidebarRouters;
     },
   },
