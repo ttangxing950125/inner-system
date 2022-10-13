@@ -81,7 +81,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     public int deleteEntityInfoById(Long id);
 
-    R getInfoList(Integer type, String param);
+    R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize);
 
     Integer updateInfoList(List<EntityInfo> list);
 
@@ -123,7 +123,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     R updateOldName(String dqCode, String oldName, String newOldName, String status);
 
-    R getInfoDetail(EntityInfo entityInfo);
+    R getInfoDetailByEntityCode(String entityCode);
 
     List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto);
 

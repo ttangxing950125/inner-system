@@ -69,7 +69,10 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      */
     List<EntityInfo> findByName(String entityName);
 
-    List<EntityInfo> selectGovInfoListByTypeAndParam(EntityInfo entityInfo);
+    List<EntityInfo> selectGovInfoListByTypeAndParam(@Param("type")Integer type,
+                                                     @Param("param")String param,
+                                                     @Param("pageNum")Integer pageNum,
+                                                     @Param("pageSize")Integer pageSize);
 
     List<EntityInfo> getEntityByBondType(@Param("raiseType") Integer raiseType,
                                          @Param("abs")Integer abs,

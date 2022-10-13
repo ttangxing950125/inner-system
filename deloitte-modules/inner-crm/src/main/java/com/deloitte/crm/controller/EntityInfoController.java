@@ -189,11 +189,13 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "企业主体分类查询")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageSize", value = "单页条数", paramType = "query", example = "", dataType = "Integer"),
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param) {
-        return entityInfoService.getInfoList(type, param);
+    public R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize) {
+        return entityInfoService.getInfoList(type, param,pageNum,pageSize);
     }
 
     /**
@@ -242,11 +244,11 @@ public class EntityInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/23 8:59
      */
-    @ApiOperation(value = "根据 dqCode 查询企业主体")
-    @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
+    @ApiOperation(value = "上市企业-修改信息-根据 entityCode 查询主体详细信息")
+    @ApiImplicitParam(name = "entityCode", value = "主体德勤唯一识别码", paramType = "query", example = "", dataType="String")
     @PostMapping("/getInfoDetail")
-    public R getInfoDetail(@RequestBody EntityInfo entityInfo) {
-        return entityInfoService.getInfoDetail(entityInfo);
+    public R getInfoDetailByEntityCode( String entityCode) {
+        return entityInfoService.getInfoDetailByEntityCode(entityCode);
     }
 
     /**
@@ -380,4 +382,6 @@ public class EntityInfoController extends BaseController {
         entityInfoService.addEntityeMsg(entityInfo);
         return R.ok();
     }
+
+
 }
