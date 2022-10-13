@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import io.swagger.models.auth.In;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
@@ -17,8 +19,10 @@ import java.io.Serializable;
  * @author deloitte
  * @date 2022-09-21
  */
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
+@Builder
 @Accessors(chain = true)
 public class EntityAttrValue implements Serializable
 {
