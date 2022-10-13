@@ -173,6 +173,8 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "政府主体分类查询")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "政府主体类型 1、地方政府2、地方主管部门3、其他", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageSize", value = "单页条数", paramType = "query", example = "", dataType = "Integer"),
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
