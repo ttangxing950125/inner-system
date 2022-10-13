@@ -181,8 +181,7 @@ public class BondConvertibleChangeInfo implements Serializable {
      */
     @Excel(name = "主承销商")
     private String leadUnderwriter;
-     */     @Excel(name = "主承销商")
-    private String leadUnderwriter;
+
     /**
      * 赎回条款
      */
