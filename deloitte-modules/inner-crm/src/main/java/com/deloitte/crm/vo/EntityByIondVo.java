@@ -46,7 +46,6 @@ public class EntityByIondVo
 
     /** 统一社会信用代码 */
     @ApiModelProperty(value="统一社会信用代码")
-    @NotNull(message = "统一社会信用代码不能为空")
     private String creditCode;
 
     /** 统一社会信用代码是否异常 0-正常 1-异常 */

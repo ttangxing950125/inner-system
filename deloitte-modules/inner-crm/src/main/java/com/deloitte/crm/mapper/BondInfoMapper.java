@@ -1,5 +1,6 @@
 package com.deloitte.crm.mapper;
 
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -79,4 +80,14 @@ public interface BondInfoMapper extends BaseMapper<BondInfo>
      * @return
      */
     BondInfo findByDqCode(String dqBondCode);
+
+    /**
+     * 通过 id 字段名 修改数据
+     * @param id
+     * @param filedName
+     * @param value
+     */
+    void editByBondInfoManager(@Param("id") Integer id, @Param("filedName") String filedName, @Param("value") String value);
+
+    void editByBondInfoManagerDate(@Param("id") Integer id, @Param("filedName") String filedName, @Param("date") Date date);
 }

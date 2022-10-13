@@ -41,7 +41,7 @@ export default {
       const first = matched[0];
 
       if (!this.isDashboard(first)) {
-        matched = [{ path: "/index", meta: { title: "主体管理系统" } }].concat(
+        matched = [{ path: "/", meta: { title: "主体管理系统" } }].concat(
           matched
         );
       }

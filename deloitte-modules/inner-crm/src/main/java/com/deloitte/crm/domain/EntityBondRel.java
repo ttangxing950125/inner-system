@@ -8,7 +8,10 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -18,7 +21,10 @@ import lombok.experimental.Accessors;
  * @date 2022-09-21
  */
 @Data
+@Builder
 @Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class EntityBondRel {
     private static final long serialVersionUID = 1L;
 
@@ -44,6 +50,11 @@ public class EntityBondRel {
      */
     @Excel(name = "关系状态")
     private Integer status;
+
+    /**
+     * 0-非可转债 1-可转债
+     */
+    private Boolean conver;
 
     /**
      * 新发行人名称

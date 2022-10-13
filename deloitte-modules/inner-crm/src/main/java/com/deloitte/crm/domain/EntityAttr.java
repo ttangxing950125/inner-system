@@ -47,7 +47,7 @@ public class EntityAttr implements Serializable
     @Excel(name = "是否允许多个值")
     private Boolean multiple;
 
-    /** 1 - 企业主体属性 2 - 政府主体属性 */
+    /** 1 - 企业主体属性 2 - 政府主体属性 3-债券 -4港股 5-a股 */
     @Excel(name = "1 - 企业主体属性 2 - 政府主体属性")
     private Long attrType;
 

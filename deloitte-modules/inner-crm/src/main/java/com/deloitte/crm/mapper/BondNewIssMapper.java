@@ -61,6 +61,17 @@ public interface BondNewIssMapper extends BaseMapper<BondNewIss>
      */
     public int deleteBondNewIssByIds(Long[] ids);
 
-
+    /**
+     * 根据债券简称查询
+     * @param shortName
+     * @return
+     */
     List<BondNewIss> findByShortName(String shortName);
+
+    /**
+     *
+     * @param shortName
+     * @return
+     */
+    BondNewIss findLastByShortName(String shortName);
 }

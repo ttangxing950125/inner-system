@@ -1,5 +1,6 @@
 package com.deloitte.crm.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityInfo;
@@ -155,7 +156,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @author 正杰
      * @date 2022/9/25
      */
-    R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword,Integer pageNum,Integer pageSize);
+    R <Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize);
 
     /**
      * 查询债券或是主体下相关的主体或是债券信息 by正杰
@@ -252,4 +253,11 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
     void addEntityeMsg(EntityInfo entityInfo);
+
+    /**
+     * 根据 id 字段名 修改
+     * @param id
+     * @param filedName
+     * @param value
+     */
 }

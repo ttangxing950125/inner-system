@@ -15,6 +15,7 @@ import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.service.ProductsService;
 import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import io.swagger.annotations.Api;
@@ -45,6 +46,7 @@ public class EntityInfoController extends BaseController {
     private SendEmailService service;
     @Autowired
     private IGovInfoService iGovInfoService;
+
 
     /**
      * 统计整体企业主体情况
@@ -340,25 +342,8 @@ public class EntityInfoController extends BaseController {
         return entityInfoService.getIng(uuid);
     }
 
-    /***
-     *覆盖查询主体
-     *
-     * @param entityOrGovByAttrVo
-     * @return R
-     * @author penTang
-     * @date 2022/10/9 15:57
-     */
-    @ApiOperation(value = "批量查询并导出excel结果")
-    @PostMapping("/getByEntity")
-    public R getEntity(@RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo) {
-        //查询政府
-        if (ObjectUtils.equals(entityOrGovByAttrVo.getEntityType(), "GV")) {
-            return iGovInfoService.getGovEntityResult(entityOrGovByAttrVo);
-        } else {
 
-        }
-        return null;
-    }
+
 
     /**
      * 财报收数根据entityCode补充录入信息--主表

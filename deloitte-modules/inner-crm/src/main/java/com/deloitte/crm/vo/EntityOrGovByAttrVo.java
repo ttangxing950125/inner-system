@@ -1,8 +1,10 @@
 package com.deloitte.crm.vo;
 
+import com.deloitte.crm.domain.Products;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -17,18 +19,19 @@ public class EntityOrGovByAttrVo {
     /***
      *用于添加的列
     */
-    List<Map<String,String>> mapList;
+    private List<Integer> proId;
 
     /***
      *政府主体-"GV"  企业主体-"Q"
      */
-    private  String EntityType;
+    private  String entityType;
 
     /***
      *主体名称(企业主体或者政府主体)
      *
      */
-    private  String EntityName;
+    @NotNull(message = "主体名称不能为空")
+    private  String entityName;
 
     private  Integer  pageNum;
 

@@ -106,6 +106,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
       <el-table
       v-if="roleId === 'role3'"
         v-loading="loading"
@@ -984,7 +991,7 @@ import {
           getRoleSupplyTask,
           getTaskByEntityCode,
           addEntityAttrValuesNew,
-          getDayTaskInfoTwo,
+          getTaskInfo,
           getTable,
           getFinances,
           getPreGovName,
@@ -998,7 +1005,11 @@ import {
           getTaskCount
         } from "@/api/task";
 import { getGovLevel, getAttrByOrganName, getTypeByAttrId, checkData } from '@/api/common'
+import pagination from "../../components/Pagination";
 export default {
+  components: {
+    pagination
+  },
   name: "Index",
   data() {
     return {
@@ -1125,7 +1136,12 @@ export default {
       detaileDig: false,
       roleId: localStorage.getItem('roleId'),
       selectRole7: [],
-      taskCount: {}
+      taskCount: {},
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10
+      },
+      total: 0
     };
   },
   mounted() {
@@ -1181,9 +1197,11 @@ export default {
           this.list3 = data
         })
         // 角色 2 相关接口
-        getDayTaskInfoTwo({date: this.nowTime }).then(res => {
+        getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
           const { data } = res
           this.list2 = data
+          this.total = data.total
+          this.queryParams.pages = data.pages
         })
 
         getTaskCount({TaskDate: this.nowTime}).then(res => {
@@ -1196,6 +1214,9 @@ export default {
         this.loading = false;
         this.$modal.closeLoading()
       }
+    },
+    getList() {
+      this.init()
     },
     changeMonth(row) {
       const parmas = {
@@ -1423,7 +1444,7 @@ export default {
       if (!row.path[0].innerText) {
         return
       }
-      const clickDay = row.path[0].innerText > 10 ? row.path[0].innerText : '0'+row.path[0].innerText
+      const clickDay = row.path[0].innerText >= 10 ? row.path[0].innerText : '0'+row.path[0].innerText
       const tbodyObj = row.path[3].localName === 'tbody' ? row.path[3].children : row.path[4].children
       const tbodyArr = Array.from(tbodyObj)
       tbodyArr.forEach(e => {
@@ -1458,9 +1479,11 @@ export default {
           this.list3 = data
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
-        getDayTaskInfoTwo({date: this.monthDate+ '-' +clickDay}).then((res) => {
+        getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
           const { data } = res
-          this.list2 = data
+          this.list2 = data.records
+          this.total = data.total
+          this.queryParams.pages = data.pages
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
         getTaskCount({TaskDate: this.monthDate+ '-' +clickDay}).then(res => {

@@ -180,9 +180,13 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE));
                 if(bondName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
                 }else{return new CheckVo().setData(bondName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
-            //债券简称
+            //债券全称
             case BOND_FULL_NAME:
-                break;
+                BondInfo bondFName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
+                        .eq(BondInfo::getIsDeleted,Boolean.FALSE));
+                if(bondFName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                }else{return new CheckVo().setData(bondFName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+
             //新地方政府地方名称
             case GOV_NAME:
                 GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
@@ -229,6 +233,6 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             default:
                 return new CheckVo().setMsg(BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }
-        return null;
+
     }
 }
