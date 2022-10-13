@@ -2,6 +2,7 @@ package com.deloitte.crm.strategy;
 
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.crm.domain.CrmWindTask;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @author 吴鹏鹏ppp
  * @date 2022/9/25
  */
+@Slf4j
 @Component
 public class WindTaskStrategyManage implements ApplicationContextAware {
 
@@ -40,20 +42,21 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
     public Object doTask(WindTaskContext windTaskContext) throws Exception {
         CrmWindTask windTask = windTaskContext.getWindTask();
         WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
-        if (supportItem==null){
+        if (supportItem == null) {
+            log.warn("上下文获取WindTaskStrategy为空缺少taskDictId={}, 任务结束!!!!!", windTask.getTaskDictId());
             return null;
         }
-
         return supportItem.doTask(windTaskContext);
     }
 
     /**
      * 获得任务详情页，上传的数据的表头
+     *
      * @return
      */
     public List<String> getDetailHeader(CrmWindTask windTask) {
         WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
-        if (supportItem==null){
+        if (supportItem == null) {
             return new ArrayList<>();
         }
 
@@ -70,7 +73,7 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
      */
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
-        if (supportItem==null){
+        if (supportItem == null) {
             return new ArrayList<>();
         }
 
@@ -78,7 +81,7 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
     }
 
 
-    public WindTaskStrategy getSupportItem(Integer taskDictId){
+    public WindTaskStrategy getSupportItem(Integer taskDictId) {
         return windTaskStrategies.stream().filter(item -> item.support(taskDictId)).findFirst().orElse(null);
     }
 

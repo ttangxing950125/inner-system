@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.BondConvertibleChangeInfoService;
@@ -49,6 +50,8 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
     private BondInfoMapper bondInfoMapper;
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
+    @Resource
+    private BondConvertibleChangeInfoMapper bondConvertibleChangeInfoMapper;
 
     @Override
     public boolean support(Integer windDictId) {
@@ -137,7 +140,19 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
                     }
                 }
             }
+            //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
+            Integer changeType = null;
+            final BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>().eq(BondConvertibleChangeInfo::getCode, item.getCode()));
+            if (bondConvertibleChangeInfo == null) {
+                changeType = DataChangeType.INSERT.getId();
+            }
+            if (!Objects.equals(bondConvertibleChangeInfo, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            } else {
+                changeType = DataChangeType.INSERT.getId();
+            }
         }
+        bondConvertibleChangeInfoMapper.insert(item);
         return new AsyncResult(new Object());
     }
 }

@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.BondConvertibleInfoService;
@@ -51,6 +52,8 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
     private BondInfoMapper bondInfoMapper;
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
+    @Resource
+    private BondConvertibleInfoMapper bondConvertibleInfoMapper;
 
 
     @Override
@@ -71,7 +74,7 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
         if (stockCnInfo != null) {
             Long attrId = 0L;
             LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            //TODO  只查询 未删除的 关系状态 1是未删除 0 是已删除
+            // 只查询 未删除的 关系状态 1是未删除 0 是已删除
             EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockCnInfo.getStockDqCode()).eq(EntityStockCnRel::getStatus, Boolean.TRUE));
             if (entityStockCnRel != null) {
                 List<EntityAttr> entityAttrsLists = entityAttrMapper.selectList(new LambdaQueryWrapper<EntityAttr>().eq(EntityAttr::getAttrType, 3));
@@ -81,12 +84,13 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
                     EntityAttr entityAttrDB = entityAttrsLists.stream().findFirst().get();
                     entityAttr.setAttrCateId(entityAttrDB.getAttrCateId());
                     entityAttr.setAttrCateName(entityAttrDB.getAttrCateName());
+                    entityAttr.setAttrType(3L);
                     entityAttr.setName("是否有可转债");
-                    attrId = Long.valueOf(entityAttrMapper.insertEntityAttr(entityAttr));
+                    attrId = Long.valueOf(entityAttrMapper.insert(entityAttr));
                 } else {
                     attrId = fiterEntityAttrsLists.get(0).getId();
                 }
-                ////TODO -失效 1-生效
+                //0-失效 1-生效
                 EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityStockCnRel.getEntityCode()).eq(EntityInfo::getStatus, 1));
                 if (entityInfo != null) {
                     EntityAttrValue entityAttrValue = entityAttrValueMapper.selectOne(new LambdaQueryWrapper<EntityAttrValue>().eq(EntityAttrValue::getAttrId, attrId).eq(EntityAttrValue::getEntityCode, entityInfo.getEntityCode()));
@@ -125,8 +129,21 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
             } else {
                 log.warn(">>>>>>>>开始到导入可转债发行【根据股票code】=>:{}查询【entity_stock_cn_rel】关联关系 数据不存在任务结束！！！！", stockCnInfo.getStockDqCode());
             }
+            //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
+            Integer changeType = null;
+            final BondConvertibleInfo bondConvertibleInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()));
+            if (bondConvertibleInfo == null) {
+                changeType = DataChangeType.INSERT.getId();
+            }
+            if (!Objects.equals(bondConvertibleInfo, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            } else {
+                changeType = DataChangeType.INSERT.getId();
+            }
+            bondConvertibleInfoMapper.insert(item);
         }
         log.warn(">>>>>>>>开始到导入可转债发行【根据公司代码】=>:{}查询数据不存在任务结束！！！！", item.getCode());
+
         return new AsyncResult(new Object());
 
     }
