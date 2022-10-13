@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.domain.EntityAttrIntype;
@@ -49,7 +50,7 @@ public class BondInfoManagerController {
         @ApiImplicitParam(name="pageNum",value="翻页控制",paramType="query",dataType = "Integer")
     })
     @PostMapping("/findBondOrEntity")
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name,String keyword,Integer pageNum,Integer pageSize) {
+    public R <Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
         //模糊匹配 查询主体||债券信息
         return iEntityInfoService.findBondOrEntity(name,keyword,pageNum,pageSize);
     }
