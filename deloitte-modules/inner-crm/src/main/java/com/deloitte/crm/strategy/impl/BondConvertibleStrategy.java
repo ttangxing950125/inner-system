@@ -86,7 +86,8 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
                     entityAttr.setAttrCateName(entityAttrDB.getAttrCateName());
                     entityAttr.setAttrType(3L);
                     entityAttr.setName("是否有可转债");
-                    attrId = Long.valueOf(entityAttrMapper.insert(entityAttr));
+                    entityAttrMapper.insert(entityAttr);
+                    attrId = Long.valueOf(entityAttrMapper.selectOne(new LambdaQueryWrapper<EntityAttr>().eq(EntityAttr::getName, "是否有可转债")).getId());
                 } else {
                     attrId = fiterEntityAttrsLists.get(0).getId();
                 }
