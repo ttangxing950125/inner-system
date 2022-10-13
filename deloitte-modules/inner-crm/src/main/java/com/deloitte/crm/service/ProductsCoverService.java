@@ -2,6 +2,10 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.ProductsCover;
+import com.deloitte.crm.dto.ProductCoverDto;
+import com.deloitte.crm.vo.EntityOrGovByAttrVo;
+
+import java.util.List;
 
 /**
  * @author PenTang
@@ -10,5 +14,5 @@ import com.deloitte.crm.domain.ProductsCover;
 public interface ProductsCoverService extends IService<ProductsCover> {
 
 
-
+    List<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo);
 }

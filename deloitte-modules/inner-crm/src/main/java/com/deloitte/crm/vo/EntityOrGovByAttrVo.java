@@ -19,6 +19,7 @@ public class EntityOrGovByAttrVo {
      *用于添加的列
     */
       List<Products> ProductsList;
+    private List<Integer> proId;
 
     /***
      *政府主体-"GV"  企业主体-"Q"
