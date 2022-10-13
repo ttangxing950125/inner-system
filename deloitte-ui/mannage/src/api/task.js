@@ -361,3 +361,15 @@ export function ignoreTask(params) {
     data: params,
   });
 }
+
+// 获取当日任务
+export function getTaskCount(params) {
+  return request({
+    url: "crm/windTask/getTaskCount?TaskDate=" + params.TaskDate,
+    headers: {
+      isToken: true,
+    },
+    method: "get",
+    data: params,
+  });
+}

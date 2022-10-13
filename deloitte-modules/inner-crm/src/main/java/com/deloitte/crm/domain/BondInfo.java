@@ -1,13 +1,15 @@
 package com.deloitte.crm.domain;
 
 import java.util.Date;
-
 import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.annotation.Excel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * 【请填写功能名称】对象 bond_info
@@ -26,6 +28,12 @@ public class BondInfo {
      * $column.columnComment
      */
     private Long id;
+
+    /**
+     * 债券全称
+     */
+    @Excel(name = "债券全称")
+    private String bondName;
 
     /**
      * 债券状态 n1-等待发行\n 2-正在发行 3-\n已发行待上市\n \r\n4-成功上市 5-推迟发行\r\n6-\n发行失败 7-违约\r\n8-展期
@@ -49,6 +57,16 @@ public class BondInfo {
      */
     @Excel(name = "债券简称")
     private String bondShortName;
+
+
+    /** 起息日*/
+    @ApiModelProperty(value="起息日")
+    private String  valueDate ;
+
+    /** 到期日*/
+    @ApiModelProperty(value="到期日")
+    private  String  dueDate ;
+
 
     /**
      * 公私募类型 0_公募 1_私募

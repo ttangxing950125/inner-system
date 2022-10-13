@@ -1,7 +1,8 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
 import com.deloitte.crm.domain.EntityMaster;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口

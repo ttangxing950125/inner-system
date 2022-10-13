@@ -45,6 +45,7 @@ public class EntityInfoController extends BaseController {
     private SendEmailService service;
     @Autowired
     private IGovInfoService iGovInfoService;
+
     /**
      * 统计整体企业主体情况
      *
@@ -290,7 +291,7 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 覆盖情况快速查询
+     * 快速查询企业上市或发债情况
      *
      * @param param
      * @param pageNum
@@ -299,13 +300,13 @@ public class EntityInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
-    @ApiOperation(value = "覆盖情况快速查询")
+    @ApiOperation(value = "快速查询企业上市或发债情况")
     @PostMapping("/getQuickOfCoverage")
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);
     }
 
-    /***
+    /**
      *批量查询并导出excel结果
      *
      * @param file
@@ -313,25 +314,28 @@ public class EntityInfoController extends BaseController {
      * @return R
      * @author penTang
      * @date 2022/10/9 15:57
-    */
+     */
     @ApiOperation(value = "批量查询并导出excel结果")
     @PostMapping("/importExcelByEntity")
-    public R importExcelByEntity(@RequestParam("file") MultipartFile file,@RequestParam("uuid") String uuid){
-        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file,uuid);
+    public R importExcelByEntity(@RequestParam("file") MultipartFile file, @RequestParam("uuid") String uuid) {
+        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file, uuid);
         R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos);
         return excelWriter;
-    };
+    }
+
+    ;
+
     /**
-     *查询匹配进度
+     * 查询匹配进度
      *
      * @return R
      * @author penTang
      * @date 2022/10/10 20:33
-    */
+     */
     @ApiOperation(value = "查询匹配进度")
     @PostMapping("/getChecking")
-    public R getChecking(String uuid){
-      return entityInfoService.getIng(uuid);
+    public R getChecking(String uuid) {
+        return entityInfoService.getIng(uuid);
     }
 
     /***
@@ -344,14 +348,36 @@ public class EntityInfoController extends BaseController {
      */
     @ApiOperation(value = "批量查询并导出excel结果")
     @PostMapping("/getByEntity")
-    public R getEntity(@RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo){
+    public R getEntity(@RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo) {
         //查询政府
-      if (ObjectUtils.equals(entityOrGovByAttrVo.getEntityType(),"GV")){
-           return iGovInfoService.getGovEntityResult(entityOrGovByAttrVo);
-      }else{
+        if (ObjectUtils.equals(entityOrGovByAttrVo.getEntityType(), "GV")) {
+            return iGovInfoService.getGovEntityResult(entityOrGovByAttrVo);
+        } else {
 
-      }
+        }
         return null;
     }
 
+    /**
+     * 财报收数根据entityCode补充录入信息--主表
+     *
+     * @param entityInfo
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/12 9:51
+     */
+    @ApiOperation(value = "财报收数根据entityCode补充录入信息--主表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "reportType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "listType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shenWanMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
+    })
+    @PostMapping("/addEntityeMsg")
+    public R addEntityeMsg(@RequestBody EntityInfo entityInfo) {
+        entityInfoService.addEntityeMsg(entityInfo);
+        return R.ok();
+    }
 }

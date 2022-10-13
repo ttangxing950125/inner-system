@@ -1,17 +1,24 @@
 package com.deloitte.crm.service.impl;
+
 import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.dto.TaskDto;
+import com.deloitte.crm.mapper.CrmEntityTaskMapper;
+import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
@@ -20,22 +27,25 @@ import com.deloitte.crm.vo.WindTaskDetailsVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.dto.CrmWindTaskDto;
+import com.deloitte.system.api.domain.SysRole;
+import com.deloitte.system.api.model.LoginUser;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.domain.CrmWindTask;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.annotation.Resource;
+
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * 角色1的每日任务，导入wind文件的任务Service业务层处理
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
 @Service
-public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWindTask> implements ICrmWindTaskService
-{
+public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWindTask> implements ICrmWindTaskService {
     @Resource
     private CrmWindTaskMapper crmWindTaskMapper;
 
@@ -57,8 +67,16 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Resource
     private SendEmailService sendEmailService;
 
+    @Resource
+    private CrmMasTaskMapper crmMasTaskMapper;
+    @Resource
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
+    @Resource
+    private CrmEntityTaskMapper crmEntityTaskMapper;
+
     /**
      * 导入wind文件
+     *
      * @param taskId
      * @param file
      * @return
@@ -67,11 +85,11 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     public Object doTask(Long taskId, MultipartFile file) throws Exception {
         //查询当前任务
         CrmWindTask windTask = crmWindTaskMapper.selectCrmWindTaskById(taskId);
-        if (windTask==null){
+        if (windTask == null) {
             throw new GlobalException("没有该任务");
         }
         //任务是否完成，已完成不允许上传
-        if (!Objects.equals(windTask.getComplete(), 0)){
+        if (!Objects.equals(windTask.getComplete(), 0)) {
             throw new GlobalException("只能处理未处理的任务");
         }
 
@@ -82,7 +100,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         int compare = DateUtil.compare(taskDate, timeNow, "yyyy-MM-dd");
 
         //只能完成当天的
-        if (compare!=0){
+        if (compare != 0) {
             throw new GlobalException("只能完成当天的任务");
         }
 
@@ -114,7 +132,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 .in(CrmWindTask::getComplete, 0, 2);
 
         long count = this.count(wrapper);
-        if (count!=0){
+        if (count != 0) {
             //代表还有任务未完成
             return false;
         }
@@ -134,9 +152,9 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         long entityTaskCount = crmEntityTaskService.count(entityTaskQue);
 
         //发送邮件给角色6|7
-        sendEmailService.SendEmail(RoleInfo.ROLE6.getId(),"新任务：新增主体"+entityTaskCount+"个待确认",
-                "今日wind导入任务已完成，平台捕获"+entityTaskCount+"个疑似新增主体需要确认。" +
-                "请尽快登陆平台完成相关任务。");
+        sendEmailService.SendEmail(RoleInfo.ROLE6.getId(), "新任务：新增主体" + entityTaskCount + "个待确认",
+                "今日wind导入任务已完成，平台捕获" + entityTaskCount + "个疑似新增主体需要确认。" +
+                        "请尽快登陆平台完成相关任务。");
 
         //发邮件给角色2
         Wrapper<CrmMasTask> masTaskQue = Wrappers.<CrmMasTask>lambdaQuery()
@@ -144,8 +162,8 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
         long entityMasCount = crmMasTaskService.count(masTaskQue);
 
-        sendEmailService.SendEmail(RoleInfo.ROLE2.getId(),"新任务：待划分敞口主体"+entityMasCount+"个",
-                "今日新增主体确认任务已完成，共计新增 "+entityMasCount+" 个主体需划分敞口。" +
+        sendEmailService.SendEmail(RoleInfo.ROLE2.getId(), "新任务：待划分敞口主体" + entityMasCount + "个",
+                "今日新增主体确认任务已完成，共计新增 " + entityMasCount + " 个主体需划分敞口。" +
                         "请尽快登陆平台完成相关任务。" +
                         "请尽快登陆平台完成相关任务。");
 
@@ -158,6 +176,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
 
     /**
      * 角色1 任务详情页面
+     *
      * @param taskCateId
      * @param taskDate
      * @return
@@ -192,111 +211,133 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
      * @return List<CrmWindTask>
      * @author penTang
      * @date 2022/9/22 17:04
-    */
+     */
     @Override
-    public List<CrmWindTask> selectCrmWindTask(@RequestBody String TaskDate, String TaskCateId){
-       return list(new LambdaQueryWrapper<CrmWindTask>()
-                .eq(CrmWindTask ::getTaskDate,TaskDate)
-                .eq(CrmWindTask :: getTaskCateId,TaskCateId));
+    public List<CrmWindTask> selectCrmWindTask(@RequestBody String TaskDate, String TaskCateId) {
+        return list(new LambdaQueryWrapper<CrmWindTask>()
+                .eq(CrmWindTask::getTaskDate, TaskDate)
+                .eq(CrmWindTask::getTaskCateId, TaskCateId));
     }
 
 
     /**
-     *根据指定日期查询任务完成度实现
-     *
-     * @return List<CrmWindTaskDto>
-     * @author penTang
-     * @date 2022/9/22 10:51
-    */
-    @Override
-    public List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo){
-        Page<CrmWindTaskDto> page = new Page<>(crmTaskVo.getPageNum(),crmTaskVo.getPageSize());
-        List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(page,crmTaskVo.getTaskDate());
-        return crmWindTaskDtos;
-    }
-
-    /**
-     *批量保存每日角色任务信息
+     * 根据指定日期查询任务完成度实现
      *
      * @return List<CrmWindTaskDto>
      * @author penTang
      * @date 2022/9/22 10:51
      */
     @Override
-    public Boolean saveCrmWindTas(List<CrmWindTask> crmWind){
-       return saveBatch(crmWind);
+    public List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo) {
+        Page<CrmWindTaskDto> page = new Page<>(crmTaskVo.getPageNum(), crmTaskVo.getPageSize());
+        List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(page, crmTaskVo.getTaskDate());
+        return crmWindTaskDtos;
+    }
+
+    /**
+     * 根据指定日期查询任务完成信息(当前登录人)
+     *
+     * @param taskDate
+     * @return List<TaskDto>
+     * @author penTang
+     * @date 2022/10/11 18:56
+     */
+    @Override
+    public TaskDto getTaskCompletedByDate(String taskDate) {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        SysRole roleInfo = loginUser.getRoleInfo();
+        if (roleInfo != null) {
+            if (roleInfo.getRoleId() == 3) {
+                return crmWindTaskMapper.selctCrmCount(taskDate);
+            } else if (roleInfo.getRoleId() == 4) {
+                return crmMasTaskMapper.selectCrmMasTaskCount(taskDate);
+
+            } else if (roleInfo.getRoleId() == 5 || roleInfo.getRoleId() == 6 || roleInfo.getRoleId() == 7) {
+                return crmSupplyTaskMapper.selctCrmCount(taskDate);
+            } else if (roleInfo.getRoleId() == 8) {
+                crmEntityTaskMapper.selctCrmEntityTaskCount(taskDate);
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 批量保存每日角色任务信息
+     *
+     * @return List<CrmWindTaskDto>
+     * @author penTang
+     * @date 2022/9/22 10:51
+     */
+    @Override
+    public Boolean saveCrmWindTas(List<CrmWindTask> crmWind) {
+        return saveBatch(crmWind);
     }
 
 
     /**
      * 查询角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param id 角色1的每日任务，导入wind文件的任务主键
      * @return 角色1的每日任务，导入wind文件的任务
      */
     @Override
-    public CrmWindTask selectCrmWindTaskById(Long id)
-    {
+    public CrmWindTask selectCrmWindTaskById(Long id) {
         return crmWindTaskMapper.selectCrmWindTaskById(id);
     }
 
     /**
      * 查询角色1的每日任务，导入wind文件的任务列表
-     * 
+     *
      * @param crmWindTask 角色1的每日任务，导入wind文件的任务
      * @return 角色1的每日任务，导入wind文件的任务
      */
     @Override
-    public List<CrmWindTask> selectCrmWindTaskList(CrmWindTask crmWindTask)
-    {
+    public List<CrmWindTask> selectCrmWindTaskList(CrmWindTask crmWindTask) {
         return crmWindTaskMapper.selectCrmWindTaskList(crmWindTask);
     }
 
     /**
      * 新增角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param crmWindTask 角色1的每日任务，导入wind文件的任务
      * @return 结果
      */
     @Override
-    public int insertCrmWindTask(CrmWindTask crmWindTask)
-    {
+    public int insertCrmWindTask(CrmWindTask crmWindTask) {
         return crmWindTaskMapper.insertCrmWindTask(crmWindTask);
     }
 
     /**
      * 修改角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param crmWindTask 角色1的每日任务，导入wind文件的任务
      * @return 结果
      */
     @Override
-    public int updateCrmWindTask(CrmWindTask crmWindTask)
-    {
+    public int updateCrmWindTask(CrmWindTask crmWindTask) {
         return crmWindTaskMapper.updateCrmWindTask(crmWindTask);
     }
 
     /**
      * 批量删除角色1的每日任务，导入wind文件的任务
-     * 
+     *
      * @param ids 需要删除的角色1的每日任务，导入wind文件的任务主键
      * @return 结果
      */
     @Override
-    public int deleteCrmWindTaskByIds(Long[] ids)
-    {
+    public int deleteCrmWindTaskByIds(Long[] ids) {
         return crmWindTaskMapper.deleteCrmWindTaskByIds(ids);
     }
 
     /**
      * 删除角色1的每日任务，导入wind文件的任务信息
-     * 
+     *
      * @param id 角色1的每日任务，导入wind文件的任务主键
      * @return 结果
      */
     @Override
-    public int deleteCrmWindTaskById(Long id)
-    {
+    public int deleteCrmWindTaskById(Long id) {
         return crmWindTaskMapper.deleteCrmWindTaskById(id);
     }
 

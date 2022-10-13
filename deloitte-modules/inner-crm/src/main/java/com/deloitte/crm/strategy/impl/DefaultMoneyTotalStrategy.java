@@ -70,7 +70,7 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
     public Future<Object> doBondImport(DefaultMoneyTotal moneyTotal, Date timeNow, CrmWindTask windTask) {
         try {
             String shortName = moneyTotal.getBondAbstract();
-            BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+            BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName,Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
             if (moneyTotal.getLatestStatus().equals("实质违约")) {
                 bondInfo.setBondStatus(7);
                 bondInfo.setBondState(1);

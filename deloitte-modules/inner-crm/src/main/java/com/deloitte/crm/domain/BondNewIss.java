@@ -318,19 +318,19 @@ public class BondNewIss implements Serializable
 
     /** 是否发行失败 */
     @Excel(name = "是否发行失败")
-    private Integer issStatus;
+    private String issStatus;
 
     /** 是否城投债 */
     @Excel(name = "是否城投债")
-    private Integer isCiBond;
+    private String isCiBond;
 
     /** 是否增发 */
     @Excel(name = "是否增发")
-    private Integer addIssStatus;
+    private String addIssStatus;
 
     /** 是否跨市场 */
     @Excel(name = "是否跨市场")
-    private Integer crossMarket;
+    private String crossMarket;
 
     /** 面值 */
     @Excel(name = "面值")

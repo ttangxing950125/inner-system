@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author 正杰
  * @description: MasDto
@@ -41,6 +43,7 @@ public class MasDto {
      * 主体code
      */
     @ApiModelProperty(value = "主体code")
+    @NotNull(message = "企业的主体code可能 无效 或是 空")
     private String entityCode;
 
     /**
@@ -50,6 +53,7 @@ public class MasDto {
      * 2、N：若在已有目前名单中不存在，即为非名单判断金融机构
      */
     @ApiModelProperty(value = "是否为金融机构（名单判断）")
+    @NotNull(message = "是否为金融机构 不能为空")
     private String isFinance;
 
     /**
@@ -66,6 +70,7 @@ public class MasDto {
      * 2、N：不是YY口径下城投机构
      */
     @ApiModelProperty(value = "是否为城投机构（YY)")
+    @NotNull(message = "是否为城投机构 不能为空")
     private String city;
 
     /**
@@ -75,6 +80,7 @@ public class MasDto {
      * 2、N：不是中诚信口径下城投机构
      */
     @ApiModelProperty(value = "中诚信-是否为城投机构")
+    @NotNull(message = "中诚信-是否为城投机构 不能为空")
     private String cityZhong;
 
     /**
@@ -84,6 +90,7 @@ public class MasDto {
      * 2、N：不是YY口径下城投机构
      */
     @ApiModelProperty(value = "IB-是否为城投机构")
+    @NotNull(message = "IB-是否为城投机构 不能为空")
     private String cityIb;
 
     /**
@@ -104,6 +111,7 @@ public class MasDto {
      *  需要通过这个字段取 entity_master 新增一个 entitycode和 它的关联关系
      */
     @ApiModelProperty(value = "敞口的code")
+    @NotNull(message = "敞口的code 不能为空")
     private String masterCode;
 
 }

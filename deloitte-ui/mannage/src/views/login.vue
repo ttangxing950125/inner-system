@@ -174,7 +174,7 @@ export default {
             .then(() => {
               this.$router.push({ path: this.redirect || "/" }).catch(() => {});
             })
-            .catch(() => {
+            .catch((err) => {
               this.loading = false;
               if (this.captchaOnOff) {
                 this.getCode();

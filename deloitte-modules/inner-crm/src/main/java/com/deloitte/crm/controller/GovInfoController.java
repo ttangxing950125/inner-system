@@ -110,12 +110,17 @@ public class GovInfoController extends BaseController {
 
     /**
      * 新增地方政府
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/12 17:10
      */
-    @RequiresPermissions("crm:govInfo:add")
+//    @RequiresPermissions("crm:govInfo:add")
     @Log(title = "【新增地方政府】", businessType = BusinessType.INSERT)
     @PostMapping("/add")
-    public AjaxResult add(@RequestBody GovInfo govInfo) {
-        return toAjax(govInfoService.insertGovInfo(govInfo));
+    public R add(@RequestBody GovInfo govInfo) {
+        govInfoService.insertGovInfo(govInfo);
+        return R.ok();
     }
 
     /**
@@ -254,13 +259,13 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 分页查询全部政府主体
+     * 地方政府-更多指标
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
-    @ApiOperation(value = "分页查询全部政府主体")
+    @ApiOperation(value = "地方政府-更多指标")
     @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody GovAttrByDto govAttrDto) {
@@ -304,9 +309,24 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/29 15:49
      */
     @ApiOperation(value = "获取省市级数据")
-    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "body", example = "GV10110", dataType = "Integer")
+    @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "query", example = "GV10110", dataType = "Integer")
     @PostMapping("/getGovLevel")
     public R getGovLevel(String preGovCode) {
         return R.ok(govInfoService.getGovLevel(preGovCode));
     }
+
+
+    /**
+     * 地方政府-更多指标-主体范围
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/11 17:10
+     */
+    @ApiOperation(value = "地方政府-更多指标-主体范围")
+    @PostMapping("/getGovRange")
+    public R getGovRange() {
+        return R.ok(govInfoService.getGovRange());
+    }
+
 }

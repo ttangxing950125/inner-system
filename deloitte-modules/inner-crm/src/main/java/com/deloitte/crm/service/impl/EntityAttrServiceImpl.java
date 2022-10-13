@@ -8,12 +8,10 @@ import com.deloitte.crm.constants.CacheName;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.dto.EntitySupplyBack;
 import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -135,7 +133,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     @Override
     public R getAllByGroup(Integer type) {
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
-        List<EntityAttr> entityAttrs = entityAttrMapper.selectList((query.lambda().eq(EntityAttr::getAttrType,type)));
+        List<EntityAttr> entityAttrs = entityAttrMapper.selectList((query.lambda().eq(EntityAttr::getAttrType, type)));
 
         Map<String, List<EntityAttr>> listMap = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getAttrCateName));
         List<Map<String, Object>> result = new ArrayList<>();
@@ -194,28 +192,15 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
         return valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, entityCode));
     }
 
-    @Autowired
-    private GovInfoMapper govInfoMapper;
-
     @Override
     public R getTaskByEntityCode(String entityCode, Integer roleId) {
         //封装企业返回信息
         EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
 
-        switch (roleId) {
-            case 5:
-                //获取城投企业基础信息
-                QueryWrapper<GovInfo> govInfoQuery = new QueryWrapper<>();
-                GovInfo govInfo = govInfoMapper.selectOne(govInfoQuery.lambda().eq(GovInfo::getDqGovCode, entityCode));
-                entitySupplyBack.setGovInfo(govInfo);
-                break;
-            default:
-                //获取企业基础信息
-                QueryWrapper<EntityInfo> entityuInfoQuery = new QueryWrapper<>();
-                EntityInfo entityInfo = entityInfoMapper.selectOne(entityuInfoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
-                entitySupplyBack.setEntityInfo(entityInfo);
-                break;
-        }
+        //获取企业基础信息
+        QueryWrapper<EntityInfo> entityuInfoQuery = new QueryWrapper<>();
+        EntityInfo entityInfo = entityInfoMapper.selectOne(entityuInfoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+        entitySupplyBack.setEntityInfo(entityInfo);
 
         //获取属性信息
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(new QueryWrapper<>());
@@ -231,9 +216,9 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
     @Override
     public Map<String, List<EntityAttr>> getAttrByOrganName(String organName) {
-        QueryWrapper<EntityAttr>query=new QueryWrapper<>();
+        QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));
-        if (CollectionUtils.isEmpty(entityAttrs)){
+        if (CollectionUtils.isEmpty(entityAttrs)) {
             return null;
         }
         Map<String, List<EntityAttr>> collect = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getName));

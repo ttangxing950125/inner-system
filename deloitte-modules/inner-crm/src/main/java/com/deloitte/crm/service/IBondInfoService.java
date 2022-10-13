@@ -77,7 +77,7 @@ public interface IBondInfoService
      * @param shortName
      * @return
      */
-    BondInfo findByShortName(String shortName);
+    BondInfo findByShortName(String shortName,Boolean isDeleted);
 
     /**
      * 根据id保存或新增

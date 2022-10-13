@@ -13,16 +13,14 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.EntityNameHis;
-import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
+import com.deloitte.crm.domain.dto.GovAttrByDtoBack;
 import com.deloitte.crm.domain.dto.GovInfoResult;
+import com.deloitte.crm.domain.dto.GovRangeValue;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.mapper.EntityNameHisMapper;
-import com.deloitte.crm.mapper.GovInfoMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
@@ -69,6 +67,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Resource
     private EntityNameHisMapper nameHisMapper;
+
+    @Autowired
+    private EntityAttrIntypeMapper intypeMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -327,7 +328,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //获取基础参数信息
         List<Map<String, String>> mapList = govAttrByDto.getMapList();
 
-        List<GovInfo> govInfos  = govInfoMapper.getGovByAttrValue(govAttrByDto);
+        List<GovInfo> govInfos = govInfoMapper.getGovByAttrValue(govAttrByDto);
 
         //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
@@ -429,15 +430,15 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
 
-        Page<GovInfoResult> pageResult = new Page<>(pageNum,pageSize);
+        Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
         List<Map<String, String>> mapList = entityAttrDto.getMapList();
 
-        pageNum=(pageNum-1)*pageSize;
+        pageNum = (pageNum - 1) * pageSize;
         entityAttrDto.setPageNum(pageNum);
         //查询页面数据
-        List<GovInfo> records=govInfoMapper.getGovByAttrValueByPage(entityAttrDto);
+        List<GovInfo> records = govInfoMapper.getGovByAttrValueByPage(entityAttrDto);
         //查询条数
-        Integer count=govInfoMapper.getGovCountByAttrValue(entityAttrDto);
+        Integer count = govInfoMapper.getGovCountByAttrValue(entityAttrDto);
 
         pageResult.setTotal(count);
 
@@ -687,20 +688,141 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     /**
-     *覆盖查询政府主体
+     * 覆盖查询政府主体
      *
      * @return R
      * @author penTang
      * @date 2022/10/10 14:38
-    */
+     */
     @Override
-    public R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo){
+    public R getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo) {
 
-        Page<GovInfoBynameDto> page= new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
+        Page<GovInfoBynameDto> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
 
-        return R.ok( govInfoMapper.getGovByname(page, entityOrGovByAttrVo.getEntityName()));
+        return R.ok(govInfoMapper.getGovByname(page, entityOrGovByAttrVo.getEntityName()));
+    }
 
+    /**
+     * 地方政府-更多指标-主体范围
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/11 17:10
+     */
+    @Autowired
+    private GovLevelMapper govLevelMapper;
 
+    @Override
+    public GovAttrByDtoBack getGovRange() {
+        GovAttrByDtoBack govAttrByDto = new GovAttrByDtoBack();
+//        省级行政区 1 地级行政区 2 县级行政区 3 经开高新区 4
+        govAttrByDto=setAdministrationRegion(govAttrByDto);
+//        八大经济区
+        govAttrByDto=setEightEconomicsRegion(govAttrByDto);
+//        19个城市群
+        govAttrByDto=setNineteenCityGroup(govAttrByDto);
 
+//        城市规模
+        govAttrByDto=setGovScale(govAttrByDto);
+//        城市分级
+        govAttrByDto=setGovGrading(govAttrByDto);
+
+//        国家中心城市
+//        省会城市
+//        百强县
+        return govAttrByDto;
+    }
+    //返回筛选范围--城市分级
+    private GovAttrByDtoBack setGovGrading(GovAttrByDtoBack govAttrByDto) {
+        QueryWrapper<EntityAttrIntype>intypeQuery=new QueryWrapper<>();
+        List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 24));
+        List<GovRangeValue> nineteenCity=new ArrayList<>();
+        entityAttrIntypes.stream().forEach(o->{
+            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(),o.getValue());
+            nineteenCity.add(govRangeValue);
+        });
+        govAttrByDto.setNineteenCity(nineteenCity);
+        return govAttrByDto;
+    }
+
+    //返回筛选范围--城市规模
+    private GovAttrByDtoBack setGovScale(GovAttrByDtoBack govAttrByDto) {
+        QueryWrapper<EntityAttrIntype>intypeQuery=new QueryWrapper<>();
+        List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 23));
+        List<GovRangeValue> nineteenCity=new ArrayList<>();
+        entityAttrIntypes.stream().forEach(o->{
+            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(),o.getValue());
+            nineteenCity.add(govRangeValue);
+        });
+        govAttrByDto.setNineteenCity(nineteenCity);
+        return govAttrByDto;
+    }
+
+    //返回筛选范围--设置19个城市群
+    private GovAttrByDtoBack setNineteenCityGroup(GovAttrByDtoBack govAttrByDto) {
+        QueryWrapper<EntityAttrIntype>intypeQuery=new QueryWrapper<>();
+        List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 21));
+        List<GovRangeValue> nineteenCity=new ArrayList<>();
+        entityAttrIntypes.stream().forEach(o->{
+            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(),o.getValue());
+            nineteenCity.add(govRangeValue);
+        });
+        govAttrByDto.setNineteenCity(nineteenCity);
+        return govAttrByDto;
+    }
+
+    //返回筛选范围--设置八大经济区
+    private GovAttrByDtoBack setEightEconomicsRegion(GovAttrByDtoBack govAttrByDto) {
+        QueryWrapper<EntityAttrIntype>intypeQuery=new QueryWrapper<>();
+        List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 20));
+        List<GovRangeValue> eightER=new ArrayList<>();
+        entityAttrIntypes.stream().forEach(o->{
+            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(),o.getValue());
+            eightER.add(govRangeValue);
+        });
+        govAttrByDto.setEightER(eightER);
+        return govAttrByDto;
+    }
+    //返回筛选范围--设置城市级别数据
+    private GovAttrByDtoBack setAdministrationRegion(GovAttrByDtoBack govAttrByDto) {
+        QueryWrapper<GovLevel> levelQuery = new QueryWrapper<>();
+        Map<Long, List<GovLevel>> levelMap = govLevelMapper.selectList(levelQuery.lambda().isNotNull(GovLevel::getParentId))
+                .stream().collect(Collectors.groupingBy(GovLevel::getParentId));
+        for (Long parentId:levelMap.keySet()){
+            if (parentId==1L){
+                List<GovLevel> govLevels = levelMap.get(parentId);
+                List<GovRangeValue> isProvince=new ArrayList<>();
+                for (GovLevel level:govLevels){
+                    GovRangeValue govRangeValue=new GovRangeValue(level.getName(),level.getId());
+                    isProvince.add(govRangeValue);
+                }
+                govAttrByDto.setIsProvince(isProvince);
+            }else if (parentId==2L){
+                List<GovLevel> govLevels = levelMap.get(parentId);
+                List<GovRangeValue> isCity=new ArrayList<>();
+                for (GovLevel level:govLevels){
+                    GovRangeValue govRangeValue=new GovRangeValue(level.getName(),level.getId());
+                    isCity.add(govRangeValue);
+                }
+                govAttrByDto.setIsCity(isCity);
+            }else if (parentId==3L){
+                List<GovLevel> govLevels = levelMap.get(parentId);
+                List<GovRangeValue> isCounty=new ArrayList<>();
+                for (GovLevel level:govLevels){
+                    GovRangeValue govRangeValue=new GovRangeValue(level.getName(),level.getId());
+                    isCounty.add(govRangeValue);
+                }
+                govAttrByDto.setIsCounty(isCounty);
+            }else if (parentId==4L){
+                List<GovLevel> govLevels = levelMap.get(parentId);
+                List<GovRangeValue> isJKGX=new ArrayList<>();
+                for (GovLevel level:govLevels){
+                    GovRangeValue govRangeValue=new GovRangeValue(level.getName(),level.getId());
+                    isJKGX.add(govRangeValue);
+                }
+                govAttrByDto.setIsJKGX(isJKGX);
+            }
+        }
+        return govAttrByDto;
     }
 }

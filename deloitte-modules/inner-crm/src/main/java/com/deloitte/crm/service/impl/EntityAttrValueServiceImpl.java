@@ -1,11 +1,6 @@
 package com.deloitte.crm.service.impl;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.lang.annotation.Annotation;
-import java.text.DecimalFormat;
-import java.util.*;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,37 +8,26 @@ import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.StrUtil;
-import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.domain.EntityAttr;
-import com.deloitte.crm.domain.EntityAttrIntype;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.dto.AttrValueMapDto;
-import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
-import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.service.EntityAttrIntypeService;
 import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.mapper.*;
-import com.deloitte.crm.service.IBondInfoService;
-import com.deloitte.crm.service.ICrmSupplyTaskService;
-import com.deloitte.crm.service.IEntityAttrService;
-import com.deloitte.crm.service.IEntityAttrValueService;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.AttrValueUtils;
-import lombok.AllArgsConstructor;
 import com.deloitte.crm.vo.EntityByIondVo;
 import com.deloitte.crm.vo.EntityStockInfoVo;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.*;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -59,14 +43,11 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
     private IEntityAttrService entityAttrService;
 
-
     private ICrmSupplyTaskService iCrmSupplyTaskService;
-
     @Resource
     private EntityInfoMapper entityInfoMapper;
     @Resource
     private StockCnInfoMapper stockCnInfoMapper;
-
     @Resource
     private IBondInfoService bondInfoService;
 
@@ -84,6 +65,12 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     private EntityStockThkRelMapper EntityStockThkRelMapper;
 
     private EntityAttrIntypeService entityAttrIntypeService;
+
+    private EntityFinancialMapper entityFinancialmapper;
+
+    private EntityInfoLogsMapper entityInfoLogsMapper;
+
+    private EntityMasterMapper entityMasterMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -243,24 +230,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         return this.updateAttrValue(code, item, 5, Excel.class, "name");
     }
 
-    @Override
-    public Integer addEntityAttrValues(List<EntityAttrValue> valueList) {
-        valueList.stream().forEach(o -> {
-            QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
-            String attrId = o.getAttrId().toString();
-            if (attrId.equals(Common.WHETHER_ATTR_NAME_SW_ID.toString())
-                    || attrId.equals(Common.WWHETHER_ATTR_NAME_WIND_ID.toString())) {
-                int num = entityAttrValueMapper.update(o, query.lambda().eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
-                if (num == 0) {
-                    entityAttrValueMapper.insert(o);
-                }
-            } else {
-                entityAttrValueMapper.insert(o);
-            }
-        });
-        return valueList.size();
-    }
-
     /**
      *
      *   ****************
@@ -372,57 +341,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         return list;
     }
 
-    @Override
-    public Object addEntityAttrValuesNew(Map<String, Object> valueMap) {
-        Object entityCode = valueMap.get("entityCode");
-        List<EntityAttrValue> valueList = new ArrayList<>();
-        //封装存储的值
-        for (String key : valueMap.keySet()) {
-            if (ObjectUtil.equal("entityCode", key)) {
-                continue;
-            }
-            Long attrId = getAttrId(key);
-            if (attrId == 0L) {
-                continue;
-            }
-            //判断为空则返回
-            Object value = valueMap.get(key);
-            if (ObjectUtils.isEmpty(value)){
-                continue;
-            }
-            //判断是否是数组，如果是，则循环存储
-            if (value.getClass().isArray()) {
-                int len = Array.getLength(value);
-                Object[] obj = new Object[len];
-                for (int i = 0; i < len; i++) {
-                    obj[i] = Array.get(obj, i);
-                }
-                for (Object o : obj) {
-                    EntityAttrValue attrValue = new EntityAttrValue();
-                    attrValue.setEntityCode(entityCode.toString());
-                    attrValue.setAttrId(attrId);
-                    attrValue.setValue(o.toString());
-                    valueList.add(attrValue);
-                }
-                continue;
-            }
-            EntityAttrValue attrValue = new EntityAttrValue();
-            attrValue.setEntityCode(entityCode.toString());
-            attrValue.setAttrId(attrId);
-            attrValue.setValue(value.toString());
-            valueList.add(attrValue);
-        }
-        addEntityAttrValues(valueList);
-
-        String id = valueMap.get("id").toString();
-        String remark = "";
-        if (!ObjectUtils.isEmpty(valueMap.get("备注"))) {
-            remark = valueMap.get("备注").toString();
-        }
-        return R.ok(iCrmSupplyTaskService.completeRoleSupplyTask(Long.valueOf(id), remark));
-    }
-
-
     //根据 key 名称，获取 attrId
     private Long getAttrId(String key) {
         Long id = 0L;
@@ -513,8 +431,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     public R createBondEntity(EntityByIondVo entityByIondVo) {
         //creditCode和bondShortName进行查重操作
         EntityInfo entityInfo1 = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByIondVo.getCreditCode()));
-        BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName());
-
+        BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName(),Boolean.FALSE);
         if (!ObjectUtils.isEmpty(byShortName) || !ObjectUtils.isEmpty(entityInfo1)) {
             return R.fail("新增失败：社会信用代码或债券简称重复不能进行新增");
         }
@@ -522,6 +439,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         EntityInfo entityInfo = new EntityInfo();
         entityInfo.setCreditCode(entityByIondVo.getCreditCode());
         entityInfo.setEntityName(entityByIondVo.getEntityName());
+        entityInfo.setListType(entityByIondVo.getAnRportType());
         if (Objects.equals(entityByIondVo.getCreditError(), "0")) {
             entityInfo.setCreditError(0);
         }
@@ -553,6 +471,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         bondInfo.setBondCode("BD" + startZeroStr);
         bondInfo.setOriCode(entityByIondVo.getStockCode());
         bondInfo.setBondShortName(entityByIondVo.getBondShortName());
+        bondInfo.setBondName(entityByIondVo.getBondName());
+        bondInfo.setValueDate(entityByIondVo.getStartXiDate());
+        bondInfo.setDueDate(entityByIondVo.getEndDate());
+        bondInfo.setRaiseType(entityByIondVo.getBondType());
         bondInfoMapper.insertBondInfo(bondInfo);
         // 新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
@@ -569,53 +491,21 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
         entityBondRel.setEntityCode(entityInfo.getEntityCode());
         entityBondRelMapper.insertEntityBondRel(entityBondRel);
-        //新增entity_attr_value
-        ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
-        EntityAttrValue entityAttrValueStockCode = new EntityAttrValue();
-        //债券全称
-        entityAttrValueStockCode.setEntityCode("BD" + startZeroStr);
-        entityAttrValueStockCode.setAttrId(Common.BOND_NAME_ID.longValue());
-        entityAttrValueStockCode.setValue(entityByIondVo.getBondName());
-        entityAttrValues.add(entityAttrValueStockCode);
-        //起息日
-        EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
-        entityAttrValueStartDate.setAttrId(Common.START_XI_DATE_ID.longValue());
-        entityAttrValueStartDate.setEntityCode("BD" + startZeroStr);
-        entityAttrValueStartDate.setValue(entityByIondVo.getStartXiDate());
-        entityAttrValues.add(entityAttrValueStartDate);
-        //到期日
-        EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
-        entityAttrValueEndDate.setAttrId(Common.STRING_END_DATE_ID.longValue());
-        entityAttrValueEndDate.setEntityCode("BD" + startZeroStr);
-        entityAttrValueEndDate.setValue(entityByIondVo.getEndDate());
-        entityAttrValues.add(entityAttrValueEndDate);
-        //债券类型
-        EntityAttrValue entityAttrValueBondType = new EntityAttrValue();
-        entityAttrValueBondType.setAttrId(Common.BOND_TYPE_ID.longValue());
-        entityAttrValueBondType.setEntityCode("BD" + startZeroStr);
-        entityAttrValueBondType.setValue(entityByIondVo.getBondType());
-        entityAttrValues.add(entityAttrValueBondType);
-        //年报类型
-        EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
-        entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
-        entityAttrValueReportType.setEntityCode("BD" + startZeroStr);
-        entityAttrValueReportType.setValue(entityByIondVo.getAnRportType());
-        entityAttrValues.add(entityAttrValueReportType);
-        //金融机构子行业
-        EntityAttrValue financeSubIndu = new EntityAttrValue();
-        financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
-        financeSubIndu.setEntityCode("BD" + startZeroStr);
-        financeSubIndu.setValue(entityByIondVo.getFinanceSubIndu());
-        entityAttrValues.add(financeSubIndu);
-        // 债券代码
-        EntityAttrValue entityAttrValueBondCode = new EntityAttrValue();
-        entityAttrValueBondCode.setAttrId(Common.STOCK_CODE_ID.longValue());
-        entityAttrValueBondCode.setEntityCode("BD" + startZeroStr);
-        entityAttrValueBondCode.setValue(entityByIondVo.getStockCode());
-        entityAttrValues.add(entityAttrValueBondCode);
-        //入库
-        saveBatch(entityAttrValues);
-        entityAttrValues.clear();
+        //新增entityfinancal
+        EntityFinancial entityFinancial = new EntityFinancial();
+        entityFinancial.setEntityCode(sb.toString() + id);
+        entityFinancial.setMince(entityByIondVo.getFinanceSubIndu());
+        entityFinancialmapper.insert(entityFinancial);
+        //日志入库
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
+        entityInfoLogs.setEntityCode(sb.toString() + id);
+        entityInfoLogs.setDeCode("BD" + startZeroStr);
+        entityInfoLogs.setCode(entityByIondVo.getStockCode());
+        entityInfoLogs.setOperType(3);
+        entityInfoLogs.setEntityName(entityByIondVo.getEntityName());
+        entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setSource(1);
+        entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
     }
 
@@ -628,10 +518,15 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @date 2022/9/29 9:59
      */
     @Override
+    @Transactional
     public R createStockEntity(EntityStockInfoVo entityStockInfoVo) {
         EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
-        StockCnInfo stockSrotName = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockShortName, entityStockInfoVo.getStockShortName()));
-        StockCnInfo stockCode = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, entityStockInfoVo.getStockCode()));
+        StockCnInfo stockSrotName = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockShortName, entityStockInfoVo.getStockShortName())
+                                                                                                        .eq(StockCnInfo ::getIsDeleted,Boolean.FALSE)
+        );
+        StockCnInfo stockCode = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, entityStockInfoVo.getStockCode())
+                                                                                                 .eq(StockCnInfo ::getIsDeleted,Boolean.FALSE)
+        );
         if (!ObjectUtils.isEmpty(entityInfo) || !ObjectUtils.isEmpty(stockSrotName) || !ObjectUtils.isEmpty(stockCode)) {
             return R.fail("新增失败：社会信用代码或股票简称或股票代码重复不能进行新增");
         }
@@ -644,9 +539,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             entityInfoBystock.setCreditError(0);
         }
         //曾用名
-        entityInfo.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
+        entityInfoBystock.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
+        entityInfoBystock.setListType(entityStockInfoVo.getAnRportType());
         //创建人
-        entityInfo.setCreater(SecurityUtils.getUsername());
+        entityInfoBystock.setCreater(SecurityUtils.getUsername());
         entityInfoBystock.setCreditError(1);
         entityInfoBystock.setCreditErrorRemark(entityStockInfoVo.getCreditErrorRemark());
         entityInfoBystock.setFinance(entityStockInfoVo.getFinance());
@@ -668,8 +564,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
-        entityNameHis.setDqCode(entityInfo.getEntityCode());
-        entityNameHis.setOldName(entityInfo.getEntityNameHis());
+        entityNameHis.setDqCode(entityInfoBystock.getEntityCode());
+        entityNameHis.setOldName(entityInfoBystock.getEntityNameHis());
         entityNameHis.setSource(3);
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
@@ -679,6 +575,9 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         StockCnInfo stockCnInfo = new StockCnInfo();
         stockCnInfo.setStockShortName(entityStockInfoVo.getStockShortName());
         stockCnInfo.setStockCode(entityStockInfoVo.getStockCode());
+        stockCnInfo.setListDate(entityStockInfoVo.getStartXiDate());
+        stockCnInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        stockCnInfo.setExchange(entityStockInfoVo.getExchange());
         int insert = stockCnInfoMapper.insert(stockCnInfo);
         DecimalFormat g1 = new DecimalFormat("000000");
         String startZeroStr = g1.format(stockCnInfo.getId());
@@ -690,46 +589,30 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //新增关联关系entity_stock_cn_rel
         EntityStockCnRel entityStockCnRel = new EntityStockCnRel();
         entityStockCnRel.setStockDqCode("SA" + startZeroStr);
-        entityStockCnRel.setEntityCode(entityInfo.getEntityCode());
+        entityStockCnRel.setEntityCode(entityInfoBystock.getEntityCode());
         entityStockCnRelMapper.insert(entityStockCnRel);
-        //新增entity_attr_value
-        ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
-        //年报类型
-        EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
-        entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
-        entityAttrValueReportType.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValueReportType.setValue(entityStockInfoVo.getAnRportType());
-        entityAttrValues.add(entityAttrValueReportType);
-        //金融机构子行业
-        EntityAttrValue financeSubIndu = new EntityAttrValue();
-        financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
-        financeSubIndu.setEntityCode(entityStockInfoVo.getStockCode());
-        financeSubIndu.setValue(entityStockInfoVo.getFinanceSubIndu());
-        entityAttrValues.add(financeSubIndu);
-        //上市日期
-        EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
-        entityAttrValueStartDate.setAttrId(Common.SHANSI_DATE_ID.longValue());
-        entityAttrValueStartDate.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValueStartDate.setValue(entityStockInfoVo.getStartXiDate());
-        entityAttrValues.add(entityAttrValueStartDate);
-        //退市日期
-        EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
-        entityAttrValueEndDate.setAttrId(Common.TUISI_DATE_ID.longValue());
-        entityAttrValueEndDate.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValueEndDate.setValue(entityStockInfoVo.getEndDate());
-        entityAttrValues.add(entityAttrValueEndDate);
-        //上市版
-        EntityAttrValue entityAttrValuelisSec = new EntityAttrValue();
-        entityAttrValuelisSec.setAttrId(Common.STOCK_SHANXI.longValue());
-        entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
-        entityAttrValues.add(entityAttrValuelisSec);
-        //交易所
-        EntityAttrValue entityAttrValueExange = new EntityAttrValue();
-        entityAttrValueExange.setAttrId(Common.EXCHANGE_ID.longValue());
-        entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
-        entityAttrValues.add(entityAttrValueExange);
+
+        //新增entityfinancal
+        EntityFinancial entityFinancial = new EntityFinancial();
+        entityFinancial.setEntityCode(sb.toString() + id);
+        entityFinancial.setMince(entityStockInfoVo.getFinanceSubIndu());
+        entityFinancialmapper.insert(entityFinancial);
+        //新增masterCode
+        EntityMaster entityMaster = new EntityMaster();
+        entityMaster.setEntityCode(sb.toString() + id);
+        entityMaster.setMasterCode(entityStockInfoVo.getMasterCode());
+        entityMasterMapper.insert(entityMaster);
+
+        //日志入库
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
+        entityInfoLogs.setEntityCode(sb.toString() + id);
+        entityInfoLogs.setDeCode("SA" + startZeroStr);
+        entityInfoLogs.setCode(entityStockInfoVo.getStockCode());
+        entityInfoLogs.setOperType(1);
+        entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
+        entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setSource(2);
+        entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
     }
 
@@ -742,6 +625,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @date 2022/9/29 9:59
      */
     @Override
+    @Transactional
     public R createStockEntityG(EntityStockInfoVo entityStockInfoVo) {
         EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
         StockThkInfo stockThkCode = stockThkInfoMapper.selectOne(new LambdaQueryWrapper<StockThkInfo>().eq(StockThkInfo::getStockCode, entityStockInfoVo.getStockCode()));
@@ -752,16 +636,19 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         EntityInfo entityInfoBystockHk = new EntityInfo();
         entityInfoBystockHk.setCreditCode(entityStockInfoVo.getCreditCode());
         entityInfoBystockHk.setEntityName(entityStockInfoVo.getEntityName());
+
         if (!ObjectUtils.isEmpty(entityStockInfoVo.getCreditError())) {
             entityInfoBystockHk.setCreditError(0);
         }
         entityInfoBystockHk.setCreditError(1);
         entityInfoBystockHk.setCreditErrorRemark(entityStockInfoVo.getCreditErrorRemark());
         entityInfoBystockHk.setFinance(entityStockInfoVo.getFinance());
+        //年报示例类型*
+        entityInfoBystockHk.setListType(entityStockInfoVo.getAnRportType());
         //曾用名
-        entityInfo.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
+        entityInfoBystockHk.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
         //创建人
-        entityInfo.setCreater(SecurityUtils.getUsername());
+        entityInfoBystockHk.setCreater(SecurityUtils.getUsername());
 
         entityInfoMapper.insert(entityInfoBystockHk);
         //根据主键id生成code
@@ -780,8 +667,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         // 新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
-        entityNameHis.setDqCode(entityInfo.getEntityCode());
-        entityNameHis.setOldName(entityInfo.getEntityNameHis());
+        entityNameHis.setDqCode(entityInfoBystockHk.getEntityCode());
+        entityNameHis.setOldName(entityInfoBystockHk.getEntityNameHis());
         entityNameHis.setSource(3);
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
@@ -796,50 +683,38 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         LambdaUpdateWrapper<StockThkInfo> Wrapper = new LambdaUpdateWrapper<>();
         Wrapper.eq(StockThkInfo::getId, stockThkInfo.getId())
                 .set(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode());
+        //上市时间
+        stockThkInfo.setListDate(entityStockInfoVo.getStartXiDate());
+        //退市时间
+        stockThkInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        //交易所
+        stockThkInfo.setExchange(entityStockInfoVo.getExchange());
         stockThkInfoMapper.update(stockThkInfo, Wrapper);
         //新增关联关系entity_stock_thk_rel
         EntityStockThkRel entityStockThkRel = new EntityStockThkRel();
         entityStockThkRel.setStockDqCode("HK" + startZeroStr);
-        entityStockThkRel.setEntityCode(entityInfo.getEntityCode());
+        entityStockThkRel.setEntityCode(entityInfoBystockHk.getEntityCode());
         EntityStockThkRelMapper.insert(entityStockThkRel);
-        //新增entity_attr_value
-        ArrayList<EntityAttrValue> entityAttrValues = new ArrayList<EntityAttrValue>();
-        //年报类型
-        EntityAttrValue entityAttrValueReportType = new EntityAttrValue();
-        entityAttrValueReportType.setAttrId(Common.AN_RPORT_TYPE.longValue());
-        entityAttrValueReportType.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValueReportType.setValue(entityStockInfoVo.getAnRportType());
-        entityAttrValues.add(entityAttrValueReportType);
         //金融机构子行业
-        EntityAttrValue financeSubIndu = new EntityAttrValue();
-        financeSubIndu.setAttrId(Common.FINANCE_SUB_INDU_ID.longValue());
-        financeSubIndu.setEntityCode(entityStockInfoVo.getStockCode());
-        financeSubIndu.setValue(entityStockInfoVo.getFinanceSubIndu());
-        entityAttrValues.add(financeSubIndu);
-        //上市日期
-        EntityAttrValue entityAttrValueStartDate = new EntityAttrValue();
-        entityAttrValueStartDate.setAttrId(Common.STOCK_SHANXI_DATE_HK_ID.longValue());
-        entityAttrValueStartDate.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValueStartDate.setValue(entityStockInfoVo.getStartXiDate());
-        entityAttrValues.add(entityAttrValueStartDate);
-        //退市日期
-        EntityAttrValue entityAttrValueEndDate = new EntityAttrValue();
-        entityAttrValueEndDate.setAttrId(Common.TUISI_DATE_HK_ID.longValue());
-        entityAttrValueEndDate.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValueEndDate.setValue(entityStockInfoVo.getEndDate());
-        entityAttrValues.add(entityAttrValueEndDate);
-        //上市版
-        EntityAttrValue entityAttrValuelisSec = new EntityAttrValue();
-        entityAttrValuelisSec.setAttrId(Common.STOCK_SHANXI_DATE_HK_ID.longValue());
-        entityAttrValuelisSec.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValuelisSec.setValue(entityStockInfoVo.getLisSec());
-        entityAttrValues.add(entityAttrValuelisSec);
-        //交易所
-        EntityAttrValue entityAttrValuelisEx = new EntityAttrValue();
-        entityAttrValuelisEx.setAttrId(Common.EXCHANGE_HK_ID.longValue());
-        entityAttrValuelisEx.setEntityCode(entityStockInfoVo.getStockCode());
-        entityAttrValuelisEx.setValue(entityStockInfoVo.getExchange());
-        entityAttrValues.add(entityAttrValuelisEx);
+        EntityFinancial entityFinancial = new EntityFinancial();
+        entityFinancial.setEntityCode(sb.toString() + id);
+        entityFinancial.setMince(entityStockInfoVo.getFinanceSubIndu());
+        entityFinancialmapper.insert(entityFinancial);
+        //新增masterCode
+        EntityMaster entityMaster = new EntityMaster();
+        entityMaster.setEntityCode(sb.toString() + id);
+        entityMaster.setMasterCode(entityStockInfoVo.getMasterCode());
+        entityMasterMapper.insert(entityMaster);
+        //日志入库
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
+        entityInfoLogs.setEntityCode(sb.toString() + id);
+        entityInfoLogs.setDeCode("HK" + startZeroStr);
+        entityInfoLogs.setCode(entityStockInfoVo.getStockCode());
+        entityInfoLogs.setOperType(1);
+        entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
+        entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setSource(2);
+        entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
     }
 

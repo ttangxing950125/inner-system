@@ -206,10 +206,10 @@ public class BondInfoServiceImpl implements IBondInfoService {
      * @return
      */
     @Override
-    public BondInfo findByShortName(String shortName) {
+    public BondInfo findByShortName(String shortName,Boolean isDeleted) {
         BondInfo bondInfo = redisService.getCacheMapValue(CacheName.BOND_CACHE, shortName);
         if (bondInfo == null) {
-            bondInfo = bondInfoMapper.findByShortName(shortName);
+            bondInfo = bondInfoMapper.findByShortName(shortName,isDeleted);
             redisService.setCacheMapValue(CacheName.BOND_CACHE, shortName, bondInfo);
         }
 

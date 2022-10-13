@@ -1,18 +1,13 @@
-package com.deloitte.crm.domain;
+package com.deloitte.crm.domain.dto;
 
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.domain.EntityFinancial;
+import com.deloitte.crm.domain.EntityInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Data;
 
 import java.io.Serializable;
 
@@ -27,7 +22,7 @@ import java.io.Serializable;
 @Data
 @Builder
 @Accessors(chain = true)
-public class EntityFinancial implements Serializable {
+public class EntityFinancialDto implements Serializable {
     private static final long serialVersionUID = 218444696023577627L;
     @Excel(name = "${column.comment}")
     private Integer id;
@@ -69,5 +64,37 @@ public class EntityFinancial implements Serializable {
      */
     @Excel(name = "备注")
     private String remarks;
+
+    public EntityFinancial getEntityFinancial(){
+        EntityFinancial entityFinancial = new EntityFinancial();
+        entityFinancial.setEntityCode(this.entityCode)
+                       .setMince(this.mince)
+                       .setBelJurisdiction(this.belJurisdiction)
+                       .setBelPlace(this.belPlace)
+                       .setRegion(this.region)
+                       .setRegulators(this.regulators)
+                       .setRemarks(this.remarks);
+        return entityFinancial;
+    }
+
+    public EntityInfo getEntityInfo(){
+        EntityInfo entityInfo = new EntityInfo();
+        entityInfo.setEntityCode(this.entityCode)
+                  .setWindMaster(this.windMaster)
+                  .setShenWanMaster(this.shenWanMaster);
+        return entityInfo;
+    }
+
+    /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "wind行业划分")
+    private String windMaster;
+
+    /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "申万行业划分")
+    private String shenWanMaster;
 
 }

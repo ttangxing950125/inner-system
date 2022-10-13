@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Builder;
+import lombok.experimental.Accessors;
 
 /**
  * (EntityInfoLogs)表实体类
@@ -19,6 +20,7 @@ import lombok.Builder;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class EntityInfoLogs implements Serializable {
     private static final long serialVersionUID = -95463303364821198L;
     /**
@@ -58,6 +60,11 @@ public class EntityInfoLogs implements Serializable {
      */
     @Excel(name = "入库时的主体名")
     private String entityName;
+    /**
+     * 操作来源
+     */
+    @Excel(name = "操作来源")
+    private Integer source;
     /**
      * 操作人
      */

@@ -68,6 +68,17 @@ public class CrmEntityTask
     @Excel(name = "处理人，完成人")
     private String handleUser;
 
+    /**
+     * 引发主体新增的文件记录json
+     */
+    private String details;
+
+    /**
+     * 债券代码，债券简称
+     * 股票代码，股票简称之类
+     */
+    private String infos;
+
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;

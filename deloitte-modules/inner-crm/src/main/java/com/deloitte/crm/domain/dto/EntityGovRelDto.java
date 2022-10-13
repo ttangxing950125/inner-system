@@ -1,7 +1,9 @@
-package com.deloitte.crm.domain;
+package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.domain.EntityGovRel;
+import com.deloitte.crm.domain.EntityInfo;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,12 +19,12 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class EntityGovRel implements Serializable
+public class EntityGovRelDto implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
-    private Long id;
+    private Integer id;
 
     /** 城投主体code */
     @Excel(name = "城投主体code")
@@ -47,6 +49,47 @@ public class EntityGovRel implements Serializable
     /** 德勤政府code */
     @Excel(name = "持股比例")
     private String shareRatio;
+
+    public EntityGovRel getEntityGovRel(){
+        EntityGovRel entityGovRel = new EntityGovRel();
+        entityGovRel.setEntityCode(this.entityCode)
+                .setDqGovCode(this.dqGovCode)
+                .setShareMethod(this.shareMethod)
+                .setSupport(this.support)
+                .setJudgment(this.judgment)
+                .setShareRatio(this.shareRatio)
+                .setShareRatioYear(this.shareRatioYear)
+                .setStatus(this.status)
+                .setCreated(this.created)
+                .setUpdated(this.updated)
+                .setRemarks(this.remarks);
+        return entityGovRel;
+    }
+
+    public EntityInfo getEntityInfo(){
+        EntityInfo entityInfo = new EntityInfo();
+        entityInfo.setEntityCode(this.entityCode)
+                .setWindMaster(this.windMaster)
+                .setShenWanMaster(this.shenWanMaster);
+        return entityInfo;
+    }
+
+    /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "wind行业划分")
+    private String windMaster;
+
+    /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "申万行业划分")
+    private String shenWanMaster;
+
+
+
+
+
 
     /** 德勤政府code */
     @Excel(name = "持股比例年份")

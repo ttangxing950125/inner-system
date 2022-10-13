@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.swing.text.html.parser.Entity;
+
 /**
  * 【请填写功能名称】Service业务层处理
  * 
@@ -52,6 +54,8 @@ public class ModelMasterServiceImpl implements IModelMasterService
     private EntityGovRelMapper entityGovRelMapper;
 
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
+
+    private EntityFinancialService entityFinancialService;
 
     /**
      * 查询【请填写功能名称】
@@ -179,52 +183,48 @@ public class ModelMasterServiceImpl implements IModelMasterService
     @Transactional(rollbackFor = Exception.class)
     public R insert(MasDto masDto) {
         String entityCode = masDto.getEntityCode();
-        BaseMapper<EntityAttrValue> valueBaseMapper = iEntityAttrValueService.getBaseMapper();
+        //新增 是否为金融机构 id 640 是为 Y 否为 N
+        if(YES.equals(masDto.getIsFinance())){
+            EntityFinancial entityFinancial = new EntityFinancial();
+            // 新增 金融细分领域 id 656
+            entityFinancial.setMince(masDto.getFinanceSegmentation());
+            entityFinancialService.getBaseMapper().insert(entityFinancial);
+        }
+        EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,entityCode));
+        Assert.notNull(entityInfo,BadInfo.VALID_EMPTY_TARGET.getInfo());
+
 
         //修改 wind 行业 id 652
-        Boolean wind = this.saveAttrValues(entityCode,652,masDto.getWind(),false);
-        if(wind){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-
+        entityInfo.setWindMaster(masDto.getWind());
         //修改 申万 id 650
-        Boolean shenWan = this.saveAttrValues(entityCode,650,masDto.getShenWan(),false);
-        if(shenWan){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        entityInfo.setShenWanMaster(masDto.getShenWan());
+        //修改 是否为金融机构 id 640 是为 Y 否为 N 是金融机构 0-否 1-是
+        entityInfo.setFinance(YES.equals(masDto.getIsFinance())?1:0);
+        iEntityInfoService.updateById(entityInfo);
 
-        //新增 是否为金融机构 id 640
-        Boolean finace = this.saveAttrValues(entityCode, 640, masDto.getIsFinance(), true);
-        if(finace){return R.fail(BadInfo.ERROR_SYSTEM_BUSY.getInfo());}
-
-        // 新增 金融细分领域 id 656
-        Boolean financeSegmentation = this.saveAttrValues(entityCode, 656, masDto.getFinanceSegmentation(), true);
-        if(financeSegmentation){return R.fail(BadInfo.ERROR_SYSTEM_BUSY.getInfo());}
 
         //新增  YY-是否为城投机构 id 644
-        Boolean city = this.saveAttrValues(entityCode, 644, masDto.getCity(), true);
-        if(city){return R.fail(BadInfo.ERROR_SYSTEM_BUSY.getInfo());}
-
+        EntityMaster entityMaster = new EntityMaster().setEntityCode(entityCode);
+        entityMaster.setYyUrban(YES.equals(masDto.getCity())?"1":"0");
         //新增  中诚信-是否为城投机构 id 645
-        Boolean cityZhong = this.saveAttrValues(entityCode, 644, masDto.getCityZhong(), true);
-        if(cityZhong){return R.fail(BadInfo.ERROR_SYSTEM_BUSY.getInfo());}
-
+        entityMaster.setZhongxinUrban(YES.equals(masDto.getCityZhong())?"1":"0");
         //新增  IB-是否为城投机构 id 642
-        Boolean cityIb = this.saveAttrValues(entityCode, 644, masDto.getCityIb(), true);
-        if(cityIb){return R.fail(BadInfo.ERROR_SYSTEM_BUSY.getInfo());}
+        entityMaster.setIbUrban(YES.equals(masDto.getCityIb())?"1":"0");
+        //新增 敞口的code
+        entityMaster.setMasterCode(masDto.getMasterCode());
+        entityMasterMapper.insertEntityMaster(entityMaster);
 
         //新增 德勤政府code
         EntityGovRel entityGovRel = new EntityGovRel();
         entityGovRel.setEntityCode(entityCode).setDqGovCode(masDto.getDqGovCode());
         entityGovRelMapper.insertEntityGovRel(entityGovRel);
 
-        //新增 敞口的code
-        EntityMaster entityMaster = new EntityMaster();
-        entityMaster.setEntityCode(entityCode).setMasterCode(masDto.getMasterCode()).setUpdate(new Date());
-        entityMasterMapper.insertEntityMaster(entityMaster);
-
         //更改当条信息任务状态
         BaseMapper<CrmMasTask> mapper = iCrmMasTaskService.getBaseMapper();
         CrmMasTask crmMasTask = mapper.selectOne(new QueryWrapper<CrmMasTask>()
                 .lambda().eq(CrmMasTask::getId,masDto.getId()));
-        if(crmMasTask==null){ return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        if(UN_FINISH_STATE.equals(crmMasTask.getState())){return R.fail(BadInfo.EXITS_TASK_FINISH.getInfo());}
+        Assert.notNull(crmMasTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+        Assert.isTrue(UN_FINISH_STATE.equals(crmMasTask.getState()),BadInfo.EXITS_TASK_FINISH.getInfo());
         //添加修改人
         String username = SecurityUtils.getUsername();
         crmMasTask.setHandleUser(username);
@@ -244,7 +244,7 @@ public class ModelMasterServiceImpl implements IModelMasterService
                     .selectOne(new QueryWrapper<CrmDailyTask>()
                             .lambda().eq(CrmDailyTask::getTaskDate, crmMasTask.getTaskDate())
                             .eq(CrmDailyTask::getTaskRoleType,TASK_ROLE_TWO));
-            if(crmDailyTask==null){ return R.fail(BadInfo.EMPTY_TASK_TABLE.getInfo()); }
+            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
             //当日任务完成状态为 3
             crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
             iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
@@ -266,8 +266,8 @@ public class ModelMasterServiceImpl implements IModelMasterService
             crmSupplyTask.setRoleId(5L);
         }
         //新增任务
-        crmSupplyTaskMapper.insert(crmSupplyTask);
-        return R.ok();
+        crmSupplyTaskMapper.insertCrmSupplyTask(crmSupplyTask);
+        return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
     /**

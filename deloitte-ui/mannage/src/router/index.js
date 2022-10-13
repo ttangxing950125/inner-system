@@ -65,6 +65,7 @@ export const constantRoutes = [
     path: "",
     component: Layout,
     redirect: "index",
+    meta: { title: "每日运维", icon: "system" },
     children: [
       {
         path: "index",
@@ -278,4 +279,5 @@ export default new Router({
   mode: "history", // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes,
+  base:"/crm-door/"
 });

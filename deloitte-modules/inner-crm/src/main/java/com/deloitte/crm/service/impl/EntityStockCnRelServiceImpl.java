@@ -5,17 +5,22 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityStockCnRelMapper;
 import com.deloitte.crm.service.EntityStockCnRelService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.utils.AttrValueUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +37,9 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
     @Resource
     private ICrmEntityTaskService entityTaskService;
+
+    @Resource
+    private ObjectMapper objectMapper;
 
     /**
      * 绑定主体和a股的关联关系，如果没有这个企业，就创建新增企业的任务
@@ -63,6 +71,21 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
             showData += ", 代码:"+cnCoachBack.getCode();
 
             entityTask.setDataShow(showData);
+
+            //infoMap
+            HashMap<String, Object> infoMap = new HashMap<>();
+            infoMap.put("证券代码", stockCnInfo.getStockCode());
+            infoMap.put("证券简称", stockCnInfo.getStockShortName());
+
+
+            try {
+                Map<String, Object> data = AttrValueUtils.parseObj(cnCoachBack, Excel.class, "name");
+
+                entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
+                entityTask.setDetails(objectMapper.writeValueAsString(data));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             entityTaskService.createTask(entityTask);
 

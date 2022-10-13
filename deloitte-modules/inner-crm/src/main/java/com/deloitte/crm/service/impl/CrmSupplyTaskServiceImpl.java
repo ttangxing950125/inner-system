@@ -114,7 +114,12 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     public int deleteCrmSupplyTaskById(Long id) {
         return crmSupplyTaskMapper.deleteCrmSupplyTaskById(id);
     }
-
+    /** 角色3 -- 5 */
+    private static Long ROLE_THREE = 5L;
+    /** 角色4 -- 6 */
+    private static Long ROLE_FOUR = 6L;
+    /** 角色5 -- 7 */
+    private static Long ROLE_FIVE = 7L;
     @Override
     public R getRoleSupplyTask(String taskDate) {
 
@@ -123,10 +128,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         QueryWrapper<SysUserRole> userRleQuery = new QueryWrapper<>();
         List<SysUserRole> sysUserRoles = sysUserRoleMapper.selectList(userRleQuery.lambda()
                 .eq(SysUserRole::getUserId, userId)
-                .in(SysUserRole::getRoleId, "5", "6", "7")
+                .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
-        SysUserRole sysUserRole = new SysUserRole(1L, 5L);
-        sysUserRoles.add(sysUserRole);
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
             return R.ok();
@@ -157,11 +160,11 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
             QueryWrapper<EntityAttr> attrQuery = new QueryWrapper<>();
 
             String value = "";
-            if (roleId == 5) {
+            if (roleId == ROLE_THREE) {
                 value = Common.ATTR_FIN;
-            } else if (roleId == 6) {
+            } else if (roleId == ROLE_FOUR) {
                 value = Common.ATTR_CITY;
-            } else if (roleId == 7) {
+            } else if (roleId == ROLE_FIVE) {
                 value = Common.ATTR_ISS;
             }
             List<EntityAttr> entityAttrs = attrMapper.selectList(attrQuery.lambda().eq(EntityAttr::getAttrCateName, value));
@@ -191,17 +194,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     //不是城投机构
     private static String NOT_URBAN_INVESTMENT="N";
     @Override
-    public Integer completeRoleSupplyTask(Long id, String remark) {
-        String username = SecurityUtils.getUsername();
-        CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
-        crmSupplyTask.setId(id);
-        crmSupplyTask.setState(1);
-        crmSupplyTask.setHandleUser(username);
-        crmSupplyTask.setRemark(remark);
-        return crmSupplyTaskMapper.updateById(crmSupplyTask);
-    }
-
-    @Override
     public TaskStatistics getTaskStatistics() {
         Long userId = SecurityUtils.getUserId();
         TaskStatistics taskStatistics=new TaskStatistics();
@@ -210,7 +202,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         QueryWrapper<SysUserRole> userRleQuery = new QueryWrapper<>();
         List<SysUserRole> sysUserRoles = sysUserRoleMapper.selectList(userRleQuery.lambda()
                 .eq(SysUserRole::getUserId, userId)
-                .in(SysUserRole::getRoleId, "5", "6", "7")
+                .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
         if (CollectionUtils.isEmpty(sysUserRoles)){
             return null;
@@ -249,5 +241,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
             taskStatistics.setTaskComplete(complete.get()).setTaskTotal(supplyTasks.size()).setTaskWait(wait.get());
         }
         return taskStatistics;
+    }
+
+    @Override
+    public void completeTaskById(Integer id) {
+        CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
+        crmSupplyTask.setId(id);
+        crmSupplyTask.setState(1);
+        crmSupplyTaskMapper.updateById(crmSupplyTask);
     }
 }

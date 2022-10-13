@@ -95,13 +95,13 @@ public class EntityAttrController extends BaseController {
 
 
     /**
-     * 分组查询全部---构造父子级关系
+     * 指标清单--构造父子级关系
      *
      * @return
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
-    @ApiOperation(value = "分组查询全部---构造父子级关系")
+    @ApiOperation(value = "指标清单--构造父子级关系")
     @GetMapping("/getAllByGroup/{type}")
     public R getAllByGroup(@PathVariable("type") Integer type) {
         return entityAttrService.getAllByGroup(type);

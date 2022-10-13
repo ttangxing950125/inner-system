@@ -1,10 +1,12 @@
 package com.deloitte.crm.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.GovLevel;
@@ -18,10 +20,7 @@ import com.deloitte.crm.service.IModelMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
 import com.deloitte.system.api.model.LoginUser;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,32 +51,17 @@ public class RoleTwoController {
      * 角色2今日运维模块
      * @author 正杰
      * @date 2022/9/27
-     * @param date 请传入参数 yyyy-MM-dd
-     * @return R<List<CrmMasTask>> 当月任务
+     * @param date 请传入参数 yyyy-MM
+     * @return R<Page<CrmMasTaskVo>> 当日任务
      */
     @ApiOperation(value="查询当日任务 by正杰")
+    @ApiResponse(code=200,message = "操作成功",response = CrmMasTaskVo.class)
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String")
-    @PostMapping("/getDayTaskInfo")
-    @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmMasTaskVo>> getDayTaskInfo(String date){
-        //单表查询 角色2当日任务完成情况
-        return iCrmMasTaskService.getTaskInfo(Common.DAY,date);
-    }
-
-    /**
-     * 角色2今日运维模块
-     * @author 正杰
-     * @date 2022/9/27
-     * @param date 请传入参数 yyyy-MM
-     * @return R<List<CrmMasTask>> 当日任务
-     */
-    @ApiOperation(value="查询当月任务 by正杰")
-    @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM",paramType = "query",dataType = "String")
-    @PostMapping("/getMouthTaskInfo")
-    @Log(title = "【 查询当月任务情况 】", businessType = BusinessType.OTHER)
-    public R<List<CrmMasTaskVo>> getMouthTaskInfo(String date){
+    @PostMapping("/getTaskInfo")
+    @Log(title = "【 查询当日任务 】", businessType = BusinessType.OTHER)
+    public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize){
         //单表查询 角色2当月任务完成情况
-        return iCrmMasTaskService.getTaskInfo(Common.MOUTH,date);
+        return iCrmMasTaskService.getTaskInfo(date,pageNum,pageSize);
     }
 
     /**
@@ -126,6 +110,7 @@ public class RoleTwoController {
      * 获取金融细分领域多选框
      * @return
      */
+    @ApiOperation(value="获取金融细分领域多选框 by正杰")
     @Log(title = "获取金融细分领域多选框", businessType = BusinessType.OTHER)
     @PostMapping("/getFinances")
     public R<List<String>> getFinances(){
@@ -174,6 +159,7 @@ public class RoleTwoController {
      * @return
      */
     @ApiOperation(value="获取敞口信息 by正杰")
+    @ApiResponse(code = 200 ,message = "操作成功", response = ModelMaster.class)
     @Log(title = "获取敞口信息", businessType = BusinessType.OTHER)
     @PostMapping("/getModelMaster")
     public R<List<ModelMaster>> getModelMaster(){

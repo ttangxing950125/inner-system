@@ -10,10 +10,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="entityCode"    column="entity_code"    />
         <result property="created"    column="created"    />
         <result property="update"    column="update"    />
+        <result property="yyUrban"    column="yy_urban"    />
+        <result property="zhongxinUrban"    column="zhongxin_urban"    />
+        <result property="ibUrban"    column="ib_urban"    />
     </resultMap>
 
     <sql id="selectEntityMasterVo">
-        select id, master_code, entity_code, created, update from entity_master
+        select id, master_code, entity_code, created, `update` from entity_master
     </sql>
 
     <select id="selectEntityMasterList" parameterType="EntityMaster" resultMap="EntityMasterResult">
@@ -38,12 +41,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="entityCode != null">entity_code,</if>
             <if test="created != null">created,</if>
             <if test="update != null">update,</if>
+            <if test="yyUrban != null">yy_urban,</if>
+            <if test="zhongxinUrban != null">zhongxin_urban,</if>
+            <if test="ibUrban != null">ib_urban</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="masterCode != null">#{masterCode},</if>
             <if test="entityCode != null">#{entityCode},</if>
             <if test="created != null">#{created},</if>
             <if test="update != null">#{update},</if>
+            <if test="yyUrban != null">#{yyUrban},</if>
+            <if test="zhongxinUrban != null">#{zhongxinUrban},</if>
+            <if test="ibUrban != null">#{ibUrban}</if>
          </trim>
     </insert>
 

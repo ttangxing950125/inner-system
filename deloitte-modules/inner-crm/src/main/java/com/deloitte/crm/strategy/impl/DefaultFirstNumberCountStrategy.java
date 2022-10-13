@@ -128,7 +128,7 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
          * @see com.deloitte.crm.domain.BondInfo#getBondStatus()
          */
         String shortName = defaultFirstNumberCount.getDefaultBondsDesc();
-        BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+        BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName,Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
         bondInfo.setBondStatus(7);
         bondInfo.setBondState(1);
 

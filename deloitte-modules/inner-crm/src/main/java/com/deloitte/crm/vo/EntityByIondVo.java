@@ -72,7 +72,7 @@ public class EntityByIondVo
     /** 债券类型*/
     @ApiModelProperty(value="债券类型")
     @NotNull(message = "债券类型不能为空")
-    private  String  bondType;
+    private  Integer  bondType;
 
     /** 是否金融机构 0-否 1-是 */
     @ApiModelProperty(value="是否金融机构 0-否 1-是")

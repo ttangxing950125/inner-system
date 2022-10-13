@@ -250,6 +250,7 @@
           <el-table
             class="table-content"
             :data="list2"
+            :height="500"
             style="width: 98%; margin-top: 15px"
           >
             <el-table-column prop="name" label="存续状态" width="80">
