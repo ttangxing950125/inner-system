@@ -16,10 +16,7 @@ import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.domain.dto.GovAttrByDto;
-import com.deloitte.crm.domain.dto.GovAttrByDtoBack;
-import com.deloitte.crm.domain.dto.GovInfoResult;
-import com.deloitte.crm.domain.dto.GovRangeValue;
+import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.mapper.*;
@@ -72,6 +69,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Autowired
     private EntityAttrIntypeMapper intypeMapper;
+
+    @Autowired
+    private EntityGovRelMapper entityGovRelMapper;
 
     /**
      * 默认查询页码
@@ -177,28 +177,30 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public R getInfoDetail(GovInfo govInfo) {
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper<>(govInfo);
-        List<GovInfo> govInfos = govInfoMapper.selectList(queryWrapper);
+    public R getInfoDetail(String dqGovCode) {
+        List<GovInfo> govInfos = govInfoMapper.selectList(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode,dqGovCode));
         if (CollectionUtils.isEmpty(govInfos)) {
             return R.fail("异常查询，数据为空");
         }
         if (govInfos.size() > 1) {
             return R.fail("异常查询，唯一识别码查出多条数据");
         }
-        //TODO  查询上级行政code
-        String preGovCode = govInfos.get(0).getPreGovCode();
-        queryWrapper.clear();
-        Map<String, Object> result = new HashMap<>();
-        result.put("govInfo", govInfos.get(0));
-        if (ObjectUtils.isEmpty(preGovCode)) {
-            return R.ok(result);
-        }
-        GovInfo preGov = govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getDqGovCode, preGovCode));
-        result.put("preGov", preGov);
-        return R.ok(result);
-    }
+        //查询上级行政code
+        GovInfo govInfo = govInfos.get(0);
+        String preGovCode = govInfo.getPreGovCode();
+        //查询上级关联政府
+        GovInfo preGov = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, preGovCode));
 
+        //查询关联企业主体
+        Long count = entityGovRelMapper.selectCount(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getDqGovCode, dqGovCode));
+
+        //创建响应结果集
+        GovInfoDetails govInfoDetails = new GovInfoDetails();
+        govInfoDetails.setGovInfo(govInfo).setRelationGov(preGov).setRelationEntity(count);
+
+
+        return R.ok(govInfoDetails);
+    }
 
     /**
      * 统计政府信息

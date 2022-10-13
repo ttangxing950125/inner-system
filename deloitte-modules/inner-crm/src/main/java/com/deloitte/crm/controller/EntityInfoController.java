@@ -196,8 +196,8 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize) {
-        return entityInfoService.getInfoList(type, param,pageNum,pageSize);
+    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+        return entityInfoService.getInfoList(type, param, pageNum, pageSize);
     }
 
     /**
@@ -247,9 +247,9 @@ public class EntityInfoController extends BaseController {
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "上市企业-修改信息-根据 entityCode 查询主体详细信息")
-    @ApiImplicitParam(name = "entityCode", value = "主体德勤唯一识别码", paramType = "query", example = "", dataType="String")
+    @ApiImplicitParam(name = "entityCode", value = "主体德勤唯一识别码", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getInfoDetail")
-    public R getInfoDetailByEntityCode( String entityCode) {
+    public R getInfoDetailByEntityCode(String entityCode) {
         return entityInfoService.getInfoDetailByEntityCode(entityCode);
     }
 
@@ -264,10 +264,10 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "上市企业-修改信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityInfo", value = "主体基本信息", paramType = "body", example = "", dataTypeClass = EntityInfo.class),
-            @ApiImplicitParam(name = "stockCnInfo", value = "主体A股上市详情", paramType = "body", example = "", dataTypeClass =StockCnInfo.class),
-            @ApiImplicitParam(name = "stockThkInfo", value = "主体港股上市详情", paramType = "body", example = "", dataTypeClass =StockThkInfo.class)
+            @ApiImplicitParam(name = "stockCnInfo", value = "主体A股上市详情", paramType = "body", example = "", dataTypeClass = StockCnInfo.class),
+            @ApiImplicitParam(name = "stockThkInfo", value = "主体港股上市详情", paramType = "body", example = "", dataTypeClass = StockThkInfo.class)
     })
-    @PostMapping("/getInfoDetail")
+    @PostMapping("/updateInfoDetail")
     public R updateInfoDetail(@RequestBody EntityInfoDetails entityInfoDetails) {
         entityInfoService.updateInfoDetail(entityInfoDetails);
         return R.ok();
@@ -331,7 +331,7 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     *批量查询并导出excel结果
+     * 批量查询并导出excel结果
      *
      * @param file
      * @param uuid(用于存进度导redis)
@@ -361,8 +361,6 @@ public class EntityInfoController extends BaseController {
     public R getChecking(String uuid) {
         return entityInfoService.getIng(uuid);
     }
-
-
 
 
     /**
