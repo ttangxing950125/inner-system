@@ -9,20 +9,20 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.domain.StockThkInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
-import com.deloitte.crm.service.ProductsService;
 import com.deloitte.crm.service.SendEmailService;
-import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -239,9 +239,9 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 根据 dqCode 查询企业主体
+     * 上市企业-修改信息-根据 entityCode 查询主体详细信息
      *
-     * @param entityInfo
+     * @param entityCode
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:59
@@ -251,6 +251,26 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/getInfoDetail")
     public R getInfoDetailByEntityCode( String entityCode) {
         return entityInfoService.getInfoDetailByEntityCode(entityCode);
+    }
+
+    /**
+     * 上市企业-修改信息
+     *
+     * @param entityInfoDetails
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/23 8:59
+     */
+    @ApiOperation(value = "上市企业-修改信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "entityInfo", value = "主体基本信息", paramType = "body", example = "", dataTypeClass = EntityInfo.class),
+            @ApiImplicitParam(name = "stockCnInfo", value = "主体A股上市详情", paramType = "body", example = "", dataTypeClass =StockCnInfo.class),
+            @ApiImplicitParam(name = "stockThkInfo", value = "主体港股上市详情", paramType = "body", example = "", dataTypeClass =StockThkInfo.class)
+    })
+    @PostMapping("/getInfoDetail")
+    public R updateInfoDetail(@RequestBody EntityInfoDetails entityInfoDetails) {
+        entityInfoService.updateInfoDetail(entityInfoDetails);
+        return R.ok();
     }
 
     /**
