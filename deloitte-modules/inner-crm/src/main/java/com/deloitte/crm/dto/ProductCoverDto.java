@@ -32,12 +32,6 @@ public class ProductCoverDto {
      */
     private String entityCode;
 
-
-    /**
-     *是否覆盖
-     */
-    @Excel(name = "是否覆盖 0-否 1-是")
-    private List<String> isCovers = new ArrayList<>() ;
     /**
      *返回列数据
      */
