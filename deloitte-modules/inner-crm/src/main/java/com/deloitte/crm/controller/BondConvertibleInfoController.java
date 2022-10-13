@@ -21,11 +21,5 @@ import java.util.List;
 @RestController
 @RequestMapping("bondConvertibleInfo")
 public class BondConvertibleInfoController {
-    /**
-     * 服务对象
-     */
-    @Resource
-    private BondConvertibleInfoService bondConvertibleInfoService;
 
-    
 }
