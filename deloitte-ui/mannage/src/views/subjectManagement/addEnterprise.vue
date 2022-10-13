@@ -88,7 +88,7 @@
           <span>{{ currentName }}</span>
         </el-form-item>
         <el-form-item label="IB敞口划分" prop="">
-          <el-select v-model="ruleForm.region" placeholder="选择新增类型">
+          <el-select v-model="ruleForm.masterCode" placeholder="选择新增类型">
             <el-option label="区域一" value="shanghai"></el-option>
             <el-option label="区域二" value="beijing"></el-option>
           </el-select>
@@ -99,17 +99,25 @@
             <el-option label="港股" value="G"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="企业证券代码" prop="">
+        <el-form-item label="企业股票代码" prop="">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.stockCode"
               placeholder="请输入企业完整证券代码"
             ></el-input>
+            <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce1 === 1">无重复，可新增</span>
             <el-button
+              v-if="!repalce1"
               style="margin-left: 5px"
               type="text"
-              @click="check(ruleForm.stockCode, '')"
+              @click="
+                check(
+                  ruleForm.stockCode,
+                  ruleForm.stockType === 'A' ? 'STOCK_CN_CODE' : 'STOCK_HK_CODE'
+                )
+              "
               >查重</el-button
             >
           </div>
@@ -121,10 +129,18 @@
               v-model="ruleForm.stockShortName"
               placeholder="请输入企业证券简称"
             ></el-input>
+            <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
             <el-button
+              v-if="!repalce2"
               style="margin-left: 5px"
               type="text"
-              @click="check(ruleForm.stockShortName)"
+              @click="
+                check(
+                  ruleForm.stockShortName,
+                  ruleForm.stockType === 'A' ? 'STOCK_A_NAME' : 'STOCK_HK_NAME'
+                )
+              "
               >查重</el-button
             >
           </div>
@@ -136,10 +152,13 @@
               v-model="ruleForm.entityName"
               placeholder="请输入企业完整名称"
             ></el-input>
+            <span class="red" v-if="repalce3 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce3 === 1">无重复，可新增</span>
             <el-button
+              v-if="!repalce3"
               style="margin-left: 5px"
               type="text"
-              @click="check(ruleForm.entityName)"
+              @click="check(ruleForm.entityName, 'ENTITY_NAME')"
               >查重</el-button
             >
           </div>
@@ -151,20 +170,27 @@
               v-model="ruleForm.creditCode"
               placeholder="请输入企业统一社会信用代码"
             ></el-input>
+            <span class="red" v-if="repalce3 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce3 === 1">无重复，可新增</span>
             <el-button
+              v-if="!repalce4"
               style="margin-left: 5px"
               type="text"
-              @click="check(ruleForm.creditCode)"
+              @click="check(ruleForm.creditCode, 'CREDIT_CODE')"
               >查重</el-button
             >
           </div>
         </el-form-item>
         <div class="notUse">
-          <el-checkbox class="mr60" v-model="ruleForm.notUse"
+          <el-checkbox class="mr60" v-model="ruleForm.notUse" label="1"
             >不适用</el-checkbox
           >
           <span class="mr10">不适用原因</span>
-          <el-select v-model="ruleForm.creditErrorType" placeholder="请选择">
+          <el-select
+            v-model="ruleForm.creditErrorRemark"
+            :disabled="disabeld"
+            placeholder="请选择"
+          >
             <el-option
               v-for="item in notUseoptions"
               :key="item.value"
@@ -174,27 +200,12 @@
             </el-option>
           </el-select>
         </div>
-        <el-form-item label="上市日期" prop="">
-          <el-date-picker
-            v-model="ruleForm.startXiDate"
-            type="date"
-            placeholder="yyyy-mm-dd"
-            style="width: 100%"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="退市日期" prop="">
-          <el-date-picker
-            type="date"
-            placeholder="yyyy-mm-dd"
-            v-model="ruleForm.endDate"
-            style="width: 100%"
-          ></el-date-picker>
-        </el-form-item>
+
         <el-form-item label="上市板块与交易所" required>
           <el-col :span="11">
             <el-form-item prop="">
               <el-select
-                v-model="ruleForm.region"
+                v-model="ruleForm.lisSec"
                 placeholder="选择股票上市板块"
               >
                 <el-option label="区域一" value="shanghai"></el-option>
@@ -215,6 +226,26 @@
             </el-form-item>
           </el-col>
         </el-form-item>
+        <el-form-item label="上市日期" prop="">
+          <el-date-picker
+            v-model="ruleForm.startXiDate"
+            type="date"
+            class="t-input"
+            placeholder="yyyy-mm-dd"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="退市日期" prop="">
+          <el-date-picker
+            type="date"
+            class="t-input"
+            placeholder="yyyy-mm-dd"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            v-model="ruleForm.endDate"
+          ></el-date-picker>
+        </el-form-item>
         <el-form-item label="是否为金融机构" prop="">
           <el-radio-group v-model="ruleForm.finance">
             <el-radio label="1">是</el-radio>
@@ -232,15 +263,19 @@
             v-model="ruleForm.financeSubIndu"
             placeholder="请选择金融机构子行业"
           >
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+            <el-option
+              v-for="(item, index) in financeSubIndu"
+              :key="index"
+              :label="item.value"
+              :value="item.value"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item class="position-add" label="企业曾用名或别称" prop="">
           <el-input
             class="t-input"
             style="width: 320px"
-            v-model="ruleForm.name"
+            v-model="ruleForm.entityNameHis"
             placeholder="请输入企业曾用名或别称，以顿号区分"
           ></el-input>
         </el-form-item>
@@ -384,6 +419,8 @@
             type="date"
             class="t-input"
             placeholder="yyyy-mm-dd"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="到期日" prop="">
@@ -391,6 +428,8 @@
             type="date"
             class="t-input"
             placeholder="yyyy-mm-dd"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
             v-model="ruleForm.endDate"
           ></el-date-picker>
         </el-form-item>
@@ -607,11 +646,11 @@ export default {
       this.$router.back();
     },
     editData() {
-      if (this.tab === "发债") {
-        this.dialogVisible2 = true;
-      } else {
-        this.dialogVisible = true;
-      }
+      this.dialogVisible = true;
+      // if (this.tab === "发债") {
+      //   this.dialogVisible2 = true;
+      // } else {
+      // }
       getFinanceSubIndu({ attrId: 656 }).then((res) => {
         const { data } = res;
         this.financeSubIndu = data;
@@ -683,20 +722,20 @@ export default {
     subForm() {
       try {
         this.$modal.loading("Loading...");
-        // createST(this.ruleForm).then((res) => {
-        //   console.log(res);
-        // });
         this.ruleForm.creditError = this.ruleForm.notUse ? 1 : 0;
-        createBE(this.ruleForm).then((res) => {
-          const { data } = res;
-          if (data === null) {
-            this.$message({
-              showClose: true,
-              message: "操作成功",
-              type: "success",
-            });
-          }
+        createST(this.ruleForm).then((res) => {
+          console.log(res);
         });
+        // createBE(this.ruleForm).then((res) => {
+        //   const { data } = res;
+        //   if (data === "新增成功") {
+        //     this.$message({
+        //       showClose: true,
+        //       message: "操作成功",
+        //       type: "success",
+        //     });
+        //   }
+        // });
       } catch (error) {
         this.$message({
           showClose: true,
@@ -735,7 +774,7 @@ export default {
             case "ENTITY_NAME":
               this.repalce4 = ret;
               break;
-            case "ENTITY_NAME":
+            case "CREDIT_CODE":
               this.repalce5 = ret;
               break;
             default:

@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,10 +61,14 @@ public class RoleMainController {
     }
 
     @GetMapping("/queryDailyTaskByDay")
-    @ApiOperation(value = "指定日期查询各角色当月任务完成情况",response = CrmWindTask.class)
-    @ApiImplicitParam(name ="taskDate",value = " taskDate 任务日期 format => yyyy-MM-dd",paramType = "query",example = "2022-09-23",dataType = "String")
-    public R queryDailyTaskByDay(String taskDate){
-        SecurityUtils.getUserId();
+    @ApiOperation(value ="指定日期 查询当日任务",response = CrmWindTask.class)
+    @ApiImplicitParams({
+        @ApiImplicitParam(name ="taskDate",value = "yyyy-MM-dd", paramType = "query",example = "2022-09-28",dataType = "String"),
+        @ApiImplicitParam(name ="pageNum",value = "当前页",example = "1",paramType = "query",dataType = "Integer"),
+        @ApiImplicitParam(name ="pageSize",value = "分页页数",example = "5",paramType = "query",dataType = "Integer")
+    })
+    public R queryDailyTaskByDay(String taskDate, Integer pageNum, Integer pageSize){
+
         return null;
     }
 

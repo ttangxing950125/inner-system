@@ -268,9 +268,9 @@
               >
                 <el-option
                   v-for="item in options2"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  :key="item.proName"
+                  :label="item.proName"
+                  :value="item.proName"
                 >
                 </el-option>
               </el-select>
@@ -373,7 +373,7 @@
 </template>
 
 <script>
-import { govList, entityInfoList } from "@/api/subject";
+import { govList, entityInfoList, getProduct } from "@/api/subject";
 import fileUpload from "../../components/FileUpload";
 export default {
   name: "Index",
@@ -382,40 +382,7 @@ export default {
   },
   data() {
     return {
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       input: "",
       options: [
         {
@@ -440,28 +407,7 @@ export default {
         },
       ],
       value: "企业主体",
-      options2: [
-        {
-          value: "选项1",
-          label: "黄金糕",
-        },
-        {
-          value: "选项2",
-          label: "双皮奶",
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎",
-        },
-        {
-          value: "选项4",
-          label: "龙须面",
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
-      ],
+      options2: [],
       value1: [],
       loading: false,
       goveSum: 0,
@@ -526,9 +472,10 @@ export default {
             this.entitySum
           );
         });
-        setTimeout(() => {
-          this.loadingData = false;
-        }, 2000);
+        getProduct({}).then((res) => {
+          const { data } = res;
+          this.options2 = data;
+        });
       } catch (error) {
         console.log(error);
       } finally {

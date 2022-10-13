@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelReader;
@@ -1006,20 +1007,23 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //债券代码 => bond_code
         bondVo.setBondCode(bondInfo.getBondCode());
         //债券交易代码
-        bondVo.setTransactionCode(
-                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
-                        .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID)).getValue()
-        );
+//        bondVo.setTransactionCode(
+//                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+//                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
+//                        .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID)).getValue()
+//        );
+        bondVo.setTransactionCode(bondInfo.getOriCode());
         //债券全称
-        bondVo.setFullName(
-                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
-                        .eq(EntityAttrValue::getAttrId, Common.BOND_NAME_ID)).getValue()
-        );
+//        bondVo.setFullName(
+//                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+//                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
+//                        .eq(EntityAttrValue::getAttrId, Common.BOND_NAME_ID)).getValue()
+//        );
+        bondVo.setFullName(bondInfo.getBondName());
         //债券简称
         bondVo.setShortName(bondInfo.getBondShortName());
-        //TODO 存续状态
+        //存续状态
+        bondVo.setDebtRaisingType(bondInfo.getBondState()==null?null:bondInfo.getBondState().toString());
         //TODO 债募类型
         //公私募类型
         bondVo.setRaiseType(bondInfo.getRaiseType());
@@ -1074,7 +1078,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/25
      */
     @Override
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
+    public R <Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum==null?1:pageNum;
+        pageSize = pageSize==null?20:pageSize;
         //模糊匹配 查询主体||债券信息
         switch (keyword) {
             //模糊匹配主体名
@@ -1091,7 +1097,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 entityInfos.forEach(row -> {
                     res.add(this.matchingEntityInfo(row));
                 });
-                return R.ok(res);
+                Page<TargetEntityBondsVo> targetEntityBondsVoPage = new Page<>();
+                targetEntityBondsVoPage.setRecords(res)
+                        .setTotal(entityInfoPage.getTotal())
+                        .setPages(entityInfoPage.getPages())
+                        .setCurrent(entityInfoPage.getCurrent())
+                        .setSize(entityInfoPage.getSize());
+                return R.ok(targetEntityBondsVoPage,SuccessInfo.SUCCESS.getInfo());
             // 模糊匹配债券名
             case BOND:
                 List<TargetEntityBondsVo> rest = new ArrayList<>();
@@ -1109,7 +1121,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 bondInfos.forEach(row -> {
                     rest.add(this.matchingBondInfo(row));
                 });
-                return R.ok(rest);
+                Page<TargetEntityBondsVo> targetEntityBondsVoPageBond = new Page<>();
+                targetEntityBondsVoPageBond.setRecords(rest)
+                        .setTotal(bondInfoPage.getTotal())
+                        .setPages(bondInfoPage.getPages())
+                        .setCurrent(bondInfoPage.getCurrent())
+                        .setSize(bondInfoPage.getSize());
+                return R.ok(targetEntityBondsVoPageBond,SuccessInfo.SUCCESS.getInfo());
             default:
                 return R.fail(BadInfo.VALID_PARAM.getInfo());
         }
