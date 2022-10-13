@@ -107,7 +107,8 @@ public class GovInfo implements Serializable {
      * 失效后的新政府德勤code
      */
     @Excel(name = "经济区归属")
-    private String economyRegion;    /**
+    private String economyRegion;
+    /**
      * 失效后的新政府德勤code
      */
     @Excel(name = "城市群归属")
@@ -158,7 +159,6 @@ public class GovInfo implements Serializable {
      */
     @Excel(name = "主体状态")
     private Integer status;
-
 
 
     @Override

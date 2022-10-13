@@ -65,8 +65,12 @@ public interface GovInfoMapper extends BaseMapper<GovInfo>
      */
     public int deleteGovInfoByIds(Long[] ids);
 
-    List<GovInfo> selectGovInfoListByTypeAndParam(GovInfo govInfo);
-
+    List<GovInfo> selectGovInfoListByTypeAndParam(@Param("type") Integer type,
+                                                  @Param("param") String param,
+                                                  @Param("pageNum") Integer pageNum,
+                                                  @Param("pageSize") Integer pageSize);
+    Integer selectGovInfoCountByTypeAndParam(@Param("type") Integer type,
+                                             @Param("param") String param);
     List<GovInfo> selectCountByGroup(@Param("param") String param);
 
     List<GovInfo> getGovByAttrValue(GovAttrByDto govAttrByDto);
@@ -76,4 +80,6 @@ public interface GovInfoMapper extends BaseMapper<GovInfo>
     Integer getGovCountByAttrValue(GovAttrByDto entityAttrDto);
 
     List<GovInfoBynameDto> getGovByname(Page<GovInfoBynameDto> page, @Param("govName") String govName);
+
+
 }
