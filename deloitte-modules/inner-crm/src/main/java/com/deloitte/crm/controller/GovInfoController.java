@@ -109,16 +109,6 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 新增地方政府
-     */
-    @RequiresPermissions("crm:govInfo:add")
-    @Log(title = "【新增地方政府】", businessType = BusinessType.INSERT)
-    @PostMapping("/add")
-    public AjaxResult add(@RequestBody GovInfo govInfo) {
-        return toAjax(govInfoService.insertGovInfo(govInfo));
-    }
-
-    /**
      * 修改【请填写功能名称】
      */
     @RequiresPermissions("crm:govInfo:edit")
@@ -162,8 +152,11 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "查询政府名称，或者编码，是否重复")
-    @ApiImplicitParam(name = "govInfo", value = "包含表中egov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
-    @PostMapping("/checkGov")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "govName", value = "政府主体名称---查重只填一个参数", paramType = "body", example = "", dataType="String"),
+            @ApiImplicitParam(name = "govCode", value = "政府主体官方代码---查重只填一个参数", paramType = "body", example = "", dataType="String")
+    })
+     @PostMapping("/checkGov")
     public R checkGov(@RequestBody GovInfo govInfo) {
         return R.ok(govInfoService.checkGov(govInfo));
     }
@@ -183,8 +176,8 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param) {
-        return govInfoService.getInfoList(type, param);
+    public R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize) {
+        return govInfoService.getInfoList(type, param,pageNum,pageSize);
     }
 
     /**
@@ -317,12 +310,24 @@ public class GovInfoController extends BaseController {
      * @return R
      * @author 冉浩岑
      * @date 2022/10/11 17:10
-    */
+     */
     @ApiOperation(value = "地方政府-更多指标-主体范围")
     @PostMapping("/getGovRange")
     public R getGovRange() {
         return R.ok(govInfoService.getGovRange());
     }
 
-
+    /**
+     * 新增地方政府
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/12 17:10
+     */
+    @Log(title = "新增地方政府", businessType = BusinessType.INSERT)
+    @PostMapping("/addGovInfo")
+    public R addGovInfo(@RequestBody GovInfo govInfo) {
+        govInfoService.insertGovInfo(govInfo);
+        return R.ok();
+    }
 }

@@ -80,7 +80,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R getInfoDetail(GovInfo govInfo);
 
-    R getInfoList(Integer type,String param);
+    R getInfoList(Integer type,String param,Integer pageNum,Integer pageSize);
 
     R addOldName(GovInfo govInfo);
 
