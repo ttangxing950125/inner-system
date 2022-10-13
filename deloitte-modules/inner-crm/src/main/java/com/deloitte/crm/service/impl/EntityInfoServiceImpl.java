@@ -169,31 +169,32 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityInfoDto entityInfoDto = new EntityInfoDto();
         List<EntityInfo> list = this.list();
 
-        //TODO issue_bonds 是否发债 0-未发债 1-已发债
+        //issue_bonds 是否发债 0-未发债 1-已发债
         List<EntityInfo> bonds = list().stream()
                 .filter(row -> row.getIssueBonds() != null && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
-        //TODO finance 是否金融机构
+        //finance 是否金融机构
         List<EntityInfo> finance = list().stream()
                 .filter(row -> row.getFinance() != null && row.getFinance() == 1)
                 .collect(Collectors.toList());
 
-        //TODO list 是否上市 0-未上市 1-已上市
+        //list 是否上市 0-未上市 1-已上市
         List<EntityInfo> entityInfoList = list().stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
                 .collect(Collectors.toList());
 
-        //TODO 即是上市又是发债
-        List<EntityInfo> listAndBonds = list().stream()
+        //即是上市又是发债
+        List<EntityInfo> listAndBonds = list();
+         listAndBonds = listAndBonds.stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
-                .filter(row -> row.getFinance() != null && row.getIssueBonds() == 1)
+                .filter(row -> (row.getFinance() != null&&row.getIssueBonds()!=null)  && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
-        //TODO !即是上市又是发债
+        //!即是上市又是发债
         List<EntityInfo> notListAndBonds = list().stream()
                 .filter(row -> row.getList() != null && row.getList() == 0)
-                .filter(row -> row.getFinance() != null && row.getIssueBonds() == 0)
+                .filter(row -> (row.getFinance() != null&&row.getIssueBonds()!=null) && row.getIssueBonds() == 0)
                 .collect(Collectors.toList());
         entityInfoDto.setIssueBonds(bonds.size());
         entityInfoDto.setEntitySum(list.size());
