@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
@@ -14,6 +15,7 @@ import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
 import com.deloitte.crm.utils.ApplicationContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
  * @Date: 2022/10/13/14:11
  * @Description: 可转债发行预案
  */
+@Slf4j
 @Component
 public class BondConvertibleStrategy implements WindTaskStrategy {
     @Resource
@@ -62,13 +65,14 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(BondConvertibleInfo item, Date timeNow, CrmWindTask windTask) {
-        //设置属性
+        log.info(">>>>>>>>开始到导入可转债发行开始【当前时间】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), windTask.getId());
         item.setTaskId(windTask.getId());
-        StockCnInfo stockCnInfo = this.stockCnInfoService.findByCode(item.getCode());
+        StockCnInfo stockCnInfo = stockCnInfoService.findByCode(item.getCode());
         if (stockCnInfo != null) {
             Long attrId = 0L;
             LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockCnInfo.getStockDqCode()).eq(EntityStockCnRel::getStatus, Boolean.TRUE));//TODO  只查询 未删除的 关系状态 1是未删除 0 是已删除
+            //TODO  只查询 未删除的 关系状态 1是未删除 0 是已删除
+            EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockCnInfo.getStockDqCode()).eq(EntityStockCnRel::getStatus, Boolean.TRUE));
             if (entityStockCnRel != null) {
                 List<EntityAttr> entityAttrsLists = entityAttrMapper.selectList(new LambdaQueryWrapper<EntityAttr>().eq(EntityAttr::getAttrType, 3));
                 List<EntityAttr> fiterEntityAttrsLists = entityAttrsLists.stream().filter(e -> ObjectUtil.isNotEmpty(e.getName()) && e.getName().equals("是否有可转债")).collect(Collectors.toList());
@@ -82,20 +86,17 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
                 } else {
                     attrId = fiterEntityAttrsLists.get(0).getId();
                 }
-                LambdaQueryWrapper<EntityInfo> lambdaQueryWrapperEntityInfo = new LambdaQueryWrapper<>();
-                EntityInfo entityInfo = entityInfoMapper.selectOne(lambdaQueryWrapperEntityInfo.eq(EntityInfo::getEntityCode, entityStockCnRel.getEntityCode()).eq(EntityInfo::getStatus, 1));//TODO -失效 1-生效
+                ////TODO -失效 1-生效
+                EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityStockCnRel.getEntityCode()).eq(EntityInfo::getStatus, 1));
                 if (entityInfo != null) {
                     EntityAttrValue entityAttrValue = entityAttrValueMapper.selectOne(new LambdaQueryWrapper<EntityAttrValue>().eq(EntityAttrValue::getAttrId, attrId).eq(EntityAttrValue::getEntityCode, entityInfo.getEntityCode()));
-                    if (entityAttrValue != null) {
-                        entityAttrValue.setValue("1"); // Y N =>1 0
+                    Long finalAttrId = attrId;//Y N =>1 0
+                    EntityAttrValue judgeEntityAttrValue = Optional.ofNullable(entityAttrValue).map(e -> e.setValue("1")).orElseGet(() -> EntityAttrValue.builder().value("1").attrId(finalAttrId).entityCode(entityInfo.getEntityCode()).build());
+                    if (judgeEntityAttrValue.getId() != null) {
+                        entityAttrValueMapper.updateById(judgeEntityAttrValue);
                     } else {
-                        EntityAttrValue insertEntityAttrValue = new EntityAttrValue();
-                        insertEntityAttrValue.setValue("1");
-                        insertEntityAttrValue.setEntityCode(entityInfo.getEntityCode());
-                        insertEntityAttrValue.setAttrId(attrId);
-                        entityAttrValueMapper.insertEntityAttrValue(insertEntityAttrValue);
+                        entityAttrValueMapper.insertEntityAttrValue(judgeEntityAttrValue);
                     }
-
                     /***
                      * 根据 转债简称 查询 bond_info 如果这一列有数据
                      * 添加entity_bond_info 的关联关系 更新 conver 为ture
@@ -121,8 +122,11 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
                         }
                     }
                 }
+            } else {
+                log.warn(">>>>>>>>开始到导入可转债发行【根据股票code】=>:{}查询【entity_stock_cn_rel】关联关系 数据不存在任务结束！！！！", stockCnInfo.getStockDqCode());
             }
         }
+        log.warn(">>>>>>>>开始到导入可转债发行【根据公司代码】=>:{}查询数据不存在任务结束！！！！", item.getCode());
         return new AsyncResult(new Object());
 
     }
@@ -133,7 +137,7 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<BondConvertibleInfo> util = new ExcelUtil<BondConvertibleInfo>(BondConvertibleInfo.class);
         List<BondConvertibleInfo> bondConvertibleInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(BondConvertibleInfoService.class).doTask(windTask,bondConvertibleInfo);
+        return ApplicationContextHolder.get().getBean(BondConvertibleInfoService.class).doTask(windTask, bondConvertibleInfo);
     }
 
     @Override
