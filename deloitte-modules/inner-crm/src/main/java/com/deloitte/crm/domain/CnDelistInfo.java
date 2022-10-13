@@ -24,22 +24,22 @@ public class CnDelistInfo implements Serializable {
     /**
      * 主键
      */
-    @Excel(name = "主键")
+//    @Excel(name = "主键")
     private Integer id;
     /**
      * 导入时间
      */
-    @Excel(name = "导入时间")
+//    @Excel(name = "导入时间")
     private Date importTime;
     /**
      * 1-新增 2-修改
      */
-    @Excel(name = "1-新增 2-修改")
+//    @Excel(name = "1-新增 2-修改")
     private Integer changeType;
     /**
      * crm_wind_task的id
      */
-    @Excel(name = "crm_wind_task的id")
+//    @Excel(name = "crm_wind_task的id")
     private Integer taskId;
     /**
      * 序号
@@ -119,12 +119,12 @@ public class CnDelistInfo implements Serializable {
     /**
      * 创建时间
      */
-    @Excel(name = "创建时间")
+//    @Excel(name = "创建时间")
     private Date created;
     /**
      * 更新时间
      */
-    @Excel(name = "更新时间")
+//    @Excel(name = "更新时间")
     private Date updated;
 
 
