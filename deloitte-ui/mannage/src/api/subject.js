@@ -51,3 +51,31 @@ export function getInfoList(params) {
     data: params,
   });
 }
+
+// 企业产品
+export function getProduct(params) {
+  return request({
+    url: "/crm/Products/getProducts",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 覆盖情况
+export function getProductCover(params) {
+  return request({
+    url:
+      "/crm/entityInfo/getInfoList?type=" +
+      params.type +
+      "&param=" +
+      params.param,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}

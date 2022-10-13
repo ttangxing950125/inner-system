@@ -47,14 +47,20 @@ export function findTaskDetails(taskDate) {
 }
 
 // 查询指定日期或当月任务情况,返回 List
-export function getTaskInfo(taskDate) {
+export function getTaskInfo(params) {
   return request({
-    url: "/crm//roleTwo/getTaskInfo",
+    url:
+      "/crm//roleTwo/getTaskInfo?date=" +
+      params.date +
+      "&pageNum=" +
+      params.pageNum +
+      "&pageSize=" +
+      params.pageSize,
     headers: {
       isToken: true,
     },
     method: "post",
-    data: taskDate,
+    data: params,
   });
 }
 
