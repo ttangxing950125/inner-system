@@ -6,6 +6,7 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -248,10 +249,23 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         if (ObjectUtil.isEmpty(pageSize)) {
             pageSize = DEFAULT_PAGE_NUM_SIZE;
         }
+
+        Page<GovInfo> pageInfo = new Page(pageNum, pageSize);
+        LambdaQueryWrapper<GovInfo> govInfoQuery=new LambdaQueryWrapper<>();
+        if (!ObjectUtil.isEmpty(type)){
+            govInfoQuery.eq(GovInfo::getGovType, type);
+        }
+        if (!ObjectUtil.isEmpty(param)){
+            govInfoQuery.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param);
+        }
+
+        Page<GovInfo> govInfoPage = govInfoMapper.selectPage(pageInfo, govInfoQuery);
+        List<GovInfo> govInfoList = govInfoPage.getRecords();
+
+        //设置结果集
         Page<Map<String, Object>> page = new Page(pageNum, pageSize);
-        Integer count = govInfoMapper.selectGovInfoCountByTypeAndParam(type, param);
-        List<GovInfo> govInfoList = govInfoMapper.selectGovInfoListByTypeAndParam(type, param, pageNum, pageSize);
-        //封装结果集
+        page.setTotal(govInfoPage.getTotal());
+
         List<Map<String, Object>> records = new ArrayList<>();
         //查出所有的曾用名
         QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
@@ -264,7 +278,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         govInfoList.stream().forEach(o -> {
             records.add(getResultMap(o, finalHisNameListMap));
         });
-        page.setTotal(count).setRecords(records);
+        page.setRecords(records);
         return R.ok(page);
     }
 
