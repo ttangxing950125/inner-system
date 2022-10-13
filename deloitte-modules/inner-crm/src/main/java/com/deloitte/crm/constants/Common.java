@@ -137,7 +137,7 @@ public enum Common {
     public static final Integer FINANCE_SUB_INDU_ID = 656;
 
     /**
-     *  匹配社会信用代码的震泽表达式
+     *  匹配社会信用代码的正则表达式
      */
     public static final String REGEX_CREDIT_CODE = "\\S{18}";
 

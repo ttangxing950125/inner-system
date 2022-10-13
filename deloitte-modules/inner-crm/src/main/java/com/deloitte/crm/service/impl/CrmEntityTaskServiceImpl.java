@@ -21,6 +21,7 @@ import com.deloitte.crm.vo.CrmEntityTaskVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -119,9 +120,11 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      */
     @Override
     public R<Page<CrmEntityTaskVo>> getTaskInfo(String date,Integer pageNum,Integer pageSize) {
+        pageNum = pageNum==null?1:pageNum;
+        pageSize = pageSize==null?5:pageSize;
         Date dateDay = DateUtil.parseDate(date);
 
-        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
+        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum,pageSize), new QueryWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
         List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
         Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum,pageSize,crmEntityTaskPage.getTotal());
@@ -156,11 +159,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     @Transactional(rollbackFor = Exception.class)
     public R finishTask(Integer taskId, Integer state) {
         CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId));
-        if (crmEntityTask == null) {
-            return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());
-        } else if (crmEntityTask.getState() != 0) {
-            return R.fail(BadInfo.EXITS_TASK_FINISH.getInfo());
-        }
+        Assert.notNull(crmEntityTask,BadInfo.VALID_EMPTY_TARGET.getInfo());
+        Assert.isTrue(crmEntityTask.getState() == 0,BadInfo.EXITS_TASK_FINISH.getInfo());
+
         crmEntityTask.setState(state);
         baseMapper.updateById(crmEntityTask);
         Date taskDate = crmEntityTask.getTaskDate();
@@ -173,9 +174,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
             //查询日任务 角色7对应的 task_role_type 为 8
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>()
                     .lambda().eq(CrmDailyTask::getTaskDate, taskDate).eq(CrmDailyTask::getTaskRoleType, 8));
-            if (crmDailyTask == null) {
-                return R.fail(BadInfo.EMPTY_TASK_TABLE.getInfo());
-            }
+            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
             // 当日任务处理完毕 状态码为 3
             crmDailyTask.setTaskStatus(3);
             crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);

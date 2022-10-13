@@ -174,6 +174,8 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      */
     @Override
     public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum==null?1:pageNum;
+        pageSize = pageSize==null?5:pageSize;
         List<CrmMasTaskVo> res = new ArrayList<>();
         Date dateDay = DateUtil.parseDate(date);
         Page<CrmMasTask> crmMasTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmMasTask>()

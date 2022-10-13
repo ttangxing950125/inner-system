@@ -91,4 +91,12 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @return
      */
     EntityInfo findLastOneByPrefixCredit(@Param("prefix") String prefix);
+
+    /**
+     * 通过 id 字段名 修改数据
+     * @param id
+     * @param filedName
+     * @param value
+     */
+    void editByBondInfoManager(@Param("id") Integer id, @Param("filedName") String filedName, @Param("value") String value);
 }

@@ -22,6 +22,7 @@ import com.deloitte.crm.vo.ModelMasterInfoVo;
 import com.deloitte.system.api.model.LoginUser;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Security;
@@ -59,7 +60,7 @@ public class RoleTwoController {
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String")
     @PostMapping("/getTaskInfo")
     @Log(title = "【 查询当日任务 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize){
+    public R<Page<CrmMasTaskVo>> getTaskInfo(String date,Integer pageNum, Integer pageSize){
         //单表查询 角色2当月任务完成情况
         return iCrmMasTaskService.getTaskInfo(date,pageNum,pageSize);
     }

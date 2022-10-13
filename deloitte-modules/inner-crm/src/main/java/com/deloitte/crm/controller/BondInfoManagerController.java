@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.domain.EntityAttrIntype;
@@ -10,13 +11,11 @@ import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.vo.BondEntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -51,7 +50,7 @@ public class BondInfoManagerController {
         @ApiImplicitParam(name="pageNum",value="翻页控制",paramType="query",dataType = "Integer")
     })
     @PostMapping("/findBondOrEntity")
-    public R<List<TargetEntityBondsVo>> findBondOrEntity(String name,String keyword,Integer pageNum,Integer pageSize) {
+    public R <Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
         //模糊匹配 查询主体||债券信息
         return iEntityInfoService.findBondOrEntity(name,keyword,pageNum,pageSize);
     }
@@ -86,8 +85,9 @@ public class BondInfoManagerController {
         @ApiImplicitParam(name = "entityCode", value = "请传入 主体代码:IB000001 ", paramType = "query", dataType = "String"),
         @ApiImplicitParam(name = "bondCode", value = "请传入 债券代码:BD000001 ", paramType = "query", dataType = "String")
     })
+    @ApiResponse(code = 200,message = "操作成功",response =BondEntityInfoVo.class)
     @PostMapping("/findAllDetail")
-    public R<BondEntityInfoVo> findAllDetail(String entityCode, String bondCode){
+    public R<List<BondEntityInfoVo>> findAllDetail(@NotNull(message = "主体代码不能为空") String entityCode,@NotNull(message = "债券代码不能为空") String bondCode){
         return iBondInfoService.findAllDetail(entityCode,bondCode);
     }
 
@@ -100,7 +100,7 @@ public class BondInfoManagerController {
     @ApiOperation(value="修改具体信息 by正杰")
     @ApiImplicitParam(name = "bondInfoEditVo", value = "传入bondInfoEditVo 中 list需要修改的参数", paramType = "body", dataType = "body",dataTypeClass = BondEntityInfoVo.class)
     @PostMapping("/editAllDetail")
-    public R editAllDetail(@RequestBody BondEntityInfoVo bondInfoEditVo){
+    public R editAllDetail(@RequestBody List<BondEntityInfoVo> bondInfoEditVo){
         return iBondInfoService.editAllDetail(bondInfoEditVo);
     }
 
