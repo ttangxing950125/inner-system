@@ -425,3 +425,18 @@ export function replaceStr(row, keywork) {
   row = row.replace(replaceReg, replaceString);
   return row;
 }
+
+/**
+ * 分割二维数组
+ * @param {*} arr // 被分割数组
+ * @param {*} chunkSize  // 分割粒度
+ * @returns
+ */
+export function sliceIntoChunks(arr, chunkSize) {
+  const res = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    const chunk = arr.slice(i, i + chunkSize);
+    res.push(chunk);
+  }
+  return res;
+}

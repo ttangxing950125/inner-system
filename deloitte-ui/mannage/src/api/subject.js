@@ -43,7 +43,11 @@ export function getInfoList(params) {
       "/crm/entityInfo/getInfoList?type=" +
       params.type +
       "&param=" +
-      params.param,
+      params.param +
+      "&pageNum=" +
+      params.pageNum +
+      "&pageSize=" +
+      params.pageSize,
     headers: {
       isToken: true,
     },
@@ -64,14 +68,10 @@ export function getProduct(params) {
   });
 }
 
-// 覆盖情况
-export function getProductCover(params) {
+// 查询覆盖情况
+export function getCov(params) {
   return request({
-    url:
-      "/crm/entityInfo/getInfoList?type=" +
-      params.type +
-      "&param=" +
-      params.param,
+    url: "/crm/ProductsCover/getCov",
     headers: {
       isToken: true,
     },

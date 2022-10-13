@@ -7,7 +7,11 @@ export function findBondOrEntity(parmas) {
       "/crm/bondInfoManager/findBondOrEntity?keyword=" +
       parmas.keyword +
       "&name=" +
-      parmas.name,
+      parmas.name +
+      "&pageNum=" +
+      parmas.pageNum +
+      "&pageSize=" +
+      parmas.pageSize,
     headers: {
       isToken: true,
     },
@@ -64,6 +68,54 @@ export function findAllDetail(parmas) {
       parmas.bondCode +
       "&entityCode=" +
       parmas.entityCode,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 修改具体信息
+export function editAllDetail(parmas) {
+  return request({
+    url: "/crm/bondInfoManager/editAllDetail",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 手动添加债券信息
+export function insertBondInfoManual(parmas) {
+  return request({
+    url: "/crm/bondInfoManager/insertBondInfoManual",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// wind下拉框
+export function getWindBondType(parmas) {
+  return request({
+    url: "/crm/bondInfoManager/getWindBondType?id=" + parmas.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询主体信息
+export function getEntityInfo(parmas) {
+  return request({
+    url: "/crm/bondInfoManager/getEntityInfo?creditCode=" + parmas.creditCode,
     headers: {
       isToken: true,
     },
