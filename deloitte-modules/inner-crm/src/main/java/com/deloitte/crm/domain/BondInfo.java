@@ -61,11 +61,11 @@ public class BondInfo {
 
     /** 起息日*/
     @ApiModelProperty(value="起息日")
-    private String  valueDate ;
+    private String valueDate ;
 
     /** 到期日*/
     @ApiModelProperty(value="到期日")
-    private  String  dueDate ;
+    private  String dueDate ;
 
 
     /**
