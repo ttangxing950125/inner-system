@@ -3,6 +3,7 @@ package com.deloitte.crm.dto;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,9 @@ public class ProductCoverDto {
      */
     @Excel(name = "是否覆盖 0-否 1-是")
     private List<String> isCovers = new ArrayList<>() ;
-
+    /**
+     *返回列数据
+     */
     private ArrayList<HashMap<String,String>> result;
 
 

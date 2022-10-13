@@ -106,7 +106,7 @@ public class BondConvertibleChangeInfo implements Serializable {
     /**
      * 网上缴款日
      */     @Excel(name = "网上缴款日")
-    private Date onlinePayment Date;
+    private Date onlinePayment;
     /**
      * 上市日
      */     @Excel(name = "上市日")
@@ -146,7 +146,7 @@ public class BondConvertibleChangeInfo implements Serializable {
     /**
      * 主承销商
      */     @Excel(name = "主承销商")
-    private String lead underwriter;
+    private String leadUnderwriter;
     /**
      * 赎回条款
      */     @Excel(name = "赎回条款")
