@@ -93,7 +93,7 @@ public interface IBondInfoService
      * @author 正杰
      * @date 2022/9/28
      */
-    R<BondEntityInfoVo> findAllDetail(String entityCode, String bondCode);
+    R<List<BondEntityInfoVo>> findAllDetail(String entityCode, String bondCode);
 
     /**
      * 修改具体信息 by正杰
@@ -101,7 +101,7 @@ public interface IBondInfoService
      * @author 正杰
      * @date 2022/9/28
      */
-    R<BondEntityInfoVo> editAllDetail(BondEntityInfoVo bondInfoEditVo);
+    R editAllDetail(List<BondEntityInfoVo> bondInfoEditVo);
 
 //    Object getBondType();
 

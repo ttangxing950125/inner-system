@@ -231,4 +231,9 @@
     <select id="findLastOneByPrefixCredit" resultMap="EntityInfoResult">
         SELECT * FROM entity_info WHERE credit_code LIKE CONCAT (#{prefix},'%') ORDER BY id DESC  LIMIT 1
     </select>
+
+    <update id="editByBondInfoManager">
+        UPDATE `entity_info` SET ${filedName} = #{value} WHERE `id` = #{id};
+    </update>
+
 </mapper>

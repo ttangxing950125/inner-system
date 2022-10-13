@@ -1006,20 +1006,23 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //债券代码 => bond_code
         bondVo.setBondCode(bondInfo.getBondCode());
         //债券交易代码
-        bondVo.setTransactionCode(
-                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
-                        .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID)).getValue()
-        );
+//        bondVo.setTransactionCode(
+//                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+//                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
+//                        .eq(EntityAttrValue::getAttrId, Common.TRANSACTION_CODE_ID)).getValue()
+//        );
+        bondVo.setTransactionCode(bondInfo.getOriCode());
         //债券全称
-        bondVo.setFullName(
-                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
-                        .eq(EntityAttrValue::getAttrId, Common.BOND_NAME_ID)).getValue()
-        );
+//        bondVo.setFullName(
+//                entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+//                        .lambda().eq(EntityAttrValue::getEntityCode, bondInfo.getBondCode())
+//                        .eq(EntityAttrValue::getAttrId, Common.BOND_NAME_ID)).getValue()
+//        );
+        bondVo.setFullName(bondInfo.getBondName());
         //债券简称
         bondVo.setShortName(bondInfo.getBondShortName());
-        //TODO 存续状态
+        //存续状态
+        bondVo.setDebtRaisingType(bondInfo.getBondState()==null?null:bondInfo.getBondState().toString());
         //TODO 债募类型
         //公私募类型
         bondVo.setRaiseType(bondInfo.getRaiseType());
@@ -1075,6 +1078,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<List<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum==null?1:pageNum;
+        pageSize = pageSize==null?20:pageSize;
         //模糊匹配 查询主体||债券信息
         switch (keyword) {
             //模糊匹配主体名

@@ -252,4 +252,11 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
     void addEntityeMsg(EntityInfo entityInfo);
+
+    /**
+     * 根据 id 字段名 修改
+     * @param id
+     * @param filedName
+     * @param value
+     */
 }
