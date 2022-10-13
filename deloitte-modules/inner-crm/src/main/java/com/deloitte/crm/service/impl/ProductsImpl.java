@@ -30,6 +30,7 @@ public class ProductsImpl extends ServiceImpl<ProductsMapper,Products> implement
     */
     @Override
     public List<Products> getProducts() {
+
         return list();
     }
 }

@@ -69,7 +69,10 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      */
     List<EntityInfo> findByName(String entityName);
 
-    List<EntityInfo> selectGovInfoListByTypeAndParam(EntityInfo entityInfo);
+    List<EntityInfo> selectGovInfoListByTypeAndParam(@Param("type")Integer type,
+                                                     @Param("param")String param,
+                                                     @Param("pageNum")Integer pageNum,
+                                                     @Param("pageSize")Integer pageSize);
 
     List<EntityInfo> getEntityByBondType(@Param("raiseType") Integer raiseType,
                                          @Param("abs")Integer abs,
@@ -91,4 +94,12 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @return
      */
     EntityInfo findLastOneByPrefixCredit(@Param("prefix") String prefix);
+
+    /**
+     * 通过 id 字段名 修改数据
+     * @param id
+     * @param filedName
+     * @param value
+     */
+    void editByBondInfoManager(@Param("id") Integer id, @Param("filedName") String filedName, @Param("value") String value);
 }

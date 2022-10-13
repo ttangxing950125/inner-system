@@ -8,8 +8,7 @@ import com.deloitte.crm.domain.CrmWindTask;
 import java.util.List;
 
 /**
- * (CnDelistInfo)表服务接口
- *
+ *  退市资料-仅A股
  * @author 吴鹏鹏ppp
  * @since 2022-10-11 18:46:11
  */

@@ -1,13 +1,16 @@
 package com.deloitte.crm.controller;
 
 import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.ProductsCoverService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +43,9 @@ public class ProductCoverController {
      */
     @ApiOperation(value = "查询覆盖情况")
     @PostMapping("/getCov")
-    public R getProCov(@RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo) {
+    @ApiImplicitParam(name = "getProCov", value = "", paramType = "body", example = "", dataTypeClass = EntityOrGovByAttrVo.class)
+
+    public R getProCov(@Validated @RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo) {
         //查询政府覆盖
         if (ObjectUtils.equals(entityOrGovByAttrVo.getEntityType(), "GV")) {
             return R.ok(iGovInfoService.getGovEntityResult(entityOrGovByAttrVo));

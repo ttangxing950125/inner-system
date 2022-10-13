@@ -47,6 +47,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
     /**
      * 处理文件中的每一行
+     *
      * @param item
      * @param timeNow
      * @param windTask
@@ -64,7 +65,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
             //没有就创建一个
-            if (stockCnInfo==null){
+            if (stockCnInfo == null) {
                 stockCnInfo = new StockCnInfo();
             }
 
@@ -75,19 +76,19 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             Integer changeType = null;
             CnIpoInfo last = cnIpoInfoService.findLastByCode(code);
 
-            if (last==null){
+            if (last == null) {
                 //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在  新股发行 中时，记为“发行中”
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
                 stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
 
-            }else if (!Objects.equals(last, item)){
+            } else if (!Objects.equals(last, item)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
 
-            if (last!=null && DateUtil.compare(last.getIpoDate(), item.getIpoDate())!=0){
+            if (last != null && DateUtil.compare(last.getIpoDate(), item.getIpoDate()) != 0) {
                 //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
                 // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
@@ -97,17 +98,16 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
             if (
                     Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getId())
-                    &&
-                    DateUtil.compare(timeNow, item.getIpoDate())==0
-            ){
+                            &&
+                            DateUtil.compare(timeNow, item.getIpoDate()) == 0
+            ) {
                 stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getId());
                 stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getName());
             }
 
 
-
             //如果是成功上市，发送给敞口划分人
-            if ( Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getId()) ){
+            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getId())) {
 
                 //查询和当前a股绑定关联关系的主体
                 List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
@@ -117,7 +117,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             }
 
 
-            if (StrUtil.isNotBlank(code)){
+            if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
@@ -150,6 +150,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
     /**
      * 开始执行任务
+     *
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
@@ -159,7 +160,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnIpoInfo> util = new ExcelUtil<CnIpoInfo>(CnIpoInfo.class);
-        List<CnIpoInfo> list = util.importExcel(null,file.getInputStream(),1, true);
+        List<CnIpoInfo> list = util.importExcel(null, file.getInputStream(), 1, true);
 
         return cnIpoInfoService.doTask(windTask, list);
 //        return null;
@@ -206,7 +207,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 .in(CnIpoInfo::getChangeType, changeStatusArr);
 
 
-        return cnIpoInfoService.list(wrapper).stream().map(item->{
+        return cnIpoInfoService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

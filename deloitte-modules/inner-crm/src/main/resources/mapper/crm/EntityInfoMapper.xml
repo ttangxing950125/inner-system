@@ -69,16 +69,6 @@
             <if test="finance != null  and finance != ''">and finance = #{finance}</if>
             <if test="list != null ">and list = #{list}</if>
             <if test="issueBonds != null ">and issue_bonds = #{issueBonds}</if>
-            <if test="creditError != null ">and credit_error = #{creditError}</if>
-            <if test="creditErrorType != null ">and credit_error_type = #{creditErrorType}</if>
-            <if test="entityNameHis != null  and entityNameHis != ''">and entity_name_his = #{entityNameHis}</if>
-            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''">and entity_name_his_remarks =
-                #{entityNameHisRemarks}
-            </if>
-            <if test="creater != null  and creater != ''">and creater = #{creater}</if>
-            <if test="updater != null  and updater != ''">and updater = #{updater}</if>
-            <if test="created != null ">and created = #{created}</if>
-            <if test="updated != null ">and updated = #{updated}</if>
         </where>
     </select>
 
@@ -231,4 +221,9 @@
     <select id="findLastOneByPrefixCredit" resultMap="EntityInfoResult">
         SELECT * FROM entity_info WHERE credit_code LIKE CONCAT (#{prefix},'%') ORDER BY id DESC  LIMIT 1
     </select>
+
+    <update id="editByBondInfoManager">
+        UPDATE `entity_info` SET ${filedName} = #{value} WHERE `id` = #{id};
+    </update>
+
 </mapper>

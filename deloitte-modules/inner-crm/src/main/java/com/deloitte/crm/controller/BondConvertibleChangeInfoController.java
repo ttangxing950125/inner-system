@@ -5,7 +5,6 @@ package com.deloitte.crm.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.BondConvertibleChangeInfo;
-import com.deloitte.crm.service.BondConvertibleChangeInfoService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -21,11 +20,4 @@ import java.util.List;
 @RestController
 @RequestMapping("bondConvertibleChangeInfo")
 public class BondConvertibleChangeInfoController {
-    /**
-     * 服务对象
-     */
-    @Resource
-    private BondConvertibleChangeInfoService bondConvertibleChangeInfoService;
-
-    
 }

@@ -108,5 +108,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             a.attr_id = 57
     </select>
 
+    <update id="editByBondInfoManager">
+        UPDATE `bond_info` SET ${filedName} = #{value} WHERE `id` = #{id};
+    </update>
+
+    <update id="editByBondInfoManagerDate">
+        UPDATE `bond_info` SET ${filedName} = #{date} WHERE `id` = #{id};
+    </update>
 
 </mapper>

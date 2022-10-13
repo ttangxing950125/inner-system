@@ -14,8 +14,13 @@ public enum WindTaskEnum {
     CN_APPRD_WAIT_ISS(4, 2, "A股发行", "IPO-审核通过尚未发行"),
     CN_DELISTINFO(8, 2, "A股发行", "退市资料-仅A股"),
 
+
     BOND_NEW_ISS(15, 2, "债券发行", "新债发行-新发行债券"),
     BOND_DEL_ISS(14, 2, "债券发行", "新债发行-推迟或取消发行债券"),
+    BOND_CONVERTIBLE(16, 2, "债券发行", "可转债发行预案"),
+    BOND_CONVERTIBLE_CHANGE(17, 2, "债券发行", "可交换转债发行预案"),
+
+
 
     THK_SEC_ISS_INFO(22, 3, "港股发行", "证券发行-股票发行-聆讯信息一览"),
     THK_SEC_ISS_DETAIL(23, 3, "港股发行", "证券发行-股票发行-首次发行明细"),
