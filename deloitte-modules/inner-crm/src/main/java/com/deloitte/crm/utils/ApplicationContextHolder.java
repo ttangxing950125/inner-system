@@ -23,7 +23,7 @@ public class ApplicationContextHolder implements ApplicationContextAware {
     }
 
     public static ConfigurableApplicationContext get() {
-        return (ConfigurableApplicationContext)CONTEXT;
+        return (ConfigurableApplicationContext) CONTEXT;
     }
 
     public void setApplicationContext(ApplicationContext context) throws BeansException {

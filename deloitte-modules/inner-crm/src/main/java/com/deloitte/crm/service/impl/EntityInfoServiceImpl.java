@@ -1470,37 +1470,94 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return bondDetail;
     }
 
-    //获取上市情况
-    private String getListDetail(EntityInfo o) {
-        String listDetail = "";
+    @Autowired
+    private StockCnInfoMapper stockCnMapper;
 
-        QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-        List<EntityAttrValue> attrValueListA = entityAttrValueMapper.selectList(valueQuery.lambda()
-                .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
-                .eq(EntityAttrValue::getAttrId, A_LIST_ATTRID)
-        );
-        List<EntityAttrValue> attrValueListG = entityAttrValueMapper.selectList(valueQuery.lambda()
-                .eq(EntityAttrValue::getEntityCode, o.getEntityCode())
-                .eq(EntityAttrValue::getAttrId, G_LIST_ATTRID)
-        );
-        //                25		A股上市状态		1、存续 2、已退市 3、未曾A股上市
-        if (!CollectionUtils.isEmpty(attrValueListA)) {
-            String value = attrValueListA.get(0).getValue();
-            if ("1".equals(value)) {
-                listDetail = listDetail + "A股(存续)";
-            } else if ("2".equals(value)) {
-                listDetail = listDetail + "A股(已退市)";
+    @Autowired
+    private StockThkInfoMapper stockThkMapper;
+
+    //获取上市情况
+    public String getListDetail(EntityInfo o) {
+        String listDetail = "";
+        //查询是否存在 A股  上市情况
+        QueryWrapper <EntityStockCnRel> cnRelQuery=new QueryWrapper<>();
+        List<EntityStockCnRel> cnRels = cnRelMapper.selectList(cnRelQuery.lambda().eq(EntityStockCnRel::getEntityCode, o.getEntityCode()));
+        //创建 A股 上市描述
+        String ADetail="";
+        //不存在则直接返回
+        //存在，则分别识别是否退市
+            //A股 判断退市时间和当前时间
+        if(!CollectionUtils.isEmpty(cnRels)){
+            //保存全部的上市 code
+            List<String>cnCodes=new ArrayList<>();
+            cnRels.stream().forEach(x->cnCodes.add(x.getStockDqCode()));
+            QueryWrapper<StockCnInfo>stockCnInfoQuery=new QueryWrapper<>();
+
+            //查询 entityCode 下所有的A股信息
+            List<StockCnInfo> stockCnInfos = stockCnMapper.selectList(stockCnInfoQuery.lambda().in(StockCnInfo::getStockDqCode, cnCodes));
+            if (!CollectionUtils.isEmpty(stockCnInfos)){
+                for (int i=0;i<stockCnInfos.size();i++){
+                    if ("A股(存续)".equals(ADetail)){
+                        break;
+                    }
+                    StockCnInfo stockCnInfo = stockCnInfos.get(i);
+                    //退市日期
+                    String delistingDate = stockCnInfo.getDelistingDate();
+                    // TODO 需要验证是否是这样判断
+                    int days = TimeFormatUtil.between_days("yyyy-MM-dd", delistingDate, TimeFormatUtil.getFormartDate(new Date()));
+                    if (days<0){
+                        //当前时间小于退市时间------未退市
+                        ADetail="A股(存续)";
+                    }else {
+                        //当前时间大于退市时间------退市
+                        ADetail="A股(已退市)";
+                    }
+                }
             }
         }
-        //                44		港股上市状态		1、存续 2、已退市
-        if (!CollectionUtils.isEmpty(attrValueListG)) {
-            String value = attrValueListG.get(0).getValue();
-            if ("1".equals(value)) {
-                if (ObjectUtils.isEmpty(listDetail)) {
-                    listDetail = "B股";
-                } else {
-                    listDetail = listDetail + ",B股";
+        //查询是否存在 G股  上市情况
+        QueryWrapper <EntityStockThkRel> thkRelQuery=new QueryWrapper<>();
+        List<EntityStockThkRel> thkRels = thkRelMapper.selectList(thkRelQuery.lambda().eq(EntityStockThkRel::getEntityCode, o.getEntityCode()));
+        //创建 G股 上市描述
+        String GDetail="";
+        //不存在则直接返回
+        //存在，则分别识别是否退市
+        //A股 判断退市时间和当前时间
+        if(!CollectionUtils.isEmpty(thkRels)){
+            //保存全部的上市 code
+            List<String>thkCodes=new ArrayList<>();
+            thkRels.stream().forEach(x->thkCodes.add(x.getStockDqCode()));
+            QueryWrapper<StockThkInfo>stockThkInfoQuery=new QueryWrapper<>();
+
+            //查询 entityCode 下所有的G股信息
+            List<StockThkInfo> stockThkInfos = stockThkMapper.selectList(stockThkInfoQuery.lambda().in(StockThkInfo::getStockDqCode, thkCodes));
+            if (!CollectionUtils.isEmpty(stockThkInfos)){
+                for (int i=0;i<stockThkInfos.size();i++){
+                    if ("港股(存续)".equals(GDetail)){
+                        break;
+                    }
+                    StockThkInfo stockThkInfo = stockThkInfos.get(i);
+                    //退市日期
+                    String delistingDate = stockThkInfo.getDelistingDate();
+                    // TODO 需要验证是否是这样判断
+                    int days = TimeFormatUtil.between_days("yyyy-MM-dd", delistingDate, TimeFormatUtil.getFormartDate(new Date()));
+                    if (days<0){
+                        //当前时间小于退市时间------未退市
+                        GDetail="港股(存续)";
+                    }else {
+                        //当前时间大于退市时间------退市
+                        GDetail="港股(已退市)";
+                    }
                 }
+            }
+        }
+        if (ObjectUtil.isEmpty(ADetail)){
+            listDetail=GDetail;
+        }else {
+            if (ObjectUtil.isEmpty(ADetail)){
+                listDetail=ADetail;
+            }else {
+                listDetail=ADetail+","+GDetail;
             }
         }
         return listDetail;

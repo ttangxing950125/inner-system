@@ -30,7 +30,9 @@
     </resultMap>
 
     <sql id="selectGovInfoVo">
-        select id, gov_name, gov_code, dq_gov_code,   economyRegion,provincial,cityGroup,countryCenter, gov_type, gov_level_big, gov_level_small, gov_name_his, entity_name_his_remarks, invalid, new_gov_name, new_dq_code, new_gov_code, creater, updater, created, updated from gov_info
+        select id, gov_name, gov_code, dq_gov_code,economy_region,provincial,city_group,country_center, gov_type, gov_level_big,
+        gov_level_small, gov_name_his, entity_name_his_remarks, invalid, new_gov_name, new_dq_code, new_gov_code, creater,
+        updater, created, updated from gov_info
     </sql>
 
     <select id="selectGovInfoList" parameterType="GovInfo" resultMap="GovInfoResult">
@@ -126,12 +128,23 @@
         where id = #{id}
     </update>
 
-    <select id="selectGovInfoListByTypeAndParam" parameterType="GovInfo" resultMap="GovInfoResult">
+    <select id="selectGovInfoListByTypeAndParam" resultMap="GovInfoResult">
         <include refid="selectGovInfoVo"/>
         <where>
-            <if test="govType != null ">and gov_type = #{govType}</if>
-            <if test="govName != null  and govName != ''">and gov_name like concat('%', #{govName}, '%')or dq_gov_code
-                like concat('%', #{dqGovCode}, '%')
+            <if test="type != null  and type != '' ">and gov_type = #{type}</if>
+            <if test="param != null  and param != ''">and gov_name like concat('%', #{param}, '%')or dq_gov_code
+                like concat('%', #{param}, '%')
+            </if>
+        </where>
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="selectGovInfoCountByTypeAndParam" resultType="java.lang.Integer">
+        select count(0) from gov_info
+        <where>
+            <if test="type != null  and type != '' ">and gov_type = #{type}</if>
+            <if test="param != null  and param != ''">and gov_name like concat('%', #{param}, '%')or dq_gov_code
+                like concat('%', #{param}, '%')
             </if>
         </where>
     </select>
