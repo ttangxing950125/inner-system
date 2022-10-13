@@ -986,7 +986,7 @@ import {
           getTaskByDate,
           queryList,
           getDayTaskInfo,
-          getMouthTaskInfo,
+          // getMouthTaskInfo,
           checkCreditCode,
           getRoleSupplyTask,
           getTaskByEntityCode,
@@ -1166,11 +1166,11 @@ export default {
           date:this.monthDate
         }
         // 角色7相关接口
-        getMouthTaskInfo(role2MonthDate).then((res) => {
-          const { data } = res
-          this.showMsg(data)
-        });
-        getDayTaskInfo(role2date).then(res => {
+        // getMouthTaskInfo(role2MonthDate).then((res) => {
+        //   const { data } = res
+        //   this.showMsg(data)
+        // });
+        (role2date).then(res => {
           const { data } = res
           this.list7 = data
         })

@@ -130,7 +130,7 @@ public class BondConvertibleChangeInfo implements Serializable {
      * 网上缴款日
      */
     @Excel(name = "网上缴款日")
-    private Date onlinePayment;
+    private Date onlinePaymentDate;
     /**
      * 上市日
      */

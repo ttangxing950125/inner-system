@@ -44,7 +44,8 @@ public class BondConvertibleChangeInfoServiceImpl extends ServiceImpl<BondConver
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 
         for (BondConvertibleChangeInfo bondConvertibleChangeInfos : bondConvertibleChangeInfo) {
-            if (bondConvertibleChangeInfos.getNoticeDate().equals("数据来源：Wind")) {
+            final Date noticeDate = bondConvertibleChangeInfos.getNoticeDate();
+            if (noticeDate != null && DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, noticeDate).equals("数据来源：Wind")) {
                 continue;
             }
             Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleChangeStrategy.class).doBondImport(bondConvertibleChangeInfos, timeNow, windTask);

@@ -36,7 +36,11 @@
         <el-table-column type="index" sortable label="序号"> </el-table-column>
         <el-table-column prop="entityCode" label="德勤主体代码" sortable>
         </el-table-column>
-        <el-table-column prop="entityName" label="企业名称"> </el-table-column>
+        <el-table-column prop="entityName" label="企业名称">
+          <template slot-scope="scope">
+            <div v-html="replaceFun(scope.row.entityName)"></div>
+          </template>
+        </el-table-column>
         <el-table-column prop="creditCode" label="统一社会信用代码">
         </el-table-column>
         <el-table-column prop="bondCode" label="债券交易代码">
@@ -49,6 +53,13 @@
           </template></el-table-column
         >
       </el-table>
+      <pagination
+        v-show="total > 0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
     </div>
     <div class="mt20">
       <div class="flex1">
@@ -93,29 +104,45 @@
       <div class="flex1 between">
         <h3 class="g-t-title">债券交易信息表</h3>
         <div class="mt20">
-          <el-button @click="handleClick(scope.row)" type="text" size="small"
-            >提交变更并退出修改模式</el-button
+          <el-button @click="submit()" type="text" size="small"
+            >提交变更</el-button
           >
         </div>
       </div>
       <el-card>
         <el-col :sm="24" :lg="12" class="form-card">
           <div
-            v-for="(item, index) in xContent"
+            v-for="(item, index) in xContent[0]"
             :key="index"
             class="flex1 mt10"
           >
-            <div class="first">{{ item.key }}</div>
-            <div class="content">{{ item.value || "-" }}</div>
+            <div class="first">{{ item.name }}</div>
+            <el-input
+              v-if="item.enableEdite"
+              class="t-input"
+              v-model="item.value"
+              @change="item.edit = true"
+            ></el-input>
+            <div v-else class="content">{{ item.value || "-" }}</div>
           </div>
-          <span v-if="xContent.length === 0">暂无数据</span>
         </el-col>
-        <!-- <el-col :sm="24" :lg="12" class="form-card">
-          <div v-for="(item,index) in xContent" :key="index" class="flex1 mt10">
-            <div class="first">{{ item.key }}</div>
-            <div class="content">{{ item.value }}</div>
+        <el-col :sm="24" :lg="12" class="form-card">
+          <div
+            v-for="(item, index) in xContent[1]"
+            :key="index"
+            class="flex1 mt10"
+          >
+            <div class="first">{{ item.name }}</div>
+            <el-input
+              v-if="item.enableEdite"
+              class="t-input"
+              v-model="item.value"
+              @change="item.edit = true"
+            ></el-input>
+            <div v-else class="content">{{ item.value || "-" }}</div>
           </div>
-        </el-col> -->
+        </el-col>
+        <span v-if="xContent.length === 0">暂无数据</span>
       </el-card>
     </div>
     <el-dialog
@@ -130,67 +157,91 @@
         label-width="195px"
         label-position="left"
       >
-        <el-form-item label="债券全称" prop="region">
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="债券全称" prop="">
+          <el-input class="t-input" v-model="ruleForm.bondFullName"></el-input>
         </el-form-item>
-        <el-form-item label="债券简称" prop="region">
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="债券简称" prop="">
+          <el-input class="t-input" v-model="ruleForm.bondShortName"></el-input>
         </el-form-item>
-        <el-form-item label="债券交易代码" prop="region">
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="债券交易代码" prop="">
+          <el-input class="t-input" v-model="ruleForm.oriCode"></el-input>
         </el-form-item>
-        <el-form-item label="wind债券类型" prop="region">
+        <el-form-item label="wind债券类型" prop="">
           <el-col :span="11">
             <el-form-item prop="date1">
-              <el-date-picker
-                type="date"
+              <el-select
+                class="mr10 selects"
+                v-model="ruleForm.windTypeOne"
                 placeholder="下拉选择债券类型-I"
-                v-model="ruleForm.date1"
-                style="width: 100%"
-              ></el-date-picker>
+                @change="selectChange"
+              >
+                <el-option
+                  v-for="item in wind1"
+                  :key="item.id"
+                  :label="item.value"
+                  :value="item"
+                >
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col class="line" :span="2">-</el-col>
           <el-col :span="11">
             <el-form-item prop="date2">
-              <el-time-picker
+              <el-select
+                class="mr10 selects"
+                v-model="ruleForm.windTypeTwo"
                 placeholder="下拉选择债券类型-II"
-                v-model="ruleForm.date2"
-                style="width: 100%"
-              ></el-time-picker>
+              >
+                <el-option
+                  v-for="item in wind2"
+                  :key="item.id"
+                  :label="item.value"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-form-item>
-        <el-form-item label="公私募类型" prop="region">
-          <el-radio-group v-model="ruleForm.resource">
-            <el-radio label="公募"></el-radio>
-            <el-radio label="私募"></el-radio>
+        <el-form-item label="公私募类型" prop="">
+          <el-radio-group v-model="ruleForm.raiseType">
+            <el-radio label="0">公募</el-radio>
+            <el-radio label="1">私募</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="债券状态" prop="region">
-          <el-radio-group v-model="ruleForm.resource">
-            <el-radio label="存续"></el-radio>
-            <el-radio label="违约"></el-radio>
-            <el-radio label="已兑付"></el-radio>
+        <el-form-item label="债券状态" prop="">
+          <el-radio-group v-model="ruleForm.bondState">
+            <el-radio label="0">存续</el-radio>
+            <el-radio label="1">违约</el-radio>
+            <el-radio label="2">已兑付</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="起息日" prop="region">
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="起息日" prop="">
+          <el-input class="t-input" v-model="ruleForm.valueDate"></el-input>
         </el-form-item>
-        <el-form-item label="到期兑付日" prop="region">
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="到期兑付日" prop="">
+          <el-input
+            class="t-input"
+            v-model="ruleForm.dueCashingDate"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="债务主体统一社会信用代码" prop="region">
-          <el-input class="t-input" v-model="ruleForm.name"></el-input>
+        <el-form-item label="债务主体统一社会信用代码" prop="">
+          <el-input
+            class="t-input"
+            v-model="ruleForm.creditCode"
+            @change="getCode"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="债务主体名称" prop="region">
-          <span class="color-gary">根据统一社会信用代码自动匹配</span>
+        <el-form-item label="债务主体名称" prop="">
+          <span v-if="ruleForm.entityCode" class="balck">{{
+            ruleForm.entityName
+          }}</span>
+          <span v-else class="color-gary">根据统一社会信用代码自动匹配</span>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false"
-          >确认新增</el-button
-        >
+        <el-button type="primary" @click="submitAdd">确认新增</el-button>
       </span>
     </el-dialog>
   </div>
@@ -201,9 +252,18 @@ import {
   findBondOrEntity,
   findRelationEntityOrBond,
   findAllDetail,
+  editAllDetail,
+  insertBondInfoManual,
+  getWindBondType,
+  getEntityInfo,
 } from "@/api/bond";
+import pagination from "../../../components/Pagination";
+import { replaceStr, sliceIntoChunks } from "@/utils/index";
 export default {
   name: "government",
+  components: {
+    pagination,
+  },
   data() {
     return {
       input: "",
@@ -211,16 +271,7 @@ export default {
       list2: [],
       loading: false,
       dialogVisible: false,
-      ruleForm: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
-      },
+      ruleForm: {},
       rules: {
         name: [
           { required: true, message: "请输入活动名称", trigger: "blur" },
@@ -261,6 +312,13 @@ export default {
       tab: 1,
       entityCode: "",
       xContent: [],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
+      wind1: [],
+      wind2: [],
     };
   },
   created() {},
@@ -271,11 +329,15 @@ export default {
         const parmas = {
           keyword: this.tab === 1 ? "ENTITY" : "BOND",
           name: this.input,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
         };
         findBondOrEntity(parmas).then((res) => {
           const { data } = res;
           this.list = [];
-          data.forEach((e) => {
+          this.total = data.total;
+          this.queryParams.pageNum = data.pages;
+          data.records.forEach((e) => {
             this.list.push(e.entityVo);
           });
         });
@@ -293,6 +355,23 @@ export default {
     },
     addNew() {
       this.dialogVisible = true;
+      try {
+        this.$modal.loading("loading...");
+        getWindBondType({ id: "" }).then((res) => {
+          const { data } = res;
+          this.wind1 = data;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    selectChange(row) {
+      getWindBondType({ id: row.id }).then((res) => {
+        const { data } = res;
+        this.wind2 = data;
+      });
     },
     changeTab(tab) {
       this.tab = tab;
@@ -327,18 +406,83 @@ export default {
         };
         findAllDetail(parmas).then((res) => {
           const { data } = res;
-          this.xContent = [];
-          for (const key in data.attrs) {
-            const x = {
-              key: data.attrs[key].name,
-              value: data.attrs[key].value,
-            };
-            this.xContent.push(x);
-          }
+          this.xContent = data;
+          this.xContent = sliceIntoChunks(
+            this.xContent,
+            this.xContent.length / 2
+          );
           console.log(this.xContent);
         });
       } catch (error) {
         console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getList() {
+      this.getBondOrEntity();
+    },
+    replaceFun(row) {
+      return replaceStr(row, this.input);
+    },
+    submit() {
+      try {
+        this.$modal.loading("loading...");
+        const parmas = this.xContent[0].concat(this.xContent[1]);
+        const ret = [];
+        parmas.forEach((e) => {
+          if (e.edit) {
+            ret.push(e);
+          }
+        });
+        editAllDetail(ret).then((res) => {
+          const { data } = res;
+          this.$message({
+            showClose: true,
+            message: "操作成功",
+            type: "success",
+          });
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    submitAdd() {
+      try {
+        this.$modal.loading("loading...");
+        this.ruleForm.windTypeOne = this.ruleForm.windTypeOne.value;
+        insertBondInfoManual(this.ruleForm).then((res) => {
+          this.$message({
+            showClose: true,
+            message: "操作成功",
+            type: "success",
+          });
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getCode() {
+      try {
+        this.$modal.loading("loading...");
+        getEntityInfo({ creditCode: this.ruleForm.creditCode }).then((res) => {
+          const { data } = res;
+          this.$set(this.ruleForm, "entityName", data.entityName);
+          this.$set(this.ruleForm, "entityCode", data.entityCode);
+        });
+      } catch (error) {
       } finally {
         this.$modal.closeLoading();
       }
@@ -398,12 +542,19 @@ export default {
   .content {
     color: #a7a7a7;
     margin-top: 3px;
+    width: 300px;
+    margin-left: 10px;
   }
 }
 .color-gary {
   color: #a7a7a7;
 }
+.black {
+  color: black;
+}
 .t-input {
   width: 50%;
+  width: 300px;
+  margin-left: 10px;
 }
 </style>

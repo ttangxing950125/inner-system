@@ -265,12 +265,13 @@
                 v-model="value1"
                 multiple
                 placeholder="选择查询产品范围（可多选）"
+                @change="selectChange"
               >
                 <el-option
                   v-for="item in options2"
-                  :key="item.proName"
+                  :key="item.id"
                   :label="item.proName"
-                  :value="item.proName"
+                  :value="item.id"
                 >
                 </el-option>
               </el-select>
@@ -297,30 +298,39 @@
                 <div>查询结果</div>
                 <div class="table-result">共查询到<span> 36 </span>个结果:</div>
               </div>
-              <el-table class="table-content" :data="list" style="width: 98%%">
+              <el-table class="table-content" :data="list" style="width: 98%">
                 <el-table-column fixed type="index" width="50" label="序号">
                 </el-table-column>
-                <el-table-column fixed prop="date" label="德勤主体代码">
+                <el-table-column
+                  fixed
+                  prop="creditCode"
+                  label="德勤主体代码"
+                  width="200"
+                >
                 </el-table-column>
-                <el-table-column fixed prop="name" label="企业名称" width="300">
+                <el-table-column
+                  fixed
+                  prop="entityName"
+                  label="企业名称"
+                  width="300"
+                >
                 </el-table-column>
-                <el-table-column prop="province" label="IB" width="120">
+                <el-table-column
+                  v-for="(item, index) in selectHeaer"
+                  :key="index"
+                  prop="province"
+                  :label="item.proName"
+                  width="120"
+                >
                 </el-table-column>
-                <el-table-column prop="city" label="城投" width="120">
-                </el-table-column>
-                <el-table-column prop="address" label="地产"> </el-table-column>
-                <el-table-column prop="zip" label="财报"> </el-table-column>
-                <el-table-column prop="zip" label="股票"> </el-table-column>
-                <el-table-column prop="zip" label="产业链"> </el-table-column>
-                <el-table-column prop="zip" label="ES"> </el-table-column>
               </el-table>
-              <el-pagination
-                class="page"
-                background
-                layout="prev, pager, next"
-                :total="1000"
-              >
-              </el-pagination>
+              <pagination
+                v-show="total > 0"
+                :total="total"
+                :page.sync="queryParams.pageNum"
+                :limit.sync="queryParams.pageSize"
+                @pagination="getList"
+              />
             </div>
           </div>
         </el-card>
@@ -373,12 +383,14 @@
 </template>
 
 <script>
-import { govList, entityInfoList, getProduct } from "@/api/subject";
+import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
 import fileUpload from "../../components/FileUpload";
+import pagination from "../../components/Pagination";
 export default {
   name: "Index",
   components: {
     fileUpload,
+    pagination,
   },
   data() {
     return {
@@ -386,27 +398,15 @@ export default {
       input: "",
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: "GV",
+          label: "政府主体",
         },
         {
-          value: "选项2",
-          label: "双皮奶",
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎",
-        },
-        {
-          value: "选项4",
-          label: "龙须面",
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭",
+          value: "Q",
+          label: "企业主体",
         },
       ],
-      value: "企业主体",
+      value: "Q",
       options2: [],
       value1: [],
       loading: false,
@@ -429,6 +429,22 @@ export default {
       dialogVisible: false,
       percentage: 20,
       uploadStatus: false,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
+      selectHeaer: [],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
+      queryParams2: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total2: 0,
     };
   },
   mounted() {
@@ -476,11 +492,34 @@ export default {
           const { data } = res;
           this.options2 = data;
         });
+        const parmas = {
+          entityName: this.input,
+          entityType: this.value,
+          proId: this.value1,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getCov(parmas).then((res) => {
+          const { data } = res;
+          this.list = data;
+        });
       } catch (error) {
         console.log(error);
       } finally {
         this.$modal.closeLoading();
       }
+    },
+    getList() {
+      const parmas = {
+        entityName: this.input,
+        entityType: this.value,
+        proId: this.value1,
+        pageNum: this.queryParams.pageNum,
+        pageSize: this.queryParams.pageSize,
+      };
+      getCov(parmas).then((res) => {
+        console.log(res);
+      });
     },
     getPercent(newObj, sum) {
       const res = ((newObj / sum) * 100).toFixed(2);
@@ -490,10 +529,14 @@ export default {
       window.open(href, "_blank");
     },
     select() {
-      this.loading = true;
-      setTimeout(() => {
+      try {
+        this.loading = true;
+        this.getList();
+      } catch (error) {
+        console.log(error);
+      } finally {
         this.loading = false;
-      }, 2000);
+      }
     },
     selectAll() {
       this.dialogVisible = true;
@@ -515,6 +558,17 @@ export default {
     },
     uploadFail(index) {
       console.log(3);
+    },
+    selectChange(row) {
+      this.selectHeaer = [];
+      row.forEach((e) => {
+        this.options2.forEach((k) => {
+          if (e === k.id) {
+            this.selectHeaer.push(k);
+          }
+        });
+      });
+      console.log(this.selectHeaer);
     },
   },
   computed: {

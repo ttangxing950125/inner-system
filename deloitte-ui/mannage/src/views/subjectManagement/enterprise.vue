@@ -290,6 +290,13 @@
             </el-table-column>
             <el-table-column prop="zip" label="更新记录"> </el-table-column>
           </el-table>
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize"
+            @pagination="getList"
+          />
         </el-card>
       </el-col>
     </el-row>
@@ -298,8 +305,12 @@
 <script>
 import { getOverviewByGroup, getInfoList } from "@/api/subject";
 import { replaceStr } from "@/utils/index";
+import pagination from "../../components/Pagination";
 export default {
   name: "government",
+  components: {
+    pagination,
+  },
   data() {
     return {
       codeInput: "",
@@ -350,6 +361,11 @@ export default {
       currentTab: "1",
       currentPage4: 4,
       overviewData: {},
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
     };
   },
   created() {
@@ -366,10 +382,14 @@ export default {
         const parmas = {
           param: "",
           type: this.currentTab,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
         };
         getInfoList(parmas).then((res) => {
           const { data } = res;
-          this.list2 = data;
+          this.list2 = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
@@ -390,13 +410,18 @@ export default {
       try {
         this.$modal.loading("Loading...");
         this.currentTab = tab;
+        this.queryParams.pageNum = 1;
         const parmas = {
           param: this.codeInput,
           type: this.currentTab,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
         };
         getInfoList(parmas).then((res) => {
           const { data } = res;
-          this.list2 = data;
+          this.list2 = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
@@ -416,6 +441,27 @@ export default {
     },
     replaceFun(row) {
       return replaceStr(row, this.nameInput);
+    },
+    getList() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: "",
+          type: this.currentTab,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getInfoList(parmas).then((res) => {
+          const { data } = res;
+          this.list2 = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
   },
   computed: {

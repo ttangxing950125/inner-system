@@ -1,6 +1,8 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 
 import java.io.Serializable;
@@ -8,63 +10,63 @@ import java.util.Date;
 
 /**
  * 企业属性分类对象 entity_attr_cate
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
-public class EntityAttrCate implements Serializable
-{
+public class EntityAttrCate implements Serializable {
     private static final long serialVersionUID = 1L;
-
+    @TableId(type = IdType.AUTO)
     /** $column.columnComment */
     private Long id;
 
-    /** 分类名 */
+    /**
+     * 分类名
+     */
     @Excel(name = "分类名")
     private String name;
 
-    /** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;
 
-    /** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 
-    public void setId(Long id) 
-    {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getId() 
-    {
+    public Long getId() {
         return id;
     }
-    public void setName(String name) 
-    {
+
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getName() 
-    {
+    public String getName() {
         return name;
     }
-    public void setCreated(Date created) 
-    {
+
+    public void setCreated(Date created) {
         this.created = created;
     }
 
-    public Date getCreated() 
-    {
+    public Date getCreated() {
         return created;
     }
-    public void setUpdated(Date updated) 
-    {
+
+    public void setUpdated(Date updated) {
         this.updated = updated;
     }
 
-    public Date getUpdated() 
-    {
+    public Date getUpdated() {
         return updated;
     }
 
