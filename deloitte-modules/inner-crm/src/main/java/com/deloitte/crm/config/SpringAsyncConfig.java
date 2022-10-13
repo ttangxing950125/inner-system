@@ -1,9 +1,13 @@
 package com.deloitte.crm.config;
 
+import cn.hutool.core.thread.ExecutorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
@@ -13,8 +17,30 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class SpringAsyncConfig {
 
+
+    /**
+     * 单例线程池
+     * @return
+     */
+    @Bean("singleThreadPoll")
+    public ExecutorService singleThreadPoll(){
+
+        return ExecutorBuilder.create()
+                .setCorePoolSize(2)
+                .setMaxPoolSize(5)
+                .setWorkQueue(new LinkedBlockingQueue<>(Integer.MAX_VALUE))
+                .build();
+    }
+
+    /**
+     * 导入文件使用的线程池
+     * @return
+     */
     @Bean("taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
+
+
+
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 //        int i = Runtime.getRuntime().availableProcessors();
         // 设置核心线程数

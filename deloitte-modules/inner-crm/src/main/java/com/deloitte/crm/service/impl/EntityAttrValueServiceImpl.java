@@ -28,6 +28,7 @@ import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +73,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     private EntityInfoLogsMapper entityInfoLogsMapper;
 
     private EntityMasterMapper entityMasterMapper;
+
+    private ExecutorService singleThreadPoll;
 
     /**
      * 查询【请填写功能名称】
@@ -143,7 +146,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     /**
      * 更新entityAttrValue表中债券的相关信息
      * 反射获取obj里的属性，key 为 Excel 注解 的name 属性, value 为实体类的值
-     *
+     * 默认该方法异步调用， 需要同步请调用 com.deloitte.crm.service.impl.EntityAttrValueServiceImpl#updateBondAttr(java.lang.String, java.lang.Object, boolean)
      * @param bondCode
      * @param obj
      * @return
@@ -151,11 +154,32 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateBondAttr(String bondCode, Object obj) {
-        int count = this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
+        return  this.updateBondAttr(bondCode, obj, true);
+    }
 
-        bondInfoService.updateBondType(bondCode);
+    /**
+     *
+     * @param bondCode
+     * @param obj
+     * @param async
+     * @return 正常情况返回更新的行数， async为true固定返回-1
+     */
+    private int updateBondAttr(String bondCode, Object obj, boolean async) {
+        if (async){
+            singleThreadPoll.execute(()->{
+                this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
 
-        return count;
+                bondInfoService.updateBondType(bondCode);
+            });
+
+            return -1;
+        }else {
+            int count = this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
+
+            bondInfoService.updateBondType(bondCode);
+
+            return count;
+        }
     }
 
     /**
@@ -216,7 +240,27 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      */
     @Override
     public int updateStockThkAttr(String stockDqCode, Object secIssInfo) {
-        return this.updateAttrValue(stockDqCode, secIssInfo, 4, Excel.class, "name");
+        return this.updateStockThkAttr(stockDqCode, secIssInfo, true);
+    }
+
+
+    /**
+     *
+     * @param stockDqCode
+     * @param obj
+     * @param async
+     * @return 正常情况返回更新的行数， async为true固定返回-1
+     */
+    private int updateStockThkAttr(String stockDqCode, Object obj, boolean async) {
+        if (async){
+            singleThreadPoll.execute(()->{
+                this.updateAttrValue(stockDqCode, obj, 4, Excel.class, "name");
+            });
+
+            return -1;
+        }else {
+            return this.updateAttrValue(stockDqCode, obj, 4, Excel.class, "name");
+        }
     }
 
     /**
@@ -228,7 +272,26 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      */
     @Override
     public int updateStockCnAttr(String code, Object item) {
-        return this.updateAttrValue(code, item, 5, Excel.class, "name");
+        return updateStockCnAttr(code, item, true);
+    }
+
+    /**
+     * 更新entityAttrValue表中a股的相关信息
+     *
+     * @param code a股德勤code
+     * @param item a股相关表任意对象
+     * @return
+     */
+    public int updateStockCnAttr(String code, Object item, boolean async) {
+        if (async){
+            singleThreadPoll.execute(()->{
+                this.updateAttrValue(code, item, 4, Excel.class, "name");
+            });
+
+            return -1;
+        }else {
+            return this.updateAttrValue(code, item, 4, Excel.class, "name");
+        }
     }
 
     /**

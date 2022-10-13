@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
+import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.BondNewIss;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -86,9 +87,11 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             bondInfo.setBondName(newIss.getBondName());
 
             //看之前有没有导入过这个数据
-            List<BondNewIss> bondNewIsses = bondNewIssMapper.findByShortName(shortName);
-            if (CollUtil.isEmpty(bondNewIsses)){
-                resStatus = 1;
+            BondNewIss last = bondNewIssMapper.findLastByShortName(shortName);
+            if (last==null){
+                resStatus = DataChangeType.INSERT.getId();
+            }else if (!Objects.equals(last, newIss)){
+                resStatus = DataChangeType.UPDATE.getId();
             }
 
             Integer newStatus = judgeBondStatus(bondInfo.getBondStatus(), newIss.getIssStartDate(), newIss.getIssEndDate(), newIss.getIpoDate(), timeNow);
@@ -98,12 +101,6 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
 
             //保存当前债券
             BondInfo newDbBond = bondInfoService.saveOrUpdate(bondInfo);
-
-            //更新当前债券属性
-            int updateCount = entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
-            if (resStatus==null && updateCount>0){
-                resStatus = 2;
-            }
 
             BondInfoDto bondInfoDto = new BondInfoDto();
             bondInfoDto.setBondInfo(bondInfo);
@@ -129,6 +126,9 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }
+
+            //更新当前债券属性
+            entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
 
             return new AsyncResult(bondInfoDto);
         } catch (Exception e) {
