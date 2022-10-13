@@ -10,6 +10,7 @@ import com.deloitte.crm.mapper.BondConvertibleInfoMapper;
 import com.deloitte.crm.domain.BondConvertibleInfo;
 import com.deloitte.crm.service.BondConvertibleInfoService;
 import com.deloitte.crm.service.ICrmWindTaskService;
+//import com.deloitte.crm.strategy.impl.BondConvertibleStrategy;
 import com.deloitte.crm.strategy.impl.BondConvertibleStrategy;
 import com.deloitte.crm.strategy.impl.CnDelistInfoStrategy;
 import com.deloitte.crm.utils.ApplicationContextHolder;
@@ -34,9 +35,6 @@ public class BondConvertibleInfoServiceImpl extends ServiceImpl<BondConvertibleI
     @Resource
     private ICrmWindTaskService crmWindTaskService;
 
-    @Resource
-    private BondConvertibleInfoService bondConvertibleInfoService;
-
     @Override
     public Object doTask(CrmWindTask windTask, List<BondConvertibleInfo> bondConvertibleInfo) {
         //改任务状态
@@ -52,7 +50,7 @@ public class BondConvertibleInfoServiceImpl extends ServiceImpl<BondConvertibleI
             if (convertibleInfo.getNoticeDate().equals("数据来源：Wind")) {
                 continue;
             }
-            Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleStrategy.class).doBondImport(convertibleInfo, timeNow, windTask);
+           Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleStrategy.class).doBondImport(convertibleInfo, timeNow, windTask);
             futureList.add(future);
         }
         while (true) {
