@@ -22,6 +22,7 @@ import com.deloitte.crm.service.IEntityAttrService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.BondEntityInfoVo;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -452,13 +453,13 @@ public class BondInfoServiceImpl implements IBondInfoService {
         if(bondInfo==null){
             BondEntityInfoVo temp = new BondEntityInfoVo().setTable(1).setId(entityInfo.getId());
             //债务主体德勤代码
-            result.add(new BondEntityInfoVo(temp,false,"债务主体德勤代码","entity_code",entityInfo.getEntityCode()));
+            result.add(new BondEntityInfoVo(temp,false,"债务主体德勤代码","",entityInfo.getEntityCode()));
             //债务主体名称
             result.add(new BondEntityInfoVo(temp,true,"债务主体名称","entity_name",entityInfo.getEntityName()));
             //债务主体名称_原始
-            result.add(new BondEntityInfoVo(temp,false,"债务主体名称_原始","entity_name_his",entityInfo.getEntityNameHis()));
+            result.add(new BondEntityInfoVo(temp,false,"债务主体名称_原始","",entityInfo.getEntityNameHis()));
             //债务主体统一社会信用代码
-            result.add(new BondEntityInfoVo(temp,false,"债务主体统一社会信用代码","credit_code",entityInfo.getCreditCode()));
+            result.add(new BondEntityInfoVo(temp,false,"债务主体统一社会信用代码","",entityInfo.getCreditCode()));
             return result;
         }else{
             BondEntityInfoVo temp = new BondEntityInfoVo().setTable(2).setId(bondInfo.getId().intValue());
@@ -467,7 +468,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
             //是否为ABS "1.Y":"0.N"
             result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs",bondInfo.getAbs().toString()));
             //债券交易代码
-            result.add(new BondEntityInfoVo(temp,false,"债券交易代码","ori_code",bondInfo.getOriCode()));
+            result.add(new BondEntityInfoVo(temp,false,"债券交易代码","",bondInfo.getOriCode()));
             //债券全称
             result.add(new BondEntityInfoVo(temp,true,"债券全称","bond_name",bondInfo.getBondName()));
             //债券简称
@@ -485,15 +486,19 @@ public class BondInfoServiceImpl implements IBondInfoService {
     }
 
     public void edit(BondEntityInfoVo bondEntityInfoVo){
+        if(!bondEntityInfoVo.getEnableEdite()){return;}
         Integer id = bondEntityInfoVo.getId();
         String value = bondEntityInfoVo.getValue();
+        String filedName = bondEntityInfoVo.getFiledName();
         Assert.notNull(id,BadInfo.PARAM_EMPTY.getInfo());
+        matchingField(filedName);
         switch (bondEntityInfoVo.getTable()){
             case 1:
-                entityInfoMapper.editByBondInfoManager(id,bondEntityInfoVo.getFiledName(), value);
+                entityInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 2:
-                bondInfoMapper.editByBondInfoManager(id,bondEntityInfoVo.getFiledName(), value);
+                ArrayList<Object> matchingField = new ArrayList<>();
+                bondInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 3:
                 EntityAttrValue entityAttrValue = iEntityAttrValueService.getBaseMapper().selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, id));
@@ -504,10 +509,24 @@ public class BondInfoServiceImpl implements IBondInfoService {
             case 4:
                 //table 4 表示 债券信息中的 日期字段
                 Date date = DateUtil.parseDate(bondEntityInfoVo.getValue());
-                bondInfoMapper.editByBondInfoManagerDate(id,bondEntityInfoVo.getFiledName(), date);
+                bondInfoMapper.editByBondInfoManagerDate(id, filedName, date);
             default:
                 break;
         }
+    }
+
+    public void matchingField(String filedName){
+        HashMap<String, String> targetFiles = new HashMap<>();
+        targetFiles.put("entity_name","");
+        targetFiles.put("coll","");
+        targetFiles.put("abs","");
+        targetFiles.put("bond_name","");
+        targetFiles.put("bond_short_name","");
+        targetFiles.put("raise_type","");
+        targetFiles.put("bond_state","");
+        targetFiles.put("value_date","");
+        targetFiles.put("due_date","");
+        Assert.isTrue(!targetFiles.containsKey(filedName),BadInfo.VALID_PARAM.getInfo());
     }
 
 }
