@@ -141,6 +141,7 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
             } else {
                 changeType = DataChangeType.INSERT.getId();
             }
+            item.setChangeType(changeType);
             bondConvertibleInfoMapper.insert(item);
         }
         log.warn(">>>>>>>>开始到导入可转债发行【根据公司代码】=>:{}查询数据不存在任务结束！！！！", item.getCode());

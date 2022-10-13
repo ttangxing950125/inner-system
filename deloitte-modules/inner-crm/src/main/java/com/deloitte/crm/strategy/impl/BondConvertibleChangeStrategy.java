@@ -151,6 +151,7 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
             } else {
                 changeType = DataChangeType.INSERT.getId();
             }
+            item.setChangeType(changeType);
         }
         bondConvertibleChangeInfoMapper.insert(item);
         return new AsyncResult(new Object());
