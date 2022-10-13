@@ -387,7 +387,9 @@ export default {
         };
         getInfoList(parmas).then((res) => {
           const { data } = res;
-          this.list2 = data;
+          this.list2 = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
@@ -417,9 +419,9 @@ export default {
         };
         getInfoList(parmas).then((res) => {
           const { data } = res;
-          this.list2 = data;
+          this.list2 = data.records;
           this.total = data.total;
-          this.queryParams.pageNum = data.pages;
+          this.queryParams.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
@@ -451,9 +453,9 @@ export default {
         };
         getInfoList(parmas).then((res) => {
           const { data } = res;
-          this.list2 = data;
+          this.list2 = data.records;
           this.total = data.total;
-          this.queryParams.pageNum = data.pages;
+          this.queryParams.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);

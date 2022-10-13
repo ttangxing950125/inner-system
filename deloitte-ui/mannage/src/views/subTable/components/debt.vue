@@ -458,9 +458,18 @@ export default {
         this.$modal.loading("loading...");
         this.ruleForm.windTypeOne = this.ruleForm.windTypeOne.value;
         insertBondInfoManual(this.ruleForm).then((res) => {
-          console.log(res);
+          this.$message({
+            showClose: true,
+            message: "操作成功",
+            type: "success",
+          });
         });
       } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
       } finally {
         this.$modal.closeLoading();
       }
