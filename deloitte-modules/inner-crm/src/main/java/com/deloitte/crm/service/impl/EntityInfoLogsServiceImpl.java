@@ -86,7 +86,6 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
          */
         if (findType.equals(Common.TYPE_BOND)) {
 
-
             CompletableFuture<EntityInfoLogsByBondVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsByBondVo sockVo = new EntityInfoLogsByBondVo();
                 final List<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}));
@@ -107,7 +106,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 String sevenTradingDayDate = DateUtil.format(DateUtil.offsetDay(new Date(), -7), DatePattern.NORM_DATE_PATTERN);
                 String latestMonthDayDate = DateUtil.format(DateUtil.lastMonth(), DatePattern.NORM_DATE_PATTERN);
                 // sevenTradingDayDate <= createTime <= nowDayDate  查询前7天的排除周六周天的数据 算平均数
-                List<EntityInfoLogs> sevenTradingtotalListsFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"})
+                List<EntityInfoLogs> sevenTradingtotalListsFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
+                        .in(EntityInfoLogs::getOperType, new String[]{"3"})
                         .ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowDayDate))
                         .stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime()))
@@ -121,7 +121,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                     e1.setSevenTradingDayAverages(String.valueOf(div));
                 }
                 // latestMonthDayDate <= createTime <= nowDayDate  当前日期最近一个月的日期 算平均数
-                List<EntityInfoLogs> latestMonthDayDateFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"})
+                List<EntityInfoLogs> latestMonthDayDateFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
+                        .in(EntityInfoLogs::getOperType, new String[]{"3"})
                         .ge(EntityInfoLogs::getCreateTime, latestMonthDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowDayDate));
 
@@ -156,22 +157,29 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
              *{@link Common#TYPE_STOCK}
              */
         } else if (Common.TYPE_STOCK.equals(findType)) {
+
             CompletableFuture<EntityInfoLogsBySockVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsBySockVo sockVo = new EntityInfoLogsBySockVo();
-                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"}));
+                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
+                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"}));
                 sockVo.setEntityInfoLogs(entoty);
                 return sockVo;
             });
+
             final CompletableFuture<Void> getAddTodayCountTask = baskTask.thenAcceptAsync(e -> {
-                List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"}).eq(EntityInfoLogs::getCreateTime, DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN)));
+                List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
+                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
+                        .eq(EntityInfoLogs::getCreateTime, DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN)));
                 e.setAddToday(totalLists.size());
             });
+
             final CompletableFuture<Void> otherTask = baskTask.thenAcceptAsync(e1 -> {
                 String nowStrDate = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
                 String sevenTradingDayDate = DateUtil.format(DateUtil.offsetDay(new Date(), -7), DatePattern.NORM_DATE_PATTERN);
                 String latestMonthDayDate = DateUtil.format(DateUtil.lastMonth(), DatePattern.NORM_DATE_PATTERN);
                 //查询7 天排除周六周天 并计算平均7天的
-                List<EntityInfoLogs> sevenTradingDayAveragesEntityInfoLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
+                List<EntityInfoLogs> sevenTradingDayAveragesEntityInfoLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
+                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
                         .ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowStrDate))
                         .stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime()))
@@ -184,7 +192,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                     e1.setSevenTradingDayAverages(String.valueOf(div));
                 }
                 //当前日期最近一个月的 并求平均一个月的
-                List<EntityInfoLogs> lastMothEntityInfoLogsLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
+                List<EntityInfoLogs> lastMothEntityInfoLogsLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
+                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
                         .ge(EntityInfoLogs::getCreateTime, latestMonthDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowStrDate));
                 if (CollUtil.isNotEmpty(lastMothEntityInfoLogsLists) && lastMothEntityInfoLogsLists.size() >= 1) {
@@ -298,6 +307,6 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 }
             }
         }
-        return result;
+        return R.ok();
     }
 }

@@ -30,15 +30,6 @@ public class EntityInfoLogsByBondVo {
      * 最近一月平均每日新上市主体
      */
     private String averageDailyLatestMonth;
-    /**
-     * 发债主体
-     */
-    private String issueBondTruesEntity;
-
-    /**
-     *收录主体
-     */
-    private String shouliEntity;
 
     /**
      * 实体接
