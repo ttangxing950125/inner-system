@@ -639,16 +639,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityStockThkRels.stream().forEach(o -> thkRelCodes.add(o.getStockDqCode()));
         List<StockThkInfo> stockThkInfos = stockThkMapper.selectList(new QueryWrapper<StockThkInfo>().lambda().in(StockThkInfo::getStockDqCode, thkRelCodes));
         //上市数据排序  TODO 验证排序是否是升序排序
-        stockThkInfos.sort(Comparator.comparing(o -> o.getListDate()));
+        stockThkInfos.stream().filter(o->!ObjectUtil.isEmpty(o.getListDate())).collect(Collectors.toList()).sort(Comparator.comparing(o -> o.getListDate()));
         StockThkInfo stockThkInfo = stockThkInfos.get(stockThkInfos.size() - 1);
         //退市日期
         String delistingDate = stockThkInfo.getDelistingDate();
-        int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
-        if (i >= 0) {
+        if (ObjectUtil.isEmpty(delistingDate)){
             entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
             entityInfoDetails.setListTypeG("存续");
-        } else {
-            entityInfoDetails.setListTypeA("已退市");
+        }else {
+            int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
+            if (i >= 0) {
+                entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+                entityInfoDetails.setListTypeG("存续");
+            } else {
+                entityInfoDetails.setListTypeA("已退市");
+            }
         }
         entityInfoDetails.setStockThkInfo(stockThkInfo);
         return entityInfoDetails;
@@ -665,16 +670,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityStockCnRels.stream().forEach(o -> cnRelCodes.add(o.getStockDqCode()));
         List<StockCnInfo> stockCnInfos = stockCnMapper.selectList(new QueryWrapper<StockCnInfo>().lambda().in(StockCnInfo::getStockDqCode, cnRelCodes));
         //上市数据排序  TODO 验证排序是否是升序排序
-        stockCnInfos.sort(Comparator.comparing(o -> o.getListDate()));
+        stockCnInfos.stream().filter(o->!ObjectUtil.isEmpty(o.getListDate())).collect(Collectors.toList()).sort(Comparator.comparing(o -> o.getListDate()));
         StockCnInfo stockCnInfo = stockCnInfos.get(stockCnInfos.size() - 1);
         //退市日期
         String delistingDate = stockCnInfo.getDelistingDate();
-        int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
-        if (i >= 0) {
+        if (ObjectUtil.isEmpty(delistingDate)){
             entityInfoDetails.setListType("A股");
             entityInfoDetails.setListTypeA("存续");
-        } else {
-            entityInfoDetails.setListTypeA("已退市");
+        }else {
+            int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
+            if (i >= 0) {
+                entityInfoDetails.setListType("A股");
+                entityInfoDetails.setListTypeA("存续");
+            } else {
+                entityInfoDetails.setListTypeA("已退市");
+            }
         }
         entityInfoDetails.setStockCnInfo(stockCnInfo);
         return entityInfoDetails;
