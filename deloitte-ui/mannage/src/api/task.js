@@ -391,3 +391,27 @@ export function addFinEntitySubtableMsg(params) {
     data: params,
   });
 }
+
+// 城投机构根据entityCode补充录入副表信息
+export function addGovEntitySubtableMsg(params) {
+  return request({
+    url: "/crm/entityGovRel/addGovEntitySubtableMsg",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 财报收数根据entityCode补充录入信息--主表
+export function addEntityeMsg(params) {
+  return request({
+    url: "/crm/entityInfo/addEntityeMsg",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}

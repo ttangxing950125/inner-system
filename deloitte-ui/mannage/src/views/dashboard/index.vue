@@ -126,17 +126,17 @@
         <el-table-column type="index" label="来源"> </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
@@ -146,7 +146,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -170,17 +170,17 @@
         <el-table-column type="index" label="来源"> </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
@@ -190,7 +190,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -214,12 +214,12 @@
         <el-table-column type="index" label="来源"> </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为城投机构">
@@ -229,12 +229,12 @@
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -1197,7 +1197,6 @@ export default {
         // 角色 345 相关接口
         getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
           const { data } = res
-          console.log(data)
           this.list3 = data
         })
         // 角色 2 相关接口

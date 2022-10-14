@@ -18,7 +18,7 @@
             <div
               class="box1"
               :style="{
-                background: 'green',
+                background: '#CCCCCC',
                 width: unInvalidPercent + '%',
                 'text-align': 'center',
               }"
@@ -30,7 +30,7 @@
             <div
               class="box2"
               :style="{
-                background: 'greenyellow',
+                background: '#86bc25',
                 width: invalidPercent + '%',
                 'text-align': 'center',
               }"
@@ -44,31 +44,28 @@
       </el-col>
       <h3 class="g-title" style="margin-top: 10px">政府主体清单</h3>
       <div class="g-tab flex1">
-        <a
-          :class="currentTab === '地方政府' ? 'g-select' : ''"
-          @click="changeTab('地方政府')"
+        <a :class="currentTab === '1' ? 'g-select' : ''" @click="changeTab('1')"
           >地方政府</a
         >
-        <a
-          :class="currentTab === '地方主管部门' ? 'g-select' : ''"
-          @click="changeTab('地方主管部门')"
+        <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
           >地方主管部门</a
         >
-        <a
-          :class="currentTab === '其他' ? 'g-select' : ''"
-          @click="changeTab('其他')"
+        <a :class="currentTab === '3' ? 'g-select' : ''" @click="changeTab('3')"
           >其他</a
         >
       </div>
       <el-col :sm="24" :lg="24" class="mt20" style="padding-left: 20px">
         <el-card>
-          <h3 class="g-t-title">{{ currentTab }}</h3>
+          <h3 class="g-t-title">{{ tabArr[currentTab] }}</h3>
           <div class="g-desc">
             截止日期，会计收录<span>xxxx</span>个地方政府主体，其中<span>xxxx</span>个省级行政区，<span>xxxx</span>个地市级行政区，<span>xxxx</span>个县级行政区，<span>xxxx</span>个经开高新区，
           </div>
           <div class="g-desc flex1">
             <router-link
-              :to="{ name: 'indexGovernment', query: { name: currentTab } }"
+              :to="{
+                name: 'indexGovernment',
+                query: { name: tabArr[currentTab] },
+              }"
             >
               <a href="">更多指标</a>
             </router-link>
@@ -84,7 +81,7 @@
             <el-input
               class="select-x"
               v-model="input"
-              placeholder="搜索的亲主体代码/主体名称"
+              placeholder="搜索德勤主体代码/主体名称"
               @change="selectTable"
             ></el-input>
           </div>
@@ -93,17 +90,17 @@
             :data="list"
             style="width: 98%; margin-top: 15px"
           >
-            <el-table-column
-              type="index"
-              sortable
-              label="生效状态"
-              width="100px"
-            >
+            <el-table-column sortable label="生效状态" width="100px">
               <template slot-scope="scope">
-                <span>{{ scope.row.invalid === "0" ? "N" : "Y" }}</span>
+                <span :class="scope.row.status === '0' ? 'green' : 'red'">{{
+                  scope.row.status === "0" ? "N" : "Y"
+                }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="govLevel" label="行政级别" sortable>
+              <template slot-scope="scope">
+                <span>{{ getLevel(scope.row.govLevelBig) }}</span>
+              </template>
             </el-table-column>
             <el-table-column prop="dqGovCode" label="德勤主体代码">
             </el-table-column>
@@ -126,15 +123,17 @@
               </template>
             </el-table-column>
           </el-table>
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize"
+            @pagination="getList"
+          />
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog
-      title="曾用名或别称管理"
-      :visible.sync="usedDig"
-      width="30%"
-      :before-close="handleClose"
-    >
+    <el-dialog title="曾用名或别称管理" :visible.sync="usedDig" width="30%">
       <el-table
         class="table-content"
         :data="list"
@@ -152,11 +151,12 @@
         <el-table-column prop="govName" label="主体名称"> </el-table-column>
         <el-table-column prop="nameUsedNum" label="曾用名或别称">
           <template slot-scope="scope">
-            <el-button
-              type="text"
-              style="color: rgb(181 182 184)"
-              @click="usedName"
-              >{{ 1 }}</el-button
+            <a
+              :class="scope.row.nameUsedNum > 0 ? 'green' : ''"
+              @click="usedName(scope.row)"
+              >{{
+                scope.row.nameUsedNum > 0 ? scope.row.nameUsedNum : "暂无"
+              }}</a
             >
           </template>
         </el-table-column>
@@ -174,6 +174,8 @@
 
 <script>
 import { getInfoList, getOverview } from "@/api/common";
+import pagination from "../../components/Pagination";
+import { getInfoListGov } from "@/api/subject";
 import { formatDate } from "@/utils/index";
 export default {
   name: "government",
@@ -182,45 +184,22 @@ export default {
       usedDig: false,
       input: "",
       activeName: "frist",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       loading: false,
-      currentTab: "地方政府",
+      currentTab: "1",
+      tabArr: {
+        1: "地方政府",
+        2: "地方主管部门",
+        3: "其他",
+      },
       count: 0,
       invalid: 0,
       unInvalid: 0,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
     };
   },
   created() {
@@ -238,36 +217,55 @@ export default {
   },
   methods: {
     init() {
-      const parmas = {
-        parmas: this.input,
-      };
-      // getInfoList(parmas).then((res) => {
-      //   console.log(res);
-      // });
-      getOverview({}).then((res) => {
-        const { data } = res;
-        this.count = data.count;
-        this.invalid = data.invalid;
-        this.unInvalid = data.unInvalid;
-      });
-    },
-    goTarget(href) {
-      window.open(href, "_blank");
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.input,
+          pageSize: this.queryParams.pageSize,
+          pageNum: this.queryParams.pageNum,
+          type: this.currentTab,
+        };
+        getInfoListGov(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+        getOverview({}).then((res) => {
+          const { data } = res;
+          this.count = data.count;
+          this.invalid = data.invalid;
+          this.unInvalid = data.unInvalid;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     changeTab(tab) {
       this.currentTab = tab;
     },
-    add() {
-      console.log(1);
-      this.$router.psuh({ path: "subjectManagement/enterprise" });
-    },
     selectTable() {
-      const parmas = {
-        parmas: this.input,
-      };
-      getInfoList(parmas).then((res) => {
-        console.log(res);
-      });
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.input,
+          pageSize: this.queryParams.pageSize,
+          pageNum: 1,
+          type: this.currentTab,
+        };
+        getInfoListGov(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     getLocalTime(nS) {
       return formatDate(1664363715);
@@ -276,11 +274,56 @@ export default {
       //   .replace(/:\d{1,2}$/, " ");
     },
     usedName(row) {},
+    getList() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.input,
+          type: this.currentTab,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getInfoListGov(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getLevel(row) {
+      let ret = "";
+      switch (row) {
+        case "1":
+          ret = "1-省级行政区";
+          break;
+        case "2":
+          ret = "2-地级行政区";
+          break;
+        case "3":
+          ret = "3-县级行政区";
+          break;
+        case "4":
+          ret = "4-经开高新区";
+          break;
+      }
+      return ret;
+    },
   },
 };
 </script>
 
 <style scoped lang="scss">
+.green {
+  color: #86bc25;
+}
+.red {
+  color: red;
+}
 .tabs {
   width: 98%;
   margin-left: 1.5%;
@@ -307,7 +350,7 @@ export default {
     width: 330px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
   }
   .top-right {
@@ -320,13 +363,13 @@ export default {
     position: relative;
     left: 167%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .g-desc {
   margin-top: 15px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -349,7 +392,7 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 </style>

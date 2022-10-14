@@ -38,14 +38,33 @@
             :data="list"
             style="width: 98%; margin-top: 20px"
           >
-            <el-table-column type="index" sortable label="序号" width="50">
+            <el-table-column type="index" label="序号" width="50">
             </el-table-column>
-            <el-table-column prop="date" label="德勤主体代码" sortable>
+            <el-table-column prop="date" label="德勤主体代码">
+              <template slot-scope="scope">
+                <span>{{
+                  scope.row.entityInfo && scope.row.entityInfo.entityCode
+                }}</span>
+              </template>
             </el-table-column>
-            <el-table-column prop="name" label="政府名称"> </el-table-column>
-            <el-table-column prop="province" label="行政区划代码">
+            <el-table-column prop="name" label="企业名称">
+              <template slot-scope="scope">
+                <div v-html="replaceFun(scope.row.entityInfo.entityName)"></div>
+              </template>
             </el-table-column>
-            <el-table-column prop="city" label="上级政府名称">
+            <el-table-column prop="province" label="统一社会信用代码">
+              <template slot-scope="scope">
+                <span>{{ scope.row.entityInfo.creditCode || "-" }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="city" label="证券代码">
+              <template slot-scope="scope">
+                <span>{{
+                  scope.row.entityInfo.stockCode
+                    ? scope.row.entityInfo.stockCode.toString()
+                    : "-"
+                }}</span>
+              </template>
             </el-table-column>
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
@@ -58,6 +77,13 @@
               </template>
             </el-table-column>
           </el-table>
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize"
+            @pagination="getList"
+          />
         </el-card>
       </el-col>
       <div class="clearf">
@@ -65,7 +91,7 @@
           <span class="g-title">目标企业信息</span>
           <span class="s-2">修改中</span>
         </div>
-        <el-button type="text">提交变更并退出修改模式</el-button>
+        <el-button type="text" @click="submit">提交变更</el-button>
       </div>
       <el-col
         :sm="24"
@@ -84,50 +110,66 @@
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">德勤主体代码（企业）</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.entityInfo && info.entityInfo.entityCode"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">统一社会信用代码</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.entityInfo && info.entityInfo.creditCode"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">统一社会信用代码是否异常</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.entityInfo && info.entityInfo.creditError === 0
+                        ? "正常"
+                        : "异常"
+                    }}
+                  </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">统一社会信用代码异常备注</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{ info.entityInfo && info.entityInfo.creditErrorRemark }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">年报列示类型</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.entityInfo && info.entityInfo.listType"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
+                  <div class="first">企业名称</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.entityInfo && info.entityInfo.entityName"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
                 <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
+                  <div class="first">企业曾用名</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{ info.entityInfo && info.entityInfo.entityNameHis }}
+                  </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
-                </div>
-                <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
+                  <div class="first">企业更名日期</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{ info.entityInfo && info.entityInfo.updated }}
+                  </div>
                 </div>
               </el-col>
             </el-collapse-item>
@@ -139,57 +181,53 @@
 </template>
 
 <script>
+import {
+  getQuickOfCoverage,
+  getInfoDetail,
+  updateInfoDetail,
+} from "@/api/subject";
+import pagination from "../../components/Pagination";
+import { replaceStr } from "@/utils/index";
 export default {
   name: "eidtGovernment",
+  components: {
+    pagination,
+  },
   data() {
     return {
+      input: "",
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
       currentTime: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       currentTab: "",
+      info: {},
     };
   },
   created() {
     this.getCurrentTime();
   },
   methods: {
-    goTarget(href) {
-      window.open(href, "_blank");
+    replaceFun(row) {
+      return replaceStr(row, this.input);
     },
-    handleClick() {
-      console.log(1);
+    handleClick(row) {
+      try {
+        this.$modal.loading("Loading...");
+        const code = row.entityInfo.entityCode;
+        getInfoDetail({ entityCode: code }).then((res) => {
+          const { data } = res;
+          console.log(data);
+          this.info = data;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     getCurrentTime() {
       //获取当前时间并打印
@@ -219,20 +257,98 @@ export default {
       this.$router.back();
     },
     select() {
-      console.log(1);
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.input,
+          pageNum: 1,
+          pageSize: this.queryParams.pageSize,
+        };
+        getQuickOfCoverage(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getList() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.input,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getQuickOfCoverage(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    submit() {
+      try {
+        this.$modal.loading("Loading...");
+        const entityInfoDetails = {
+          entityInfo: this.info.entityInfo,
+          stockCnInfo: {
+            stockDqCode: this.info.stockDqCode,
+          },
+          stockThkInfo: {
+            stockDqCode: this.info.stockDqCode,
+          },
+        };
+        updateInfoDetail(entityInfoDetails).then((res) => {
+          if (res.code === 200) {
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success",
+            });
+          }
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: "操作成功",
+          type: "success",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
+.t-input {
+  width: 200px;
+}
 .edit-btn {
   margin-top: -3px;
   margin-left: 5px;
 }
 .flex1 {
   .first {
-    width: 200px;
+    width: 250px;
+    font-size: 14px;
+    line-height: 3;
+  }
+  .scond {
+    font-size: 14px;
+    line-height: 3;
+    width: 300px;
   }
 }
 .collpase {
