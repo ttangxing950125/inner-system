@@ -153,7 +153,7 @@ public class EntityInfoController extends BaseController {
      * 企业主体批量修改
      *
      * @param entityInfoList
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/22 15:24
      */
@@ -326,7 +326,7 @@ public class EntityInfoController extends BaseController {
      */
     @ApiOperation(value = "快速查询企业上市或发债情况")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "param", value = "收缩条件", paramType = "query", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "param", value = "搜索条件", paramType = "query", example = "", dataType = "String"),
             @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query", example = "", dataType = "Integer"),
             @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "query", example = "", dataType = "Integer")
     })

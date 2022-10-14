@@ -327,6 +327,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R editAllDetail(List<BondEntityInfoVo> bondInfoEditVo) {
+
         bondInfoEditVo.forEach(this::edit);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
@@ -388,11 +389,21 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Transactional(rollbackFor = Exception.class)
     public R insertBondInfoManual(BondInfoManualDto bondInfoManualDto) {
         BondInfo bondInfo = new BondInfo();
-        BeanUtil.copyProperties(bondInfoManualDto,bondInfo);
+
+        bondInfo.setBondName(bondInfoManualDto.getBondFullName());
+        bondInfo.setBondShortName(bondInfoManualDto.getBondShortName());
+        bondInfo.setOriCode(bondInfoManualDto.getOriCode());
+        bondInfo.setRaiseType(bondInfoManualDto.getRaiseType());
+        bondInfo.setBondState(bondInfoManualDto.getBondState());
+        bondInfo.setValueDate(bondInfoManualDto.getValueDate());
+        bondInfo.setDueDate(bondInfoManualDto.getDueCashingDate());
+
         bondInfoMapper.insertBondInfo(bondInfo);
 
         //生成bond_info的 bondCode 长度为8位 用id拼接若干个0
         String bondCode = iEntityInfoService.appendPrefixDiy("BD", 6, bondInfo.getId().intValue());
+        bondInfo.setBondCode(bondCode);
+
         bondInfoMapper.updateById(bondInfo);
 
         //债券全称 id 57
@@ -478,9 +489,9 @@ public class BondInfoServiceImpl implements IBondInfoService {
             //债务关系有效性 / 存续状态 "0.存续":"1.违约"
             result.add(new BondEntityInfoVo(temp,true,"债务关系有效性 / 存续状态","bond_state",bondInfo.getBondState()==null?null:bondInfo.getBondState().toString()));
             //起息日
-            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate()).setTable(4));
+            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate().toString()).setTable(4));
             //到期日
-            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate()).setTable(4));
+            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate().toString()).setTable(4));
             return result;
         }
     }
@@ -491,7 +502,20 @@ public class BondInfoServiceImpl implements IBondInfoService {
         String value = bondEntityInfoVo.getValue();
         String filedName = bondEntityInfoVo.getFiledName();
         Assert.notNull(id,BadInfo.PARAM_EMPTY.getInfo());
-        matchingField(filedName);
+
+        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+        stringObjectHashMap.put("entity_name","");
+        stringObjectHashMap.put("coll","");
+        stringObjectHashMap.put("abs","");
+        stringObjectHashMap.put("bond_name","");
+        stringObjectHashMap.put("bond_short_name","");
+        stringObjectHashMap.put("raise_type","");
+        stringObjectHashMap.put("bond_state","");
+        stringObjectHashMap.put("value_date","");
+        stringObjectHashMap.put("due_date","");
+
+        Assert.isTrue(stringObjectHashMap.containsKey(filedName),BadInfo.VALID_PARAM.getInfo());
+
         switch (bondEntityInfoVo.getTable()){
             case 1:
                 entityInfoMapper.editByBondInfoManager(id, filedName, value);
@@ -513,20 +537,6 @@ public class BondInfoServiceImpl implements IBondInfoService {
             default:
                 break;
         }
-    }
-
-    public void matchingField(String filedName){
-        HashMap<String, String> targetFiles = new HashMap<>();
-        targetFiles.put("entity_name","");
-        targetFiles.put("coll","");
-        targetFiles.put("abs","");
-        targetFiles.put("bond_name","");
-        targetFiles.put("bond_short_name","");
-        targetFiles.put("raise_type","");
-        targetFiles.put("bond_state","");
-        targetFiles.put("value_date","");
-        targetFiles.put("due_date","");
-        Assert.isTrue(!targetFiles.containsKey(filedName),BadInfo.VALID_PARAM.getInfo());
     }
 
 }

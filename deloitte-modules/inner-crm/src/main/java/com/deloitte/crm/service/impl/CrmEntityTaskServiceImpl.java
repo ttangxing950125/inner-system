@@ -19,6 +19,7 @@ import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.vo.CrmEntityTaskVo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -36,6 +37,7 @@ import java.util.List;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, CrmEntityTask> implements ICrmEntityTaskService {
     @Resource
     private CrmEntityTaskMapper crmEntityTaskMapper;
@@ -126,6 +128,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum,pageSize), new QueryWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
+        log.info("----查询到的记录数量{}",crmEntityTaskPage.getRecords().size());
         List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
         Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum,pageSize,crmEntityTaskPage.getTotal());
         ArrayList<CrmEntityTaskVo> crmEntityTaskVos = new ArrayList<>();

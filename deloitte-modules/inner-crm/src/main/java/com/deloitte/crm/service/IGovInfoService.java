@@ -84,7 +84,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R addOldName(GovInfo govInfo);
 
-    R checkGov(GovInfo govInfo);
+    R getGovByName(String govName);
 
     Object getListEntityByPage(GovAttrByDto govAttrDto);
 

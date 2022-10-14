@@ -144,21 +144,19 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 查询政府名称，或者编码，是否重复
+     * 根据政府名称查询政府主体
      *
-     * @param govInfo
+     * @param govName
      * @return R
      * @author 冉浩岑
      * @date 2022/9/22 17:49
      */
-    @ApiOperation(value = "查询政府名称，或者编码，是否重复")
+    @ApiOperation(value = "根据政府名称查询政府主体")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "govName", value = "政府主体名称---查重只填一个参数", paramType = "body", example = "", dataType="String"),
-            @ApiImplicitParam(name = "govCode", value = "政府主体官方代码---查重只填一个参数", paramType = "body", example = "", dataType="String")
-    })
-     @PostMapping("/checkGov")
-    public R checkGov(@RequestBody GovInfo govInfo) {
-        return R.ok(govInfoService.checkGov(govInfo));
+            @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", example = "", dataType="String")})
+     @PostMapping("/getGovByName")
+    public R getGovByName( String govName) {
+        return R.ok(govInfoService.getGovByName(govName));
     }
 
     /**
@@ -326,11 +324,13 @@ public class GovInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/10/12 17:10
      */
-    @Log(title = "新增地方政府", businessType = BusinessType.INSERT)
+    @ApiOperation(value = "新增地方政府")
+    @ApiImplicitParam(name = "govInfo", value = "全数据", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/addGovInfo")
     public R addGovInfo(@RequestBody GovInfo govInfo) {
         govInfoService.insertGovInfo(govInfo);
         return R.ok();
     }
+
 
 }

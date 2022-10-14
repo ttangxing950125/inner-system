@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.Attrs;
+import com.deloitte.crm.constants.Common;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -22,7 +24,7 @@ public class EntityMaster implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * $column.columnComment
+     * 主键
      */
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -43,42 +45,49 @@ public class EntityMaster implements Serializable {
      * $column.columnComment
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    @Attrs(attrId = 0,attrName = Common.CREATED)
     private Date created;
 
     /**
      * $column.columnComment
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    @Attrs(attrId = 0,attrName = Common.UPDATED)
     private Date update;
 
     /**
-     * entity_info的entity_code
+     * model_master 的 master_code
      */
-    @Excel(name = "wind行业划分")
+    @Excel(name = "wind口径下行业划分")
+    @Attrs(attrId = 652,attrName = "wind口径下行业划分")
     private String windMaster;
 
     /**
      * entity_info的entity_code
      */
     @Excel(name = "申万行业划分")
+    @Attrs(attrId = 650,attrName = "申万(2021)行业划分明细")
     private String shenWanMaster;
 
     /**
      * entity_info的entity_code
      */
-    @Excel(name = "1、Y：是YY口径下城投机构 2、N：不是YY口径下城投机构")
+    @Excel(name = "是否为城投机构（YY） 1、Y：是YY口径下城投机构 2、N：不是YY口径下城投机构")
+    @Attrs(attrId = 644,attrName = "是否为城投机构（YY）")
     private String yyUrban;
 
     /**
      * entity_info的entity_code
      */
-    @Excel(name = "1、Y：是YY口径下城投机构 2、N：不是YY口径下城投机构")
+    @Excel(name = "是否为城投机构（中诚信） 1、Y：是中诚信口径下城投机构 2、N：不是中诚信口径下城投机构")
+    @Attrs(attrId = 645,attrName = "是否为城投机构（中诚信）")
     private String zhongxinUrban;
 
     /**
      * entity_info的entity_code
      */
-    @Excel(name = "1、Y：是YY口径下城投机构 2、N：不是YY口径下城投机构")
+    @Excel(name = "是否为城投机构  1、Y：是IB口径下城投机构 2、N：不是IB口径下城投机构")
+    @Attrs(attrId = 642,attrName = "是否为城投机构（IB）")
     private String ibUrban;
 
 

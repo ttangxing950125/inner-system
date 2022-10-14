@@ -1630,7 +1630,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 result.setBondDetail(bondDetail);
                 resultList.add(result);
             });
-            pageResult.setRecords(resultList);
+            pageResult.setRecords(resultList).setCurrent(page.getCurrent());
         }
         return R.ok(pageResult);
     }
@@ -1848,7 +1848,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public String appendPrefixDiy(String prefixWord, Integer prefixLength, Integer target) {
-        return prefixWord + String.format("%0" + prefixLength, target);
+        return prefixWord + String.format("%0" + prefixLength+"d", target);
     }
 
     /**
@@ -1904,15 +1904,18 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         StockCnInfo stockCnInfo = entityInfoDetails.getStockCnInfo();
         //港股信息
         StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
-
-        //修改基础属性
-        entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,entityInfo.getEntityCode()));
-
-        //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
-        stockCnMapper.update(stockCnInfo,new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
-
-        //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
-        stockThkMapper.update(stockThkInfo,new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
+        if (!ObjectUtil.isEmpty(entityInfo)&&!ObjectUtil.isEmpty(entityInfo.getEntityCode())){
+            //修改基础属性
+            entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,entityInfo.getEntityCode()));
+        }
+        if (!ObjectUtil.isEmpty(stockCnInfo)&&!ObjectUtil.isEmpty(stockCnInfo.getStockDqCode())){
+            //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
+            stockCnMapper.update(stockCnInfo,new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
+        }
+        if (!ObjectUtil.isEmpty(stockThkInfo)&&!ObjectUtil.isEmpty(stockThkInfo.getStockDqCode())){
+            //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
+            stockThkMapper.update(stockThkInfo,new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
+        }
     }
 
     /**
