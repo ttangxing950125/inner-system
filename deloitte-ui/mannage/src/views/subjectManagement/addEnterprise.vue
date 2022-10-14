@@ -43,18 +43,16 @@
           </div>
           <el-table
             class="table-content"
-            :data="list"
+            :data="infomation.entityInfoLogs"
             style="width: 98%; margin-top: 15px"
           >
-            <el-table-column type="index" sortable label="序号" width="50">
+            <el-table-column prop="createTime" label="时间"> </el-table-column>
+            <el-table-column prop="operName" label="操作人"> </el-table-column>
+            <el-table-column prop="code" label="证券代码"> </el-table-column>
+            <el-table-column prop="name" label="证券简称"> </el-table-column>
+            <el-table-column prop="entityCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="date" label="时间" sortable>
-            </el-table-column>
-            <el-table-column prop="name" label="操作人"> </el-table-column>
-            <el-table-column prop="province" label="主体名称">
-            </el-table-column>
-            <el-table-column prop="city" label="主体代码"> </el-table-column>
-            <el-table-column prop="address" label="详细信息"> </el-table-column>
+            <el-table-column prop="remarks" label="详细信息"> </el-table-column>
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
@@ -487,7 +485,7 @@
 <script>
 import * as echarts from "echarts";
 import { createST, createBE } from "@/api/bond";
-import { entityInfoLogsList } from "@/api/subject";
+import { entityInfoLogsList, logCancel } from "@/api/subject";
 import { checkData, getFinanceSubIndu } from "@/api/common";
 export default {
   name: "addGovernment",
@@ -496,40 +494,7 @@ export default {
       dialogVisible2: false,
       noUse2: "",
       noUse1: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       dialogVisible: false,
       ruleForm: {},
       rules: {
@@ -604,7 +569,6 @@ export default {
     };
   },
   mounted() {
-    this.xEcharts();
     this.getCurrentTime();
     this.init();
   },
@@ -626,6 +590,9 @@ export default {
         this.$modal.loading("Loading...");
         entityInfoLogsList({ type: "TYPE_STOCK" }).then((res) => {
           this.infomation = res.data;
+          const keys = Object.keys(this.infomation.cylinderDates);
+          const values = Object.values(this.infomation.cylinderDates);
+          this.xEcharts(keys, values);
         });
       } catch (error) {
         console.log(error);
@@ -654,8 +621,27 @@ export default {
     goTarget(href) {
       window.open(href, "_blank");
     },
-    handleClick() {
-      console.log(1);
+    handleClick(row) {
+      try {
+        this.$modal.loading("Loading...");
+        logCancel({ id: row.id }).then((res) => {
+          if (res.code === 200) {
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success",
+            });
+          }
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     back() {
       this.$router.back();
@@ -671,7 +657,7 @@ export default {
         this.financeSubIndu = data;
       });
     },
-    xEcharts() {
+    xEcharts(keys, values) {
       const myChart = echarts.init(document.getElementById("xchart"));
       const option = {
         title: {
@@ -690,15 +676,7 @@ export default {
         },
         xAxis: {
           type: "category",
-          data: [
-            "22-08-15",
-            "22-08-15",
-            "22-08-15",
-            "22-08-15",
-            "22-08-15",
-            "22-08-15",
-            "22-08-15",
-          ],
+          data: keys,
         },
         yAxis: {
           type: "value",
@@ -714,21 +692,12 @@ export default {
         },
         series: [
           {
-            data: [
-              120,
-              {
-                value: 200,
-                itemStyle: {
-                  color: "red",
-                },
-              },
-              150,
-              80,
-              70,
-              110,
-              130,
-            ],
+            barWidth: 30,
+            data: values,
             type: this.tab === "上市" ? "bar" : "line",
+            itemStyle: {
+              color: "#cccccc",
+            },
           },
         ],
       };
