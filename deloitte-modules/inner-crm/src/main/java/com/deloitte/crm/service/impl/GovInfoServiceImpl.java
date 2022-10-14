@@ -80,7 +80,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     /**
      * 默认查询页面size
      */
-    private static final Integer DEFAULT_PAGE_NUM_SIZE = 1000;
+    private static final Integer DEFAULT_PAGE_NUM_SIZE = 50;
 
     /**
      * 查询【请填写功能名称】
@@ -279,7 +279,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         govInfoList.stream().forEach(o -> {
             records.add(getResultMap(o, finalHisNameListMap));
         });
-        page.setRecords(records);
+        page.setRecords(records).setCurrent(govInfoPage.getCurrent());
         return R.ok(page);
     }
 
@@ -329,9 +329,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public R checkGov(GovInfo govInfo) {
-        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper(govInfo);
-        return R.ok(govInfoMapper.selectList(queryWrapper));
+    public R getGovByName(String govName) {
+        QueryWrapper<GovInfo> queryWrapper = new QueryWrapper();
+        return R.ok(govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getGovName,govName)));
     }
 
     @Override
