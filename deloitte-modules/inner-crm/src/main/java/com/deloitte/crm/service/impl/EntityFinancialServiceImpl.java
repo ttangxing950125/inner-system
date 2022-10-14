@@ -11,6 +11,7 @@ import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * (EntityFinancial)表服务实现类
@@ -35,6 +36,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
      * @date 2022/10/12 9:10
      */
     @Override
+    @Transactional
     public void addFinEntitySubtableMsg(EntityFinancialDto entityFinancialDto) {
         crmSupplyTaskService.completeTaskById(entityFinancialDto.getId());
         //保存

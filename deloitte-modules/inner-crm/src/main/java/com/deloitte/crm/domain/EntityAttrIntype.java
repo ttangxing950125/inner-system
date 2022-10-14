@@ -1,6 +1,8 @@
 package com.deloitte.crm.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -23,6 +25,7 @@ public class EntityAttrIntype implements Serializable {
      * 主键id
      */
     @ApiModelProperty(value = "主键id")
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**

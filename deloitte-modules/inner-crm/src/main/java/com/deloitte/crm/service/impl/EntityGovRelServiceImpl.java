@@ -10,6 +10,7 @@ import com.deloitte.crm.service.IEntityGovRelService;
 import com.deloitte.crm.service.IEntityInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -115,6 +116,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
      * @date 2022/10/12 9:56
      */
     @Override
+    @Transactional
     public void addGovEntitySubtableMsg(EntityGovRelDto entityGovRelDto) {
         crmSupplyTaskService.completeTaskById(entityGovRelDto.getId());
         EntityGovRel entityGovRel = entityGovRelDto.getEntityGovRel();

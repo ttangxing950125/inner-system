@@ -1,18 +1,17 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
-
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 entity_bond_rel
@@ -31,6 +30,7 @@ public class EntityBondRel {
     /**
      * $column.columnComment
      */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**

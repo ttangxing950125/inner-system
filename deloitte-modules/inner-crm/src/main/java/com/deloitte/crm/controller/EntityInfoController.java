@@ -276,7 +276,7 @@ public class EntityInfoController extends BaseController {
     /**
      * 分页查询企业主体
      *
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
@@ -374,8 +374,8 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "财报收数根据entityCode补充录入信息--主表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "reportType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "listType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "reportType", value = "关注报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "listType", value = "财报类型", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shenWanMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
