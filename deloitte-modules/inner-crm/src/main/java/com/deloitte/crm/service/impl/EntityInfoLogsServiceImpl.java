@@ -265,8 +265,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
             final StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(stockCnInfoLambdaQueryWrapper.eq(StockCnInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockCnInfo != null) {
                 String stockDqCode = stockCnInfo.getStockDqCode();
-                LambdaQueryWrapper<EntityStockCnRel> EntityStockCnRelLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                final EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(EntityStockCnRelLambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockDqCode));
+                LambdaQueryWrapper<EntityStockCnRel> entityStockCnRelLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                final EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(entityStockCnRelLambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockDqCode));
                 if (entityStockCnRel != null) {
                     entityStockCnRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
                     entityStockCnRelMapper.updateById(entityStockCnRel);
