@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelReader;
@@ -26,12 +25,14 @@ import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.domain.dto.BondInfoDetail;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
+import com.deloitte.crm.dto.EntityByBatchDto;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.dto.*;
+import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.HttpUtils;
@@ -178,31 +179,30 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfo> list = this.list();
 
         //issue_bonds 是否发债 0-未发债 1-已发债
-        List<EntityInfo> bonds = list().stream()
+        List<EntityInfo> bonds = list.stream()
                 .filter(row -> row.getIssueBonds() != null && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //finance 是否金融机构
-        List<EntityInfo> finance = list().stream()
+        List<EntityInfo> finance = list.stream()
                 .filter(row -> row.getFinance() != null && row.getFinance() == 1)
                 .collect(Collectors.toList());
 
         //list 是否上市 0-未上市 1-已上市
-        List<EntityInfo> entityInfoList = list().stream()
+        List<EntityInfo> entityInfoList = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
                 .collect(Collectors.toList());
 
         //即是上市又是发债
-        List<EntityInfo> listAndBonds = list();
-         listAndBonds = listAndBonds.stream()
+        List<EntityInfo> listAndBonds = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
-                .filter(row -> (row.getFinance() != null&&row.getIssueBonds()!=null)  && row.getIssueBonds() == 1)
+                .filter(row -> (row.getFinance() != null && row.getIssueBonds() != null) && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //!即是上市又是发债
-        List<EntityInfo> notListAndBonds = list().stream()
+        List<EntityInfo> notListAndBonds = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 0)
-                .filter(row -> (row.getFinance() != null&&row.getIssueBonds()!=null) && row.getIssueBonds() == 0)
+                .filter(row -> (row.getFinance() != null && row.getIssueBonds() != null) && row.getIssueBonds() == 0)
                 .collect(Collectors.toList());
         entityInfoDto.setIssueBonds(bonds.size());
         entityInfoDto.setEntitySum(list.size());
@@ -506,27 +506,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //TODO 查询基础数据
         EntityInfo entityInfo = entityInfos.get(0);
         //TODO 查询上市情况  --  A股曾用证券简称  A股证券简称变更日期
-
-        //设置 A股 证券信息
+        entityInfoDetails.setEntityInfo(entityInfo);
+        //查询 A股 证券信息
         entityInfoDetails = getStockCnInfo(entityInfoDetails, entityCode);
 
-        //设置 港股 证券信息
+        //查询 港股 证券信息
         entityInfoDetails = getStockThkInfo(entityInfoDetails, entityCode);
 
-
-        List<EntityStockThkRel> entityStockThkRels = thkRelMapper.selectList(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode));
-
-
         //TODO 查询发债情况  --  是否可以收数
-        List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getEntityCode, entityCode));
-
+        entityInfoDetails = getEntityBondInfo(entityInfoDetails, entityCode);
 
         //TODO 查询金融机构  --  是否发行同业存单（银行）
-        List<EntityFinancial> entityFinancials = financialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
-
+        entityInfoDetails = getEntityFinancials(entityInfoDetails, entityCode,entityInfo);
 
         //TODO 查询敞口划分  --  客户敞口行业划分汇集  产业链CICS行业划分明细  旧辖口行业划分
-
+        //从主表获取数据
 
         //TODO 查询产品覆盖情况  --  全部
 
@@ -538,27 +532,132 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return R.ok(entityInfoDetails);
     }
 
+    private EntityInfoDetails getEntityFinancials(EntityInfoDetails entityInfoDetails, String entityCode,EntityInfo entityInfo) {
+
+        if (ObjectUtil.isEmpty(entityInfo.getFinance())||entityInfo.getFinance()==0){
+            return entityInfoDetails;
+        }
+        //查询金融机构表
+        EntityFinancial entityFinancial = financialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode)).get(0);
+        entityInfoDetails.setEntityFinancial(entityFinancial);
+        return entityInfoDetails;
+    }
+
+    private EntityInfoDetails getEntityBondInfo(EntityInfoDetails entityInfoDetails, String entityCode) {
+        BondInfoDetail bondInfoDetail = new BondInfoDetail();
+        //查询关联表
+        List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getEntityCode, entityCode));
+        //是否发债（含历史） -- 有过就发债过
+        if (CollectionUtils.isEmpty(entityBondRels)) {
+            bondInfoDetail.setIsBond(false);
+            return null;
+        }
+        bondInfoDetail.setIsBond(true);
+        //查询债券数据
+        List<String> bdCodes = new ArrayList<>();
+        entityBondRels.stream().forEach(o -> bdCodes.add(o.getBdCode()));
+        List<BondInfo> bondInfos = bondInfoMapper.selectList(new QueryWrapper<BondInfo>().lambda().in(BondInfo::getBondCode, bdCodes));
+        // 是否可以收数  TODO 校验收数规则
+        bondInfoDetail.setIsColl(true);
+        //首次发债时间
+        List<BondInfo> liveBonds = bondInfos.stream().filter(o -> !ObjectUtil.isEmpty(o.getValueDate())).collect(Collectors.toList());
+        liveBonds.sort(Comparator.comparing(BondInfo::getValueDate));
+        bondInfoDetail.setFirstBond(liveBonds.get(0).getValueDate());
+
+        //获取集合债信息
+        List<BondInfo> collList = bondInfos.stream().filter(o -> !ObjectUtil.isEmpty(o.getColl())).collect(Collectors.toList());
+        // 是否发行集合债
+        // 发行集合债详情
+        if (CollectionUtils.isEmpty(collList)){
+            bondInfoDetail.setIsCollBond(false).setCollBondsNum(0).setCollBondsLiveNum(0);
+        }else {
+            //存续集合债数量
+            bondInfoDetail.setIsCollBond(true)
+                    .setCollBondsNum(collList.size())
+                    .setCollBonds(collList)
+                    .setCollBondsLiveNum(collList.stream().filter(o -> TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), o.getDueDate()) < 0).collect(Collectors.toList()).size());
+        }
+
+        //获取ABS信息
+        List<BondInfo> absList = bondInfos.stream().filter(o -> !ObjectUtil.isEmpty(o.getAbs())).collect(Collectors.toList());
+        // 是否发行ABS
+        // 发行ABS详情
+        if (CollectionUtils.isEmpty(absList)){
+            bondInfoDetail.setIsAbsBond(false).setAbsBondsNum(0).setAbsBondsLiveNum(0);
+        }else {
+            //存续ABS数量
+            bondInfoDetail.setIsAbsBond(true)
+                    .setAbsBondsNum(absList.size())
+                    .setAbsBonds(absList)
+                    .setAbsBondsLiveNum(absList.stream().filter(o -> TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), o.getDueDate()) < 0).collect(Collectors.toList()).size());
+        }
+
+        //获取公募债信息
+        List<BondInfo> publicList = bondInfos.stream().filter(o -> o.getRaiseType()==0).collect(Collectors.toList());
+        // 是否发行公募债
+        // 发行公募债详情
+        if (CollectionUtils.isEmpty(publicList)){
+            bondInfoDetail.setIsPublicBond(false).setPublicBondsNum(0).setPublicBondsLiveNum(0);
+        }else {
+            //存续公募债数量
+            bondInfoDetail.setIsPublicBond(true)
+                    .setPublicBondsNum(publicList.size())
+                    .setPublicBonds(publicList)
+                    .setPublicBondsLiveNum(publicList.stream().filter(o -> TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), o.getDueDate()) < 0).collect(Collectors.toList()).size());
+        }
+
+        //获取私募债信息
+        List<BondInfo> privateList = bondInfos.stream().filter(o -> o.getRaiseType()==1).collect(Collectors.toList());
+        // 是否发行私募债
+        // 发行私募债详情
+        if (CollectionUtils.isEmpty(privateList)){
+            bondInfoDetail.setIsPrivateBond(false).setPrivateBondsNum(0).setPrivateBondsLiveNum(0);
+        }else {
+            //存续私募债数量
+            bondInfoDetail.setIsPrivateBond(true)
+                    .setPrivateBondsNum(privateList.size())
+                    .setPrivateBonds(privateList)
+                    .setPrivateBondsLiveNum(privateList.stream().filter(o -> TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), o.getDueDate()) < 0).collect(Collectors.toList()).size());
+        }
+
+        entityInfoDetails.setBondInfoDetail(bondInfoDetail);
+        return entityInfoDetails;
+
+    }
+
+
+
     private EntityInfoDetails getStockThkInfo(EntityInfoDetails entityInfoDetails, String entityCode) {
         //查询关联表
         List<EntityStockThkRel> entityStockThkRels = thkRelMapper.selectList(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode));
         if (CollectionUtils.isEmpty(entityStockThkRels)) {
             return null;
         }
-        //查询A股上市数据
+        //查询港股上市数据
         List<String> thkRelCodes = new ArrayList<>();
         entityStockThkRels.stream().forEach(o -> thkRelCodes.add(o.getStockDqCode()));
         List<StockThkInfo> stockThkInfos = stockThkMapper.selectList(new QueryWrapper<StockThkInfo>().lambda().in(StockThkInfo::getStockDqCode, thkRelCodes));
         //上市数据排序  TODO 验证排序是否是升序排序
-        stockThkInfos.sort(Comparator.comparing(o -> o.getListDate()));
+        stockThkInfos.stream().filter(o->!ObjectUtil.isEmpty(o.getListDate())).collect(Collectors.toList()).sort(Comparator.comparing(o -> o.getListDate()));
         StockThkInfo stockThkInfo = stockThkInfos.get(stockThkInfos.size() - 1);
         //退市日期
         String delistingDate = stockThkInfo.getDelistingDate();
-        int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
-        if (i>=0){
-            entityInfoDetails.setListType("A股");
-            entityInfoDetails.setListTypeA("存续");
+        if (ObjectUtil.isEmpty(delistingDate)){
+            entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+            entityInfoDetails.setListTypeG("存续");
         }else {
-            entityInfoDetails.setListTypeA("已退市");
+            int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
+            if (i >= 0) {
+                String listType = entityInfoDetails.getListType();
+                if (ObjectUtil.isEmpty(listType)){
+                    entityInfoDetails.setListType("G股");
+                }else {
+                    entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+                }
+                entityInfoDetails.setListTypeG("存续");
+            } else {
+                entityInfoDetails.setListTypeA("已退市");
+            }
         }
         entityInfoDetails.setStockThkInfo(stockThkInfo);
         return entityInfoDetails;
@@ -575,16 +674,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityStockCnRels.stream().forEach(o -> cnRelCodes.add(o.getStockDqCode()));
         List<StockCnInfo> stockCnInfos = stockCnMapper.selectList(new QueryWrapper<StockCnInfo>().lambda().in(StockCnInfo::getStockDqCode, cnRelCodes));
         //上市数据排序  TODO 验证排序是否是升序排序
-        stockCnInfos.sort(Comparator.comparing(o -> o.getListDate()));
+        stockCnInfos.stream().filter(o->!ObjectUtil.isEmpty(o.getListDate())).collect(Collectors.toList()).sort(Comparator.comparing(o -> o.getListDate()));
         StockCnInfo stockCnInfo = stockCnInfos.get(stockCnInfos.size() - 1);
         //退市日期
         String delistingDate = stockCnInfo.getDelistingDate();
-        int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
-        if (i>=0){
+        if (ObjectUtil.isEmpty(delistingDate)){
             entityInfoDetails.setListType("A股");
             entityInfoDetails.setListTypeA("存续");
         }else {
-            entityInfoDetails.setListTypeA("已退市");
+            int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
+            if (i >= 0) {
+                entityInfoDetails.setListType("A股");
+                entityInfoDetails.setListTypeA("存续");
+            } else {
+                entityInfoDetails.setListTypeA("已退市");
+            }
         }
         entityInfoDetails.setStockCnInfo(stockCnInfo);
         return entityInfoDetails;
@@ -608,21 +712,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    public R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize) {
+    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
 //        EntityInfo entityInfo = new EntityInfo();
 //        企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构
-        if (ObjectUtil.isEmpty(pageNum)){
-            pageNum=DEFAULT_PAGENUM;
+        if (ObjectUtil.isEmpty(pageNum)) {
+            pageNum = DEFAULT_PAGENUM;
         }
-        if (ObjectUtil.isEmpty(pageSize)){
-            pageSize=DEFAULT_PAGESIZE;
+        if (ObjectUtil.isEmpty(pageSize)) {
+            pageSize = DEFAULT_PAGESIZE;
         }
-        if (ObjectUtil.isEmpty(param)){
-            param="";
+        if (ObjectUtil.isEmpty(param)) {
+            param = "";
         }
-        Page<EntityInfo>pageInfo=new Page<>(pageNum,pageSize);
+        Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
 
-        LambdaQueryWrapper <EntityInfo>infoQuery=new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<EntityInfo> infoQuery = new LambdaQueryWrapper<>();
         if (ObjectUtils.isEmpty(type)) {
             type = 1;
         }
@@ -640,7 +744,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
 //        List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam( type,  param, pageNum, pageSize);
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, infoQuery);
-        List<EntityInfo> entityInfoList=page.getRecords();
+        List<EntityInfo> entityInfoList = page.getRecords();
 
         if (CollectionUtils.isEmpty(entityInfoList)) {
             return R.ok();
@@ -648,7 +752,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //封装结果集
         List<Map<String, Object>> records = new ArrayList<>();
         //相响分页结果
-        Page<Map<String, Object>>resultPage=new Page<>(pageNum,pageSize);
+        Page<Map<String, Object>> resultPage = new Page<>(pageNum, pageSize);
         resultPage.setTotal(page.getTotal());
 
         List<Map<String, Object>> finalRecords = records;
@@ -1141,7 +1245,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //债券简称
         bondVo.setShortName(bondInfo.getBondShortName());
         //存续状态
-        bondVo.setDebtRaisingType(bondInfo.getBondState()==null?null:bondInfo.getBondState().toString());
+        bondVo.setDebtRaisingType(bondInfo.getBondState() == null ? null : bondInfo.getBondState().toString());
         //TODO 债募类型
         //公私募类型
         bondVo.setRaiseType(bondInfo.getRaiseType());
@@ -1196,9 +1300,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/25
      */
     @Override
-    public R <Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
-        pageNum = pageNum==null?1:pageNum;
-        pageSize = pageSize==null?20:pageSize;
+    public R<Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum == null ? 1 : pageNum;
+        pageSize = pageSize == null ? 20 : pageSize;
         //模糊匹配 查询主体||债券信息
         switch (keyword) {
             //模糊匹配主体名
@@ -1221,7 +1325,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .setPages(entityInfoPage.getPages())
                         .setCurrent(entityInfoPage.getCurrent())
                         .setSize(entityInfoPage.getSize());
-                return R.ok(targetEntityBondsVoPage,SuccessInfo.SUCCESS.getInfo());
+                return R.ok(targetEntityBondsVoPage, SuccessInfo.SUCCESS.getInfo());
             // 模糊匹配债券名
             case BOND:
                 List<TargetEntityBondsVo> rest = new ArrayList<>();
@@ -1245,7 +1349,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .setPages(bondInfoPage.getPages())
                         .setCurrent(bondInfoPage.getCurrent())
                         .setSize(bondInfoPage.getSize());
-                return R.ok(targetEntityBondsVoPageBond,SuccessInfo.SUCCESS.getInfo());
+                return R.ok(targetEntityBondsVoPageBond, SuccessInfo.SUCCESS.getInfo());
             default:
                 return R.fail(BadInfo.VALID_PARAM.getInfo());
         }
@@ -1786,6 +1890,27 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (update < 1) {
             entityInfoMapper.insert(entityInfo);
         }
+    }
+
+    @Override
+    public void updateInfoDetail(EntityInfoDetails entityInfoDetails) {
+        //获取修改的信息 分别修改各自的信息
+
+        //基础属性
+        EntityInfo entityInfo = entityInfoDetails.getEntityInfo();
+        //A股信息
+        StockCnInfo stockCnInfo = entityInfoDetails.getStockCnInfo();
+        //港股信息
+        StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
+
+        //修改基础属性
+        entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,entityInfo.getEntityCode()));
+
+        //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
+        stockCnMapper.update(stockCnInfo,new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
+
+        //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
+        stockThkMapper.update(stockThkInfo,new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
     }
 
     /**

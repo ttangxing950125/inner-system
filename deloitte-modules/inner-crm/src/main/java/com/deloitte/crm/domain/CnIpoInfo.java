@@ -51,8 +51,15 @@ public class CnIpoInfo implements Serializable {
     /**
      * 招股日期
      */
-    @Excel(name = "招股日期")
-    private Date prospDate;
+    @Excel(name = "招股日期", dateFormat = "yyyy-MM-dd")
+    private String prospDate;
+
+    /**
+     * 初步询价起始日
+     */
+    @Excel(name = "初步询价起始日", dateFormat = "yyyy-MM-dd")
+    private String inquiryStaringDate;
+
     /**
      * 网上发行日期
      */
@@ -271,7 +278,7 @@ public class CnIpoInfo implements Serializable {
     /**
      * 认购倍数(网下)
      */
-    @Excel(sort = 47, name = "认购倍数(网下)")
+    @Excel(sort = 49, name = "认购倍数(网下)")
     private Double offlineSubsMult;
     /**
      * 战略配售获配股份占比
@@ -326,7 +333,7 @@ public class CnIpoInfo implements Serializable {
     /**
      * 认购倍数(网上)
      */
-    @Excel(sort = 58, name = "认购倍数(网上)")
+    @Excel(sort = 60, name = "认购倍数(网上)")
     private Double netCheckRatio;
     /**
      * 发行方式

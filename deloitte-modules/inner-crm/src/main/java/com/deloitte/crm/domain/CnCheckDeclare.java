@@ -202,6 +202,10 @@ public class CnCheckDeclare implements Serializable {
      */
     @Excel(name = "最新一年净利润(万元)")
     private Double netLastyear;
+
+
+    private String entityPhone;
+
     /**
      * 公司网址
      */
@@ -264,6 +268,7 @@ public class CnCheckDeclare implements Serializable {
                 Objects.equals(calibrationDate, that.calibrationDate) &&
                 Objects.equals(revenueLastyear, that.revenueLastyear) &&
                 Objects.equals(netLastyear, that.netLastyear) &&
+                Objects.equals(entityPhone, that.entityPhone) &&
                 Objects.equals(entityWeb, that.entityWeb) &&
                 Objects.equals(entityEmail, that.entityEmail) &&
                 Objects.equals(registerAddress, that.registerAddress) &&
@@ -273,6 +278,6 @@ public class CnCheckDeclare implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, annoDate, entityName, simulationListed, auditStatus, declarationProcess, isDisclose, ipoTransferBoard, issRule, csrcBelIndustry, estIssNum, issPredicAfterStock, predicFund, entityRegisterAddress, city, sponsorOrgan, sponsor, sponsorOrganTeam, accountingFirm, signingAccountant, lawFirm, signingAttorney, auditStatusChange, firstAnnoDate, ipoDeclareDiscloseDate, ipoDeclareFirstsendDate, acceptDate, auditDate, calibrationDate, revenueLastyear, netLastyear, entityWeb, entityEmail, registerAddress, boardSecretary, windIndustry);
+        return Objects.hash(code, annoDate, entityName, simulationListed, auditStatus, declarationProcess, isDisclose, ipoTransferBoard, issRule, csrcBelIndustry, estIssNum, issPredicAfterStock, predicFund, entityRegisterAddress, city, sponsorOrgan, sponsor, sponsorOrganTeam, accountingFirm, signingAccountant, lawFirm, signingAttorney, auditStatusChange, firstAnnoDate, ipoDeclareDiscloseDate, ipoDeclareFirstsendDate, acceptDate, auditDate, calibrationDate, revenueLastyear, netLastyear, entityPhone, entityWeb, entityEmail, registerAddress, boardSecretary, windIndustry);
     }
 }
