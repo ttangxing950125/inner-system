@@ -1213,7 +1213,7 @@ export default {
         })
 
         // 角色7
-        getDayTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
+        getDayTaskInfo({ date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
           const { data } = res
           this.list7 = data.records
           this.total = data.total

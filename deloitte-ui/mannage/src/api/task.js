@@ -79,10 +79,15 @@ export function doTask(params) {
 // 查询当日任务
 export function getDayTaskInfo(date) {
   return request({
-    url: "/crm/roleSeven/getDayTaskInfo?date=" + date.date,
+    url:
+      "/crm/roleSeven/getDayTaskInfo?date=" +
+      date.date +
+      "&pageNum=" +
+      date.pageNum +
+      "&pageSize=" +
+      date.pageSize,
     headers: {
       isToken: true,
-      "Content-Type": "application/x-www-form-urlencoded",
     },
     method: "post",
     data: date,
