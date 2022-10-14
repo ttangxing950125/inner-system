@@ -1,10 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
@@ -64,10 +61,11 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
     @Resource
     private IEntityInfoService entityInfoService;
 
-
     @Resource
     @Lazy
     private BondNewIssueStrategy bondNewIssueStrategy;
+
+    private List<String> excludeBondTypeSecond = Arrays.asList("国债","地方政府债");
 
 
     /**
@@ -93,6 +91,12 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
             if (StrUtil.isBlank(newIss.getBondShortName())){
                 continue;
             }
+            //Wind债券类型(二级) 国债和地方政府债不考虑
+            if (excludeBondTypeSecond.contains(newIss.getWindBondTypeSecond())){
+                continue;
+            }
+
+
             //多线程保存债券信息，更新attrvalue表
             Future<BondInfoDto> future = bondNewIssueStrategy.doBondImport(newIss, timeNow, windTask);
 

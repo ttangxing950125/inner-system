@@ -179,29 +179,28 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfo> list = this.list();
 
         //issue_bonds 是否发债 0-未发债 1-已发债
-        List<EntityInfo> bonds = list().stream()
+        List<EntityInfo> bonds = list.stream()
                 .filter(row -> row.getIssueBonds() != null && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //finance 是否金融机构
-        List<EntityInfo> finance = list().stream()
+        List<EntityInfo> finance = list.stream()
                 .filter(row -> row.getFinance() != null && row.getFinance() == 1)
                 .collect(Collectors.toList());
 
         //list 是否上市 0-未上市 1-已上市
-        List<EntityInfo> entityInfoList = list().stream()
+        List<EntityInfo> entityInfoList = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
                 .collect(Collectors.toList());
 
         //即是上市又是发债
-        List<EntityInfo> listAndBonds = list();
-        listAndBonds = listAndBonds.stream()
+        List<EntityInfo> listAndBonds = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
                 .filter(row -> (row.getFinance() != null && row.getIssueBonds() != null) && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //!即是上市又是发债
-        List<EntityInfo> notListAndBonds = list().stream()
+        List<EntityInfo> notListAndBonds = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 0)
                 .filter(row -> (row.getFinance() != null && row.getIssueBonds() != null) && row.getIssueBonds() == 0)
                 .collect(Collectors.toList());

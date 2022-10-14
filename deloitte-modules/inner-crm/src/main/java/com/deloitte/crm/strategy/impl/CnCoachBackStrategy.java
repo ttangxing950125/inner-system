@@ -1,5 +1,7 @@
 package com.deloitte.crm.strategy.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -20,11 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * @author 吴鹏鹏ppp
@@ -113,6 +113,7 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
         }
     }
 
+
     /**
      * 是否支持当前wind任务
      *
@@ -149,7 +150,17 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
      */
     @Override
     public List<String> getDetailHeader(CrmWindTask windTask) {
-        return null;
+
+
+        return Arrays.asList(
+                "导入日期",
+                "变化状态",
+
+                "企业名称",
+                "代码",
+                "最新公告日",
+                "审核状态"
+                );
     }
 
     /**
@@ -162,7 +173,26 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
      */
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        Integer taskId = windTask.getId();
+        Wrapper<CnCoachBack> wrapper = Wrappers.<CnCoachBack>lambdaQuery()
+                .eq(CnCoachBack::getTaskId, taskId)
+                .in(CnCoachBack::getChangeType, 1, 2);
+
+
+        return cnCoachBackService.list(wrapper).stream().map(item->{
+            HashMap<String, Object> dataMap = new HashMap<>();
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("企业名称", item.getEntityName());
+            dataMap.put("代码", item.getCode());
+            dataMap.put("最新公告日", item.getAnnoDate());
+            dataMap.put("审核状态", item.getAuditStatus());
+
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
 

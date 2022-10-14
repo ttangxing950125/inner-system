@@ -44,10 +44,6 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
-    public static void main(String[] args) {
-        System.out.println(Integer.MAX_VALUE);
-    }
-
     /**
      * 导入ThkSecIssInfo表的数据
      * @param secIssInfo
@@ -154,6 +150,9 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
     @Override
     public List<String> getDetailHeader(CrmWindTask windTask) {
         ArrayList<String> arr = new ArrayList<>();
+        arr.add("导入日期");
+        arr.add("变化状态");
+
         //证券代码
         //证券简称
         //公司中文名称
