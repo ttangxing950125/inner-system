@@ -17,26 +17,48 @@ import java.util.List;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class EntityInfoDetails {
-    //主体基本信息
-    EntityInfo entityInfo;
-    //主体金融机构信息
-    EntityFinancial entityFinancial;
-    //主体A股上市详情
-    StockCnInfo stockCnInfo;
-    //主体港股上市详情
-    StockThkInfo stockThkInfo;
-    //主体其他一般工商信息
-    EntityBaseBusiInfo entityBaseBusiInfo;
-    //A股上市状态
+    /**
+     * 主体基本信息
+     */
+    private EntityInfo entityInfo;
+    /**
+     * 主体金融机构信息
+     */
+    private EntityFinancial entityFinancial;
+    /**
+     * 主体A股上市详情
+     */
+    private StockCnInfo stockCnInfo;
+    /**
+     * 主体港股上市详情
+     */
+    private StockThkInfo stockThkInfo;
+    /**
+     * 主体其他一般工商信息
+     */
+    private EntityBaseBusiInfo entityBaseBusiInfo;
+    /**
+     * A股上市状态
+     */
     private String listTypeA;
-    //港股上市状态
+    /**
+     * 港股上市状态
+     */
     private String listTypeG;
-    //上市汇总
+    /**
+     * 上市汇总
+     */
     private String listType;
-    //主体产品覆盖情况
+    /**主体产品覆盖情况*/
     // TODO
-    //主体发债情况详情
-    BondInfo bondInfo;
-    //主体敞口划分
-    List<EntityAttrValue>attrList;
+    /**
+     * /**主体发债情况详情
+     */
+    private BondInfoDetail bondInfoDetail;
+
+
+    /**
+     * 主体敞口划分
+     */
+    private List<EntityAttrValue> attrList;
 }

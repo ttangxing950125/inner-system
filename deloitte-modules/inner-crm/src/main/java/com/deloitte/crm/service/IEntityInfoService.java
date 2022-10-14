@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
@@ -253,6 +254,8 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
     void addEntityeMsg(EntityInfo entityInfo);
+
+    void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
     /**
      * 根据 id 字段名 修改

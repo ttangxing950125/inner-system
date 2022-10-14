@@ -78,7 +78,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R updateInfoList(List<GovInfo> list);
 
-    R getInfoDetail(GovInfo govInfo);
+    R getInfoDetail(String dqGovCode);
 
     R getInfoList(Integer type,String param,Integer pageNum,Integer pageSize);
 

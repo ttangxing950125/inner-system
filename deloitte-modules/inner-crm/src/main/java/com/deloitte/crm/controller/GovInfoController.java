@@ -236,16 +236,16 @@ public class GovInfoController extends BaseController {
     /**
      * 根据 dqCode 查询政府主体
      *
-     * @param govInfo
-     * @return AjaxResult
+     * @param dqGovCode
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "根据 dqCode 查询政府主体")
-    @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
+    @ApiImplicitParam(name = "dqGovCode", value = "政府主体德勤唯一识别码", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getInfoDetail")
-    public R getInfoDetail(@RequestBody GovInfo govInfo) {
-        return govInfoService.getInfoDetail(govInfo);
+    public R getInfoDetail(String dqGovCode) {
+        return govInfoService.getInfoDetail(dqGovCode);
     }
 
     /**
@@ -332,4 +332,5 @@ public class GovInfoController extends BaseController {
         govInfoService.insertGovInfo(govInfo);
         return R.ok();
     }
+
 }

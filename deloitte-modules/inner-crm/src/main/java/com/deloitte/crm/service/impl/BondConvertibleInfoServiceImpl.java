@@ -47,10 +47,11 @@ public class BondConvertibleInfoServiceImpl extends ServiceImpl<BondConvertibleI
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 
         for (BondConvertibleInfo convertibleInfo : bondConvertibleInfo) {
-            if (convertibleInfo.getNoticeDate().equals("数据来源：Wind")) {
+            final Date noticeDate = convertibleInfo.getNoticeDate();
+            if (noticeDate != null && DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, noticeDate).equals("数据来源：Wind")) {
                 continue;
             }
-           Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleStrategy.class).doBondImport(convertibleInfo, timeNow, windTask);
+            Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleStrategy.class).doBondImport(convertibleInfo, timeNow, windTask);
             futureList.add(future);
         }
         while (true) {

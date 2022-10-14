@@ -84,7 +84,8 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Override
     public Object doTask(Long taskId, MultipartFile file) throws Exception {
         //查询当前任务
-        CrmWindTask windTask = crmWindTaskMapper.selectCrmWindTaskById(taskId);
+//        CrmWindTask windTask = crmWindTaskMapper.selectCrmWindTaskById(taskId);
+        CrmWindTask windTask = crmWindTaskMapper.selectById(taskId);
         if (windTask == null) {
             throw new GlobalException("没有该任务");
         }
