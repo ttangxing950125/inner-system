@@ -142,4 +142,13 @@ public interface IEntityAttrValueService extends IService<EntityAttrValue>
      */
     Boolean saveAttrValue(String entityCode,AttrValueMapDto attrValueMapDto);
 
+    /**
+     * 批量导入附表数据至 entity_attr_value by 正杰
+     *
+     * @param entityCode
+     * @param attrId
+     * @param value
+     */
+    void runBatchToAttrValue(String entityCode,Integer attrId,String value);
+
 }

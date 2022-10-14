@@ -390,6 +390,19 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         }
     }
 
+    /**
+     * 批量导入附表数据至 entity_attr_value by 正杰
+     *
+     * @param entityCode
+     * @param attrId
+     * @param value
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void runBatchToAttrValue(String entityCode, Integer attrId, String value) {
+        baseMapper.insertEntityAttrValue(new EntityAttrValue().setEntityCode(entityCode).setAttrId(attrId.longValue()).setValue(value));
+    }
+
     public List<AttrValueMapDto> getAllChildrenId(AttrValueMapDto attrValueMapDto, List<AttrValueMapDto> list) {
         List<AttrValueMapDto> children = attrValueMapDto.getChildren();
         if (children.size() != 0) {

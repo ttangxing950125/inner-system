@@ -2,6 +2,7 @@ package com.deloitte.crm.domain;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -192,5 +193,46 @@ public class CnCoachBack implements Serializable {
     @Excel(name = "Wind行业")
     private String windIndustry;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CnCoachBack that = (CnCoachBack) o;
+        return Objects.equals(code, that.code) &&
+                Objects.equals(annoDate, that.annoDate) &&
+                Objects.equals(entityName, that.entityName) &&
+                Objects.equals(simulationListed, that.simulationListed) &&
+                Objects.equals(auditStatus, that.auditStatus) &&
+                Objects.equals(declarationProcess, that.declarationProcess) &&
+                Objects.equals(isDisclose, that.isDisclose) &&
+                Objects.equals(issRule, that.issRule) &&
+                Objects.equals(csrcBelIndustry, that.csrcBelIndustry) &&
+                Objects.equals(estIssNum, that.estIssNum) &&
+                Objects.equals(issPredicAfterStock, that.issPredicAfterStock) &&
+                Objects.equals(predicFund, that.predicFund) &&
+                Objects.equals(entityRegisterAddress, that.entityRegisterAddress) &&
+                Objects.equals(sponsorOrgan, that.sponsorOrgan) &&
+                Objects.equals(sponsor, that.sponsor) &&
+                Objects.equals(accountingFirm, that.accountingFirm) &&
+                Objects.equals(signingAccountant, that.signingAccountant) &&
+                Objects.equals(lawFirm, that.lawFirm) &&
+                Objects.equals(signingAttorney, that.signingAttorney) &&
+                Objects.equals(auditStatusChange, that.auditStatusChange) &&
+                Objects.equals(firstAnnoDate, that.firstAnnoDate) &&
+                Objects.equals(ipoDeclareDiscloseDate, that.ipoDeclareDiscloseDate) &&
+                Objects.equals(ipoDeclareFirstsendDate, that.ipoDeclareFirstsendDate) &&
+                Objects.equals(acceptDate, that.acceptDate) &&
+                Objects.equals(auditDate, that.auditDate) &&
+                Objects.equals(entityWeb, that.entityWeb) &&
+                Objects.equals(entityEmail, that.entityEmail) &&
+                Objects.equals(entityPhone, that.entityPhone) &&
+                Objects.equals(registerAddress, that.registerAddress) &&
+                Objects.equals(boardSecretary, that.boardSecretary) &&
+                Objects.equals(windIndustry, that.windIndustry);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, annoDate, entityName, simulationListed, auditStatus, declarationProcess, isDisclose, issRule, csrcBelIndustry, estIssNum, issPredicAfterStock, predicFund, entityRegisterAddress, sponsorOrgan, sponsor, accountingFirm, signingAccountant, lawFirm, signingAttorney, auditStatusChange, firstAnnoDate, ipoDeclareDiscloseDate, ipoDeclareFirstsendDate, acceptDate, auditDate, entityWeb, entityEmail, entityPhone, registerAddress, boardSecretary, windIndustry);
+    }
 }

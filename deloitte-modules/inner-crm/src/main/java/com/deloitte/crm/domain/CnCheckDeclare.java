@@ -203,7 +203,10 @@ public class CnCheckDeclare implements Serializable {
     @Excel(name = "最新一年净利润(万元)")
     private Double netLastyear;
 
-
+    /**
+     * 公司电话
+     */
+    @Excel(name = "公司电话")
     private String entityPhone;
 
     /**

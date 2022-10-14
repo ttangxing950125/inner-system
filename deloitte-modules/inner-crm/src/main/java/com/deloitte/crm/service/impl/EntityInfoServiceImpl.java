@@ -1848,7 +1848,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public String appendPrefixDiy(String prefixWord, Integer prefixLength, Integer target) {
-        return prefixWord + String.format("%0" + prefixLength, target);
+        return prefixWord + String.format("%0" + prefixLength+"d", target);
     }
 
     /**
