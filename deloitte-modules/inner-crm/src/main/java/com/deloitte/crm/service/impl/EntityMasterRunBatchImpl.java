@@ -41,18 +41,18 @@ public class EntityMasterRunBatchImpl implements EntityAttrValueRunBatchTask {
         String entityCode = entityMaster.getEntityCode();
         if(entityCode==null){return null;}
 
-
-        Class<? extends EntityMaster> aClass = entityMaster.getClass();
-        Field[] declaredFields = aClass.getDeclaredFields();
-
         EntityAttrValue result = new EntityAttrValue();
         result.setEntityCode(entityCode);
 
+        Class<? extends EntityMaster> aClass = entityMaster.getClass();
+        Field[] declaredFields = aClass.getDeclaredFields();
 
         for (Field declaredField : declaredFields) {
             Attrs annotation = declaredField.getAnnotation(Attrs.class);
             if(annotation==null){break;}
             int i = annotation.attrId();
+
+
         }
 
         return null;

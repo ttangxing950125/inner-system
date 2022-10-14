@@ -15,6 +15,7 @@ import com.deloitte.crm.vo.CrmEntityTaskVo;
 import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+
+import static org.reflections.Reflections.log;
 
 /**
  * @author 正杰
@@ -38,6 +41,7 @@ import java.util.List;
 @RequestMapping("/roleSeven")
 @AllArgsConstructor
 @Api(tags = "角色7控制层")
+@Slf4j
 public class RoleSevenController {
 
     private final ICrmEntityTaskService iCrmEntityTaskService;
@@ -59,6 +63,7 @@ public class RoleSevenController {
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
     public R<Page<CrmEntityTaskVo>> getDayTaskInfo(String date, Integer pageNum, Integer pageSize){
+        log.info("==> 角色7当日查询 <==");
         return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
     }
 
