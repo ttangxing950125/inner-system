@@ -214,25 +214,24 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public GovInfoDto getGovInfo() {
         List<GovInfo> list = this.list();
         GovInfoDto govInfoDto = new GovInfoDto();
-//TODO gov_level_big 是否 省  1-是
-        List<GovInfo> province = list().stream()
+// gov_level_big 是否 省  1-是
+        List<GovInfo> province = list.stream()
                 .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 1)
                 .collect(Collectors.toList());
 
-//TODO gov_level_big 是否 市  2-是
-        List<GovInfo> city = list().stream()
+// gov_level_big 是否 市  2-是
+        List<GovInfo> city = list.stream()
                 .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 2)
                 .collect(Collectors.toList());
 
-//TODO gov_level_big 是否 县  3-是
-        List<GovInfo> county = list().stream()
+// gov_level_big 是否 县  3-是
+        List<GovInfo> county = list.stream()
                 .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 3)
                 .collect(Collectors.toList());
 
-//TODO gov_level_big 是否 经开  4-是
-        List<GovInfo> open = list().stream()
+// gov_level_big 是否 经开  4-是
+        List<GovInfo> open = list.stream()
                 .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 4)
-
                 .collect(Collectors.toList());
 
         govInfoDto.setProvince(province.size());
