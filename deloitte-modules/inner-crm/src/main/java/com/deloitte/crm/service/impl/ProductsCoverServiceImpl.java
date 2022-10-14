@@ -73,16 +73,16 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
                 ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()));
                 if (productsCover == null) {
                     Products products = productsMapper.selectById(integer);
-                    stringStringHashMap.put(o.getEntityName(), products.getProName());
-                    stringStringHashMap.put(o.getEntityCode(), "暂无数据");
-                    stringStringHashMap.put(o.getCreditCode(), "0");
+                    stringStringHashMap.put("key", products.getProName());
+                    stringStringHashMap.put("value", "未覆盖");
+                    stringStringHashMap.put("color", "0");
                     maps.add(stringStringHashMap);
                 } else {
                     //当前主体的产品名称
                     Products products = productsMapper.selectById(integer);
-                    stringStringHashMap.put(o.getEntityName(), products.getProName());
-                    stringStringHashMap.put(o.getEntityCode(), productsCover.getCoverDes());
-                    stringStringHashMap.put(o.getCreditCode(), productsCover.getIsCover());
+                    stringStringHashMap.put("key", products.getProName());
+                    stringStringHashMap.put("value", productsCover.getCoverDes());
+                    stringStringHashMap.put("color", productsCover.getIsCover());
                     maps.add(stringStringHashMap);
                 }
             }
