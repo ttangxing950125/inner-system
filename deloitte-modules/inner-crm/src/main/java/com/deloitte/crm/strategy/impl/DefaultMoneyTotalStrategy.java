@@ -3,7 +3,9 @@ package com.deloitte.crm.strategy.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -157,7 +160,26 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
     //TODO
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        Integer taskId = windTask.getId();
+        Wrapper<DefaultMoneyTotal> wrapper = Wrappers.<DefaultMoneyTotal>lambdaQuery()
+                .eq(DefaultMoneyTotal::getTaskId, taskId)
+                .in(DefaultMoneyTotal::getChangeType, 1, 2);
+
+        return defaultMoneyTotalMapper.selectList(wrapper).stream().map(item -> {
+
+            HashMap<String, Object> dataMap = new HashMap<>();
+
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("证券代码", item.getBondCode());
+            dataMap.put("证券简称", item.getBondAbstract());
+            dataMap.put("发行人", item.getPublisher());
+            dataMap.put("发行规模(亿元)", item.getOfferingSize());
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
 }
