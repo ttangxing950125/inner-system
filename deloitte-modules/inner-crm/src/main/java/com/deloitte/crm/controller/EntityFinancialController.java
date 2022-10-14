@@ -44,7 +44,9 @@ public class EntityFinancialController {
             @ApiImplicitParam(name = "belJurisdiction", value = "所属辖区", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "regulators", value = "对口监管机构", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "shenWanMaster", value = "申万行业划分", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addFinEntitySubtableMsg")
     public R addFinEntitySubtableMsg(@RequestBody EntityFinancialDto entityFinancial) {

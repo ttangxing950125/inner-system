@@ -1,13 +1,13 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 
 /**
  * 导入的wind文件分类对象 crm_wind_dict
@@ -20,6 +20,7 @@ public class CrmWindDict implements Serializable
     private static final Long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /** wind文件分类名 */

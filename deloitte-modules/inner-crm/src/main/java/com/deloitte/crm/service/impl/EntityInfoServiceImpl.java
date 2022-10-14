@@ -331,6 +331,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
+
         //设置主键为空，防止修改主键
         entityInfo.setId(null);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
@@ -1880,6 +1881,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/10/12 9:51
      */
     @Override
+    @Transactional
     public void addEntityeMsg(EntityInfo entityInfo) {
         Integer id = entityInfo.getId();
         crmSupplyTaskService.completeTaskById(id);

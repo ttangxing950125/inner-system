@@ -1,6 +1,8 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -22,6 +24,7 @@ public class EntityMaster implements Serializable {
     /**
      * $column.columnComment
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

@@ -1,14 +1,16 @@
 package com.deloitte.crm.domain;
 
-import java.util.Date;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * (EntityInfoLogs)表实体类
@@ -27,6 +29,7 @@ public class EntityInfoLogs implements Serializable {
      * 主键
      */
     @Excel(name = "主键")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 股票证券代码 | 债券交易代码
