@@ -1,13 +1,15 @@
 package com.deloitte.crm.domain;
 
-import java.util.Date;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 可交换转债发行预案(BondConvertibleChangeInfo)表实体类
@@ -25,6 +27,7 @@ public class BondConvertibleChangeInfo implements Serializable {
      * 主键自动增加
      */
 //    @Excel(name = "主键自动增加")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 导入时间
@@ -130,7 +133,7 @@ public class BondConvertibleChangeInfo implements Serializable {
      * 网上缴款日
      */
     @Excel(name = "网上缴款日")
-    private Date onlinePayment;
+    private Date onlinePaymentDate;
     /**
      * 上市日
      */

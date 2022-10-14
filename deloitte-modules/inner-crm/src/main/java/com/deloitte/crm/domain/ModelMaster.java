@@ -1,12 +1,11 @@
 package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 
 /**
  * 【请填写功能名称】对象 model_master
@@ -19,6 +18,7 @@ public class ModelMaster
     private static final long serialVersionUID = 1L;
 
     /** $column.columnComment */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /** 敞口名 */

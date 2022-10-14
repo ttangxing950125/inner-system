@@ -13,6 +13,7 @@ import com.deloitte.crm.mapper.BondDelIssMapper;
 import com.deloitte.crm.service.BondDelIssService;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.strategy.impl.BondDelIssStrategy;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -32,9 +33,6 @@ public class BondDelIssServiceImpl extends ServiceImpl<BondDelIssMapper, BondDel
 
     @Resource
     private ICrmWindTaskService crmWindTaskService;
-
-    @Resource
-    private BondDelIssStrategy bondDelIssStrategy;
 
     /**
      * 完成当前wind文件的任务
@@ -59,7 +57,7 @@ public class BondDelIssServiceImpl extends ServiceImpl<BondDelIssMapper, BondDel
                 continue;
             }
             //多线程保存债券信息，更新attrvalue表
-            Future<BondInfoDto> future = bondDelIssStrategy.doBondImport(delIss, timeNow, windTask);
+            Future<BondInfoDto> future = ApplicationContextHolder.get().getBean(BondDelIssStrategy.class).doBondImport(delIss, timeNow, windTask);
 
             futureList.add(future);
         }

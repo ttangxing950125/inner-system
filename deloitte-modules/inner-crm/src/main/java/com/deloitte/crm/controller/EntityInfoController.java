@@ -9,20 +9,20 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.domain.StockThkInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
+import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
-import com.deloitte.crm.service.ProductsService;
 import com.deloitte.crm.service.SendEmailService;
-import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -196,8 +196,8 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize) {
-        return entityInfoService.getInfoList(type, param,pageNum,pageSize);
+    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+        return entityInfoService.getInfoList(type, param, pageNum, pageSize);
     }
 
     /**
@@ -239,24 +239,44 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 根据 dqCode 查询企业主体
+     * 上市企业-修改信息-根据 entityCode 查询主体详细信息
      *
-     * @param entityInfo
+     * @param entityCode
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "上市企业-修改信息-根据 entityCode 查询主体详细信息")
-    @ApiImplicitParam(name = "entityCode", value = "主体德勤唯一识别码", paramType = "query", example = "", dataType="String")
+    @ApiImplicitParam(name = "entityCode", value = "主体德勤唯一识别码", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getInfoDetail")
-    public R getInfoDetailByEntityCode( String entityCode) {
+    public R getInfoDetailByEntityCode(String entityCode) {
         return entityInfoService.getInfoDetailByEntityCode(entityCode);
+    }
+
+    /**
+     * 上市企业-修改信息
+     *
+     * @param entityInfoDetails
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/9/23 8:59
+     */
+    @ApiOperation(value = "上市企业-修改信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "entityInfo", value = "主体基本信息", paramType = "body", example = "", dataTypeClass = EntityInfo.class),
+            @ApiImplicitParam(name = "stockCnInfo", value = "主体A股上市详情", paramType = "body", example = "", dataTypeClass = StockCnInfo.class),
+            @ApiImplicitParam(name = "stockThkInfo", value = "主体港股上市详情", paramType = "body", example = "", dataTypeClass = StockThkInfo.class)
+    })
+    @PostMapping("/updateInfoDetail")
+    public R updateInfoDetail(@RequestBody EntityInfoDetails entityInfoDetails) {
+        entityInfoService.updateInfoDetail(entityInfoDetails);
+        return R.ok();
     }
 
     /**
      * 分页查询企业主体
      *
-     * @return AjaxResult
+     * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
@@ -305,13 +325,18 @@ public class EntityInfoController extends BaseController {
      * @date 2022/10/8 15:53
      */
     @ApiOperation(value = "快速查询企业上市或发债情况")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "param", value = "收缩条件", paramType = "query", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "query", example = "", dataType = "Integer")
+    })
     @PostMapping("/getQuickOfCoverage")
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);
     }
 
     /**
-     *批量查询并导出excel结果
+     * 批量查询并导出excel结果
      *
      * @param file
      * @param uuid(用于存进度导redis)
@@ -343,24 +368,22 @@ public class EntityInfoController extends BaseController {
     }
 
 
-
-
     /**
      * 财报收数根据entityCode补充录入信息--主表
      *
      * @param entityInfo
-     * @return void
+     * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:51
      */
     @ApiOperation(value = "财报收数根据entityCode补充录入信息--主表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "reportType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "listType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "reportType", value = "关注报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "listType", value = "财报类型", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shenWanMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addEntityeMsg")
     public R addEntityeMsg(@RequestBody EntityInfo entityInfo) {

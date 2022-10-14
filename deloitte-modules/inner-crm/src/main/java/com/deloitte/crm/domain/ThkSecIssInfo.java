@@ -81,7 +81,7 @@ public class ThkSecIssInfo implements Serializable {
     /**
      * 成立时间
      */
-    @Excel(name = "成立日期",dateFormat = "yyyyMMdd")
+    @Excel(name = "成立日期",dateFormat = "yyyy-MM-dd")
     private String createDate;
     /**
      * 注册地址
@@ -121,7 +121,7 @@ public class ThkSecIssInfo implements Serializable {
     /**
      * 员工数
      */
-    @Excel(name = "员工数")
+    @Excel(name = "员工总数")
     private Integer entityEmpCount;
     /**
      * 经营范围
@@ -129,9 +129,9 @@ public class ThkSecIssInfo implements Serializable {
     @Excel(name = "经营范围")
     private String entityScope;
     /**
-     * 公司描述
+     * 公司简介
      */
-    @Excel(name = "公司描述")
+    @Excel(name = "公司简介")
     private String entityDes;
     /**
      * 所属Wind行业
@@ -143,6 +143,11 @@ public class ThkSecIssInfo implements Serializable {
      */
     @Excel(name = "保荐人")
     private String sponsor;
+    /**
+     * 保荐机构
+     */
+    @Excel(name = "保荐机构")
+    private String sponsorOrg;
     /**
      * 全球协调人
      */
@@ -175,11 +180,12 @@ public class ThkSecIssInfo implements Serializable {
                 Objects.equals(entityDes, that.entityDes) &&
                 Objects.equals(belWind, that.belWind) &&
                 Objects.equals(sponsor, that.sponsor) &&
+                Objects.equals(sponsorOrg, that.sponsorOrg) &&
                 Objects.equals(coordinator, that.coordinator);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code, name, infoDate, status, entityCnName, entityUkName, simulationListed, createDate, registerAddress, entityAddress, entityWeb, entityMail, entityPhone, entityFax, yearBillDate, entityEmpCount, entityScope, entityDes, belWind, sponsor, coordinator);
+        return Objects.hash(code, name, infoDate, status, entityCnName, entityUkName, simulationListed, createDate, registerAddress, entityAddress, entityWeb, entityMail, entityPhone, entityFax, yearBillDate, entityEmpCount, entityScope, entityDes, belWind, sponsor, sponsorOrg, coordinator);
     }
 }

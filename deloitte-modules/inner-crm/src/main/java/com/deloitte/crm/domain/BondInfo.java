@@ -1,7 +1,8 @@
 package com.deloitte.crm.domain;
 
-import java.util.Date;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 bond_info
@@ -27,6 +28,7 @@ public class BondInfo {
     /**
      * $column.columnComment
      */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
