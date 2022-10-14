@@ -3,7 +3,9 @@ package com.deloitte.crm.strategy.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -174,7 +176,23 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
 
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        List<Integer> changeStatusArr = Arrays.stream(DataChangeType.values()).map(DataChangeType::getId).collect(Collectors.toList());
+        Integer taskId = windTask.getId();
+        Wrapper<BondConvertibleInfo> wrapper = Wrappers.<BondConvertibleInfo>lambdaQuery()
+                .eq(BondConvertibleInfo::getTaskId, taskId)
+                .in(BondConvertibleInfo::getChangeType, changeStatusArr);
+
+        return bondConvertibleInfoMapper.selectList(wrapper).stream().map(item -> {
+            HashMap<String, Object> dataMap = new HashMap<>();
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("公司代码", item.getCode());
+            dataMap.put("公司名称", item.getName());
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
 }
