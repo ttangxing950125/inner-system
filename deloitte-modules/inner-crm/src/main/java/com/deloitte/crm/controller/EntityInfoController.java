@@ -367,7 +367,7 @@ public class EntityInfoController extends BaseController {
      * 财报收数根据entityCode补充录入信息--主表
      *
      * @param entityInfo
-     * @return void
+     * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:51
      */
@@ -378,7 +378,7 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "listType", value = "报告类型", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shenWanMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "String")
+            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addEntityeMsg")
     public R addEntityeMsg(@RequestBody EntityInfo entityInfo) {

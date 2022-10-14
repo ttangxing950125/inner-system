@@ -648,7 +648,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }else {
             int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
             if (i >= 0) {
-                entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+                String listType = entityInfoDetails.getListType();
+                if (ObjectUtil.isEmpty(listType)){
+                    entityInfoDetails.setListType("G股");
+                }else {
+                    entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+                }
                 entityInfoDetails.setListTypeG("存续");
             } else {
                 entityInfoDetails.setListTypeA("已退市");
@@ -1902,12 +1907,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,entityInfo.getEntityCode()));
 
         //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
-
+        stockCnMapper.update(stockCnInfo,new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
 
         //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
-
-
-
+        stockThkMapper.update(stockThkInfo,new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
     }
 
     /**
