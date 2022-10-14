@@ -5,7 +5,7 @@
       <div>HELLO!</div>
       <div>今天是 {{ currentTime }}, {{ week }}。</div>
       <div>
-        今日完成任务合计 {{ taskCount.taskCount || 0 }} 条, 待完成 {{ taskCount.taskNoCount || 0 }} 条，已完成 {{ taskCount.taskCop || 0 }} 条，请尽快完成！
+        今日完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
       </div>
       <span type="text">切换日期：</span>
       <el-date-picker v-model="monthDate" type="month" placeholder="选择月" value-format="yyyy-MM" @change="changeMonth">
@@ -1202,7 +1202,7 @@ export default {
         // 角色 2 相关接口
         getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
           const { data } = res
-          this.list2 = data
+          this.list2 = data.records
           this.total = data.total
           this.queryParams.pages = data.pages
         })
@@ -1211,6 +1211,15 @@ export default {
           const { data } = res
           this.taskCount = data
         })
+
+        // 角色7
+        getDayTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
+          const { data } = res
+          this.list7 = data.records
+          this.total = data.total
+          this.queryParams.pages = data.pages
+          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+        });
       } catch (error) {
         console.log(error);
       } finally {
