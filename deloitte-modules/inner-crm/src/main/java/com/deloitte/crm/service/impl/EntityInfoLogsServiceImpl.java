@@ -10,6 +10,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.CacheName;
@@ -151,7 +152,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 throw new ServiceException("发券企业-历史记录数据组装组装异常");
             }).join();
             log.info("发券企业-历史记录>>  结束:{} ", JSON.toJSONString(baskTask.get()));
-            return baskTask.get();
+            return R.ok(baskTask.get());
             /**
              * 处理股票
              *{@link Common#TYPE_STOCK}
@@ -223,7 +224,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 throw new ServiceException("企业主体-历史记录数据组装组装异常");
             }).join();
             log.info("企业主体-历史记录>>  结束:{} ", JSON.toJSONString(baskTask.get()));
-            return baskTask.get();
+            return R.ok(baskTask.get());
         } else {
             throw new ServiceException("参数非法");
         }
