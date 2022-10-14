@@ -51,6 +51,7 @@ public class EntityInfoDetails {
     private String listType;
     /**主体产品覆盖情况*/
     // TODO
+    private Object coverageDetail;
     /**
      * /**主体发债情况详情
      */
