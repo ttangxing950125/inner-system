@@ -129,9 +129,9 @@ public class ThkSecIssInfo implements Serializable {
     @Excel(name = "经营范围")
     private String entityScope;
     /**
-     * 公司描述
+     * 公司简介
      */
-    @Excel(name = "公司描述")
+    @Excel(name = "公司简介")
     private String entityDes;
     /**
      * 所属Wind行业
