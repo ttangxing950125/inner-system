@@ -67,7 +67,7 @@ public class BondInfoTest {
     @Test
     void test0() {
         final Object allByType = entityInfoLogsService.findAllByType(Common.TYPE_STOCK);
-        log.info("JSON:{}", JSON.toJSONString(allByType));
+        log.info("JSON:==>{}", JSON.toJSONString(allByType));
     }
 
 
