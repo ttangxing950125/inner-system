@@ -1,7 +1,9 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,6 +39,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
     private StockCnInfoService stockCnInfoService;
     @Resource
     private CnDelistInfoMapper cnDelistInfoMapper;
+
 
     @Resource
     private EntityStockCnRelService entityStockCnRelService;
@@ -75,7 +79,22 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
 
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        Integer taskId = windTask.getId();
+        Wrapper<CnDelistInfo> wrapper = Wrappers.<CnDelistInfo>lambdaQuery()
+                .eq(CnDelistInfo::getTaskId, taskId)
+                .in(CnDelistInfo::getChangeType, 1, 2);
+
+        return cnDelistInfoMapper.selectList(wrapper).stream().map(item -> {
+            HashMap<String, Object> dataMap = new HashMap<>();
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("证券代码", item.getCode());
+            dataMap.put("公司名称", item.getName());
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
     @Async("taskExecutor")
