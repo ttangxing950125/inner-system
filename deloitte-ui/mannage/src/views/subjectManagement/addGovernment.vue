@@ -23,92 +23,129 @@
             <el-form-item label="新增操作人">
               <span>admin</span>
             </el-form-item>
-            <el-form-item label="新增主体名称" prop="region">
+            <el-form-item label="新增主体名称" prop="">
               <div class="flex1">
                 <el-input
                   class="t-input"
-                  v-model="ruleForm.name"
+                  v-model="ruleForm.govName"
                   placeholder="输入新增主体名称"
+                  @change="repalce1 = false"
                 ></el-input>
+                <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
+                <span class="green" v-if="repalce1 === 1">无重复，可新增</span>
                 <el-button
+                  v-if="!repalce1"
                   style="margin-left: 5px"
                   type="text"
-                  @click="check(ruleForm.name)"
+                  @click="check(ruleForm.govName, 'GOV_NAME')"
                   >查重</el-button
                 >
               </div>
             </el-form-item>
-            <el-form-item label="官方行政代码" prop="region">
+            <el-form-item label="官方行政代码" prop="">
               <div class="flex1">
                 <el-input
                   class="t-input"
-                  v-model="ruleForm.name"
+                  v-model="ruleForm.govCode"
                   placeholder="输入官方6位行政代码"
+                  @change="repalce2 === false"
                 ></el-input>
+                <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
+                <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
                 <el-button
+                  v-if="!repalce2"
                   style="margin-left: 5px"
                   type="text"
-                  @click="check(ruleForm.name)"
+                  @click="check(ruleForm.govCode, 'GOV_CODE')"
                   >查重</el-button
                 >
               </div>
-            </el-form-item>
-            <el-form-item label="新增类型" prop="region">
-              <el-select v-model="ruleForm.region" placeholder="选择新增类型">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="行政单位级别" required>
-              <el-col :span="11">
-                <el-form-item prop="date1">
-                  <el-date-picker
-                    type="date"
-                    placeholder="选择行政单位级别"
-                    v-model="ruleForm.date1"
-                    style="width: 100%"
-                  ></el-date-picker>
-                </el-form-item>
-              </el-col>
-              <el-col class="line" :span="1">-</el-col>
-              <el-col :span="11">
-                <el-form-item prop="date2">
-                  <el-time-picker
-                    placeholder="选择行政单位细分级别"
-                    v-model="ruleForm.date2"
-                    style="width: 100%"
-                  ></el-time-picker>
-                </el-form-item>
-              </el-col>
             </el-form-item>
             <el-form-item label="上级行政单位名称" prop="delivery">
               <el-input
                 class="t-input"
-                v-model="ruleForm.name"
+                v-model="ruleForm.preGovName"
                 placeholder="输入行政上级单位名称"
               ></el-input>
+            </el-form-item>
+            <el-form-item label="行政单位级别" class="max">
+              <el-col :span="11">
+                <el-select
+                  class="level-select"
+                  v-model="ruleForm.govLevelBig"
+                  placeholder="选择行政单位级别"
+                  @change="getSmall"
+                >
+                  <el-option
+                    v-for="(item, index) in govOption1"
+                    :key="index"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-col>
+              <el-col class="line" :span="1">-</el-col>
+              <el-col :span="11">
+                <el-form-item prop="">
+                  <el-select
+                    class="level-select"
+                    v-model="ruleForm.govLevelSmall"
+                    placeholder="选择行政单位细分级别"
+                    @change="getSmall"
+                  >
+                    <el-option
+                      v-for="(item, index) in govOption2"
+                      :key="index"
+                      :label="item.name"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+            <el-form-item label="新增类型" prop="">
+              <el-select v-model="ruleForm.govType" placeholder="选择新增类型">
+                <el-option label="地方政府" value="1"></el-option>
+                <el-option label="地方主管部门" value="2"></el-option>
+                <el-option label="其他" value="3"></el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="曾用名或别称" prop="delivery">
               <el-input
                 class="t-input"
-                v-model="ruleForm.name"
+                v-model="ruleForm.govNameHis"
                 placeholder="输入曾用名或别称、顿号区分"
               ></el-input>
             </el-form-item>
-            <el-form-item label="城市规模与分级" prop="region">
-              <el-select v-model="ruleForm.region" placeholder="选择新增类型">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+            <el-form-item label="城市规模" prop="">
+              <el-select
+                class="width146"
+                v-model="ruleForm.govGrading"
+                placeholder="选择城市规模"
+              >
+                <el-option
+                  v-for="(item, index) in range"
+                  :key="index"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="城市分级" prop="delivery">
+              <el-select
+                class="width146"
+                v-model="ruleForm.govScale"
+                placeholder="选择城市分级"
+              >
+                <el-option
+                  v-for="(item, index) in level"
+                  :key="index"
+                  :label="item.value"
+                  :value="item.value"
+                ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item class="position-add" label="新增备注" prop="delivery">
-              <el-input class="t-input" v-model="ruleForm.name"></el-input>
-            </el-form-item>
-            <el-form-item
-              class="position-add"
-              label="上级行政单位代码"
-              prop="delivery"
-            >
               <el-input class="t-input" v-model="ruleForm.name"></el-input>
             </el-form-item>
             <el-form-item
@@ -118,8 +155,18 @@
             >
               <el-input
                 class="t-input"
-                v-model="ruleForm.name"
+                v-model="ruleForm.entityNameHisRemarks"
                 placeholder="按需输入必要的曾用名或别称备注"
+              ></el-input>
+            </el-form-item>
+            <el-form-item
+              class="position-add"
+              label="上级行政单位代码"
+              prop="delivery"
+            >
+              <el-input
+                class="t-input"
+                v-model="ruleForm.preGovCode"
               ></el-input>
             </el-form-item>
             <el-form-item
@@ -127,11 +174,14 @@
               label="是否为百强县"
               prop="delivery"
             >
-              <el-select v-model="ruleForm.region" placeholder="选择是或否">
-                <el-option label="是" value="Y"></el-option>
-                <el-option label="否" value="N"></el-option>
+              <el-select v-model="ruleForm.hundred" placeholder="选择是或否">
+                <el-option label="是" value="1"></el-option>
+                <el-option label="否" value="0"></el-option>
               </el-select>
             </el-form-item>
+            <!-- <el-form-item class="position-add" label="" prop="delivery">
+              <div></div>
+            </el-form-item> -->
             <el-form-item class="add-btn">
               <el-button type="primary" @click="submitForm('ruleForm')"
                 >保存并添加</el-button
@@ -179,7 +229,7 @@
     <el-dialog title="重复性提醒" :visible.sync="dialogVisible" width="35%">
       <div class="tips" style="margin-top: 5px">
         数据库中已有名称为 "<span style="font-weight: 600">xxx</span>" 的主体
-        <span style="color: greenyellow"> 3 </span> 个
+        <span style="color: #86bc25"> 3 </span> 个
       </div>
       <div class="tips">GV410307 偃师区</div>
       <div class="tips">从属上级政府 GV410300 洛阳市</div>
@@ -196,6 +246,9 @@
 </template>
 
 <script>
+import { addGovInfo } from "@/api/subject";
+import { getGovLevelBig, getGovLevelSmall } from "@/api/task";
+import { checkData, getTypeByAttrId } from "@/api/common";
 export default {
   name: "addGovernment",
   data() {
@@ -235,16 +288,7 @@ export default {
           zip: 200333,
         },
       ],
-      ruleForm: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
-      },
+      ruleForm: {},
       rules: {
         name: [
           { required: true, message: "请输入活动名称", trigger: "blur" },
@@ -283,12 +327,33 @@ export default {
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
       },
       dialogVisible: false,
+      repalce2: false,
+      repalce1: false,
+      govOption1: [],
+      govOption2: [],
+      range: [],
+      level: [],
     };
   },
   created() {
     this.getCurrentTime();
+    this.init();
   },
   methods: {
+    init() {
+      getGovLevelBig({}).then((res) => {
+        const { data } = res;
+        this.govOption1 = data;
+      });
+      getTypeByAttrId({ attrId: 23 }).then((res) => {
+        const { data } = res;
+        this.range = data;
+      });
+      getTypeByAttrId({ attrId: 24 }).then((res) => {
+        const { data } = res;
+        this.level = data;
+      });
+    },
     goTarget(href) {
       window.open(href, "_blank");
     },
@@ -313,22 +378,93 @@ export default {
       this.currentTime =
         yy + "-" + mm + "-" + dd + " " + hh + ":" + mf + ":" + ss;
     },
-    check(name) {
-      this.dialogVisible = true;
-    },
     back() {
       this.$router.back();
+    },
+    check(row, keyword) {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          target: row,
+          keyword: keyword,
+        };
+        checkData(parmas).then((res) => {
+          const { data } = res;
+          let ret = false;
+          if (!data.data) {
+            ret = 1;
+          } else {
+            ret = 2;
+          }
+          switch (keyword) {
+            case "GOV_NAME":
+              this.repalce1 = ret;
+              break;
+            case "GOV_CODE":
+              this.repalce2 = ret;
+              break;
+          }
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    submitForm() {
+      try {
+        this.$modal.loading("Loading...");
+        addGovInfo(this.ruleForm).then((res) => {
+          if (res.code === 200) {
+            this.governmentDig = false;
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success",
+            });
+          }
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getSmall(row) {
+      getGovLevelSmall({ id: row }).then((res) => {
+        const { data } = res;
+        this.govOption2 = data;
+      });
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
+::v-deep .max {
+  width: 700px;
+}
+.level-select {
+  width: 222px;
+}
 .tips {
   margin-top: 5px;
 }
 .tips-2 {
   margin-top: 10px;
+  color: red;
+}
+
+.green {
+  margin-left: 5px;
+  color: #86bc25;
+}
+.red {
+  margin-left: 5px;
   color: red;
 }
 .t-input {
@@ -346,8 +482,8 @@ export default {
 }
 .add-btn {
   position: relative;
-  left: 63%;
-  top: -27%;
+  left: 53%;
+  top: -35%;
 }
 .back {
   margin-left: 19px;
@@ -377,7 +513,7 @@ export default {
     width: 330px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
   }
   .top-right {
@@ -389,13 +525,13 @@ export default {
     position: relative;
     left: 167%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .g-desc {
   margin-top: 15px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -418,7 +554,7 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 </style>

@@ -5,7 +5,7 @@
       <div>HELLO!</div>
       <div>今天是 {{ currentTime }}, {{ week }}。</div>
       <div>
-        今日完成任务合计 {{ taskCount.taskCount || 0 }} 条, 待完成 {{ taskCount.taskNoCount || 0 }} 条，已完成 {{ taskCount.taskCop || 0 }} 条，请尽快完成！
+        今日完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
       </div>
       <span type="text">切换日期：</span>
       <el-date-picker v-model="monthDate" type="month" placeholder="选择月" value-format="yyyy-MM" @change="changeMonth">
@@ -126,17 +126,17 @@
         <el-table-column type="index" label="来源"> </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
@@ -146,7 +146,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -170,17 +170,17 @@
         <el-table-column type="index" label="来源"> </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
@@ -190,7 +190,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -214,12 +214,12 @@
         <el-table-column type="index" label="来源"> </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为城投机构">
@@ -229,12 +229,12 @@
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -1197,13 +1197,12 @@ export default {
         // 角色 345 相关接口
         getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
           const { data } = res
-          console.log(data)
           this.list3 = data
         })
         // 角色 2 相关接口
         getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
           const { data } = res
-          this.list2 = data
+          this.list2 = data.records
           this.total = data.total
           this.queryParams.pages = data.pages
         })
@@ -1212,6 +1211,15 @@ export default {
           const { data } = res
           this.taskCount = data
         })
+
+        // 角色7
+        getDayTaskInfo({ date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
+          const { data } = res
+          this.list7 = data.records
+          this.total = data.total
+          this.queryParams.pages = data.pages
+          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+        });
       } catch (error) {
         console.log(error);
       } finally {

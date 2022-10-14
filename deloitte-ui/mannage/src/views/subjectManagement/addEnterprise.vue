@@ -11,16 +11,16 @@
         <el-card>
           <div class="mt10">今日新{{ tab }}</div>
           <div v-if="tab === '上市'" class="mt10">
-            今日新上市主体 3 个，最近七个交易日平均每日新上市主体 2.8
-            个，最近一月平均每日新上市主体 1.1 个
+            今日新上市主体
+            <span>{{ infomation.addToday || 0 }}</span>
+            个，最近七个交易日平均每日新上市主体
+            <span>{{ infomation.sevenTradingDayAverages || 0 }}</span>
+            个，最近一月平均每日新上市主体
+            <span>{{ infomation.averageDailyLatestMonth || 0 }}</span> 个
           </div>
           <div v-if="tab === '发债'" class="mt10">
-            今日新发债主体 3 个，涉及 x 个发债主体。其中 x 个为未收录主体， x
-            给为已收录主体新发债
-          </div>
-          <div class="mt10">
-            最近七个交易日平均每日新上市主体 2.8 个，最近一月平均每日新上市主体
-            1.1 个
+            今日新发债主体 <span>{{ infomation.addToday || 0 }}</span> 个，涉及
+            x 个发债主体。其中 x 个为未收录主体， x 给为已收录主体新发债
           </div>
           <div class="mt20" id="xchart" style="height: 240px; width: 100%" />
         </el-card>
@@ -487,6 +487,7 @@
 <script>
 import * as echarts from "echarts";
 import { createST, createBE } from "@/api/bond";
+import { entityInfoLogsList } from "@/api/subject";
 import { checkData, getFinanceSubIndu } from "@/api/common";
 export default {
   name: "addGovernment",
@@ -599,11 +600,13 @@ export default {
       repalce5: false,
       disabeld: true,
       financeSubIndu: [],
+      infomation: {},
     };
   },
   mounted() {
     this.xEcharts();
     this.getCurrentTime();
+    this.init();
   },
   watch: {
     ruleForm: {
@@ -618,6 +621,18 @@ export default {
     },
   },
   methods: {
+    init() {
+      try {
+        this.$modal.loading("Loading...");
+        entityInfoLogsList({ type: "TYPE_STOCK" }).then((res) => {
+          this.infomation = res.data;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
     getCurrentTime() {
       //获取当前时间并打印
       let yy = new Date().getFullYear();
@@ -788,8 +803,6 @@ export default {
               break;
             default:
               break;
-          }
-          if (!data) {
           }
         });
       } catch (error) {

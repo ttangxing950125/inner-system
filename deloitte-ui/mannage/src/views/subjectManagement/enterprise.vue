@@ -148,44 +148,48 @@
             </div>
             <el-card class="mt20">
               <div class="font">查询结果</div>
-              <div class="font">共查询到 <span>35</span> 个结果</div>
+              <div class="font">
+                共查询到 <span>{{ total2 }}</span> 个结果
+              </div>
               <el-table
                 class="table-content"
                 :data="list"
                 style="width: 98%; margin-top: 20px"
               >
-                <el-table-column
-                  type="index"
-                  sortable
-                  label="存续状态"
-                  width="50"
-                >
                 </el-table-column>
                 <el-table-column prop="date" label="德勤主体代码" sortable>
+                  <template slot-scope="scope">
+                    <div>{{ scope.row.entityInfo.entityCode }}</div>
+                  </template>
                 </el-table-column>
                 <el-table-column prop="name" label="统一社会信用代码">
+                  <template slot-scope="scope">
+                    <div>{{ scope.row.entityInfo.creditCode }}</div>
+                  </template>
                 </el-table-column>
                 <el-table-column prop="province" label="企业名称">
                   <template slot-scope="scope">
-                    <div v-html="replaceFun(scope.row.province)"></div>
+                    <div v-html="replaceFun(scope.row.entityInfo.entityName)"></div>
                   </template>
                 </el-table-column>
                 <el-table-column prop="city" label="上市情况">
+                  <template slot-scope="scope">
+                    <div :class="scope.row.listDetail ? 'green' : ''">{{ scope.row.listDetail || '未曾上市' }}</div>
+                  </template>
                 </el-table-column>
                 <el-table-column prop="city" label="发债情况">
+                  <template slot-scope="scope">
+                    <div :class="scope.row.bondDetail ? 'green' : ''">{{ scope.row.bondDetail || '未曾发债' }}</div>
+                  </template>
                 </el-table-column>
               </el-table>
-              <el-pagination
-                class="page-t"
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="currentPage4"
-                :page-sizes="[100, 200, 300, 400]"
-                :page-size="100"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="400"
-              >
-              </el-pagination>
+              <pagination
+                v-show="total2 > 0"
+                :total="total2"
+                :page.sync="queryParams2.pageNum"
+                :limit.sync="queryParams2.pageSize"
+                @pagination="getList2"
+              />
             </el-card>
           </div>
         </el-card>
@@ -256,18 +260,19 @@
           >
             <el-table-column prop="name" label="存续状态" width="80">
               <template slot-scope="scope">
-                <a
-                  :class="scope.row.nameUsedNum > 0 ? 'green' : 'red'"
-                  @click="checkName(scope.row)"
+                <span
+                  :class="scope.row.liveState === 'Y' ? 'green' : 'red'"
                   >{{
-                    scope.row.nameUsedNum > 0 ? scope.row.nameUsedNum : "暂无"
-                  }}</a
-                >
+                    scope.row.liveState || "暂无"
+                  }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="entityCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="date" label="证券代码（A）">
+            <el-table-column prop="liveBondDetail" label="证券代码（A）">
+              <template slot-scope="scope">
+                <span>{{ scope.row.stockCode && scope.row.stockCode.toString() }}</span>
+              </template>
             </el-table-column>
             <el-table-column prop="entityName" label="主体名称" width="200">
             </el-table-column>
@@ -283,10 +288,13 @@
               </template>
             </el-table-column>
             <el-table-column prop="date" label="上市日期（A）">
+              <template slot-scope="scope">
+                <span>{{ scope.row.listDate && scope.row.listDate.toString() }}</span>
+              </template>
             </el-table-column>
             <el-table-column prop="date" label="退市日期（B）">
               <template slot-scope="scope">
-                <span>{{ scope.row.date || "当前未退市" }}</span>
+                <span>{{ scope.row.downDate ? scope.row.downDate.toString() : '未曾退市' }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="zip" label="更新记录"> </el-table-column>
@@ -304,7 +312,11 @@
   </div>
 </template>
 <script>
-import { getOverviewByGroup, getInfoList } from "@/api/subject";
+import {
+  getOverviewByGroup,
+  getInfoList,
+  getQuickOfCoverage,
+} from "@/api/subject";
 import { replaceStr } from "@/utils/index";
 import pagination from "../../components/Pagination";
 export default {
@@ -324,40 +336,7 @@ export default {
         4: "金融机构",
       },
       list2: [],
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海xxxxxxx",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       loading: false,
       currentTab: "1",
       currentPage4: 4,
@@ -367,6 +346,11 @@ export default {
         pageSize: 10,
       },
       total: 0,
+      queryParams2: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total2: 0,
     };
   },
   created() {
@@ -391,6 +375,17 @@ export default {
           this.list2 = data.records;
           this.total = data.total;
           this.queryParams.pageNum = data.current;
+        });
+        const parmas2 = {
+          param: "",
+          pageNum: this.queryParams2.pageNum,
+          pageSize: this.queryParams2.pageSize,
+        };
+        getQuickOfCoverage(parmas2).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total2 = data.total;
+          this.queryParams2.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
@@ -435,7 +430,24 @@ export default {
       this.$router.psuh({ path: "subjectManagement/enterprise" });
     },
     select() {
-      console.log(1);
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.nameInput,
+          pageNum: this.queryParams2.pageNum,
+          pageSize: this.queryParams2.pageSize,
+        };
+        getQuickOfCoverage(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total2 = data.total;
+          this.queryParams2.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     checkName(row) {
       console.log(row);
@@ -457,6 +469,27 @@ export default {
           this.list2 = data.records;
           this.total = data.total;
           this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getList2() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.nameInput,
+          type: this.currentTab,
+          pageNum: this.queryParams2.pageNum,
+          pageSize: this.queryParams2.pageSize,
+        };
+        getQuickOfCoverage(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total2 = data.total;
+          this.queryParams2.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
