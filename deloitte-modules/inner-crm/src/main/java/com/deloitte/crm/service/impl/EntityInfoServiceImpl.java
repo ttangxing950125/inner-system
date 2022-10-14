@@ -1630,7 +1630,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 result.setBondDetail(bondDetail);
                 resultList.add(result);
             });
-            pageResult.setRecords(resultList);
+            pageResult.setRecords(resultList).setCurrent(page.getCurrent());
         }
         return R.ok(pageResult);
     }
