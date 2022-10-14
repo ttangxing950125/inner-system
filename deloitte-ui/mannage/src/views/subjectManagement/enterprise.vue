@@ -245,6 +245,7 @@
               class="select-x"
               v-model="codeInput"
               placeholder="搜索主体名称/代码/统一社会信用代码"
+              @change="selectList"
             ></el-input>
           </div>
           <el-table
@@ -446,9 +447,30 @@ export default {
       try {
         this.$modal.loading("Loading...");
         const parmas = {
-          param: "",
+          param: this.codeInput,
           type: this.currentTab,
           pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getInfoList(parmas).then((res) => {
+          const { data } = res;
+          this.list2 = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    selectList() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          param: this.codeInput,
+          type: this.currentTab,
+          pageNum: 1,
           pageSize: this.queryParams.pageSize,
         };
         getInfoList(parmas).then((res) => {

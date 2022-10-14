@@ -89,11 +89,11 @@
         </el-form-item>
         <el-form-item label="IB敞口划分" prop="">
           <el-select v-model="ruleForm.masterCode" placeholder="选择新增类型">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+            <el-option label="是IB口径下城投机构" value="1"></el-option>
+            <el-option label="不是IB口径下城投机构" value="0"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="企业股票类型" prop="stockType">
+        <el-form-item label="企业股票类型" prop="">
           <el-select v-model="ruleForm.stockType" placeholder="请选择股票类型">
             <el-option label="A股" value="A"></el-option>
             <el-option label="港股" value="G"></el-option>
@@ -201,7 +201,7 @@
           </el-select>
         </div>
 
-        <el-form-item label="上市板块与交易所" required>
+        <el-form-item label="上市板块与交易所">
           <el-col :span="11">
             <el-form-item prop="">
               <el-select
@@ -478,7 +478,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="subForm">确认新增</el-button>
+        <el-button type="primary" @click="subForm(2)">确认新增</el-button>
       </span>
     </el-dialog>
   </div>
@@ -719,23 +719,32 @@ export default {
       };
       myChart.setOption(option);
     },
-    subForm() {
+    subForm(row) {
       try {
         this.$modal.loading("Loading...");
         this.ruleForm.creditError = this.ruleForm.notUse ? 1 : 0;
-        createST(this.ruleForm).then((res) => {
-          console.log(res);
-        });
-        // createBE(this.ruleForm).then((res) => {
-        //   const { data } = res;
-        //   if (data === "新增成功") {
-        //     this.$message({
-        //       showClose: true,
-        //       message: "操作成功",
-        //       type: "success",
-        //     });
-        //   }
-        // });
+        if (row) {
+          createST(this.ruleForm).then((res) => {
+            if (data === "新增成功") {
+              this.$message({
+                showClose: true,
+                message: "操作成功",
+                type: "success",
+              });
+            }
+          });
+        } else {
+          createBE(this.ruleForm).then((res) => {
+            const { data } = res;
+            if (data === "新增成功") {
+              this.$message({
+                showClose: true,
+                message: "操作成功",
+                type: "success",
+              });
+            }
+          });
+        }
       } catch (error) {
         this.$message({
           showClose: true,

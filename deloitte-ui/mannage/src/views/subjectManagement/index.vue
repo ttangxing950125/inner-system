@@ -296,7 +296,9 @@
             <div>
               <div class="table-desc">
                 <div>查询结果</div>
-                <div class="table-result">共查询到<span> 36 </span>个结果:</div>
+                <div class="table-result">
+                  共查询到<span> {{ total }} </span>个结果:
+                </div>
               </div>
               <el-table class="table-content" :data="list" style="width: 98%">
                 <el-table-column fixed type="index" width="50" label="序号">
@@ -324,14 +326,14 @@
                 >
                 </el-table-column>
               </el-table>
-              <pagination
-                v-show="total > 0"
-                :total="total"
-                :page.sync="queryParams.pageNum"
-                :limit.sync="queryParams.pageSize"
-                @pagination="getList"
-              />
             </div>
+            <pagination
+              v-show="total > 0"
+              :total="total"
+              :page.sync="queryParams.pageNum"
+              :limit.sync="queryParams.pageSize"
+              @pagination="getList"
+            />
           </div>
         </el-card>
       </el-col>
@@ -491,34 +493,64 @@ export default {
         getProduct({}).then((res) => {
           const { data } = res;
           this.options2 = data;
+          this.options2.push({
+            id: 9999,
+            proName: "全部产品",
+          });
         });
+        let proId = [];
+        if (this.value1.length === 1 && this.value1[0] === 9999) {
+          this.options2.forEach((k) => {
+            if (k.id !== 9999) {
+              proId.push(k.id);
+            }
+          });
+        } else {
+          proId = this.value1;
+        }
         const parmas = {
           entityName: this.input,
           entityType: this.value,
-          proId: this.value1,
+          proId: proId,
           pageNum: this.queryParams.pageNum,
           pageSize: this.queryParams.pageSize,
         };
         getCov(parmas).then((res) => {
           const { data } = res;
-          this.list = data;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
         });
       } catch (error) {
         console.log(error);
       } finally {
+        this.loadingData = false;
         this.$modal.closeLoading();
       }
     },
     getList() {
+      let proId = [];
+      if (this.value1.length === 1 && this.value1[0] === 9999) {
+        this.options2.forEach((k) => {
+          if (k.id !== 9999) {
+            proId.push(k.id);
+          }
+        });
+      } else {
+        proId = this.value1;
+      }
       const parmas = {
         entityName: this.input,
         entityType: this.value,
-        proId: this.value1,
+        proId: proId,
         pageNum: this.queryParams.pageNum,
         pageSize: this.queryParams.pageSize,
       };
       getCov(parmas).then((res) => {
-        console.log(res);
+        const { data } = res;
+        this.list = data.records;
+        this.total = data.total;
+        this.queryParams.pageNum = data.current;
       });
     },
     getPercent(newObj, sum) {
@@ -561,14 +593,19 @@ export default {
     },
     selectChange(row) {
       this.selectHeaer = [];
-      row.forEach((e) => {
+      if (row.length === 1 && row[0] === 9999) {
         this.options2.forEach((k) => {
-          if (e === k.id) {
-            this.selectHeaer.push(k);
-          }
+          this.selectHeaer.push(k);
         });
-      });
-      console.log(this.selectHeaer);
+      } else {
+        row.forEach((e) => {
+          this.options2.forEach((k) => {
+            if (e === k.id && e !== 9999) {
+              this.selectHeaer.push(k);
+            }
+          });
+        });
+      }
     },
   },
   computed: {
