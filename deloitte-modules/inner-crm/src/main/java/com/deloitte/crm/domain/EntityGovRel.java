@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.Attrs;
+import com.deloitte.crm.constants.Common;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -44,30 +46,35 @@ public class EntityGovRel implements Serializable {
      * 德勤政府code
      */
     @Excel(name = "持股方式")
+    @Attrs(attrId = 676,attrName = "政府持股方式")
     private String shareMethod;
 
     /**
      * 德勤政府code
      */
     @Excel(name = "支持力度")
+    @Attrs(attrId = 677,attrName = "政府对当前城投支持力度")
     private String support;
 
     /**
      * 德勤政府code
      */
     @Excel(name = "支持力度判断依据")
+    @Attrs(attrId = 981,attrName = "政府对当前城投支持力度判断依据")
     private String judgment;
 
     /**
      * 德勤政府code
      */
     @Excel(name = "持股比例")
+    @Attrs(attrId = 678,attrName = "政府部门实际持股比例")
     private String shareRatio;
 
     /**
      * 德勤政府code
      */
     @Excel(name = "持股比例年份")
+    @Attrs(attrId = 982,attrName = "政府部门实际持股比例年份")
     private String shareRatioYear;
 
     /**
@@ -87,6 +94,7 @@ public class EntityGovRel implements Serializable {
      */
     @Excel(name = "created")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Attrs(attrId = 0,attrName = Common.CREATED)
     private Date created;
 
     /**
@@ -94,6 +102,7 @@ public class EntityGovRel implements Serializable {
      */
     @Excel(name = "updated")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Attrs(attrId = 0,attrName = Common.UPDATED)
     private Date updated;
 
     @Override
