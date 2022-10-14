@@ -325,6 +325,11 @@ public class EntityInfoController extends BaseController {
      * @date 2022/10/8 15:53
      */
     @ApiOperation(value = "快速查询企业上市或发债情况")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "param", value = "收缩条件", paramType = "query", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query", example = "", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "query", example = "", dataType = "Integer")
+    })
     @PostMapping("/getQuickOfCoverage")
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         return entityInfoService.getQuickOfCoverage(param, pageNum, pageSize);
