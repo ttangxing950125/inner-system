@@ -649,7 +649,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }else {
             int i = TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), delistingDate);
             if (i >= 0) {
-                entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+                String listType = entityInfoDetails.getListType();
+                if (ObjectUtil.isEmpty(listType)){
+                    entityInfoDetails.setListType("G股");
+                }else {
+                    entityInfoDetails.setListType(entityInfoDetails.getListType()+"G股");
+                }
                 entityInfoDetails.setListTypeG("存续");
             } else {
                 entityInfoDetails.setListTypeA("已退市");
