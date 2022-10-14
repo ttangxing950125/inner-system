@@ -30,7 +30,7 @@ public class CnIpoFail implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer id;
     /**
-     * 杭州富通通信技术股份有限公司
+     * 公司名称
      */
     @Excel(name = "公司名称")
     private String entityName;
