@@ -1,11 +1,11 @@
 package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
+import com.deloitte.crm.dto.MoreIndex;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 【请填写功能名称】对象 entity_attr
@@ -17,7 +17,8 @@ import java.util.Map;
 public class EntityAttrByDto implements Serializable
 {
 
-    List<Map<String,String>>mapList;
+    private List<MoreIndex>mapList;
+
 
     private Integer pageSize;
 

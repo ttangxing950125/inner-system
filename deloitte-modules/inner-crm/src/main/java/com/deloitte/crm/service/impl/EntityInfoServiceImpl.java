@@ -29,10 +29,7 @@ import com.deloitte.crm.domain.dto.BondInfoDetail;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
-import com.deloitte.crm.dto.EntityByBatchDto;
-import com.deloitte.crm.dto.EntityDto;
-import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.dto.ExportEntityCheckDto;
+import com.deloitte.crm.dto.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.HttpUtils;
@@ -93,6 +90,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
+    @Autowired
+    private StockCnInfoMapper stockCnMapper;
+
+    @Autowired
+    private StockThkInfoMapper stockThkMapper;
+
     private EntityInfoMapper entityInfoMapper;
 
     private EntityNameHisMapper nameHisMapper;
@@ -135,14 +138,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     private static final Integer DEFAULT_PAGENUM = 1;
     /**
-     * A股上市状态attrId
-     */
-    private static final Integer A_LIST_ATTRID = 25;
-    /**
-     * G股上市状态attrId
-     */
-    private static final Integer G_LIST_ATTRID = 44;
-    /**
      * 曾用名重复
      */
     private static final String REPET_OLD_NAME = "曾用名重复，请重新输入";
@@ -151,17 +146,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     private static final Integer ENTITY_INFO_TYPE = 2;
     /**
-     * 记录新增来源  1-企业主体 2-政府
-     */
-    private static final Integer GOV_INFO_TYPE = 1;
-    /**
      * 记录新增来源  2-曾用名管理中操作
      */
     private static final Integer OLD_NAME_FROM_MAN = 2;
-    /**
-     * 记录新增来源 1-修改主体名称自动生成
-     */
-    private static final Integer OLD_NAME_FROM_AUTO = 1;
 
     private EntityInfoLogsService entityInfoLogsService;
 
@@ -861,7 +848,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
         //获取参数信息
-        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+        List<MoreIndex> mapList = entityAttrDto.getMapList();
 
         Integer raiseType = entityAttrDto.getRaiseType();
         Integer abs = entityAttrDto.getAbs();
@@ -904,7 +891,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             if (!CollectionUtils.isEmpty(vo.getMore())) {
-                vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
+                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), map.get("value")));
             }
             rows.add(map);
         });
@@ -975,7 +962,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
-        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+        List<MoreIndex> mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
         pageNum = (pageNum - 1) * pageSize;
@@ -990,30 +977,31 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return pageResult;
     }
 
-    private EntityInfoResult getEntityInfoResult(EntityInfo o, List<Map<String, String>> mapList) {
+    private EntityInfoResult getEntityInfoResult(EntityInfo o, List<MoreIndex> mapList) {
         EntityInfoResult entityInfoResult = new EntityInfoResult();
         entityInfoResult.setEntityInfo(o);
         List<String> header = new ArrayList<>();
         List<String> values = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mapList)) {
-            List<Map<String, Object>> more = new ArrayList<>();
-            for (Map<String, String> map : mapList) {
+            List<MoreIndex> more = new ArrayList<>();
+            for (MoreIndex moreIndex : mapList) {
                 QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
                 EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                        .eq(EntityAttrValue::getAttrId, map.get(EntityUtils.MORE_ENTITY_KPI_ID))
+                        .eq(EntityAttrValue::getAttrId, moreIndex.getId())
                         .eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
                 //新增指标栏
-                Map<String, Object> moreMap = new HashMap<>();
-                moreMap.put(EntityUtils.MORE_ENTITY_KPI_KEY, map.get(EntityUtils.MORE_ENTITY_KPI_NAME));
-                header.add(map.get(EntityUtils.MORE_ENTITY_KPI_NAME));
+
+                moreIndex.setKey(moreIndex.getName());
+                header.add(moreIndex.getName());
+
                 if (ObjectUtils.isEmpty(attrValue)) {
                     values.add(null);
-                    moreMap.put(EntityUtils.MORE_ENTITY_KPI_VALUE, null);
                 } else {
-                    values.add(attrValue.getValue());
-                    moreMap.put(EntityUtils.MORE_ENTITY_KPI_VALUE, attrValue.getValue());
+                    String value = attrValue.getValue();
+                    values.add(value);
+                    moreIndex.setValue(value);
                 }
-                more.add(moreMap);
+                more.add(moreIndex);
             }
             entityInfoResult.setMore(more).setHeader(header).setValues(values);
         }
@@ -1429,9 +1417,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public Map<String, Object> getOverviewByGroup() {
         QueryWrapper<EntityInfo> query = new QueryWrapper<>();
-//        list	是否上市 0-未上市 1-已上市
-//        finance		0	是否金融机构
-//        issue_bonds		是否发债 0-未发债 1-已发债
+        //全部主体
         Long count = entityInfoMapper.selectCount(query);
         //上市主体
         Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1));
@@ -1710,12 +1696,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return bondDetail;
     }
-
-    @Autowired
-    private StockCnInfoMapper stockCnMapper;
-
-    @Autowired
-    private StockThkInfoMapper stockThkMapper;
 
     //获取上市情况
     public String getListDetail(EntityInfo o) {

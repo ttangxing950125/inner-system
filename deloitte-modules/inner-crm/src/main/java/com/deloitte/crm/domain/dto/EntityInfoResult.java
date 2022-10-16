@@ -1,11 +1,11 @@
 package com.deloitte.crm.domain.dto;
 
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.dto.MoreIndex;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author 冉浩岑
@@ -17,7 +17,7 @@ public class EntityInfoResult {
 
     private EntityInfo entityInfo;
 
-    private List<Map<String,Object>> more;
+    private List<MoreIndex> more;
     private List<String> header;
     private List<String> values;
 
