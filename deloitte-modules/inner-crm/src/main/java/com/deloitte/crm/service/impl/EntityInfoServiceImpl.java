@@ -1606,14 +1606,18 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //封装后的新结果
                 EntityInfoValueResult result = new EntityInfoValueResult();
                 result.setEntityInfo(o);
-                String entityCode = o.getEntityCode();
                 //获取上市情况
-                String listDetail = getListDetail(o);
+                List<String> listList = getListDetail(o);
+                //上市详情
+                String listDetail = listList.get(0);
+                //证券代码
+                String stockCode = listList.get(1);
                 //获取发债情况
                 String bondDetail = getBondDetail(o);
 
-                result.setListDetail(listDetail);
-                result.setBondDetail(bondDetail);
+                //设置属性值
+                result.setListDetail(listDetail).setBondDetail(bondDetail).setStockCode(stockCode);
+
                 resultList.add(result);
             });
             pageResult.setRecords(resultList).setCurrent(page.getCurrent());
@@ -1698,8 +1702,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     //获取上市情况
-    public String getListDetail(EntityInfo o) {
+    public List<String> getListDetail(EntityInfo o) {
+        //上市详情
         String listDetail = "";
+        //证券代码
+        String stockCode ="";
         //查询是否存在 A股  上市情况
         QueryWrapper<EntityStockCnRel> cnRelQuery = new QueryWrapper<>();
         List<EntityStockCnRel> cnRels = cnRelMapper.selectList(cnRelQuery.lambda().eq(EntityStockCnRel::getEntityCode, o.getEntityCode()));
@@ -1734,6 +1741,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         ADetail = "A股(已退市)";
                     }
                 }
+            }
+            List<StockCnInfo> cnInfos = stockCnInfos.stream().filter(x -> !ObjectUtil.isEmpty(x.getListDate())).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(cnInfos)){
+                cnInfos.sort(Comparator.comparing(StockCnInfo::getListDate));
+                stockCode = cnInfos.get(cnInfos.size() - 1).getStockCode();
             }
         }
         //查询是否存在 G股  上市情况
@@ -1771,6 +1783,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     }
                 }
             }
+            List<StockThkInfo> thkInfos = stockThkInfos.stream().filter(x -> !ObjectUtil.isEmpty(x.getListDate())).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(thkInfos)){
+                thkInfos.sort(Comparator.comparing(StockThkInfo::getListDate));
+                if (ObjectUtil.isEmpty(stockCode)){
+                    stockCode = thkInfos.get(thkInfos.size() - 1).getStockCode();
+                }else {
+                    stockCode = stockCode+","+thkInfos.get(thkInfos.size() - 1).getStockCode();
+                }
+            }
         }
         if (ObjectUtil.isEmpty(ADetail)) {
             listDetail = GDetail;
@@ -1781,7 +1802,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 listDetail = ADetail + "," + GDetail;
             }
         }
-        return listDetail;
+        List<String>result=new ArrayList<>();
+        result.add(listDetail);
+        result.add(stockCode);
+        return result;
     }
 
     /**
