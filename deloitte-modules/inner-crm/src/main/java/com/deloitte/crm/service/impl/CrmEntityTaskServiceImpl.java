@@ -172,12 +172,12 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
         List<CrmEntityTask> unFinish = baseMapper
                 .selectList(new QueryWrapper<CrmEntityTask>().lambda()
-                        .eq(CrmEntityTask::getTaskDate, taskDate)
+                        .like(CrmEntityTask::getTaskDate, DateUtil.format(taskDate,"yyyy-MM-dd"))
                         .eq(CrmEntityTask::getState, 0));
         if (unFinish.size() == 0) {
             //查询日任务 角色7对应的 task_role_type 为 8
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>()
-                    .lambda().eq(CrmDailyTask::getTaskDate, taskDate).eq(CrmDailyTask::getTaskRoleType, 8));
+                    .lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate,"yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8));
             Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
             // 当日任务处理完毕 状态码为 3
             crmDailyTask.setTaskStatus(3);

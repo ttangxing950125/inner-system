@@ -98,7 +98,7 @@ public class EntityDto {
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @ApiModelProperty(name="created",value="修改时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updated = new Date();
+    private Date updated;
 
     /** 曾用名 */
     @Excel(name = "曾用名")
