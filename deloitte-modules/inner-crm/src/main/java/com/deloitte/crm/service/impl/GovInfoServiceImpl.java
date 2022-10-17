@@ -151,7 +151,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return govInfoMapper.deleteGovInfoById(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public R updateInfoList(List<GovInfo> list) {
         list.stream().forEach(o -> {
@@ -285,7 +285,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return R.ok(page);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public R addOldName(GovInfo gov) {
         //获取操作用户
@@ -525,7 +525,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return govInfoResult;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表

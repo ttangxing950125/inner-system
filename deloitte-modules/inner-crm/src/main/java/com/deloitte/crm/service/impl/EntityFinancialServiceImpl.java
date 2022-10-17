@@ -36,7 +36,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
      * @date 2022/10/12 9:10
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addFinEntitySubtableMsg(EntityFinancialDto entityFinancialDto) {
         crmSupplyTaskService.completeTaskById(entityFinancialDto.getId());
         //保存

@@ -371,7 +371,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return baseMapper.findByName(entityName);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public R addOldName(EntityInfo entity) {
         EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
@@ -415,7 +415,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表
         QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
@@ -471,7 +471,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public R getInfoDetailByEntityCode(String entityCode) {
         EntityInfoDetails entityInfoDetails = new EntityInfoDetails();
 
@@ -770,7 +770,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return R.ok(resultPage);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer updateInfoList(List<EntityInfo> list) {
         list.stream().forEach(o -> {
@@ -1868,7 +1868,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/10/12 9:51
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addEntityeMsg(EntityInfo entityInfo) {
         Integer id = entityInfo.getId();
         crmSupplyTaskService.completeTaskById(id);
@@ -1882,7 +1882,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateInfoDetail(EntityInfoDetails entityInfoDetails) {
         //获取修改的信息 分别修改各自的信息
 
