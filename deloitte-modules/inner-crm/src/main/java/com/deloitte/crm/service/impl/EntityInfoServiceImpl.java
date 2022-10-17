@@ -25,10 +25,7 @@ import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.domain.dto.BondInfoDetail;
-import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.EntityInfoDetails;
-import com.deloitte.crm.domain.dto.EntityInfoResult;
+import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
@@ -1920,6 +1917,27 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
             stockThkMapper.update(stockThkInfo,new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
         }
+    }
+
+    @Override
+    public EntityListView getListView() {
+        EntityListView entityListView = new EntityListView();
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 1));
+        entityListView.setListTotle(listTotle);
+        if (listTotle<1){
+            return entityListView.setListLive(0L).setListDie(0L);
+        }
+        Date now = new Date();
+        //根据时间查询A股上市存续企业
+        List<String> listCnLive=entityInfoMapper.selectListCnLive(TimeFormatUtil.getFormartDate(now));
+        //根据时间查询港股上市存续企业
+        List<String> listThkLive=entityInfoMapper.selectListThkLive(TimeFormatUtil.getFormartDate(now));
+        if (!CollectionUtils.isEmpty(listThkLive)){
+            List<String> newThkList  = listThkLive.stream().filter(o -> !listCnLive.contains(o)).collect(Collectors.toList());
+            listCnLive.addAll(newThkList);
+        }
+        Long listLive=(long)listCnLive.size();
+        return entityListView.setListLive(listLive).setListDie(listTotle-listLive);
     }
 
     /**

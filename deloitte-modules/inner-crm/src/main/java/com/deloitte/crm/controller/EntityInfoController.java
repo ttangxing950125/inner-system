@@ -391,5 +391,17 @@ public class EntityInfoController extends BaseController {
         return R.ok();
     }
 
-
+    /**
+     * 企业主体清单-查询上市概览
+     *
+     * @param
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/17 8:49
+    */
+    @ApiOperation(value = "企业主体清单-查询上市概览")
+    @PostMapping("/getListView")
+    public R getListView() {
+        return R.ok(entityInfoService.getListView());
+    }
 }

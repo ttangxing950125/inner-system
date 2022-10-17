@@ -102,4 +102,22 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @param value
      */
     void editByBondInfoManager(@Param("id") Integer id, @Param("filedName") String filedName, @Param("value") String value);
+    /**
+     * 根据时间查询A股上市存续企业
+     *
+     * @param timeParam
+     * @return Long
+     * @author 冉浩岑
+     * @date 2022/10/17 9:02
+    */
+    List<String> selectListCnLive(@Param("timeParam")String timeParam);
+    /**
+     * 根据时间查询港股上市存续企业
+     *
+     * @param timeParam
+     * @return Long
+     * @author 冉浩岑
+     * @date 2022/10/17 9:02
+     */
+    List<String> selectListThkLive(@Param("timeParam")String timeParam);
 }

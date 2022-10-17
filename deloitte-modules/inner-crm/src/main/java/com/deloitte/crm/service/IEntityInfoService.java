@@ -7,6 +7,7 @@ import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
+import com.deloitte.crm.domain.dto.EntityListView;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
@@ -256,6 +257,8 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     void addEntityeMsg(EntityInfo entityInfo);
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
+
+    EntityListView getListView();
 
     /**
      * 根据 id 字段名 修改

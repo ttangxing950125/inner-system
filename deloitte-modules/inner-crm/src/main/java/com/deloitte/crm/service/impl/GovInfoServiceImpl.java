@@ -775,6 +775,40 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return govAttrByDto;
     }
 
+    @Override
+    public GovView getGovView() {
+        GovView govView = new GovView();
+        List<GovInfo> govInfos = govInfoMapper.selectList(new QueryWrapper<>());
+        Map<Integer, List<GovInfo>> listGovMap = govInfos.stream().filter(o -> !ObjectUtil.isEmpty(o.getGovLevelBig())).collect(Collectors.groupingBy(GovInfo::getGovLevelBig));
+        Integer total = 0;
+        Integer province = 0;
+        Integer city = 0;
+        Integer area = 0;
+        Integer gx = 0;
+        //政府总数
+        if (!CollectionUtils.isEmpty(govInfos)){
+            total = govInfos.size();
+        }
+        //省级总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(1))){
+            province = listGovMap.get(1).size();
+        }
+        //市级总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(2))){
+            city = listGovMap.get(2).size();
+        }
+        //县级总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(3))){
+            area = listGovMap.get(3).size();
+        }
+        //经开高兴总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(4))){
+            gx = listGovMap.get(4).size();
+        }
+        govView.setGovTotle(total).setProvince(province).setCity(city).setArea(area).setGx(gx).setNoLevel(total-province-city-area-gx);
+        return govView;
+    }
+
     //返回筛选范围--城市分级
     private GovAttrByDtoBack setGovGrading(GovAttrByDtoBack govAttrByDto) {
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
