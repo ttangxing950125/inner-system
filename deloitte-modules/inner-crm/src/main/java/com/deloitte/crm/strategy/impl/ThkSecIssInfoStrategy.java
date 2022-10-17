@@ -102,8 +102,10 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
                 entityStockThkRelService.bindRelOrCreateTask(stockThkInfo, entityName, windTask, secIssInfo);
             }
 
-            //更新港股属性
-            entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), secIssInfo);
+            if (changeType!=null){
+                //更新港股属性
+                entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), secIssInfo);
+            }
 
 
             return new AsyncResult(new Object());

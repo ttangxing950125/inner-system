@@ -3,13 +3,16 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * (CnDelistInfo)表实体类
@@ -68,12 +71,12 @@ public class CnDelistInfo implements Serializable {
      * 退市时股价(元)
      */
     @Excel(name = "退市时股价(元)")
-    private Double delistSharePrice;
+    private BigDecimal delistSharePrice;
     /**
      * 退市时每股净资产(元)
      */
     @Excel(name = "退市时每股净资产(元)")
-    private Double delistNetWorth;
+    private BigDecimal delistNetWorth;
     /**
      * 终止上市原因
      */
@@ -130,5 +133,13 @@ public class CnDelistInfo implements Serializable {
 //    @Excel(name = "更新时间")
     private Date updated;
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, code, name, delistDate, delistSharePrice, delistNetWorth, stopDelistdWhy, reconstitutedCode, reconstitutedName, reconstitutedDelistDate, threeBoardDate, threeBoardCode, threeBoardName, delistedType, reconstitutedType);
+    }
 }

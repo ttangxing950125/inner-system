@@ -1,11 +1,14 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -53,27 +56,27 @@ public class CnIpoPause implements Serializable {
      * 发行价格(元)
      */
     @Excel(name = "发行价格(元)")
-    private Double issPrice;
+    private BigDecimal issPrice;
     /**
      * 发行数量(万股)
      */
     @Excel(name = "发行数量(万股)")
-    private Double issCount;
+    private BigDecimal issCount;
     /**
      * 募资总额(万元)
      */
     @Excel(name = "募资总额(万元)")
-    private Double fundTotal;
+    private BigDecimal fundTotal;
     /**
      * 发行费用(万元)
      */
     @Excel(name = "发行费用(万元)")
-    private Double issCost;
+    private BigDecimal issCost;
     /**
      * 发行市盈率(倍)
      */
     @Excel(name = "发行市盈率(倍)")
-    private Double issMult;
+    private BigDecimal issMult;
     /**
      * 发行方式
      */
@@ -88,7 +91,7 @@ public class CnIpoPause implements Serializable {
      * 超额认购倍数
      */
     @Excel(name = "超额认购倍数")
-    private Double exceedSubcMult;
+    private BigDecimal exceedSubcMult;
     /**
      * 网上发行日期
      */
@@ -119,5 +122,13 @@ public class CnIpoPause implements Serializable {
      */
     private Integer  changeType;
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(entityName, code, prospDate, issSusDate, issPrice, issCount, fundTotal, issCost, issMult, issType, unwType, exceedSubcMult, netIssDate, mainUnw, entityDes);
+    }
 }

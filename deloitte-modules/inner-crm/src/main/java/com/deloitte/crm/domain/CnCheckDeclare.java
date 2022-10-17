@@ -1,5 +1,6 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -101,17 +103,17 @@ public class CnCheckDeclare implements Serializable {
      * 预计发行股数(万股)
      */
     @Excel(name = "预计发行股数(万股)")
-    private Double estIssNum;
+    private BigDecimal estIssNum;
     /**
      * 预计发行后总股本(万股)
      */
     @Excel(name = "预计发行后总股本(万股)")
-    private Double issPredicAfterStock;
+    private BigDecimal issPredicAfterStock;
     /**
      * 拟募集资金(万元)
      */
     @Excel(name = "拟募集资金(万元)")
-    private Double predicFund;
+    private BigDecimal predicFund;
     /**
      * 企业注册地
      */
@@ -196,12 +198,12 @@ public class CnCheckDeclare implements Serializable {
      * 最新一年营业收入(万元)
      */
     @Excel(name = "最新一年营业收入(万元)")
-    private Double revenueLastyear;
+    private BigDecimal revenueLastyear;
     /**
      * 最新一年净利润(万元)
      */
     @Excel(name = "最新一年净利润(万元)")
-    private Double netLastyear;
+    private BigDecimal netLastyear;
 
     /**
      * 公司电话
@@ -237,46 +239,7 @@ public class CnCheckDeclare implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CnCheckDeclare that = (CnCheckDeclare) o;
-        return Objects.equals(code, that.code) &&
-                Objects.equals(annoDate, that.annoDate) &&
-                Objects.equals(entityName, that.entityName) &&
-                Objects.equals(simulationListed, that.simulationListed) &&
-                Objects.equals(auditStatus, that.auditStatus) &&
-                Objects.equals(declarationProcess, that.declarationProcess) &&
-                Objects.equals(isDisclose, that.isDisclose) &&
-                Objects.equals(ipoTransferBoard, that.ipoTransferBoard) &&
-                Objects.equals(issRule, that.issRule) &&
-                Objects.equals(csrcBelIndustry, that.csrcBelIndustry) &&
-                Objects.equals(estIssNum, that.estIssNum) &&
-                Objects.equals(issPredicAfterStock, that.issPredicAfterStock) &&
-                Objects.equals(predicFund, that.predicFund) &&
-                Objects.equals(entityRegisterAddress, that.entityRegisterAddress) &&
-                Objects.equals(city, that.city) &&
-                Objects.equals(sponsorOrgan, that.sponsorOrgan) &&
-                Objects.equals(sponsor, that.sponsor) &&
-                Objects.equals(sponsorOrganTeam, that.sponsorOrganTeam) &&
-                Objects.equals(accountingFirm, that.accountingFirm) &&
-                Objects.equals(signingAccountant, that.signingAccountant) &&
-                Objects.equals(lawFirm, that.lawFirm) &&
-                Objects.equals(signingAttorney, that.signingAttorney) &&
-                Objects.equals(auditStatusChange, that.auditStatusChange) &&
-                Objects.equals(firstAnnoDate, that.firstAnnoDate) &&
-                Objects.equals(ipoDeclareDiscloseDate, that.ipoDeclareDiscloseDate) &&
-                Objects.equals(ipoDeclareFirstsendDate, that.ipoDeclareFirstsendDate) &&
-                Objects.equals(acceptDate, that.acceptDate) &&
-                Objects.equals(auditDate, that.auditDate) &&
-                Objects.equals(calibrationDate, that.calibrationDate) &&
-                Objects.equals(revenueLastyear, that.revenueLastyear) &&
-                Objects.equals(netLastyear, that.netLastyear) &&
-                Objects.equals(entityPhone, that.entityPhone) &&
-                Objects.equals(entityWeb, that.entityWeb) &&
-                Objects.equals(entityEmail, that.entityEmail) &&
-                Objects.equals(registerAddress, that.registerAddress) &&
-                Objects.equals(boardSecretary, that.boardSecretary) &&
-                Objects.equals(windIndustry, that.windIndustry);
+        return EqualsUtil.equalsAnnoField(o, this, Excel.class);
     }
 
     @Override

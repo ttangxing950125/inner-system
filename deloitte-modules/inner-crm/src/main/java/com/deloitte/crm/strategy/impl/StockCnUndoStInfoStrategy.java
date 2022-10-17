@@ -7,13 +7,11 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.ImplementStInfo;
 import com.deloitte.crm.domain.StockCnInfo;
-import com.deloitte.crm.domain.UndoStInfo;
+import com.deloitte.crm.domain.StockCnUndoStInfo;
 import com.deloitte.crm.mapper.StockCnInfoMapper;
-import com.deloitte.crm.mapper.UndoStInfoMapper;
-import com.deloitte.crm.service.ImplementStInfoService;
-import com.deloitte.crm.service.UndoStInfoService;
+import com.deloitte.crm.mapper.StockCnUndoStInfoMapper;
+import com.deloitte.crm.service.StockCnUndoStInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
@@ -39,9 +37,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class UndoStInfoStrategy implements WindTaskStrategy {
+public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
     @Resource
-    private UndoStInfoMapper undoStInfoMapper;
+    private StockCnUndoStInfoMapper undoStInfoMapper;
     @Resource
     private StockCnInfoMapper stockCnInfoMapper;
     @Override
@@ -53,9 +51,9 @@ public class UndoStInfoStrategy implements WindTaskStrategy {
     public Object doTask(WindTaskContext windTaskContext) throws Exception {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
-        ExcelUtil<UndoStInfo> util = new ExcelUtil<UndoStInfo>(UndoStInfo.class);
-        List<UndoStInfo> undoStInfoListndoStInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(UndoStInfoService.class).doTask(windTask, undoStInfoListndoStInfo);
+        ExcelUtil<StockCnUndoStInfo> util = new ExcelUtil<StockCnUndoStInfo>(StockCnUndoStInfo.class);
+        List<StockCnUndoStInfo> undoStInfoListndoStInfo = util.importExcel(windTaskContext.getFileStream(), true);
+        return ApplicationContextHolder.get().getBean(StockCnUndoStInfoService.class).doTask(windTask, undoStInfoListndoStInfo);
     }
 
     @Override
@@ -73,9 +71,9 @@ public class UndoStInfoStrategy implements WindTaskStrategy {
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         Integer taskId = windTask.getId();
-        Wrapper<UndoStInfo> wrapper = Wrappers.<UndoStInfo>lambdaQuery()
-                .eq(UndoStInfo::getTaskId, taskId)
-                .in(UndoStInfo::getChangeType, 1, 2);
+        Wrapper<StockCnUndoStInfo> wrapper = Wrappers.<StockCnUndoStInfo>lambdaQuery()
+                .eq(StockCnUndoStInfo::getTaskId, taskId)
+                .in(StockCnUndoStInfo::getChangeType, 1, 2);
 
         return undoStInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
@@ -91,7 +89,7 @@ public class UndoStInfoStrategy implements WindTaskStrategy {
     }
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
-    public Future<Object> doBondImport(UndoStInfo undoStInfo, Date timeNow, CrmWindTask windTask) {
+    public Future<Object> doBondImport(StockCnUndoStInfo undoStInfo, Date timeNow, CrmWindTask windTask) {
         log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), windTask.getId());
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, undoStInfo.getCode()));
         if (stockCnInfo != null) {
@@ -102,7 +100,7 @@ public class UndoStInfoStrategy implements WindTaskStrategy {
         } else {
             log.warn(">>>>>>>>开始到导入【实施ST摘帽】根据<股票代码=>:{}>查询不到A股信息 【任务ID】={}任务结束！！！！！", undoStInfo.getCode(), windTask.getId());
         }
-        UndoStInfo undoStInfoResult = undoStInfoMapper.selectOne(new LambdaQueryWrapper< UndoStInfo>().eq(UndoStInfo::getCode, undoStInfo.getCode()));
+        StockCnUndoStInfo undoStInfoResult = undoStInfoMapper.selectOne(new LambdaQueryWrapper<StockCnUndoStInfo>().eq(StockCnUndoStInfo::getCode, undoStInfo.getCode()));
         Integer changeType = null;
         if (undoStInfoResult == null) {
             changeType = DataChangeType.INSERT.getId();

@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.dto.CrmWindTaskDto;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @date 2022-09-21
  */
 @Service
+@Slf4j
 public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWindTask> implements ICrmWindTaskService {
     @Resource
     private CrmWindTaskMapper crmWindTaskMapper;
@@ -133,6 +135,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 .in(CrmWindTask::getComplete, 0, 2);
 
         long count = this.count(wrapper);
+        log.info("--------------未完成的任务数量{}",count);
         if (count != 0) {
             //代表还有任务未完成
             return false;
@@ -157,6 +160,8 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 "今日wind导入任务已完成，平台捕获" + entityTaskCount + "个疑似新增主体需要确认。" +
                         "请尽快登陆平台完成相关任务。");
 
+        log.info("--------------角色7的任务数量{}",entityTaskCount);
+
         //发邮件给角色2
         Wrapper<CrmMasTask> masTaskQue = Wrappers.<CrmMasTask>lambdaQuery()
                 .eq(CrmMasTask::getTaskDate, timeNow);
@@ -167,6 +172,8 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 "今日新增主体确认任务已完成，共计新增 " + entityMasCount + " 个主体需划分敞口。" +
                         "请尽快登陆平台完成相关任务。" +
                         "请尽快登陆平台完成相关任务。");
+
+        log.info("--------------角色2的任务数量{}",entityMasCount);
 
 
         dailyTaskService.update(updateDaily);

@@ -116,9 +116,11 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             //新增港股
             stockThkInfo = stockThkInfoService.saveOrUpdateNew(stockThkInfo);
 
-            //保存attr
-            //更新港股属性
-            entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);
+            if (changeType==null){
+                //保存attr
+                //更新港股属性
+                entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);
+            }
 
             //保存thkSecIssInfo
             thkSecIssDetailService.save(thkSecIssInfos);

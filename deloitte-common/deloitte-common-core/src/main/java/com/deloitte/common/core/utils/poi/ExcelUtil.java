@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -244,6 +245,9 @@ public class ExcelUtil<T> {
                 // 判断当前行是否是空行
                 if (isRowEmpty(row)) {
                     continue;
+                }
+                if (i==58){
+                    System.out.println("111");
                 }
                 T entity = null;
                 for (Map.Entry<Integer, Object[]> entry : fieldsMap.entrySet()) {
@@ -978,6 +982,14 @@ public class ExcelUtil<T> {
         }
     }
 
+
+    private static NumberFormat numberFormat = NumberFormat.getNumberInstance();
+
+    static {
+        numberFormat.setMaximumFractionDigits(16);
+        numberFormat.setGroupingUsed(false);
+    }
+
     /**
      * 获取单元格值
      *
@@ -994,13 +1006,24 @@ public class ExcelUtil<T> {
             Cell cell = row.getCell(column);
             if (ObjectUtil.isNotNull(cell)) {
                 if (cell.getCellType() == CellType.NUMERIC || cell.getCellType() == CellType.FORMULA) {
+                    //为了解决将空单元格读成0
+                    boolean dateFormatted = org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell);
                     val = cell.getNumericCellValue();
-                    if (org.apache.poi.ss.usermodel.DateUtil.isCellDateFormatted(cell)) {
+                    if (dateFormatted) {
                         val = org.apache.poi.ss.usermodel.DateUtil.getJavaDate((Double) val); // POI Excel 日期格式转换
                     } else {
                         if ((Double) val % 1 != 0) {
+
+
                             val = new BigDecimal(val.toString());
+                            val = numberFormat.format(val);
                         } else {
+                            cell.setCellType(CellType.STRING);
+                            val = cell.getStringCellValue();
+                            if(StrUtil.isBlank(Objects.toString(val,""))){
+                                return null;
+                            }
+                            val = Double.valueOf(val.toString());
                             val = new DecimalFormat("0").format(val);
                         }
                     }

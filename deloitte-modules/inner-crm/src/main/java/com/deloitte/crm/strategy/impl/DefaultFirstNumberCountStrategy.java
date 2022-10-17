@@ -101,8 +101,10 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         arr.add("导入日期");
         arr.add("变化状态");
 
-        arr.add("代码");
-        arr.add("公司名称");
+        arr.add("证券代码");
+        arr.add("证券简称");
+        arr.add("摘要");
+        arr.add("首次违约时债券余额(亿元)");
         return arr;
     }
 

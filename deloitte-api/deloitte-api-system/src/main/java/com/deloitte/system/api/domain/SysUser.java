@@ -7,6 +7,7 @@ import com.deloitte.common.core.annotation.Excel.Type;
 import com.deloitte.common.core.annotation.Excels;
 import com.deloitte.common.core.web.domain.BaseEntity;
 import com.deloitte.common.core.xss.Xss;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -101,6 +102,7 @@ public class SysUser extends BaseEntity {
      * 最后登录时间
      */
     @Excel(name = "最后登录时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date loginDate;
 
     /**
