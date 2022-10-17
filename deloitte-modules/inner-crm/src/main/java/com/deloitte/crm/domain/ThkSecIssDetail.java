@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.web.domain.BaseEntity;
@@ -19,7 +20,7 @@ import lombok.ToString;
 
 /**
  * 证券发行-股票发行-首次发行明细对象 thk_sec_iss_detail
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
@@ -140,33 +141,7 @@ public class ThkSecIssDetail implements Serializable
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ThkSecIssDetail that = (ThkSecIssDetail) o;
-        return Objects.equals(code, that.code) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(ipoDate, that.ipoDate) &&
-                Objects.equals(ipoBoard, that.ipoBoard) &&
-                Objects.equals(issType, that.issType) &&
-                Objects.equals(issPrice, that.issPrice) &&
-                Objects.equals(issCountReal, that.issCountReal) &&
-                Objects.equals(issCountPlan, that.issCountPlan) &&
-                Objects.equals(issPlacingExceed, that.issPlacingExceed) &&
-                Objects.equals(issFundCount, that.issFundCount) &&
-                Objects.equals(issFundNet, that.issFundNet) &&
-                Objects.equals(issFundExceed, that.issFundExceed) &&
-                Objects.equals(mainUnw, that.mainUnw) &&
-                Objects.equals(sponsor, that.sponsor) &&
-                Objects.equals(firstDenom, that.firstDenom) &&
-                Objects.equals(firstCurrency, that.firstCurrency) &&
-                Objects.equals(firstUnit, that.firstUnit) &&
-                Objects.equals(prospDate, that.prospDate) &&
-                Objects.equals(prospPriceMax, that.prospPriceMax) &&
-                Objects.equals(prospPriceMin, that.prospPriceMin) &&
-                Objects.equals(belWind, that.belWind) &&
-                Objects.equals(belModle, that.belModle) &&
-                Objects.equals(stockBelong, that.stockBelong) &&
-                Objects.equals(entityDes, that.entityDes);
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
     }
 
     @Override

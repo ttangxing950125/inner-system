@@ -121,10 +121,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @Override
-    public R<Page<CrmEntityTaskVo>> getTaskInfo(String date,Integer pageNum,Integer pageSize) {
+    public R<Page<CrmEntityTaskVo>> getTaskInfo(Date dateDay,Integer pageNum,Integer pageSize) {
         pageNum = pageNum==null?1:pageNum;
         pageSize = pageSize==null?5:pageSize;
-        Date dateDay = DateUtil.parseDate(date);
 
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum,pageSize), new QueryWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getTaskDate, dateDay));

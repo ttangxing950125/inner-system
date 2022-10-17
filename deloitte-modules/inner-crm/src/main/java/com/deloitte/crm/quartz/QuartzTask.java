@@ -43,16 +43,16 @@ public class QuartzTask {
        //当前日期
        String date = DateUtil.getDate();
        //节假日 0=工作日, 1=假日, 2=节日
-       try {
-           HttpResponse response = HttpRequest.get("https://tool.bitefu.net/jiari/?d=".concat(date)).execute();
-           if (Objects.equal("1",response.body()) || Objects.equal("2",response.body())) {
-               return;
-           }
-       }catch (Exception e){
-
-        log.error("e");
-
-       }
+//       try {
+//           HttpResponse response = HttpRequest.get("https://tool.bitefu.net/jiari/?d=".concat(date)).execute();
+//           if (Objects.equal("1",response.body()) || Objects.equal("2",response.body())) {
+//               return;
+//           }
+//       }catch (Exception e){
+//
+//        log.error("e");
+//
+//       }
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();
         log.info("同步任务结束 =============");
