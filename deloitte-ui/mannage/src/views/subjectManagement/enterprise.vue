@@ -213,8 +213,8 @@
         <el-card>
           <h3 class="g-t-title">{{ tabArr[currentTab] + "企业" }}</h3>
           <div class="g-desc">
-            截止日期，会计收录<span>xxxx</span>个地方政府主体，其中
-            <span>xxxx</span> 个存续上市， <span>xxxx</span> 个已退市
+            截止日期，会计收录 <span>{{ overview.listTotle }}</span> 个地方企业主体，其中
+            <span>{{ overview.listLive }}</span> 个存续上市， <span>{{ overview.listDie }}</span> 个已退市
           </div>
           <div class="g-desc flex1">
             <router-link
@@ -316,6 +316,7 @@ import {
   getOverviewByGroup,
   getInfoList,
   getQuickOfCoverage,
+  getListView
 } from "@/api/subject";
 import { replaceStr } from "@/utils/index";
 import pagination from "../../components/Pagination";
@@ -351,6 +352,7 @@ export default {
         pageSize: 10,
       },
       total2: 0,
+      overview: {}
     };
   },
   created() {
@@ -387,6 +389,10 @@ export default {
           this.total2 = data.total;
           this.queryParams2.pageNum = data.current;
         });
+        getListView({}).then(res => {
+          const { data } = res;
+          this.overview = data
+        })
       } catch (error) {
         console.log(error);
       } finally {

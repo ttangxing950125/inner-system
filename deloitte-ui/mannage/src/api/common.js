@@ -15,14 +15,17 @@ export function getAllByGroup(params) {
 
 // 分页查询全部政府主体
 export function getListEntityByPage(params) {
-  const govAttrDto = JSON.stringify(params);
   return request({
-    url: "/crm/govInfo/getListEntityByPage",
+    url:
+      "/crm/govInfo/getListEntityByPage?pageNum=" +
+      params.pageNum +
+      "&pageSize=" +
+      params.pageSize,
     headers: {
       isToken: true,
     },
     method: "post",
-    data: govAttrDto,
+    data: params,
   });
 }
 

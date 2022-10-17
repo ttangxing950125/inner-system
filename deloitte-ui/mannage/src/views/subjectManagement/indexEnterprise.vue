@@ -28,16 +28,18 @@
             <el-input
               class="filter"
               placeholder="输入关键字进行过滤"
-              v-model="filterText"
+              v-model="filterTextFirst"
             >
             </el-input>
 
             <el-tree
               class="filter-tree"
-              :data="data"
+              :data="data1"
+              :props="{ label: 'name', children: 'value' }"
               show-checkbox
               :filter-node-method="filterNode"
-              ref="tree"
+              ref="tree1"
+              @check-change="handleCheckChange"
             >
             </el-tree>
           </div>
@@ -51,16 +53,18 @@
             <el-input
               class="filter"
               placeholder="输入关键字进行过滤"
-              v-model="filterText"
+              v-model="filterTextScend"
             >
             </el-input>
 
             <el-tree
               class="filter-tree"
-              :data="data"
+              :data="data2"
+              :props="{ label: 'name', children: 'value' }"
               show-checkbox
               :filter-node-method="filterNode"
-              ref="tree"
+              ref="tree2"
+              @check-change="handleCheckChange"
             >
             </el-tree>
           </div>
@@ -78,37 +82,53 @@
           border
           style="width: 100%; margin-top: 15px"
         >
-          <el-table-column type="index" fixed sortable label="序号">
+          <el-table-column fixed type="index" fixed sortable label="序号">
           </el-table-column>
-          <el-table-column prop="date" fixed label="德勤主体代码">
+          <el-table-column fixed prop="dqGovCode" fixed label="德勤主体代码">
           </el-table-column>
-          <el-table-column prop="name" fixed label="主体名称">
+          <el-table-column fixed prop="govName" fixed label="主体名称">
           </el-table-column>
-          <el-table-column prop="province" fixed label="生效状态">
+          <el-table-column fixed prop="invalid" fixed label="生效状态">
+            <template slot-scope="scope">
+              <span>{{ scope.row.invalid ? "Y" : "N" }}</span>
+            </template>
           </el-table-column>
-          <el-table-column prop="city" label="证券代码"> </el-table-column>
-          <el-table-column prop="address" label="创建日期"> </el-table-column>
-          <el-table-column prop="zip" label="创建人"> </el-table-column>
-          <el-table-column prop="zip" label="创建类型"> </el-table-column>
+          <el-table-column prop="created" label="创建日期">
+            <template slot-scope="scope">
+              <span>{{
+                scope.row.created && scope.row.created.substr(0, 10)
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="creater" label="创建人"> </el-table-column>
+          <el-table-column
+            v-for="(item, index) in header"
+            :key="index"
+            :prop="item"
+            :label="item"
+          >
+          </el-table-column>
         </el-table>
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage1"
-          :page-size="100"
-          layout="total, prev, pager, next"
-          :total="1000"
-          class="page"
-        >
-        </el-pagination>
+        <pagination
+          v-show="total > 0"
+          :total="total"
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getList"
+        />
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
+import { getAllByGroup, getListEntityByPage } from "@/api/common";
+import pagination from "../../components/Pagination";
 export default {
   name: "addGovernment",
+  components: {
+    pagination,
+  },
   data() {
     return {
       currentPage1: "",
@@ -149,67 +169,102 @@ export default {
       ],
       tab: this.$route.query.name,
       filterText: "",
-      data: [
+      header: [],
+      data1: [],
+      data2: [
         {
-          id: 1,
-          label: "一级 1",
-          children: [
+          name: "全部",
+          value: [
             {
-              id: 4,
-              label: "二级 1-1",
-              children: [
+              name: "内地股票",
+              value: [
                 {
-                  id: 9,
-                  label: "三级 1-1-1",
+                  id: 18,
+                  name: "是",
                 },
                 {
-                  id: 10,
-                  label: "三级 1-1-2",
+                  id: 18,
+                  name: "否",
+                },
+              ],
+            },
+            {
+              name: "香港股票",
+              value: [
+                {
+                  id: 18,
+                  name: "是",
+                },
+                {
+                  id: 18,
+                  name: "否",
+                },
+              ],
+            },
+            {
+              name: "接触地划分",
+              value: [
+                {
+                  id: 18,
+                  name: "是",
+                },
+                {
+                  id: 18,
+                  name: "否",
                 },
               ],
             },
           ],
         },
-        {
-          id: 2,
-          label: "一级 2",
-          children: [
-            {
-              id: 5,
-              label: "二级 2-1",
-            },
-            {
-              id: 6,
-              label: "二级 2-2",
-            },
-          ],
-        },
-        {
-          id: 3,
-          label: "一级 3",
-          children: [
-            {
-              id: 7,
-              label: "二级 3-1",
-            },
-            {
-              id: 8,
-              label: "二级 3-2",
-            },
-          ],
-        },
       ],
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
+      selected: "",
+      mapList: [],
+      filterTextFirst: "",
+      filterTextScend: "",
     };
   },
   watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
+    filterTextFirst(val) {
+      this.$refs.tree1.filter(val);
+    },
+    filterTextScend(val) {
+      this.$refs.tree2.filter(val);
     },
   },
   created() {
-    this.getCurrentTime();
+    this.init();
   },
   methods: {
+    init() {
+      try {
+        this.$modal.loading("Loading...");
+        getAllByGroup({ type: 1 }).then((res) => {
+          const { data } = res;
+          this.data1 = data;
+        });
+        const params = {
+          pageNum: 1,
+          pageSize: 10,
+        };
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
     goTarget(href) {
       window.open(href, "_blank");
     },
@@ -221,13 +276,106 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+      return data.name.indexOf(value) !== -1;
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    handleCheckChange(data, checked, indeterminate) {
+      //获取所有选中的节点 start
+      let res = this.$refs.tree1.getCheckedNodes();
+      let arrDeptId = [];
+      res.forEach((e) => {
+        const item = {
+          id: e.id,
+          name: e.name,
+        };
+        arrDeptId.push(item);
+      });
+      this.selected = arrDeptId.length;
+      this.mapList = arrDeptId;
+      try {
+        this.$modal.loading("loading...");
+        const params = {
+          pageNum: 1,
+          pageSize: 10,
+          mapList: this.mapList,
+        };
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          let more = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+            more.forEach((i) => {
+              e[i.key] = i.value;
+            });
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
+    handleCheckChange2(data, checked, indeterminate) {
+      //获取所有选中的节点 start
+      let res = this.$refs.tree2.getCheckedNodes();
+      let arrDeptId = [];
+      res.forEach((e) => {
+        const item = {
+          id: e.id,
+          name: e.name,
+        };
+        arrDeptId.push(item);
+      });
+      this.selected = arrDeptId.length;
+      this.mapList = arrDeptId;
+      try {
+        this.$modal.loading("loading...");
+        const params = {
+          pageNum: 1,
+          pageSize: 10,
+          mapList: this.mapList,
+        };
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          let more = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+            more.forEach((i) => {
+              e[i.key] = i.value;
+            });
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    getList() {
+      const params = {
+        pageNum: this.queryParams.pageNum,
+        pageSize: 10,
+      };
+      getListEntityByPage(params).then((res) => {
+        const { data } = res;
+        this.total = data.total;
+        this.list = [];
+        this.queryParams.pageNum = data.current;
+        data.records.forEach((e) => {
+          this.list.push(e.govInfo);
+        });
+      });
     },
   },
 };
@@ -241,10 +389,13 @@ export default {
     padding: 10px 15px;
   }
   .head {
-    background: #ddd9d9;
+    background: #f8f8f9;
     display: flex;
     justify-content: space-between;
     padding: 0px 10px;
+    span {
+      margin-top: 7px;
+    }
   }
   .filter-tree {
     margin-bottom: 10px;

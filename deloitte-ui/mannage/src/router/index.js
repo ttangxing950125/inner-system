@@ -180,15 +180,15 @@ export const constantRoutes = [
         meta: { title: "曾用名管理" },
       },
       {
-        path: "work1",
-        component: () => import("@/views/dashboard/work.vue"),
-        name: "1",
+        path: "debt",
+        component: () => import("@/views/subTable/debt.vue"),
+        name: "debt",
         meta: { title: "债券信息管理" },
       },
       {
-        path: "work2",
-        component: () => import("@/views/dashboard/work.vue"),
-        name: "2",
+        path: "exposure",
+        component: () => import("@/views/subTable/exposure.vue"),
+        name: "exposure",
         meta: { title: "主体敞口划分管理" },
       },
     ],
@@ -279,5 +279,5 @@ export default new Router({
   mode: "history", // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes,
-  base:"/crm-door/"
+  base: "/crm-door/",
 });
