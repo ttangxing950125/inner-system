@@ -12,6 +12,8 @@ import com.deloitte.crm.domain.EntityInfoLogs;
 import com.deloitte.crm.mapper.EntityInfoLogsMapper;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.service.EntityInfoLogsService;
+import com.deloitte.crm.service.ICrmWindTaskService;
+import com.deloitte.crm.vo.WindTaskDetailsVo;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysDictData;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +45,8 @@ public class BondInfoTest{
 
     @Resource
     private RoleService roleService;
+    @Resource
+    private ICrmWindTaskService crmWindTaskService;
 
     @Resource
     private EntityInfoLogsService entityInfoLogsService;
@@ -88,6 +92,16 @@ public class BondInfoTest{
         log.info("=>>  "+ com.deloitte.common.core.utils.DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");
         entityAttrValueRunBatchTasks.runBatchData();
         log.info("=>>  "+ com.deloitte.common.core.utils.DateUtil.dateTimeNow() +" Attr数据导入完成  <<=");
+    }
+
+    @Test
+    public void test2(){
+        long start = System.currentTimeMillis();
+        final List<WindTaskDetailsVo> taskDetails = crmWindTaskService.findTaskDetails(1, "2022-10-17");
+        long end = System.currentTimeMillis();
+        log.info("查询完成，耗时：" + (end - start) +" ms");
+        System.out.println("数据:>>>:"+JSON.toJSONString(taskDetails));
+        //查询完成，耗时：1691 ms
     }
 
 }

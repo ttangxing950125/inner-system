@@ -2,8 +2,10 @@ package com.deloitte.crm.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import cn.hutool.cron.TaskExecutor;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -76,6 +78,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Resource
     private CrmEntityTaskMapper crmEntityTaskMapper;
 
+
     /**
      * 导入wind文件
      *
@@ -124,11 +127,13 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     /**
      * 检查指定日期任务完成状态，如果全部都是已完成，那么更改今天角色3的日常任务状态
      *
-     * @param timeNow
+     * @param timeNowDate
      * @return
      */
     @Override
-    public boolean checkAllComplete(Date timeNow) {
+    public boolean checkAllComplete(Date timeNowDate) {
+        String timeNow = DateUtil.format(timeNowDate, "yyyy-MM-dd");
+
         //查询今天有没有状态为 0 和 2 的
         Wrapper<CrmWindTask> wrapper = Wrappers.<CrmWindTask>lambdaQuery()
                 .eq(CrmWindTask::getTaskDate, timeNow)
@@ -191,12 +196,27 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
      */
     @Override
     public List<WindTaskDetailsVo> findTaskDetails(Integer taskCateId, String taskDate) {
+        long start = System.currentTimeMillis();
         //查询今天某个分类的全部任务
-        Wrapper<CrmWindTask> wrapper = Wrappers.<CrmWindTask>lambdaUpdate()
-                .eq(CrmWindTask::getTaskDate, taskDate)
-                .eq(CrmWindTask::getTaskCateId, taskCateId);
+        Wrapper<CrmWindTask> wrapper = Wrappers.<CrmWindTask>lambdaUpdate().eq(CrmWindTask::getTaskDate, taskDate).eq(CrmWindTask::getTaskCateId, taskCateId);
         List<CrmWindTask> windTasks = this.list(wrapper);
-        return windTasks.stream().map(item -> {
+        final List<WindTaskDetailsVo> collect = windTasks.stream().map(e -> CompletableFuture.supplyAsync(() -> {
+            WindTaskDetailsVo detailsVo = new WindTaskDetailsVo();
+            detailsVo.setWindTask(e);
+            detailsVo.setTaskFileName(e.getTaskFileName());
+            detailsVo.setTaskStatus(e.getComplete());
+            List<Map<String, Object>> data = windTaskStrategyManage.getDetail(e);
+            //查询展示到列表上的信息
+            List<String> header = windTaskStrategyManage.getDetailHeader(e);
+            detailsVo.setHeader(header);
+            detailsVo.setData(data);
+            return detailsVo;
+        })).map(CompletableFuture::join).collect(Collectors.toList());
+        long end = System.currentTimeMillis();
+        log.info("查询完成，耗时：" + (end - start) +" ms");
+        return collect;
+        /*
+       return windTasks.stream().map(item -> {
             WindTaskDetailsVo detailsVo = new WindTaskDetailsVo();
             detailsVo.setWindTask(item);
             detailsVo.setTaskFileName(item.getTaskFileName());
@@ -207,7 +227,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             detailsVo.setHeader(header);
             detailsVo.setData(data);
             return detailsVo;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList());*/
     }
 
 
