@@ -1217,7 +1217,7 @@ export default {
           const { data } = res
           this.list7 = data.records
           this.total = data.total
-          this.queryParams.pages = data.pages
+          this.queryParams.pageNum = data.current
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
       } catch (error) {

@@ -258,6 +258,27 @@ export default {
     },
     changeTab(tab) {
       this.currentTab = tab;
+      try {
+        this.$modal.loading("Loading...");
+        this.currentTab = tab;
+        this.queryParams.pageNum = 1;
+        const parmas = {
+          param: this.codeInput,
+          type: this.currentTab,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getInfoListGov(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     selectTable() {
       try {
