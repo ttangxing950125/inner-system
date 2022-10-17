@@ -1,18 +1,15 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.EntityMaster;
+import com.deloitte.crm.domain.EntityBaseBusiInfo;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
-import com.deloitte.crm.mapper.EntityMasterMapper;
+import com.deloitte.crm.mapper.EntityBaseBusiInfoMapper;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.utils.GetAnnotationAttr;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,17 +17,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 表 entity_master 批量数据导入
  * @author 正杰
- * @description: EntityMasterRunBatchImpl
+ * @description: EntityBaseBusiInfoRunBatchImpl
  * @date 2022/10/14
  */
 @Service
 @AllArgsConstructor
 @Slf4j
-public class EntityMasterRunBatchImpl implements EntityAttrValueRunBatchTask {
+public class EntityBaseBusiInfoRunBatchImpl implements EntityAttrValueRunBatchTask {
 
-    private EntityMasterMapper entityMasterMapper;
+    private EntityBaseBusiInfoMapper entityBaseBusiInfoMapper;
 
     private GetAnnotationAttr getAnnotationAttr;
 
@@ -42,19 +38,18 @@ public class EntityMasterRunBatchImpl implements EntityAttrValueRunBatchTask {
      * @return EntityAttrValue
      */
     @Override
-    public List<EntityAttrValue> getPrams(){
+    public List<EntityAttrValue> getPrams() {
         Date date = new Date();
-        log.info(" =>> 当前时间 ： "+ date +" 开始对 EntityMaster 进行数据拉去");
-        DateTime start = DateUtil.beginOfDay(date);
-        DateTime end = DateUtil.endOfDay(date);
+        log.info(" =>> 当前时间 ： "+ date +" 开始对 EntityBaseBusiInfo 进行数据拉去");
+
         List<EntityAttrValue> result = new ArrayList<>();
-        List<EntityMaster> entityMasters = entityMasterMapper.selectList(new QueryWrapper<EntityMaster>().lambda().between(EntityMaster::getUpdate,start,end).or().between(EntityMaster::getCreated,start,end));
+        List<EntityBaseBusiInfo> entityBaseBusiInfos = entityBaseBusiInfoMapper.selectList(new QueryWrapper<EntityBaseBusiInfo>().lambda().eq(EntityBaseBusiInfo::getUpdated, date).or().eq(EntityBaseBusiInfo::getCreated, date));
 
-        int size = entityMasters.size();
-        if(size==0){ log.info(" =>> EntityMaster 今日数据为零 录入操作终止 <<= "); return null;}
-        log.info(" =>> EntityMaster 今日数据为"+ size +" 准备开始导入 <<= ");
+        int size = entityBaseBusiInfos.size();
+        if(size==0){ log.info(" =>> EntityBaseBusiInfo 今日数据为零 录入操作终止 <<= "); return null;}
+        log.info(" =>> EntityBaseBusiInfo 今日数据为"+ size +" 准备开始导入 <<= ");
 
-        entityMasters.stream().map(row -> getAnnotationAttr.get(row, row.getEntityCode())).collect(Collectors.toList()).forEach(result::addAll);
+        entityBaseBusiInfos.stream().map(row -> getAnnotationAttr.get(row, row.getEntityCode())).collect(Collectors.toList()).forEach(result::addAll);
         return result;
     }
 
@@ -62,7 +57,6 @@ public class EntityMasterRunBatchImpl implements EntityAttrValueRunBatchTask {
      * 批量导入数据
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void runBatchData() {
         List<EntityAttrValue> prams = this.getPrams();
         if(prams==null){return;}
@@ -76,6 +70,6 @@ public class EntityMasterRunBatchImpl implements EntityAttrValueRunBatchTask {
                 entityAttrValueMapper.insertEntityAttrValue(row);
             }
         });
-        log.info(" =>> EntityMaster 中，数据导入成功 <<= ");
+        log.info(" =>> EntityBaseBusiInfo 中，数据导入成功 <<= ");
     }
 }
