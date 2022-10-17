@@ -2,7 +2,7 @@ package com.deloitte.crm.controller;
 
 
 
-import com.deloitte.crm.service.ImplementStInfoService;
+import com.deloitte.crm.service.StockCnImplementStInfoService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -15,12 +15,12 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("implementStInfo")
-public class ImplementStInfoController {
+public class StockCnImplementStInfoController {
     /**
      * 服务对象
      */
     @Resource
-    private ImplementStInfoService implementStInfoService;
+    private StockCnImplementStInfoService implementStInfoService;
 
     
 }

@@ -2,7 +2,7 @@ package com.deloitte.crm.controller;
 
 
 
-import com.deloitte.crm.service.UndoStInfoService;
+import com.deloitte.crm.service.StockCnUndoStInfoService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -15,12 +15,12 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("undoStInfo")
-public class UndoStInfoController {
+public class StockCnUndoStInfoController {
     /**
      * 服务对象
      */
     @Resource
-    private UndoStInfoService undoStInfoService;
+    private StockCnUndoStInfoService undoStInfoService;
 
     
 }

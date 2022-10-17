@@ -11,7 +11,7 @@ import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.domain.StockCnUndoStInfo;
 import com.deloitte.crm.mapper.StockCnInfoMapper;
 import com.deloitte.crm.mapper.StockCnUndoStInfoMapper;
-import com.deloitte.crm.service.UndoStInfoService;
+import com.deloitte.crm.service.StockCnUndoStInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class UndoStInfoStrategy implements WindTaskStrategy {
+public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
     @Resource
     private StockCnUndoStInfoMapper undoStInfoMapper;
     @Resource
@@ -53,7 +53,7 @@ public class UndoStInfoStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<StockCnUndoStInfo> util = new ExcelUtil<StockCnUndoStInfo>(StockCnUndoStInfo.class);
         List<StockCnUndoStInfo> undoStInfoListndoStInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(UndoStInfoService.class).doTask(windTask, undoStInfoListndoStInfo);
+        return ApplicationContextHolder.get().getBean(StockCnUndoStInfoService.class).doTask(windTask, undoStInfoListndoStInfo);
     }
 
     @Override

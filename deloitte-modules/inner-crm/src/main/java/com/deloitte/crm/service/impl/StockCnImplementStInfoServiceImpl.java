@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.mapper.StockCnUndoStInfoMapper;
-import com.deloitte.crm.domain.StockCnUndoStInfo;
+import com.deloitte.crm.mapper.StockCnImplementStInfoMapper;
+import com.deloitte.crm.domain.StockCnImplementStInfo;
 import com.deloitte.crm.service.ICrmWindTaskService;
-import com.deloitte.crm.service.UndoStInfoService;
-import com.deloitte.crm.strategy.impl.UndoStInfoStrategy;
+import com.deloitte.crm.service.StockCnImplementStInfoService;
+import com.deloitte.crm.strategy.impl.StockCnImplementStInfoStrategy;
 import com.deloitte.crm.utils.ApplicationContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +19,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
 
 /**
- * 撤销ST(摘帽)(UndoStInfo)表服务实现类
+ * 实施ST(带帽)(ImplementStInfo)表服务实现类
  *
  * @author 吴鹏鹏ppp
  * @since 2022-10-14 17:50:05
  */
-@Service("undoStInfoService")
-public class UndoStInfoServiceImpl extends ServiceImpl<StockCnUndoStInfoMapper, StockCnUndoStInfo> implements UndoStInfoService {
+@Service("stockCnImplementStInfoServiceImpl")
+public class StockCnImplementStInfoServiceImpl extends ServiceImpl<StockCnImplementStInfoMapper, StockCnImplementStInfo> implements StockCnImplementStInfoService {
     @Resource
     private ICrmWindTaskService crmWindTaskService;
+
     @Override
-    public Object doTask(CrmWindTask windTask, List<StockCnUndoStInfo> delIsses) {
+    public Object doTask(CrmWindTask windTask, List<StockCnImplementStInfo> delIsses) {
         windTask.setComplete(2);
         crmWindTaskService.updateById(windTask);
         //获取当前时间
@@ -37,11 +38,11 @@ public class UndoStInfoServiceImpl extends ServiceImpl<StockCnUndoStInfoMapper, 
 
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 
-        for ( StockCnUndoStInfo undoStInfo : delIsses) {
-            if (undoStInfo.getCode().contains("数据来源：Wind")) {
+        for (StockCnImplementStInfo implementStInfo : delIsses) {
+            if (implementStInfo.getCode().contains("数据来源：Wind")) {
                 continue;
             }
-            Future<Object> future = ApplicationContextHolder.get().getBean(UndoStInfoStrategy.class).doBondImport(undoStInfo, timeNow, windTask);
+            Future<Object> future = ApplicationContextHolder.get().getBean(StockCnImplementStInfoStrategy.class).doBondImport(implementStInfo, timeNow, windTask);
             futureList.add(future);
         }
 

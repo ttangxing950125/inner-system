@@ -11,7 +11,7 @@ import com.deloitte.crm.domain.StockCnImplementStInfo;
 import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.mapper.StockCnImplementStInfoMapper;
 import com.deloitte.crm.mapper.StockCnInfoMapper;
-import com.deloitte.crm.service.ImplementStInfoService;
+import com.deloitte.crm.service.StockCnImplementStInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class ImplementStInfoStrategy implements WindTaskStrategy {
+public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
     @Resource
     private StockCnInfoMapper stockCnInfoMapper;
     @Resource
@@ -83,7 +83,7 @@ public class ImplementStInfoStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<StockCnImplementStInfo> util = new ExcelUtil<StockCnImplementStInfo>(StockCnImplementStInfo.class);
         List<StockCnImplementStInfo> implementStInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(ImplementStInfoService.class).doTask(windTask, implementStInfo);
+        return ApplicationContextHolder.get().getBean(StockCnImplementStInfoService.class).doTask(windTask, implementStInfo);
     }
 
     @Override
