@@ -19,7 +19,7 @@
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
-          <span class="el-span-caret-bottom">admin</span>
+          <span class="el-span-caret-bottom">{{ userName }}</span>
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/user/profile">
@@ -78,6 +78,9 @@ export default {
       get() {
         return this.$store.state.settings.topNav;
       },
+    },
+    userName() {
+      return this.$store.state.user.name;
     },
   },
   methods: {
