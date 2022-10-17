@@ -53,9 +53,6 @@
               :prop="e"
               :label="e"
             >
-              <template v-if="e === '变化状态'" slot-scope="scope">
-                <span>{{ scope.row.变化状态 === 1 ? "新增" : "修改" }}</span>
-              </template>
             </el-table-column>
           </el-table>
         </el-col>
