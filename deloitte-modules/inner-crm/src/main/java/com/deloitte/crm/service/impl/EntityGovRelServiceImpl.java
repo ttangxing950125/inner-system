@@ -116,7 +116,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
      * @date 2022/10/12 9:56
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addGovEntitySubtableMsg(EntityGovRelDto entityGovRelDto) {
         crmSupplyTaskService.completeTaskById(entityGovRelDto.getId());
         EntityGovRel entityGovRel = entityGovRelDto.getEntityGovRel();

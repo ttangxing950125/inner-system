@@ -136,7 +136,7 @@ public class GovInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/22 15:24
      */
-    @ApiOperation(value = "政府主题批量修改")
+    @ApiOperation(value = "政府主体批量修改")
     @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
     public R updateInfoList(List<GovInfo> govInfoList) {

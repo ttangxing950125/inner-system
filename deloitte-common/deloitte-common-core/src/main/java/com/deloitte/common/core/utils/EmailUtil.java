@@ -4,6 +4,7 @@ import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import cn.hutool.setting.dialect.Props;
 import cn.hutool.setting.dialect.PropsUtil;
+import org.apache.ibatis.io.Resources;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,11 +87,16 @@ public class EmailUtil {
     //读取到html文件模板，替换文件模板中的信息
     public static String scopeTemplate(String companyName, String context) {
         String filename = "emailTemplate/market.ftl";
-        InputStream inputStream = ClassLoader.getSystemResourceAsStream(filename);
-        BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuffer buffer = new StringBuffer();
-        String line = "";
+
+        InputStream inputStream = null;
+        BufferedReader fileReader = null;
+        StringBuffer buffer = null;
         try {
+            inputStream = Resources.getResourceAsStream(filename);
+//        InputStream inputStream = ClassLoader.getSystemResourceAsStream(filename);
+            fileReader = new BufferedReader(new InputStreamReader(inputStream));
+            buffer = new StringBuffer();
+            String line = "";
             while ((line = fileReader.readLine()) != null) {
                 buffer.append(line);
             }

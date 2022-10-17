@@ -194,7 +194,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public R getTaskByEntityCode(String entityCode, Integer roleId) {
         //封装企业返回信息
         EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
@@ -217,7 +217,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, List<EntityAttr>> getAttrByOrganName(String organName) {
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));
