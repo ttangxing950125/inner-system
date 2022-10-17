@@ -1,12 +1,12 @@
 package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
+import com.deloitte.crm.dto.MoreIndex;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 地方政府-更多指标-主体范围    返回对象
@@ -19,7 +19,7 @@ import java.util.Map;
 public class GovAttrByDtoBack implements Serializable
 {
 
-    List<Map<String,String>>mapList;
+    List<MoreIndex>mapList;
 
     private Integer pageSize;
 
@@ -30,7 +30,6 @@ public class GovAttrByDtoBack implements Serializable
     /** 城市分级 */
     private List<GovRangeValue> govGrading;
 
-
     /** 省级行政区 */
     private List<GovRangeValue> isProvince;
     /** 地级行政区 */
@@ -40,12 +39,10 @@ public class GovAttrByDtoBack implements Serializable
     /** 经开高新区 */
     private List<GovRangeValue> isJKGX;
 
-
     /** 八大经济区 *///    八大经济区 ——> 经济区归属
     private List<GovRangeValue> eightER ;
     /** 19个城市群 *///    19个城市群 ——> 城市群归属
     private List<GovRangeValue> nineteenCity;
-
 
     /** 百强县 */
     private Integer hundred;

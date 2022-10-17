@@ -92,7 +92,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
-    R<EntityInfoVo> validEntity(String creditCode, String entityName);
     /**
      * 根据统一社会信用代码 查询主体信息
      * @param creditCode

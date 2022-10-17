@@ -75,7 +75,7 @@ public interface GovInfoMapper extends BaseMapper<GovInfo>
 
     List<GovInfo> getGovByAttrValue(GovAttrByDto govAttrByDto);
 
-    List<GovInfo> getGovByAttrValueByPage(GovAttrByDto entityAttrDto);
+    List<GovInfo> getGovByAttrValueByPage(GovAttrByDto govAttrDto);
 
     Integer getGovCountByAttrValue(GovAttrByDto entityAttrDto);
 

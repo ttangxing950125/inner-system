@@ -814,12 +814,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
     }
 
-    @Override
-    public R<EntityInfoVo> validEntity(String creditCode, String entityName) {
-
-        return null;
-    }
-
     /**
      * 根据统一社会信用代码 查询主体信息
      *

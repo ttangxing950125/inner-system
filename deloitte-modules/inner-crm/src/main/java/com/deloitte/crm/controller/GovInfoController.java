@@ -261,6 +261,19 @@ public class GovInfoController extends BaseController {
     }
 
     /**
+     * 地方政府-更多指标-主体范围
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/11 17:10
+     */
+    @ApiOperation(value = "地方政府-更多指标-主体范围")
+    @PostMapping("/getGovRange")
+    public R getGovRange() {
+        return R.ok(govInfoService.getGovRange());
+    }
+
+    /**
      * 政府主体总概览
      *
      * @return R
@@ -303,19 +316,6 @@ public class GovInfoController extends BaseController {
         return R.ok(govInfoService.getGovLevel(preGovCode));
     }
 
-
-    /**
-     * 地方政府-更多指标-主体范围
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/10/11 17:10
-     */
-    @ApiOperation(value = "地方政府-更多指标-主体范围")
-    @PostMapping("/getGovRange")
-    public R getGovRange() {
-        return R.ok(govInfoService.getGovRange());
-    }
 
     /**
      * 新增地方政府

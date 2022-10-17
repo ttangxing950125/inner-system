@@ -274,13 +274,13 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 分页查询企业主体
+     * 上市企业-更多指标
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
-    @ApiOperation(value = "分页查询企业主体")
+    @ApiOperation(value = "上市企业-更多指标")
     @ApiImplicitParam(name = "entityAttrDto", value = "包含表中entity_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto) {

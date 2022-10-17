@@ -337,13 +337,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public Object getListEntityByPage(GovAttrByDto entityAttrDto) {
-        Integer pageNum = entityAttrDto.getPageNum();
-        Integer pageSize = entityAttrDto.getPageSize();
+    public Object getListEntityByPage(GovAttrByDto govAttrDto) {
+        Integer pageNum = govAttrDto.getPageNum();
+        Integer pageSize = govAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
-            return getListEntityAll(entityAttrDto);
+            return getListEntityAll(govAttrDto);
         } else {
-            return getListEntityPage(entityAttrDto);
+            return getListEntityPage(govAttrDto);
         }
     }
 
@@ -453,25 +453,25 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     /**
      * 分页查询
      *
-     * @param entityAttrDto
+     * @param govAttrDto
      * @return Page<GovInfoResult>
      * @author 冉浩岑
      * @date 2022/9/25 17:05
      */
-    public Page<GovInfoResult> getListEntityPage(GovAttrByDto entityAttrDto) {
+    public Page<GovInfoResult> getListEntityPage(GovAttrByDto govAttrDto) {
 
-        Integer pageNum = entityAttrDto.getPageNum();
-        Integer pageSize = entityAttrDto.getPageSize();
+        Integer pageNum = govAttrDto.getPageNum();
+        Integer pageSize = govAttrDto.getPageSize();
 
         Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
-        List<MoreIndex> mapList = entityAttrDto.getMapList();
+        List<MoreIndex> mapList = govAttrDto.getMapList();
 
         pageNum = (pageNum - 1) * pageSize;
-        entityAttrDto.setPageNum(pageNum);
+        govAttrDto.setPageNum(pageNum);
         //查询页面数据
-        List<GovInfo> records = govInfoMapper.getGovByAttrValueByPage(entityAttrDto);
+        List<GovInfo> records = govInfoMapper.getGovByAttrValueByPage(govAttrDto);
         //查询条数
-        Integer count = govInfoMapper.getGovCountByAttrValue(entityAttrDto);
+        Integer count = govInfoMapper.getGovCountByAttrValue(govAttrDto);
 
         pageResult.setTotal(count);
 
@@ -519,7 +519,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                     more.setValue(value);
                 }
                 moreList.add(more);
-
             }
             govInfoResult.setMore(moreList).setHeader(header).setValues(values);
         }
@@ -760,15 +759,16 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         govAttrByDto = setEightEconomicsRegion(govAttrByDto);
 //        19个城市群
         govAttrByDto = setNineteenCityGroup(govAttrByDto);
-
 //        城市规模
         govAttrByDto = setGovScale(govAttrByDto);
 //        城市分级
         govAttrByDto = setGovGrading(govAttrByDto);
-
 //        国家中心城市
+
 //        省会城市
+
 //        百强县
+
         return govAttrByDto;
     }
 
