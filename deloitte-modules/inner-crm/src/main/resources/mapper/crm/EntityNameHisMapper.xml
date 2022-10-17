@@ -45,17 +45,17 @@
 
     <select id="getGovHisNameList" parameterType="java.lang.String" resultType="java.util.Map">
        SELECT
-        a.`status`,
-        a.dq_code,
-        b.gov_name,
-        a.old_name,
-        a.updated,
-        a.remarks
+        a.`status` as status,
+        a.dq_code as dqCode,
+        b.gov_name  as govName,
+        a.old_name  as oldName,
+        a.updated as updated,
+        a.remarks as remarks
         FROM
         entity_name_his a
         LEFT JOIN gov_info b ON a.dq_code = b.dq_gov_code
         WHERE
-        a.entity_type=1 and
+        a.entity_type=2 and
         (
             a.dq_code LIKE  concat('%', #{param}, '%')
             OR b.gov_name LIKE  concat('%', #{param}, '%')
@@ -65,18 +65,18 @@
 
     <select id="getEntityHisNameList" parameterType="java.lang.String" resultType="java.util.Map">
      SELECT
-	    a.`status`,
-	    b.entity_code,
-	    b.entity_name,
-	    b.credit_code,
-	    a.old_name,
-	    a.updated,
-	    a.remarks
+	    a.`status` as status,
+	    b.entity_code as entityCode,
+	    b.entity_name as entityName,
+	    b.credit_code as creditCode,
+	    a.old_name as oldName,
+	    a.updated as updated,
+	    a.remarks as remarks
         FROM
 	    entity_name_his a
         LEFT JOIN entity_info b ON a.dq_code = b.entity_code
         WHERE
-	    a.entity_type = 2
+	    a.entity_type = 1
         AND (
 	        a.dq_code LIKE  concat('%', #{param}, '%')
 	        OR b.entity_name LIKE  concat('%', #{param}, '%')
