@@ -2,6 +2,7 @@ package com.deloitte.crm.domain;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -168,4 +169,37 @@ public class DefaultMoneyTotal implements Serializable {
     private Date updated;
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DefaultMoneyTotal that = (DefaultMoneyTotal) o;
+        return Objects.equals(bondCode, that.bondCode) &&
+                Objects.equals(defaultDate, that.defaultDate) &&
+                Objects.equals(bondAbstract, that.bondAbstract) &&
+                Objects.equals(publisher, that.publisher) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(course, that.course) &&
+                Objects.equals(latestStatus, that.latestStatus) &&
+                Objects.equals(offeringSize, that.offeringSize) &&
+                Objects.equals(bondBalanceDefaultDate, that.bondBalanceDefaultDate) &&
+                Objects.equals(defaultPrincipal, that.defaultPrincipal) &&
+                Objects.equals(defaultInterest, that.defaultInterest) &&
+                Objects.equals(dueDate, that.dueDate) &&
+                Objects.equals(valueDate, that.valueDate) &&
+                Objects.equals(residualMaturity, that.residualMaturity) &&
+                Objects.equals(surety, that.surety) &&
+                Objects.equals(predefaultSubjectRating, that.predefaultSubjectRating) &&
+                Objects.equals(predefaultDebtRating, that.predefaultDebtRating) &&
+                Objects.equals(coNature, that.coNature) &&
+                Objects.equals(listedCompany, that.listedCompany) &&
+                Objects.equals(belWind, that.belWind) &&
+                Objects.equals(bondType, that.bondType) &&
+                Objects.equals(exchange, that.exchange);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bondCode, defaultDate, bondAbstract, publisher, type, course, latestStatus, offeringSize, bondBalanceDefaultDate, defaultPrincipal, defaultInterest, dueDate, valueDate, residualMaturity, surety, predefaultSubjectRating, predefaultDebtRating, coNature, listedCompany, belWind, bondType, exchange);
+    }
 }

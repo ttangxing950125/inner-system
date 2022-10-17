@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * IPO-审核通过尚未发行(CnApprdWaitIss)表实体类
@@ -97,5 +98,25 @@ public class CnApprdWaitIss implements Serializable {
     @Excel(name = "交易所")
     private String exchange;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CnApprdWaitIss that = (CnApprdWaitIss) o;
+        return Objects.equals(code, that.code) &&
+                Objects.equals(entityName, that.entityName) &&
+                Objects.equals(province, that.province) &&
+                Objects.equals(city, that.city) &&
+                Objects.equals(approvedDate, that.approvedDate) &&
+                Objects.equals(ipoBoard, that.ipoBoard) &&
+                Objects.equals(mainUnw, that.mainUnw) &&
+                Objects.equals(estIssNum, that.estIssNum) &&
+                Objects.equals(estFundNum, that.estFundNum) &&
+                Objects.equals(exchange, that.exchange);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, entityName, province, city, approvedDate, ipoBoard, mainUnw, estIssNum, estFundNum, exchange);
+    }
 }

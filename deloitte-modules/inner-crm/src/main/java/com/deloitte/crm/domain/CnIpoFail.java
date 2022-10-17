@@ -2,6 +2,7 @@ package com.deloitte.crm.domain;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -120,5 +121,30 @@ public class CnIpoFail implements Serializable {
      */
     private Integer  changeType;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CnIpoFail cnIpoFail = (CnIpoFail) o;
+        return Objects.equals(entityName, cnIpoFail.entityName) &&
+                Objects.equals(code, cnIpoFail.code) &&
+                Objects.equals(prospDate, cnIpoFail.prospDate) &&
+                Objects.equals(issFailDate, cnIpoFail.issFailDate) &&
+                Objects.equals(issPrice, cnIpoFail.issPrice) &&
+                Objects.equals(issCount, cnIpoFail.issCount) &&
+                Objects.equals(fundTotal, cnIpoFail.fundTotal) &&
+                Objects.equals(issCost, cnIpoFail.issCost) &&
+                Objects.equals(issYield, cnIpoFail.issYield) &&
+                Objects.equals(issType, cnIpoFail.issType) &&
+                Objects.equals(unwType, cnIpoFail.unwType) &&
+                Objects.equals(exceedSubcMult, cnIpoFail.exceedSubcMult) &&
+                Objects.equals(issNetDate, cnIpoFail.issNetDate) &&
+                Objects.equals(mainUnw, cnIpoFail.mainUnw) &&
+                Objects.equals(entityDes, cnIpoFail.entityDes);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(entityName, code, prospDate, issFailDate, issPrice, issCount, fundTotal, issCost, issYield, issType, unwType, exceedSubcMult, issNetDate, mainUnw, entityDes);
+    }
 }

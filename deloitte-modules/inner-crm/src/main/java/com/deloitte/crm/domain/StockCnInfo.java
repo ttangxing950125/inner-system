@@ -47,20 +47,27 @@ public class StockCnInfo implements Serializable {
     @Excel(name = "德勤内部股票代码 ST_0000id 6位数字")
     private String stockDqCode;
 
-    /** 上市日期*/
-    @ApiModelProperty(value="上市日期")
-    private String  listDate ;
+    /**
+     * 上市日期
+     */
+    @ApiModelProperty(value = "上市日期")
+    private String listDate;
 
-    /** 退市日期*/
-    @ApiModelProperty(value="退市日期")
-    private  String  delistingDate ;
+    /**
+     * 退市日期
+     */
+    @ApiModelProperty(value = "退市日期")
+    private String delistingDate;
 
-    /** 交易所*/
-    @ApiModelProperty(value="交易所")
-    private  String  exchange ;
-
-//    private String
-
+    /**
+     * 交易所
+     */
+    @ApiModelProperty(value = "交易所")
+    private String exchange;
+    /**
+     * 摘戴帽状态 0 摘帽状态 1 带帽状态
+     */
+    private Integer stUndoImplemtnet;
 
     /**
      * 状态 1-删除 0-未删除 默认都是未删除
@@ -70,7 +77,7 @@ public class StockCnInfo implements Serializable {
      * 股票简称
      */
     @ApiModelProperty(value = "股票简称")
-    private String StockShortName;
+    private String stockShortName;
     /**
      * 股票代码
      */
