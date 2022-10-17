@@ -1,10 +1,13 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -76,22 +79,22 @@ public class DefaultFirstNumberCount implements Serializable {
      * 首次违约时债券余额(亿元)
      */
     @Excel(name = "首次违约时债券余额(亿元)")
-    private Double defaultBondsBalance;
+    private BigDecimal defaultBondsBalance;
     /**
      * 存续债券余额(亿元)
      */
     @Excel(name = "存续债券余额(亿元)")
-    private Double defaultBondsExistence;
+    private BigDecimal defaultBondsExistence;
     /**
      * 已实质违约债券余额(亿元)
      */
     @Excel(name = "已实质违约债券余额(亿元)")
-    private Double defaultBondsEssence;
+    private BigDecimal defaultBondsEssence;
     /**
      * 尚未违约债券余额(亿元)
      */
     @Excel(name = "尚未违约债券余额(亿元)")
-    private Double defaultBondsNot;
+    private BigDecimal defaultBondsNot;
     /**
      * 担保人
      */
@@ -144,4 +147,13 @@ public class DefaultFirstNumberCount implements Serializable {
     private Date updated;
 
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(publisher, fristDateCount, defaultBondsCode, defaultBondsDesc, abstracts, defaultBondsBalance, defaultBondsExistence, defaultBondsEssence, defaultBondsNot, surety, latestTopicRating, subjectRating, monthAgoRating, coNature, listedCompany, defaultProvince, belWind, created, updated);
+    }
 }

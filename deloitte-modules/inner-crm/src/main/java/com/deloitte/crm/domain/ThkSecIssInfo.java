@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import com.deloitte.common.core.annotation.Excel;
@@ -157,31 +158,7 @@ public class ThkSecIssInfo implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ThkSecIssInfo that = (ThkSecIssInfo) o;
-        return Objects.equals(code, that.code) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(infoDate, that.infoDate) &&
-                Objects.equals(status, that.status) &&
-                Objects.equals(entityCnName, that.entityCnName) &&
-                Objects.equals(entityUkName, that.entityUkName) &&
-                Objects.equals(simulationListed, that.simulationListed) &&
-                Objects.equals(createDate, that.createDate) &&
-                Objects.equals(registerAddress, that.registerAddress) &&
-                Objects.equals(entityAddress, that.entityAddress) &&
-                Objects.equals(entityWeb, that.entityWeb) &&
-                Objects.equals(entityMail, that.entityMail) &&
-                Objects.equals(entityPhone, that.entityPhone) &&
-                Objects.equals(entityFax, that.entityFax) &&
-                Objects.equals(yearBillDate, that.yearBillDate) &&
-                Objects.equals(entityEmpCount, that.entityEmpCount) &&
-                Objects.equals(entityScope, that.entityScope) &&
-                Objects.equals(entityDes, that.entityDes) &&
-                Objects.equals(belWind, that.belWind) &&
-                Objects.equals(sponsor, that.sponsor) &&
-                Objects.equals(sponsorOrg, that.sponsorOrg) &&
-                Objects.equals(coordinator, that.coordinator);
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
     }
 
     @Override

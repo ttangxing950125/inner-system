@@ -1,11 +1,13 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
 import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -86,22 +88,22 @@ public class DefaultMoneyTotal implements Serializable {
      * 发行规模(亿元)
      */
     @Excel(name = "发行规模(亿元)")
-    private Double offeringSize;
+    private BigDecimal offeringSize;
     /**
      * 违约日债券余额(亿)
      */
     @Excel(name = "违约日债券余额(亿)")
-    private Double bondBalanceDefaultDate;
+    private BigDecimal bondBalanceDefaultDate;
     /**
      * 逾期本金(亿元)
      */
     @Excel(name = "逾期本金(亿元)")
-    private Double defaultPrincipal;
+    private BigDecimal defaultPrincipal;
     /**
      * 逾期利息(万元)
      */
     @Excel(name = "逾期利息(万元)")
-    private Double defaultInterest;
+    private BigDecimal defaultInterest;
     /**
      * 到期日 yyyy-MM-dd
      */
@@ -171,31 +173,7 @@ public class DefaultMoneyTotal implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DefaultMoneyTotal that = (DefaultMoneyTotal) o;
-        return Objects.equals(bondCode, that.bondCode) &&
-                Objects.equals(defaultDate, that.defaultDate) &&
-                Objects.equals(bondAbstract, that.bondAbstract) &&
-                Objects.equals(publisher, that.publisher) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(course, that.course) &&
-                Objects.equals(latestStatus, that.latestStatus) &&
-                Objects.equals(offeringSize, that.offeringSize) &&
-                Objects.equals(bondBalanceDefaultDate, that.bondBalanceDefaultDate) &&
-                Objects.equals(defaultPrincipal, that.defaultPrincipal) &&
-                Objects.equals(defaultInterest, that.defaultInterest) &&
-                Objects.equals(dueDate, that.dueDate) &&
-                Objects.equals(valueDate, that.valueDate) &&
-                Objects.equals(residualMaturity, that.residualMaturity) &&
-                Objects.equals(surety, that.surety) &&
-                Objects.equals(predefaultSubjectRating, that.predefaultSubjectRating) &&
-                Objects.equals(predefaultDebtRating, that.predefaultDebtRating) &&
-                Objects.equals(coNature, that.coNature) &&
-                Objects.equals(listedCompany, that.listedCompany) &&
-                Objects.equals(belWind, that.belWind) &&
-                Objects.equals(bondType, that.bondType) &&
-                Objects.equals(exchange, that.exchange);
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
     }
 
     @Override

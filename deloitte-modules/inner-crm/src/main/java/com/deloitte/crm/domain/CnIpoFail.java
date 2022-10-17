@@ -1,5 +1,6 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -54,27 +56,27 @@ public class CnIpoFail implements Serializable {
      * 发行价格(元)
      */
     @Excel(name = "发行价格(元)")
-    private Double issPrice;
+    private BigDecimal issPrice;
     /**
      * 发行数量(万股)
      */
     @Excel(name = "发行数量(万股)")
-    private Double issCount;
+    private BigDecimal issCount;
     /**
      * 募资总额(万元)
      */
     @Excel(name = "募资总额(万元)")
-    private Double fundTotal;
+    private BigDecimal fundTotal;
     /**
      * 发行费用(万元)
      */
     @Excel(name = "发行费用(万元)")
-    private Double issCost;
+    private BigDecimal issCost;
     /**
      * 发行市盈率(倍)
      */
     @Excel(name = "发行市盈率(倍)")
-    private Double issYield;
+    private BigDecimal issYield;
     /**
      * 发行方式
      */
@@ -123,24 +125,7 @@ public class CnIpoFail implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CnIpoFail cnIpoFail = (CnIpoFail) o;
-        return Objects.equals(entityName, cnIpoFail.entityName) &&
-                Objects.equals(code, cnIpoFail.code) &&
-                Objects.equals(prospDate, cnIpoFail.prospDate) &&
-                Objects.equals(issFailDate, cnIpoFail.issFailDate) &&
-                Objects.equals(issPrice, cnIpoFail.issPrice) &&
-                Objects.equals(issCount, cnIpoFail.issCount) &&
-                Objects.equals(fundTotal, cnIpoFail.fundTotal) &&
-                Objects.equals(issCost, cnIpoFail.issCost) &&
-                Objects.equals(issYield, cnIpoFail.issYield) &&
-                Objects.equals(issType, cnIpoFail.issType) &&
-                Objects.equals(unwType, cnIpoFail.unwType) &&
-                Objects.equals(exceedSubcMult, cnIpoFail.exceedSubcMult) &&
-                Objects.equals(issNetDate, cnIpoFail.issNetDate) &&
-                Objects.equals(mainUnw, cnIpoFail.mainUnw) &&
-                Objects.equals(entityDes, cnIpoFail.entityDes);
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
     }
 
     @Override

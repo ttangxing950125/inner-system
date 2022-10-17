@@ -64,7 +64,11 @@ public class EqualsUtil {
         //bigdecimal
         if (aClass==BigDecimal.class){
             return ((BigDecimal)o1).compareTo( (BigDecimal)o2 )==0;
-        }else {
+        }else if (aClass==Double.class){
+            //double
+            return ((Double)o1).compareTo( (Double)o2 )==0;
+        }
+        else{
             return o1.equals(o2);
         }
     }

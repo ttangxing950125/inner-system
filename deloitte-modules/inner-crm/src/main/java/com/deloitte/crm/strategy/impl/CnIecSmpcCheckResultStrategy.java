@@ -91,13 +91,14 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
-                //更新a股属性
-                entityAttrValueService.updateStockCnAttr(code, item);
+                if (changeType!=null){
+                    //更新a股属性
+//                    entityAttrValueService.updateStockCnAttr(code, item);
+                }
             }
 
 
             item.setChangeType(changeType);
-
             cnIecSmpcCheckResultService.save(item);
 
             return new AsyncResult(new Object());

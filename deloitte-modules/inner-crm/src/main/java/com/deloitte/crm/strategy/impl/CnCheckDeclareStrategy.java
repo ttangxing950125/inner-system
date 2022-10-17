@@ -88,8 +88,10 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
-                //更新a股属性
-                entityAttrValueService.updateStockCnAttr(code, item);
+                if (changeType!=null){
+                    //更新a股属性
+                    entityAttrValueService.updateStockCnAttr(code, item);
+                }
             }
 
 
