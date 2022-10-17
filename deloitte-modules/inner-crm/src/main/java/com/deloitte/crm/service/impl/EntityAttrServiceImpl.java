@@ -15,6 +15,7 @@ import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.IEntityAttrService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -193,6 +194,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
+    @Transactional
     public R getTaskByEntityCode(String entityCode, Integer roleId) {
         //封装企业返回信息
         EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
@@ -215,6 +217,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     }
 
     @Override
+    @Transactional
     public Map<String, List<EntityAttr>> getAttrByOrganName(String organName) {
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));

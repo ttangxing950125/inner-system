@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.EntityUtils;
@@ -22,7 +23,6 @@ import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IGovInfoService;
-import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -291,7 +291,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R addOldName(GovInfo gov) {
         //获取操作用户
-        String remoter = HttpUtils.getRemoter();
+        String remoter = SecurityUtils.getUsername();
 
         GovInfo govInfo = govInfoMapper.selectById(gov.getId());
 

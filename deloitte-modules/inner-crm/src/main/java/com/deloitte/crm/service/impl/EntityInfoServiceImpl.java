@@ -29,7 +29,6 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
-import com.deloitte.crm.utils.HttpUtils;
 import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
@@ -106,8 +105,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private BondInfoMapper bondInfoMapper;
 
     private EntityInfoManager entityInfoManager;
-
-    private HttpUtils httpUtils;
 
     private EntityNameHisMapper entityNameHisMapper;
 
@@ -392,7 +389,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return R.fail(REPET_OLD_NAME);
         }
         //获取操作用户
-        String remoter = HttpUtils.getRemoter();
+        String remoter = SecurityUtils.getUsername();
         //修改曾用名记录
         String entityNameHis = entityInfo.getEntityNameHis();
         if (ObjectUtils.isEmpty(entityNameHis)) {
@@ -421,6 +418,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
+    @Transactional
     public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
         //根据dqCode查询主体表
         QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
@@ -476,6 +474,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
+    @Transactional
     public R getInfoDetailByEntityCode(String entityCode) {
         EntityInfoDetails entityInfoDetails = new EntityInfoDetails();
 
@@ -738,7 +737,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<Map<String, Object>> records = new ArrayList<>();
         //相响分页结果
         Page<Map<String, Object>> resultPage = new Page<>(pageNum, pageSize);
-        resultPage.setTotal(page.getTotal());
+        resultPage.setTotal(page.getTotal()).setCurrent(page.getCurrent());
 
         List<Map<String, Object>> finalRecords = records;
         //查出所有的曾用名
@@ -958,12 +957,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Page<EntityInfoResult> pageResult = new Page<>(pageNum, pageSize);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
-
         List<MoreIndex> mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
         pageNum = (pageNum - 1) * pageSize;
         List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize);
+
         pageResult.setTotal(count);
 
         records.stream().forEach(o -> {
@@ -1560,7 +1559,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
-     * 覆盖情况快速查询
+     * 快速查询
      *
      * @param param
      * @param pageNum
@@ -1585,7 +1584,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         //创建分页结果集
         List<EntityInfoValueResult> resultList = new ArrayList<>();
-        Page<EntityInfoValueResult> pageResult = new Page<>();
+        Page<EntityInfoValueResult> pageResult = new Page<>(pageNum, pageSize);
 
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
                 .like(EntityInfo::getEntityCode, param)
@@ -1593,7 +1592,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 .or().like(EntityInfo::getCreditCode, param).orderByAsc(EntityInfo::getEntityCode)
         );
         //新的分页结果赋值
-        pageResult.setTotal(page.getTotal()).setSize(page.getSize());
+        pageResult.setTotal(page.getTotal());
 
         List<EntityInfo> records = page.getRecords();
         if (CollectionUtils.isEmpty(records)) {
@@ -1896,6 +1895,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
+    @Transactional
     public void updateInfoDetail(EntityInfoDetails entityInfoDetails) {
         //获取修改的信息 分别修改各自的信息
 

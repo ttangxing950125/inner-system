@@ -11,12 +11,7 @@ public class EntityUtils {
      * @date 2022/9/25 13:20
     */
     public static final Integer INVALID=0;
-    /**
-     * 生效
-     * @author 冉浩岑
-     * @date 2022/9/25 13:20
-     */
-    public static final Integer USE=1;
+
     /***
      * 默认页面条数
      */
