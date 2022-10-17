@@ -124,11 +124,13 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     /**
      * 检查指定日期任务完成状态，如果全部都是已完成，那么更改今天角色3的日常任务状态
      *
-     * @param timeNow
+     * @param timeNowDate
      * @return
      */
     @Override
-    public boolean checkAllComplete(Date timeNow) {
+    public boolean checkAllComplete(Date timeNowDate) {
+        String timeNow = DateUtil.format(timeNowDate, "yyyy-MM-dd");
+
         //查询今天有没有状态为 0 和 2 的
         Wrapper<CrmWindTask> wrapper = Wrappers.<CrmWindTask>lambdaQuery()
                 .eq(CrmWindTask::getTaskDate, timeNow)
