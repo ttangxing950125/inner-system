@@ -62,19 +62,19 @@ public class UndoStInfo implements Serializable {
     @Excel(name = "公司名称")
     private String name;
     /**
-     * 实施日期
+     * 撤销日期
      */
-    @Excel(name = "实施日期")
+    @Excel(name = "撤销日期")
     private Date undoDate;
     /**
-     * 实施前简称
+     * 撤销前简称
      */
-    @Excel(name = "实施前简称")
+    @Excel(name = "撤销前简称")
     private String undoBeforeName;
     /**
-     * 实施后简称
+     * 撤销后简称
      */
-    @Excel(name = "实施后简称")
+    @Excel(name = "撤销后简称")
     private String undoBackName;
     /**
      * 证监会行业
