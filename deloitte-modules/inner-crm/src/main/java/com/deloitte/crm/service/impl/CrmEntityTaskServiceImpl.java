@@ -1,12 +1,12 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -126,7 +126,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         pageSize = pageSize==null?5:pageSize;
 
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum,pageSize), new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
+                .lambda().eq(CrmEntityTask::getTaskDate, DateUtil.format(dateDay,"yyyy-MM-dd")));
         log.info("----查询到的记录数量{}",crmEntityTaskPage.getRecords().size());
         List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
         Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum,pageSize,crmEntityTaskPage.getTotal());
