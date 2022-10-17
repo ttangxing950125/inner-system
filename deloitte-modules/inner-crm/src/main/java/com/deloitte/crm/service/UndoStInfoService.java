@@ -2,8 +2,7 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.ImplementStInfo;
-import com.deloitte.crm.domain.UndoStInfo;
+import com.deloitte.crm.domain.StockCnUndoStInfo;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  * @author 吴鹏鹏ppp
  * @since 2022-10-14 17:50:05
  */
-public interface UndoStInfoService extends IService<UndoStInfo> {
+public interface UndoStInfoService extends IService<StockCnUndoStInfo> {
     /**
      * 完成当前wind文件的任务
      *
@@ -21,6 +20,6 @@ public interface UndoStInfoService extends IService<UndoStInfo> {
      * @param delIsses
      * @return
      */
-    Object doTask(CrmWindTask windTask, List<UndoStInfo> delIsses);
+    Object doTask(CrmWindTask windTask, List<StockCnUndoStInfo> delIsses);
 
 }

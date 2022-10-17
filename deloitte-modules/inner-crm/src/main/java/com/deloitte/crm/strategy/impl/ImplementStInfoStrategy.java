@@ -1,19 +1,16 @@
 package com.deloitte.crm.strategy.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
-import com.deloitte.crm.domain.BondConvertibleChangeInfo;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.ImplementStInfo;
+import com.deloitte.crm.domain.StockCnImplementStInfo;
 import com.deloitte.crm.domain.StockCnInfo;
-import com.deloitte.crm.mapper.ImplementStInfoMapper;
+import com.deloitte.crm.mapper.StockCnImplementStInfoMapper;
 import com.deloitte.crm.mapper.StockCnInfoMapper;
-import com.deloitte.crm.service.BondConvertibleChangeInfoService;
 import com.deloitte.crm.service.ImplementStInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
@@ -44,12 +41,12 @@ public class ImplementStInfoStrategy implements WindTaskStrategy {
     @Resource
     private StockCnInfoMapper stockCnInfoMapper;
     @Resource
-    private ImplementStInfoMapper implementStInfoMapper;
+    private StockCnImplementStInfoMapper implementStInfoMapper;
 
 
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
-    public Future<Object> doBondImport(ImplementStInfo implementStInfo, Date timeNow, CrmWindTask windTask) {
+    public Future<Object> doBondImport(StockCnImplementStInfo implementStInfo, Date timeNow, CrmWindTask windTask) {
         log.info(">>>>>>>>开始到导入【实施ST带帽】【当前时间】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), windTask.getId());
 
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, implementStInfo.getCode()));
@@ -61,7 +58,7 @@ public class ImplementStInfoStrategy implements WindTaskStrategy {
         } else {
             log.warn(">>>>>>>>开始到导入【实施ST带帽】根据<股票代码=>:{}>查询不到A股信息 【任务ID】={}任务结束！！！！！", implementStInfo.getCode(), windTask.getId());
         }
-        ImplementStInfo implementStInfoResult = implementStInfoMapper.selectOne(new LambdaQueryWrapper<ImplementStInfo>().eq(ImplementStInfo::getCode, implementStInfo.getCode()));
+        StockCnImplementStInfo implementStInfoResult = implementStInfoMapper.selectOne(new LambdaQueryWrapper<StockCnImplementStInfo>().eq(StockCnImplementStInfo::getCode, implementStInfo.getCode()));
         Integer changeType = null;
         if (implementStInfoResult == null) {
             changeType = DataChangeType.INSERT.getId();
@@ -84,8 +81,8 @@ public class ImplementStInfoStrategy implements WindTaskStrategy {
     public Object doTask(WindTaskContext windTaskContext) throws Exception {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
-        ExcelUtil<ImplementStInfo> util = new ExcelUtil<ImplementStInfo>(ImplementStInfo.class);
-        List<ImplementStInfo> implementStInfo = util.importExcel(windTaskContext.getFileStream(), true);
+        ExcelUtil<StockCnImplementStInfo> util = new ExcelUtil<StockCnImplementStInfo>(StockCnImplementStInfo.class);
+        List<StockCnImplementStInfo> implementStInfo = util.importExcel(windTaskContext.getFileStream(), true);
         return ApplicationContextHolder.get().getBean(ImplementStInfoService.class).doTask(windTask, implementStInfo);
     }
 
@@ -105,9 +102,9 @@ public class ImplementStInfoStrategy implements WindTaskStrategy {
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         Integer taskId = windTask.getId();
-        Wrapper<ImplementStInfo> wrapper = Wrappers.<ImplementStInfo>lambdaQuery()
-                .eq(ImplementStInfo::getTaskId, taskId)
-                .in(ImplementStInfo::getChangeType, 1, 2);
+        Wrapper<StockCnImplementStInfo> wrapper = Wrappers.<StockCnImplementStInfo>lambdaQuery()
+                .eq(StockCnImplementStInfo::getTaskId, taskId)
+                .in(StockCnImplementStInfo::getChangeType, 1, 2);
 
         return implementStInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();

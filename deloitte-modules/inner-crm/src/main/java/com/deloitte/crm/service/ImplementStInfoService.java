@@ -2,8 +2,7 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.DefaultFirstNumberCount;
-import com.deloitte.crm.domain.ImplementStInfo;
+import com.deloitte.crm.domain.StockCnImplementStInfo;
 
 import java.util.List;
 
@@ -14,13 +13,13 @@ import java.util.List;
  * @since 2022-10-14 17:50:05
  * UndoStInfoStrategy
  */
-public interface ImplementStInfoService extends IService<ImplementStInfo> {
+public interface ImplementStInfoService extends IService<StockCnImplementStInfo> {
     /**
      * 完成当前wind文件的任务
      * @param windTask
      * @param delIsses
      * @return
      */
-    Object doTask(CrmWindTask windTask, List<ImplementStInfo> delIsses);
+    Object doTask(CrmWindTask windTask, List<StockCnImplementStInfo> delIsses);
 
 }

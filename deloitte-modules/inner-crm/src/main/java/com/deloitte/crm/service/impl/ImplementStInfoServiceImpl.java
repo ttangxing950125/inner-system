@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.mapper.ImplementStInfoMapper;
-import com.deloitte.crm.domain.ImplementStInfo;
+import com.deloitte.crm.mapper.StockCnImplementStInfoMapper;
+import com.deloitte.crm.domain.StockCnImplementStInfo;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.service.ImplementStInfoService;
 import com.deloitte.crm.strategy.impl.ImplementStInfoStrategy;
@@ -25,12 +25,12 @@ import java.util.concurrent.Future;
  * @since 2022-10-14 17:50:05
  */
 @Service("implementStInfoService")
-public class ImplementStInfoServiceImpl extends ServiceImpl<ImplementStInfoMapper, ImplementStInfo> implements ImplementStInfoService {
+public class ImplementStInfoServiceImpl extends ServiceImpl<StockCnImplementStInfoMapper, StockCnImplementStInfo> implements ImplementStInfoService {
     @Resource
     private ICrmWindTaskService crmWindTaskService;
 
     @Override
-    public Object doTask(CrmWindTask windTask, List<ImplementStInfo> delIsses) {
+    public Object doTask(CrmWindTask windTask, List<StockCnImplementStInfo> delIsses) {
         windTask.setComplete(2);
         crmWindTaskService.updateById(windTask);
         //获取当前时间
@@ -38,7 +38,7 @@ public class ImplementStInfoServiceImpl extends ServiceImpl<ImplementStInfoMappe
 
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 
-        for (ImplementStInfo implementStInfo : delIsses) {
+        for (StockCnImplementStInfo implementStInfo : delIsses) {
             if (implementStInfo.getCode().contains("数据来源：Wind")) {
                 continue;
             }
