@@ -4,8 +4,6 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -182,7 +180,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public R getInfoDetail(String dqGovCode) {
-        List<GovInfo> govInfos = govInfoMapper.selectList(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode,dqGovCode));
+        List<GovInfo> govInfos = govInfoMapper.selectList(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
         if (CollectionUtils.isEmpty(govInfos)) {
             return R.fail("异常查询，数据为空");
         }
@@ -256,11 +254,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         }
 
         Page<GovInfo> pageInfo = new Page(pageNum, pageSize);
-        LambdaQueryWrapper<GovInfo> govInfoQuery=new LambdaQueryWrapper<>();
-        if (!ObjectUtil.isEmpty(type)){
+        LambdaQueryWrapper<GovInfo> govInfoQuery = new LambdaQueryWrapper<>();
+        if (!ObjectUtil.isEmpty(type)) {
             govInfoQuery.eq(GovInfo::getGovType, type);
         }
-        if (!ObjectUtil.isEmpty(param)){
+        if (!ObjectUtil.isEmpty(param)) {
             govInfoQuery.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param);
         }
 
@@ -268,10 +266,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<GovInfo> govInfoList = govInfoPage.getRecords();
 
         //设置结果集
-        Page<Map<String, Object>> page = new Page(pageNum, pageSize);
+        Page<GovInfoList> page = new Page(pageNum, pageSize);
         page.setTotal(govInfoPage.getTotal());
 
-        List<Map<String, Object>> records = new ArrayList<>();
+        List<GovInfoList> records = new ArrayList<>();
         //查出所有的曾用名
         QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
         List<EntityNameHis> nameHisList = nameHisMapper.selectList(hisQuery.lambda().eq(EntityNameHis::getEntityType, 2));
@@ -335,7 +333,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovByName(String govName) {
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper();
-        return R.ok(govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getGovName,govName)));
+        return R.ok(govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getGovName, govName)));
     }
 
     @Override
@@ -496,7 +494,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //值数据
         List<String> values = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mapList)) {
-            List<MoreIndex>moreList=new ArrayList<>();
+            List<MoreIndex> moreList = new ArrayList<>();
 
             //遍历查询添加指标，并封装到响应数据中
             for (MoreIndex moreValue : mapList) {
@@ -505,7 +503,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                         .eq(EntityAttrValue::getAttrId, moreValue.getId())
                         .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
                 //新增指标栏
-                MoreIndex more=new MoreIndex();
+                MoreIndex more = new MoreIndex();
 
                 //获取表头值和数据
                 String name = moreValue.getName();
@@ -710,11 +708,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @author 冉浩岑
      * @date 2022/9/22 23:45
      */
-    public Map<String, Object> getResultMap(GovInfo govInfo, Map<String, List<EntityNameHis>> map) {
-        Map<String, Object> resultMap = new HashMap();
+    public GovInfoList getResultMap(GovInfo govInfo, Map<String, List<EntityNameHis>> map) {
+        GovInfoList resultMap = new GovInfoList();
         if (null != govInfo) {
-            resultMap = JSON.parseObject(JSON.toJSONString(govInfo), new TypeReference<Map<String, String>>() {
-            });
+            resultMap.setGovInfo(govInfo);
             try {
                 Integer count = 0;
                 if (!map.isEmpty()) {
@@ -723,7 +720,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                         count = nameHisList.size();
                     }
                 }
-                resultMap.put(EntityUtils.NAME_USED_NUM, count);
+                resultMap.setNameUsedNum(count);
             } catch (Exception e) {
                 return resultMap;
             }
@@ -786,26 +783,26 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         Integer area = 0;
         Integer gx = 0;
         //政府总数
-        if (!CollectionUtils.isEmpty(govInfos)){
+        if (!CollectionUtils.isEmpty(govInfos)) {
             total = govInfos.size();
         }
         //省级总数
-        if (!CollectionUtils.isEmpty(listGovMap.get(1))){
+        if (!CollectionUtils.isEmpty(listGovMap.get(1))) {
             province = listGovMap.get(1).size();
         }
         //市级总数
-        if (!CollectionUtils.isEmpty(listGovMap.get(2))){
+        if (!CollectionUtils.isEmpty(listGovMap.get(2))) {
             city = listGovMap.get(2).size();
         }
         //县级总数
-        if (!CollectionUtils.isEmpty(listGovMap.get(3))){
+        if (!CollectionUtils.isEmpty(listGovMap.get(3))) {
             area = listGovMap.get(3).size();
         }
         //经开高兴总数
-        if (!CollectionUtils.isEmpty(listGovMap.get(4))){
+        if (!CollectionUtils.isEmpty(listGovMap.get(4))) {
             gx = listGovMap.get(4).size();
         }
-        govView.setGovTotle(total).setProvince(province).setCity(city).setArea(area).setGx(gx).setNoLevel(total-province-city-area-gx);
+        govView.setGovTotle(total).setProvince(province).setCity(city).setArea(area).setGx(gx).setNoLevel(total - province - city - area - gx);
         return govView;
     }
 

@@ -404,4 +404,6 @@ public class EntityInfoController extends BaseController {
     public R getListView() {
         return R.ok(entityInfoService.getListView());
     }
+
+
 }
