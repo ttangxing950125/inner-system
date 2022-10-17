@@ -1512,7 +1512,6 @@ export default {
     addBody(row) {
       this.bodyDig = true
       this.addBodyId = row.id
-      this.ruleForm.created = (row.created).substr(0, 10)
       this.ruleForm.bondFullName = JSON.parse(row.details).债券全称
       this.ruleForm.bondShortName = JSON.parse(row.details).债券简称
       this.ruleForm.id = row.id
@@ -1564,8 +1563,7 @@ export default {
       try {
         this.$modal.loading("loading...");
         const params = {
-          id: id || this.addBodyId,
-          state: state,
+          id: id || this.addBodyId
         }
         ignoreTask(params).then(res => {
           const { data } = res
