@@ -315,15 +315,22 @@
                   prop="entityName"
                   label="企业名称"
                   width="300"
+                  class="xxxxxxx"
                 >
                 </el-table-column>
                 <el-table-column
                   v-for="(item, index) in selectHeaer"
                   :key="index"
-                  prop="province"
+                  :prop="item.proName"
                   :label="item.proName"
                   width="120"
+                  :class="item.color === 1 ? 'red' : 'green'"
                 >
+                  <template slot-scope="scope">
+                    <div>
+                      {{ scope.row[item.proName] }}
+                    </div>
+                  </template>
                 </el-table-column>
               </el-table>
             </div>
@@ -386,6 +393,7 @@
 
 <script>
 import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
+import { Scope } from "quill";
 import fileUpload from "../../components/FileUpload";
 import pagination from "../../components/Pagination";
 export default {
@@ -517,7 +525,15 @@ export default {
         };
         getCov(parmas).then((res) => {
           const { data } = res;
+          data.records.forEach((e) => {
+            if (e.result) {
+              e.result.forEach((r) => {
+                e[r.key] = r.value;
+              });
+            }
+          });
           this.list = data.records;
+          console.log(this.list);
           this.total = data.total;
           this.queryParams.pageNum = data.current;
         });
@@ -548,6 +564,14 @@ export default {
       };
       getCov(parmas).then((res) => {
         const { data } = res;
+        data.records.forEach((e) => {
+          if (e.result) {
+            e.result.forEach((r) => {
+              e[r.key] = r.value;
+              e.color = r.color;
+            });
+          }
+        });
         this.list = data.records;
         this.total = data.total;
         this.queryParams.pageNum = data.current;
@@ -606,6 +630,7 @@ export default {
           });
         });
       }
+      console.log(this.selectHeaer);
     },
   },
   computed: {
@@ -771,5 +796,11 @@ export default {
     background: #86bc25;
     border-color: #86bc25;
   }
+}
+.red {
+  background-color: #ffe7e7;
+}
+.green {
+  background-color: #86bc25;
 }
 </style>
