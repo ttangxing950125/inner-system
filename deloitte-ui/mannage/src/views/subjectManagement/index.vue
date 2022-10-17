@@ -721,7 +721,7 @@ export default {
 }
 .table-result {
   margin-top: 10px;
-  width: 150px;
+  width: 200px;
   span {
     color: #86bc25;
   }

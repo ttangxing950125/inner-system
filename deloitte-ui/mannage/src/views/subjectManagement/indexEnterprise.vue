@@ -28,7 +28,7 @@
             <el-input
               class="filter"
               placeholder="输入关键字进行过滤"
-              v-model="filterText"
+              v-model="filterTextFirst"
             >
             </el-input>
 
@@ -39,7 +39,7 @@
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree1"
-              @check-change="handleCheckChange2"
+              @check-change="handleCheckChange"
             >
             </el-tree>
           </div>
@@ -53,7 +53,7 @@
             <el-input
               class="filter"
               placeholder="输入关键字进行过滤"
-              v-model="filterText"
+              v-model="filterTextScend"
             >
             </el-input>
 
@@ -224,11 +224,16 @@ export default {
       total: 0,
       selected: "",
       mapList: [],
+      filterTextFirst: "",
+      filterTextScend: "",
     };
   },
   watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val);
+    filterTextFirst(val) {
+      this.$refs.tree1.filter(val);
+    },
+    filterTextScend(val) {
+      this.$refs.tree2.filter(val);
     },
   },
   created() {
@@ -271,7 +276,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+      return data.name.indexOf(value) !== -1;
     },
     handleCheckChange(data, checked, indeterminate) {
       //获取所有选中的节点 start

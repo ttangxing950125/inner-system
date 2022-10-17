@@ -289,3 +289,27 @@ export function updateOldNameGov(parmas) {
     data: parmas,
   });
 }
+
+// 企业主体清单-查询上市概览
+export function getListView(parmas) {
+  return request({
+    url: "/crm/entityInfo/getListView",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 政府主体清单-地方政府概览
+export function getGovView(parmas) {
+  return request({
+    url: "/crm/govInfo/getGovView",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
