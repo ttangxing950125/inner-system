@@ -50,6 +50,7 @@ public class GovAttrByDto implements Serializable
     /** 省会城市 *///    省会城市 ——> 是否为省会城市
     private Integer provincial;
 
+    private GovAttrByDto govAttrByDto;
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);
