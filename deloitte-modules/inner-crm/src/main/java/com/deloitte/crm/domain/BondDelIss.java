@@ -1,10 +1,13 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -62,7 +65,7 @@ public class BondDelIss implements Serializable {
      * 计划发行规模(亿)
      */
     @Excel(name = "计划发行规模(亿)")
-    private Double issScalePlan;
+    private BigDecimal issScalePlan;
     /**
      * 事件
      */
@@ -92,12 +95,12 @@ public class BondDelIss implements Serializable {
      * 发行期限(年)
      */
     @Excel(name = "发行期限(年)")
-    private Double issTerm;
+    private BigDecimal issTerm;
     /**
      * 特殊期限
      */
     @Excel(name = "特殊期限")
-    private Double specialTerm;
+    private BigDecimal specialTerm;
     /**
      * 债券评级
      */
@@ -112,12 +115,12 @@ public class BondDelIss implements Serializable {
      * 票面利率(%)
      */
     @Excel(name = "票面利率(%)")
-    private Double couponRate;
+    private BigDecimal couponRate;
     /**
      * 发行规模(亿)
      */
     @Excel(name = "发行规模(亿)")
-    private Double issScale;
+    private BigDecimal issScale;
     /**
      * 利率类型
      */
@@ -144,5 +147,13 @@ public class BondDelIss implements Serializable {
     @Excel(name = "所属Wind二级行业")
     private String winSecondIndustry;
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(bondCode, bondShortName, happenDate, annoDate, issScalePlan, event, mainUnw, bookKeeper, issStartDate, ipoAddr, issTerm, specialTerm, bondGrade, entityGrade, couponRate, issScale, rateType, issorShortName, coNature, province, winSecondIndustry);
+    }
 }

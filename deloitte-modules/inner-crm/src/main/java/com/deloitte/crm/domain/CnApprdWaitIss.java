@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -86,12 +88,12 @@ public class CnApprdWaitIss implements Serializable {
      * 预计发行股数(万股)
      */
     @Excel(name = "预计发行股数(万股)")
-    private Double estIssNum;
+    private BigDecimal estIssNum;
     /**
      * 预计募集资金(万元)
      */
     @Excel(name = "预计募集资金(万元)")
-    private Double estFundNum;
+    private BigDecimal estFundNum;
     /**
      * 交易所
      */
@@ -100,19 +102,7 @@ public class CnApprdWaitIss implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CnApprdWaitIss that = (CnApprdWaitIss) o;
-        return Objects.equals(code, that.code) &&
-                Objects.equals(entityName, that.entityName) &&
-                Objects.equals(province, that.province) &&
-                Objects.equals(city, that.city) &&
-                Objects.equals(approvedDate, that.approvedDate) &&
-                Objects.equals(ipoBoard, that.ipoBoard) &&
-                Objects.equals(mainUnw, that.mainUnw) &&
-                Objects.equals(estIssNum, that.estIssNum) &&
-                Objects.equals(estFundNum, that.estFundNum) &&
-                Objects.equals(exchange, that.exchange);
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
     }
 
     @Override

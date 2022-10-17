@@ -1,10 +1,13 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import com.deloitte.common.core.annotation.Excel;
@@ -79,262 +82,262 @@ public class CnIpoInfo implements Serializable {
      * 发行价格
      */
     @Excel(name = "发行价格")
-    private Double issPrice;
+    private BigDecimal issPrice;
     /**
      * 发行市盈率
      */
     @Excel(name = "发行市盈率")
-    private Double issMult;
+    private BigDecimal issMult;
     /**
      * 行业PE(披露值)
      */
     @Excel(name = "行业PE(披露值)")
-    private Double industryPe;
+    private BigDecimal industryPe;
     /**
      * 行业PE(近1月,静态)
      */
     @Excel(name = "行业PE(近1月,静态)")
-    private Double indusPeStat;
+    private BigDecimal indusPeStat;
     /**
      * 可比上市公司PE均值（扣非后）
      */
     @Excel(name = "可比上市公司PE均值（扣非后）")
-    private Double ipoPeAvg;
+    private BigDecimal ipoPeAvg;
     /**
      * 行业PE(近1月,TTM)
      */
     @Excel(name = "行业PE(近1月,TTM)")
-    private Double indusPeTtm;
+    private BigDecimal indusPeTtm;
     /**
      * 总计
      */
     @Excel(name = "总计")
-    private Double total;
+    private BigDecimal total;
     /**
      * 新股发行数量
      */
     @Excel(name = "新股发行数量")
-    private Double newStockIssnub;
+    private BigDecimal newStockIssnub;
     /**
      * 老股转让数量
      */
     @Excel(name = "老股转让数量")
-    private Double oldStockConvnub;
+    private BigDecimal oldStockConvnub;
     /**
      * 网下配售数量
      */
     @Excel(name = "网下配售数量")
-    private Double offlinePlacnub;
+    private BigDecimal offlinePlacnub;
     /**
      * 网上发行数量
      */
     @Excel(name = "网上发行数量")
-    private Double netIssnub;
+    private BigDecimal netIssnub;
     /**
      * 回拨前网上发行股数
      */
     @Excel(name = "回拨前网上发行股数")
-    private Double callIssstockBefor;
+    private BigDecimal callIssstockBefor;
     /**
      * 回拨后网上发行股数
      */
     @Excel(name = "回拨前网下发行股数")
-    private Double callIssstockAfter;
+    private BigDecimal callIssstockAfter;
     /**
      * 回拨比例(%)
      */
     @Excel(name = "回拨比例(%)")
-    private Double callRatio;
+    private BigDecimal callRatio;
     /**
      * 网下申购上限
      */
     @Excel(name = "网下申购上限")
-    private Double offlineSubsMax;
+    private BigDecimal offlineSubsMax;
     /**
      * 网上发行申购上限
      */
     @Excel(name = "网上发行申购上限")
-    private Double onlineIsssubsMax;
+    private BigDecimal onlineIsssubsMax;
     /**
      * 预计募资(上市公司)
      */
     @Excel(name = "预计募资(上市公司)")
-    private Double predicFund;
+    private BigDecimal predicFund;
     /**
      * 募资总额(上市公司)
      */
     @Excel(name = "募资总额(上市公司)")
-    private Double fundTotal;
+    private BigDecimal fundTotal;
     /**
      * 募资净额(上市公司)
      */
     @Excel(name = "募资净额(上市公司)")
-    private Double fundNetAmount;
+    private BigDecimal fundNetAmount;
     /**
      * 项目募投资金(上市公司)
      */
     @Excel(name = "项目募投资金(上市公司)")
-    private Double prsFund;
+    private BigDecimal prsFund;
     /**
      * 上市公司发行费用
      */
     @Excel(name = "上市公司发行费用")
-    private Double ipoIssFees;
+    private BigDecimal ipoIssFees;
     /**
      * 上市公司发行费率(%)
      */
     @Excel(name = "上市公司发行费率(%)")
-    private Double ipoIssMult;
+    private BigDecimal ipoIssMult;
     /**
      * 老股转让费用
      */
     @Excel(name = "老股转让费用")
-    private Double stackConvFees;
+    private BigDecimal stackConvFees;
     /**
      * 转让费率(%)
      */
     @Excel(name = "转让费率(%)")
-    private Double convRate;
+    private BigDecimal convRate;
     /**
      * 发行费用合计
      */
     @Excel(name = "发行费用合计")
-    private Double issFeesTotal;
+    private BigDecimal issFeesTotal;
     /**
      * 发行费率(%)
      */
     @Excel(name = "发行费率(%)")
-    private Double issRate;
+    private BigDecimal issRate;
     /**
      * 承销及保荐费
      */
     @Excel(name = "承销及保荐费")
-    private Double unwSponsorFees;
+    private BigDecimal unwSponsorFees;
     /**
      * 审计及验资费
      */
     @Excel(name = "审计及验资费")
-    private Double auditVerFees;
+    private BigDecimal auditVerFees;
     /**
      * 法律费用
      */
     @Excel(name = "法律费用")
-    private Double lawFees;
+    private BigDecimal lawFees;
     /**
      * 信息披露费
      */
     @Excel(name = "信息披露费")
-    private Double inforDisFees;
+    private BigDecimal inforDisFees;
     /**
      * 投资者数量(家)
      */
     @Excel(name = "投资者数量(家)")
-    private Double investorsNub;
+    private BigDecimal investorsNub;
     /**
      * 配售对象数量(个)
      */
     @Excel(name = "配售对象数量(个)")
-    private Double placObjNub;
+    private BigDecimal placObjNub;
     /**
      * 询价申购数量(万股)
      */
     @Excel(name = "询价申购数量(万股)")
-    private Double inquirePurNub;
+    private BigDecimal inquirePurNub;
     /**
      * 询价认购倍数
      */
     @Excel(name = "询价认购倍数")
-    private Double inquireSubcMult;
+    private BigDecimal inquireSubcMult;
     /**
      * 有效报价配售对象家数
      */
     @Excel(name = "有效报价配售对象家数")
-    private Double validQuotePlacnub;
+    private BigDecimal validQuotePlacnub;
     /**
      * 有效报价投资者户数
      */
     @Excel(name = "有效报价投资者户数")
-    private Double validQuoteInvenub;
+    private BigDecimal validQuoteInvenub;
     /**
      * 有效申购配售对象家数
      */
     @Excel(name = "有效申购配售对象家数")
-    private Double validPlacsubsNub;
+    private BigDecimal validPlacsubsNub;
     /**
      * 有效申购数量(万股)
      */
     @Excel(name = "有效申购数量(万股)")
-    private Double validSubsNub;
+    private BigDecimal validSubsNub;
     /**
      * 有效申购资金(亿元)
      */
     @Excel(name = "有效申购资金(亿元)")
-    private Double validSubsFund;
+    private BigDecimal validSubsFund;
     /**
      * 有效申购获配比例(%)
      */
     @Excel(name = "有效申购获配比例(%)")
-    private Double validSubsPlacratio;
+    private BigDecimal validSubsPlacratio;
     /**
      * 认购倍数(网下)
      */
     @Excel(sort = 49, name = "认购倍数(网下)")
-    private Double offlineSubsMult;
+    private BigDecimal offlineSubsMult;
     /**
      * 战略配售获配股份占比
      */
     @Excel(name = "战略配售获配股份占比")
-    private Double tacticPlacStakeratio;
+    private BigDecimal tacticPlacStakeratio;
     /**
      * A类法人投资者数量
      */
     @Excel(name = "A类法人投资者数量")
-    private Double legalInvesnubA;
+    private BigDecimal legalInvesnubA;
     /**
      * B类法人投资者数量
      */
     @Excel(name = "B类法人投资者数量")
-    private Double legalInvesnubB;
+    private BigDecimal legalInvesnubB;
     /**
      * C类法人投资者数量
      */
     @Excel(name = "C类法人投资者数量")
-    private Double legalInvesnubC;
+    private BigDecimal legalInvesnubC;
     /**
      * A类法人投资者获配数量总计(万股)
      */
     @Excel(name = "A类法人投资者获配数量总计(万股)")
-    private Double legalInvesPlacnubA;
+    private BigDecimal legalInvesPlacnubA;
     /**
      * B类法人投资者获配数量总计(万股)
      */
     @Excel(name = "B类法人投资者获配数量总计(万股)")
-    private Double legalInvesPlacnubB;
+    private BigDecimal legalInvesPlacnubB;
     /**
      * C类法人投资者获配数量总计(万股)
      */
     @Excel(name = "C类法人投资者获配数量总计(万股)")
-    private Double legalInvesPlacnubC;
+    private BigDecimal legalInvesPlacnubC;
     /**
      * 有效申购户数
      */
     @Excel(name = "有效申购户数")
-    private Double validSubsInvenub;
+    private BigDecimal validSubsInvenub;
     /**
      * 有效申购股数(万股)
      */
     @Excel(name = "有效申购股数(万股)")
-    private Double validSubsStakernub;
+    private BigDecimal validSubsStakernub;
     /**
      * 中签率(%)
      */
     @Excel(name = "中签率(%)")
-    private Double checkRatio;
+    private BigDecimal checkRatio;
     /**
      * 认购倍数(网上)
      */
     @Excel(sort = 60, name = "认购倍数(网上)")
-    private Double netCheckRatio;
+    private BigDecimal netCheckRatio;
     /**
      * 发行方式
      */
@@ -389,32 +392,32 @@ public class CnIpoInfo implements Serializable {
      * 网上发行冻结资金(亿元)
      */
     @Excel(name = "网上发行冻结资金(亿元)")
-    private Double netIssFreeze;
+    private BigDecimal netIssFreeze;
     /**
      * 网下配售冻结资金(亿元)
      */
     @Excel(name = "网下配售冻结资金(亿元)")
-    private Double offlinePlacFreeze;
+    private BigDecimal offlinePlacFreeze;
     /**
      * 承销商认购余股(万股)
      */
     @Excel(name = "承销商认购余股(万股)")
-    private Double unwSubcBalanstock;
+    private BigDecimal unwSubcBalanstock;
     /**
      * 包销金额(万元)
      */
     @Excel(name = "包销金额(万元)")
-    private Double underAmount;
+    private BigDecimal underAmount;
     /**
      * 包销比例
      */
     @Excel(name = "包销比例")
-    private Double underRatio;
+    private BigDecimal underRatio;
     /**
      * 面值
      */
     @Excel(name = "面值")
-    private Double faceValue;
+    private BigDecimal faceValue;
     /**
      * 省份
      */
@@ -442,4 +445,13 @@ public class CnIpoInfo implements Serializable {
     private String bourse;
 
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, stockName, subsCode, prospDate, inquiryStaringDate, netIssDate, ipoDate, ipoBoard, issPrice, issMult, industryPe, indusPeStat, ipoPeAvg, indusPeTtm, total, newStockIssnub, oldStockConvnub, offlinePlacnub, netIssnub, callIssstockBefor, callIssstockAfter, callRatio, offlineSubsMax, onlineIsssubsMax, predicFund, fundTotal, fundNetAmount, prsFund, ipoIssFees, ipoIssMult, stackConvFees, convRate, issFeesTotal, issRate, unwSponsorFees, auditVerFees, lawFees, inforDisFees, investorsNub, placObjNub, inquirePurNub, inquireSubcMult, validQuotePlacnub, validQuoteInvenub, validPlacsubsNub, validSubsNub, validSubsFund, validSubsPlacratio, offlineSubsMult, tacticPlacStakeratio, legalInvesnubA, legalInvesnubB, legalInvesnubC, legalInvesPlacnubA, legalInvesPlacnubB, legalInvesPlacnubC, validSubsInvenub, validSubsStakernub, checkRatio, netCheckRatio, issType, unwType, mainUnw, sponsorInst, auditInst, assetsEvaIns, lawFirm, issAnnoDate, offlineIssStardate, offlineIssEnddate, netIssFreeze, offlinePlacFreeze, unwSubcBalanstock, underAmount, underRatio, faceValue, province, csrcIndustry, windIndustry, bondType, bourse);
+    }
 }

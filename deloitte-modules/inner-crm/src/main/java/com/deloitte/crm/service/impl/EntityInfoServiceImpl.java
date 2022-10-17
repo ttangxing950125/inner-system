@@ -2177,8 +2177,5 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         writer.close();
         IoUtil.close(out);
         return R.ok("导出成功");
-
     }
-
-
 }

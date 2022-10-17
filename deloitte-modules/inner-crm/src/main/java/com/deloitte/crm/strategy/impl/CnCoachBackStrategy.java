@@ -92,8 +92,10 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
-                //更新a股属性
-                entityAttrValueService.updateStockCnAttr(code, cnCoachBack);
+                if (changeType!=null){
+                    //更新a股属性
+                    entityAttrValueService.updateStockCnAttr(code, cnCoachBack);
+                }
             }
 
             //有债券信息，给债券和主体绑定关联关系
