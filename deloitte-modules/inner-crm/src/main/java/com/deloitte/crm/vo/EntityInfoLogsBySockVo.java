@@ -31,7 +31,17 @@ public class EntityInfoLogsBySockVo {
      * 最近一月平均每日新上市主体
      */
     private String averageDailyLatestMonth;
+    /**
+     * 发债主体 需求待确定 标记 过时
+     */
+//    @Deprecated
+//    private String issueBondTruesEntity;
 
+    /**
+     * 收录主体
+     */
+//    @Deprecated
+//    private String shouliEntity;
     /**
      * 实体接
      */

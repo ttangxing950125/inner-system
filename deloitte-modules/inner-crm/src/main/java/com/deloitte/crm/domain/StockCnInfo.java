@@ -59,6 +59,8 @@ public class StockCnInfo implements Serializable {
     @ApiModelProperty(value="交易所")
     private  String  exchange ;
 
+//    private String
+
 
     /**
      * 状态 1-删除 0-未删除 默认都是未删除

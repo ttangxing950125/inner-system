@@ -19,6 +19,7 @@ import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
+import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.HttpUtils;
@@ -72,6 +73,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
+
+    @Autowired
+    private GovLevelMapper govLevelMapper;
 
     /**
      * 默认查询页码
@@ -356,7 +360,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
 
         //获取基础参数信息
-        List<Map<String, String>> mapList = govAttrByDto.getMapList();
+//        List<Map<String, String>> mapList = govAttrByDto.getMapList();
+        List<MoreIndex> mapList = govAttrByDto.getMapList();
 
         List<GovInfo> govInfos = govInfoMapper.getGovByAttrValue(govAttrByDto);
 
@@ -397,7 +402,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             if (!CollectionUtils.isEmpty(vo.getMore())) {
-                vo.getMore().forEach(entryMap -> map.put(entryMap.get("key").toString(), map.get("value")));
+                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), map.get("value")));
             }
             rows.add(map);
         });
@@ -461,7 +466,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         Integer pageSize = entityAttrDto.getPageSize();
 
         Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
-        List<Map<String, String>> mapList = entityAttrDto.getMapList();
+        List<MoreIndex> mapList = entityAttrDto.getMapList();
 
         pageNum = (pageNum - 1) * pageSize;
         entityAttrDto.setPageNum(pageNum);
@@ -483,33 +488,42 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return pageResult;
     }
 
-    private GovInfoResult getGovInfoResult(GovInfo o, List<Map<String, String>> mapList) {
+    private GovInfoResult getGovInfoResult(GovInfo o, List<MoreIndex> mapList) {
         GovInfoResult govInfoResult = new GovInfoResult();
         govInfoResult.setGovInfo(o);
+        //表头信息
         List<String> header = new ArrayList<>();
+        //值数据
         List<String> values = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mapList)) {
-            List<Map<String, Object>> more = new ArrayList<>();
-            for (Map<String, String> map : mapList) {
+            List<MoreIndex>moreList=new ArrayList<>();
+
+            //遍历查询添加指标，并封装到响应数据中
+            for (MoreIndex moreValue : mapList) {
                 QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
                 EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                        .eq(EntityAttrValue::getAttrId, map.get(MORE_ENTITY_KPI_ID))
+                        .eq(EntityAttrValue::getAttrId, moreValue.getId())
                         .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
                 //新增指标栏
-                Map<String, Object> moreMap = new HashMap<>();
-                moreMap.put(MORE_ENTITY_KPI_KEY, map.get(MORE_ENTITY_KPI_NAME));
-                header.add(map.get(MORE_ENTITY_KPI_NAME));
+                MoreIndex more=new MoreIndex();
+
+                //获取表头值和数据
+                String name = moreValue.getName();
+
+                more.setKey(name);
+                header.add(name);
+
                 if (ObjectUtils.isEmpty(attrValue)) {
                     values.add(null);
-                    moreMap.put(MORE_ENTITY_KPI_VALUE, null);
                 } else {
-                    values.add(attrValue.getValue());
-                    moreMap.put(MORE_ENTITY_KPI_VALUE, attrValue.getValue());
+                    String value = attrValue.getValue();
+                    values.add(value);
+                    more.setValue(value);
                 }
-                more.add(moreMap);
+                moreList.add(more);
 
             }
-            govInfoResult.setMore(more).setHeader(header).setValues(values);
+            govInfoResult.setMore(moreList).setHeader(header).setValues(values);
         }
         return govInfoResult;
     }
@@ -739,8 +753,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @author 冉浩岑
      * @date 2022/10/11 17:10
      */
-    @Autowired
-    private GovLevelMapper govLevelMapper;
 
     @Override
     public GovAttrByDtoBack getGovRange() {
@@ -761,6 +773,40 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 //        省会城市
 //        百强县
         return govAttrByDto;
+    }
+
+    @Override
+    public GovView getGovView() {
+        GovView govView = new GovView();
+        List<GovInfo> govInfos = govInfoMapper.selectList(new QueryWrapper<>());
+        Map<Integer, List<GovInfo>> listGovMap = govInfos.stream().filter(o -> !ObjectUtil.isEmpty(o.getGovLevelBig())).collect(Collectors.groupingBy(GovInfo::getGovLevelBig));
+        Integer total = 0;
+        Integer province = 0;
+        Integer city = 0;
+        Integer area = 0;
+        Integer gx = 0;
+        //政府总数
+        if (!CollectionUtils.isEmpty(govInfos)){
+            total = govInfos.size();
+        }
+        //省级总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(1))){
+            province = listGovMap.get(1).size();
+        }
+        //市级总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(2))){
+            city = listGovMap.get(2).size();
+        }
+        //县级总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(3))){
+            area = listGovMap.get(3).size();
+        }
+        //经开高兴总数
+        if (!CollectionUtils.isEmpty(listGovMap.get(4))){
+            gx = listGovMap.get(4).size();
+        }
+        govView.setGovTotle(total).setProvince(province).setCity(city).setArea(area).setGx(gx).setNoLevel(total-province-city-area-gx);
+        return govView;
     }
 
     //返回筛选范围--城市分级

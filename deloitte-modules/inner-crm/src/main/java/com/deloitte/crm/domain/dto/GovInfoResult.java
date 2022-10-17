@@ -1,11 +1,11 @@
 package com.deloitte.crm.domain.dto;
 
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.dto.MoreIndex;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author 冉浩岑
@@ -15,7 +15,8 @@ import java.util.Map;
 @Accessors(chain = true)
 public class GovInfoResult {
     private GovInfo govInfo;
-    private List<Map<String,Object>> more;
+//    private List<Map<String,Object>> more;
+    private List<MoreIndex> more;
     private List<String> header;
     private List<String> values;
 }

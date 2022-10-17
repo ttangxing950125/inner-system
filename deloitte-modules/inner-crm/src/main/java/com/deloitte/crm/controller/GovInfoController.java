@@ -332,5 +332,17 @@ public class GovInfoController extends BaseController {
         return R.ok();
     }
 
-
+    /**
+     * 政府主体清单-地方政府概览
+     *
+     * @param
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/17 8:49
+     */
+    @ApiOperation(value = "政府主体清单-地方政府概览")
+    @PostMapping("/getGovView")
+    public R getGovView() {
+        return R.ok(govInfoService.getGovView());
+    }
 }

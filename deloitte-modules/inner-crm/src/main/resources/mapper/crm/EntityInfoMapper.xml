@@ -72,6 +72,26 @@
         </where>
     </select>
 
+    <select id="selectListCnLive" parameterType="java.lang.String" resultType="java.lang.String" >
+        SELECT
+        DISTINCT a.entity_code
+        from
+        entity_info a
+        LEFT JOIN entity_stock_cn_rel b ON a.entity_code = b.entity_code
+        LEFT JOIN stock_cn_info c ON b.stock_dq_code = c.stock_dq_code
+        where c.delisting_date >#{timeParam}
+    </select>
+
+    <select id="selectListThkLive" parameterType="java.lang.String" resultType="java.lang.String" >
+        SELECT
+        DISTINCT a.entity_code
+        from
+        entity_info a
+        LEFT JOIN entity_stock_thk_rel d ON a.entity_code = d.entity_code
+        LEFT JOIN stock_thk_info e ON d.stock_dq_code = e.stock_dq_code
+        where e.delisting_date>#{timeParam}
+    </select>
+
     <select id="selectEntityInfoById" parameterType="Long" resultMap="EntityInfoResult">
         <include refid="selectEntityInfoVo"/>
         where id = #{id}

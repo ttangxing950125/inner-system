@@ -20,4 +20,6 @@ public class EntityInfoValueResult {
     private String listDetail;
     //发债情况
     private String bondDetail;
+    //证券代码
+    private String stockCode;
 }
