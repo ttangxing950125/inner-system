@@ -1,6 +1,7 @@
 package com.deloitte.crm.dto;
 
 import com.deloitte.common.core.annotation.Excel;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -96,6 +97,7 @@ public class EntityDto {
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @ApiModelProperty(name="created",value="修改时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updated = new Date();
 
     /** 曾用名 */
