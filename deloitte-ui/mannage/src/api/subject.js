@@ -165,7 +165,19 @@ export function updateInfoDetail(parmas) {
 // 查询 企业主体股票-历史记录
 export function entityInfoLogsList(parmas) {
   return request({
-    url: "/entityInfoLogs/list/" + parmas.type,
+    url: "/crm/entityInfoLogs/list/" + parmas.type,
+    headers: {
+      isToken: true,
+    },
+    method: "get",
+    data: parmas,
+  });
+}
+
+// 撤销停用
+export function logCancel(parmas) {
+  return request({
+    url: "/crm/entityInfoLogs/cancel/" + parmas.id,
     headers: {
       isToken: true,
     },
