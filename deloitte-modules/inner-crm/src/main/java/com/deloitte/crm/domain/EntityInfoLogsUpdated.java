@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 
 import java.util.Date;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +35,7 @@ public class EntityInfoLogsUpdated{
     * 主键
     */
     @ApiModelProperty("主键")
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
