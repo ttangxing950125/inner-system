@@ -22,4 +22,6 @@ public interface EntityInfoLogsUpdatedService extends IService<EntityInfoLogsUpd
      */
     R<Page<EntityInfoLogsUpdated>> getInfo(Integer tableType, Integer pageNum, Integer pageSize);
 
+    void insert(String table,Object old,Object now,Integer tableType);
+
 }

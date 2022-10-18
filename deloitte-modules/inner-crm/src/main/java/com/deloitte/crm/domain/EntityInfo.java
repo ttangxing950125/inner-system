@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.UpdateLog;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class EntityInfo implements Serializable {
      * 企业名
      */
     @Excel(name = "企业名")
+    @UpdateLog(fieldName = "企业名称",tableFieldName ="entity_name")
     private String entityName;
 
     /**
@@ -50,6 +52,7 @@ public class EntityInfo implements Serializable {
      * 报告类型
      */
     @Excel(name = "报告类型")
+    @UpdateLog(fieldName = "年报列示类型",tableFieldName ="report_type")
     private String reportType;
 
 
@@ -70,6 +73,7 @@ public class EntityInfo implements Serializable {
      * 统一社会信用代码
      */
     @Excel(name = "统一社会信用代码")
+    @UpdateLog(fieldName = "统一社会信用代码",tableFieldName ="credit_code")
     private String creditCode;
 
     /**

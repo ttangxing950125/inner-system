@@ -2,6 +2,7 @@ package com.deloitte.crm.utils;
 
 import com.deloitte.crm.annotation.Attrs;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.EntityInfoLogsUpdated;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -46,4 +47,9 @@ public class GetAnnotationAttr {
         }
         return entityAttrValues;
     }
+
+    public List<EntityInfoLogsUpdated> getEntityInfoLogsUpdated(String tableName,Object old,Object now,String userName){
+        return null;
+    }
+
 }
