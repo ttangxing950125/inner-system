@@ -319,7 +319,7 @@
                 >
                 </el-table-column>
                 <el-table-column
-                  v-for="(item, index) in selectHeaer"
+                  v-for="(item, index) in rettHeaer"
                   :key="index"
                   :prop="item.proName"
                   :label="item.proName"
@@ -455,6 +455,7 @@ export default {
         pageSize: 10,
       },
       total2: 0,
+      rettHeaer: []
     };
   },
   mounted() {
@@ -588,6 +589,7 @@ export default {
       try {
         this.loading = true;
         this.getList();
+        this.rettHeaer = this.selectHeaer
       } catch (error) {
         console.log(error);
       } finally {
@@ -619,7 +621,9 @@ export default {
       this.selectHeaer = [];
       if (row.length === 1 && row[0] === 9999) {
         this.options2.forEach((k) => {
-          this.selectHeaer.push(k);
+            if (k.id !== 9999) {
+              this.selectHeaer.push(k);
+            }
         });
       } else {
         row.forEach((e) => {

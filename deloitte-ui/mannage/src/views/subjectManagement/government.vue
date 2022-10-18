@@ -47,12 +47,6 @@
         <a :class="currentTab === '1' ? 'g-select' : ''" @click="changeTab('1')"
           >地方政府</a
         >
-        <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
-          >地方主管部门</a
-        >
-        <a :class="currentTab === '3' ? 'g-select' : ''" @click="changeTab('3')"
-          >其他</a
-        >
       </div>
       <el-col :sm="24" :lg="24" class="mt20" style="padding-left: 20px">
         <el-card>

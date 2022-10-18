@@ -64,7 +64,7 @@
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree2"
-              @check-change="handleCheckChange"
+              @check-change="handleCheckChange2"
             >
             </el-tree>
           </div>
@@ -177,42 +177,15 @@ export default {
           value: [
             {
               name: "内地股票",
-              value: [
-                {
-                  id: 18,
-                  name: "是",
-                },
-                {
-                  id: 18,
-                  name: "否",
-                },
-              ],
+              value: [],
             },
             {
               name: "香港股票",
-              value: [
-                {
-                  id: 18,
-                  name: "是",
-                },
-                {
-                  id: 18,
-                  name: "否",
-                },
-              ],
+              value: [],
             },
             {
               name: "接触地划分",
-              value: [
-                {
-                  id: 18,
-                  name: "是",
-                },
-                {
-                  id: 18,
-                  name: "否",
-                },
-              ],
+              value: [],
             },
           ],
         },
@@ -331,8 +304,8 @@ export default {
         };
         arrDeptId.push(item);
       });
+      console.log(arrDeptId)
       this.selected = arrDeptId.length;
-      this.mapList = arrDeptId;
       try {
         this.$modal.loading("loading...");
         const params = {
@@ -340,22 +313,22 @@ export default {
           pageSize: 10,
           mapList: this.mapList,
         };
-        getListEntityByPage(params).then((res) => {
-          const { data } = res;
-          this.total = data.total;
-          this.list = [];
-          let more = [];
-          data.records.forEach((e) => {
-            this.list.push(e.govInfo);
-            more = e.more;
-            this.header = e.header;
-          });
-          this.list.forEach((e) => {
-            more.forEach((i) => {
-              e[i.key] = i.value;
-            });
-          });
-        });
+        // getListEntityByPage(params).then((res) => {
+        //   const { data } = res;
+        //   this.total = data.total;
+        //   this.list = [];
+        //   let more = [];
+        //   data.records.forEach((e) => {
+        //     this.list.push(e.govInfo);
+        //     more = e.more;
+        //     this.header = e.header;
+        //   });
+        //   this.list.forEach((e) => {
+        //     more.forEach((i) => {
+        //       e[i.key] = i.value;
+        //     });
+        //   });
+        // });
       } catch (error) {
         console.log(error);
       } finally {
