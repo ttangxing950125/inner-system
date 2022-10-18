@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * @author 正杰
@@ -70,12 +71,13 @@ public class EntityInfoLogsUpdatedServiceImpl extends ServiceImpl<EntityInfoLogs
             Class<StockThkInfo> stockThkInfoClass = StockThkInfo.class;
             declaredFields = stockThkInfoClass.getDeclaredFields();
         }else{
-            log.info(" =>> 字段类型未映射成功，更新记录表记录失败 <<=");
+            log.info("  =>> 字段类型未映射成功，更新记录表记录失败 <<=  ");
             return;
         }
         //开始新增
-        log.info("=>> 开始更新关于 "+stockShortName+" 相关的数据 <<=");
+        log.info("  =>> 开始更新关于 "+stockShortName+" 相关的数据 <<=  ");
         doInsert(declaredFields, code, stockShortName, old, now, userName);
+        log.info("  =>>  字段更新成功  <<=  ");
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -87,11 +89,13 @@ public class EntityInfoLogsUpdatedServiceImpl extends ServiceImpl<EntityInfoLogs
             String originalValue = getValue(declaredField, old);
             String tableFieldName = annotation.tableFieldName();
             String value = getValue(declaredField, now);
+            if(Objects.equals(originalValue, value)){continue;}
+            log.info("  =>> 更新字段为 "+fieldName+" <<=  ");
             String created = null;
             if(originalValue!=null){
                 EntityInfoLogsUpdated entityInfoLogsUpdated = baseMapper.selectOne(new QueryWrapper<EntityInfoLogsUpdated>().lambda().eq(EntityInfoLogsUpdated::getCode, code).eq(EntityInfoLogsUpdated::getTableFieldName, tableFieldName).orderBy(true, false, EntityInfoLogsUpdated::getId).last("limit 1"));
                 if(entityInfoLogsUpdated!=null){
-                    created = entityInfoLogsUpdated.getCreated();
+                    created = entityInfoLogsUpdated.getUpdated();
                     entityInfoLogsUpdated.setStatus(false);
                     baseMapper.updateById(entityInfoLogsUpdated);
                 }
