@@ -1,10 +1,9 @@
 package com.deloitte.crm.utils;
 
 import com.deloitte.crm.annotation.Attrs;
-import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.EntityInfoLogsUpdated;
+import com.deloitte.crm.domain.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.List;
  * @date 2022/10/14
  */
 @Component
+@Slf4j
 public class GetAnnotationAttr {
 
     /**
@@ -46,10 +46,6 @@ public class GetAnnotationAttr {
             entityAttrValues.add(entityAttrValue.setAttrId((long) attrId).setValue(value).setEntityCode(entityCode));
         }
         return entityAttrValues;
-    }
-
-    public List<EntityInfoLogsUpdated> getEntityInfoLogsUpdated(String tableName,Object old,Object now,String userName){
-        return null;
     }
 
 }

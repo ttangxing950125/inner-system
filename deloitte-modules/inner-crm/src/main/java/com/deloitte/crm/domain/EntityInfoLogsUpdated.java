@@ -39,9 +39,9 @@ public class EntityInfoLogsUpdated{
     * 德勤主体代码
     */
     @Size(max= 11,message="编码长度不能超过11")
-    @ApiModelProperty("德勤主体代码")
-    @NotNull(message="[ 主体代码 ]不能为空")
-    private String entityCode;
+    @ApiModelProperty("德勤代码")
+    @NotNull(message="[ 德勤代码 ]不能为空")
+    private String code;
 
     /**
     * 证券简称
@@ -68,7 +68,7 @@ public class EntityInfoLogsUpdated{
     * 已存值录入日期
     */
     @ApiModelProperty("已存值录入日期")
-    private Date created;
+    private String created;
 
     /**
     * 修改值
@@ -84,13 +84,13 @@ public class EntityInfoLogsUpdated{
     @Size(max= 1,message="编码长度不能超过1")
     @ApiModelProperty("是否生效")
     @NotNull(message="[ 是否生效 ]不能为空")
-    private Boolean status;
+    private Boolean status = true;
 
     /**
     * 修改日期
     */
     @ApiModelProperty("修改日期")
-    private Date updated;
+    private String updated;
 
     /**
     * 修改人
@@ -123,4 +123,15 @@ public class EntityInfoLogsUpdated{
     @ApiModelProperty("1-企业上市信息 2-地方政府上市信息")
     private Integer tableType;
 
+    public EntityInfoLogsUpdated(String code, String stockShortName, String fieldName, String originalValue, String value, String userName, String tableName, String tableFieldName, Integer tableType) {
+        this.code = code;
+        this.stockShortName = stockShortName;
+        this.fieldName = fieldName;
+        this.originalValue = originalValue;
+        this.value = value;
+        this.userName = userName;
+        this.tableName = tableName;
+        this.tableFieldName = tableFieldName;
+        this.tableType = tableType;
+    }
 }
