@@ -410,7 +410,7 @@ public class EntityInfoController extends BaseController {
     */
     @ApiOperation(value = "敞口划分根据主体名称查询信息")
     @ApiImplicitParams({
-            @ApiImplicitParam( paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+            @ApiImplicitParam(name = "name",value = "主体名称" ,paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     })
     @PostMapping("/entityMaster")
     public R  selectEntityInfoByName(String name) {
