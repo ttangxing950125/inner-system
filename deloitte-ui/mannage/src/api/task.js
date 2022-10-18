@@ -50,7 +50,7 @@ export function findTaskDetails(taskDate) {
 export function getTaskInfo(params) {
   return request({
     url:
-      "/crm//roleTwo/getTaskInfo?date=" +
+      "/crm/roleTwo/getTaskInfo?date=" +
       params.date +
       "&pageNum=" +
       params.pageNum +

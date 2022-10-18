@@ -103,15 +103,6 @@ export default {
     goTarget(href) {
       window.open(href, "_blank");
     },
-    handlePreview() {
-      console.log(1);
-    },
-    handleExceed() {
-      console.log(1);
-    },
-    handleClick() {
-      console.log(1);
-    },
     back() {
       this.$router.back();
     },
@@ -123,6 +114,7 @@ export default {
     },
     uploadPass(data, index) {
       this.contentData[index].taskStatus = 1;
+      this.init()
     },
     uploadFail(index) {
       this.contentData[index].taskStatus = 0;

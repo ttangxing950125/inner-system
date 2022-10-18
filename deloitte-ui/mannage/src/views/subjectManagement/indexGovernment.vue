@@ -61,11 +61,11 @@
             <el-tree
               class="filter-tree"
               :data="data2"
-              :props="{ label: 'name', children: 'value' }"
+              :props="{ label: 'name', children: 'children' }"
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree2"
-              @check-change="handleCheckChange"
+              @check-change="handleCheckChange2"
             >
             </el-tree>
           </div>
@@ -136,40 +136,7 @@ export default {
     return {
       currentPage1: 1,
       currentTime: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       tab: this.$route.query.name,
       filterTextFirst: "",
       filterTextScend: "",
@@ -254,6 +221,48 @@ export default {
     handleCheckChange(data, checked, indeterminate) {
       //获取所有选中的节点 start
       let res = this.$refs.tree1.getCheckedNodes();
+      let arrDeptId = [];
+      res.forEach((e) => {
+        const item = {
+          id: e.id,
+          name: e.name,
+        };
+        arrDeptId.push(item);
+      });
+      this.selected = arrDeptId.length;
+      this.mapList = arrDeptId;
+      try {
+        this.$modal.loading("loading...");
+        const params = {
+          pageNum: 1,
+          pageSize: 10,
+          mapList: this.mapList,
+        };
+        getListEntityByPage(params).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          let more = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+            more.forEach((i) => {
+              e[i.key] = i.value;
+            });
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    handleCheckChange2(data, checked, indeterminate) {
+      //获取所有选中的节点 start
+      let res = this.$refs.tree2.getCheckedNodes();
       let arrDeptId = [];
       res.forEach((e) => {
         const item = {

@@ -440,3 +440,21 @@ export function sliceIntoChunks(arr, chunkSize) {
   }
   return res;
 }
+
+/**
+ * 下载文件流
+ * @param {*} data 
+ * @param {*} fileName 
+ * @param {*} mineType 
+ */
+export function download(data,fileName,mineType = 'application/vnd.ms-excel') {
+    //创建blob
+    let blob = new Blob([data],{type:mineType});
+    const url = window.URL || window.webkitURL || window.moxURL;
+    const link=document.createElement('a');
+    link.style.display='none';
+    link.href=url.createObjectURL(blob);
+    link.download = fileName;   //下载的文件名称
+    link.click();//触发click
+    window.URL.revokeObjectURL(url);
+}

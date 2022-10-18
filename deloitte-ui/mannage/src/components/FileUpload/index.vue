@@ -4,6 +4,7 @@
       multiple
       :action="uploadFileUrl"
       :before-upload="handleBeforeUpload"
+      :http-request="httpFun"
       :file-list="fileList"
       :limit="limit"
       :on-error="handleUploadError"
@@ -93,6 +94,10 @@ export default {
       type: String,
       default: "选取文件",
     },
+    httpFun: {
+      type: Function,
+      default: null
+    },
   },
   data() {
     return {
@@ -103,6 +108,7 @@ export default {
         process.env.VUE_APP_BASE_API + "/file/upload", // 上传的图片服务器地址
       headers: {
         Authorization: "Bearer " + getToken(),
+        responseType: 'blob'
       },
       fileList: [],
     };
@@ -194,7 +200,7 @@ export default {
         }
 
         // this.uploadList.push({ name: res.data.url, url: res.data.url });
-        this.$emit("uploadPass", res.data, this.index);
+        this.$emit("uploadPass", res.data || res, this.index);
         // if (this.uploadList.length === this.number) {
         //   this.fileList = this.fileList.concat(this.uploadList);
         //   this.uploadList = [];

@@ -48,7 +48,7 @@
         align="center"
         style="width: 98%; margin-top: 15px"
       >
-        <el-table-column type="index" sortable label="序号"> </el-table-column>
+        <el-table-column type="index" label="序号"> </el-table-column>
         <el-table-column prop="taskCategory" label="捕获渠道"> </el-table-column>
         <el-table-column prop="dataShow" label="任务说明"> 
         </el-table-column>
@@ -869,6 +869,7 @@
       title="新增主体"
       :visible.sync="bodyDig"
       width="50%"
+      :before-close="handleClose"
     >
       <el-form
         :model="ruleForm"
@@ -900,6 +901,7 @@
             class="t-input"
             v-model="ruleForm.creditCode"
             @change="changeInput"
+            :disabled="ruleForm.notUse"
             ></el-input>
             <el-button
             v-if="!creditCodePass"
@@ -913,7 +915,7 @@
         <div class="notUse">
           <el-checkbox class="mr60" v-model="ruleForm.notUse">不适用</el-checkbox>
           <span class="mr10" >不适用原因</span>
-          <el-select v-model="ruleForm.creditErrorType" placeholder="请选择">
+          <el-select :disabled="!ruleForm.notUse" v-model="ruleForm.creditErrorType" placeholder="请选择">
             <el-option
               v-for="item in notUseoptions"
               :key="item.value"
@@ -1502,8 +1504,9 @@ export default {
     addBody(row) {
       this.bodyDig = true
       this.addBodyId = row.id
-      this.ruleForm.bondFullName = JSON.parse(row.details).债券全称
-      this.ruleForm.bondShortName = JSON.parse(row.details).债券简称
+      this.ruleForm.bondFullName = row.bondFullName
+      this.ruleForm.created = row.created
+      this.ruleForm.bondShortName = row.bondShortName
       this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
     },
@@ -1537,10 +1540,12 @@ export default {
       try {
         addSeven(this.ruleForm).then(res => {
           const { data } = res
+          this.bodyDig = false
           this.$message({
             message: '操作成功',
             type: 'success'
           });
+          this.init()
         })
       } catch (error) {
         console.log(error)
@@ -1561,6 +1566,7 @@ export default {
             message: data,
             type: 'success'
           });
+          this.init()
         })
       } catch (error) {
         console.log(error)
@@ -1955,8 +1961,25 @@ export default {
       }
     },
     // 角色345流程结束
-
+    handleClose() {
+        this.ruleForm = {}
+        this.creditCodePass = false
+        this.entityNamePass = false
+        this.bodyDig = false
+    }
   },
+  watch: {
+     'ruleForm.notUse':{
+      handler(newName,oldName){
+          if (newName) {
+              this.ruleForm.creditCode = ''
+          } else {
+              this.ruleForm.creditErrorType = ''
+          }
+      },
+      deep:true //为true，表示深度监听，这时候就能监测到a值变化
+    }
+    }
 };
 </script>
 

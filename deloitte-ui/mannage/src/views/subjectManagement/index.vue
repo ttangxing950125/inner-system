@@ -361,12 +361,13 @@
       <div :class="uploadStatus ? 'upload-success' : 'upload-background'">
         <div class="upload-font">上传批量查询输入文件</div>
         <fileUpload
-          :uploadUrl="'xxx'"
+          :uploadUrl="'#'"
           :uploadStr="'+ 点击上传文件'"
           ref="fileUpload"
           @loading="loadingFun"
           @uploadFail="uploadFail"
           @uploadPass="uploadPass"
+          :httpFun="uploadFun"
         />
       </div>
       <div>
@@ -393,7 +394,8 @@
 
 <script>
 import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
-import { Scope } from "quill";
+import { importExcelByEntity } from "@/api/common";
+import { download } from '@/utils/index'
 import fileUpload from "../../components/FileUpload";
 import pagination from "../../components/Pagination";
 export default {
@@ -455,13 +457,21 @@ export default {
         pageSize: 10,
       },
       total2: 0,
-      rettHeaer: []
+      rettHeaer: [],
+      uuid: ''
     };
   },
   mounted() {
     this.init();
   },
   methods: {
+      getuuid() {
+          const timeStr = Date.now()
+        const rondStr = Math.round(Math.random()*10)
+        const parmasStr = timeStr+rondStr
+        localStorage.setItem('uuid', parmasStr)
+        this.uuid = parmasStr
+      },
     init() {
       try {
         this.$modal.loading("loading...");
@@ -538,6 +548,7 @@ export default {
           this.total = data.total;
           this.queryParams.pageNum = data.current;
         });
+        this.getuuid()
       } catch (error) {
         console.log(error);
       } finally {
@@ -609,10 +620,11 @@ export default {
       a.remove(); // 一次性的，用完就删除a标签
     },
     loadingFun(index) {
-      console.log(1);
+      this.$modal.loading('Loading...')
     },
     uploadPass(data, index) {
-      console.log(2);
+      download(data, '适配文件.xlsx')
+      this.$modal.closeLoading()
     },
     uploadFail(index) {
       console.log(3);
@@ -634,8 +646,37 @@ export default {
           });
         });
       }
-      console.log(this.selectHeaer);
     },
+    uploadFun(params) {
+    // 获取文件 通过FormData将文件转化为二进制流的形式传给后端
+    let form = new FormData()
+    form.append('file', params.file)
+    const paramsObj = {
+        file: form,
+        uuid: this.uuid
+    }
+    console.log(paramsObj)
+    importExcelByEntity(paramsObj).then((res) => {
+        let contentType = res.headers['content-type']
+        let contentDisposition = res.headers['content-disposition']
+        if (contentType.indexOf('application/json') !== -1) {
+        } else {
+            contentDisposition = contentDisposition.split(';')[1]
+            let filename = contentDisposition.split('=')[1]
+            let filenameStr = window.decodeURI(filename.split(',')[0], 'utf-8')
+            const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' })
+            const link = document.createElement('a')
+            const href = window.URL.createObjectURL(blob)
+            // 后台再header中传文件名
+            link.href = href
+            link.download = filenameStr
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link) // 下载完成移除元素
+            window.URL.revokeObjectURL(href) // 释放掉blob对象
+        }
+    })
+},
   },
   computed: {
     govePercent() {

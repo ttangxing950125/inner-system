@@ -74,9 +74,6 @@ const user = {
             }
 
             // localStorage.setItem("roleId", res.roleInfo.roleKey);
-
-            console.log("store")
-            console.log(res.roleInfo.roleKey)
             commit("SET_NAME", user.userName);
             commit("SET_AVATAR", avatar);
             resolve(res);
