@@ -361,4 +361,6 @@ public class GovInfoController extends BaseController {
     public R getGovView() {
         return R.ok(govInfoService.getGovView());
     }
+
+
 }

@@ -338,7 +338,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovByName(String govName) {
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper();
-        return R.ok(govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getGovName, govName)));
+        return R.ok(govInfoMapper.selectList(queryWrapper.lambda().like(GovInfo::getGovName, govName)));
     }
 
     @Override
