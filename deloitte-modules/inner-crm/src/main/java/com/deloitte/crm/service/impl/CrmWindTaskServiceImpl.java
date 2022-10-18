@@ -163,7 +163,8 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         //发送邮件给角色6|7
         sendEmailService.SendEmail(RoleInfo.ROLE6.getId(), "新任务：新增主体" + entityTaskCount + "个待确认",
                 "今日wind导入任务已完成，平台捕获" + entityTaskCount + "个疑似新增主体需要确认。" +
-                        "请尽快登陆平台完成相关任务。");
+                        "请尽快登陆平台完成相关任务。<\br>" +
+                        "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a>");
 
         log.info("--------------角色7的任务数量{}",entityTaskCount);
 
@@ -176,7 +177,8 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         sendEmailService.SendEmail(RoleInfo.ROLE2.getId(), "新任务：待划分敞口主体" + entityMasCount + "个",
                 "今日新增主体确认任务已完成，共计新增 " + entityMasCount + " 个主体需划分敞口。" +
                         "请尽快登陆平台完成相关任务。" +
-                        "请尽快登陆平台完成相关任务。");
+                        "请尽快登陆平台完成相关任务。<\br>" +
+                        "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a>");
 
         log.info("--------------角色2的任务数量{}",entityMasCount);
 

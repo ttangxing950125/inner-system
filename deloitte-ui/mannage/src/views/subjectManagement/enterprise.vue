@@ -199,7 +199,7 @@
         <a :class="currentTab === '1' ? 'g-select' : ''" @click="changeTab('1')"
           >上市</a
         >
-        <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
+        <!-- <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
           >发债</a
         >
         <a :class="currentTab === '3' ? 'g-select' : ''" @click="changeTab('3')"
@@ -207,7 +207,7 @@
         >
         <a :class="currentTab === '4' ? 'g-select' : ''" @click="changeTab('4')"
           >金融机构</a
-        >
+        > -->
       </div>
       <el-col :sm="24" :lg="24" class="mt20" style="padding-left: 20px">
         <el-card>

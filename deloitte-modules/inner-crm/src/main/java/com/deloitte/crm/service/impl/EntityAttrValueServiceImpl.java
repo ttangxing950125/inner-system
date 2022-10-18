@@ -285,12 +285,12 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     public int updateStockCnAttr(String code, Object item, boolean async) {
         if (async){
             singleThreadPoll.execute(()->{
-                this.updateAttrValue(code, item, 4, Excel.class, "name");
+                this.updateAttrValue(code, item, 5, Excel.class, "name");
             });
 
             return -1;
         }else {
-            return this.updateAttrValue(code, item, 4, Excel.class, "name");
+            return this.updateAttrValue(code, item, 5, Excel.class, "name");
         }
     }
 

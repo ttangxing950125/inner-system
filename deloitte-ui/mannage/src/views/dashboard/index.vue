@@ -1237,11 +1237,12 @@ export default {
       this.year = this.monthDate.substr(0, 4)
       this.month = this.monthDate.substr(5, 2)
       this.month = this.month.indexOf('0') === 0 ? this.month.substr(1, 1) : this.month
-      this.sureDate(this, false, this.year, this.month)
+      this.sureDate(this, false, this.year, this.month-1)
       // sureDate(this, false, )
       try {
         queryList(parmas).then((res)=> {
-          console.log(res)
+            const { data } = res
+          this.showMsg(data)
         })
       } catch (error) {
         console.log(error)
@@ -1415,39 +1416,24 @@ export default {
       this.showMsg();
     },
     //通过接口返回的是我们当前的月份对应在日历中需要处理的事项
-    showMsg(flagData) {
-      var jsonHtml = [
-        {
-          date: 2,
-          msg: "吃饭",
-        },
-        {
-          date: 3,
-          msg: "睡觉",
-        },
-        {
-          date: 4,
-          msg: "打豆豆",
-        },
-        {
-          date: 6,
-          msg: "豆豆不在家",
-        },
-        {
-          date: 12,
-          msg: "~~~~~",
-        },
-        {
-          date: 15,
-          msg: "怎么办~~~~",
-        },
-        {
-          date: 20,
-          bad: true,
-          msg: "找豆豆",
-        },
-      ];
-      this.drawTable(jsonHtml || flagData);
+    showMsg(flagData = []) {
+        if (flagData) {
+            flagData.forEach(e => {
+                let dateStr = e.taskDate.substr(-2, 2)
+                if(dateStr.substr(0, 1) == 0) {
+                    e.date = dateStr.substr(-1)
+                }else {
+                    e.date = dateStr
+                }
+                if(e.taskStatus === 2){
+                    e.bad = true
+                }
+                if(e.taskStatus === 3){
+                    e.bad = false
+                }
+            });
+        }
+      this.drawTable(flagData);
     },
     work(row) {
       this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.nowTime } });
@@ -1469,11 +1455,15 @@ export default {
       try {
         this.$modal.loading("loading...");
         const parmas = {
-          taskDate: this.monthDate+ '-' +clickDay,
+          date: this.monthDate+ '-' +clickDay,
+          pageNum: 1,
+          pageSize: this.queryParams.pageSize
         };
-        getDayTaskInfo({date: this.monthDate+ '-' +clickDay}).then((res) => {
+        getDayTaskInfo(parmas).then((res) => {
           const { data } = res
-          this.list7 = data
+          this.list7 = data.records
+          this.total = data.total
+          this.queryParams.pageNum = data.current
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
         const params = {
