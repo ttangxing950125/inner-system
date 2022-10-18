@@ -528,7 +528,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     private EntityInfoDetails getEntityBondInfo(EntityInfoDetails entityInfoDetails, String entityCode) {
-        EntityInfoDetails entityInfo=new EntityInfoDetails();
+        EntityInfoDetails infoDetails=new EntityInfoDetails();
         BondInfoDetail bondInfoDetail = new BondInfoDetail();
         //查询关联表
         List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getEntityCode, entityCode));
@@ -605,8 +605,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     .setPrivateBondsLiveNum(privateList.stream().filter(o -> TimeFormatUtil.between_days("yyyy-MM-dd", TimeFormatUtil.getFormartDate(new Date()), o.getDueDate()) < 0).collect(Collectors.toList()).size());
         }
 
-        entityInfo.setBondInfoDetail(bondInfoDetail);
-        return entityInfo;
+        infoDetails.setBondInfoDetail(bondInfoDetail);
+        return infoDetails;
 
     }
 
