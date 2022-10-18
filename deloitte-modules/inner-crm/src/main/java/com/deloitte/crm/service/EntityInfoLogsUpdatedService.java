@@ -22,6 +22,13 @@ public interface EntityInfoLogsUpdatedService extends IService<EntityInfoLogsUpd
      */
     R<Page<EntityInfoLogsUpdated>> getInfo(Integer tableType, Integer pageNum, Integer pageSize);
 
-    void insert(String code,String stockShortName,Object old,Object now,Integer tableType);
+    /**
+     * 修改后 对修改的值进行新增
+     * @param code
+     * @param stockShortName
+     * @param old
+     * @param now
+     */
+    void insert(String code,String stockShortName,Object old,Object now);
 
 }

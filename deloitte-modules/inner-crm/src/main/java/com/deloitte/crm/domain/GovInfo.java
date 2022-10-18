@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.UpdateLog;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -31,12 +32,14 @@ public class GovInfo implements Serializable {
      * 政府主体官方名称
      */
     @Excel(name = "政府主体官方名称")
+    @UpdateLog(fieldName = "政府主体官方名称",tableFieldName = "gov_name")
     private String govName;
 
     /**
      * 官方行政代码，六位数字，各地方唯一
      */
     @Excel(name = "官方行政代码，六位数字，各地方唯一")
+    @UpdateLog(fieldName = "官方行政代码",tableFieldName = "gov_code")
     private String govCode;
 
     @Excel(name = "上级地方政府行政编码，六位数字，各地方唯一")
@@ -66,13 +69,18 @@ public class GovInfo implements Serializable {
      * sys_dict_data gov_level_big
      */
     @Excel(name = "sys_dict_data gov_level_big")
+    @UpdateLog(fieldName = "政府主体行政单位级别-大类",tableFieldName = "gov_level_big")
     private Integer govLevelBig;
 
     /**
      * sys_dict_data gov_level_small
      */
     @Excel(name = "sys_dict_data gov_level_small")
+    @UpdateLog(fieldName = "政府主体行政单位级别-小类",tableFieldName = "gov_level_small")
     private Integer govLevelSmall;
+
+    @UpdateLog(fieldName = "是否为百强县",tableFieldName = "hundred")
+    private Integer hundred;
 
     /**
      * 汇总合并根据企业主体-匹配表中主体所有的曾用名或别称，存在多个时以“、”区分
@@ -110,22 +118,26 @@ public class GovInfo implements Serializable {
      * 失效后的新政府德勤code
      */
     @Excel(name = "经济区归属")
+    @UpdateLog(fieldName = "八大经济区归属",tableFieldName = "economy_region")
     private String economyRegion;
     /**
      * 失效后的新政府德勤code
      */
     @Excel(name = "城市群归属")
+    @UpdateLog(fieldName = "19个城市群归属",tableFieldName = "city_group")
     private String cityGroup;
     /**
      * 失效后的新政府德勤code
      */
     @Excel(name = "是否为省会城市 0.否 1.是")
+    @UpdateLog(fieldName = "是否为省会城市",tableFieldName = "provincial")
     private Integer provincial;
 
     /**
      * 失效后的新政府德勤code
      */
     @Excel(name = "是否为国家中心城市 0.否 1.是")
+    @UpdateLog(fieldName = "是否为国家中心城市",tableFieldName = "country_center")
     private Integer countryCenter;
 
     /**
@@ -157,6 +169,7 @@ public class GovInfo implements Serializable {
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
+
     /**
      * 主体状态 是否生效 0-失效 1-生效
      */

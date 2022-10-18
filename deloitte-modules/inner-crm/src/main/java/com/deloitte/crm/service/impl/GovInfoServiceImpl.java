@@ -20,6 +20,7 @@ import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.mapper.*;
+import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
@@ -60,20 +61,23 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Resource
     private GovInfoMapper govInfoMapper;
 
-    @Autowired
+    @Resource
     private EntityAttrValueMapper entityAttrValueMapper;
 
     @Resource
     private EntityNameHisMapper nameHisMapper;
 
-    @Autowired
+    @Resource
     private EntityAttrIntypeMapper intypeMapper;
 
-    @Autowired
+    @Resource
     private EntityGovRelMapper entityGovRelMapper;
 
-    @Autowired
+    @Resource
     private GovLevelMapper govLevelMapper;
+
+    @Resource
+    private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
 
     /**
      * 默认查询页码
@@ -156,6 +160,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public R updateInfoList(List<GovInfo> list) {
         list.stream().forEach(o -> {
             GovInfo govInfo = govInfoMapper.selectById(o.getId());
+            entityInfoLogsUpdatedService.insert(govInfo.getDqGovCode(),govInfo.getGovName(),govInfo,o);
             govInfoMapper.updateById(o);
             //修改政府主体名称时，需要添加曾用名
             if (!ObjectUtils.isEmpty(o.getGovName())) {
