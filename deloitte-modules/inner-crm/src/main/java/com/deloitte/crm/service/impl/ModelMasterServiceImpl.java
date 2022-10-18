@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -58,6 +59,8 @@ public class ModelMasterServiceImpl implements IModelMasterService
     private EntityFinancialService entityFinancialService;
 
     private ICrmWindTaskService iCrmWindTaskService;
+
+    private SendEmailService sendEmailService;
 
     /**
      * 查询【请填写功能名称】
@@ -240,19 +243,6 @@ public class ModelMasterServiceImpl implements IModelMasterService
                 .lambda().eq(CrmMasTask::getTaskDate, crmMasTask.getTaskDate())
                 .eq(CrmMasTask::getState, UN_FINISH_STATE)
         );
-        // 查询到所有任务已经完成 修改当日单表
-        if(crmMasTasks.size()==0){
-            CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper()
-                    .selectOne(new QueryWrapper<CrmDailyTask>()
-                            .lambda().eq(CrmDailyTask::getTaskDate, crmMasTask.getTaskDate())
-                            .eq(CrmDailyTask::getTaskRoleType,TASK_ROLE_TWO));
-            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
-            //当日任务完成状态为 3
-            crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
-            iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
-            //TODO 发送邮件
-        }
-
         //完成当条任务后 向 crm_supply 添加任务
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setEntityCode(entityCode);
@@ -270,6 +260,41 @@ public class ModelMasterServiceImpl implements IModelMasterService
         }
         //新增任务
         crmSupplyTaskMapper.insertCrmSupplyTask(crmSupplyTask);
+
+        // 查询到所有任务已经完成 修改当日单表
+        if(crmMasTasks.size()==0){
+            CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper()
+                    .selectOne(new QueryWrapper<CrmDailyTask>()
+                            .lambda().eq(CrmDailyTask::getTaskDate, crmMasTask.getTaskDate())
+                            .eq(CrmDailyTask::getTaskRoleType,TASK_ROLE_TWO));
+            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+            //当日任务完成状态为 3
+            crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
+            iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            //TODO 发送邮件
+            String dateNow = DateUtil.format(new Date(), "yyyy-MM-dd");
+            Long role3 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 5L).eq(CrmSupplyTask::getTaskDate, dateNow));
+            Long role4 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 6L).eq(CrmSupplyTask::getTaskDate, dateNow));
+            Long role5 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 7L).eq(CrmSupplyTask::getTaskDate, dateNow));
+
+            sendEmailService.SendEmail(5,"[新任务︰待划分敞口主体" + role3.intValue() + "个]",
+                    "</br>  今日新增主体确认任务已完成，共计新增 " + role3.intValue() + " 个主体需划分敞口。" +
+                            "请尽快登陆平台完成相关任务。</br>" +
+                            "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a></br>" +
+                            "</br></br>Thanks,</br>主体管理平台");
+
+            sendEmailService.SendEmail(6,"[新任务︰待划分敞口主体" + role4.intValue() + "个]",
+                    "</br>  今日新增主体确认任务已完成，共计新增 " + role4.intValue() + " 个主体需划分敞口。" +
+                            "请尽快登陆平台完成相关任务。</br>" +
+                            "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a></br>" +
+                            "</br></br>Thanks,</br>主体管理平台");
+
+            sendEmailService.SendEmail(7,"[新任务︰待划分敞口主体" + role5.intValue() + "个]",
+                    "</br>  今日新增主体确认任务已完成，共计新增 " + role5.intValue() + " 个主体需划分敞口。" +
+                            "请尽快登陆平台完成相关任务。</br>" +
+                            "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a></br>" +
+                            "</br></br>Thanks,</br>主体管理平台");
+        }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
