@@ -141,12 +141,15 @@
         :data="list"
         style="width: 98%; margin-top: 15px"
       >
-        <el-table-column type="index" sortable label="序号" width="100px">
+        <el-table-column type="index" label="序号" width="100px">
           <template slot-scope="scope">
             <span>{{ scope.row.invalid === "0" ? "N" : "Y" }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="govLevel" label="行政级别" sortable>
+        <el-table-column prop="govLevel" label="行政级别">
+            <template slot-scope="scope">
+            <span>{{ levelStr[scope.row.bigLevel] }}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="dqGovCode" label="德勤主体代码">
         </el-table-column>
@@ -193,6 +196,12 @@ export default {
         1: "地方政府",
         2: "地方主管部门",
         3: "其他",
+      },
+      levelStr: {
+        1: "省级行政区",
+        2: "地级市行政区",
+        3: "县级行政区",
+        4: "经开，高新区，新区等",
       },
       count: 0,
       invalid: 0,

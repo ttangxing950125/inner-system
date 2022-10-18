@@ -123,10 +123,10 @@ export function importExcelByEntity(params) {
     url: "/crm/entityInfo/importExcelByEntity?uuid=" + params.uuid,
     headers: {
       isToken: true,
-      responseType:'bolb'
+      responseType:'blob'
     },
-    responseType:'bolb',
+    responseType:'blob',
     method: "post",
     data: params,
-  }, {responseType:'bolb'}, {responseType:'bolb'});
+  }, {responseType:'blob'}, {responseType:'blob'});
 }
