@@ -203,8 +203,12 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/23 8:44
      */
     @ApiOperation(value = "新增政府主体的曾用名")
-    @ApiImplicitParam(name = "govInfo", value = "包含表中gov_info的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
-    @PostMapping("/addOldName")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "gov_info主键", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "govNameHis", value = "主体添加的曾用名或别称", paramType = "body", example = "白云区", dataType = "String"),
+            @ApiImplicitParam(name = "entityNameHisRemarks", value = "主体添加的曾用名或别称的备注", paramType = "body", example = "测试", dataType = "String")
+    })
+     @PostMapping("/addOldName")
     public R addOldName(@RequestBody GovInfo govInfo) {
         return govInfoService.addOldName(govInfo);
     }
