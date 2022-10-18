@@ -61,7 +61,7 @@ public class StockCnImplementStInfo implements Serializable {
     /**
      * 公司名称
      */
-    @Excel(name = "公司名称")
+    @Excel(name = "名称")
     private String name;
     /**
      * 实施日期
