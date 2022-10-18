@@ -522,8 +522,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return entityInfoDetails;
         }
         //查询金融机构表
-        EntityFinancial entityFinancial = financialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode)).get(0);
-        entityInfoDetails.setEntityFinancial(entityFinancial);
+        List<EntityFinancial> list = financialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
+        if (!CollectionUtils.isEmpty(list)){
+            entityInfoDetails.setEntityFinancial(list.get(0));
+        }
         return entityInfoDetails;
     }
 
