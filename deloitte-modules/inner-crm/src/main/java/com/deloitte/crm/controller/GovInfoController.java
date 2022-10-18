@@ -259,17 +259,17 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "mapList", value = "更多指标添加指标项", paramType = "body", example = "", dataTypeClass = MoreIndex.class),
             @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "body", example = "1", dataType = "Integer"),
             @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1",dataType = "Integer"),
-            @ApiImplicitParam(name = "govScale", value = "城市规模", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "govGrading", value = "城市分级", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "isProvince", value = "省级行政区", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "isCity", value = "地级行政区", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "isCounty", value = "县级行政区", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "isJKGX", value = "经开高新区", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "eightER", value = "八大经济区", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "nineteenCity", value = "19个城市群", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "hundred", value = "百强县", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "CCity", value = "国家中心城市", paramType = "body", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "provincial", value = "省会城市", paramType = "body", example = "1", dataType = "String")
+            @ApiImplicitParam(name = "govScale", value = "城市规模", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "govGrading", value = "城市分级", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isProvince", value = "省级行政区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isCity", value = "地级行政区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isCounty", value = "县级行政区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isJKGX", value = "经开高新区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "eightER", value = "八大经济区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "nineteenCity", value = "19个城市群", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "hundred", value = "百强县", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "CCity", value = "国家中心城市", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "provincial", value = "省会城市", paramType = "body", example = "1", dataType = "Integer")
     })
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody GovAttrByDto govAttrDto) {
