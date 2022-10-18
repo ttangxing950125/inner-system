@@ -577,7 +577,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         //获取公募债信息
-        List<BondInfo> publicList = bondInfos.stream().filter(o -> o.getRaiseType() == 0).collect(Collectors.toList());
+        List<BondInfo> publicList = bondInfos.stream().filter(o -> !ObjectUtils.isEmpty(o.getRaiseType())&&o.getRaiseType() == 0).collect(Collectors.toList());
         // 是否发行公募债
         // 发行公募债详情
         if (CollectionUtils.isEmpty(publicList)) {
@@ -591,7 +591,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         //获取私募债信息
-        List<BondInfo> privateList = bondInfos.stream().filter(o -> o.getRaiseType() == 1).collect(Collectors.toList());
+        List<BondInfo> privateList = bondInfos.stream().filter(o ->!ObjectUtils.isEmpty(o.getRaiseType())&& o.getRaiseType() == 1).collect(Collectors.toList());
         // 是否发行私募债
         // 发行私募债详情
         if (CollectionUtils.isEmpty(privateList)) {
