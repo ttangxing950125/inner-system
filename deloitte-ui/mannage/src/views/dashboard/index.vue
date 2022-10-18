@@ -1146,7 +1146,8 @@ export default {
         pageNum: 1,
         pageSize: 10
       },
-      total: 0
+      total: 0,
+      clickDay: ''
     };
   },
   mounted() {
@@ -1160,7 +1161,7 @@ export default {
     }
   },
   methods: {
-    init() {
+    init(page) {
       try {
         this.$modal.loading('Loading...')
         this.loading = true;
@@ -1170,6 +1171,7 @@ export default {
         const role2MonthDate = {
           date:this.monthDate
         }
+        this.nowTime = this.clickDay || this.nowTime
         // 角色7相关接口
         // getMouthTaskInfo(role2MonthDate).then((res) => {
         //   const { data } = res
@@ -1182,8 +1184,8 @@ export default {
         // 角色1相关接口
         const params = {
           taskDate: this.nowTime,
-          pageNum: 1,
-          pageSize: 20
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize
         };
         const paramsMonth = {
           taskDate: this.monthDate,
@@ -1194,7 +1196,9 @@ export default {
         });
         queryList(paramsMonth).then((res)=> {
           const { data } = res
-          this.showMsg(data)
+          if (!page) {
+              this.showMsg(data)
+          }
         })
         // 角色 345 相关接口
         getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
@@ -1230,7 +1234,7 @@ export default {
       }
     },
     getList() {
-      this.init()
+      this.init(true)
     },
     changeMonth(row) {
       const parmas = {
@@ -1461,6 +1465,7 @@ export default {
           pageNum: 1,
           pageSize: this.queryParams.pageSize
         };
+        this.clickDay = this.monthDate+ '-' +clickDay
         getDayTaskInfo(parmas).then((res) => {
           const { data } = res
           this.list7 = data.records

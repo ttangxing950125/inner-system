@@ -651,12 +651,8 @@ export default {
     // 获取文件 通过FormData将文件转化为二进制流的形式传给后端
     let form = new FormData()
     form.append('file', params.file)
-    const paramsObj = {
-        file: form,
-        uuid: this.uuid
-    }
-    console.log(paramsObj)
-    importExcelByEntity(paramsObj).then((res) => {
+    form.uuid = this.uuid
+    importExcelByEntity(form).then((res) => {
         let contentType = res.headers['content-type']
         let contentDisposition = res.headers['content-disposition']
         if (contentType.indexOf('application/json') !== -1) {
@@ -676,6 +672,7 @@ export default {
             window.URL.revokeObjectURL(href) // 释放掉blob对象
         }
     })
+    this.$modal.closeLoading()
 },
   },
   computed: {
