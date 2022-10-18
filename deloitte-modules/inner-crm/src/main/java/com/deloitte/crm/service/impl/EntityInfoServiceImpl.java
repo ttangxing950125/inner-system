@@ -650,7 +650,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //查询关联表
         List<EntityStockCnRel> entityStockCnRels = cnRelMapper.selectList(new QueryWrapper<EntityStockCnRel>().lambda().eq(EntityStockCnRel::getEntityCode, entityCode));
         if (CollectionUtils.isEmpty(entityStockCnRels)) {
-            return null;
+            return entityInfoDetails;
         }
         //查询A股上市数据
         List<String> cnRelCodes = new ArrayList<>();
