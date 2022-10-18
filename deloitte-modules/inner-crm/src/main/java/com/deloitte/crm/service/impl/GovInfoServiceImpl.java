@@ -358,7 +358,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
 
         //获取基础参数信息
-//        List<Map<String, String>> mapList = govAttrByDto.getMapList();
         List<MoreIndex> mapList = govAttrByDto.getMapList();
 
         List<GovInfo> govInfos = govInfoMapper.getGovByAttrValue(govAttrByDto);

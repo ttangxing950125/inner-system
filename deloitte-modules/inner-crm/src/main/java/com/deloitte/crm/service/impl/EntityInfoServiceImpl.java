@@ -35,7 +35,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -839,16 +838,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //获取参数信息
         List<MoreIndex> mapList = entityAttrDto.getMapList();
         //0.公募债券 1.私募债券
-        Integer raiseType = 0;
+        Integer raiseType = null;
 
         Integer privateType = entityAttrDto.getPrivateType();
         Integer publicType = entityAttrDto.getPublicType();
-        if (!ObjectUtils.isEmpty(publicType)&&!ObjectUtils.isEmpty(privateType)){
-            raiseType=null;
-        }else if (!ObjectUtils.isEmpty(publicType)){
-            raiseType=0;
-        }else if (!ObjectUtils.isEmpty(privateType)){
-            raiseType=1;
+        if (!ObjectUtils.isEmpty(publicType) && !ObjectUtils.isEmpty(privateType)) {
+            raiseType = null;
+        } else if (!ObjectUtils.isEmpty(publicType)) {
+            raiseType = 0;
+        } else if (!ObjectUtils.isEmpty(privateType)) {
+            raiseType = 1;
         }
 
         //获取是否是abs
@@ -861,7 +860,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //获取是否是A股
         Integer stockCn = entityAttrDto.getStockCn();
 
-        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll,stockThk,stockCn);
+        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll, stockThk, stockCn);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
@@ -959,16 +958,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public Page<EntityInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
-        Integer raiseType = 0;
+        Integer raiseType = null;
 
         Integer privateType = entityAttrDto.getPrivateType();
         Integer publicType = entityAttrDto.getPublicType();
-        if (!ObjectUtils.isEmpty(publicType)&&!ObjectUtils.isEmpty(privateType)){
-            raiseType=null;
-        }else if (!ObjectUtils.isEmpty(publicType)){
-            raiseType=0;
-        }else if (!ObjectUtils.isEmpty(privateType)){
-            raiseType=1;
+        if (!ObjectUtils.isEmpty(publicType) && !ObjectUtils.isEmpty(privateType)) {
+            raiseType = null;
+        } else if (!ObjectUtils.isEmpty(publicType)) {
+            raiseType = 0;
+        } else if (!ObjectUtils.isEmpty(privateType)) {
+            raiseType = 1;
         }
         //获取是否是abs
         Integer abs = entityAttrDto.getAbs();
@@ -988,9 +987,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfoResult> resultRecords = new ArrayList<>();
         List<MoreIndex> mapList = entityAttrDto.getMapList();
 
-        Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll,stockThk,stockCn);
+        Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll, stockThk, stockCn);
         pageNum = (pageNum - 1) * pageSize;
-        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize,stockThk,stockCn);
+        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize, stockThk, stockCn);
 
         pageResult.setTotal(count);
 
@@ -1946,12 +1945,67 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    public EntityListView getListView() {
+    public EntityListView getListView(Integer type) {
         EntityListView entityListView = new EntityListView();
-        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 1));
-        entityListView.setListTotle(listTotle);
+        switch (type) {
+            //查询上市概览
+            case 1:
+                entityListView = getListViews();
+                break;
+            //查询发债概览
+            case 2:
+                entityListView = getBondsViews();
+                break;
+            //查询既没上市，也没发债概览
+            case 3:
+                entityListView = getUnBondsListViews();
+                break;
+            //查询金融机构概览
+            case 4:
+                entityListView = getFinViews();
+        }
+        return entityListView;
+    }
+
+    private EntityListView getFinViews() {
+        EntityListView entityListView = new EntityListView();
+
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getFinance, 1));
+        entityListView.setTotle(listTotle);
+
+        return entityListView;
+
+    }
+
+    private EntityListView getUnBondsListViews() {
+        EntityListView entityListView = new EntityListView();
+
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0));
+        entityListView.setTotle(listTotle);
+        return entityListView;
+
+    }
+
+    private EntityListView getBondsViews() {
+        EntityListView entityListView = new EntityListView();
+
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getIssueBonds, 1));
+        entityListView.setTotle(listTotle);
         if (listTotle < 1) {
-            return entityListView.setListLive(0L).setListDie(0L);
+            return entityListView.setLive(0L).setDead(0L);
+        }
+        //根据时间查询发债存续企业
+        Long bondLive = bondInfoMapper.selectCount(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondState,0));
+        return entityListView.setLive(bondLive).setDead(listTotle - bondLive);
+    }
+
+    private EntityListView getListViews() {
+        EntityListView entityListView = new EntityListView();
+
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 1));
+        entityListView.setTotle(listTotle);
+        if (listTotle < 1) {
+            return entityListView.setLive(0L).setDead(0L);
         }
         Date now = new Date();
         //根据时间查询A股上市存续企业
@@ -1963,7 +2017,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             listCnLive.addAll(newThkList);
         }
         Long listLive = (long) listCnLive.size();
-        return entityListView.setListLive(listLive).setListDie(listTotle - listLive);
+        return entityListView.setLive(listLive).setDead(listTotle - listLive);
+
     }
 
     /**

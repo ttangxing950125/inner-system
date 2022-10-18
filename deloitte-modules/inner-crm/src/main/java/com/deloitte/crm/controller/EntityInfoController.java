@@ -402,18 +402,17 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 企业主体清单-查询上市概览
+     * 企业主体清单-查询概览
      *
      * @param
      * @return R
      * @author 冉浩岑
      * @date 2022/10/17 8:49
     */
-    @ApiOperation(value = "企业主体清单-查询上市概览")
+    @ApiOperation(value = "企业主体清单-查询概览")
+    @ApiImplicitParam(name = "type", value = "查询类型", paramType = "query", example = "1", dataType = "Integer")
     @PostMapping("/getListView")
-    public R getListView() {
-        return R.ok(entityInfoService.getListView());
+    public R getListView(Integer type) {
+        return R.ok(entityInfoService.getListView(type));
     }
-
-
 }

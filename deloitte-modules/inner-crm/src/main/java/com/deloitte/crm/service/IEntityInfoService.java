@@ -257,7 +257,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
-    EntityListView getListView();
+    EntityListView getListView(Integer type);
 
     /**
      * 根据 id 字段名 修改

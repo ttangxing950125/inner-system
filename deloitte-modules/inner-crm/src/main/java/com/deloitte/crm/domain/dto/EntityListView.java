@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EntityListView {
-    /** 上市总计 */
-    private Long listTotle;
-    /** 上市存续 */
-    private Long listLive;
-    /** 已经退市 */
-    private Long listDie;
+    /** 总计 */
+    private Long totle;
+    /** 存续 */
+    private Long live;
+    /** 退市 */
+    private Long dead;
 }

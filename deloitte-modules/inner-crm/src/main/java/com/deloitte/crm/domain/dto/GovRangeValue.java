@@ -20,4 +20,11 @@ public class GovRangeValue{
     private String name;
     //属性值
     private Object value;
+    //属性值
+    private GovRangeValue chlidren;
+
+    public GovRangeValue(String name,Object value){
+        this.name=name;
+        this.value=value;
+    }
 }
