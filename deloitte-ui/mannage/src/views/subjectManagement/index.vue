@@ -653,24 +653,7 @@ export default {
     form.append('file', params.file)
     form.uuid = this.uuid
     importExcelByEntity(form).then((res) => {
-        let contentType = res.headers['content-type']
-        let contentDisposition = res.headers['content-disposition']
-        if (contentType.indexOf('application/json') !== -1) {
-        } else {
-            contentDisposition = contentDisposition.split(';')[1]
-            let filename = contentDisposition.split('=')[1]
-            let filenameStr = window.decodeURI(filename.split(',')[0], 'utf-8')
-            const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' })
-            const link = document.createElement('a')
-            const href = window.URL.createObjectURL(blob)
-            // 后台再header中传文件名
-            link.href = href
-            link.download = filenameStr
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link) // 下载完成移除元素
-            window.URL.revokeObjectURL(href) // 释放掉blob对象
-        }
+        download(res, 'xxxx.xlsx')
     })
     this.$modal.closeLoading()
 },

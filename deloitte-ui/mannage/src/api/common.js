@@ -128,5 +128,5 @@ export function importExcelByEntity(params) {
     responseType:'bolb',
     method: "post",
     data: params,
-  });
+  }, {responseType:'bolb'}, {responseType:'bolb'});
 }

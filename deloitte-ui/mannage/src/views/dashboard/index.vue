@@ -1480,7 +1480,7 @@ export default {
         };
         getTaskByDate(params).then((res) => {
           const { data } = res
-          this.list7 = data
+          this.list = data
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
         getRoleSupplyTask(params).then((res) => {
