@@ -362,5 +362,17 @@ public class GovInfoController extends BaseController {
         return R.ok(govInfoService.getGovView());
     }
 
-
+    /**
+     * 根据政府名称或者政府code查询政府主体
+     *
+     * @param param
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/18 17:39
+    */
+    @ApiOperation(value = "根据政府名称或者政府code查询政府主体")
+    @PostMapping("/getGovByParam")
+    public R getGovByParam(String param) {
+        return R.ok(govInfoService.getGovByParam(param));
+    }
 }

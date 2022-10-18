@@ -28,7 +28,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -808,6 +807,15 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         }
         govView.setGovTotle(total).setProvince(province).setCity(city).setArea(area).setGx(gx).setNoLevel(total - province - city - area - gx);
         return govView;
+    }
+
+    @Override
+    public List<GovInfo> getGovByParam(String param) {
+        return govInfoMapper.selectList(new QueryWrapper<GovInfo>().lambda()
+                            .like(GovInfo::getDqGovCode, param)
+                            .or().like(GovInfo::getGovName, param)
+                            .or().like(GovInfo::getGovCode, param)
+        );
     }
 
     //返回筛选范围--城市分级
