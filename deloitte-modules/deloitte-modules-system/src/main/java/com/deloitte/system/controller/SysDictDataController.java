@@ -133,4 +133,10 @@ public class SysDictDataController extends BaseController
         dictDataService.deleteDictDataByIds(dictCodes);
         return success();
     }
+
+    @PostMapping("/dataYear")
+    public List<String> getList(){
+
+       return dictDataService.getDictData();
+    }
 }

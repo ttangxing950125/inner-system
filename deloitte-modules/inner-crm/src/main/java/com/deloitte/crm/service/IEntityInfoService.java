@@ -8,6 +8,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.dto.EntityDto;
+import com.deloitte.crm.dto.EntityInfoCodeDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
 import com.deloitte.crm.vo.EntityInfoVo;
@@ -257,10 +258,8 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
-    /**
-     * 根据 id 字段名 修改
-     * @param id
-     * @param filedName
-     * @param value
-     */
+    List<EntityInfo> selectEntityInfoListByName(String name);
+
+
+    EntityInfoCodeDto selectEntityDto(String code);
 }

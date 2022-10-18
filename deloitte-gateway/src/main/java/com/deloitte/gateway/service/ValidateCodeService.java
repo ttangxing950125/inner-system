@@ -1,5 +1,4 @@
 package com.deloitte.gateway.service;
-
 import java.io.IOException;
 import com.deloitte.common.core.exception.CaptchaException;
 import com.deloitte.common.core.web.domain.AjaxResult;

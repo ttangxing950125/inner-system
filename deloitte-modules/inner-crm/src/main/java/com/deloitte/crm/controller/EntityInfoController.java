@@ -391,5 +391,42 @@ public class EntityInfoController extends BaseController {
         return R.ok();
     }
 
+    /**
+     *根据名称查询主体的相关信息(产品客户划分情况)
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/17 9:53
+    */
+    @ApiOperation(value = "敞口划分根据主体名称查询信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam( paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+    })
+    @PostMapping("/entityMaster")
+    public R  selectEntityInfoByName(String name) {
+        return R.ok(entityInfoService.selectEntityInfoListByName(name));
+
+    }
+
+    /**
+     *根据名code
+     *查询主体信息
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/17 9:53
+     */
+    @ApiOperation(value = "根据主体code查询主体信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code",paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+    })
+    @PostMapping("/entityByMaster")
+    public R  selectEntityInfoByCode(@RequestParam("code") String code) {
+        return  R.ok(entityInfoService.selectEntityDto(code));
+    }
+
+
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.deloitte.system.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -127,4 +128,23 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper,SysDic
         }
         return row;
     }
+
+    /**
+     *查询产品年份
+     *
+     * @return List<String>
+     * @author penTang
+     * @date 2022/10/17 12:52
+    */
+    @Override
+    public List<String> getDictData(){
+        LambdaQueryWrapper<SysDictData> qw = new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getDictType, "Products_master_rel");
+        ArrayList<String> dataYearList = new ArrayList<>();
+        List<SysDictData> list = list(qw);
+        list.forEach(o->{
+            dataYearList.add(o.getDictValue());
+        });
+        return dataYearList;
+    }
+
 }

@@ -7,6 +7,7 @@ import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,5 +55,9 @@ public interface RoleService {
      */
     @PostMapping("/role/roleList")
     List<SysRole> selectRoleList();
+
+
+    @PostMapping("/dict/data/dataYear")
+    List<String> selectDataYear();
 
 }

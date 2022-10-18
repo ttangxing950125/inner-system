@@ -117,6 +117,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private ICrmEntityTaskService iCrmEntityTaskService;
 
     private RedisService redisService;
+
+    private EntityGovRelMapper entityGovRelMapper;
+
+    private EntityMasterMapper entityMasterMapper;
     /**
      * 主体
      */
@@ -1939,21 +1943,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             for (int i = 0; i < entityByBatchDtos.size(); i++) {
                 ExportEntityCheckDto exportEntityCheckDto = new ExportEntityCheckDto();
                 //添加原始数据
-                exportEntityCheckDto.setEntityName(entityByBatchList.get(i).getEntityName());
-                exportEntityCheckDto.setCreditCode(entityByBatchList.get(i).getCreditCode());
+                exportEntityCheckDto.setEntityName(entityByBatchDtos.get(i).getEntityName());
+                exportEntityCheckDto.setCreditCode(entityByBatchDtos.get(i).getCreditCode());
                 //统计社会性代码进行检查
-                if (Objects.equals(entityByBatchList.get(i).getCreditCode(), null) || Objects.equals(entityByBatchList.get(i).getCreditCode(), "")) {
+                if (Objects.equals(entityByBatchDtos.get(i).getCreditCode(), null) || Objects.equals(entityByBatchDtos.get(i).getCreditCode(), "")) {
                     exportEntityCheckDto.setCreditCodeByRecord("无法识别");
                 } else {
                     //校验统一社会性代码
-                    String code = entityByBatchList.get(i).getCreditCode();
+                    String code = entityByBatchDtos.get(i).getCreditCode();
                     String regx = "\\w{18}";
                     boolean matches = code.matches(regx);
                     if (!matches) {
                         exportEntityCheckDto.setCreditCodeByRecord("无法识别");
                     } else {
                         //根据统一查询数据库是否已覆盖
-                        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByBatchList.get(i).getCreditCode()));
+                        EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByBatchDtos.get(i).getCreditCode()));
                         if (entityInfo != null) {
                             exportEntityCheckDto.setCreditCodeByRecord("识别成功,已覆盖主体");
                             exportEntityCheckDto.setCreditCodeByEntityName(entityInfo.getEntityName());
@@ -1965,11 +1969,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     }
                 }
                 //主体全称进行检查
-                if (Objects.equals(entityByBatchList.get(i).getEntityName(), null) || Objects.equals(entityByBatchList.get(i).getEntityName(), "")) {
+                if (Objects.equals(entityByBatchDtos.get(i).getEntityName(), null) || Objects.equals(entityByBatchDtos.get(i).getEntityName(), "")) {
                     exportEntityCheckDto.setEntityNameByRecord("无法识别");
                 } else {
                     //根据主体全称查询是否未覆盖
-                    EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityName, entityByBatchList.get(i).getEntityName()));
+                    EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityName, entityByBatchDtos.get(i).getEntityName()));
                     if (entityInfo != null) {
                         exportEntityCheckDto.setEntityNameByRecord("识别成功,已覆盖主体");
                         exportEntityCheckDto.setEntityNameByEntityName(entityInfo.getEntityName());
@@ -2032,8 +2036,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 NumberFormat percentInstance = NumberFormat.getPercentInstance();
                 // 设置保留几位小数，这里设置的是保留1位小数
                 percentInstance.setMinimumFractionDigits(1);
-                String format = percentInstance.format(index / sum);
-                redisService.setCacheObject(uuid, format, 1L, TimeUnit.DAYS);
+               Double cov = index / sum;
+                String s = cov.toString();
+                redisService.setCacheObject(uuid, s, 1L, TimeUnit.DAYS);
             }
 
 
@@ -2174,6 +2179,64 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return R.ok("导出成功");
 
     }
+        /**
+         *根据名称查询主体信息
+         *
+         * @param name
+         * @return List<EntityInfo>
+         * @author penTang
+         * @date 2022/10/18 10:01
+        */
+        @Override
+      public List<EntityInfo> selectEntityInfoListByName(String name){
+          LambdaQueryWrapper<EntityInfo> qw = new LambdaQueryWrapper<EntityInfo>().like(EntityInfo::getEntityName, name);
+          List<EntityInfo> list = list(qw);
+          return list;
+      }
 
+    /**
+     *根据code 查询
+     *
+     * @param code
+     * @return List<EntityInfo>
+     * @author penTang
+     * @date 2022/10/18 10:01
+     */
+    @Override
+      public EntityInfoCodeDto selectEntityDto(String code){
+          //entity infoQuery
+          LambdaQueryWrapper<EntityInfo> qw = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, code);
+          EntityInfo one = getOne(qw);
+          EntityInfoCodeDto entityInfoCodeDto = new EntityInfoCodeDto();
+          entityInfoCodeDto.setEntityCode(one.getEntityCode());
+          entityInfoCodeDto.setCreditCode(one.getCreditCode());
+          entityInfoCodeDto.setEntityName(one.getEntityName());
+          entityInfoCodeDto.setFinance(one.getFinance());
+          entityInfoCodeDto.setIssueBonds(one.getIssueBonds());
+          entityInfoCodeDto.setList(one.getList());
+          entityInfoCodeDto.setWindMaster(one.getWindMaster());
+          entityInfoCodeDto.setShenWanMaster(one.getShenWanMaster());
+          //entityFinancial
+          LambdaQueryWrapper<EntityFinancial> eq = new LambdaQueryWrapper<EntityFinancial>().eq(EntityFinancial::getEntityCode, code);
+          EntityFinancial entityFinancial = financialMapper.selectOne(eq);
+          entityInfoCodeDto.setMince(entityFinancial.getMince());
+          //是否为城投机构
+          LambdaQueryWrapper<EntityGovRel> eq1 = new LambdaQueryWrapper<EntityGovRel>().eq(EntityGovRel::getEntityCode, code);
+          EntityGovRel entityGovRel = entityGovRelMapper.selectOne(eq1);
+          if (entityGovRel!= null){
+              entityInfoCodeDto.setIsGov("Y");
+              LambdaQueryWrapper<GovInfo> eq2 = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getDqGovCode, entityGovRel.getDqGovCode());
+              GovInfo govInfo = govInfoMapper.selectOne(eq2);
+              entityInfoCodeDto.setGovName(govInfo.getGovName());
+          }else{
+              entityInfoCodeDto.setIsGov("N");
+          }
+          //entitMaster
+          LambdaQueryWrapper<EntityMaster> eq2 = new LambdaQueryWrapper<EntityMaster>().eq(EntityMaster::getEntityCode, code);
+          EntityMaster entityMaster = entityMasterMapper.selectOne(eq2);
+          entityInfoCodeDto.setYyUrban(entityMaster.getYyUrban());
+          entityInfoCodeDto.setZhongxinUrban(entityMaster.getZhongxinUrban());
+          return entityInfoCodeDto;
+      }
 
 }
