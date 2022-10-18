@@ -534,7 +534,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //是否发债（含历史） -- 有过就发债过
         if (CollectionUtils.isEmpty(entityBondRels)) {
             bondInfoDetail.setIsBond(false);
-            return null;
+            return entityInfoDetails;
         }
         bondInfoDetail.setIsBond(true);
         //查询债券数据
@@ -614,7 +614,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //查询关联表
         List<EntityStockThkRel> entityStockThkRels = thkRelMapper.selectList(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode));
         if (CollectionUtils.isEmpty(entityStockThkRels)) {
-            return null;
+            return entityInfoDetails;
         }
         //查询港股上市数据
         List<String> thkRelCodes = new ArrayList<>();
