@@ -16,6 +16,7 @@ import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
+import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
@@ -274,19 +275,28 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 上市企业-更多指标
+     * 企业主体-更多指标
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 10:56
      */
-    @ApiOperation(value = "上市企业-更多指标")
-    @ApiImplicitParam(name = "entityAttrDto", value = "包含表中entity_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+    @ApiOperation(value = "企业主体-更多指标")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "mapList", value = "更多指标添加指标项", paramType = "body", example = "", dataTypeClass = MoreIndex.class),
+            @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1",dataType = "Integer"),
+            @ApiImplicitParam(name = "publicType", value = "公募债券", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "privateType", value = "私募债券", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "abs", value = "ABS", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "coll", value = "集合债券", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "stockThk", value = "港股", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "stockCn", value = "内地股", paramType = "body", example = "1", dataType = "Integer")
+    })
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto) {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
     }
-
     /**
      * 企业主体分类概览
      *

@@ -163,6 +163,18 @@ public class GovInfo implements Serializable {
     @Excel(name = "主体状态")
     private Integer status;
 
+    /**
+     * 主体状态 是否生效 0-失效 1-生效
+     */
+    @Excel(name = "城市规模")
+    private String gov_scale;
+
+    /**
+     * 主体状态 是否生效 0-失效 1-生效
+     */
+    @Excel(name = "城市分级")
+    private String govGrading;
+
 
     @Override
     public String toString() {

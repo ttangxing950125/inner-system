@@ -76,17 +76,23 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     List<EntityInfo> getEntityByBondType(@Param("raiseType") Integer raiseType,
                                          @Param("abs")Integer abs,
-                                         @Param("coll")Integer coll);
+                                         @Param("coll")Integer coll,
+                                         @Param("stockThk")Integer stockThk,
+                                         @Param("stockCn")Integer stockCn);
 
     Integer getEntityCountByBondType(@Param("raiseType") Integer raiseType,
                                      @Param("abs")Integer abs,
-                                     @Param("coll")Integer coll);
+                                     @Param("coll")Integer coll,
+                                     @Param("stockThk")Integer stockThk,
+                                     @Param("stockCn")Integer stockCn);
 
     List<EntityInfo> getEntityByBondTypeByPage(@Param("raiseType") Integer raiseType,
                                                @Param("abs")Integer abs,
                                                @Param("coll")Integer coll,
                                                @Param("pageNum")Integer pageNum,
-                                               @Param("pageSize")Integer pageSize);
+                                               @Param("pageSize")Integer pageSize,
+                                               @Param("stockThk")Integer stockThk,
+                                               @Param("stockCn")Integer stockCn);
 
     /**
      * 通过 credit_code 的前缀 查询主体

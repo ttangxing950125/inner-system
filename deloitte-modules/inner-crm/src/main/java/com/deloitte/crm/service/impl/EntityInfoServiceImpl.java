@@ -837,12 +837,30 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
         //获取参数信息
         List<MoreIndex> mapList = entityAttrDto.getMapList();
+        //0.公募债券 1.私募债券
+        Integer raiseType = 0;
 
-        Integer raiseType = entityAttrDto.getRaiseType();
+        Integer privateType = entityAttrDto.getPrivateType();
+        Integer publicType = entityAttrDto.getPublicType();
+        if (!ObjectUtils.isEmpty(publicType)&&!ObjectUtils.isEmpty(privateType)){
+            raiseType=null;
+        }else if (!ObjectUtils.isEmpty(publicType)){
+            raiseType=0;
+        }else if (!ObjectUtils.isEmpty(privateType)){
+            raiseType=1;
+        }
+
+        //获取是否是abs
         Integer abs = entityAttrDto.getAbs();
+        //获取是否是集合债
         Integer coll = entityAttrDto.getColl();
 
-        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll);
+        //获取是否是港股
+        Integer stockThk = entityAttrDto.getStockThk();
+        //获取是否是A股
+        Integer stockCn = entityAttrDto.getStockCn();
+
+        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll,stockThk,stockCn);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
@@ -940,9 +958,27 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public Page<EntityInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
-        Integer raiseType = entityAttrDto.getRaiseType();
+        Integer raiseType = 0;
+
+        Integer privateType = entityAttrDto.getPrivateType();
+        Integer publicType = entityAttrDto.getPublicType();
+        if (!ObjectUtils.isEmpty(publicType)&&!ObjectUtils.isEmpty(privateType)){
+            raiseType=null;
+        }else if (!ObjectUtils.isEmpty(publicType)){
+            raiseType=0;
+        }else if (!ObjectUtils.isEmpty(privateType)){
+            raiseType=1;
+        }
+        //获取是否是abs
         Integer abs = entityAttrDto.getAbs();
+        //获取是否是集合债
         Integer coll = entityAttrDto.getColl();
+
+        //获取是否是港股
+        Integer stockThk = entityAttrDto.getStockThk();
+        //获取是否是A股
+        Integer stockCn = entityAttrDto.getStockCn();
+
         if (ObjectUtils.isEmpty(pageSize)) {
             pageSize = 9;
         }
@@ -951,9 +987,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfoResult> resultRecords = new ArrayList<>();
         List<MoreIndex> mapList = entityAttrDto.getMapList();
 
-        Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll);
+        Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll,stockThk,stockCn);
         pageNum = (pageNum - 1) * pageSize;
-        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize);
+        List<EntityInfo> records = entityInfoMapper.getEntityByBondTypeByPage(raiseType, abs, coll, pageNum, pageSize,stockThk,stockCn);
 
         pageResult.setTotal(count);
 
