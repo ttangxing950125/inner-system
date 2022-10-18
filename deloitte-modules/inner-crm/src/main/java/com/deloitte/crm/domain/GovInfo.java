@@ -45,6 +45,9 @@ public class GovInfo implements Serializable {
     @Excel(name = "上级地方政府行政编码，六位数字，各地方唯一")
     private String preGovCode;
 
+    @Excel(name = "上级地方政府名称")
+    private String preGovName;
+
     /**
      * 对于地方政府主体：
      * 省级、地级、县级政府为“GV+官方行政代码”
