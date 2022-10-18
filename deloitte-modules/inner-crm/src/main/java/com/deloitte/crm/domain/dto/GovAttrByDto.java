@@ -43,7 +43,6 @@ public class GovAttrByDto implements Serializable
     /** 19个城市群 *///    19个城市群 ——> 城市群归属
     private List<String> nineteenCity;
 
-
     /** 百强县 */
     private Integer hundred;
     /** 国家中心城市 *///    国家中心城市 ——> 是否为国家中心城市
@@ -51,6 +50,7 @@ public class GovAttrByDto implements Serializable
     /** 省会城市 *///    省会城市 ——> 是否为省会城市
     private Integer provincial;
 
+    private GovAttrByDto govAttrByDto;
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

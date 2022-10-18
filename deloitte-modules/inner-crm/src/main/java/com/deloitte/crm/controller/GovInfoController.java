@@ -12,6 +12,7 @@ import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
 import com.deloitte.crm.dto.GovInfoDto;
+import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.service.IGovInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -136,7 +137,7 @@ public class GovInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/22 15:24
      */
-    @ApiOperation(value = "政府主题批量修改")
+    @ApiOperation(value = "政府主体批量修改")
     @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
     public R updateInfoList(List<GovInfo> govInfoList) {
@@ -254,10 +255,38 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/23 10:56
      */
     @ApiOperation(value = "地方政府-更多指标")
-    @ApiImplicitParam(name = "entityAttrDto", value = "包含表中gov_info的所有字段和分页参数 pageSize pageNum", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "mapList", value = "更多指标添加指标项", paramType = "body", example = "", dataTypeClass = MoreIndex.class),
+            @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1",dataType = "Integer"),
+            @ApiImplicitParam(name = "govScale", value = "城市规模", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "govGrading", value = "城市分级", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isProvince", value = "省级行政区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isCity", value = "地级行政区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isCounty", value = "县级行政区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "isJKGX", value = "经开高新区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "eightER", value = "八大经济区", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "nineteenCity", value = "19个城市群", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "hundred", value = "百强县", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "CCity", value = "国家中心城市", paramType = "body", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "provincial", value = "省会城市", paramType = "body", example = "1", dataType = "Integer")
+    })
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody GovAttrByDto govAttrDto) {
         return R.ok(govInfoService.getListEntityByPage(govAttrDto));
+    }
+
+    /**
+     * 地方政府-更多指标-主体范围
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/11 17:10
+     */
+    @ApiOperation(value = "地方政府-更多指标-主体范围")
+    @PostMapping("/getGovRange")
+    public R getGovRange() {
+        return R.ok(govInfoService.getGovRange());
     }
 
     /**
@@ -305,19 +334,6 @@ public class GovInfoController extends BaseController {
 
 
     /**
-     * 地方政府-更多指标-主体范围
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/10/11 17:10
-     */
-    @ApiOperation(value = "地方政府-更多指标-主体范围")
-    @PostMapping("/getGovRange")
-    public R getGovRange() {
-        return R.ok(govInfoService.getGovRange());
-    }
-
-    /**
      * 新增地方政府
      *
      * @return R
@@ -332,5 +348,17 @@ public class GovInfoController extends BaseController {
         return R.ok();
     }
 
-
+    /**
+     * 政府主体清单-地方政府概览
+     *
+     * @param
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/17 8:49
+     */
+    @ApiOperation(value = "政府主体清单-地方政府概览")
+    @PostMapping("/getGovView")
+    public R getGovView() {
+        return R.ok(govInfoService.getGovView());
+    }
 }

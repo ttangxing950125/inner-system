@@ -127,8 +127,10 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }
 
-            //更新当前债券属性
-            entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
+            if (resStatus!=null){
+                //更新当前债券属性
+                entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
+            }
 
             return new AsyncResult(bondInfoDto);
         } catch (Exception e) {

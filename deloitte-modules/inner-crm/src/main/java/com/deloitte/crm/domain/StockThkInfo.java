@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.annotation.UpdateLog;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,14 +51,17 @@ public class StockThkInfo implements Serializable {
 
     /** 上市日期*/
     @ApiModelProperty(value="上市日期")
+    @UpdateLog(fieldName = "港股上市时间",tableFieldName ="list_date")
     private String  listDate ;
 
     /** 退市日期*/
     @ApiModelProperty(value="退市日期")
+    @UpdateLog(fieldName = "港股退市时间",tableFieldName ="delisting_date")
     private  String  delistingDate ;
 
     /** 交易所*/
     @ApiModelProperty(value="交易所")
+    @UpdateLog(fieldName = "港股上市交易所",tableFieldName ="exchange")
     private  String  exchange ;
 
     /**
@@ -72,6 +76,7 @@ public class StockThkInfo implements Serializable {
      * 股票代码
      */
     @Excel(name = "股票代码")
+    @UpdateLog(fieldName = "港股股票代码",tableFieldName ="stock_code")
     private String stockCode;
     /**
      * 创建时间

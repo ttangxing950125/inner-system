@@ -47,18 +47,20 @@
         <a :class="currentTab === '1' ? 'g-select' : ''" @click="changeTab('1')"
           >地方政府</a
         >
-        <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
-          >地方主管部门</a
-        >
-        <a :class="currentTab === '3' ? 'g-select' : ''" @click="changeTab('3')"
-          >其他</a
-        >
       </div>
       <el-col :sm="24" :lg="24" class="mt20" style="padding-left: 20px">
         <el-card>
           <h3 class="g-t-title">{{ tabArr[currentTab] }}</h3>
           <div class="g-desc">
-            截止日期，会计收录<span>xxxx</span>个地方政府主体，其中<span>xxxx</span>个省级行政区，<span>xxxx</span>个地市级行政区，<span>xxxx</span>个县级行政区，<span>xxxx</span>个经开高新区，
+            截止日期，会计收录
+            <span>{{ overview.govTotle }}</span> 个地方政府主体，其中
+            <span>{{ overview.province }}</span> 个省级行政区，<span>{{
+              overview.city
+            }}</span>
+            个地市级行政区，<span>{{ overview.area }}</span> 个县级行政区，<span
+              >{{ overview.gx }}</span
+            >
+            个经开高新区
           </div>
           <div class="g-desc flex1">
             <router-link
@@ -175,7 +177,7 @@
 <script>
 import { getInfoList, getOverview } from "@/api/common";
 import pagination from "../../components/Pagination";
-import { getInfoListGov } from "@/api/subject";
+import { getInfoListGov, getGovView } from "@/api/subject";
 import { formatDate } from "@/utils/index";
 export default {
   name: "government",
@@ -200,6 +202,7 @@ export default {
         pageSize: 10,
       },
       total: 0,
+      overview: {},
     };
   },
   created() {
@@ -237,6 +240,10 @@ export default {
           this.invalid = data.invalid;
           this.unInvalid = data.unInvalid;
         });
+        getGovView({}).then((res) => {
+          const { data } = res;
+          this.overview = data;
+        });
       } catch (error) {
         console.log(error);
       } finally {
@@ -245,6 +252,27 @@ export default {
     },
     changeTab(tab) {
       this.currentTab = tab;
+      try {
+        this.$modal.loading("Loading...");
+        this.currentTab = tab;
+        this.queryParams.pageNum = 1;
+        const parmas = {
+          param: this.codeInput,
+          type: this.currentTab,
+          pageNum: this.queryParams.pageNum,
+          pageSize: this.queryParams.pageSize,
+        };
+        getInfoListGov(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.records;
+          this.total = data.total;
+          this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     selectTable() {
       try {

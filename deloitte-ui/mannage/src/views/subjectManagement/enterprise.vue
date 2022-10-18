@@ -199,7 +199,7 @@
         <a :class="currentTab === '1' ? 'g-select' : ''" @click="changeTab('1')"
           >上市</a
         >
-        <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
+        <!-- <a :class="currentTab === '2' ? 'g-select' : ''" @click="changeTab('2')"
           >发债</a
         >
         <a :class="currentTab === '3' ? 'g-select' : ''" @click="changeTab('3')"
@@ -207,14 +207,14 @@
         >
         <a :class="currentTab === '4' ? 'g-select' : ''" @click="changeTab('4')"
           >金融机构</a
-        >
+        > -->
       </div>
       <el-col :sm="24" :lg="24" class="mt20" style="padding-left: 20px">
         <el-card>
           <h3 class="g-t-title">{{ tabArr[currentTab] + "企业" }}</h3>
           <div class="g-desc">
-            截止日期，会计收录<span>xxxx</span>个地方政府主体，其中
-            <span>xxxx</span> 个存续上市， <span>xxxx</span> 个已退市
+            截止日期，会计收录 <span>{{ overview.listTotle }}</span> 个地方企业主体，其中
+            <span>{{ overview.listLive }}</span> 个存续上市， <span>{{ overview.listDie }}</span> 个已退市
           </div>
           <div class="g-desc flex1">
             <router-link
@@ -316,6 +316,7 @@ import {
   getOverviewByGroup,
   getInfoList,
   getQuickOfCoverage,
+  getListView
 } from "@/api/subject";
 import { replaceStr } from "@/utils/index";
 import pagination from "../../components/Pagination";
@@ -351,6 +352,7 @@ export default {
         pageSize: 10,
       },
       total2: 0,
+      overview: {}
     };
   },
   created() {
@@ -387,6 +389,10 @@ export default {
           this.total2 = data.total;
           this.queryParams2.pageNum = data.current;
         });
+        getListView({}).then(res => {
+          const { data } = res;
+          this.overview = data
+        })
       } catch (error) {
         console.log(error);
       } finally {

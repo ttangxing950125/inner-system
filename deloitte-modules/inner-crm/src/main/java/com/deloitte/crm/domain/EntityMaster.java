@@ -2,6 +2,7 @@ package com.deloitte.crm.domain;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
@@ -9,6 +10,7 @@ import com.deloitte.crm.constants.Common;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -53,6 +55,7 @@ public class EntityMaster implements Serializable {
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @Attrs(attrId = 0,attrName = Common.UPDATED)
+    @TableField(value = "`update`")
     private Date update;
 
     /**

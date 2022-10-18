@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.math.MathUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -114,9 +116,11 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             //新增港股
             stockThkInfo = stockThkInfoService.saveOrUpdateNew(stockThkInfo);
 
-            //保存attr
-            //更新港股属性
-            entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);
+            if (changeType==null){
+                //保存attr
+                //更新港股属性
+                entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);
+            }
 
             //保存thkSecIssInfo
             thkSecIssDetailService.save(thkSecIssInfos);
@@ -169,10 +173,10 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
         ArrayList<String> arr = new ArrayList<>();
 
         arr.add("导入日期");
-        arr.add("修改状态");
+        arr.add("变化状态");
 
-        arr.add("代码");
-        arr.add("名称");
+        arr.add("证券代码");
+        arr.add("证券简称");
         arr.add("上市日期");
 
 

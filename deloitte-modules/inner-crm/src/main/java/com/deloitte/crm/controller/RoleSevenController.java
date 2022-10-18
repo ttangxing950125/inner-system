@@ -16,12 +16,15 @@ import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 import java.util.List;
 
 import static org.reflections.Reflections.log;
@@ -62,7 +65,8 @@ public class RoleSevenController {
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(String date, Integer pageNum, Integer pageSize){
+    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+                                                   Integer pageNum, Integer pageSize){
         log.info("==> 角色7当日查询 <==");
         return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
     }

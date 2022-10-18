@@ -76,17 +76,23 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     List<EntityInfo> getEntityByBondType(@Param("raiseType") Integer raiseType,
                                          @Param("abs")Integer abs,
-                                         @Param("coll")Integer coll);
+                                         @Param("coll")Integer coll,
+                                         @Param("stockThk")Integer stockThk,
+                                         @Param("stockCn")Integer stockCn);
 
     Integer getEntityCountByBondType(@Param("raiseType") Integer raiseType,
                                      @Param("abs")Integer abs,
-                                     @Param("coll")Integer coll);
+                                     @Param("coll")Integer coll,
+                                     @Param("stockThk")Integer stockThk,
+                                     @Param("stockCn")Integer stockCn);
 
     List<EntityInfo> getEntityByBondTypeByPage(@Param("raiseType") Integer raiseType,
                                                @Param("abs")Integer abs,
                                                @Param("coll")Integer coll,
                                                @Param("pageNum")Integer pageNum,
-                                               @Param("pageSize")Integer pageSize);
+                                               @Param("pageSize")Integer pageSize,
+                                               @Param("stockThk")Integer stockThk,
+                                               @Param("stockCn")Integer stockCn);
 
     /**
      * 通过 credit_code 的前缀 查询主体
@@ -102,4 +108,22 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @param value
      */
     void editByBondInfoManager(@Param("id") Integer id, @Param("filedName") String filedName, @Param("value") String value);
+    /**
+     * 根据时间查询A股上市存续企业
+     *
+     * @param timeParam
+     * @return Long
+     * @author 冉浩岑
+     * @date 2022/10/17 9:02
+    */
+    List<String> selectListCnLive(@Param("timeParam")String timeParam);
+    /**
+     * 根据时间查询港股上市存续企业
+     *
+     * @param timeParam
+     * @return Long
+     * @author 冉浩岑
+     * @date 2022/10/17 9:02
+     */
+    List<String> selectListThkLive(@Param("timeParam")String timeParam);
 }

@@ -23,10 +23,17 @@ public class EntityAttrByDto implements Serializable
     private Integer pageSize;
 
     private Integer pageNum;
+
     /**
-     * 0.公募债券 1.私募债券
-    */
-    private Integer raiseType;
+     * 0.公募债券
+     */
+    private Integer publicType;
+
+    /**
+     * 1.私募债券
+     */
+    private Integer privateType;
+
     /**
      * ABS
      */
@@ -35,6 +42,16 @@ public class EntityAttrByDto implements Serializable
      * 集合债券
      */
     private Integer coll;
+
+    /**
+     * 港股
+     */
+    private Integer stockThk;
+
+    /**
+     * 内地股
+     */
+    private Integer stockCn;
 
     @Override
     public String toString() {

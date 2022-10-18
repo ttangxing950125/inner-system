@@ -57,6 +57,8 @@ public class ModelMasterServiceImpl implements IModelMasterService
 
     private EntityFinancialService entityFinancialService;
 
+    private ICrmWindTaskService iCrmWindTaskService;
+
     /**
      * 查询【请填写功能名称】
      * 
@@ -248,6 +250,7 @@ public class ModelMasterServiceImpl implements IModelMasterService
             //当日任务完成状态为 3
             crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
             iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            //TODO 发送邮件
         }
 
         //完成当条任务后 向 crm_supply 添加任务

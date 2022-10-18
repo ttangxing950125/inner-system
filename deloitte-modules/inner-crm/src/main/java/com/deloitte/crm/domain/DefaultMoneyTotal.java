@@ -1,10 +1,13 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
+import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -85,22 +88,22 @@ public class DefaultMoneyTotal implements Serializable {
      * 发行规模(亿元)
      */
     @Excel(name = "发行规模(亿元)")
-    private Double offeringSize;
+    private BigDecimal offeringSize;
     /**
      * 违约日债券余额(亿)
      */
     @Excel(name = "违约日债券余额(亿)")
-    private Double bondBalanceDefaultDate;
+    private BigDecimal bondBalanceDefaultDate;
     /**
      * 逾期本金(亿元)
      */
     @Excel(name = "逾期本金(亿元)")
-    private Double defaultPrincipal;
+    private BigDecimal defaultPrincipal;
     /**
      * 逾期利息(万元)
      */
     @Excel(name = "逾期利息(万元)")
-    private Double defaultInterest;
+    private BigDecimal defaultInterest;
     /**
      * 到期日 yyyy-MM-dd
      */
@@ -168,4 +171,13 @@ public class DefaultMoneyTotal implements Serializable {
     private Date updated;
 
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bondCode, defaultDate, bondAbstract, publisher, type, course, latestStatus, offeringSize, bondBalanceDefaultDate, defaultPrincipal, defaultInterest, dueDate, valueDate, residualMaturity, surety, predefaultSubjectRating, predefaultDebtRating, coNature, listedCompany, belWind, bondType, exchange);
+    }
 }

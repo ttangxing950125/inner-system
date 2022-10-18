@@ -20,7 +20,7 @@ public interface EntityAttrValueRunBatchTask {
      * @return EntityAttrValue
      * @throws Exception
      */
-    List<EntityAttrValue> getPrams() throws Exception;
+    List<EntityAttrValue> getPrams();
 
     /**
      * 开始导入数据

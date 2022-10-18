@@ -7,6 +7,7 @@ import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
+import com.deloitte.crm.domain.dto.EntityListView;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.dto.EntityInfoCodeDto;
 import com.deloitte.crm.dto.EntityInfoDto;
@@ -92,7 +93,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     Object getListEntityByPage(EntityAttrByDto entityAttrDto);
 
-    R<EntityInfoVo> validEntity(String creditCode, String entityName);
     /**
      * 根据统一社会信用代码 查询主体信息
      * @param creditCode
@@ -258,6 +258,14 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
+    EntityListView getListView(Integer type);
+
+    /**
+     * 根据 id 字段名 修改
+     * @param id
+     * @param filedName
+     * @param value
+     */
     List<EntityInfo> selectEntityInfoListByName(String name);
 
 

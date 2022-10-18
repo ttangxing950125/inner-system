@@ -1,12 +1,12 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -121,13 +121,14 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @Override
-    public R<Page<CrmEntityTaskVo>> getTaskInfo(String date,Integer pageNum,Integer pageSize) {
+    public R<Page<CrmEntityTaskVo>> getTaskInfo(Date dateDay,Integer pageNum,Integer pageSize) {
         pageNum = pageNum==null?1:pageNum;
         pageSize = pageSize==null?5:pageSize;
-        Date dateDay = DateUtil.parseDate(date);
+
+
 
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum,pageSize), new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getTaskDate, dateDay));
+                .lambda().eq(CrmEntityTask::getTaskDate, DateUtil.format(dateDay,"yyyy-MM-dd")));
         log.info("----查询到的记录数量{}",crmEntityTaskPage.getRecords().size());
         List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
         Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum,pageSize,crmEntityTaskPage.getTotal());
@@ -171,12 +172,12 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
         List<CrmEntityTask> unFinish = baseMapper
                 .selectList(new QueryWrapper<CrmEntityTask>().lambda()
-                        .eq(CrmEntityTask::getTaskDate, taskDate)
+                        .like(CrmEntityTask::getTaskDate, DateUtil.format(taskDate,"yyyy-MM-dd"))
                         .eq(CrmEntityTask::getState, 0));
         if (unFinish.size() == 0) {
             //查询日任务 角色7对应的 task_role_type 为 8
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>()
-                    .lambda().eq(CrmDailyTask::getTaskDate, taskDate).eq(CrmDailyTask::getTaskRoleType, 8));
+                    .lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate,"yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8));
             Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
             // 当日任务处理完毕 状态码为 3
             crmDailyTask.setTaskStatus(3);

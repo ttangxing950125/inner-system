@@ -285,12 +285,12 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     public int updateStockCnAttr(String code, Object item, boolean async) {
         if (async){
             singleThreadPoll.execute(()->{
-                this.updateAttrValue(code, item, 4, Excel.class, "name");
+                this.updateAttrValue(code, item, 5, Excel.class, "name");
             });
 
             return -1;
         }else {
-            return this.updateAttrValue(code, item, 4, Excel.class, "name");
+            return this.updateAttrValue(code, item, 5, Excel.class, "name");
         }
     }
 
@@ -503,7 +503,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @author penTang
      * @date 2022/9/27 20:40
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public R createBondEntity(EntityByIondVo entityByIondVo) {
         //creditCode和bondShortName进行查重操作
@@ -606,7 +606,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @date 2022/9/29 9:59
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public R createStockEntity(EntityStockInfoVo entityStockInfoVo) {
         if (entityStockInfoVo.getCreditCode()!=null){
             EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
@@ -719,7 +719,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @date 2022/9/29 9:59
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public R createStockEntityG(EntityStockInfoVo entityStockInfoVo) {
         EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
         StockThkInfo stockThkCode = stockThkInfoMapper.selectOne(new LambdaQueryWrapper<StockThkInfo>().eq(StockThkInfo::getStockCode, entityStockInfoVo.getStockCode()));

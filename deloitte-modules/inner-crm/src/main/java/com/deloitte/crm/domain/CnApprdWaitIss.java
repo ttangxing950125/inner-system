@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * IPO-审核通过尚未发行(CnApprdWaitIss)表实体类
@@ -85,17 +88,25 @@ public class CnApprdWaitIss implements Serializable {
      * 预计发行股数(万股)
      */
     @Excel(name = "预计发行股数(万股)")
-    private Double estIssNum;
+    private BigDecimal estIssNum;
     /**
      * 预计募集资金(万元)
      */
     @Excel(name = "预计募集资金(万元)")
-    private Double estFundNum;
+    private BigDecimal estFundNum;
     /**
      * 交易所
      */
     @Excel(name = "交易所")
     private String exchange;
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, entityName, province, city, approvedDate, ipoBoard, mainUnw, estIssNum, estFundNum, exchange);
+    }
 }

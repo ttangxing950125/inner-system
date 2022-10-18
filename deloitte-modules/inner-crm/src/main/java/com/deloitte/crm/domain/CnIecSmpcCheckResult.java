@@ -1,5 +1,6 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,6 +8,7 @@ import java.util.Objects;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,17 +60,17 @@ public class CnIecSmpcCheckResult implements Serializable {
      * 预计发行股数(万股)
      */
     @Excel(name = "预计发行股数(万股)")
-    private Double estIssNum;
+    private BigDecimal estIssNum;
     /**
      * 预计发行后总股本(万股)
      */
     @Excel(name = "预计发行后总股本(万股)")
-    private Double estIssTotalEquity;
+    private BigDecimal estIssTotalEquity;
     /**
      * 预计募集资金(万元)
      */
     @Excel(name = "预计募集资金(万元)")
-    private Double estFundNum;
+    private BigDecimal estFundNum;
     /**
      * 会议年度
      */
@@ -118,7 +120,7 @@ public class CnIecSmpcCheckResult implements Serializable {
      * 注册资本(万元)
      */
     @Excel(name = "注册资本(万元)")
-    private Double regCapital;
+    private BigDecimal regCapital;
     /**
      * 主要产品及业务
      */
@@ -157,31 +159,7 @@ public class CnIecSmpcCheckResult implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CnIecSmpcCheckResult that = (CnIecSmpcCheckResult) o;
-        return Objects.equals(tempCode, that.tempCode) &&
-                Objects.equals(entityName, that.entityName) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(ipoBoard, that.ipoBoard) &&
-                Objects.equals(checkResult, that.checkResult) &&
-                Objects.equals(estIssNum, that.estIssNum) &&
-                Objects.equals(estIssTotalEquity, that.estIssTotalEquity) &&
-                Objects.equals(estFundNum, that.estFundNum) &&
-                Objects.equals(meetingYear, that.meetingYear) &&
-                Objects.equals(meetingSession, that.meetingSession) &&
-                Objects.equals(meetingDate, that.meetingDate) &&
-                Objects.equals(reviewers, that.reviewers) &&
-                Objects.equals(iecQuestion, that.iecQuestion) &&
-                Objects.equals(sponsor, that.sponsor) &&
-                Objects.equals(accountingFirm, that.accountingFirm) &&
-                Objects.equals(lawFirm, that.lawFirm) &&
-                Objects.equals(province, that.province) &&
-                Objects.equals(regCapital, that.regCapital) &&
-                Objects.equals(prodBusiness, that.prodBusiness) &&
-                Objects.equals(exchange, that.exchange) &&
-                Objects.equals(csrcIndustry, that.csrcIndustry) &&
-                Objects.equals(refuseReason, that.refuseReason);
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
     }
 
     @Override

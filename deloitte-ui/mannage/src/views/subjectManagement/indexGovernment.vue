@@ -60,7 +60,7 @@
 
             <el-tree
               class="filter-tree"
-              :data="data"
+              :data="data2"
               :props="{ label: 'name', children: 'value' }"
               show-checkbox
               :filter-node-method="filterNode"
@@ -111,16 +111,13 @@
           >
           </el-table-column>
         </el-table>
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page.sync="currentPage1"
-          :page-size="100"
-          layout="total, prev, pager, next"
+        <pagination
+          v-show="total > 0"
           :total="total"
-          class="page"
-        >
-        </el-pagination>
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getList"
+        />
       </el-col>
     </el-row>
   </div>
@@ -128,8 +125,13 @@
 
 <script>
 import { getAllByGroup, getListEntityByPage } from "@/api/common";
+import { getGovRange } from "@/api/subject";
+import pagination from "../../components/Pagination";
 export default {
   name: "addGovernment",
+  components: {
+    pagination,
+  },
   data() {
     return {
       currentPage1: 1,
@@ -171,62 +173,31 @@ export default {
       tab: this.$route.query.name,
       filterTextFirst: "",
       filterTextScend: "",
-      data: [
+      data: [],
+      data2: [
         {
-          id: 1,
-          key: "一级 1",
-          value: [
-            {
-              id: 4,
-              key: "二级 1-1",
-              value: [
-                {
-                  id: 9,
-                  key: "三级 1-1-1",
-                },
-                {
-                  id: 10,
-                  key: "三级 1-1-2",
-                },
-              ],
-            },
-          ],
+          name: "东北综合经济区",
+          value: {},
         },
         {
-          id: 2,
-          key: "一级 2",
-          value: [
-            {
-              id: 5,
-              key: "二级 2-1",
-            },
-            {
-              id: 6,
-              key: "二级 2-2",
-            },
-          ],
+          name: "北部沿海综合经济区",
+          value: {},
         },
         {
-          id: 3,
-          key: "一级 3",
-          value: [
-            {
-              id: 7,
-              key: "二级 3-1",
-            },
-            {
-              id: 8,
-              key: "二级 3-2",
-            },
-          ],
+          name: "东部沿海综合经济区",
+          value: {},
         },
       ],
-      total: 0,
       tableLoading: false,
       mapList: [],
       moreData: [],
       header: [],
       selected: 0,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0,
     };
   },
   watch: {
@@ -248,12 +219,8 @@ export default {
           const { data } = res;
           this.data = data;
         });
-        // getAllByGroup({ type: 2 }).then((res) => {
-        //   const { data } = res;
-        //   this.data = data;
-        // });
         const params = {
-          pageNum: this.currentPage1,
+          pageNum: 1,
           pageSize: 10,
         };
         getListEntityByPage(params).then((res) => {
@@ -264,17 +231,15 @@ export default {
             this.list.push(e.govInfo);
           });
         });
+        getGovRange({}).then((res) => {
+          const { data } = res;
+          this.data2 = data.eightER;
+        });
       } catch (error) {
         console.log(error);
       } finally {
         this.$modal.closeLoading();
       }
-    },
-    goTarget(href) {
-      window.open(href, "_blank");
-    },
-    handleClick() {
-      console.log(1);
     },
     back() {
       this.$router.back();
@@ -285,27 +250,6 @@ export default {
     },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      try {
-        const params = {
-          pageNum: val,
-          pageSize: 10,
-        };
-        this.tableLoading = true;
-        getListEntityByPage(params).then((res) => {
-          const { data } = res;
-          this.total = data.total;
-          this.list = [];
-          data.records.forEach((e) => {
-            this.list.push(e.govInfo);
-          });
-        });
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.tableLoading = false;
-      }
     },
     handleCheckChange(data, checked, indeterminate) {
       //获取所有选中的节点 start
@@ -323,7 +267,7 @@ export default {
       try {
         this.$modal.loading("loading...");
         const params = {
-          pageNum: this.currentPage1,
+          pageNum: 1,
           pageSize: 10,
           mapList: this.mapList,
         };
@@ -353,6 +297,21 @@ export default {
       getAllByGroup({}).then((res) => {
         const { data } = res;
         this.data = data;
+      });
+    },
+    getList() {
+      const params = {
+        pageNum: this.queryParams.pageNum,
+        pageSize: 10,
+      };
+      getListEntityByPage(params).then((res) => {
+        const { data } = res;
+        this.total = data.total;
+        this.list = [];
+        this.queryParams.pageNum = data.current;
+        data.records.forEach((e) => {
+          this.list.push(e.govInfo);
+        });
       });
     },
   },

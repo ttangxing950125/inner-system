@@ -10,16 +10,26 @@ import com.deloitte.crm.constants.CacheName;
 import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityInfoLogs;
 import com.deloitte.crm.mapper.EntityInfoLogsMapper;
+import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.service.EntityInfoLogsService;
+import com.deloitte.crm.service.ICrmWindTaskService;
+import com.deloitte.crm.vo.WindTaskDetailsVo;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysDictData;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -28,13 +38,15 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @SpringBootTest
-public class BondInfoTest {
+public class BondInfoTest{
 
     @Resource
     private RedisService redisService;
 
     @Resource
     private RoleService roleService;
+    @Resource
+    private ICrmWindTaskService crmWindTaskService;
 
     @Resource
     private EntityInfoLogsService entityInfoLogsService;
@@ -70,5 +82,26 @@ public class BondInfoTest {
         log.info("JSON:==>{}", JSON.toJSONString(allByType));
     }
 
+    @Autowired
+    @Qualifier("entityMasterRunBatchImpl")
+    private EntityAttrValueRunBatchTask entityAttrValueRunBatchTasks;
+
+
+    @Test
+    public void test1(){
+        log.info("=>>  "+ com.deloitte.common.core.utils.DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");
+        entityAttrValueRunBatchTasks.runBatchData();
+        log.info("=>>  "+ com.deloitte.common.core.utils.DateUtil.dateTimeNow() +" Attr数据导入完成  <<=");
+    }
+
+    @Test
+    public void test2(){
+        long start = System.currentTimeMillis();
+        final List<WindTaskDetailsVo> taskDetails = crmWindTaskService.findTaskDetails(1, "2022-10-17");
+        long end = System.currentTimeMillis();
+        log.info("查询完成，耗时：" + (end - start) +" ms");
+        System.out.println("数据:>>>:"+JSON.toJSONString(taskDetails));
+        //查询完成，耗时：1691 ms
+    }
 
 }

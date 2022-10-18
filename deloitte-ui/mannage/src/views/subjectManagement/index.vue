@@ -315,15 +315,22 @@
                   prop="entityName"
                   label="企业名称"
                   width="300"
+                  class="xxxxxxx"
                 >
                 </el-table-column>
                 <el-table-column
-                  v-for="(item, index) in selectHeaer"
+                  v-for="(item, index) in rettHeaer"
                   :key="index"
-                  prop="province"
+                  :prop="item.proName"
                   :label="item.proName"
                   width="120"
+                  :class="item.color === 1 ? 'red' : 'green'"
                 >
+                  <template slot-scope="scope">
+                    <div>
+                      {{ scope.row[item.proName] }}
+                    </div>
+                  </template>
                 </el-table-column>
               </el-table>
             </div>
@@ -386,6 +393,7 @@
 
 <script>
 import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
+import { Scope } from "quill";
 import fileUpload from "../../components/FileUpload";
 import pagination from "../../components/Pagination";
 export default {
@@ -447,6 +455,7 @@ export default {
         pageSize: 10,
       },
       total2: 0,
+      rettHeaer: []
     };
   },
   mounted() {
@@ -517,7 +526,15 @@ export default {
         };
         getCov(parmas).then((res) => {
           const { data } = res;
+          data.records.forEach((e) => {
+            if (e.result) {
+              e.result.forEach((r) => {
+                e[r.key] = r.value;
+              });
+            }
+          });
           this.list = data.records;
+          console.log(this.list);
           this.total = data.total;
           this.queryParams.pageNum = data.current;
         });
@@ -548,6 +565,14 @@ export default {
       };
       getCov(parmas).then((res) => {
         const { data } = res;
+        data.records.forEach((e) => {
+          if (e.result) {
+            e.result.forEach((r) => {
+              e[r.key] = r.value;
+              e.color = r.color;
+            });
+          }
+        });
         this.list = data.records;
         this.total = data.total;
         this.queryParams.pageNum = data.current;
@@ -564,6 +589,7 @@ export default {
       try {
         this.loading = true;
         this.getList();
+        this.rettHeaer = this.selectHeaer
       } catch (error) {
         console.log(error);
       } finally {
@@ -595,7 +621,9 @@ export default {
       this.selectHeaer = [];
       if (row.length === 1 && row[0] === 9999) {
         this.options2.forEach((k) => {
-          this.selectHeaer.push(k);
+            if (k.id !== 9999) {
+              this.selectHeaer.push(k);
+            }
         });
       } else {
         row.forEach((e) => {
@@ -606,6 +634,7 @@ export default {
           });
         });
       }
+      console.log(this.selectHeaer);
     },
   },
   computed: {
@@ -696,7 +725,7 @@ export default {
 }
 .table-result {
   margin-top: 10px;
-  width: 150px;
+  width: 200px;
   span {
     color: #86bc25;
   }
@@ -771,5 +800,11 @@ export default {
     background: #86bc25;
     border-color: #86bc25;
   }
+}
+.red {
+  background-color: #ffe7e7;
+}
+.green {
+  background-color: #86bc25;
 }
 </style>

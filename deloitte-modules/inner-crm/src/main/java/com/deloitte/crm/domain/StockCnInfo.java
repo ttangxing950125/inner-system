@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.deloitte.crm.annotation.UpdateLog;
 import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -47,20 +48,30 @@ public class StockCnInfo implements Serializable {
     @Excel(name = "德勤内部股票代码 ST_0000id 6位数字")
     private String stockDqCode;
 
-    /** 上市日期*/
-    @ApiModelProperty(value="上市日期")
-    private String  listDate ;
+    /**
+     * 上市日期
+     */
+    @ApiModelProperty(value = "上市日期")
+    @UpdateLog(fieldName = "A股上市日期",tableFieldName ="list_date")
+    private String listDate;
 
-    /** 退市日期*/
-    @ApiModelProperty(value="退市日期")
-    private  String  delistingDate ;
+    /**
+     * 退市日期
+     */
+    @ApiModelProperty(value = "退市日期")
+    @UpdateLog(fieldName = "A股退市日期",tableFieldName ="delisting_date")
+    private String delistingDate;
 
-    /** 交易所*/
-    @ApiModelProperty(value="交易所")
-    private  String  exchange ;
-
-//    private String
-
+    /**
+     * 交易所
+     */
+    @ApiModelProperty(value = "交易所")
+    @UpdateLog(fieldName = "A股上市交易所",tableFieldName ="exchange")
+    private String exchange;
+    /**
+     * 摘戴帽状态 0 摘帽状态 1 带帽状态
+     */
+    private Integer stUndoImplemtnet;
 
     /**
      * 状态 1-删除 0-未删除 默认都是未删除
@@ -70,11 +81,12 @@ public class StockCnInfo implements Serializable {
      * 股票简称
      */
     @ApiModelProperty(value = "股票简称")
-    private String StockShortName;
+    private String stockShortName;
     /**
      * 股票代码
      */
     @Excel(name = "股票代码")
+    @UpdateLog(fieldName = "A股股票代码",tableFieldName ="stock_code")
     private String stockCode;
     @Excel(name = "${column.comment}")
     private Date created;

@@ -165,11 +165,151 @@ export function updateInfoDetail(parmas) {
 // 查询 企业主体股票-历史记录
 export function entityInfoLogsList(parmas) {
   return request({
-    url: "/entityInfoLogs/list/" + parmas.type,
+    url: "/crm/entityInfoLogs/list/" + parmas.type,
     headers: {
       isToken: true,
     },
     method: "get",
+    data: parmas,
+  });
+}
+
+// 撤销停用
+export function logCancel(parmas) {
+  return request({
+    url: "/crm/entityInfoLogs/cancel/" + parmas.id,
+    headers: {
+      isToken: true,
+    },
+    method: "get",
+    data: parmas,
+  });
+}
+
+// 地方政府-更多指标-主体范围
+export function getGovRange(parmas) {
+  return request({
+    url: "/crm/govInfo/getGovRange",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 企业主体分类查询
+export function getListEntityByPage(parmas) {
+  return request({
+    url:
+      "/crm/entityInfo/getListEntityByPage?pageNum=" +
+      parmas.pageNum +
+      "&pageSize=" +
+      parmas.pageSize,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询政府曾用名列表
+export function getGovHisNameList(parmas) {
+  return request({
+    url:
+      "/crm/his/getGovHisNameList?pageNum=" +
+      parmas.pageNum +
+      "&pageSize=" +
+      parmas.pageSize +
+      "&param=" +
+      parmas.param,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询企业曾用名列表
+export function getEntityHisNameList(parmas) {
+  return request({
+    url:
+      "/crm/his/getEntityHisNameList?pageNum=" +
+      parmas.pageNum +
+      "&pageSize=" +
+      parmas.pageSize +
+      "&param=" +
+      parmas.param,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 修改企业主体的曾用名
+export function updateOldName(parmas) {
+  return request({
+    url:
+      "/crm/entityInfo/updateOldName?dqCode=" +
+      parmas.dqCode +
+      "&newOldName=" +
+      parmas.newOldName +
+      "&oldName=" +
+      parmas.oldName +
+      "&status=" +
+      parmas.status,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 修改企业主体的曾用名
+export function updateOldNameGov(parmas) {
+  return request({
+    url:
+      "/crm/govInfo/updateOldName?dqCode=" +
+      parmas.dqCode +
+      "&newOldName=" +
+      parmas.newOldName +
+      "&oldName=" +
+      parmas.oldName +
+      "&status=" +
+      parmas.status,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 企业主体清单-查询上市概览
+export function getListView(parmas) {
+  return request({
+    url: "/crm/entityInfo/getListView",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 政府主体清单-地方政府概览
+export function getGovView(parmas) {
+  return request({
+    url: "/crm/govInfo/getGovView",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
     data: parmas,
   });
 }
