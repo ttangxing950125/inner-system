@@ -513,8 +513,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
         stringObjectHashMap.put("bond_state","");
         stringObjectHashMap.put("value_date","");
         stringObjectHashMap.put("due_date","");
-
-        Assert.isTrue(stringObjectHashMap.containsKey(filedName),BadInfo.VALID_PARAM.getInfo());
+        Assert.isTrue(stringObjectHashMap.containsKey(filedName)||bondEntityInfoVo.getTable()==3,BadInfo.VALID_PARAM.getInfo());
 
         switch (bondEntityInfoVo.getTable()){
             case 1:
