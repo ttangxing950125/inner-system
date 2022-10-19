@@ -1129,41 +1129,45 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
-     * 查询发债特定列----存续债数量 存续债明细  2
+     * 查询发债特定列----存续债数量 存续债明细 存续状态 2
      */
     private List<EntityInfoList> getIssSpecial(List<EntityInfoList> record, List<String> codeList) {
-        QueryWrapper<EntityBondRel> relQueryWrapper = new QueryWrapper<>();
-
-        List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(relQueryWrapper.lambda()
-                .eq(EntityBondRel::getStatus, 1)
+        List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
                 .in(EntityBondRel::getEntityCode, codeList)
         );
         if (CollectionUtils.isEmpty(entityBondRels)) {
             return record;
         }
+        Map<String, List<EntityBondRel>> listMap = entityBondRels.stream().collect(Collectors.groupingBy(EntityBondRel::getEntityCode));
         for (int i = 0; i < record.size(); i++) {
-            Integer liveBond = 0;
+            //存续债明细 TODO
+            List<String> liveBondDetail = new ArrayList<>();
+            //存续债数量
+            final Integer[] liveBond = {0};
             EntityInfoList result = record.get(i);
             String entityCode = result.getEntityCode();
-            List<EntityBondRel> bondRels = entityBondRels.stream().collect(Collectors.groupingBy(EntityBondRel::getEntityCode)).get(entityCode);
-
-            //债券存续数量
-            result.setLiveBond(liveBond);
+            List<EntityBondRel> bondRels = listMap.get(entityCode);
             if (CollectionUtils.isEmpty(bondRels)) {
                 record.set(i, result);
                 continue;
             }
-            liveBond = bondRels.size();
-            //设置存续状态
-            result.setLiveState("N");
-            if (liveBond>0){
+            //获取债券 code
+            List<String>bondCodeList=new ArrayList<>();
+            bondRels.stream().forEach(x->bondCodeList.add(x.getBdCode()));
+
+            List<BondInfo> bondInfos = bondInfoMapper.selectList(new QueryWrapper<BondInfo>().lambda().in(BondInfo::getBondCode, bondCodeList));
+            bondInfos.stream().forEach(x->{
+                Integer bondStatus = x.getBondState();
+                if (!ObjectUtils.isEmpty(bondStatus)&&0==bondStatus){
+                    liveBond[0]++;
+                    liveBondDetail.add(x.getBondCode());
+                }
+            });
+            if (liveBond[0] >0){
                 result.setLiveState("Y");
             }
-            //存续债明细 TODO
-            List<String> liveBondDetail = new ArrayList<>();
-            bondRels.stream().forEach(o -> liveBondDetail.add(o.getBdCode()));
             //债券存续数量
-            result.setLiveBond(liveBond);
+            result.setLiveBond(liveBond[0]);
             result.setLiveBondDetail(liveBondDetail);
             record.set(i, result);
         }
@@ -1175,13 +1179,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     private List<EntityInfoList> getListSpecial(List<EntityInfoList> record, List<String> codeList) {
 
-        //封装退市日期   A股退市 584  港股退市 602
-        QueryWrapper<EntityAttrValue> valueQueryWrapper = new QueryWrapper<>();
-        List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQueryWrapper.lambda()
-                .in(EntityAttrValue::getEntityCode, codeList)
-                .in(EntityAttrValue::getAttrId, 584, 602)
-        );
-
         QueryWrapper<EntityStockCnRel> cnRelQueryWrapper = new QueryWrapper<>();
         List<EntityStockCnRel> entityStockCnRels = cnRelMapper.selectList(cnRelQueryWrapper.lambda().in(EntityStockCnRel::getEntityCode, codeList));
 
@@ -1191,6 +1188,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         for (int i = 0; i < record.size(); i++) {
             EntityInfoList entityInfoList = record.get(i);
             String o = entityInfoList.getEntityCode();
+            //德勤唯一识别代码
+            List<String> stockDqCodeList = new ArrayList<>();
             //证券代码
             List<String> stockCodeList = new ArrayList<>();
             //上市日期
@@ -1202,8 +1201,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockCnRel> cnRels = entityStockCnRels.stream().collect(Collectors.groupingBy(EntityStockCnRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(cnRels)) {
                     cnRels.stream().forEach(x -> {
-                        //证券代码
-                        stockCodeList.add(x.getStockDqCode());
+                        //德勤唯一识别代码
+                        stockDqCodeList.add(x.getStockDqCode());
                         //上市日期
                         stockDateList.add(TimeFormatUtil.getFormartDate(x.getCreated()));
                     });
@@ -1213,30 +1212,74 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockThkRel> thkRels = entityStockthkRels.stream().collect(Collectors.groupingBy(EntityStockThkRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(thkRels)) {
                     thkRels.stream().forEach(x -> {
-                        //证券代码
-                        stockCodeList.add(x.getStockDqCode());
+                        //德勤唯一识别代码
+                        stockDqCodeList.add(x.getStockDqCode());
                         //上市日期
                         stockDateList.add(TimeFormatUtil.getFormartDate(x.getCreated()));
                     });
                 }
             }
             //最晚退市日期
-            final String[] latest = {""};
+            final String[] listState = {"N"};
+
+//            List<String> stockDateList = new ArrayList<>();
             //退市日期
-            if (!CollectionUtils.isEmpty(attrValueList)) {
-                List<EntityAttrValue> attrValues = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode)).get(o);
-                if (!CollectionUtils.isEmpty(attrValues)) {
-                    attrValues.stream().forEach(x -> {
-                        stockdownDateList.add(x.getValue());
-                        if (ObjectUtils.isEmpty(latest[0])&&!ObjectUtils.isEmpty(x.getValue())){
-                            latest[0] =x.getValue();
-                        }else if (!ObjectUtils.isEmpty(latest[0])&&!ObjectUtils.isEmpty(x.getValue())){
-                            int days = TimeFormatUtil.between_days("yyyy-MM-dd", latest[0], x.getValue());
-                            if (days>=0){
-                                latest[0] =x.getValue();
-                            }
+//            List<String> stockdownDateList = new ArrayList<>();
+            //A股上市日期
+            //A股退市日期
+            if (!CollectionUtils.isEmpty(stockDqCodeList)) {
+                List<StockCnInfo> stockCnInfos = stockCnMapper.selectList(new QueryWrapper<StockCnInfo>().lambda().in(StockCnInfo::getStockDqCode, stockDqCodeList));
+                List<StockThkInfo> stockThkInfos = stockThkMapper.selectList(new QueryWrapper<StockThkInfo>().lambda().in(StockThkInfo::getStockDqCode, stockDqCodeList));
+                //A股信息
+                if (!CollectionUtils.isEmpty(stockCnInfos)){
+                    //上市状态  6-成功上市
+                    stockCnInfos.forEach(x->{
+                        if ("Y".equals(listState[0])){
+                            return;
+                        }
+                        Integer stockStatus = x.getStockStatus();
+                        if (!ObjectUtils.isEmpty(stockStatus)&&6==stockStatus){
+                            listState[0] ="Y";
                         }
                     });
+                    //退市日期
+                    try {
+                        stockCnInfos.stream().filter(x->!ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x->{ stockdownDateList.add(x.getDelistingDate()); });
+                    }catch (Exception e){
+                        log.error(e.getMessage());
+                    }
+                    //上市日期
+                    try {
+                        stockCnInfos.stream().filter(x->!ObjectUtils.isEmpty(x.getListDate())).forEach(x->{ stockDateList.add(x.getListDate()); });
+                    }catch (Exception e){
+                        log.error(e.getMessage());
+                    }
+                }
+                //港股上市日期
+                //港股退市日期
+                if (!CollectionUtils.isEmpty(stockThkInfos)){
+                    //上市状态  4-成功上市
+                    stockThkInfos.forEach(x->{
+                        if ("Y".equals(listState[0])){
+                            return;
+                        }
+                        Integer stockStatus = x.getStockStatus();
+                        if (!ObjectUtils.isEmpty(stockStatus)&&4==stockStatus){
+                            listState[0] ="Y";
+                        }
+                    });
+                    //退市日期
+                    try {
+                        stockThkInfos.stream().filter(x->!ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x->{ stockdownDateList.add(x.getDelistingDate()); });
+                    }catch (Exception e){
+                        log.error(e.getMessage());
+                    }
+                    //上市日期
+                    try {
+                        stockThkInfos.stream().filter(x->!ObjectUtils.isEmpty(x.getListDate())).forEach(x->{ stockDateList.add(x.getListDate()); });
+                    }catch (Exception e){
+                        log.error(e.getMessage());
+                    }
                 }
             }
             entityInfoList.setStockCode(stockCodeList);
@@ -1244,11 +1287,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             entityInfoList.setDownDate(stockdownDateList);
 
             //设置存续状态 Y 存续 N 退市
-            entityInfoList.setLiveState("N");
-            int days = TimeFormatUtil.between_days("yyyy-MM-dd",TimeFormatUtil.getFormartDate( new Date()), latest[0]);
-            if (days>0){
-                entityInfoList.setLiveState("Y");
-            }
+            entityInfoList.setLiveState(listState[0]);
             record.set(i, entityInfoList);
         }
         return record;
