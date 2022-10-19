@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/ProMaRel")
 @Api(tags = "产品敞口关联关系修改d")
-public class ProductsMasterRelController {
+public class ProductsMasterRelController  {
 
     @Resource
     private RoleService roleService;

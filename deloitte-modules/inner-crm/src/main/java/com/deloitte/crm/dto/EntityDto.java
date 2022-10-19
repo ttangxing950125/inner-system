@@ -92,12 +92,13 @@ public class EntityDto {
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @ApiModelProperty(name="created",value="创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date created;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @ApiModelProperty(name="created",value="修改时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updated;
 
     /** 曾用名 */
