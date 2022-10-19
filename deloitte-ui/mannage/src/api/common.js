@@ -116,3 +116,17 @@ export function getFinanceSubIndu(params) {
     data: params,
   });
 }
+
+// 批量查询并导出excel结果
+export function importExcelByEntity(params) {
+  return request({
+    url: "/crm/entityInfo/importExcelByEntity?uuid=" + params.uuid,
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    responseType:'blob',
+    method: "post",
+    data: params,
+  }, {responseType:'blob'}, {responseType:'blob'});
+}

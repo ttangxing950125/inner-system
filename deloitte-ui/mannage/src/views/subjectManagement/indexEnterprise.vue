@@ -133,40 +133,7 @@ export default {
     return {
       currentPage1: "",
       currentTime: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       tab: this.$route.query.name,
       filterText: "",
       header: [],
@@ -177,14 +144,36 @@ export default {
           value: [
             {
               name: "内地股票",
+              key: 'stockCn',
               value: [],
             },
             {
               name: "香港股票",
+              key: 'stockThk',
+              value: [],
+            },
+            // {
+            //   name: "接触地划分",
+            //   value: [],
+            // },
+            {
+              name: "集合债",
+              key: 'coll',
               value: [],
             },
             {
-              name: "接触地划分",
+              name: "ABS",
+              key: 'abs',
+              value: [],
+            },
+            {
+              name: "公募债",
+              key: 'publicType',
+              value: [],
+            },
+            {
+              name: "私募债",
+              key: 'privateType',
               value: [],
             },
           ],
@@ -195,7 +184,7 @@ export default {
         pageSize: 10,
       },
       total: 0,
-      selected: "",
+      selected: {},
       mapList: [],
       filterTextFirst: "",
       filterTextScend: "",
@@ -262,7 +251,6 @@ export default {
         };
         arrDeptId.push(item);
       });
-      this.selected = arrDeptId.length;
       this.mapList = arrDeptId;
       try {
         this.$modal.loading("loading...");
@@ -296,39 +284,35 @@ export default {
     handleCheckChange2(data, checked, indeterminate) {
       //获取所有选中的节点 start
       let res = this.$refs.tree2.getCheckedNodes();
-      let arrDeptId = [];
+      this.selected = {};
       res.forEach((e) => {
-        const item = {
-          id: e.id,
-          name: e.name,
-        };
-        arrDeptId.push(item);
+        this.selected[e.key] = 1
       });
-      console.log(arrDeptId)
-      this.selected = arrDeptId.length;
+      
       try {
-        this.$modal.loading("loading...");
-        const params = {
-          pageNum: 1,
-          pageSize: 10,
-          mapList: this.mapList,
-        };
-        // getListEntityByPage(params).then((res) => {
-        //   const { data } = res;
-        //   this.total = data.total;
-        //   this.list = [];
-        //   let more = [];
-        //   data.records.forEach((e) => {
-        //     this.list.push(e.govInfo);
-        //     more = e.more;
-        //     this.header = e.header;
-        //   });
-        //   this.list.forEach((e) => {
-        //     more.forEach((i) => {
-        //       e[i.key] = i.value;
-        //     });
-        //   });
-        // });
+          this.$modal.loading("loading...");
+          this.selected.pageNum = 1
+          this.selected.pageSize = 1
+          this.selected.mapList = this.mapList
+          
+        getListEntityByPage(this.selected).then((res) => {
+          const { data } = res;
+          this.total = data.total;
+          this.list = [];
+          let more = [];
+          data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+            if (more) { 
+                more.forEach((i) => {
+                e[i.key] = i.value;
+                });
+            }
+          });
+        });
       } catch (error) {
         console.log(error);
       } finally {
@@ -336,11 +320,10 @@ export default {
       }
     },
     getList() {
-      const params = {
-        pageNum: this.queryParams.pageNum,
-        pageSize: 10,
-      };
-      getListEntityByPage(params).then((res) => {
+      this.selected.pageNum = this.queryParams.pageNum
+      this.selected.pageSize = this.queryParams.pageSize
+      this.selected.mapList = this.mapList
+      getListEntityByPage(this.selected).then((res) => {
         const { data } = res;
         this.total = data.total;
         this.list = [];

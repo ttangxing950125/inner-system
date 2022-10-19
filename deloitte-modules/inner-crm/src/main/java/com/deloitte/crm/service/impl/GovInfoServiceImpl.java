@@ -20,6 +20,7 @@ import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.mapper.*;
+import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -60,20 +60,23 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Resource
     private GovInfoMapper govInfoMapper;
 
-    @Autowired
+    @Resource
     private EntityAttrValueMapper entityAttrValueMapper;
 
     @Resource
     private EntityNameHisMapper nameHisMapper;
 
-    @Autowired
+    @Resource
     private EntityAttrIntypeMapper intypeMapper;
 
-    @Autowired
+    @Resource
     private EntityGovRelMapper entityGovRelMapper;
 
-    @Autowired
+    @Resource
     private GovLevelMapper govLevelMapper;
+
+    @Resource
+    private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
 
     /**
      * 默认查询页码
@@ -156,6 +159,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public R updateInfoList(List<GovInfo> list) {
         list.stream().forEach(o -> {
             GovInfo govInfo = govInfoMapper.selectById(o.getId());
+            entityInfoLogsUpdatedService.insert(govInfo.getDqGovCode(),govInfo.getGovName(),govInfo,o);
             govInfoMapper.updateById(o);
             //修改政府主体名称时，需要添加曾用名
             if (!ObjectUtils.isEmpty(o.getGovName())) {
@@ -333,7 +337,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovByName(String govName) {
         QueryWrapper<GovInfo> queryWrapper = new QueryWrapper();
-        return R.ok(govInfoMapper.selectOne(queryWrapper.lambda().eq(GovInfo::getGovName, govName)));
+        return R.ok(govInfoMapper.selectList(queryWrapper.lambda().like(GovInfo::getGovName, govName)));
     }
 
     @Override
@@ -803,6 +807,15 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         }
         govView.setGovTotle(total).setProvince(province).setCity(city).setArea(area).setGx(gx).setNoLevel(total - province - city - area - gx);
         return govView;
+    }
+
+    @Override
+    public List<GovInfo> getGovByParam(String param) {
+        return govInfoMapper.selectList(new QueryWrapper<GovInfo>().lambda()
+                            .like(GovInfo::getDqGovCode, param)
+                            .or().like(GovInfo::getGovName, param)
+                            .or().like(GovInfo::getGovCode, param)
+        );
     }
 
     //返回筛选范围--城市分级

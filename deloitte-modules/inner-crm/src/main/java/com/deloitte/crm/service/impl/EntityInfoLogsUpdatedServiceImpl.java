@@ -7,10 +7,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.annotation.UpdateLog;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.EntityInfoLogsUpdated;
-import com.deloitte.crm.domain.StockCnInfo;
-import com.deloitte.crm.domain.StockThkInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityInfoLogsUpdatedMapper;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import lombok.AllArgsConstructor;
@@ -47,41 +44,43 @@ public class EntityInfoLogsUpdatedServiceImpl extends ServiceImpl<EntityInfoLogs
     }
 
     @Override
-    public void insert(String code,String stockShortName,Object old, Object now, Integer tableType) {
+    public void insert(String code,String stockShortName,Object old,Object now){
         String username = SecurityUtils.getUsername();
-        switch (tableType){
-            case 1:
-                this.insertEntityInfoLogsUpdatedOne(code,stockShortName,old, now, username);
-            case 2:
-                return;
-            default:
-                break;
-        }
-    }
-
-    public void insertEntityInfoLogsUpdatedOne(String code,String stockShortName,Object old,Object now,String userName){
         Field[] declaredFields;
+        String tableName;
+        int tableType;
         if(old instanceof EntityInfo){
             Class<EntityInfo> entityInfoClass = EntityInfo.class;
             declaredFields = entityInfoClass.getDeclaredFields();
+            tableName = "entity_info";
+            tableType = 1;
         }else if(old instanceof StockCnInfo){
             Class<StockCnInfo> stockCnInfoClass = StockCnInfo.class;
             declaredFields = stockCnInfoClass.getDeclaredFields();
+            tableName = "stock_cn_info";
+            tableType = 1;
         }else if(old instanceof StockThkInfo){
             Class<StockThkInfo> stockThkInfoClass = StockThkInfo.class;
             declaredFields = stockThkInfoClass.getDeclaredFields();
-        }else{
+            tableName = "stock_thk_info";
+            tableType = 1;
+        }else if(old instanceof GovInfo){
+            Class<GovInfo> govInfoClass = GovInfo.class;
+            declaredFields = govInfoClass.getDeclaredFields();
+            tableName = "gov_info";
+            tableType = 2;
+        } else{
             log.info("  =>> 字段类型未映射成功，更新记录表记录失败 <<=  ");
             return;
         }
         //开始新增
         log.info("  =>> 开始更新关于 "+stockShortName+" 相关的数据 <<=  ");
-        doInsert(declaredFields, code, stockShortName, old, now, userName);
+        doInsert(tableName,declaredFields, code, stockShortName, old, now, username,tableType);
         log.info("  =>>  字段更新成功  <<=  ");
     }
 
     @Transactional(rollbackFor = Exception.class)
-    void doInsert(Field[] declaredFields,String code,String stockShortName,Object old,Object now,String userName){
+    void doInsert(String tableName,Field[] declaredFields,String code,String stockShortName,Object old,Object now,String username,Integer tableType){
         for (Field declaredField : declaredFields) {
             UpdateLog annotation = declaredField.getAnnotation(UpdateLog.class);
             if(annotation == null){continue;}
@@ -100,7 +99,7 @@ public class EntityInfoLogsUpdatedServiceImpl extends ServiceImpl<EntityInfoLogs
                     baseMapper.updateById(entityInfoLogsUpdated);
                 }
             }
-            EntityInfoLogsUpdated entityInfoLogsUpdated = new EntityInfoLogsUpdated(code,stockShortName,fieldName,originalValue,value,userName,"entity_info",tableFieldName,1);
+            EntityInfoLogsUpdated entityInfoLogsUpdated = new EntityInfoLogsUpdated(code,stockShortName,fieldName,originalValue,value,username,tableName,tableFieldName,tableType);
             if(created!=null){
                 entityInfoLogsUpdated.setCreated(created);
             }

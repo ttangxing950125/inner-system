@@ -90,15 +90,15 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(StockCnUndoStInfo undoStInfo, Date timeNow, CrmWindTask windTask) {
-        log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), windTask.getId());
+        log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),undoStInfo.getCode(),windTask.getId());
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, undoStInfo.getCode()));
         if (stockCnInfo != null) {
             stockCnInfo.setStUndoImplemtnet(1);
             stockCnInfo.setStockShortName(Optional.ofNullable(undoStInfo.getUndoBackName()).orElse(""));
             stockCnInfoMapper.updateById(stockCnInfo);
-            log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), windTask.getId());
+            log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),undoStInfo.getCode(), windTask.getId());
         } else {
-            log.warn(">>>>>>>>开始到导入【实施ST摘帽】根据<股票代码=>:{}>查询不到A股信息 【任务ID】={}任务结束！！！！！", undoStInfo.getCode(), windTask.getId());
+            log.warn(">>>>>>>>开始到导入【实施ST摘帽】根据【股票代码】=>:{}>查询不到A股信息 【任务ID】={}任务结束！！！！！", undoStInfo.getCode(), windTask.getId());
         }
         StockCnUndoStInfo undoStInfoResult = undoStInfoMapper.selectOne(new LambdaQueryWrapper<StockCnUndoStInfo>().eq(StockCnUndoStInfo::getCode, undoStInfo.getCode()));
         Integer changeType = null;

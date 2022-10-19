@@ -115,4 +115,6 @@ public interface IGovInfoService  extends IService<GovInfo>
     GovAttrByDtoBack getGovRange();
 
     GovView getGovView();
+
+    List<GovInfo> getGovByParam(String param);
 }
