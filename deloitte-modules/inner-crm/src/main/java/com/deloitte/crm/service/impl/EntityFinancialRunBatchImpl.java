@@ -1,8 +1,11 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityFinancial;
+import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityFinancialMapper;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
@@ -41,9 +44,10 @@ public class EntityFinancialRunBatchImpl implements EntityAttrValueRunBatchTask 
     public List<EntityAttrValue> getPrams(){
         Date date = new Date();
         log.info(" =>> 当前时间 ： "+ date +" 开始对 EntityFinancial 进行数据拉去");
-
+        DateTime start = cn.hutool.core.date.DateUtil.beginOfDay(date);
+        DateTime end = cn.hutool.core.date.DateUtil.endOfDay(date);
         List<EntityAttrValue> result = new ArrayList<>();
-        List<EntityFinancial> entityFinancials = entityFinancialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getUpdated, date).or().eq(EntityFinancial::getCreated, date));
+        List<EntityFinancial> entityFinancials = entityFinancialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().between(EntityFinancial::getUpdated,start,end).or().between(EntityFinancial::getCreated,start,end));
 
         int size = entityFinancials.size();
         if(size==0){ log.info(" =>> EntityFinancial 今日数据为零 录入操作终止 <<= "); return null;}

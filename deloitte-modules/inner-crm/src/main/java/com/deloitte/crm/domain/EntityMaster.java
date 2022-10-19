@@ -47,14 +47,12 @@ public class EntityMaster implements Serializable {
      * $column.columnComment
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    @Attrs(attrId = 0,attrName = Common.CREATED)
     private Date created;
 
     /**
      * $column.columnComment
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    @Attrs(attrId = 0,attrName = Common.UPDATED)
     @TableField(value = "`update`")
     private Date update;
 
