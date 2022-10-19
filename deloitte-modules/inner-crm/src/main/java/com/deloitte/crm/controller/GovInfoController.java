@@ -157,7 +157,7 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", example = "", dataType="String")})
      @PostMapping("/getGovByName")
     public R getGovByName( String govName) {
-        return R.ok(govInfoService.getGovByName(govName));
+        return govInfoService.getGovByName(govName);
     }
 
     /**
@@ -245,7 +245,7 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/23 8:59
      */
     @ApiOperation(value = "根据 dqCode 查询政府主体")
-    @ApiImplicitParam(name = "dqGovCode", value = "政府主体德勤唯一识别码", paramType = "query", example = "", dataType = "String")
+    @ApiImplicitParam(name = "dqGovCode", value = "政府主体德勤唯一识别码", paramType = "query", dataType = "String")
     @PostMapping("/getInfoDetail")
     public R getInfoDetail(String dqGovCode) {
         return govInfoService.getInfoDetail(dqGovCode);
