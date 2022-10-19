@@ -4,6 +4,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +16,10 @@ import java.util.Date;
  * @author PenTang
  * @date 2022/09/22 15:24
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class CrmDailyTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -60,54 +68,6 @@ public class CrmDailyTask implements Serializable {
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTaskRoleType() {
-        return taskRoleType;
-    }
-
-    public void setTaskRoleType(String taskRoleType) {
-        this.taskRoleType = taskRoleType;
-    }
-
-    public Integer getTaskStatus() {
-        return taskStatus;
-    }
-
-    public void setTaskStatus(Integer taskStatus) {
-        this.taskStatus = taskStatus;
-    }
-
-    public Date getTaskDate() {
-        return taskDate;
-    }
-
-    public void setTaskDate(Date taskDate) {
-        this.taskDate = taskDate;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
 
     @Override
     public String toString() {

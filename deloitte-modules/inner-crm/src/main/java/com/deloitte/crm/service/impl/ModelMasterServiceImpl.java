@@ -1,32 +1,31 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.dto.MasDto;
-import com.deloitte.crm.mapper.*;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
+import com.deloitte.crm.mapper.EntityGovRelMapper;
+import com.deloitte.crm.mapper.EntityMasterMapper;
+import com.deloitte.crm.mapper.ModelMasterMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import javax.swing.text.html.parser.Entity;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -57,8 +56,6 @@ public class ModelMasterServiceImpl implements IModelMasterService
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     private EntityFinancialService entityFinancialService;
-
-    private ICrmWindTaskService iCrmWindTaskService;
 
     private SendEmailService sendEmailService;
 
@@ -179,6 +176,12 @@ public class ModelMasterServiceImpl implements IModelMasterService
 
     private final String YES = "Y";
 
+    private final Integer ROLE_3_ID = 5;
+
+    private final Integer ROLE_4_ID = 6;
+
+    private final Integer ROLE_5_ID = 7;
+
     /**
      * 敞口划分 保存并提交
      * @param masDto
@@ -246,6 +249,8 @@ public class ModelMasterServiceImpl implements IModelMasterService
         //完成当条任务后 向 crm_supply 添加任务
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setEntityCode(entityCode);
+        //设置为 未处理
+        crmSupplyTask.setState(0);
         crmSupplyTask.setTaskDate(crmMasTask.getTaskDate());
         crmSupplyTask.setFrom(masDto.getSourceName());
         crmSupplyTask.setRemark(masDto.getRemarks());
@@ -271,29 +276,33 @@ public class ModelMasterServiceImpl implements IModelMasterService
             //当日任务完成状态为 3
             crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
             iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+
             //TODO 发送邮件
             String dateNow = DateUtil.format(new Date(), "yyyy-MM-dd");
+            CrmDailyTask dailyTask = new CrmDailyTask();
+            dailyTask.setTaskDate(new Date());
+
+            //角色3 角色id为 5L
             Long role3 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 5L).eq(CrmSupplyTask::getTaskDate, dateNow));
+            if(role3!=0){
+                sendEmailService.email(ROLE_3_ID,role3.intValue());
+                //无任务为 1 有任务未完成 2
+                this.createTask(ROLE_3_ID,2);
+            }else{ this.createTask(ROLE_3_ID,1);}
+
+            //角色4 角色id为 6L
             Long role4 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 6L).eq(CrmSupplyTask::getTaskDate, dateNow));
+            if(role4!=0){
+                sendEmailService.email(ROLE_4_ID,role4.intValue());
+            this.createTask(ROLE_4_ID,2);
+            }else{ this.createTask(ROLE_4_ID,1);}
+
             Long role5 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 7L).eq(CrmSupplyTask::getTaskDate, dateNow));
+            if(role5!=0){
+                sendEmailService.email(ROLE_5_ID,role5.intValue());
+                this.createTask(ROLE_5_ID,2);
+            }else{ this.createTask(ROLE_5_ID,1);}
 
-            sendEmailService.SendEmail(5,"[新任务︰待划分敞口主体" + role3.intValue() + "个]",
-                    "</br>  今日新增主体确认任务已完成，共计新增 " + role3.intValue() + " 个主体需划分敞口。" +
-                            "请尽快登陆平台完成相关任务。</br>" +
-                            "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a></br>" +
-                            "</br></br>Thanks,</br>主体管理平台");
-
-            sendEmailService.SendEmail(6,"[新任务︰待划分敞口主体" + role4.intValue() + "个]",
-                    "</br>  今日新增主体确认任务已完成，共计新增 " + role4.intValue() + " 个主体需划分敞口。" +
-                            "请尽快登陆平台完成相关任务。</br>" +
-                            "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a></br>" +
-                            "</br></br>Thanks,</br>主体管理平台");
-
-            sendEmailService.SendEmail(7,"[新任务︰待划分敞口主体" + role5.intValue() + "个]",
-                    "</br>  今日新增主体确认任务已完成，共计新增 " + role5.intValue() + " 个主体需划分敞口。" +
-                            "请尽快登陆平台完成相关任务。</br>" +
-                            "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a></br>" +
-                            "</br></br>Thanks,</br>主体管理平台");
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
@@ -328,6 +337,13 @@ public class ModelMasterServiceImpl implements IModelMasterService
             valueBaseMapper.updateById(entityAttrValue);
             return false;
         }
+    }
+
+    /**
+     * 角色2 生成任务
+     */
+    public void createTask(Integer roleId,Integer taskState){
+        iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskDate(new Date()).setTaskStatus(taskState).setTaskRoleType(roleId.toString()));
     }
 
 }

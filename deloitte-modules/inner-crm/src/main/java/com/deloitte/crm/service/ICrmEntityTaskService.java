@@ -1,14 +1,12 @@
 package com.deloitte.crm.service;
 
-import java.util.Date;
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
-import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.vo.CrmEntityTaskVo;
+
+import java.util.List;
 
 /**
  * 角色7，根据导入的数据新增主体的任务Service接口
@@ -90,5 +88,5 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
      * @param state
      * @return
      */
-    R finishTask(Integer taskId,Integer state);
+    R finishTask(Integer taskId,Integer state,String entityCode);
 }

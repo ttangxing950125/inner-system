@@ -16,4 +16,11 @@ public interface SendEmailService {
      * @date 2022/9/23 15:58
     */
     String SendEmail(Integer id,String title,String content);
+
+    /**
+     * 角色2 角色7 邮件模板
+     * @param roleId
+     * @param taskCount
+     */
+    void email(Integer roleId,Integer taskCount);
 }
