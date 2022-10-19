@@ -394,9 +394,9 @@
 
 <script>
 import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
-import { importExcelByEntity } from "@/api/common";
+import { importExcelByEntity, getChecking  } from "@/api/common";
 import { download } from '@/utils/index'
-import fileUpload from "../../components/FileUpload";
+import fileUpload from "../../components/FileUpload/httpUpload.vue";
 import pagination from "../../components/Pagination";
 export default {
   name: "Index",
@@ -439,7 +439,7 @@ export default {
       notBondsAndListPercent: 0,
       loadingData: false,
       dialogVisible: false,
-      percentage: 20,
+      percentage: 0,
       uploadStatus: false,
       queryParams: {
         pageNum: 1,
@@ -458,7 +458,8 @@ export default {
       },
       total2: 0,
       rettHeaer: [],
-      uuid: ''
+      uuid: '',
+      timer: null
     };
   },
   mounted() {
@@ -649,14 +650,24 @@ export default {
     },
     uploadFun(params) {
     // 获取文件 通过FormData将文件转化为二进制流的形式传给后端
-    let form = new FormData()
-    form.append('file', params.file)
-    form.uuid = this.uuid
-    importExcelByEntity(form).then((res) => {
-        download(res, 'xxxx.xlsx')
-    })
-    this.$modal.closeLoading()
-},
+        let form = new FormData()
+        form.append('file', params.file)
+        form.uuid = this.uuid
+        importExcelByEntity(form).then((res) => {
+            clearTimeout(this.timer);
+            download(res, 'xxxx.xlsx')
+        })
+        this.timer = setInterval(this.getProgress, 1000)
+        this.$modal.closeLoading()
+    },
+    getProgress() {
+        let uuid = localStorage.getItem('uuid')
+        getChecking({uuid: uuid}).then(res => {
+            const { data } = res
+            const percent = data && (parseInt(data).toFixed(2))*100
+            this. percentage = percent
+        })
+    }
   },
   computed: {
     govePercent() {
