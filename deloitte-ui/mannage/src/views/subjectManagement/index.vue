@@ -347,7 +347,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog title="批量查询" :visible.sync="dialogVisible" width="30%">
+    <el-dialog title="批量查询" :visible.sync="dialogVisible" :before-close="handleClose" width="30%">
       <div class="p-top">
         <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
       </div>
@@ -662,6 +662,7 @@ export default {
             clearTimeout(this.timer);
             this.uploadStatus = true
             this.uploadLoading = false
+            this.percentage = 0
             download(res, this.fileName)
         })
         this.timer = setInterval(this.getProgress, 1000)
@@ -680,6 +681,11 @@ export default {
     },
     changeType() {
         this.value1 = this.value === 'GV' ? [] : this.value1
+    },
+    handleClose() {
+        this.uploadStatus = false
+        this.percentage = 0
+        this.dialogVisible = false
     }
   },
   computed: {

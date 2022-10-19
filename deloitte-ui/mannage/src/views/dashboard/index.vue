@@ -1147,7 +1147,12 @@ export default {
         pageSize: 10
       },
       total: 0,
-      clickDay: ''
+      clickDay: '',
+      colorArr: {
+          1: 'shadow',
+          2: 'shadow-yellow',
+          3: 'shadow-green',
+      }
     };
   },
   mounted() {
@@ -1380,7 +1385,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='"+(jsonHtml[l].bad ? 'shadow-yellow' : 'shadow-green')+"'>" +
+                    "<div class='"+(this.colorArr[jsonHtml[l].bad])+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1431,14 +1436,10 @@ export default {
                 }else {
                     e.date = dateStr
                 }
-                if(e.taskStatus === 2){
-                    e.bad = true
-                }
-                if(e.taskStatus === 3){
-                    e.bad = false
-                }
+                e.bad = e.taskStatus
             });
         }
+        console.log(flagData)
       this.drawTable(flagData);
     },
     work(row) {
