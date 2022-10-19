@@ -126,7 +126,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.INSERT.getId();
         } else {
             CnDelistInfo last = cnDelistInfos.stream().findFirst().get();
-            if (Objects.equals(last, item)) {
+            if (!Objects.equals(last, item)) {
                 changeType = DataChangeType.UPDATE.getId();
             }
         }
