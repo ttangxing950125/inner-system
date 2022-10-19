@@ -62,11 +62,10 @@ public class RoleSevenController {
      */
     @ApiOperation(value="查询当日任务 by正杰")
     @ApiResponse(code = 200,message = "操作成功",response = CrmEntityTaskVo.class)
-    @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String")
+    @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String",example = "2022-10-12")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(@DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-                                                   Integer pageNum, Integer pageSize){
+    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(String date,Integer pageNum, Integer pageSize){
         log.info("==> 角色7当日查询 <==");
         return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
     }
