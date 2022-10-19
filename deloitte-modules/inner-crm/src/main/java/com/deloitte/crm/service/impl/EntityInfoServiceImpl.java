@@ -1232,8 +1232,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<StockThkInfo> stockThkInfos = stockThkMapper.selectList(new QueryWrapper<StockThkInfo>().lambda().in(StockThkInfo::getStockDqCode, stockDqCodeList));
                 //A股信息
                 if (!CollectionUtils.isEmpty(stockCnInfos)){
+
                     //上市状态  6-成功上市
                     stockCnInfos.forEach(x->{
+                        stockCodeList.add(x.getStockCode());
                         if ("Y".equals(listState[0])){
                             return;
                         }
@@ -1260,6 +1262,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (!CollectionUtils.isEmpty(stockThkInfos)){
                     //上市状态  4-成功上市
                     stockThkInfos.forEach(x->{
+                        stockCodeList.add(x.getStockCode());
                         if ("Y".equals(listState[0])){
                             return;
                         }

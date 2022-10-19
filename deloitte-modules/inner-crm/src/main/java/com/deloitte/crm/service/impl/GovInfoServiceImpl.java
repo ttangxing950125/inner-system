@@ -793,7 +793,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         if (!CollectionUtils.isEmpty(listGovMap.get(3))) {
             area = listGovMap.get(3).size();
         }
-        //经开高兴总数
+        //经开高新总数
         if (!CollectionUtils.isEmpty(listGovMap.get(4))) {
             gx = listGovMap.get(4).size();
         }
