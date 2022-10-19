@@ -218,6 +218,10 @@ public class EntityInfoList {
      */
     private Integer liveBond;
 
+    /**
+     * 存续状态
+     */
+    private String liveState;
 
     @Override
     public String toString() {
