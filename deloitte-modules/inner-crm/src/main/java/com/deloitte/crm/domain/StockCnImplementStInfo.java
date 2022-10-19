@@ -101,12 +101,10 @@ public class StockCnImplementStInfo implements Serializable {
     /**
      * 创建时间
      */
-//    @Excel(name = "创建时间")
     private Date created;
     /**
      * 更新时间
      */
-//    @Excel(name = "更新时间")
     private Date updated;
 
 
