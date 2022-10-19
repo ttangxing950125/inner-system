@@ -1374,7 +1374,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='shadow'>" +
+                     "<div class='"+(this.colorArr[jsonHtml[l].bad])+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1438,8 +1438,7 @@ export default {
                 }
                 e.bad = e.taskStatus
             });
-        }
-        console.log(flagData)
+        }        
       this.drawTable(flagData);
     },
     work(row) {
