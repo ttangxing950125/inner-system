@@ -3,9 +3,9 @@
     <h3 class="g-title">今日运维任务</h3>
     <div class="todo-desc">
       <div>HELLO!</div>
-      <div>今天是 {{ currentTime }}, {{ week }}。</div>
+      <div>今日日期 {{ currentTime }}, {{ week }}。</div>
       <div>
-        今日完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
+        当前日期完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
       </div>
       <span type="text">切换日期：</span>
       <el-date-picker v-model="monthDate" type="month" placeholder="选择月" value-format="yyyy-MM" @change="changeMonth">
@@ -1514,6 +1514,8 @@ export default {
       this.ruleForm.bondShortName = row.bondShortName
       this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
+      this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
     },
     check(row) {
       this.$modal.loading("loading...");
@@ -1595,6 +1597,8 @@ export default {
         this.ruleForm.sourceName = row.sourceName
         this.$set(this.ruleForm, 'entityCode',  row.entityCode)
         this.$set(this.ruleForm, 'id',  row.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         this.$modal.loading("loading...");
         getTable({id: row.id}).then(res => {
           const { data } = res
@@ -1741,6 +1745,8 @@ export default {
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         this.$modal.loading("loading...");
         const params = {
           entityCode: row.entityInfo.entityCode,
@@ -1877,6 +1883,8 @@ export default {
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         const params = {
           entityCode: row.entityInfo.entityCode,
           roleId: 5,
@@ -1925,6 +1933,8 @@ export default {
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         const params = {
           entityCode: row.entityInfo.entityCode,
           roleId: 5,
