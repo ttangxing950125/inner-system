@@ -20,7 +20,7 @@ public class CrmWindTaskDto {
     private String taskCount;
     /** 未完成任务数(指定日期) */
     @ApiModelProperty(value = "未完成任务数(指定日期)")
-    private String notComplete;
+    private String Complete;
 
     public Integer getTaskCateId() {
         return taskCateId;
@@ -47,11 +47,11 @@ public class CrmWindTaskDto {
     }
 
     public String getNotComplete() {
-        return notComplete;
+        return Complete;
     }
 
     public void setNotComplete(String notComplete) {
-        this.notComplete = notComplete;
+        this.Complete = notComplete;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class CrmWindTaskDto {
         return "CrmWindTaskDto{" +
                 "taskDesc='" + taskDesc + '\'' +
                 ", taskCount='" + taskCount + '\'' +
-                ", notComplete='" + notComplete + '\'' +
+                ", Complete='" + Complete + '\'' +
                 '}';
     }
 }

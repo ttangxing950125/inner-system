@@ -2081,12 +2081,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     exportEntityCheckDto.setEntityNameByRecord("无法识别");
                 } else {
                     //根据主体全称查询是否未覆盖
-                    EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityName, entityByBatchDtos.get(i).getEntityName()));
-                    if (entityInfo != null) {
+                    List<EntityInfo> entityInfos = entityInfoMapper.selectList(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityName, entityByBatchDtos.get(i).getEntityName()));
+
+                    if (!entityInfos.isEmpty()) {
                         exportEntityCheckDto.setEntityNameByRecord("识别成功,已覆盖主体");
-                        exportEntityCheckDto.setEntityNameByEntityName(entityInfo.getEntityName());
-                        exportEntityCheckDto.setEntityNameByEntityCode(entityInfo.getEntityCode());
-                        exportEntityCheckDto.setEntityNameByCreditCode(entityInfo.getCreditCode());
+                        exportEntityCheckDto.setEntityNameByEntityName(entityInfos.get(0).getEntityName());
+                        exportEntityCheckDto.setEntityNameByEntityCode(entityInfos.get(0).getEntityCode());
+                        exportEntityCheckDto.setEntityNameByCreditCode(entityInfos.get(0).getCreditCode());
                     } else {
                         exportEntityCheckDto.setEntityNameByRecord("识别成功,未覆盖主体");
                     }
