@@ -28,7 +28,7 @@
         <el-table-column prop="taskDesc" label="任务说明"> </el-table-column>
         <el-table-column prop="name" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.notComplete > 0 ? 'red' : 'green'">{{ scope.row.notComplete > 0 ? '待完成( '+scope.row.notComplete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
+            <span :class="scope.row.complete === scope.row.taskCount ? 'green' : 'red'">{{ scope.row.complete !== scope.row.taskCount ? '待完成( '+scope.row.complete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
           </template>
         </el-table-column>
         </el-table-column>
