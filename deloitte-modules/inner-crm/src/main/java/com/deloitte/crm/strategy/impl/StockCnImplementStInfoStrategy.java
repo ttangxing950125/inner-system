@@ -48,6 +48,7 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(StockCnImplementStInfo implementStInfo, Date timeNow, CrmWindTask windTask) {
         log.info(">>>>>>>>开始到导入【实施ST带帽】【当前时间】=>:{},【股票代码】=>:{}【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),implementStInfo.getCode(), windTask.getId());
+        implementStInfo.setTaskId(windTask.getId());
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, implementStInfo.getCode()));
         if (stockCnInfo != null) {
             stockCnInfo.setStUndoImplemtnet(1);
@@ -65,7 +66,7 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.UPDATE.getId();
         }
         implementStInfo.setChangeType(changeType);
-        implementStInfo.setTaskId(windTask.getId());
+
         implementStInfoMapper.insert(implementStInfo);
         return new AsyncResult<>(new Object());
 

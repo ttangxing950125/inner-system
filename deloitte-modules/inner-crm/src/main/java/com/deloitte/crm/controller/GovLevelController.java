@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
@@ -9,6 +10,7 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovLevel;
 import com.deloitte.crm.service.IGovLevelService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,4 +91,16 @@ public class GovLevelController extends BaseController {
         return toAjax(govLevelService.deleteGovLevelByIds(ids));
     }
 
+    /**
+     * 政府级别
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/19 14:20
+    */
+    @ApiOperation(value = "政府级别")
+    @PostMapping("/getGovLevel")
+    public R getGovLevel(){
+        return govLevelService.getGovLevel();
+    }
 }
