@@ -475,9 +475,9 @@ public class BondInfoServiceImpl implements IBondInfoService {
         }else{
             BondEntityInfoVo temp = new BondEntityInfoVo().setTable(2).setId(bondInfo.getId().intValue());
             //是否为集合债 "1.Y":"0.N"
-            result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll",bondInfo.getColl().toString()));
+            result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll",bondInfo.getColl()==null?null:bondInfo.getColl().toString()));
             //是否为ABS "1.Y":"0.N"
-            result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs",bondInfo.getAbs().toString()));
+            result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs",bondInfo.getAbs()==null?null:bondInfo.getAbs().toString()));
             //债券交易代码
             result.add(new BondEntityInfoVo(temp,false,"债券交易代码","",bondInfo.getOriCode()));
             //债券全称
@@ -489,9 +489,9 @@ public class BondInfoServiceImpl implements IBondInfoService {
             //债务关系有效性 / 存续状态 "0.存续":"1.违约"
             result.add(new BondEntityInfoVo(temp,true,"债务关系有效性 / 存续状态","bond_state",bondInfo.getBondState()==null?null:bondInfo.getBondState().toString()));
             //起息日
-            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate().toString()).setTable(4));
+            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate()==null?null:bondInfo.getValueDate().toString()).setTable(4));
             //到期日
-            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate().toString()).setTable(4));
+            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate()==null?null:bondInfo.getValueDate().toString()).setTable(4));
             return result;
         }
     }
