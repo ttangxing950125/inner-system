@@ -519,13 +519,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //TODO 查询敞口划分  --  客户敞口行业划分汇集  产业链CICS行业划分明细  旧辖口行业划分
         entityInfoDetails=getProductsMaster(entityInfoDetails, entityCode);
 
-        //查询敞口覆盖情况
+        //查询产品覆盖情况
         entityInfoDetails=getCoverageDetail(entityInfoDetails, entityCode);
-
-        //从主表获取数据
-
-        //TODO 查询产品覆盖情况  --  全部
-
 
         //TODO 其他一般工商信息  --  全部
         EntityBaseBusiInfo baseBusiInfo = entityBaseBusiInfoService.getInfoByEntityCode(entityCode);
