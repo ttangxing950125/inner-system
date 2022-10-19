@@ -1,8 +1,11 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityGovRel;
+import com.deloitte.crm.domain.EntityMaster;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
@@ -41,9 +44,10 @@ public class EntityGovRelRunBatchImpl implements EntityAttrValueRunBatchTask {
     public List<EntityAttrValue> getPrams() {
         Date date = new Date();
         log.info(" =>> 当前时间 ： "+ date +" 开始对 EntityGovRel 进行数据拉去");
-
+        DateTime start = cn.hutool.core.date.DateUtil.beginOfDay(date);
+        DateTime end = cn.hutool.core.date.DateUtil.endOfDay(date);
         List<EntityAttrValue> result = new ArrayList<>();
-        List<EntityGovRel> entityGovRels = entityGovRelMapper.selectList(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getUpdated, date).or().eq(EntityGovRel::getCreated, date));
+        List<EntityGovRel> entityGovRels = entityGovRelMapper.selectList(new QueryWrapper<EntityGovRel>().lambda().between(EntityGovRel::getUpdated,start,end).or().between(EntityGovRel::getCreated,start,end));
 
         int size = entityGovRels.size();
         if(size==0){ log.info(" =>> EntityGovRel 今日数据为零 录入操作终止 <<= "); return null;}

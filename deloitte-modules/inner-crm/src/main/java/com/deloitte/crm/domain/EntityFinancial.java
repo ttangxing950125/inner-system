@@ -80,13 +80,11 @@ public class EntityFinancial implements Serializable {
     private String remarks;
 
     /** $column.columnComment */
-    @Attrs(attrId = 0,attrName = Common.CREATED)
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
-    @Attrs(attrId = 0,attrName = Common.UPDATED)
     private Date updated;
 
 }

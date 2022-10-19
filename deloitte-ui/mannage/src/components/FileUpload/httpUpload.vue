@@ -4,6 +4,7 @@
       multiple
       :action="uploadFileUrl"
       :before-upload="handleBeforeUpload"
+      :http-request="httpFun"
       :file-list="fileList"
       :limit="limit"
       :on-error="handleUploadError"
@@ -92,7 +93,11 @@ export default {
     uploadStr: {
       type: String,
       default: "选取文件",
-    }
+    },
+    httpFun: {
+      type: Function,
+      default: null
+    },
   },
   data() {
     return {

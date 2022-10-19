@@ -106,13 +106,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getList"
-      />
       <el-table
       v-if="roleId === 'role3'"
         v-loading="loading"
@@ -245,6 +238,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
     </div>
     <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%">
       <el-form
@@ -1542,6 +1542,7 @@ export default {
     },
     submitAdd() {
       this.$modal.loading("loading...");
+      this.ruleForm.created = ''
       try {
         addSeven(this.ruleForm).then(res => {
           const { data } = res

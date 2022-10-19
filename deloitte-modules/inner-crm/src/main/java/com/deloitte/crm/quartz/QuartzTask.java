@@ -1,13 +1,8 @@
 package com.deloitte.crm.quartz;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
-import com.deloitte.crm.service.IEntityAttrValueService;
-import com.deloitte.crm.strategy.WindTaskStrategy;
-import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Map;
 
@@ -71,7 +65,7 @@ public class QuartzTask implements ApplicationContextAware {
      * {@link EntityAttrValue}
      */
     @Async
-//    @Scheduled(cron = "0 0 12 * * ?" )
+    @Scheduled(cron = "0 0 12 * * ?" )
     @Transactional(rollbackFor = Exception.class)
     public void runBatchDataToAttrValue(){
         log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");

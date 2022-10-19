@@ -191,6 +191,11 @@ public class BondConvertibleChangeInfo implements Serializable {
     @Excel(name = "赎回条款")
     private String callProvision;
     /**
+     * 回售条款
+     */
+    @Excel(name = "回售条款")
+    private String putProvision;
+    /**
      * 转股条款
      */
     @Excel(name = "转股条款")

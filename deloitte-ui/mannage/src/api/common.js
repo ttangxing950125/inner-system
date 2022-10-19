@@ -130,3 +130,15 @@ export function importExcelByEntity(params) {
     data: params,
   }, {responseType:'blob'}, {responseType:'blob'});
 }
+
+// 查询匹配进度
+export function getChecking(params) {
+  return request({
+    url: "/crm/entityInfo/getChecking?uuid=" + params.uuid,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
