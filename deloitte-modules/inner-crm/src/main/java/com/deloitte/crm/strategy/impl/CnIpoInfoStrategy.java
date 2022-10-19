@@ -45,6 +45,9 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
     @Resource
     private EntityStockCnRelService entityStockCnRelService;
 
+    @Resource
+    private IEntityInfoService entityInfoService;
+
     /**
      * 处理文件中的每一行
      *
@@ -111,6 +114,12 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
                 //查询和当前a股绑定关联关系的主体
                 List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
+
+                entityInfos.forEach(entity->{
+                    entity.setList(1);
+                });
+
+                entityInfoService.updateBatchById(entityInfos);
 
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());

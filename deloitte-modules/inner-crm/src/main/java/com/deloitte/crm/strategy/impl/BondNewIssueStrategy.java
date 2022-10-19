@@ -119,9 +119,26 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             //如果债券状态变为成功上市，创建敞口划分任务
             List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
             Integer bondStatus = bondInfo.getBondStatus();
+
+            //债券发行成功，主体发债状态
+            if (Objects.equals(bondStatus, BondStatus.WAIT_LIST.getId())){
+                entityInfos.forEach(entity->{
+                    entity.setIssueBonds(1);
+                });
+            }
+
+
             if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)){
                 newDbBond.setBondState(0);
                 newDbBond = bondInfoService.saveOrUpdate(bondInfo);
+
+                //修改主体的上市状态
+                entityInfos.forEach(entity->{
+                    entity.setList(1);
+                });
+
+                //更新主体数据
+                entityInfoService.updateBatchById(entityInfos);
 
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
