@@ -527,7 +527,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         //查询金融机构表
         List<EntityFinancial> list = financialMapper.selectList(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
-        if (!CollectionUtils.isEmpty(list)){
+        if (!CollectionUtils.isEmpty(list)) {
             entityInfoDetails.setEntityFinancial(list.get(0));
         }
         return entityInfoDetails;
@@ -583,7 +583,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         //获取公募债信息
-        List<BondInfo> publicList = bondInfos.stream().filter(o -> !ObjectUtils.isEmpty(o.getRaiseType())&&o.getRaiseType() == 0).collect(Collectors.toList());
+        List<BondInfo> publicList = bondInfos.stream().filter(o -> !ObjectUtils.isEmpty(o.getRaiseType()) && o.getRaiseType() == 0).collect(Collectors.toList());
         // 是否发行公募债
         // 发行公募债详情
         if (CollectionUtils.isEmpty(publicList)) {
@@ -597,7 +597,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         //获取私募债信息
-        List<BondInfo> privateList = bondInfos.stream().filter(o ->!ObjectUtils.isEmpty(o.getRaiseType())&& o.getRaiseType() == 1).collect(Collectors.toList());
+        List<BondInfo> privateList = bondInfos.stream().filter(o -> !ObjectUtils.isEmpty(o.getRaiseType()) && o.getRaiseType() == 1).collect(Collectors.toList());
         // 是否发行私募债
         // 发行私募债详情
         if (CollectionUtils.isEmpty(privateList)) {
@@ -1080,6 +1080,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     public EntityInfoList getResultMap(EntityInfo entityInfo, Map<String, List<EntityNameHis>> map, Integer type) {
         EntityInfoList entityInfoList = new EntityInfoList();
+        entityInfoList.setLiveState("N");
         if (null != entityInfo) {
             entityInfoList.setEntityInfo(entityInfo);
             try {
@@ -1153,6 +1154,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 continue;
             }
             liveBond = bondRels.size();
+            //设置存续状态
+            result.setLiveState("N");
+            if (liveBond>0){
+                result.setLiveState("Y");
+            }
             //存续债明细 TODO
             List<String> liveBondDetail = new ArrayList<>();
             bondRels.stream().forEach(o -> liveBondDetail.add(o.getBdCode()));
@@ -1214,18 +1220,35 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     });
                 }
             }
+            //最晚退市日期
+            final String[] latest = {""};
             //退市日期
             if (!CollectionUtils.isEmpty(attrValueList)) {
                 List<EntityAttrValue> attrValues = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(attrValues)) {
                     attrValues.stream().forEach(x -> {
                         stockdownDateList.add(x.getValue());
+                        if (ObjectUtils.isEmpty(latest[0])&&!ObjectUtils.isEmpty(x.getValue())){
+                            latest[0] =x.getValue();
+                        }else if (!ObjectUtils.isEmpty(latest[0])&&!ObjectUtils.isEmpty(x.getValue())){
+                            int days = TimeFormatUtil.between_days("yyyy-MM-dd", latest[0], x.getValue());
+                            if (days>=0){
+                                latest[0] =x.getValue();
+                            }
+                        }
                     });
                 }
             }
             entityInfoList.setStockCode(stockCodeList);
             entityInfoList.setListDate(stockDateList);
             entityInfoList.setDownDate(stockdownDateList);
+
+            //设置存续状态 Y 存续 N 退市
+            entityInfoList.setLiveState("N");
+            int days = TimeFormatUtil.between_days("yyyy-MM-dd",TimeFormatUtil.getFormartDate( new Date()), latest[0]);
+            if (days>0){
+                entityInfoList.setLiveState("Y");
+            }
             record.set(i, entityInfoList);
         }
         return record;
@@ -1940,19 +1963,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (!ObjectUtil.isEmpty(entityInfo) && !ObjectUtil.isEmpty(entityInfo.getEntityCode())) {
             //修改基础属性
             EntityInfo old = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-            entityInfoLogsUpdatedService.insert(old.getEntityCode(),old.getEntityName(),old,entityInfo);
+            entityInfoLogsUpdatedService.insert(old.getEntityCode(), old.getEntityName(), old, entityInfo);
             entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
         }
         if (!ObjectUtil.isEmpty(stockCnInfo) && !ObjectUtil.isEmpty(stockCnInfo.getStockDqCode())) {
             //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
             StockCnInfo old = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
-            entityInfoLogsUpdatedService.insert(old.getStockDqCode(),old.getStockShortName(),old,entityInfo);
+            entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockShortName(), old, entityInfo);
             stockCnMapper.update(stockCnInfo, new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
         }
         if (!ObjectUtil.isEmpty(stockThkInfo) && !ObjectUtil.isEmpty(stockThkInfo.getStockDqCode())) {
             //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
             StockThkInfo old = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
-            entityInfoLogsUpdatedService.insert(old.getStockDqCode(),old.getStockName(),old,entityInfo);
+            entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockName(), old, entityInfo);
             stockThkMapper.update(stockThkInfo, new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
         }
     }
@@ -2008,7 +2031,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return entityListView.setLive(0L).setDead(0L);
         }
         //根据时间查询发债存续企业
-        Long bondLive = bondInfoMapper.selectCount(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondState,0));
+        Long bondLive = bondInfoMapper.selectCount(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondState, 0));
         return entityListView.setLive(bondLive).setDead(listTotle - bondLive);
     }
 
@@ -2144,7 +2167,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 NumberFormat percentInstance = NumberFormat.getPercentInstance();
                 // 设置保留几位小数，这里设置的是保留1位小数
                 percentInstance.setMinimumFractionDigits(1);
-               Double cov = index / sum;
+                Double cov = index / sum;
                 String s = cov.toString();
                 redisService.setCacheObject(uuid, s, 1L, TimeUnit.DAYS);
             }
@@ -2286,23 +2309,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         IoUtil.close(out);
         return R.ok("导出成功");
     }
-        /**
-         *根据名称查询主体信息
-         *
-         * @param name
-         * @return List<EntityInfo>
-         * @author penTang
-         * @date 2022/10/18 10:01
-        */
-        @Override
-      public List<EntityInfo> selectEntityInfoListByName(String name){
-          LambdaQueryWrapper<EntityInfo> qw = new LambdaQueryWrapper<EntityInfo>().like(EntityInfo::getEntityName, name);
-          List<EntityInfo> list = list(qw);
-          return list;
-      }
 
     /**
-     *根据code 查询
+     * 根据名称查询主体信息
+     *
+     * @param name
+     * @return List<EntityInfo>
+     * @author penTang
+     * @date 2022/10/18 10:01
+     */
+    @Override
+    public List<EntityInfo> selectEntityInfoListByName(String name) {
+        LambdaQueryWrapper<EntityInfo> qw = new LambdaQueryWrapper<EntityInfo>().like(EntityInfo::getEntityName, name);
+        List<EntityInfo> list = list(qw);
+        return list;
+    }
+
+    /**
+     * 根据code 查询
      *
      * @param code
      * @return List<EntityInfo>
@@ -2310,40 +2334,40 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/10/18 10:01
      */
     @Override
-      public EntityInfoCodeDto selectEntityDto(String code){
-          //entity infoQuery
-          LambdaQueryWrapper<EntityInfo> qw = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, code);
-          EntityInfo one = getOne(qw);
-          EntityInfoCodeDto entityInfoCodeDto = new EntityInfoCodeDto();
-          entityInfoCodeDto.setEntityCode(one.getEntityCode());
-          entityInfoCodeDto.setCreditCode(one.getCreditCode());
-          entityInfoCodeDto.setEntityName(one.getEntityName());
-          entityInfoCodeDto.setFinance(one.getFinance());
-          entityInfoCodeDto.setIssueBonds(one.getIssueBonds());
-          entityInfoCodeDto.setList(one.getList());
-          entityInfoCodeDto.setWindMaster(one.getWindMaster());
-          entityInfoCodeDto.setShenWanMaster(one.getShenWanMaster());
-          //entityFinancial
-          LambdaQueryWrapper<EntityFinancial> eq = new LambdaQueryWrapper<EntityFinancial>().eq(EntityFinancial::getEntityCode, code);
-          EntityFinancial entityFinancial = financialMapper.selectOne(eq);
-          entityInfoCodeDto.setMince(entityFinancial.getMince());
-          //是否为城投机构
-          LambdaQueryWrapper<EntityGovRel> eq1 = new LambdaQueryWrapper<EntityGovRel>().eq(EntityGovRel::getEntityCode, code);
-          EntityGovRel entityGovRel = entityGovRelMapper.selectOne(eq1);
-          if (entityGovRel!= null){
-              entityInfoCodeDto.setIsGov("Y");
-              LambdaQueryWrapper<GovInfo> eq2 = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getDqGovCode, entityGovRel.getDqGovCode());
-              GovInfo govInfo = govInfoMapper.selectOne(eq2);
-              entityInfoCodeDto.setGovName(govInfo.getGovName());
-          }else{
-              entityInfoCodeDto.setIsGov("N");
-          }
-          //entitMaster
-          LambdaQueryWrapper<EntityMaster> eq2 = new LambdaQueryWrapper<EntityMaster>().eq(EntityMaster::getEntityCode, code);
-          EntityMaster entityMaster = entityMasterMapper.selectOne(eq2);
-          entityInfoCodeDto.setYyUrban(entityMaster.getYyUrban());
-          entityInfoCodeDto.setZhongxinUrban(entityMaster.getZhongxinUrban());
-          return entityInfoCodeDto;
-      }
+    public EntityInfoCodeDto selectEntityDto(String code) {
+        //entity infoQuery
+        LambdaQueryWrapper<EntityInfo> qw = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, code);
+        EntityInfo one = getOne(qw);
+        EntityInfoCodeDto entityInfoCodeDto = new EntityInfoCodeDto();
+        entityInfoCodeDto.setEntityCode(one.getEntityCode());
+        entityInfoCodeDto.setCreditCode(one.getCreditCode());
+        entityInfoCodeDto.setEntityName(one.getEntityName());
+        entityInfoCodeDto.setFinance(one.getFinance());
+        entityInfoCodeDto.setIssueBonds(one.getIssueBonds());
+        entityInfoCodeDto.setList(one.getList());
+        entityInfoCodeDto.setWindMaster(one.getWindMaster());
+        entityInfoCodeDto.setShenWanMaster(one.getShenWanMaster());
+        //entityFinancial
+        LambdaQueryWrapper<EntityFinancial> eq = new LambdaQueryWrapper<EntityFinancial>().eq(EntityFinancial::getEntityCode, code);
+        EntityFinancial entityFinancial = financialMapper.selectOne(eq);
+        entityInfoCodeDto.setMince(entityFinancial.getMince());
+        //是否为城投机构
+        LambdaQueryWrapper<EntityGovRel> eq1 = new LambdaQueryWrapper<EntityGovRel>().eq(EntityGovRel::getEntityCode, code);
+        EntityGovRel entityGovRel = entityGovRelMapper.selectOne(eq1);
+        if (entityGovRel != null) {
+            entityInfoCodeDto.setIsGov("Y");
+            LambdaQueryWrapper<GovInfo> eq2 = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getDqGovCode, entityGovRel.getDqGovCode());
+            GovInfo govInfo = govInfoMapper.selectOne(eq2);
+            entityInfoCodeDto.setGovName(govInfo.getGovName());
+        } else {
+            entityInfoCodeDto.setIsGov("N");
+        }
+        //entitMaster
+        LambdaQueryWrapper<EntityMaster> eq2 = new LambdaQueryWrapper<EntityMaster>().eq(EntityMaster::getEntityCode, code);
+        EntityMaster entityMaster = entityMasterMapper.selectOne(eq2);
+        entityInfoCodeDto.setYyUrban(entityMaster.getYyUrban());
+        entityInfoCodeDto.setZhongxinUrban(entityMaster.getZhongxinUrban());
+        return entityInfoCodeDto;
+    }
 
 }
