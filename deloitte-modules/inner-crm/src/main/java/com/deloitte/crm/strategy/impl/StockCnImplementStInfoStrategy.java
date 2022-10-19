@@ -1,14 +1,14 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
-import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.StockCnImplementStInfo;
-import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.StockCnImplementStInfoMapper;
 import com.deloitte.crm.mapper.StockCnInfoMapper;
 import com.deloitte.crm.service.StockCnImplementStInfoService;
@@ -47,26 +47,33 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(StockCnImplementStInfo implementStInfo, Date timeNow, CrmWindTask windTask) {
-        log.info(">>>>>>>>开始到导入【实施ST带帽】【当前时间】=>:{},【股票代码】=>:{}【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),implementStInfo.getCode(), windTask.getId());
+        log.info(">>>>>>>>开始到导入【实施ST带帽】【当前时间】=>:{},【股票代码】=>:{}【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), implementStInfo.getCode(), windTask.getId());
         implementStInfo.setTaskId(windTask.getId());
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, implementStInfo.getCode()));
         if (stockCnInfo != null) {
             stockCnInfo.setStUndoImplemtnet(1);
             stockCnInfo.setStockShortName(Optional.ofNullable(implementStInfo.getImplementBackName()).orElse(""));
             stockCnInfoMapper.updateById(stockCnInfo);
-            log.info(">>>>>>>>开始到导入【实施ST带帽】【当前时间】=>:{},【股票代码】=>:{}【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),implementStInfo.getCode(), windTask.getId());
+            log.info(">>>>>>>>开始到导入【实施ST带帽】【当前时间】=>:{},【股票代码】=>:{}【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), implementStInfo.getCode(), windTask.getId());
         } else {
             log.warn(">>>>>>>>开始到导入【实施ST带帽】根据【股票代码】=>:{}>查询不到A股信息 【任务ID】={}任务结束！！！！！", implementStInfo.getCode(), windTask.getId());
         }
-        StockCnImplementStInfo implementStInfoResult = implementStInfoMapper.selectOne(new LambdaQueryWrapper<StockCnImplementStInfo>().eq(StockCnImplementStInfo::getCode, implementStInfo.getCode()));
+
+        List<StockCnImplementStInfo> implementStInfoResult = implementStInfoMapper.selectList(new LambdaQueryWrapper<StockCnImplementStInfo>()
+                .eq(StockCnImplementStInfo::getCode, implementStInfo.getCode())
+                .orderBy(true, false, StockCnImplementStInfo::getId)
+                .last("LIMIT 1"));
+
         Integer changeType = null;
-        if (implementStInfoResult == null) {
+        if (CollUtil.isEmpty(implementStInfoResult)) {
             changeType = DataChangeType.INSERT.getId();
-        } else if (!Objects.equals(implementStInfoResult, implementStInfo)) {
-            changeType = DataChangeType.UPDATE.getId();
+        } else {
+            final StockCnImplementStInfo last = implementStInfoResult.stream().findFirst().get();
+            if (!ObjectUtil.equals(last, implementStInfo)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
         }
         implementStInfo.setChangeType(changeType);
-
         implementStInfoMapper.insert(implementStInfo);
         return new AsyncResult<>(new Object());
 

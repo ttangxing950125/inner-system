@@ -134,14 +134,13 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
             }
             //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
             Integer changeType = null;
-            final BondConvertibleInfo bondConvertibleInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()));
+            final BondConvertibleInfo bondConvertibleInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleInfo::getId).last("LIMIT 1"));
             if (bondConvertibleInfo == null) {
                 changeType = DataChangeType.INSERT.getId();
-            }
-            if (!Objects.equals(bondConvertibleInfo, item)) {
-                changeType = DataChangeType.UPDATE.getId();
             } else {
-                changeType = DataChangeType.INSERT.getId();
+                if (!Objects.equals(bondConvertibleInfo, item)) {
+                    changeType = DataChangeType.UPDATE.getId();
+                }
             }
             item.setChangeType(changeType);
             bondConvertibleInfoMapper.insert(item);

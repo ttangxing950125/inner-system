@@ -50,12 +50,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectComWindByDate" resultType="com.deloitte.crm.dto.CrmWindTaskDto" parameterType="string">
-        SELECT task_cate_id,task_desc,COUNT(id) as taskCount,COUNT(if(complete = 1 TRUE,NULL))
-         as Complete FROM crm_wind_task WHERE task_date = #{taskDate}  GROUP BY task_cate_id
+        SELECT task_cate_id,task_desc,COUNT(id) as taskCount,COUNT(if(complete = 1,TRUE,NULL))
+         as complete FROM crm_wind_task WHERE task_date = #{taskDate}  GROUP BY task_cate_id
     </select>
 
     <select id="selctCrmCount" resultType="com.deloitte.crm.dto.TaskDto" parameterType="string">
-        SELECT COUNT(id) AS taskCount,COUNT(if(complete = 0,TRUE,NULL)) AS taskNoCount,COUNT(if(complete = 1,TRUE,NULL)) AS taskCop FROM crm_wind_task WHERE task_date = #{taskDate}
+        SELECT COUNT(id) AS taskCount,COUNT(if(complete != 1,TRUE,NULL)) AS taskNoCount,COUNT(if(complete = 1,TRUE,NULL)) AS taskCop FROM crm_wind_task WHERE task_date = #{taskDate}
     </select>
 
     <insert id="insertCrmWindTask" parameterType="com.deloitte.crm.domain.CrmWindTask" useGeneratedKeys="true" keyProperty="id">

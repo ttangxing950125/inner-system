@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -163,7 +164,7 @@ public class BondConvertibleChangeInfo implements Serializable {
      * 发行规模(亿元)
      */
     @Excel(name = "发行规模(亿元)")
-    private Double issuingScale;
+    private BigDecimal issuingScale;
     /**
      * 利率条款
      */
