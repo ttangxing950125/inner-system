@@ -46,11 +46,11 @@ public class CrmWindTaskDto {
         this.taskCount = taskCount;
     }
 
-    public String getNotComplete() {
+    public String getComplete() {
         return complete;
     }
 
-    public void setNotComplete(String notComplete) {
+    public void setComplete(String notComplete) {
         this.complete = notComplete;
     }
 
