@@ -54,25 +54,25 @@ public class CnIpoInfo implements Serializable {
     /**
      * 招股日期
      */
-    @Excel(name = "招股日期", dateFormat = "yyyy-MM-dd")
+    @Excel(name = "招股日期")
     private String prospDate;
 
     /**
      * 初步询价起始日
      */
-    @Excel(name = "初步询价起始日", dateFormat = "yyyy-MM-dd")
+    @Excel(name = "初步询价起始日")
     private String inquiryStaringDate;
 
     /**
      * 网上发行日期
      */
     @Excel(name = "网上发行日期")
-    private Date netIssDate;
+    private String netIssDate;
     /**
      * 上市日期
      */
     @Excel(name = "上市日期")
-    private Date ipoDate;
+    private String ipoDate;
     /**
      * 上市板
      */
@@ -376,18 +376,18 @@ public class CnIpoInfo implements Serializable {
     /**
      * 发行公告日期
      */
-    @Excel(name = "发行公告日期")
-    private Date issAnnoDate;
+    @Excel(name = "发行公告日期", dateFormat = "yyyy-MM-dd")
+    private String issAnnoDate;
     /**
      * 网下发行起始日期
      */
-    @Excel(name = "网下发行起始日期")
-    private Date offlineIssStardate;
+    @Excel(name = "网下发行起始日期", dateFormat = "yyyy-MM-dd")
+    private String offlineIssStardate;
     /**
      * 网下发行截止日期
      */
-    @Excel(name = "网下发行截止日期")
-    private Date offlineIssEnddate;
+    @Excel(name = "网下发行截止日期", dateFormat = "yyyy-MM-dd")
+    private String offlineIssEnddate;
     /**
      * 网上发行冻结资金(亿元)
      */

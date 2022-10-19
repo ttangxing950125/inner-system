@@ -91,7 +91,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 changeType = DataChangeType.UPDATE.getId();
             }
 
-            if (last != null && DateUtil.compare(last.getIpoDate(), item.getIpoDate()) != 0) {
+            if (last != null && !last.getIpoDate().equals( item.getIpoDate())) {
                 //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
                 // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
@@ -102,7 +102,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             if (
                     Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getId())
                             &&
-                            DateUtil.compare(timeNow, item.getIpoDate()) == 0
+                            DateUtil.format(timeNow,"yyyy-MM-dd").equals(item.getIpoDate())
             ) {
                 stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getId());
                 stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getName());

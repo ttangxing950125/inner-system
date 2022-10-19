@@ -1,9 +1,11 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -66,14 +68,17 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
 
     /**
      * 参看逻辑
-     * {@link com.deloitte.crm.strategy.impl.DefaultFirstNumberCountStrategy#doBondImport(DefaultFirstNumberCount, Date, CrmWindTask)} }
+     * {@link com.deloitte.crm.strategy.iampl.DefaultFirstNumberCountStrategy#doBondImport(DefaultFirstNumberCount, Date, CrmWindTask)} }
      */
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(DefaultMoneyTotal moneyTotal, Date timeNow, CrmWindTask windTask) {
         try {
+
+            moneyTotal.setTaskId(windTask.getId());
+
             String shortName = moneyTotal.getBondAbstract();
-            BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName,Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+            BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName, Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
             if (moneyTotal.getLatestStatus().equals("实质违约")) {
                 bondInfo.setBondStatus(7);
                 bondInfo.setBondState(1);
@@ -103,17 +108,19 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             Integer resStatus = null;
             Integer changeType = null;
             //看之前有没有导入过这个数据 根据 "债券代码"
-            final List<DefaultMoneyTotal> defaultMoneyTotals = defaultMoneyTotalMapper.selectList(new QueryWrapper<DefaultMoneyTotal>().lambda().eq(DefaultMoneyTotal::getBondCode, moneyTotal.getBondCode()));
-            if (CollUtil.isEmpty(defaultMoneyTotals)) {
+            final List<DefaultMoneyTotal> lastList = defaultMoneyTotalMapper.selectList(new LambdaQueryWrapper<DefaultMoneyTotal>()
+                    .eq(DefaultMoneyTotal::getBondCode, moneyTotal.getBondCode())
+                    .orderBy(true, false, DefaultMoneyTotal::getId)
+                    .last("LIMIT 1"));
+            if (CollUtil.isEmpty(lastList)) {
                 changeType = DataChangeType.INSERT.getId();
-            } else if (!Objects.equals(defaultMoneyTotals, moneyTotal)) {
-                //如果他们两个不相同，代表有属性修改了
-                changeType = DataChangeType.UPDATE.getId();
+            }else {
+                final DefaultMoneyTotal last = lastList.stream().findFirst().get();
+                if (!ObjectUtil.equals(last, moneyTotal)) {
+                    changeType = DataChangeType.UPDATE.getId();
+                }
             }
-
             moneyTotal.setChangeType(changeType);
-            moneyTotal.setTaskId(windTask.getId());
-
             final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), moneyTotal);
             if (resStatus == null && updateCount > 0) {
                 resStatus = 2;
@@ -152,8 +159,8 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
         arr.add("导入日期");
         arr.add("变化状态");
 
-        arr.add("代码");
-        arr.add("公司名称");
+        arr.add("证券代码");
+        arr.add("证券简称");
         return arr;
     }
 

@@ -1,9 +1,9 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovLevel;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -73,4 +73,6 @@ public interface IGovLevelService
      * @return
      */
     R<List<GovLevel>> getGovLevelSmall(Integer id);
+
+    R getGovLevel();
 }

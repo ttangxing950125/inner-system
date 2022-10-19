@@ -25,7 +25,7 @@
             <el-input
               class="mr10"
               v-model="input"
-              style="width: 400px"
+              style="width: 80%;"
               placeholder="请输入内容"
             ></el-input>
             <el-button class="mr10" type="primary" @click="select"
@@ -38,14 +38,14 @@
             :data="list"
             style="width: 98%; margin-top: 20px"
           >
-            <el-table-column type="index" sortable label="序号" width="50">
+            <el-table-column type="index" label="序号" width="50">
             </el-table-column>
-            <el-table-column prop="date" label="德勤主体代码" sortable>
+            <el-table-column prop="dqGovCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="name" label="政府名称"> </el-table-column>
-            <el-table-column prop="province" label="行政区划代码">
+            <el-table-column prop="govName" label="政府名称"> </el-table-column>
+            <el-table-column prop="govCode" label="行政区划代码">
             </el-table-column>
-            <el-table-column prop="city" label="上级政府名称">
+            <el-table-column prop="preGovName" label="上级政府名称">
             </el-table-column>
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
@@ -65,7 +65,7 @@
           <span class="g-title">目标政府信息</span>
           <span class="s-2">修改中</span>
         </div>
-        <el-button type="text">提交变更并退出修改模式</el-button>
+        <el-button type="text">提交变更</el-button>
       </div>
       <el-col
         :sm="24"
@@ -84,50 +84,64 @@
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">德勤主体代码（企业）</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.dqGovCode"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">政府主体名称</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govName"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">政府主体类型</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.govInfo && levelStr[info.govInfo.govType] 
+                    }}
+                  </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">德勤主体代码</div>
-                  <div style="color: a7a7a7">GV304892</div>
-                  <el-button class="edit-btn" type="text" size="mini"
-                    >修改</el-button
-                  >
+                  <div class="first">生效状态</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{ info.govInfo && info.govInfo.status === 1 ? 'Y' : 'N' }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">曾用名或别称</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govNameHis"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    @change="item.edit = true"
+                  ></el-input>
                 </div>
                 <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
+                  <div class="first">曾用名或别称更新人</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{ info.govInfo && info.govInfo.entityNameHis }}
+                  </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
-                </div>
-                <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
-                  <div>（暂无记录）</div>
+                  <div class="first">曾用名或别称更名日期</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
                 </div>
               </el-col>
             </el-collapse-item>
@@ -139,78 +153,44 @@
 </template>
 
 <script>
+import {
+  getGovByName,
+  getInfoDetailGov,
+  updateInfoList
+} from "@/api/subject";
 export default {
   name: "eidtGovernment",
   data() {
     return {
       currentTime: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       currentTab: "",
+      input: '',
+      info: {},
+      levelStr: {
+        1: "省级行政区",
+        2: "地级市行政区",
+        3: "县级行政区",
+        4: "经开，高新区，新区等",
+      },
     };
   },
   created() {
-    this.getCurrentTime();
   },
   methods: {
-    goTarget(href) {
-      window.open(href, "_blank");
-    },
-    handleClick() {
-      console.log(1);
-    },
-    getCurrentTime() {
-      //获取当前时间并打印
-      let yy = new Date().getFullYear();
-      let mm = new Date().getMonth() + 1;
-      let dd = new Date().getDate();
-      let hh = new Date().getHours();
-      let mf =
-        new Date().getMinutes() < 10
-          ? "0" + new Date().getMinutes()
-          : new Date().getMinutes();
-      let ss =
-        new Date().getSeconds() < 10
-          ? "0" + new Date().getSeconds()
-          : new Date().getSeconds();
-      // eslint-disable-next-line no-unused-vars
-      this.currentTime =
-        yy + "-" + mm + "-" + dd + " " + hh + ":" + mf + ":" + ss;
-    },
-    check(name) {
-      this.dialogVisible = true;
+     handleClick(row) {
+      try {
+        this.$modal.loading("Loading...");
+        const code = row.dqGovCode
+        getInfoDetailGov({ dqGovCode: code }).then((res) => {
+          const { data } = res;
+          this.info = data;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     changeTab(tab) {
       this.currentTab = tab;
@@ -218,17 +198,68 @@ export default {
     back() {
       this.$router.back();
     },
+    select() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+          govName: this.input
+        };
+        getGovByName(parmas).then((res) => {
+          const { data } = res;
+          this.list = data.data
+        //   this.list = data.records;
+        //   this.total = data.total;
+        //   this.queryParams.pageNum = data.current;
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+     submit() {
+      try {
+        this.$modal.loading("Loading...");
+        updateInfoList(this.info).then((res) => {
+          if (res.code === 200) {
+            this.$message({
+              showClose: true,
+              message: "操作成功",
+              type: "success",
+            });
+          }
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: 'error'
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
   },
 };
 </script>
 
 <style scoped lang="scss">
+.t-input {
+  width: 200px;
+}
 .edit-btn {
   margin-top: -3px;
   margin-left: 5px;
 }
 .flex1 {
   .first {
+    width: 250px;
+    font-size: 14px;
+    line-height: 3;
+  }
+  .scond {
+    font-size: 14px;
+    line-height: 3;
     width: 200px;
   }
 }

@@ -3,9 +3,9 @@
     <h3 class="g-title">今日运维任务</h3>
     <div class="todo-desc">
       <div>HELLO!</div>
-      <div>今天是 {{ currentTime }}, {{ week }}。</div>
+      <div>今日日期 {{ currentTime }}, {{ week }}。</div>
       <div>
-        今日完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
+        当前日期完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
       </div>
       <span type="text">切换日期：</span>
       <el-date-picker v-model="monthDate" type="month" placeholder="选择月" value-format="yyyy-MM" @change="changeMonth">
@@ -28,7 +28,7 @@
         <el-table-column prop="taskDesc" label="任务说明"> </el-table-column>
         <el-table-column prop="name" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.notComplete > 0 ? 'red' : 'green'">{{ scope.row.notComplete > 0 ? '待完成( '+scope.row.notComplete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
+            <span :class="scope.row.complete === scope.row.taskCount ? 'green' : 'red'">{{ scope.row.complete !== scope.row.taskCount ? '待完成( '+scope.row.complete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
           </template>
         </el-table-column>
         </el-table-column>
@@ -1147,7 +1147,12 @@ export default {
         pageSize: 10
       },
       total: 0,
-      clickDay: ''
+      clickDay: '',
+      colorArr: {
+          1: 'shadow',
+          2: 'shadow-yellow',
+          3: 'shadow-green',
+      }
     };
   },
   mounted() {
@@ -1369,7 +1374,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='shadow'>" +
+                     "<div class='"+(this.colorArr[jsonHtml[l].bad])+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1380,7 +1385,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='"+(jsonHtml[l].bad ? 'shadow-yellow' : 'shadow-green')+"'>" +
+                    "<div class='"+(this.colorArr[jsonHtml[l].bad])+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1431,14 +1436,9 @@ export default {
                 }else {
                     e.date = dateStr
                 }
-                if(e.taskStatus === 2){
-                    e.bad = true
-                }
-                if(e.taskStatus === 3){
-                    e.bad = false
-                }
+                e.bad = e.taskStatus
             });
-        }
+        }        
       this.drawTable(flagData);
     },
     work(row) {
@@ -1514,6 +1514,8 @@ export default {
       this.ruleForm.bondShortName = row.bondShortName
       this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
+      this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
     },
     check(row) {
       this.$modal.loading("loading...");
@@ -1595,6 +1597,8 @@ export default {
         this.ruleForm.sourceName = row.sourceName
         this.$set(this.ruleForm, 'entityCode',  row.entityCode)
         this.$set(this.ruleForm, 'id',  row.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         this.$modal.loading("loading...");
         getTable({id: row.id}).then(res => {
           const { data } = res
@@ -1741,6 +1745,8 @@ export default {
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         this.$modal.loading("loading...");
         const params = {
           entityCode: row.entityInfo.entityCode,
@@ -1877,6 +1883,8 @@ export default {
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         const params = {
           entityCode: row.entityInfo.entityCode,
           roleId: 5,
@@ -1925,6 +1933,8 @@ export default {
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'wind',  '')
+        this.$set(this.ruleForm, 'shenWan',  '')
         const params = {
           entityCode: row.entityInfo.entityCode,
           roleId: 5,

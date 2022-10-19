@@ -142,3 +142,15 @@ export function getChecking(params) {
     data: params,
   });
 }
+
+// 根据政府名称或者政府code查询政府主体
+export function getGovByParam(params) {
+  return request({
+    url: "/crm/govInfo/getGovByParam?param=" + params.param,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}

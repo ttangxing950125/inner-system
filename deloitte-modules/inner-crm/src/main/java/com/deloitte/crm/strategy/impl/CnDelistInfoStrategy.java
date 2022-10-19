@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
@@ -107,6 +108,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
         if (stockCnInfo != null) {
             stockCnInfo.setIsDeleted(Boolean.TRUE);//TODO 1-删除 0-未删除 默认都是未删除
+            stockCnInfo.setDelistingDate(DateUtil.formatDate(item.getDelistDate()));
             stockCnInfoService.saveOrUpdateNew(stockCnInfo);
             final LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockCnInfo.getStockDqCode()));
@@ -119,17 +121,15 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         Integer changeType = null;
         String excelReadCode = item.getCode();
         final LambdaQueryWrapper<CnDelistInfo> cnDelistInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        final List<CnDelistInfo> cnDelistInfos = cnDelistInfoMapper.selectList(cnDelistInfoLambdaQueryWrapper.eq(CnDelistInfo::getCode, excelReadCode));
-        if (CollUtil.isNotEmpty(cnDelistInfos)) {
+        final List<CnDelistInfo> cnDelistInfos = cnDelistInfoMapper.selectList(cnDelistInfoLambdaQueryWrapper.eq(CnDelistInfo::getCode, excelReadCode).orderBy(true, false, CnDelistInfo::getId).last("LIMIT 1"));
+        if (CollUtil.isEmpty(cnDelistInfos)) {
             changeType = DataChangeType.INSERT.getId();
-        }
-        CnDelistInfo last = cnDelistInfos.stream().findFirst().get();
-        if (!Objects.equals(last, item)) {
-            changeType = DataChangeType.UPDATE.getId();
         } else {
-            changeType = DataChangeType.INSERT.getId();
+            CnDelistInfo last = cnDelistInfos.stream().findFirst().get();
+            if (!Objects.equals(last, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
         }
-
         item.setChangeType(changeType);
 
         //更新a股属性

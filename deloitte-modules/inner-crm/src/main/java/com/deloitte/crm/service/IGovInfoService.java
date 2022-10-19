@@ -5,6 +5,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
 import com.deloitte.crm.domain.dto.GovAttrByDtoBack;
+import com.deloitte.crm.domain.dto.GovInfoDetails;
 import com.deloitte.crm.domain.dto.GovView;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;

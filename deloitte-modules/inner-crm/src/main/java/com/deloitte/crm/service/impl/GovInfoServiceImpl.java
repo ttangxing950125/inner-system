@@ -157,26 +157,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R updateInfoList(List<GovInfo> list) {
+
         list.stream().forEach(o -> {
-            GovInfo govInfo = govInfoMapper.selectById(o.getId());
-            entityInfoLogsUpdatedService.insert(govInfo.getDqGovCode(),govInfo.getGovName(),govInfo,o);
+            entityInfoLogsUpdatedService.insert(o.getDqGovCode(),o.getGovName(),o,o);
             govInfoMapper.updateById(o);
             //修改政府主体名称时，需要添加曾用名
             if (!ObjectUtils.isEmpty(o.getGovName())) {
-                String oldName = govInfo.getGovName();
+                String oldName = o.getGovName();
                 GovInfo addOldName = new GovInfo();
                 addOldName.setId(o.getId());
                 addOldName.setGovNameHis(oldName);
                 addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
                 addOldName(addOldName);
-            }
-            //修改政府主体代码时，需要修改主体历史表中的政府主体代码
-            if (!ObjectUtils.isEmpty(o.getDqGovCode())) {
-                String oldDqCode = govInfo.getDqGovCode();
-                QueryWrapper<EntityNameHis> wrapper = new QueryWrapper<>();
-                EntityNameHis nameHis = new EntityNameHis();
-                nameHis.setDqCode(o.getDqGovCode());
-                nameHisMapper.update(nameHis, wrapper.lambda().eq(EntityNameHis::getDqCode, oldDqCode));
             }
         });
         return R.ok(list.size());
@@ -801,7 +793,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         if (!CollectionUtils.isEmpty(listGovMap.get(3))) {
             area = listGovMap.get(3).size();
         }
-        //经开高兴总数
+        //经开高新总数
         if (!CollectionUtils.isEmpty(listGovMap.get(4))) {
             gx = listGovMap.get(4).size();
         }
