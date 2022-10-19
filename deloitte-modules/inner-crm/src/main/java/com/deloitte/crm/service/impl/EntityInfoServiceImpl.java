@@ -78,16 +78,25 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityStockThkRelMapper thkRelMapper;
 
     @Autowired
+    private ProductsCoverMapper productsCoverMapper;
+
+    @Autowired
     private EntityFinancialMapper financialMapper;
 
     @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
     @Autowired
+    private ProductsMasterRelMapper productsMasterRelMapper;
+
+    @Autowired
     private StockCnInfoMapper stockCnMapper;
 
     @Autowired
     private StockThkInfoMapper stockThkMapper;
+
+    @Autowired
+    private ProductsMasterDictMapper productsMasterDictMapper;
 
     private EntityInfoMapper entityInfoMapper;
 
@@ -508,6 +517,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfoDetails = getEntityFinancials(entityInfoDetails, entityCode, entityInfo);
 
         //TODO 查询敞口划分  --  客户敞口行业划分汇集  产业链CICS行业划分明细  旧辖口行业划分
+        entityInfoDetails=getProductsMaster(entityInfoDetails, entityCode);
+
+        //查询敞口覆盖情况
+        entityInfoDetails=getCoverageDetail(entityInfoDetails, entityCode);
+
         //从主表获取数据
 
         //TODO 查询产品覆盖情况  --  全部
@@ -518,6 +532,61 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         entityInfoDetails.setEntityBaseBusiInfo(baseBusiInfo);
         return R.ok(entityInfoDetails);
+    }
+
+    private EntityInfoDetails getCoverageDetail(EntityInfoDetails entityInfoDetails, String entityCode) {
+        //查询产品覆盖相关
+        List<ProductsCover> productsCovers = productsCoverMapper.selectList(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getEntityCode, entityCode));
+        if (CollectionUtils.isEmpty(productsCovers)){
+            return entityInfoDetails;
+        }
+        Map<Integer, List<ProductsCover>> collect = productsCovers.stream().collect(Collectors.groupingBy(ProductsCover::getProId));
+        //创建产品覆盖集合
+        List<ProCoverVo>coverVos=new ArrayList<>();
+
+        List<Products> products = productsMapper.selectList(new QueryWrapper<>());
+
+        products.stream().forEach(o->{
+            String proName = o.getProName();
+            List<ProductsCover> covers = collect.get(o.getId());
+
+            ProCoverVo proCoverVo = new ProCoverVo();
+            //设置产品是否覆盖
+            NameValueVo isCover=new NameValueVo();
+            //设置产品覆盖描述
+            NameValueVo coverReason=new NameValueVo();
+            //设置产品名称
+            isCover.setName(proName+"是否覆盖");
+            coverReason.setName(proName+"未覆盖原因");
+            //设置值
+            if (!CollectionUtils.isEmpty(covers)){
+                isCover.setValue(covers.get(0).getIsCover());
+                coverReason.setValue(covers.get(0).getCoverDes());
+            }
+            proCoverVo.setIsCover(isCover).setCoverReason(coverReason);
+            coverVos.add(proCoverVo);
+        });
+        entityInfoDetails.setCoverageDetail(coverVos);
+        return entityInfoDetails;
+    }
+
+    @Autowired
+    private ProductsMapper productsMapper;
+
+    private EntityInfoDetails getProductsMaster(EntityInfoDetails entityInfoDetails, String entityCode) {
+        //查询敞口相关
+        List<ProductsMasterRel> productsMasterRels = productsMasterRelMapper.selectList(new QueryWrapper<ProductsMasterRel>().lambda().eq(ProductsMasterRel::getEntityCode, entityCode));
+        if (CollectionUtils.isEmpty(productsMasterRels)){
+            return entityInfoDetails;
+        }
+        //根据敞口id查询敞口
+        Set<Integer> masterIds = productsMasterRels.stream().collect(Collectors.groupingBy(ProductsMasterRel::getProMasDictId)).keySet();
+        List<ProductsMasterDict> productsMasterDicts = productsMasterDictMapper.selectList(new QueryWrapper<ProductsMasterDict>().lambda().in(ProductsMasterDict::getId, masterIds));
+        List<String>masterName=new ArrayList<>();
+        productsMasterDicts.stream().forEach(o->masterName.add(o.getMasterName()));
+        //设置敞口属性
+        entityInfoDetails.setMasterNames(masterName);
+        return entityInfoDetails;
     }
 
     private EntityInfoDetails getEntityFinancials(EntityInfoDetails entityInfoDetails, String entityCode, EntityInfo entityInfo) {
@@ -775,6 +844,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         else if (type == 4) {
             records = getFinSpecial(records, codeList);
         }
+
         resultPage.setRecords(records);
         return R.ok(resultPage);
     }
@@ -1203,8 +1273,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     cnRels.stream().forEach(x -> {
                         //德勤唯一识别代码
                         stockDqCodeList.add(x.getStockDqCode());
-                        //上市日期
-                        stockDateList.add(TimeFormatUtil.getFormartDate(x.getCreated()));
                     });
                 }
             }
@@ -1214,8 +1282,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     thkRels.stream().forEach(x -> {
                         //德勤唯一识别代码
                         stockDqCodeList.add(x.getStockDqCode());
-                        //上市日期
-                        stockDateList.add(TimeFormatUtil.getFormartDate(x.getCreated()));
                     });
                 }
             }
