@@ -140,7 +140,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 .in(CrmWindTask::getComplete, 0, 2);
 
         long count = this.count(wrapper);
-        log.info("--------------未完成的任务数量{}",count);
+        log.info("--------------未完成的任务数量{}", count);
         if (count != 0) {
             //代表还有任务未完成
             return false;
@@ -166,7 +166,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                         "请尽快登陆平台完成相关任务。</br>" +
                         "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a>");
 
-        log.info("--------------角色7的任务数量{}",entityTaskCount);
+        log.info("--------------角色7的任务数量{}", entityTaskCount);
 
         //发邮件给角色2
         Wrapper<CrmMasTask> masTaskQue = Wrappers.<CrmMasTask>lambdaQuery()
@@ -180,7 +180,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                         "请尽快登陆平台完成相关任务。</br>" +
                         "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a>");
 
-        log.info("--------------角色2的任务数量{}",entityMasCount);
+        log.info("--------------角色2的任务数量{}", entityMasCount);
 
 
         dailyTaskService.update(updateDaily);
@@ -215,7 +215,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             return detailsVo;
         })).map(CompletableFuture::join).collect(Collectors.toList());
         long end = System.currentTimeMillis();
-        log.info("查询完成，耗时：" + (end - start) +" ms");
+        log.info("查询完成，耗时：" + (end - start) + " ms");
         return collect;
         /*
        return windTasks.stream().map(item -> {
@@ -259,7 +259,19 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
      */
     @Override
     public List<CrmWindTaskDto> selectComTaskByDate(CrmTaskVo crmTaskVo) {
-        Page<CrmWindTaskDto> page = new Page<>(crmTaskVo.getPageNum(), crmTaskVo.getPageSize());
+        Integer pageNum = null;
+        Integer pageSize = null;
+        if (crmTaskVo.getPageNum() == null || crmTaskVo.getPageNum() == 0) {
+            pageNum = 1;
+        } else {
+            pageNum = crmTaskVo.getPageNum();
+        }
+        if (crmTaskVo.getPageSize() == null || crmTaskVo.getPageSize() == 0) {
+            pageSize = 5;
+        } else {
+            pageSize = crmTaskVo.getPageSize();
+        }
+        Page<CrmWindTaskDto> page = new Page<>(pageNum, pageSize);
         List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskMapper.selectComWindByDate(page, crmTaskVo.getTaskDate());
         return crmWindTaskDtos;
     }
