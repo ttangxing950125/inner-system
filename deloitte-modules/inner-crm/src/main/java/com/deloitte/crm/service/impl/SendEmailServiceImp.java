@@ -5,6 +5,7 @@ import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class SendEmailServiceImp implements SendEmailService {
      * @date 2022/9/23 15:58
      */
     @Override
+    @Async()
     public String SendEmail(Integer id, String title, String content) {
         List<SysUser> sysUsers = roleService.selectUserListById(id);
         sysUsers.stream().forEach(row -> {
