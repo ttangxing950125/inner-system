@@ -124,6 +124,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityGovRelMapper entityGovRelMapper;
 
     private EntityMasterMapper entityMasterMapper;
+
     /**
      * 主体
      */
@@ -293,7 +294,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //再次修改当条信息
         baseMapper.updateById(entityInfo);
 
-        //TODO 将新增的信息保存至 entity_info_logs
+        //将新增的信息保存至 entity_info_logs
         EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
         //数据装配新增基础信息
         entityInfoLogs.setEntityCode(entityCode)
@@ -302,7 +303,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfoLogsService.getBaseMapper().insert(entityInfoLogs);
 
         //修改当日任务 新增主体状态码为 2
-        return iCrmEntityTaskService.finishTask(taskId, 2);
+        return iCrmEntityTaskService.finishTask(taskId, 2,entityCode);
     }
 
     /**

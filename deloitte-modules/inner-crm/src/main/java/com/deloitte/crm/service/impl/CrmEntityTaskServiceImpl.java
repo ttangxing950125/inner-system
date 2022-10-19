@@ -2,21 +2,21 @@ package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
+import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
+import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.CrmEntityTaskVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +44,13 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     @Resource
     private ICrmDailyTaskService crmDailyTaskService;
+
+    @Resource
+    private CrmMasTaskMapper crmMasTaskMapper;
+
+    @Resource
+    private SendEmailService sendEmailService;
+
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务
@@ -159,10 +166,13 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R finishTask(Integer taskId, Integer state) {
+    public R finishTask(Integer taskId, Integer state,String entityCode) {
         CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId));
         Assert.notNull(crmEntityTask,BadInfo.VALID_EMPTY_TARGET.getInfo());
         Assert.isTrue(crmEntityTask.getState() == 0,BadInfo.EXITS_TASK_FINISH.getInfo());
+
+        //给角色 2 新增一条任务
+        crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
 
         crmEntityTask.setState(state);
         baseMapper.updateById(crmEntityTask);
@@ -180,6 +190,19 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
             // 当日任务处理完毕 状态码为 3
             crmDailyTask.setTaskStatus(3);
             crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+
+            List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2));
+            CrmDailyTask role2DailyTask = new CrmDailyTask().setTaskRoleType("4").setTaskDate(new Date());
+
+            if(crmEntityTasks.size()==0){
+                //没有任务 不发邮件
+                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(1));
+            }else{
+                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(2));
+                //发送邮件
+                sendEmailService.email(4,crmEntityTasks.size());
+            }
+
             return R.ok(SuccessInfo.SUCCESS.getInfo());
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());

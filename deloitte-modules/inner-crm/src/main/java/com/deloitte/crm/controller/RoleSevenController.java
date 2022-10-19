@@ -1,13 +1,8 @@
 package com.deloitte.crm.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
-import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
-import com.deloitte.common.security.annotation.RequiresPermissions;
-import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -16,18 +11,10 @@ import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
-import java.util.List;
-
-import static org.reflections.Reflections.log;
 
 /**
  * @author 正杰
@@ -84,7 +71,7 @@ public class RoleSevenController {
     @PostMapping("/ignoreTask")
     public R ignoreTask(Integer id){
         // 已有主体状态为 1
-        return iCrmEntityTaskService.finishTask(id,1);
+        return iCrmEntityTaskService.finishTask(id,1,null);
     }
 
     /**
