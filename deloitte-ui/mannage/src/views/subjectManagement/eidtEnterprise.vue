@@ -25,7 +25,7 @@
             <el-input
               class="mr10"
               v-model="input"
-              style="width: 400px"
+              style="width: 80%;"
               placeholder="请输入内容"
             ></el-input>
             <el-button class="mr10" type="primary" @click="select"
@@ -320,8 +320,8 @@ export default {
       } catch (error) {
         this.$message({
           showClose: true,
-          message: "操作成功",
-          type: "success",
+          message: error,
+          type: 'error'
         });
       } finally {
         this.$modal.closeLoading();
@@ -348,7 +348,7 @@ export default {
   .scond {
     font-size: 14px;
     line-height: 3;
-    width: 300px;
+    width: 200px;
   }
 }
 .collpase {

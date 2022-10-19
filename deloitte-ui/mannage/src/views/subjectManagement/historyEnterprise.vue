@@ -21,22 +21,21 @@
             style="width: 98%; margin-top: 15px"
           >
             <el-table-column
-              type="index"
-              sortable
+              prop="code"
               label="德勤主体代码"
-              width="50"
+              
             >
             </el-table-column>
-            <el-table-column prop="date" label="证券简称" sortable>
+            <el-table-column prop="stockShortName" label="证券简称">
             </el-table-column>
-            <el-table-column prop="name" label="变动字段"> </el-table-column>
-            <el-table-column prop="province" label="已存值"> </el-table-column>
-            <el-table-column prop="city" label="已存值录入日期">
+            <el-table-column prop="fieldName" label="变动字段"> </el-table-column>
+            <el-table-column prop="originalValue" label="已存值"> </el-table-column>
+            <el-table-column prop="created" label="已存值录入日期">
             </el-table-column>
-            <el-table-column prop="address" label="修改值"> </el-table-column>
-            <el-table-column prop="address" label="修改日期"> </el-table-column>
-            <el-table-column prop="address" label="修改人"> </el-table-column>
-            <el-table-column label="操作" width="100">
+            <el-table-column prop="value" label="修改值"> </el-table-column>
+            <el-table-column prop="updated" label="修改日期"> </el-table-column>
+            <el-table-column prop="userName" label="修改人"> </el-table-column>
+            <!-- <el-table-column label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
                   @click="handleClick(scope.row)"
@@ -45,61 +44,15 @@
                   >撤销</el-button
                 >
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
-        </el-card>
-      </el-col>
-      <el-col
-        :sm="24"
-        :lg="24"
-        class="mt20 form-card"
-        style="padding-left: 20px"
-      >
-        <el-card>
-          <h3 class="g-t-title">外部更新记录</h3>
-          <div class="content">
-            <div style="font-weight: 600">存量修改</div>
-            <div>最近一次接受更新时间：2022-09-23 11：11：11</div>
-            <div>设计变动条数 328 条，其中已确认 10 条， 待确认 318 条</div>
-          </div>
-          <el-table
-            class="table-content"
-            :data="list"
-            style="width: 98%; margin-top: 15px"
-          >
-            <el-table-column
-              type="index"
-              sortable
-              label="德勤主体代码"
-              width="50"
-            >
-            </el-table-column>
-            <el-table-column prop="date" label="证券简称" sortable>
-            </el-table-column>
-            <el-table-column prop="name" label="变动字段"> </el-table-column>
-            <el-table-column prop="province" label="已存值"> </el-table-column>
-            <el-table-column prop="city" label="已存值录入日期">
-            </el-table-column>
-            <el-table-column prop="address" label="修改值"> </el-table-column>
-            <el-table-column prop="address" label="修改值推送日期">
-            </el-table-column>
-            <el-table-column label="操作" width="100">
-              <template slot-scope="scope">
-                <el-button
-                  @click="handleClick(scope.row)"
-                  type="text"
-                  size="small"
-                  >撤销</el-button
-                >
-                <el-button
-                  @click="handleClick(scope.row)"
-                  type="text"
-                  size="small"
-                  >忽略</el-button
-                >
-              </template>
-            </el-table-column>
-          </el-table>
+           <pagination
+              v-show="total > 0"
+              :total="total"
+              :page.sync="queryParams.pageNum"
+              :limit.sync="queryParams.pageSize"
+              @pagination="getList"
+            />
         </el-card>
       </el-col>
     </el-row>
@@ -107,61 +60,75 @@
 </template>
 
 <script>
+import { getInfoUpdate } from '@/api/subject'
+import pagination from "../../components/Pagination";
 export default {
-  name: "addGovernment",
+  name: "historyEnterprise",
+  components: {
+      pagination
+  },
   data() {
     return {
       currentTime: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       tab: this.$route.query.name,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+      },
+      total: 0
     };
   },
   created() {
-    this.getCurrentTime();
+    this.init()
   },
   methods: {
-    goTarget(href) {
-      window.open(href, "_blank");
-    },
+      init() {
+        try {
+            this.$modal.loading("loading...");
+            const parmas = {
+                pageNum: 1,
+                pageSize: this.queryParams.pageSize,
+                tableType: 1
+            }
+            getInfoUpdate(parmas).then(res => {
+                const { data } = res
+                this.list = data.records
+                this.queryParams.pageNum = data.current
+                this.total = data.total
+            })
+        } catch (error) {
+            console.log(error);
+        } finally {
+            this.$modal.closeLoading();
+        }
+      },
     handleClick() {
       console.log(1);
     },
     back() {
       this.$router.back();
     },
+    getList() {
+         try {
+            this.$modal.loading("loading...");
+            const parmas = {
+                pageNum: this.queryParams.pageNum,
+                pageSize: this.queryParams.pageSize,
+                tableType: 1
+            }
+            getInfoUpdate(parmas).then(res => {
+                const { data } = res
+                this.list = data.records
+                this.queryParams.pageNum = data.current
+                this.total = data.total
+            })
+        } catch (error) {
+            console.log(error);
+        } finally {
+            this.$modal.closeLoading();
+        }
+    }
   },
 };
 </script>
