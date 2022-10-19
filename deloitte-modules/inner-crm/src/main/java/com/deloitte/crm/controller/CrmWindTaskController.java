@@ -157,7 +157,7 @@ public class CrmWindTaskController extends BaseController {
     @PostMapping("/getTaskByDate")
     @ApiOperation(value = "{根据指定TaskDate查询任务完成度}", response = CrmWindTaskDto.class)
     @ApiImplicitParams({@ApiImplicitParam(
-            name = "TaskDate",
+            name = "taskDate",
             value = "Crm_wind_task task_date,任务日期",
             paramType = "query",
             example = "2022-09-23",
@@ -165,7 +165,8 @@ public class CrmWindTaskController extends BaseController {
 
     )})
     public R getTaskCompleted(@RequestBody CrmTaskVo crmTaskVo) {
-        return R.ok(crmWindTaskService.selectComTaskByDate(crmTaskVo));
+        final List<CrmWindTaskDto> crmWindTaskDtos = crmWindTaskService.selectComTaskByDate(crmTaskVo);
+        return R.ok(crmWindTaskDtos);
     }
 
     /**

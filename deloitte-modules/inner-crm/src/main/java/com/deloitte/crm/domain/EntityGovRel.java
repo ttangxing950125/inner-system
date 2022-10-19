@@ -94,7 +94,6 @@ public class EntityGovRel implements Serializable {
      */
     @Excel(name = "created")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Attrs(attrId = 0,attrName = Common.CREATED)
     private Date created;
 
     /**
@@ -102,7 +101,6 @@ public class EntityGovRel implements Serializable {
      */
     @Excel(name = "updated")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Attrs(attrId = 0,attrName = Common.UPDATED)
     private Date updated;
 
     @Override

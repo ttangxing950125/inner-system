@@ -93,12 +93,10 @@ public class EntityBaseBusiInfo {
     private Date busEndDate;
 
     /** $column.columnComment */
-    @Attrs(attrId = 0,attrName = Common.CREATED)
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;
 
     /** $column.columnComment */
-    @Attrs(attrId = 0,attrName = Common.UPDATED)
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 

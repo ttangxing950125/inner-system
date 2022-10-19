@@ -1,8 +1,11 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityBaseBusiInfo;
+import com.deloitte.crm.domain.EntityFinancial;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityBaseBusiInfoMapper;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
@@ -41,9 +44,10 @@ public class EntityBaseBusiInfoRunBatchImpl implements EntityAttrValueRunBatchTa
     public List<EntityAttrValue> getPrams() {
         Date date = new Date();
         log.info(" =>> 当前时间 ： "+ date +" 开始对 EntityBaseBusiInfo 进行数据拉去");
-
+        DateTime start = cn.hutool.core.date.DateUtil.beginOfDay(date);
+        DateTime end = cn.hutool.core.date.DateUtil.endOfDay(date);
         List<EntityAttrValue> result = new ArrayList<>();
-        List<EntityBaseBusiInfo> entityBaseBusiInfos = entityBaseBusiInfoMapper.selectList(new QueryWrapper<EntityBaseBusiInfo>().lambda().eq(EntityBaseBusiInfo::getUpdated, date).or().eq(EntityBaseBusiInfo::getCreated, date));
+        List<EntityBaseBusiInfo> entityBaseBusiInfos = entityBaseBusiInfoMapper.selectList(new QueryWrapper<EntityBaseBusiInfo>().lambda().between(EntityBaseBusiInfo::getUpdated,start,end).or().between(EntityBaseBusiInfo::getCreated,start,end));
 
         int size = entityBaseBusiInfos.size();
         if(size==0){ log.info(" =>> EntityBaseBusiInfo 今日数据为零 录入操作终止 <<= "); return null;}
