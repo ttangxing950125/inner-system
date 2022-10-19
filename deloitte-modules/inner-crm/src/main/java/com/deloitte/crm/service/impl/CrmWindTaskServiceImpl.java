@@ -208,7 +208,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             detailsVo.setTaskFileName(e.getTaskFileName());
             detailsVo.setTaskStatus(e.getComplete());
             List<Map<String, Object>> data = windTaskStrategyManage.getDetail(e);
-            //查询展示到列表上的信息
             List<String> header = windTaskStrategyManage.getDetailHeader(e);
             detailsVo.setHeader(header);
             detailsVo.setData(data);
@@ -217,19 +216,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         long end = System.currentTimeMillis();
         log.info("查询完成，耗时：" + (end - start) + " ms");
         return collect;
-        /*
-       return windTasks.stream().map(item -> {
-            WindTaskDetailsVo detailsVo = new WindTaskDetailsVo();
-            detailsVo.setWindTask(item);
-            detailsVo.setTaskFileName(item.getTaskFileName());
-            detailsVo.setTaskStatus(item.getComplete());
-            List<Map<String, Object>> data = windTaskStrategyManage.getDetail(item);
-            //查询展示到列表上的信息
-            List<String> header = windTaskStrategyManage.getDetailHeader(item);
-            detailsVo.setHeader(header);
-            detailsVo.setData(data);
-            return detailsVo;
-        }).collect(Collectors.toList());*/
     }
 
 

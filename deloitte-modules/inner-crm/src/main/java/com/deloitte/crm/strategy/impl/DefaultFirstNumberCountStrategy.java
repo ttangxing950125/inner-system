@@ -177,15 +177,20 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         Integer resStatus = null;
         Integer changeType = null;
         //看之前有没有导入过这个数据 根据 "债券代码"
-        final List<DefaultFirstNumberCount> DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>().lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode()));
+        List<DefaultFirstNumberCount> DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>()
+                .lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode())
+                .orderBy(true, false, DefaultFirstNumberCount::getId)
+                .last("LIMIT 1"));
         if (CollUtil.isEmpty(DBDefaultFirstNumberCount)) {
             changeType = DataChangeType.INSERT.getId();
-        } else if (!Objects.equals(DBDefaultFirstNumberCount, defaultFirstNumberCount)) {
-            ////如果他们两个不相同，代表有属性修改了
-            changeType = DataChangeType.UPDATE.getId();
+        } else {
+            final DefaultFirstNumberCount last = DBDefaultFirstNumberCount.stream().findFirst().get();
+            if (!Objects.equals(last, defaultFirstNumberCount)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
         }
+        ////如果他们两个不相同，代表有属性修改了
         defaultFirstNumberCount.setChangeType(changeType);
-
         final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), defaultFirstNumberCount);
         if (resStatus == null && updateCount > 0) {
             resStatus = 2;

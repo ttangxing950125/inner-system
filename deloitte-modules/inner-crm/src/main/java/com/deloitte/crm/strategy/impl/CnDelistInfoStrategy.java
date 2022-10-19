@@ -121,17 +121,15 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         Integer changeType = null;
         String excelReadCode = item.getCode();
         final LambdaQueryWrapper<CnDelistInfo> cnDelistInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        final List<CnDelistInfo> cnDelistInfos = cnDelistInfoMapper.selectList(cnDelistInfoLambdaQueryWrapper.eq(CnDelistInfo::getCode, excelReadCode));
-        if (CollUtil.isNotEmpty(cnDelistInfos)) {
+        final List<CnDelistInfo> cnDelistInfos = cnDelistInfoMapper.selectList(cnDelistInfoLambdaQueryWrapper.eq(CnDelistInfo::getCode, excelReadCode).orderBy(true, false, CnDelistInfo::getId).last("LIMIT 1"));
+        if (CollUtil.isEmpty(cnDelistInfos)) {
             changeType = DataChangeType.INSERT.getId();
-        }
-        CnDelistInfo last = cnDelistInfos.stream().findFirst().get();
-        if (!Objects.equals(last, item)) {
-            changeType = DataChangeType.UPDATE.getId();
         } else {
-            changeType = DataChangeType.INSERT.getId();
+            CnDelistInfo last = cnDelistInfos.stream().findFirst().get();
+            if (Objects.equals(last, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
         }
-
         item.setChangeType(changeType);
 
         //更新a股属性
