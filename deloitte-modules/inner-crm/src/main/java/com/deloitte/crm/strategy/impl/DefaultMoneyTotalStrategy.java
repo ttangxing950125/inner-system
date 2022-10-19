@@ -66,12 +66,15 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
 
     /**
      * 参看逻辑
-     * {@link com.deloitte.crm.strategy.impl.DefaultFirstNumberCountStrategy#doBondImport(DefaultFirstNumberCount, Date, CrmWindTask)} }
+     * {@link com.deloitte.crm.strategy.iampl.DefaultFirstNumberCountStrategy#doBondImport(DefaultFirstNumberCount, Date, CrmWindTask)} }
      */
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(DefaultMoneyTotal moneyTotal, Date timeNow, CrmWindTask windTask) {
         try {
+
+            moneyTotal.setTaskId(windTask.getId());
+
             String shortName = moneyTotal.getBondAbstract();
             BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName,Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
             if (moneyTotal.getLatestStatus().equals("实质违约")) {
@@ -112,7 +115,7 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             }
 
             moneyTotal.setChangeType(changeType);
-            moneyTotal.setTaskId(windTask.getId());
+
 
             final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), moneyTotal);
             if (resStatus == null && updateCount > 0) {
@@ -152,8 +155,8 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
         arr.add("导入日期");
         arr.add("变化状态");
 
-        arr.add("代码");
-        arr.add("公司名称");
+        arr.add("证券代码");
+        arr.add("证券简称");
         return arr;
     }
 

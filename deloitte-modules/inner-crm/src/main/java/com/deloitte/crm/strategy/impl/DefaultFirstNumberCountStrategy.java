@@ -147,6 +147,8 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
          * 查询债券是否存在 根据 “债券简称” 查询 如果不存在创建对象 并修改 状态为违约 7
          * @see com.deloitte.crm.domain.BondInfo#getBondStatus()
          */
+        defaultFirstNumberCount.setTaskId(windTask.getId());
+
         String shortName = defaultFirstNumberCount.getDefaultBondsDesc();
         BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName, Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
         bondInfo.setBondStatus(7);
@@ -183,7 +185,7 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
             changeType = DataChangeType.UPDATE.getId();
         }
         defaultFirstNumberCount.setChangeType(changeType);
-        defaultFirstNumberCount.setTaskId(windTask.getId());
+
         final int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), defaultFirstNumberCount);
         if (resStatus == null && updateCount > 0) {
             resStatus = 2;

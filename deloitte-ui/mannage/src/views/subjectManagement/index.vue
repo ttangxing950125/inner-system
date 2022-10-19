@@ -246,6 +246,7 @@
                 class="mr5 select-only"
                 v-model="value"
                 placeholder="选择主体类型"
+                @change="changeType"
               >
                 <el-option
                   v-for="item in options"
@@ -263,6 +264,7 @@
               <el-select
                 class="mr10 selects"
                 v-model="value1"
+                :disabled="value === 'GV'"
                 multiple
                 placeholder="选择查询产品范围（可多选）"
                 @change="selectChange"
@@ -313,7 +315,7 @@
                 <el-table-column
                   fixed
                   prop="entityName"
-                  label="企业名称"
+                  :label="value === 'GV' ? '政府名称' : '企业名称'"
                   width="300"
                   class="xxxxxxx"
                 >
@@ -345,7 +347,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-dialog title="批量查询" :visible.sync="dialogVisible" width="30%">
+    <el-dialog title="批量查询" :visible.sync="dialogVisible" :before-close="handleClose" width="30%">
       <div class="p-top">
         <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
       </div>
@@ -359,8 +361,9 @@
         <div>请不要在行间出现空行！</div>
       </div>
       <div :class="uploadStatus ? 'upload-success' : 'upload-background'">
-        <div class="upload-font">上传批量查询输入文件</div>
+        <div class="upload-font">请选择文件</div>
         <fileUpload
+          v-if="!uploadStatus && !uploadLoading"
           :uploadUrl="'#'"
           :uploadStr="'+ 点击上传文件'"
           ref="fileUpload"
@@ -368,12 +371,15 @@
           @uploadFail="uploadFail"
           @uploadPass="uploadPass"
           :httpFun="uploadFun"
-        />
+        /> 
+        <div class="upload-complete" v-else>
+            <span class="upload-c-s">{{ uploadLoading ? '上传中' : '已完成' }}</span>
+        </div>
       </div>
       <div>
         <div class="flex1">
           <div class="upload-font">匹配进度</div>
-          <div class="upload-font2">[暂未开始匹配]</div>
+          <div class="upload-font2"> {{ !uploadStatus ? '[暂未开始匹配]' : '匹配完成' }}</div>
         </div>
         <el-progress
           class="percentage"
@@ -394,9 +400,9 @@
 
 <script>
 import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
-import { importExcelByEntity } from "@/api/common";
+import { importExcelByEntity, getChecking  } from "@/api/common";
 import { download } from '@/utils/index'
-import fileUpload from "../../components/FileUpload";
+import fileUpload from "../../components/FileUpload/httpUpload.vue";
 import pagination from "../../components/Pagination";
 export default {
   name: "Index",
@@ -439,13 +445,7 @@ export default {
       notBondsAndListPercent: 0,
       loadingData: false,
       dialogVisible: false,
-      percentage: 20,
-      uploadStatus: false,
-      queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-      },
-      total: 0,
+      percentage: 0,
       selectHeaer: [],
       queryParams: {
         pageNum: 1,
@@ -458,7 +458,11 @@ export default {
       },
       total2: 0,
       rettHeaer: [],
-      uuid: ''
+      uuid: '',
+      timer: null,
+      uploadStatus: false,
+      fileName: '批量检查结果.xlsx',
+      uploadLoading: false
     };
   },
   mounted() {
@@ -621,13 +625,15 @@ export default {
     },
     loadingFun(index) {
       this.$modal.loading('Loading...')
+      this.uploadLoading = true
     },
     uploadPass(data, index) {
       download(data, '适配文件.xlsx')
       this.$modal.closeLoading()
     },
     uploadFail(index) {
-      console.log(3);
+      this.uploadStatus = false
+      this.uploadLoading = false
     },
     selectChange(row) {
       this.selectHeaer = [];
@@ -649,14 +655,38 @@ export default {
     },
     uploadFun(params) {
     // 获取文件 通过FormData将文件转化为二进制流的形式传给后端
-    let form = new FormData()
-    form.append('file', params.file)
-    form.uuid = this.uuid
-    importExcelByEntity(form).then((res) => {
-        download(res, 'xxxx.xlsx')
-    })
-    this.$modal.closeLoading()
-},
+        let form = new FormData()
+        form.append('file', params.file)
+        form.uuid = this.uuid
+        importExcelByEntity(form).then((res) => {
+            clearTimeout(this.timer);
+            this.uploadStatus = true
+            this.uploadLoading = false
+            this.percentage = 0
+            download(res, this.fileName)
+        })
+        this.timer = setInterval(this.getProgress, 1000)
+        this.$modal.closeLoading()
+    },
+    getProgress() {
+        let uuid = localStorage.getItem('uuid')
+        getChecking({uuid: uuid}).then(res => {
+            const { data } = res
+            if (data) { 
+                const ret = parseFloat(data)
+                const percent = data && (ret.toFixed(2))*100
+                this.percentage = percent
+            }
+        })
+    },
+    changeType() {
+        this.value1 = this.value === 'GV' ? [] : this.value1
+    },
+    handleClose() {
+        this.uploadStatus = false
+        this.percentage = 0
+        this.dialogVisible = false
+    }
   },
   computed: {
     govePercent() {
@@ -827,5 +857,13 @@ export default {
 }
 .green {
   background-color: #86bc25;
+}
+.upload-complete {
+    height: 46px;
+    width: 100%;
+    text-align: center;
+    background: #86bc25;
+    color: white;
+    line-height: 3;
 }
 </style>

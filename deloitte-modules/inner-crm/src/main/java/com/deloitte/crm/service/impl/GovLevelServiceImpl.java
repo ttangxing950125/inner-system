@@ -1,16 +1,14 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.domain.R;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.GovLevelMapper;
 import com.deloitte.crm.domain.GovLevel;
+import com.deloitte.crm.mapper.GovLevelMapper;
 import com.deloitte.crm.service.IGovLevelService;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -116,5 +114,10 @@ public class GovLevelServiceImpl implements IGovLevelService
     public R<List<GovLevel>> getGovLevelSmall(Integer id) {
         List<GovLevel> govLevels = govLevelMapper.selectList(new QueryWrapper<GovLevel>().lambda().eq(GovLevel::getParentId, id));
         return R.ok(govLevels);
+    }
+
+    @Override
+    public R getGovLevel() {
+        return R.ok(govLevelMapper.selectList(new QueryWrapper<>()));
     }
 }

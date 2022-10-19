@@ -106,13 +106,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <pagination
-        v-show="total>0"
-        :total="total"
-        :page.sync="queryParams.pageNum"
-        :limit.sync="queryParams.pageSize"
-        @pagination="getList"
-      />
       <el-table
       v-if="roleId === 'role3'"
         v-loading="loading"
@@ -245,6 +238,13 @@
           </template>
         </el-table-column>
       </el-table>
+      <pagination
+        v-show="total>0"
+        :total="total"
+        :page.sync="queryParams.pageNum"
+        :limit.sync="queryParams.pageSize"
+        @pagination="getList"
+      />
     </div>
     <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%">
       <el-form
@@ -1147,7 +1147,12 @@ export default {
         pageSize: 10
       },
       total: 0,
-      clickDay: ''
+      clickDay: '',
+      colorArr: {
+          1: 'shadow',
+          2: 'shadow-yellow',
+          3: 'shadow-green',
+      }
     };
   },
   mounted() {
@@ -1369,7 +1374,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='shadow'>" +
+                     "<div class='"+(this.colorArr[jsonHtml[l].bad])+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1380,7 +1385,7 @@ export default {
                     '"><div class="' +
                     isRed +
                     'content-day">' +
-                    "<div class='"+(jsonHtml[l].bad ? 'shadow-yellow' : 'shadow-green')+"'>" +
+                    "<div class='"+(this.colorArr[jsonHtml[l].bad])+"'>" +
                     date_str +
                     "</div>" +
                     "</div>" +
@@ -1431,14 +1436,9 @@ export default {
                 }else {
                     e.date = dateStr
                 }
-                if(e.taskStatus === 2){
-                    e.bad = true
-                }
-                if(e.taskStatus === 3){
-                    e.bad = false
-                }
+                e.bad = e.taskStatus
             });
-        }
+        }        
       this.drawTable(flagData);
     },
     work(row) {
@@ -1542,6 +1542,7 @@ export default {
     },
     submitAdd() {
       this.$modal.loading("loading...");
+      this.ruleForm.created = ''
       try {
         addSeven(this.ruleForm).then(res => {
           const { data } = res

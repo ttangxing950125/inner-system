@@ -293,7 +293,7 @@ export function updateOldNameGov(parmas) {
 // 企业主体清单-查询上市概览
 export function getListView(parmas) {
   return request({
-    url: "/crm/entityInfo/getListView",
+    url: "/crm/entityInfo/getListView?type="+parmas.type,
     headers: {
       isToken: true,
     },
@@ -306,6 +306,54 @@ export function getListView(parmas) {
 export function getGovView(parmas) {
   return request({
     url: "/crm/govInfo/getGovView",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 上市企业-地方政府-更新记录 by正杰
+export function getInfoUpdate(parmas) {
+  return request({
+    url: "/crm/updateRecords/getInfo?pageNum=" + parmas.pageNum + '&pageSize=' + parmas.pageSize + '&tableType='+parmas.tableType,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 根据政府名称查询政府主体
+export function getGovByName(parmas) {
+  return request({
+    url: "/crm/govInfo/getGovByName?govName=" + parmas.govName ,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 根据 dqCode 查询政府主体
+export function getInfoDetailGov(parmas) {
+  return request({
+    url: "/crm/govInfo/getInfoDetail?dqGovCode=" + parmas.dqGovCode ,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 政府主体批量修改
+export function updateInfoList(parmas) {
+  return request({
+    url: "/crm/govInfo/updateInfoList",
     headers: {
       isToken: true,
     },

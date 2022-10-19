@@ -130,3 +130,27 @@ export function importExcelByEntity(params) {
     data: params,
   }, {responseType:'blob'}, {responseType:'blob'});
 }
+
+// 查询匹配进度
+export function getChecking(params) {
+  return request({
+    url: "/crm/entityInfo/getChecking?uuid=" + params.uuid,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 根据政府名称或者政府code查询政府主体
+export function getGovByParam(params) {
+  return request({
+    url: "/crm/govInfo/getGovByParam?param=" + params.param,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}

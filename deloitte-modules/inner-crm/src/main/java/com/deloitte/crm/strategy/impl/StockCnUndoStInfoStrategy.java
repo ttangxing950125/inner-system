@@ -91,6 +91,7 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(StockCnUndoStInfo undoStInfo, Date timeNow, CrmWindTask windTask) {
         log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),undoStInfo.getCode(),windTask.getId());
+        undoStInfo.setTaskId(windTask.getId());
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, undoStInfo.getCode()));
         if (stockCnInfo != null) {
             stockCnInfo.setStUndoImplemtnet(1);
@@ -108,7 +109,7 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.UPDATE.getId();
         }
         undoStInfo.setChangeType(changeType);
-        undoStInfo.setTaskId(windTask.getId());
+
         undoStInfoMapper.insert(undoStInfo);
         return new AsyncResult<>(new Object());
     }

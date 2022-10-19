@@ -17,7 +17,7 @@ const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: process.env.VUE_APP_BASE_API,
   // 超时
-  timeout: 20000,
+  timeout: 600000,
 });
 
 // request拦截器
@@ -60,7 +60,7 @@ service.interceptors.request.use(
         const s_url = sessionObj.url; // 请求地址
         const s_data = sessionObj.data; // 请求数据
         const s_time = sessionObj.time; // 请求时间
-        const interval = 1000; // 间隔时间(ms)，小于此时间视为重复提交
+        const interval = 500; // 间隔时间(ms)，小于此时间视为重复提交
         if (
           s_data === requestObj.data &&
           requestObj.time - s_time < interval &&
