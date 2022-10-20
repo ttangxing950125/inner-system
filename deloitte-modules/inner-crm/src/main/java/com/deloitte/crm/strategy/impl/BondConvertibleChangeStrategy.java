@@ -77,7 +77,7 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
         //公司中文名称
         arr.add("导入日期");
         arr.add("变化状态");
-        arr.add("代码");
+        arr.add("公司代码");
         arr.add("公司名称");
         return arr;
     }
