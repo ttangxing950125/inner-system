@@ -2,24 +2,42 @@
   <div class="app-container home">
     <div class="home">
       <div class="mt20">
-        <div class="flex1 between">
+        <div class="flex1">
           <h3 class="g-t-title">债券交易信息表</h3>
           <div class="mt20">
-            <el-button @click="addNew" type="text" size="small"
-              >手动添加债券</el-button
+            <el-button @click="notice = !notice" type="text" class="notice" size="small"
+              >{{ notice ? '收起近期敞口划分变更公告' : '展开近期敞口划分变更公告' }}</el-button
             >
           </div>
         </div>
+        <div class="mb20" v-if="notice">
+          <el-table class="table-content" :data="list2" style="margin-top: 15px" max-height="300">
+          <el-table-column type="index" label="序号"> </el-table-column>
+          <el-table-column prop="addHis" label="变更操作日期">
+          </el-table-column>
+          <el-table-column prop="addHis" label="变更年份">
+            <template slot-scope="scope">
+              <div>{{ scope.row.addHis.substr(0, 4) }}</div>
+            </template>  
+          </el-table-column>
+          <el-table-column prop="entityNameHis" label="变更企业">
+          </el-table-column>
+          <el-table-column prop="city" label="变更版本">
+             <template slot-scope="scope">
+              <div>{{ scope.row.proCustName ? scope.row.proCustName + ' - ' + scope.row.masterName : '-' }}</div>
+            </template>  
+          </el-table-column>
+          <el-table-column prop="masterName" label="原敞口"> </el-table-column> 
+          <el-table-column prop="masterName" label=""> 
+              <template slot-scope="scope">
+              <div>➡</div>
+            </template>
+        </el-table-column> 
+          <el-table-column prop="masterNameNew" label="变更后敞口"> </el-table-column>
+        </el-table>
+        </div>
         <div>
           <div class="select-body">
-            <div class="g-desc flex1">
-              <a :class="tab === 1 ? 'g-select' : ''" @click="changeTab(1)"
-                >搜主体</a
-              >
-              <a :class="tab === 2 ? 'g-select' : ''" @click="changeTab(2)"
-                >搜债券</a
-              >
-            </div>
             <div class="">
               <el-input
                 class="mr10 ml20"
@@ -33,14 +51,27 @@
             </div>
           </div>
         </div>
-        <el-table class="table-content" :data="list" style="margin-top: 15px">
+        <el-table class="table-content" :data="list" style="margin-top: 15px" max-height="300">
           <el-table-column type="index" label="序号"> </el-table-column>
-          <el-table-column prop="date" label="德勤主体代码" sortable>
+          <el-table-column prop="entityCode" label="德勤主体代码">
           </el-table-column>
-          <el-table-column prop="name" label="企业名称"> </el-table-column>
-          <el-table-column prop="province" label="统一社会信用代码">
+          <el-table-column prop="entityName" label="企业名称">
+            <template slot-scope="scope">
+              <div v-html="replaceFun(scope.row.entityName)"></div>
+            </template>
           </el-table-column>
-          <el-table-column prop="city" label="债券交易代码"> </el-table-column>
+          <el-table-column prop="creditCode" label="统一社会信用代码">
+          </el-table-column>
+          <el-table-column prop="city" label="是否上市">
+            <template slot-scope="scope">
+              <div>{{ scope.row.list === 1 ? '已上市' : '未上市' }}</div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="city" label="是否发债">
+            <template slot-scope="scope">
+              <div>{{ scope.row.issueBonds === 1 ? '已发债' : '未发债' }}</div>
+            </template>
+          </el-table-column>
           <el-table-column prop="zip" label="操作">
             <template slot-scope="scope">
               <el-button
@@ -52,278 +83,353 @@
             </template></el-table-column
           >
         </el-table>
+        <div class=btn-str>(列表中默认展示当日新增主体，如果有其他查询需要请于搜索框中输入相关信息)</div>
       </div>
       <div class="mt20">
         <div class="flex1">
-          <h3 class="g-t-title">目标主体发行债券</h3>
-          <div class="mt20">
-            【 <span class="font-color">请从上表选定目标主体</span> 】
-          </div>
+          <h3 class="g-t-title">选中主体敞口划分信息</h3>
+          <div class="g-tab flex1 mt20">
+            <a v-for="(item, index) in options" :key="index" :class="currentTab === item.id ? 'g-select' : ''" @click="changeTab(item.id, item.proName)"
+            >{{item.proName}}</a>
         </div>
-        <el-table class="table-content" :data="list" style="margin-top: 15px">
-          <el-table-column type="index" label="序号"> </el-table-column>
-          <el-table-column prop="date" label="债券交易代码"> </el-table-column>
-          <el-table-column prop="name" label="债券全称"> </el-table-column>
-          <el-table-column prop="province" label="债券简称"> </el-table-column>
-          <el-table-column prop="city" label="存续状态"> </el-table-column>
-          <el-table-column prop="city" label="债券类型"> </el-table-column>
-          <el-table-column prop="address" label="公私募类型"> </el-table-column>
-          <el-table-column prop="address" label="是否违约"> </el-table-column>
-          <el-table-column prop="zip" label="操作">
-            <template slot-scope="scope">
-              <el-button
-                @click="handleClick(scope.row)"
-                type="text"
-                size="small"
-                >设为目标</el-button
-              >
-            </template></el-table-column
-          >
-        </el-table>
-        <div class="flex1 between">
-          <h3 class="g-t-title">债券交易信息表</h3>
-          <div class="mt20">
+          <!-- <div class="mt20">
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >提交变更并退出修改模式</el-button
             >
-          </div>
+          </div> -->
         </div>
-        <el-card>
+        <el-card v-if="JSON.stringify(info) !== '{}'">
+          <div class="content-title">CRM基本信息</div>
           <el-col :sm="24" :lg="12" class="form-card">
             <div class="flex1 mt10">
-              <div class="first">德勤主体代码</div>
-              <div class="content">GV304892</div>
-              <el-button class="edit-btn" type="text" size="mini"
-                >修改</el-button
-              >
+              <div class="first">主体德勤代码</div>
+              <div class="content">{{ info.entityCode }}</div>
             </div>
             <div class="flex1 mt10">
-              <div class="first">德勤主体代码</div>
-              <div class="content">GV304892</div>
-              <el-button class="edit-btn" type="text" size="mini"
-                >修改</el-button
-              >
+              <div class="first">企业名称</div>
+              <div class="content">{{ info.entityName }}</div>
             </div>
             <div class="flex1 mt10">
-              <div class="first">德勤主体代码</div>
-              <div class="content">GV304892</div>
-              <el-button class="edit-btn" type="text" size="mini"
-                >修改</el-button
-              >
+              <div class="first">统一社会信用代码</div>
+              <div class="content">{{ info.creditCode }}</div>
             </div>
             <div class="flex1 mt10">
-              <div class="first">德勤主体代码</div>
-              <div class="content">GV304892</div>
-              <el-button class="edit-btn" type="text" size="mini"
-                >修改</el-button
-              >
+              <div class="first">是否上市</div>
+              <div class="content">{{ info.list === 1 ? '已上市' : '未上市' }}</div>
+            </div>
+            <div class="flex1 mt10">
+              <div class="first">是否发债</div>
+              <div class="content">{{ info.issueBonds === 1 ? '已发债' : '未发债' }}</div>
+            </div>
+            <div class="flex1 mt10">
+              <div class="first">是否为金融机构</div>
+              <div class="content">{{ info.finance === 1 ? '是' : '否' }}</div>
+            </div>
+            <div class="flex1 mt10">
+              <div class="first">金融细分行业</div>
+              <div class="content">{{ info.mince || '-' }}</div>
+            </div>
+            <div class="flex1 mt10">
+              <div class="first">是否为城投机构</div>
+              <div class="content">{{ info.isGov || '-' }}</div>
+            </div>
+            <div class="flex1 mt10">
+              <div class="first">所属城投机构</div>
+              <div class="content">{{ info.govName || '-' }}</div>
             </div>
           </el-col>
           <el-col :sm="24" :lg="12" class="form-card">
             <div class="flex1 mt10">
-              <div class="first">曾用名或别称备注</div>
-              <div class="content">-</div>
+              <div class="first">YY-是否为城投</div>
+              <div class="content">{{ info.yyUrban && info.yyUrban === '1' ? '是' : '否' }}</div>
             </div>
             <div class="flex1 mt10">
-              <div class="first">曾用名或别称备注</div>
-              <div class="content">-</div>
+              <div class="first">中诚信-是否为城投</div>
+              <div class="content">{{ info.zhongxinUrban && info.zhongxinUrban === '1' ? '是' : '否' }}</div>
             </div>
             <div class="flex1 mt10">
-              <div class="first">曾用名或别称备注</div>
-              <div class="content">-</div>
+              <div class="first">wind行业划分</div>
+              <div class="content">{{ info.windMaster && info.windMaster === '1' ? '是' : '否' }}</div>
             </div>
             <div class="flex1 mt10">
-              <div class="first">曾用名或别称备注</div>
-              <div class="content">-</div>
+              <div class="first">申万行业划分</div>
+              <div class="content">{{ info.shenWanMaster && info.shenWanMaster === '1' ? '是' : '否' }}</div>
+            </div>
+            <div class="flex1 mt10">
+              <div class="first">IB行业划分结果</div>
+              <div class="content">{{ info.yyUrban && info.yyUrban === '1' ? '是' : '否' }}</div>
+            </div>
+          </el-col>
+          <div v-if="currentTab" class="flex1 max">
+            <div class="content-title">{{ currentName }}</div>
+            <el-divider class="mt10"></el-divider>
+            <el-button class="check-p" type="text" @click="dialogVisible = true">查看产品覆盖与敞口映射规则</el-button>
+          </div>
+          <div v-if="currentTab" class="g-tab flex1 mt20">
+            <a v-for="(item, index) in years" :key="index" :class="currentYear === item ? 'g-select' : ''" @click="changeYear(item)"
+            >{{ item }}</a>
+          </div>
+          <el-col v-if="currentTab && currentYear" :sm="24" :lg="12" class="form-card">
+            <div v-for="(item, index) in btnContent" :key="index" class="flex1 mt10">
+              <div class="first">{{ item.proName + ' - ' + item.customer }}</div>
+              <div class="content">{{ item.masterName }}</div>
+              <el-dropdown @command="(row)=>clickTab(row, index)" @visible-change="(row)=>getMenu(row, item)" class="ml20" style="margin-top:-3px" trigger="click">
+                <el-button  type="text">修改</el-button>
+                <el-dropdown-menu  slot="dropdown">
+                    <el-dropdown-item v-for="(e,index) in menus" :key="index" :command="e">{{ e.masterName }}</el-dropdown-item>
+                </el-dropdown-menu>
+                </el-dropdown>
             </div>
           </el-col>
         </el-card>
       </div>
-      <el-dialog
-        title="手动添加债券信息"
-        :visible.sync="dialogVisible"
-        width="50%"
-      >
-        <el-form
-          :model="ruleForm"
-          :rules="rules"
-          ref="ruleForm"
-          label-width="195px"
-          label-position="left"
-        >
-          <el-form-item label="债券全称" prop="region">
-            <el-input class="t-input" v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="债券简称" prop="region">
-            <el-input class="t-input" v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="债券交易代码" prop="region">
-            <el-input class="t-input" v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="wind债券类型" prop="region">
-            <el-col :span="11">
-              <el-form-item prop="date1">
-                <el-date-picker
-                  type="date"
-                  placeholder="下拉选择债券类型-I"
-                  v-model="ruleForm.date1"
-                  style="width: 100%"
-                ></el-date-picker>
-              </el-form-item>
-            </el-col>
-            <el-col class="line" :span="2">-</el-col>
-            <el-col :span="11">
-              <el-form-item prop="date2">
-                <el-time-picker
-                  placeholder="下拉选择债券类型-II"
-                  v-model="ruleForm.date2"
-                  style="width: 100%"
-                ></el-time-picker>
-              </el-form-item>
-            </el-col>
-          </el-form-item>
-          <el-form-item label="公私募类型" prop="region">
-            <el-radio-group v-model="ruleForm.resource">
-              <el-radio label="公募"></el-radio>
-              <el-radio label="私募"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="债券状态" prop="region">
-            <el-radio-group v-model="ruleForm.resource">
-              <el-radio label="存续"></el-radio>
-              <el-radio label="违约"></el-radio>
-              <el-radio label="已兑付"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="起息日" prop="region">
-            <el-input class="t-input" v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="到期兑付日" prop="region">
-            <el-input class="t-input" v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="债务主体统一社会信用代码" prop="region">
-            <el-input class="t-input" v-model="ruleForm.name"></el-input>
-          </el-form-item>
-          <el-form-item label="债务主体名称" prop="region">
-            <span class="color-gary">根据统一社会信用代码自动匹配</span>
-          </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="dialogVisible = false"
-            >确认新增</el-button
-          >
-        </span>
-      </el-dialog>
     </div>
+    <el-dialog :title="currentName" :visible.sync="dialogVisible" width="30%">
+      <div class="p-top">
+        <span>产品覆盖规则</span>
+      </div>
+      <div class="p-top">
+        <span>版本：</span><span>v2022-10-17</span>
+      </div>
+
+      <div class="p-red">
+        <div>这里是产品经理提供覆盖规则文字说明，这里是产品经理提供覆盖规则文字说 明这里是产品经理提供覆盖规则文字说明这里是产品经理提供覆盖规则文字说 明这里是产品经理提供覆盖规则文字说明，这里是产品经理提供覆盖规则文字
+            提供覆盖规则文字说明，这里是产品经理提供覆盖规则
+            文字说明，这里是产品经理提供覆盖规则文字说明。
+        </div>
+      </div>
+        <div class="p-top">
+        <span>敞口映射规则</span>
+      </div>
+      <div class="p-top">
+        <span>版本：</span><span>v2022-10-17</span>
+      </div>
+      <el-button type="text" class="p-top" @click="downFile">批量查询匹配模板.xlsx</el-button>
+      <div slot="footer" class="dialog-footer center">
+        <el-button type="primary" @click="dialogVisible = false"
+          >确 定</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { replaceStr } from "@/utils/index";
+import { entityMaster, entityByMaster, getDataHis, getDataYear, getProduct, getProDucCom, updateRel, ProMaDir } from "@/api/subject";
 export default {
   name: "government",
   data() {
     return {
+        currentTab: '',
+        notice: false,
       input: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       loading: false,
       dialogVisible: false,
-      ruleForm: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
-      },
-      rules: {
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
-        ],
-        region: [
-          { required: true, message: "请选择活动区域", trigger: "change" },
-        ],
-        date1: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change",
-          },
-        ],
-        date2: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择时间",
-            trigger: "change",
-          },
-        ],
-        type: [
-          {
-            type: "array",
-            required: true,
-            message: "请至少选择一个活动性质",
-            trigger: "change",
-          },
-        ],
-        resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
-        ],
-        desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
-      },
-      tab: "",
+      info: {},
+      list2: [],
+      options: [],
+      currentName: '',
+      years: [],
+      currentYear: '',
+      code: '',
+      btnContent: {},
+      entityName:'',
+      menus: [],
+      selected: [],
+      entityCode: '',
+      proCumId: '',
     };
   },
+  created() {
+      this.init()
+  },
   methods: {
-    goTarget(href) {
-      window.open(href, "_blank");
+    init() {
+       try {
+          this.$modal.loading("Loading...");
+          getDataHis({}).then(res => {
+              this.list2 = res.data
+          })
+          getDataYear({}).then(res => {
+              this.years = res.data
+          })
+          getProduct({}).then((res) => {
+            const { data } = res;
+            this.options = data;
+        });
+        
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    },
+    changeTab(tab, name) {
+        this.currentTab = tab
+        this.currentName = name
+        try {
+          this.$modal.loading("Loading...");
+          if(!this.currentTab && !this.currentYear) {
+              return
+          }
+          const params = {
+              dataYear: this.currentYear,
+              entityCode: this.code,
+              proId: this.currentTab,
+          }
+          getProDucCom(params).then(res => {
+              this.btnContent = res.data
+          })
+        
+        } catch (error) {
+            this.$message({
+            showClose: true,
+            message: error,
+            type: "error",
+            });
+        } finally {
+            this.$modal.closeLoading();
+        }
+    },
+    changeYear(tab) {
+        this.currentYear = tab   
+        try {
+          this.$modal.loading("Loading...");
+          const params = {
+              dataYear: this.currentYear,
+              entityCode: this.code,
+              proId: this.currentTab,
+          }
+          getProDucCom(params).then(res => {
+              this.btnContent = res.data
+          })
+        
+        } catch (error) {
+            this.$message({
+            showClose: true,
+            message: error,
+            type: "error",
+            });
+        } finally {
+            this.$modal.closeLoading();
+        }
     },
     select() {
-      console.log(1);
+      try {
+          this.$modal.loading("Loading...");
+          entityMaster({name: this.input}).then(res => {
+              const { data } = res
+              this.list = data
+          })
+        
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
-    addNew() {
-      this.dialogVisible = true;
+    handleClick(row) {
+      try {
+          this.code = row.entityCode
+          this.entityName = row.entityName
+          this.entityCode = row.entityCode
+          this.$modal.loading("Loading...");
+          entityByMaster({code: row.entityCode}).then(res => {
+              this.info = res.data
+          })
+        
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
-    changeTab(tab) {
-      this.tab = tab;
+    replaceFun(row) {
+      return replaceStr(row, this.input);
     },
-    handleClick(row) {},
+    downFile() {
+        console.log(1)
+    },
+    submit(index, row) {
+        try {
+            const parmas = {
+                entityName: this.entityName,
+                proCustId: this.selected.proCumId,
+                dataYear: this.currentYear,
+                customer: this.selected.customer,
+                masterNameOld: this.selected.masterName,
+                dictIdOld: this.selected.dictId,
+                masterNameNew: this.masterNameNew,
+                dictIdNew: this.dictIdNew,
+                entityCode: this.entityCode,
+            }
+            this.$modal.loading("Loading...");
+            updateRel(parmas).then(res => {
+                if(res.data) {
+                    this.$message({
+                        message: '操作成功！',
+                        type: 'success'
+                    });
+                    this.btnContent[index].masterName = row.masterName
+                }else {
+                    this.$message({
+                        showClose: true,
+                        message: '操作失败！',
+                        type: "error",
+                    }); 
+                }
+            })
+        
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      } 
+    },
+    clickTab(row, index) {
+        this.masterNameNew = row.masterName
+        this.dictIdNew = row.id
+        this.submit(index, row)
+    },
+    getMenu(row, id) {
+        try {
+            if(!row) {
+                return
+            }
+            this.selected = id
+            this.$modal.loading("Loading...");
+            ProMaDir({proCustId: id.proCumId}).then(res => {
+                this.menus = res.data
+            })
+        
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      } 
+    }
   },
 };
 </script>
@@ -344,7 +450,7 @@ export default {
   margin-left: 20px;
   margin-bottom: 1%;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -353,7 +459,7 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .select-body {
@@ -386,5 +492,38 @@ export default {
 }
 .t-input {
   width: 50%;
+}
+.notice {
+    margin-top: -5px;
+    margin-left: 28px;
+}
+.btn-str{ 
+    font-size: 13px;
+    color: #cccc;
+    margin-top: 5px;
+}
+.g-tab {
+  margin-left: 1.5%;
+  a {
+    font-size: 14px;
+    color: black;
+    text-decoration: underline;
+    margin-right: 10px;
+  }
+  .g-select {
+    color: #86bc25;
+  }
+}
+.content-title {
+    font-weight: 600;
+    color: #86bc25;
+    width: 105px;
+}
+.check-p {
+        margin-top: -15px;
+    margin-left: 20px;
+}
+.max {
+    width: 100%
 }
 </style>

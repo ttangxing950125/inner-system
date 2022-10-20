@@ -122,7 +122,8 @@
 </template>
 
 <script>
-import { getAllByGroup, getListEntityByPage } from "@/api/common";
+import { getAllByGroup } from "@/api/common";
+import { getListEntityByPage } from "@/api/subject";
 import pagination from "../../components/Pagination";
 export default {
   name: "addGovernment",
@@ -226,12 +227,6 @@ export default {
       } finally {
         this.$modal.closeLoading();
       }
-    },
-    goTarget(href) {
-      window.open(href, "_blank");
-    },
-    handleClick() {
-      console.log(1);
     },
     back() {
       this.$router.back();

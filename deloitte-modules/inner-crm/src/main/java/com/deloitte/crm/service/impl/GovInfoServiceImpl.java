@@ -889,12 +889,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     private GovAttrByDtoBack setGovGrading(GovAttrByDtoBack govAttrByDto) {
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 24));
-        List<GovRangeValue> nineteenCity = new ArrayList<>();
+        List<GovRangeValue> govGrading = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
             GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            nineteenCity.add(govRangeValue);
+            govGrading.add(govRangeValue);
         });
-        govAttrByDto.setNineteenCity(nineteenCity);
+        govAttrByDto.setGovGrading(govGrading);
         return govAttrByDto;
     }
 
@@ -902,12 +902,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     private GovAttrByDtoBack setGovScale(GovAttrByDtoBack govAttrByDto) {
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 23));
-        List<GovRangeValue> nineteenCity = new ArrayList<>();
+        List<GovRangeValue> govScale = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
             GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            nineteenCity.add(govRangeValue);
+            govScale.add(govRangeValue);
         });
-        govAttrByDto.setNineteenCity(nineteenCity);
+        govAttrByDto.setGovScale(govScale);
         return govAttrByDto;
     }
 

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
-import com.deloitte.crm.constants.Common;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,7 +42,7 @@ public class EntityFinancial implements Serializable {
      * 金融机构细分行业
      */
     @Excel(name = "金融细分领域")
-    @Attrs(attrId = 656,attrName = "金融机构细分行业")
+    @Attrs(attrId = 656, attrName = "金融机构细分行业")
     private String mince;
 
     /**
@@ -56,22 +55,29 @@ public class EntityFinancial implements Serializable {
      * 对口监管机构
      */
     @Excel(name = "对口监管机构")
-    @Attrs(attrId = 657,attrName = "对口监管机构")
+    @Attrs(attrId = 657, attrName = "对口监管机构")
     private String regulators;
 
     /**
      * 所属地区
      */
     @Excel(name = "所属地区")
-    @Attrs(attrId = 983,attrName = "所属地区")
+    @Attrs(attrId = 983, attrName = "所属地区")
     private String belPlace;
 
     /**
      * 所属辖区
      */
     @Excel(name = "所属辖区")
-    @Attrs(attrId = 658,attrName = "所属辖区")
+    @Attrs(attrId = 658, attrName = "所属辖区")
     private String belJurisdiction;
+
+    /**
+     * 是否发行同业存单（银行）
+     */
+    @Excel(name = "是否发行同业存单（银行）")
+    @Attrs(attrId = 659, attrName = "是否发行同业存单（银行）")
+    private String isIssPeerDep;
 
     /**
      * 对口监管机构
@@ -79,11 +85,15 @@ public class EntityFinancial implements Serializable {
     @Excel(name = "备注")
     private String remarks;
 
-    /** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;
 
-    /** $column.columnComment */
+    /**
+     * $column.columnComment
+     */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 

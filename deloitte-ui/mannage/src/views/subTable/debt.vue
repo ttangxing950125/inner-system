@@ -420,7 +420,6 @@ export default {
             this.xContent,
             this.xContent.length / 2
           );
-          console.log(this.xContent);
         });
       } catch (error) {
         console.log(error);
@@ -516,7 +515,7 @@ export default {
   margin-left: 20px;
   margin-bottom: 1%;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -525,7 +524,7 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: rgb(121, 131, 105);
   }
 }
 .select-body {

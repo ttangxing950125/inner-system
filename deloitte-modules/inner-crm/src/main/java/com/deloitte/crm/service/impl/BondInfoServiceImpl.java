@@ -1,28 +1,21 @@
 package com.deloitte.crm.service.impl;
 
-import java.text.DecimalFormat;
-import java.util.*;
-
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
-import com.deloitte.crm.constants.*;
+import com.deloitte.crm.constants.AttrValueMappingMap;
+import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.CacheName;
+import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.dto.BondInfoManualDto;
 import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.service.IEntityAttrService;
-import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.BondEntityInfoVo;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -38,6 +31,7 @@ import java.util.*;
  * @date 2022-09-23
  */
 @Service
+@Slf4j
 public class BondInfoServiceImpl implements IBondInfoService {
     @Resource
     private BondInfoMapper bondInfoMapper;
@@ -327,8 +321,17 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R editAllDetail(List<BondEntityInfoVo> bondInfoEditVo) {
-
-        bondInfoEditVo.forEach(this::edit);
+        HashMap<String, String> rule = new HashMap<>();
+        rule.put("entity_name","");
+        rule.put("coll","");
+        rule.put("abs","");
+        rule.put("bond_name","");
+        rule.put("bond_short_name","");
+        rule.put("raise_type","");
+        rule.put("bond_state","");
+        rule.put("value_date","");
+        rule.put("due_date","");
+        bondInfoEditVo.forEach(row->this.edit(row,rule));
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
@@ -496,31 +499,19 @@ public class BondInfoServiceImpl implements IBondInfoService {
         }
     }
 
-    public void edit(BondEntityInfoVo bondEntityInfoVo){
+    public void edit(BondEntityInfoVo bondEntityInfoVo,Map<String,String> rule){
         if(!bondEntityInfoVo.getEnableEdite()){return;}
         Integer id = bondEntityInfoVo.getId();
         String value = bondEntityInfoVo.getValue();
         String filedName = bondEntityInfoVo.getFiledName();
         Assert.notNull(id,BadInfo.PARAM_EMPTY.getInfo());
-
-        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
-        stringObjectHashMap.put("entity_name","");
-        stringObjectHashMap.put("coll","");
-        stringObjectHashMap.put("abs","");
-        stringObjectHashMap.put("bond_name","");
-        stringObjectHashMap.put("bond_short_name","");
-        stringObjectHashMap.put("raise_type","");
-        stringObjectHashMap.put("bond_state","");
-        stringObjectHashMap.put("value_date","");
-        stringObjectHashMap.put("due_date","");
-        Assert.isTrue(stringObjectHashMap.containsKey(filedName)||bondEntityInfoVo.getTable()==3,BadInfo.VALID_PARAM.getInfo());
+        Assert.isTrue(bondEntityInfoVo.getTable()==3||rule.containsKey(filedName),BadInfo.VALID_PARAM.getInfo());
 
         switch (bondEntityInfoVo.getTable()){
             case 1:
                 entityInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 2:
-                ArrayList<Object> matchingField = new ArrayList<>();
                 bondInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 3:
