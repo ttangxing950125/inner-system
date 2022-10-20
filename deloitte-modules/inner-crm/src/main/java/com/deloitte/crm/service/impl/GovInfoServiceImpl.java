@@ -19,6 +19,7 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
+import com.deloitte.crm.dto.ProductCoverDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
@@ -77,6 +78,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Resource
     private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
+    @Resource
+    private ProductsCoverMapper productsCoverMapper;
+
+    @Resource
+    private ProductsMapper productsMapper;
 
     /**
      * 默认查询页码
@@ -773,10 +779,37 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     @Override
     public R getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo) {
-
-        Page<GovInfoBynameDto> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
-
-        return R.ok(govInfoMapper.getGovByname(page, entityOrGovByAttrVo.getEntityName()));
+        Page<GovInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
+        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName,entityOrGovByAttrVo.getEntityName());
+        Page<GovInfo> page1 = govInfoMapper.selectPage(page, eq);
+        List<GovInfo> records = page1.getRecords();
+        ArrayList<GovInfoBynameDto> govInfoBynameDtos = new ArrayList<>();
+        for (GovInfo record : records) {
+            GovInfoBynameDto govInfoBynameDto = new GovInfoBynameDto();
+            ArrayList<HashMap<String, String>> maps = new ArrayList<>();
+            for (Integer integer : entityOrGovByAttrVo.getProId()) {
+                HashMap<String, String> Map = new HashMap<>();
+                LambdaQueryWrapper<Products> eq1 = new LambdaQueryWrapper<Products>().eq(Products::getId, integer);
+                Products products = productsMapper.selectOne(eq1);
+                LambdaQueryWrapper<ProductsCover> qw = new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, record.getDqGovCode())
+                        .eq(ProductsCover::getProId,integer)
+                        .eq(ProductsCover::getIsGov,1);
+                ProductsCover productsCover = productsCoverMapper.selectOne(qw);
+                Map.put(products.getProName(), productsCover.getCoverDes());
+                maps.add(Map);
+            }
+            govInfoBynameDto.setDqCode(record.getDqGovCode());
+            govInfoBynameDto.setGovCode(record.getGovCode());
+            govInfoBynameDto.setGovName(record.getGovName());
+            LambdaQueryWrapper<GovLevel> eq1 = new LambdaQueryWrapper<GovLevel>().eq(GovLevel::getId, record.getGovLevelBig());
+            GovLevel govLevel = govLevelMapper.selectOne(eq1);
+            govInfoBynameDto.setLevelName(govLevel.getName());
+            govInfoBynameDto.setResult(maps);
+            govInfoBynameDtos.add(govInfoBynameDto);
+        }
+        Page<GovInfoBynameDto> pageResult = new Page<>();
+        pageResult.setRecords(govInfoBynameDtos).setTotal(page1.getTotal());
+        return R.ok(pageResult);
     }
 
     /**
