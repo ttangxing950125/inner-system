@@ -13,10 +13,7 @@ import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.domain.StockThkInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
-import com.deloitte.crm.dto.EntityDto;
-import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.dto.ExportEntityCheckDto;
-import com.deloitte.crm.dto.MoreIndex;
+import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
@@ -362,6 +359,12 @@ public class EntityInfoController extends BaseController {
         return excelWriter;
     }
 
+    @PostMapping("/importExcel")
+    public R importExcelByCover(@RequestParam("file") MultipartFile file, ImportDto importDto) {
+        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatch(file, importDto);
+        R excelBach = entityInfoService.getExcelBach(exportEntityCheckDtos, importDto);
+        return excelBach;
+    }
 
 
     /**
@@ -413,7 +416,7 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "name",value = "主体名称" ,paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     })
     @PostMapping("/entityMaster")
-    public R  selectEntityInfoByName(String name) {
+    public R  selectEntityInfoByName(@RequestParam("name") String name) {
         return R.ok(entityInfoService.selectEntityInfoListByName(name));
 
     }

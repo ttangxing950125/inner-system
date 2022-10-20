@@ -395,7 +395,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             if (!CollectionUtils.isEmpty(vo.getMore())) {
-                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), map.get("value")));
+                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), entryMap.getValue()));
             }
             rows.add(map);
         });
