@@ -140,11 +140,26 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //生成政府德勤主体唯一识别代码
         return govInfoMapper.insertGovInfo(govInfo);
     }
-    //获取德勤政府唯一识别码
-    private String getDqGovCode() {
+
+    /**
+     * 获取德勤政府唯一识别码
+     *
+     * @return String
+     * @author 冉浩岑
+     * @date 2022/10/20 11:52
+    */
+    public String getDqGovCode() {
         GovInfo latestGov = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().like(GovInfo::getDqGovCode, frontTitle).orderByDesc(GovInfo::getId).last(" limit 1"));
+        if (ObjectUtils.isEmpty(latestGov)){
+            return frontTitle+000001;
+        }
         Long id = latestGov.getId()+1;
-        String dqGovCode=frontTitle+id;
+        int length = id.toString().length();
+        String dqGovCode=frontTitle;
+        for (int i=0;i<6-length;i++){
+            dqGovCode=dqGovCode+0;
+        }
+        dqGovCode=dqGovCode+id;
         return dqGovCode;
     }
 
