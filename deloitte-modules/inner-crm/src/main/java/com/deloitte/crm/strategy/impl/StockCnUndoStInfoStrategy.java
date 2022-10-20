@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -42,6 +43,7 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
     private StockCnUndoStInfoMapper undoStInfoMapper;
     @Resource
     private StockCnInfoMapper stockCnInfoMapper;
+
     @Override
     public boolean support(Integer windDictId) {
         return Objects.equals(WindTaskEnum.CN_ST_UNDO.getId(), windDictId);
@@ -57,7 +59,8 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
     }
 
     @Override
-    public List<String> getDetailHeader(CrmWindTask windTask) {ArrayList<String> arr = new ArrayList<>();
+    public List<String> getDetailHeader(CrmWindTask windTask) {
+        ArrayList<String> arr = new ArrayList<>();
         //证券代码
         //证券简称
         //公司中文名称
@@ -87,29 +90,35 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
             return dataMap;
         }).collect(Collectors.toList());
     }
+
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doBondImport(StockCnUndoStInfo undoStInfo, Date timeNow, CrmWindTask windTask) {
-        log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),undoStInfo.getCode(),windTask.getId());
+        log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), undoStInfo.getCode(), windTask.getId());
         undoStInfo.setTaskId(windTask.getId());
         StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, undoStInfo.getCode()));
         if (stockCnInfo != null) {
             stockCnInfo.setStUndoImplemtnet(1);
             stockCnInfo.setStockShortName(Optional.ofNullable(undoStInfo.getUndoBackName()).orElse(""));
             stockCnInfoMapper.updateById(stockCnInfo);
-            log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow),undoStInfo.getCode(), windTask.getId());
+            log.info(">>>>>>>>开始到导入【实施ST摘帽】【当前时间】=>:{},【股票代码】=>:{},【任务ID】=>:{}", DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, timeNow), undoStInfo.getCode(), windTask.getId());
         } else {
             log.warn(">>>>>>>>开始到导入【实施ST摘帽】根据【股票代码】=>:{}>查询不到A股信息 【任务ID】={}任务结束！！！！！", undoStInfo.getCode(), windTask.getId());
         }
-        StockCnUndoStInfo undoStInfoResult = undoStInfoMapper.selectOne(new LambdaQueryWrapper<StockCnUndoStInfo>().eq(StockCnUndoStInfo::getCode, undoStInfo.getCode()));
+        List<StockCnUndoStInfo> undoStInfoResultLists = undoStInfoMapper.selectList(new LambdaQueryWrapper<StockCnUndoStInfo>()
+                .eq(StockCnUndoStInfo::getCode, undoStInfo.getCode())
+                .orderBy(true, false, StockCnUndoStInfo::getId)
+                .last("LIMIT 1"));
         Integer changeType = null;
-        if (undoStInfoResult == null) {
+        if (CollUtil.isEmpty(undoStInfoResultLists)) {
             changeType = DataChangeType.INSERT.getId();
-        } else if (!Objects.equals(undoStInfoResult, undoStInfo)) {
-            changeType = DataChangeType.UPDATE.getId();
+        } else {
+            final StockCnUndoStInfo stockCnUndoStInfo = undoStInfoResultLists.stream().findFirst().get();
+            if (!Objects.equals(stockCnUndoStInfo, undoStInfo)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
         }
         undoStInfo.setChangeType(changeType);
-
         undoStInfoMapper.insert(undoStInfo);
         return new AsyncResult<>(new Object());
     }

@@ -77,7 +77,7 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
         //公司中文名称
         arr.add("导入日期");
         arr.add("变化状态");
-        arr.add("代码");
+        arr.add("公司代码");
         arr.add("公司名称");
         return arr;
     }
@@ -87,7 +87,7 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
         Integer taskId = windTask.getId();
         Wrapper<BondConvertibleChangeInfo> wrapper = Wrappers.<BondConvertibleChangeInfo>lambdaQuery()
                 .eq(BondConvertibleChangeInfo::getTaskId, taskId)
-                .in(BondConvertibleChangeInfo::getChangeType, 1,2);
+                .in(BondConvertibleChangeInfo::getChangeType, 1, 2);
 
         return bondConvertibleChangeInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
@@ -159,14 +159,14 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
             }
             //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
             Integer changeType = null;
-            final BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>().eq(BondConvertibleChangeInfo::getCode, item.getCode()));
+            BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>()
+                    .eq(BondConvertibleChangeInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleChangeInfo::getId).last("LIMIT 1"));
             if (bondConvertibleChangeInfo == null) {
                 changeType = DataChangeType.INSERT.getId();
-            }
-            if (!Objects.equals(bondConvertibleChangeInfo, item)) {
-                changeType = DataChangeType.UPDATE.getId();
             } else {
-                changeType = DataChangeType.INSERT.getId();
+                if (!Objects.equals(bondConvertibleChangeInfo, item)) {
+                    changeType = DataChangeType.UPDATE.getId();
+                }
             }
             item.setChangeType(changeType);
         }

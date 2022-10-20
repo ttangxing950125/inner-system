@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.Attrs;
 import com.deloitte.crm.annotation.UpdateLog;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -68,6 +69,12 @@ public class EntityInfo implements Serializable {
     @Excel(name = "申万行业划分")
     private String shenWanMaster;
 
+    /**
+     * entity_info的entity_code
+     */
+    @Excel(name = "产业链CICS行业划分明细")
+    @Attrs(attrId = 649,attrName="产业链CICS行业划分明细")
+    private String cicsIndustryDetails;
 
     /**
      * 统一社会信用代码

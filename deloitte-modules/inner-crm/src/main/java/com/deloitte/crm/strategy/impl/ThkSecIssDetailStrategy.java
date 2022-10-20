@@ -46,6 +46,9 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
+    @Resource
+    private IEntityInfoService entityInfoService;
+
     /**
      * 处理文件中的每一行
      *
@@ -107,6 +110,12 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
                 //查询当前港股绑定的主体
                 List<EntityInfo> entityInfos = entityStockThkRelService.findEntityByStockDqCode(stockThkInfo.getStockDqCode());
+
+                entityInfos.forEach(entity->{
+                    entity.setList(1);
+                });
+
+                entityInfoService.updateBatchById(entityInfos);
 
                 //敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), timeNow);

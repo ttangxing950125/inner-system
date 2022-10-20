@@ -169,7 +169,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         log.info("--------------角色7的任务数量{}", entityTaskCount);
 
         //发邮件给角色2
-        Wrapper<CrmMasTask> masTaskQue = Wrappers.<CrmMasTask>lambdaQuery()
+        /*Wrapper<CrmMasTask> masTaskQue = Wrappers.<CrmMasTask>lambdaQuery()
                 .eq(CrmMasTask::getTaskDate, timeNow);
 
         long entityMasCount = crmMasTaskService.count(masTaskQue);
@@ -180,7 +180,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                         "请尽快登陆平台完成相关任务。</br>" +
                         "<a href='https://ibond.deloitte.com.cn:8080/crm-door/index'>主体管理平台</a>");
 
-        log.info("--------------角色2的任务数量{}", entityMasCount);
+        log.info("--------------角色2的任务数量{}",entityMasCount);*/
 
 
         dailyTaskService.update(updateDaily);
@@ -208,7 +208,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             detailsVo.setTaskFileName(e.getTaskFileName());
             detailsVo.setTaskStatus(e.getComplete());
             List<Map<String, Object>> data = windTaskStrategyManage.getDetail(e);
-            //查询展示到列表上的信息
             List<String> header = windTaskStrategyManage.getDetailHeader(e);
             detailsVo.setHeader(header);
             detailsVo.setData(data);
