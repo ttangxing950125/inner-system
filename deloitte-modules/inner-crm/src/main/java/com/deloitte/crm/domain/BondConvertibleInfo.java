@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -266,6 +267,11 @@ public class BondConvertibleInfo implements Serializable {
      */
 //    @Excel(name = "更新时间")
     private Date updated;
+
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
 
 }
