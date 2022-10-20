@@ -213,7 +213,7 @@
         <el-card>
           <h3 class="g-t-title">{{ tabArr[currentTab] + "企业" }}</h3>
           <div class="g-desc">
-            截止日期，会计收录 <span>{{ overview.totle || 0 }}</span> 个地方企业主体，其中
+            截止日期，合计收录 <span>{{ overview.totle || 0 }}</span> 个地方企业主体，其中
             <span>{{ overview.live || 0 }}</span> 个存续上市， <span>{{ overview.dead || 0 }}</span> 个已退市
           </div>
           <div class="g-desc flex1">

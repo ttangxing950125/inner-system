@@ -84,13 +84,13 @@
         >
           <el-table-column fixed type="index" fixed sortable label="序号">
           </el-table-column>
-          <el-table-column fixed prop="dqGovCode" fixed label="德勤主体代码">
+          <el-table-column fixed prop="entityCode" fixed label="德勤主体代码">
           </el-table-column>
-          <el-table-column fixed prop="govName" fixed label="主体名称">
+          <el-table-column fixed prop="entityName" fixed label="主体名称">
           </el-table-column>
           <el-table-column fixed prop="invalid" fixed label="生效状态">
             <template slot-scope="scope">
-              <span>{{ scope.row.invalid ? "Y" : "N" }}</span>
+              <span>{{ scope.row.status === 1 ? "Y" : "N" }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="created" label="创建日期">
@@ -218,8 +218,19 @@ export default {
           const { data } = res;
           this.total = data.total;
           this.list = [];
+          let more = [];
           data.records.forEach((e) => {
-            this.list.push(e.govInfo);
+              
+            this.list.push(e.entityInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+                if (more) {
+                    more.forEach((i) => {
+                        e[i.key] = i.value;
+                    });
+                }
           });
         });
       } catch (error) {
@@ -258,16 +269,19 @@ export default {
           const { data } = res;
           this.total = data.total;
           this.list = [];
-          let more = [];
+           let more = [];
           data.records.forEach((e) => {
-            this.list.push(e.govInfo);
+              
+            this.list.push(e.entityInfo);
             more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
-            more.forEach((i) => {
-              e[i.key] = i.value;
-            });
+                if (more) {
+                    more.forEach((i) => {
+                        e[i.key] = i.value;
+                    });
+                }
           });
         });
       } catch (error) {
@@ -294,18 +308,18 @@ export default {
           const { data } = res;
           this.total = data.total;
           this.list = [];
-          let more = [];
+           let more = [];
           data.records.forEach((e) => {
-            this.list.push(e.govInfo);
+            this.list.push(e.entityInfo);
             more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
-            if (more) { 
-                more.forEach((i) => {
-                e[i.key] = i.value;
-                });
-            }
+                if (more) {
+                    more.forEach((i) => {
+                        e[i.key] = i.value;
+                    });
+                }
           });
         });
       } catch (error) {
@@ -323,9 +337,19 @@ export default {
         this.total = data.total;
         this.list = [];
         this.queryParams.pageNum = data.current;
-        data.records.forEach((e) => {
-          this.list.push(e.govInfo);
-        });
+         let more = [];
+          data.records.forEach((e) => {
+            this.list.push(e.entityInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+                if (more) {
+                    more.forEach((i) => {
+                        e[i.key] = i.value;
+                    });
+                }
+          });
       });
     },
   },
