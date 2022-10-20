@@ -1,10 +1,11 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.common.core.domain.R;
-import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
@@ -18,13 +19,18 @@ import com.deloitte.crm.mapper.EntityMasterMapper;
 import com.deloitte.crm.mapper.ModelMasterMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
+import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -33,8 +39,8 @@ import java.util.stream.Collectors;
  * @author deloitte
  * @date 2022-09-21
  */
-@Service
 @Slf4j
+@Service
 @AllArgsConstructor
 public class ModelMasterServiceImpl implements IModelMasterService {
     private ModelMasterMapper modelMasterMapper;
@@ -187,13 +193,14 @@ public class ModelMasterServiceImpl implements IModelMasterService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R insert(MasDto masDto) {
-        log.info(">>>> 敞口划分保存并提交开始 >>>>请求参数:{}", JSON.toJSONString(masDto));
+        log.info("==> 敞口划分 保存并提交开始请求参数:{}", JSON.toJSONString(masDto));
         String entityCode = masDto.getEntityCode();
         EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
         Assert.notNull(entityInfo, BadInfo.VALID_EMPTY_TARGET.getInfo());
         //新增 是否为金融机构 id 640 是为 Y 否为 N
         if (YES.equals(masDto.getIsFinance())) {
             EntityFinancial entityFinancial = new EntityFinancial();
+            // 新增 金融细分领域 id 656
             entityFinancial.setEntityCode(entityCode);
             entityFinancial.setMince(masDto.getFinanceSegmentation());
             entityFinancialService.getBaseMapper().insert(entityFinancial);
@@ -204,8 +211,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         entityInfo.setShenWanMaster(masDto.getShenWan());
         //修改 是否为金融机构 id 640 是为 Y 否为 N 是金融机构 0-否 1-是
         entityInfo.setFinance(YES.equals(masDto.getIsFinance()) ? 1 : 0);
-
         iEntityInfoService.updateById(entityInfo);
+
 
         //新增  YY-是否为城投机构 id 644
         EntityMaster entityMaster = new EntityMaster().setEntityCode(entityCode);
@@ -216,29 +223,31 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
         //新增 敞口的code
         entityMaster.setMasterCode(masDto.getMasterCode());
-
         entityMasterMapper.insertEntityMaster(entityMaster);
 
         //新增 德勤政府code
         EntityGovRel entityGovRel = new EntityGovRel();
-        entityGovRel.setEntityCode(entityCode).setDqGovCode(masDto.getDqGovCode());
-
+        entityGovRel.setEntityCode(entityCode);
+        entityGovRel.setDqGovCode(masDto.getDqGovCode());
         entityGovRelMapper.insertEntityGovRel(entityGovRel);
 
-
         //更改当条信息任务状态
-        BaseMapper<CrmMasTask>  iCrmMasTaskMapper = iCrmMasTaskService.getBaseMapper();
-        final CrmMasTask crmMasTask = Optional.ofNullable(iCrmMasTaskMapper.selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, masDto.getId()))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+        BaseMapper<CrmMasTask> mapper = iCrmMasTaskService.getBaseMapper();
+        CrmMasTask crmMasTask = mapper.selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, masDto.getId()));
+        Assert.notNull(crmMasTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
+        //0-未处理
         Assert.isTrue(UN_FINISH_STATE.equals(crmMasTask.getState()), BadInfo.EXITS_TASK_FINISH.getInfo());
         //添加修改人
         crmMasTask.setHandleUser(SecurityUtils.getUsername());
-        // 修改状态
+        // 修改状态 1 1-已处理
         crmMasTask.setState(FINISH_STATE);
-        iCrmMasTaskMapper.updateById(crmMasTask);
+        mapper.updateById(crmMasTask);
 
-        // 查看当日任务情况
-        List<CrmMasTask> crmMasTasks = iCrmMasTaskMapper.selectList(new QueryWrapper<CrmMasTask>().lambda()
-                .eq(CrmMasTask::getTaskDate, crmMasTask.getTaskDate()).eq(CrmMasTask::getState, UN_FINISH_STATE));
+        // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
+        List<CrmMasTask> crmMasTasks = mapper.selectList(new QueryWrapper<CrmMasTask>()
+                .lambda().eq(CrmMasTask::getTaskDate, crmMasTask.getTaskDate())
+                .eq(CrmMasTask::getState, UN_FINISH_STATE)
+        );
         //完成当条任务后 向 crm_supply 添加任务
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setEntityCode(entityCode);
@@ -275,33 +284,41 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             CrmDailyTask dailyTask = new CrmDailyTask();
             dailyTask.setTaskDate(new Date());
 
+            List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new LambdaQueryWrapper<CrmSupplyTask>().eq(CrmSupplyTask::getTaskDate, dateNow)
+                    .between(CrmSupplyTask::getRoleId, 5L, 7L));
+            if (CollUtil.isEmpty(crmSupplyTasks)) {
+                log.warn("==> 查询角色 3 4 5任务表【crm_supply_task】数据为空!!!!");
+                return R.ok(SuccessInfo.SUCCESS.getInfo());
+            }
+            HashMap<Long, Long> groupingByMap = Maps.newHashMap();
+            crmSupplyTasks.stream().collect(Collectors.groupingBy(CrmSupplyTask::getRoleId)).forEach((k, v) -> {
+                groupingByMap.put(k, v.stream().count());
+            });
+            Long role3 = groupingByMap.computeIfPresent(5L, (k, v) -> v != 0 ? v : 0L);
+            Long role4 = groupingByMap.computeIfPresent(6L, (k, v) -> v != 0 ? v : 0L);
+            Long role5 = groupingByMap.computeIfPresent(7L, (k, v) -> v != 0 ? v : 0L);
             //角色3 角色id为 5L
-            Long role3 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 5L).eq(CrmSupplyTask::getTaskDate, dateNow));
-            if (role3 != 0) {
+            if (role3 != 0 && role3 != null) {
                 sendEmailService.email(ROLE_3_ID, role3.intValue());
                 //无任务为 1 有任务未完成 2
                 this.createTask(ROLE_3_ID, 2);
             } else {
                 this.createTask(ROLE_3_ID, 1);
             }
-
             //角色4 角色id为 6L
-            Long role4 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 6L).eq(CrmSupplyTask::getTaskDate, dateNow));
-            if (role4 != 0) {
+            if (role4 != 0 && role4 != null) {
                 sendEmailService.email(ROLE_4_ID, role4.intValue());
                 this.createTask(ROLE_4_ID, 2);
             } else {
                 this.createTask(ROLE_4_ID, 1);
             }
-
-            Long role5 = crmSupplyTaskMapper.selectCount(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getRoleId, 7L).eq(CrmSupplyTask::getTaskDate, dateNow));
-            if (role5 != 0) {
+            //角色5 角色id为 7L
+            if (role5 != 0 && role5 != null) {
                 sendEmailService.email(ROLE_5_ID, role5.intValue());
                 this.createTask(ROLE_5_ID, 2);
             } else {
                 this.createTask(ROLE_5_ID, 1);
             }
-
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }

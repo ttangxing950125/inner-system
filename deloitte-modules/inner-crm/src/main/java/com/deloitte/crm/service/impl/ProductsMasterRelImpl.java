@@ -35,9 +35,9 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
          * @date 2022/10/17 14:58
         */
         @Override
-        public List<ProCustomerDto> getProductsMasterRelList(String entityCode,String dataYear) {
+        public List<ProCustomerDto> getProductsMasterRelList(String entityCode,String dataYear,Integer ProId) {
 
-            return mapper.futureList(entityCode,dataYear);
+            return mapper.futureList(entityCode,dataYear,ProId);
         }
                 /**
                  修改敞口关联关系
