@@ -8,10 +8,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.domain.dto.EntityListView;
-import com.deloitte.crm.dto.EntityDto;
-import com.deloitte.crm.dto.EntityInfoCodeDto;
-import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.dto.ExportEntityCheckDto;
+import com.deloitte.crm.dto.*;
 import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import org.springframework.web.multipart.MultipartFile;
@@ -230,17 +227,13 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefix(Integer prefixLength,Integer target);
 
-    /**
-     *批量查询并导出excel结果
-     *
-     * @param file
-     * @return R
-     * @author penTang
-     * @date 2022/10/9 16:12
-     */
-    List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file,String uuid);
+
+    R getExcelWriter(List<ExportEntityCheckDto> entityByBatchLis,ImportDto importDto);
+
+    List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, ImportDto importDto);
+
     R getIng(String uuid);
-    R getExcelWriter(List<ExportEntityCheckDto> entityByBatchLis);
+
 
     /**
      *   ****************
@@ -259,6 +252,8 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
     EntityListView getListView(Integer type);
+
+
 
     /**
      * 根据 id 字段名 修改

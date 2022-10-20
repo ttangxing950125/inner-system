@@ -6,6 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author PenTang
  * 用于匹配检查导出结果
@@ -92,6 +97,11 @@ public class ExportEntityCheckDto implements Serializable {
     @Excel(name = "最终统一社会信用代码结果")
     @ApiModelProperty(name="entityNameByResult",value="最终统一社会信用代码结果")
     private String  creditCodeByResult;
+
+
+    private Map<String, String> more = new HashMap<String, String>();
+
+
 
 
 }

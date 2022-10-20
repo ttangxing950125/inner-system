@@ -13,10 +13,7 @@ import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.domain.StockThkInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
-import com.deloitte.crm.dto.EntityDto;
-import com.deloitte.crm.dto.EntityInfoDto;
-import com.deloitte.crm.dto.ExportEntityCheckDto;
-import com.deloitte.crm.dto.MoreIndex;
+import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
@@ -349,16 +346,16 @@ public class EntityInfoController extends BaseController {
      * 批量查询并导出excel结果
      *
      * @param file
-     * @param uuid(用于存进度导redis)
+     * @param importDto
      * @return R
      * @author penTang
      * @date 2022/10/9 15:57
      */
     @ApiOperation(value = "批量查询并导出excel结果")
     @PostMapping("/importExcelByEntity")
-    public R importExcelByEntity(@RequestParam("file") MultipartFile file, @RequestParam("uuid") String uuid) {
-        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file, uuid);
-        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos);
+    public R importExcelByEntity(@RequestParam("file") MultipartFile file, ImportDto importDto) {
+        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file, importDto);
+        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos,importDto);
         return excelWriter;
     }
 
@@ -413,7 +410,7 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "name",value = "主体名称" ,paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     })
     @PostMapping("/entityMaster")
-    public R  selectEntityInfoByName(String name) {
+    public R  selectEntityInfoByName(@RequestParam("name") String name) {
         return R.ok(entityInfoService.selectEntityInfoListByName(name));
 
     }
