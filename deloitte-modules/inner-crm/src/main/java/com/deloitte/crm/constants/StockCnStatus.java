@@ -1,9 +1,5 @@
 package com.deloitte.crm.constants;
 
-import com.deloitte.common.core.enums.Messageable;
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/26

@@ -1,4 +1,4 @@
-package com.deloitte.common.core.enums;
+package com.deloitte.crm.constants;
 
 import java.io.Serializable;
 
