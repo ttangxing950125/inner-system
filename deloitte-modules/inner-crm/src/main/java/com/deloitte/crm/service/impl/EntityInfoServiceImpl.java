@@ -1997,15 +1997,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         break;
                     }
                     StockCnInfo stockCnInfo = stockCnInfos.get(i);
-                    //退市日期
-                    String delistingDate = stockCnInfo.getDelistingDate();
-                    // TODO 需要验证是否是这样判断
-                    int days = TimeFormatUtil.between_days("yyyy-MM-dd", delistingDate, TimeFormatUtil.getFormartDate(new Date()));
-                    if (days < 0) {
-                        //当前时间小于退市时间------未退市
+                    //A股状态 6-成功上市
+                    Integer stockStatus = stockCnInfo.getStockStatus();
+                    if (!ObjectUtils.isEmpty(stockStatus) && stockStatus==6) {
                         ADetail = "A股" + BOND_STATE_LIVE;
                     } else {
-                        //当前时间大于退市时间------退市
                         ADetail = "A股" + BOND_STATE_BACK;
                     }
                 }
@@ -2038,12 +2034,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         break;
                     }
                     StockThkInfo stockThkInfo = stockThkInfos.get(i);
-                    //退市日期
-                    String delistingDate = stockThkInfo.getDelistingDate();
-                    // TODO 需要验证是否是这样判断
-                    int days = TimeFormatUtil.between_days("yyyy-MM-dd", delistingDate, TimeFormatUtil.getFormartDate(new Date()));
-                    if (days < 0) {
-                        //当前时间小于退市时间------未退市
+                    //港股状态 3-成功上市
+                    Integer stockStatus = stockThkInfo.getStockStatus();
+                    if (!ObjectUtils.isEmpty(stockStatus) && stockStatus==3) {
                         GDetail = "港股" + BOND_STATE_LIVE;
                     } else {
                         //当前时间大于退市时间------退市
