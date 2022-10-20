@@ -87,6 +87,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     private static final Integer DEFAULT_PAGE_NUM_SIZE = 50;
 
+    /** 德勤政府主体唯一识别码前缀 */
+    private static final String frontTitle="GV";
+
     /**
      * 查询【请填写功能名称】
      *
@@ -118,6 +121,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertGovInfo(GovInfo govInfo) {
+        //生成政府主体德勤主体唯一识别代码
+        String dqGovCode=getGovDqGovCode(govInfo.getGovCode());
+        govInfo.setDqGovCode(dqGovCode);
         //曾用名不为空，则新增曾用名记录表
         String govNameHis = govInfo.getGovNameHis();
         if (!ObjectUtils.isEmpty(govNameHis)){
@@ -130,7 +136,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
+        //生成政府德勤主体唯一识别代码
         return govInfoMapper.insertGovInfo(govInfo);
+    }
+
+    private String getGovDqGovCode(String govCode) {
+        govCode=frontTitle+govCode;
+        return govCode;
     }
 
     /**
