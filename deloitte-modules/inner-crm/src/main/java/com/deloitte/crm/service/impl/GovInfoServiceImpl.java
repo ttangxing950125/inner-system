@@ -122,8 +122,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     public int insertGovInfo(GovInfo govInfo) {
         //生成政府主体德勤主体唯一识别代码
-        String dqGovCode=getGovDqGovCode(govInfo.getGovCode());
+        String dqGovCode=getDqGovCode();
         govInfo.setDqGovCode(dqGovCode);
+
         //曾用名不为空，则新增曾用名记录表
         String govNameHis = govInfo.getGovNameHis();
         if (!ObjectUtils.isEmpty(govNameHis)){
@@ -139,10 +140,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //生成政府德勤主体唯一识别代码
         return govInfoMapper.insertGovInfo(govInfo);
     }
-
-    private String getGovDqGovCode(String govCode) {
-        govCode=frontTitle+govCode;
-        return govCode;
+    //获取德勤政府唯一识别码
+    private String getDqGovCode() {
+        GovInfo latestGov = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().like(GovInfo::getDqGovCode, frontTitle).orderByDesc(GovInfo::getId).last(" limit 1"));
+        Long id = latestGov.getId()+1;
+        String dqGovCode=frontTitle+id;
+        return dqGovCode;
     }
 
     /**
