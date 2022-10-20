@@ -7,7 +7,10 @@ import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
-import com.deloitte.crm.domain.*;
+import com.deloitte.crm.domain.CnIpoInfo;
+import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
@@ -101,7 +104,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 changeType = DataChangeType.UPDATE.getId();
             }
 
-            if (last != null && !last.getIpoDate().equals(item.getIpoDate())) {
+            if (last != null && !StrUtil.equals(last.getIpoDate(),item.getIpoDate())) {
                 //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
                 // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());

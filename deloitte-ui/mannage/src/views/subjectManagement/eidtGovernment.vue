@@ -42,7 +42,11 @@
             </el-table-column>
             <el-table-column prop="dqGovCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="govName" label="政府名称"> </el-table-column>
+            <el-table-column prop="govName" label="政府名称">
+                <template slot-scope="scope">
+                <div v-html="replaceFun(scope.row.govName)"></div>
+              </template>
+            </el-table-column>
             <el-table-column prop="govCode" label="行政区划代码">
             </el-table-column>
             <el-table-column prop="preGovName" label="上级政府名称">
@@ -145,6 +149,163 @@
                 </div>
               </el-col>
             </el-collapse-item>
+            <el-collapse-item>
+              <template slot="title">
+                <span style="font-size: 16px">行政区划</span>
+              </template>
+              <el-col :sm="24" :lg="12" class="form-card">
+                <div class="flex1">
+                  <div class="first">政府主体官方行政代码</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.govInfo && levelStr[info.govInfo.govType] 
+                    }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">政府主体行政单位级别-大类</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govName"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">政府主体行政单位级别-小类</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govName"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">是否为省会城市</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govName"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">地理分区归属</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govNameHis"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">八大经济区归属</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+              </el-col>
+              <el-col :sm="24" :lg="12" class="form-card">
+                <div class="flex1">
+                  <div class="first">19个城市群归属</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">是否为国家中心城市</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">城市规模</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">城市分级</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">是否为百强县</div>
+                 <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+              </el-col>
+            </el-collapse-item>
+            <el-collapse-item>
+              <template slot="title">
+                <span style="font-size: 16px">关联政府</span>
+              </template>
+              <el-col :sm="24" :lg="12" class="form-card">
+                <div class="flex1">
+                  <div class="first">上级行政单位名称</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.govInfo && levelStr[info.govInfo.govType] 
+                    }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">上级行政单位官方行政代码</div>
+                  <el-input
+                    class="t-input"
+                    v-model="info.govInfo && info.govInfo.govName"
+                    @change="item.edit = true"
+                  ></el-input>
+                </div>
+                <div class="flex1">
+                  <div class="first">上级行政单位德勤代码</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
+                </div>
+              </el-col>
+              <el-col :sm="24" :lg="12" class="form-card">
+                <div class="flex1">
+                  <div class="first">失效后关联政府主体名称</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">失效后关联政府主体官方行政代码</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
+                </div>
+                <div class="flex1">
+                  <div class="first">失效后关联政府主体德勤代码</div>
+                  <div class="scond" style="color: #updated">
+                    {{ info.govInfo && info.govInfo.updated }}
+                  </div>
+                </div>
+              </el-col>
+            </el-collapse-item>
+            <el-collapse-item>
+              <template slot="title">
+                <span style="font-size: 16px">关联政府</span>
+              </template>
+              <el-col :sm="24" :lg="12" class="form-card">
+                <div class="flex1">
+                  <div class="first">关联城投企业数量</div>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.govInfo && levelStr[info.govInfo.govType] 
+                    }}
+                  </div>
+                </div>
+              </el-col>
+            </el-collapse-item>
           </el-collapse>
         </el-card>
       </el-col>
@@ -158,6 +319,7 @@ import {
   getInfoDetailGov,
   updateInfoList
 } from "@/api/subject";
+import { replaceStr } from "@/utils/index";
 export default {
   name: "eidtGovernment",
   data() {
@@ -178,6 +340,9 @@ export default {
   created() {
   },
   methods: {
+      replaceFun(row) {
+      return replaceStr(row, this.input);
+    },
      handleClick(row) {
       try {
         this.$modal.loading("Loading...");
@@ -206,7 +371,7 @@ export default {
         };
         getGovByName(parmas).then((res) => {
           const { data } = res;
-          this.list = data.data
+          this.list = data
         //   this.list = data.records;
         //   this.total = data.total;
         //   this.queryParams.pageNum = data.current;

@@ -399,15 +399,6 @@ export default {
         this.$modal.closeLoading();
       }
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    goTarget(href) {
-      window.open(href, "_blank");
-    },
     changeTab(tab) {
       try {
         this.$modal.loading("Loading...");
@@ -436,7 +427,6 @@ export default {
       }
     },
     add() {
-      console.log(1);
       this.$router.psuh({ path: "subjectManagement/enterprise" });
     },
     select() {

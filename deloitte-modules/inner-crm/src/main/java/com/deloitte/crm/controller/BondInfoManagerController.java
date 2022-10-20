@@ -13,7 +13,11 @@ import com.deloitte.crm.vo.BondEntityInfoVo;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -27,6 +31,7 @@ import java.util.List;
 @Api(tags = "债券信息管理")
 @RequestMapping("/bondInfoManager")
 @AllArgsConstructor
+@Slf4j
 public class BondInfoManagerController {
 
     private IEntityInfoService iEntityInfoService;
@@ -52,6 +57,8 @@ public class BondInfoManagerController {
     @PostMapping("/findBondOrEntity")
     public R <Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
         //模糊匹配 查询主体||债券信息
+        log.info("  >>>> 债券信息管理 - 开始  <<<<  ");
+        log.info("  =>> 模糊匹配查询  <<=");
         return iEntityInfoService.findBondOrEntity(name,keyword,pageNum,pageSize);
     }
 
@@ -71,6 +78,8 @@ public class BondInfoManagerController {
         @PostMapping("/findRelationEntityOrBond")
     public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id,String keyword){
         // 查询主体||债券信息
+        log.info("  >>>> 债券信息管理 - 开始  <<<<  ");
+        log.info("  =>> 二级匹配查询  <<=");
         return iEntityInfoService.findRelationEntityOrBond(id,keyword);
     }
 
@@ -88,6 +97,8 @@ public class BondInfoManagerController {
     @ApiResponse(code = 200,message = "操作成功",response =BondEntityInfoVo.class)
     @PostMapping("/findAllDetail")
     public R<List<BondEntityInfoVo>> findAllDetail(@NotNull(message = "主体代码不能为空") String entityCode,@NotNull(message = "债券代码不能为空") String bondCode){
+        log.info("  >>>> 债券信息管理 - 开始  <<<<  ");
+        log.info("  =>> 具体信息查询  <<=");
         return iBondInfoService.findAllDetail(entityCode,bondCode);
     }
 
@@ -101,6 +112,8 @@ public class BondInfoManagerController {
     @ApiImplicitParam(name = "bondInfoEditVo", value = "传入bondInfoEditVo 中 list需要修改的参数", paramType = "body", dataType = "body",dataTypeClass = BondEntityInfoVo.class)
     @PostMapping("/editAllDetail")
     public R editAllDetail(@RequestBody List<BondEntityInfoVo> bondInfoEditVo){
+        log.info("  >>>> 债券信息管理 - 开始  <<<<  ");
+        log.info("  =>> 修改具体信息  <<=");
         return iBondInfoService.editAllDetail(bondInfoEditVo);
     }
 
@@ -115,6 +128,8 @@ public class BondInfoManagerController {
     @ApiImplicitParam(name = "bondInfoManualDto", value = "bondInfoManualDto对象", paramType = "body", dataType = "body",dataTypeClass = BondInfoManualDto.class)
     @PostMapping("/insertBondInfoManual")
     public R insertBondInfoManual(@RequestBody BondInfoManualDto bondInfoManualDto){
+        log.info("  >>>> 债券信息管理 - 开始  <<<<  ");
+        log.info("  =>> 新增债券信息  <<=");
         return iBondInfoService.insertBondInfoManual(bondInfoManualDto);
     }
 

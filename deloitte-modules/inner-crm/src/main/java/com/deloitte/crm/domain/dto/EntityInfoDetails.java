@@ -43,9 +43,17 @@ public class EntityInfoDetails {
      */
     private String listTypeA;
     /**
+     * A股曾用证券简称
+     */
+    private List<String> shortNameHisA;
+    /**
      * 港股上市状态
      */
     private String listTypeG;
+    /**
+     * g港股曾用证券简称
+     */
+    private List<String> shortNameHisG;
     /**
      * 上市汇总
      */

@@ -1,6 +1,7 @@
 package com.deloitte.crm.controller;
 
 import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.domain.ProductsMasterDict;
 import com.deloitte.crm.dto.DataYearDto;
 import com.deloitte.crm.service.ProductsMasterDictService;
 import io.swagger.annotations.Api;
@@ -26,7 +27,7 @@ public class ProductsMasterDictController
     @Resource
     private ProductsMasterDictService productsMasterDictService;
     @PostMapping("/ProMaDir")
-    @ApiOperation(value = "{查询敞口信息}", response = DataYearDto.class)
+    @ApiOperation(value = "{查询敞口信息}", response = ProductsMasterDict.class)
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "body", name = "proCustId", value = "客户产品id")
     })
