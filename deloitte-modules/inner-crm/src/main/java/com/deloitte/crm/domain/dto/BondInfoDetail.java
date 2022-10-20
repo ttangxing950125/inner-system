@@ -100,5 +100,10 @@ public class BondInfoDetail {
      * 存续私募债数量
      */
     private Integer privateBondsLiveNum;
+
+    /**
+     * 是否可以收数
+     */
+    private String isCollection;
 }
 
