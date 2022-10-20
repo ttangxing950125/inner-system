@@ -346,25 +346,19 @@ public class EntityInfoController extends BaseController {
      * 批量查询并导出excel结果
      *
      * @param file
-     * @param uuid(用于存进度导redis)
+     * @param importDto
      * @return R
      * @author penTang
      * @date 2022/10/9 15:57
      */
     @ApiOperation(value = "批量查询并导出excel结果")
     @PostMapping("/importExcelByEntity")
-    public R importExcelByEntity(@RequestParam("file") MultipartFile file, @RequestParam("uuid") String uuid) {
-        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file, uuid);
-        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos);
+    public R importExcelByEntity(@RequestParam("file") MultipartFile file, ImportDto importDto) {
+        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file, importDto);
+        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos,importDto);
         return excelWriter;
     }
 
-    @PostMapping("/importExcel")
-    public R importExcelByCover(@RequestParam("file") MultipartFile file, ImportDto importDto) {
-        List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatch(file, importDto);
-        R excelBach = entityInfoService.getExcelBach(exportEntityCheckDtos, importDto);
-        return excelBach;
-    }
 
 
     /**

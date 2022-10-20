@@ -227,19 +227,13 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefix(Integer prefixLength,Integer target);
 
-    /**
-     *批量查询并导出excel结果
-     *
-     * @param file
-     * @return R
-     * @author penTang
-     * @date 2022/10/9 16:12
-     */
-    List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file,String uuid);
 
-    List<ExportEntityCheckDto> checkBatch(MultipartFile file, ImportDto importDto);
+    R getExcelWriter(List<ExportEntityCheckDto> entityByBatchLis,ImportDto importDto);
+
+    List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, ImportDto importDto);
+
     R getIng(String uuid);
-    R getExcelWriter(List<ExportEntityCheckDto> entityByBatchLis);
+
 
     /**
      *   ****************
@@ -259,7 +253,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     EntityListView getListView(Integer type);
 
-    R getExcelBach(List<ExportEntityCheckDto> entityByBatchList, ImportDto importDto);
+
 
     /**
      * 根据 id 字段名 修改
