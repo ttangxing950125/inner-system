@@ -76,6 +76,7 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
             HashMap<String, Object> infoMap = new HashMap<>();
             infoMap.put("证券代码", stockCnInfo.getStockCode());
             infoMap.put("证券简称", stockCnInfo.getStockShortName());
+            infoMap.put("公司中文名称", entityName);
 
 
             try {
