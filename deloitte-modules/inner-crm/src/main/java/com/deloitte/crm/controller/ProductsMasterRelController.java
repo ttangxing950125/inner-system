@@ -71,7 +71,7 @@ public class ProductsMasterRelController  {
     */
     @PostMapping("/updateRel")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "body", name = "ProductsMasterRelVo", value = "修改客户信息参数")
+            @ApiImplicitParam(paramType = "body", name = "productsMasterRelVo", value = "修改客户信息参数",dataType = "ProductsMasterRelVo")
     })
     @ApiOperation(value = "{修改产品信息}", response =Boolean.class)
     public R updateRel(@RequestBody ProductsMasterRelVo productsMasterRelVo ){
