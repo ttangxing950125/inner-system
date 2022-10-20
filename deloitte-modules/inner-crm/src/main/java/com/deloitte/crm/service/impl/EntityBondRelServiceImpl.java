@@ -1,6 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +73,8 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
             entityTask.setDataShow(showData);
 
             //infoMap
-            HashMap<String, Object> infoMap = new HashMap<>();
+            HashMap<String, Object> infoMap = new LinkedHashMap<>();
+            infoMap.put("发行人全称", issorName);
             infoMap.put("债券简称", bondInfo.getBondShortName());
             infoMap.put("债券全称", bondInfo.getBondName());
             infoMap.put("交易代码", bondInfo.getOriCode());

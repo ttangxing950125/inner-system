@@ -90,10 +90,11 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             BondNewIss last = bondNewIssMapper.findLastByShortName(shortName);
             if (last==null){
                 resStatus = DataChangeType.INSERT.getId();
-            }else if (!Objects.equals(last, newIss)){
-                resStatus = DataChangeType.UPDATE.getId();
+            }else{
+                if (!Objects.equals(last, newIss)) {
+                    resStatus = DataChangeType.UPDATE.getId();
+                }
             }
-
             Integer newStatus = judgeBondStatus(bondInfo.getBondStatus(), newIss.getIssStartDate(), newIss.getIssEndDate(), newIss.getIpoDate(), timeNow);
             if (newStatus!=null){
                 bondInfo.setBondStatus(newStatus);
