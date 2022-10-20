@@ -552,10 +552,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //查询 港股 证券信息
         entityInfoDetails = getStockThkInfo(entityInfoDetails, entityCode);
 
-        // 查询发债情况  --  是否可以收数
+        // 查询发债情况
         entityInfoDetails = getEntityBondInfo(entityInfoDetails, entityCode);
 
-        //TODO 查询金融机构  --  是否发行同业存单（银行）
+        // 查询金融机构
         entityInfoDetails = getEntityFinancials(entityInfoDetails, entityCode, entityInfo);
 
         //TODO 查询敞口划分  --  客户敞口行业划分汇集  产业链CICS行业划分明细  旧辖口行业划分
@@ -730,9 +730,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
-            //是否可以收数
+            //是否可以收数 attrId 686
 
-
+            bondInfoDetail.setIsCollection("0");
+            EntityAttrValue attrValue = entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda()
+                    .eq(EntityAttrValue::getEntityCode, entityCode)
+                    .eq(EntityAttrValue::getAttrId, 686).last(" limit 1"));
+            if (!ObjectUtils.isEmpty(attrValue)){
+                bondInfoDetail.setIsCollection(attrValue.getValue());
+            }
 
             //赋值属性
             entityInfoDetails.setBondInfoDetail(bondInfoDetail);
