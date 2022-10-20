@@ -31,6 +31,7 @@ import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -67,6 +68,7 @@ import static java.lang.System.out;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityInfo> implements IEntityInfoService {
 
     private IEntityNameHisService iEntityNameHisService;
@@ -1474,6 +1476,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
+        log.info("  =>> 开始查询 关于 "+ name +" 的 "+keyword+" 信息 <<=  ");
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 20 : pageSize;
         //模糊匹配 查询主体||债券信息
@@ -1486,6 +1489,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .lambda().like(EntityInfo::getEntityName, name));
                 List<EntityInfo> entityInfos = entityInfoPage.getRecords();
                 if (entityInfos.size() == 0) {
+                    log.info("  =>>  未查询到相关信息  <<=  ");
+                    log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
                     return R.ok(null, BadInfo.VALID_EMPTY_TARGET.getInfo());
                 }
                 //找到对应bd_code
@@ -1498,6 +1503,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .setPages(entityInfoPage.getPages())
                         .setCurrent(entityInfoPage.getCurrent())
                         .setSize(entityInfoPage.getSize());
+                log.info("  =>>  查询到信息并返回 "+entityInfoPage.getSize()+" 条 <<=  ");
+                log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
                 return R.ok(targetEntityBondsVoPage, SuccessInfo.SUCCESS.getInfo());
             // 模糊匹配债券名
             case BOND:
@@ -1509,7 +1516,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .like(BondInfo::getBondName, name).like(BondInfo::getBondShortName, name));
                 List<BondInfo> bondInfos = bondInfoPage.getRecords();
                 if (bondInfos.size() == 0) {
-                    return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());
+                    log.info("  =>>  未查询到相关信息  <<=  ");
+                    log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
+                    return R.ok(null,BadInfo.VALID_EMPTY_TARGET.getInfo());
                 }
 
                 //查找属性数据 组装
@@ -1522,6 +1531,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .setPages(bondInfoPage.getPages())
                         .setCurrent(bondInfoPage.getCurrent())
                         .setSize(bondInfoPage.getSize());
+                log.info("  =>>  查询到信息并返回 "+bondInfoPage.getSize()+" 条 <<=  ");
+                log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
                 return R.ok(targetEntityBondsVoPageBond, SuccessInfo.SUCCESS.getInfo());
             default:
                 return R.fail(BadInfo.VALID_PARAM.getInfo());
@@ -1542,6 +1553,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<TargetEntityBondsVo> result = new ArrayList<>();
         switch (keyword) {
             case ENTITY:
+                log.info("  =>> 开始查询 id 为 "+ id +" 的 "+BOND+" 信息 <<=  ");
                 EntityInfo entity = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getId, id));
                 List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
                         .lambda().eq(EntityBondRel::getEntityCode, entity.getEntityCode()));
@@ -1549,9 +1561,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
                             .eq(BondInfo::getBondCode, row.getBdCode()));
                     result.add(this.matchingBondInfo(bondInfo));
+                    log.info("  =>>  查询到信息并返回 "+result.size()+" 条 <<=  ");
+                    log.info("  >>>>  债券信息管理 - 结束  <<<<");
                 });
                 return R.ok(result);
             case BOND:
+                log.info("  =>> 开始查询 id 为 "+ id +" 的 "+ENTITY+" 信息 <<=  ");
                 BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getId, id));
                 List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
                         .eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
@@ -1559,9 +1574,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda()
                             .eq(EntityInfo::getEntityCode, item.getEntityCode()));
                     result.add(this.matchingEntityInfo(entityInfo));
+                    log.info("  =>>  查询到信息并返回 "+result.size()+" 条 <<=  ");
+                    log.info("  >>>>  债券信息管理 - 结束  <<<<");
                 });
                 return R.ok(result);
             default:
+                log.info("  =>> 未匹配到关键参数  <<=  ");
+                log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
                 return R.ok(result);
         }
     }

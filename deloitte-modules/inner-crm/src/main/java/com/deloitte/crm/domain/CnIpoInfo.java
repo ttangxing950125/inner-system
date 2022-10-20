@@ -1,16 +1,17 @@
 package com.deloitte.crm.domain;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.io.Serializable;
-import java.util.Objects;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
-import com.deloitte.common.core.annotation.Excel;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * IPO-新股发行资料-20210914-20221014(CnIpoInfo)表实体类
@@ -54,24 +55,24 @@ public class CnIpoInfo implements Serializable {
     /**
      * 招股日期
      */
-    @Excel(name = "招股日期")
+    @Excel(name = "招股日期", dateFormat = "yyyy-MM-dd")
     private String prospDate;
 
     /**
      * 初步询价起始日
      */
-    @Excel(name = "初步询价起始日")
+    @Excel(name = "初步询价起始日", dateFormat = "yyyy-MM-dd")
     private String inquiryStaringDate;
 
     /**
      * 网上发行日期
      */
-    @Excel(name = "网上发行日期")
+    @Excel(name = "网上发行日期", dateFormat = "yyyy-MM-dd")
     private String netIssDate;
     /**
      * 上市日期
      */
-    @Excel(name = "上市日期")
+    @Excel(name = "上市日期", dateFormat = "yyyy-MM-dd")
     private String ipoDate;
     /**
      * 上市板

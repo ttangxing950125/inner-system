@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -279,7 +278,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
             iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
 
-            //TODO 发送邮件
+            // 发送邮件
             String dateNow = DateUtil.format(new Date(), "yyyy-MM-dd");
             CrmDailyTask dailyTask = new CrmDailyTask();
             dailyTask.setTaskDate(new Date());
