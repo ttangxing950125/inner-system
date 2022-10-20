@@ -1,8 +1,8 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CnDelistInfo;
 import com.deloitte.crm.domain.CrmWindTask;
@@ -47,8 +47,13 @@ public class BondConvertibleInfoServiceImpl extends ServiceImpl<BondConvertibleI
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 
         for (BondConvertibleInfo convertibleInfo : bondConvertibleInfo) {
-            final Date noticeDate = convertibleInfo.getNoticeDate();
-            if (noticeDate != null && DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, noticeDate).equals("数据来源：Wind")) {
+            if (StrUtil.isEmpty(convertibleInfo.getCode())) {
+                continue;
+            }
+            if (convertibleInfo.getNoticeDate() != null && DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, convertibleInfo.getNoticeDate()).equals("数据来源：Wind")) {
+                continue;
+            }
+            if (StrUtil.isNotBlank(convertibleInfo.getName()) && convertibleInfo.getName().contains("合计")) {
                 continue;
             }
             Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleStrategy.class).doBondImport(convertibleInfo, timeNow, windTask);
