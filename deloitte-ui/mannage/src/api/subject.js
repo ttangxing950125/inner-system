@@ -361,3 +361,87 @@ export function updateInfoList(parmas) {
     data: parmas,
   });
 }
+
+// 敞口划分根据主体名称查询信息
+export function entityMaster(parmas) {
+  return request({
+    url: "/crm/entityInfo/entityMaster?name=" + parmas.name,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 根据主体code查询主体信息
+export function entityByMaster(parmas) {
+  return request({
+    url: "/crm/entityInfo/entityByMaster?code=" + parmas.code,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// {查询修改记录}
+export function getDataHis(parmas) {
+  return request({
+    url: "/crm/ProMaRelHis/getDataHis",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询产品年份
+export function getDataYear(parmas) {
+  return request({
+    url: "/crm/ProMaRel/getDataYear",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询产品客户敞口信息
+export function getProDucCom(parmas) {
+  return request({
+    url: "/crm/ProMaRel/getProDucCom?dataYear="+parmas.dataYear+'&entityCode='+parmas.entityCode+'&proId='+parmas.proId,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 修改产品信息
+export function updateRel(parmas) {
+  return request({
+    url: "/crm/ProMaRel/updateRel",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 查询敞口信息
+export function ProMaDir(parmas) {
+  return request({
+    url: "/crm/ProMaDir/ProMaDir?proCustId="+parmas.proCustId,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}

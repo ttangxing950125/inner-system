@@ -215,9 +215,6 @@ export default {
       if (!value) return true;
       return data.name.indexOf(value) !== -1;
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
     handleCheckChange(data, checked, indeterminate) {
       //获取所有选中的节点 start
       let res = this.$refs.tree1.getCheckedNodes();
