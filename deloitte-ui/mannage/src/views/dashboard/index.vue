@@ -1515,7 +1515,8 @@ export default {
       this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
       this.$set(this.ruleForm, 'wind',  '')
-        this.$set(this.ruleForm, 'shenWan',  '')
+      this.$set(this.ruleForm, 'shenWan',  '')
+      this.$set(this.ruleForm, 'creditErrorType',  '')
     },
     check(row) {
       this.$modal.loading("loading...");
