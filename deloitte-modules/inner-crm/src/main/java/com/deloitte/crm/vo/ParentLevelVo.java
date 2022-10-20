@@ -15,5 +15,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class ParentLevelVo {
     private String name ;
+    private Object send ;
     private Object value;
 }

@@ -827,7 +827,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         List<ParentLevelVo> parentLevelVo = new ArrayList<>();
 
-        GovAttrByDtoBack govAttrByDto = new GovAttrByDtoBack();
 //        省级行政区 1 地级行政区 2 县级行政区 3 经开高新区 4
         parentLevelVo = setAdministrationRegion(parentLevelVo);
 //        八大经济区
@@ -1032,7 +1031,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     public ParentLevelVo getParentValue(String name, Object value) {
         ParentLevelVo parentLevelVo = new ParentLevelVo();
-        parentLevelVo.setName(name).setValue(value);
+        parentLevelVo.setName(name).setSend(value);
         return parentLevelVo;
     }
 }
