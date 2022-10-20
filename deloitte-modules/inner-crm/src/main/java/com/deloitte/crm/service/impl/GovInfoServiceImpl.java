@@ -1032,9 +1032,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     public ParentLevelVo getParentValue(String name, Object value) {
         ParentLevelVo parentLevelVo = new ParentLevelVo();
-        List<Object> values = new ArrayList();
-        values.add(value);
-        parentLevelVo.setName(name).setValue(values);
+        parentLevelVo.setName(name).setValue(value);
         return parentLevelVo;
     }
 }
