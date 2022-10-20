@@ -62,6 +62,9 @@ public class ProductsMasterRelVo {
    * 变更后敞口id
    */
   @ApiParam("变更后敞口id")
+  private Integer dictIdNew;
+
+  @ApiParam("主体code")
     private String  entityCode;
 
 
