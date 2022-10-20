@@ -112,7 +112,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo);
 
-    ParentLevelVo getGovRange();
+    List<ParentLevelVo> getGovRange();
 
     GovView getGovView();
 

@@ -823,7 +823,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
 
     @Override
-    public ParentLevelVo getGovRange() {
+    public List<ParentLevelVo> getGovRange() {
 
         List<ParentLevelVo> parentLevelVo = new ArrayList<>();
 
@@ -844,10 +844,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
 //        百强县
 
-        ParentLevelVo result = new ParentLevelVo();
-
-        result.setName("全部").setValue(parentLevelVo);
-        return result;
+        return parentLevelVo;
     }
 
     @Override
