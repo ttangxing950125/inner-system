@@ -20,10 +20,11 @@ public class SpringAsyncConfig {
 
     /**
      * 单例线程池
+     *
      * @return
      */
     @Bean("singleThreadPoll")
-    public ExecutorService singleThreadPoll(){
+    public ExecutorService singleThreadPoll() {
 
         return ExecutorBuilder.create()
                 .setCorePoolSize(2)
@@ -34,12 +35,11 @@ public class SpringAsyncConfig {
 
     /**
      * 导入文件使用的线程池
+     *
      * @return
      */
     @Bean("taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
-
-
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 //        int i = Runtime.getRuntime().availableProcessors();

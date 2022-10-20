@@ -75,6 +75,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
             HashMap<String, Object> infoMap = new HashMap<>();
             infoMap.put("证券代码", stockThkInfo.getStockCode());
             infoMap.put("证券简称", stockThkInfo.getStockName());
+            infoMap.put("公司中文名称", entityName);
 
 
             try {
