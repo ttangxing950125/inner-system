@@ -2589,8 +2589,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //entitMaster
         LambdaQueryWrapper<EntityMaster> eq2 = new LambdaQueryWrapper<EntityMaster>().eq(EntityMaster::getEntityCode, code);
         EntityMaster entityMaster = entityMasterMapper.selectOne(eq2);
-        entityInfoCodeDto.setYyUrban(entityMaster.getYyUrban());
-        entityInfoCodeDto.setZhongxinUrban(entityMaster.getZhongxinUrban());
+        if (entityMaster != null) {
+            entityInfoCodeDto.setYyUrban(entityMaster.getYyUrban());
+            entityInfoCodeDto.setZhongxinUrban(entityMaster.getZhongxinUrban());
+
+        }
+
         return entityInfoCodeDto;
     }
 
