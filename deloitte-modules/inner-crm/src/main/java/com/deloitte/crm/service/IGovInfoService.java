@@ -4,11 +4,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
-import com.deloitte.crm.domain.dto.GovAttrByDtoBack;
-import com.deloitte.crm.domain.dto.GovInfoDetails;
 import com.deloitte.crm.domain.dto.GovView;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
+import com.deloitte.crm.vo.ParentLevelVo;
 
 import java.util.List;
 import java.util.Map;
@@ -113,7 +112,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     R  getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo);
 
-    GovAttrByDtoBack getGovRange();
+    List<ParentLevelVo> getGovRange();
 
     GovView getGovView();
 
