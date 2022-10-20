@@ -100,11 +100,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
 
             //当股票状态已经是“发行中”时，当【上市日期】 = 今天 时，状态改为“成功上市”
-            if (
-                    Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus())
-                            &&
-                            DateUtil.compare(ipoDate, timeNow) == 0
-            ) {
+            if (Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus()) && DateUtil.compare(ipoDate, timeNow) == 0) {
                 stockThkInfo.setStockStatus(StockThkStatus.LIST.getId());
                 stockThkInfo.setStatusDesc(StockThkStatus.LIST.getName());
 
@@ -165,10 +161,9 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<ThkSecIssDetail> util = new ExcelUtil<ThkSecIssDetail>(ThkSecIssDetail.class);
-        List<ThkSecIssDetail> thkSecIssInfos = util.importExcel(windTaskContext.getFileStream(), true);
-        ;
-
-        return thkSecIssDetailService.doTask(windTask, thkSecIssInfos);
+        List<ThkSecIssDetail> list = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(list);
+        return thkSecIssDetailService.doTask(windTask, list);
     }
 
     /**

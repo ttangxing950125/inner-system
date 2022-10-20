@@ -81,11 +81,11 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在 发行失败 中时，记为“发行失败”
                 if (stockCnInfo.getStockStatus() == null) {
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getName());
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getId()) {
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getName());
+                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getMessage());
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getMessage());
                 }
             } else if (!Objects.equals(last, item)) {
                 //如果他们两个不相同，代表有属性修改了

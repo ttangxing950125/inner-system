@@ -86,12 +86,12 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
                     log.info("==> IPO审核申报中 修改A股状态为 《IPO审核申报中》2！！！");
                     //当股票首次出现在  IPO审核申报表 中时，
                     // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
-                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getName() + "(" + item.getAuditStatus() + ")");
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.COACH_BACK.getId()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.COACH_BACK.getCode()) {
                     log.info("==> IPO审核申报中 原【股票代码】={} A股状态为:{} 修改A股状态为 《IPO审核申报中》2 ！！", stockCnInfo.getStockCode(), stockCnInfo.getStockStatus());
-                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getName() + "(" + item.getAuditStatus() + ")");
+                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
                 } else {
                     log.warn("==> IPO审核申报中 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
                 }

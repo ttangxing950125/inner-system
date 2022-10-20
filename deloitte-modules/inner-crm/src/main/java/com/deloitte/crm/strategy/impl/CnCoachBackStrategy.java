@@ -87,8 +87,8 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                 Integer stockStatus = stockCnInfo.getStockStatus();
                 if (stockStatus == null) {
                     log.info("==> IPO-辅导备案 修改A股状态为 《IPO-辅导备案》1 ！！");
-                    stockCnInfo.setStockStatus(StockCnStatus.COACH_BACK.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.COACH_BACK.getName());
+                    stockCnInfo.setStockStatus(StockCnStatus.COACH_BACK.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.COACH_BACK.getMessage());
                 } else {
                     log.warn("==> IPO-辅导备案 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
                 }

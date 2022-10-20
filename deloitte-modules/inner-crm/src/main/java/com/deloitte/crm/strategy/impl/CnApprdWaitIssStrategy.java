@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.reverseOrder;
+
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/27
@@ -83,12 +85,12 @@ public class CnApprdWaitIssStrategy implements WindTaskStrategy {
                     log.info("==> IPO-审核通过尚未发行 修改股票状态为 《IPO审核通过尚未发行》4 ！！！");
                     //当股票首次出现在  IPO审核申报表 中时，
                     // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
-                    stockCnInfo.setStockStatus(StockCnStatus.APPRD_WAIT_ISS.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.APPRD_WAIT_ISS.getName());
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getId()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.APPRD_WAIT_ISS.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.APPRD_WAIT_ISS.getMessage());
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
                     log.info("==> IPO-审核通过尚未发行 原【股票代码】={} A股状态为:{}  修改股票状态为 《IPO审核通过尚未发行》4 ！！！", stockCnInfo.getStockCode(), stockCnInfo.getStockStatus());
-                    stockCnInfo.setStockStatus(StockCnStatus.APPRD_WAIT_ISS.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.APPRD_WAIT_ISS.getName());
+                    stockCnInfo.setStockStatus(StockCnStatus.APPRD_WAIT_ISS.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.APPRD_WAIT_ISS.getMessage());
                 } else {
                     log.warn("==> IPO-审核通过尚未发行 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
                 }
@@ -143,8 +145,7 @@ public class CnApprdWaitIssStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnApprdWaitIss> util = new ExcelUtil<CnApprdWaitIss>(CnApprdWaitIss.class);
         List<CnApprdWaitIss> list = util.importExcel(windTaskContext.getFileStream(), true);
-        ;
-
+        Collections.reverse(list);
         return cnApprdWaitIssService.doTask(windTask, list);
     }
 

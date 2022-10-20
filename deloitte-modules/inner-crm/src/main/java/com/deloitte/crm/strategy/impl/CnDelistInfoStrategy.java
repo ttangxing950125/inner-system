@@ -62,6 +62,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<CnDelistInfo> util = new ExcelUtil<CnDelistInfo>(CnDelistInfo.class);
         List<CnDelistInfo> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(cnCoachBacks);
         return cnDelistInfoService.doTask(windTask, cnCoachBacks);
     }
 

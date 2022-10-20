@@ -54,8 +54,9 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<StockCnUndoStInfo> util = new ExcelUtil<StockCnUndoStInfo>(StockCnUndoStInfo.class);
-        List<StockCnUndoStInfo> undoStInfoListndoStInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(StockCnUndoStInfoService.class).doTask(windTask, undoStInfoListndoStInfo);
+        List<StockCnUndoStInfo> list = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(list);
+        return ApplicationContextHolder.get().getBean(StockCnUndoStInfoService.class).doTask(windTask, list);
     }
 
     @Override

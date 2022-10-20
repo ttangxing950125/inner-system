@@ -66,6 +66,7 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<BondConvertibleChangeInfo> util = new ExcelUtil<BondConvertibleChangeInfo>(BondConvertibleChangeInfo.class);
         List<BondConvertibleChangeInfo> bondConvertibleChangeInfo = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(bondConvertibleChangeInfo);
         return ApplicationContextHolder.get().getBean(BondConvertibleChangeInfoService.class).doTask(windTask, bondConvertibleChangeInfo);
     }
 

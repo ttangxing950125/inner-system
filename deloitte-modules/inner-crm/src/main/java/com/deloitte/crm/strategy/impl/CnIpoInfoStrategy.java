@@ -90,11 +90,11 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在  新股发行 中时，记为“发行中”
                 if (stockCnInfo.getStockStatus() == null) {
-                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getId()) {
-                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
+                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
                 } else {
                     log.warn("==> 新股发行 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
                 }
@@ -107,17 +107,17 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             if (last != null && !StrUtil.equals(last.getIpoDate(),item.getIpoDate())) {
                 //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
                 // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
-                stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
+                stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
             }
 
             //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
-            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getId()) && DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate())) {
-                stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getName());
+            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getCode()) && DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate())) {
+                stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getMessage());
             }
             //如果是成功上市，发送给敞口划分人
-            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getId())) {
+            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getCode())) {
                 //查询和当前a股绑定关联关系的主体
                 List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
                 entityInfos.forEach(entity -> {
@@ -171,7 +171,6 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnIpoInfo> util = new ExcelUtil<CnIpoInfo>(CnIpoInfo.class);
         List<CnIpoInfo> list = util.importExcel(null, file.getInputStream(), 1, true);
-
         return cnIpoInfoService.doTask(windTask, list);
 //        return null;
     }

@@ -81,8 +81,9 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultFirstNumberCount> util = new ExcelUtil<DefaultFirstNumberCount>(DefaultFirstNumberCount.class);
         List<DefaultFirstNumberCount> list = util.importExcel(file.getInputStream(), true);
-
+        Collections.reverse(list);
         DefaultFirstNumberCountService defaultFirstNumberCountService = ApplicationContextHolder.get().getBean(DefaultFirstNumberCountService.class);
+
         return defaultFirstNumberCountService.doTask(windTask, list);
     }
 

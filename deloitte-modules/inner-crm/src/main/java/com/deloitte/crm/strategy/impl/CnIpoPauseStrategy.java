@@ -81,11 +81,11 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
                 if(stockCnInfo.getStockStatus()==null){
                     //当股票首次出现在  IPO审核申报表 中时，
                     // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getName());
-                }else if(stockCnInfo.getStockStatus()!=null && stockCnInfo.getStockStatus()==StockCnStatus.IEC_SMPC_CHECK.getId()){
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getName());
+                    stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getMessage());
+                }else if(stockCnInfo.getStockStatus()!=null && stockCnInfo.getStockStatus()==StockCnStatus.IEC_SMPC_CHECK.getCode()){
+                    stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getMessage());
                 }
 
 

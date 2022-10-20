@@ -58,10 +58,11 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
 
     /**
      * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
+     *
      * @param newIss
      * @param timeNow
      * @return 如果这条 newIss 是新增的，返回1
-     *         如果这条 newIss 是原有基础上有修改，返回2
+     * 如果这条 newIss 是原有基础上有修改，返回2
      */
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
@@ -77,8 +78,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             String shortName = newIss.getBondShortName();
 
             //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(shortName,Boolean.FALSE);
-            if (bondInfo==null){
+            BondInfo bondInfo = bondInfoService.findByShortName(shortName, Boolean.FALSE);
+            if (bondInfo == null) {
                 bondInfo = new BondInfo();
             }
 
@@ -88,15 +89,15 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
 
             //看之前有没有导入过这个数据
             BondNewIss last = bondNewIssMapper.findLastByShortName(shortName);
-            if (last==null){
+            if (last == null) {
                 resStatus = DataChangeType.INSERT.getId();
-            }else{
+            } else {
                 if (!Objects.equals(last, newIss)) {
                     resStatus = DataChangeType.UPDATE.getId();
                 }
             }
             Integer newStatus = judgeBondStatus(bondInfo.getBondStatus(), newIss.getIssStartDate(), newIss.getIssEndDate(), newIss.getIpoDate(), timeNow);
-            if (newStatus!=null){
+            if (newStatus != null) {
                 bondInfo.setBondStatus(newStatus);
             }
 
@@ -122,19 +123,19 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             Integer bondStatus = bondInfo.getBondStatus();
 
             //债券发行成功，主体发债状态
-            if (Objects.equals(bondStatus, BondStatus.WAIT_LIST.getId())){
-                entityInfos.forEach(entity->{
+            if (Objects.equals(bondStatus, BondStatus.WAIT_LIST.getId())) {
+                entityInfos.forEach(entity -> {
                     entity.setIssueBonds(1);
                 });
             }
 
 
-            if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)){
+            if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)) {
                 newDbBond.setBondState(0);
                 newDbBond = bondInfoService.saveOrUpdate(bondInfo);
 
                 //修改主体的上市状态
-                entityInfos.forEach(entity->{
+                entityInfos.forEach(entity -> {
                     entity.setList(1);
                 });
 
@@ -145,7 +146,7 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }
 
-            if (resStatus!=null){
+            if (resStatus != null) {
                 //更新当前债券属性
                 entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
             }
@@ -158,17 +159,17 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
     }
 
 
-
     /**
      * 判断债券状态
-     * @param bondStatus 当前状态
+     *
+     * @param bondStatus   当前状态
      * @param startDateStr 发行起始日
-     * @param endDateStr 发行截止日
-     * @param ipoDateStr 上市日期
-     * @param timeNow 今天
+     * @param endDateStr   发行截止日
+     * @param ipoDateStr   上市日期
+     * @param timeNow      今天
      * @return
      */
-    private Integer judgeBondStatus(Integer bondStatus,String startDateStr, String endDateStr, String ipoDateStr, Date timeNow){
+    private Integer judgeBondStatus(Integer bondStatus, String startDateStr, String endDateStr, String ipoDateStr, Date timeNow) {
         //发行起始日
         Date startDate = DateUtil.parseDate(startDateStr);
         //发行截止日
@@ -177,10 +178,10 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
         Date ipoDate = DateUtil.parseDate(ipoDateStr);
 
         int compare = DateUtil.compare(startDate, timeNow);
-        if (compare>0){
+        if (compare > 0) {
             //当债券的【发行起始日】晚于今天，则记为“等待发行”
             return BondStatus.WAIT.getId();
-        }else if (compare==0 && Objects.equals(bondStatus, BondStatus.WAIT.getId())){
+        } else if (compare == 0 && Objects.equals(bondStatus, BondStatus.WAIT.getId())) {
             //当债券状态已经是“等待发行”的情况下，在【发行起始日】= 今天 时，改为“正在发行”
             return BondStatus.ISSUE.getId();
         }
@@ -188,16 +189,16 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
         //当债券状态已经是“正在发行”的情况下，在【发行截止日】= 今天 时，改为“已发行待上市”
         if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())
                 &&
-                DateUtil.compare(endDate, timeNow)==0
-        ){
+                DateUtil.compare(endDate, timeNow) == 0
+        ) {
             return BondStatus.WAIT_LIST.getId();
         }
 
         //当债券状态已经是“已发行待上市”的情况下，在【上市日期】= 今天 时，改为“成功上市”
-        if (Objects.equals(bondStatus,BondStatus.WAIT_LIST.getId())
+        if (Objects.equals(bondStatus, BondStatus.WAIT_LIST.getId())
                 &&
-                DateUtil.compare(ipoDate, timeNow)==0
-        ){
+                DateUtil.compare(ipoDate, timeNow) == 0
+        ) {
             return BondStatus.LISTED.getId();
         }
 
@@ -227,7 +228,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         //读取文件
         ExcelUtil<BondNewIss> util = new ExcelUtil<BondNewIss>(BondNewIss.class);
-        List<BondNewIss> isses = util.importExcel(windTaskContext.getFileStream(), true);;
+        List<BondNewIss> isses = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(isses);
         return bondNewIssService.doTask(windTask, isses);
     }
 
@@ -264,8 +266,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         Integer taskId = windTask.getId();
 
-        List<BondNewIss> bondNewIsses = bondNewIssService.findByTaskIdChangeType(taskId, 1,2);
-        return bondNewIsses.stream().map(item->{
+        List<BondNewIss> bondNewIsses = bondNewIssService.findByTaskIdChangeType(taskId, 1, 2);
+        return bondNewIsses.stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

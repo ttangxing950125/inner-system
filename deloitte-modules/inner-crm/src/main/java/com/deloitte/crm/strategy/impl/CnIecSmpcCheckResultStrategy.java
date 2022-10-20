@@ -85,12 +85,12 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                 // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
                 if (stockCnInfo.getStockStatus() == null) {
                     log.info("==> IPO-发审委上市委审核结果 修改股票状态为 《IPO法审上市委审核中》3 ！！！");
-                    stockCnInfo.setStockStatus(StockCnStatus.IEC_SMPC_CHECK.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IEC_SMPC_CHECK.getName() + "(" + item.getCheckResult() + ")");
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.CHECK_DECLARE.getId()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.IEC_SMPC_CHECK.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IEC_SMPC_CHECK.getMessage() + "(" + item.getCheckResult() + ")");
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.CHECK_DECLARE.getCode()) {
                     log.info("==> IPO-发审委上市委审核结果 原【股票代码】={} A股状态为:{} 修改A股状态为:《IPO法审上市委审核中》3！！！", stockCnInfo.getStockCode(), stockCnInfo.getStockStatus());
-                    stockCnInfo.setStockStatus(StockCnStatus.IEC_SMPC_CHECK.getId());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IEC_SMPC_CHECK.getName() + "(" + item.getCheckResult() + ")");
+                    stockCnInfo.setStockStatus(StockCnStatus.IEC_SMPC_CHECK.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IEC_SMPC_CHECK.getMessage() + "(" + item.getCheckResult() + ")");
                 } else {
                     log.warn("==> IPO-发审委上市委审核结果 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
                 }
