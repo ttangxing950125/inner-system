@@ -653,8 +653,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             entityBondRels.stream().forEach(o -> bdCodes.add(o.getBdCode()));
             List<BondInfo> bondInfos = bondInfoMapper.selectList(new QueryWrapper<BondInfo>().lambda().in(BondInfo::getBondCode, bdCodes).orderByAsc(BondInfo::getValueDate));
 
-            // 是否可以收数  TODO 校验收数规则
-            bondInfoDetail.setIsColl(true);
             //首次发债时间
             List<BondInfo> liveBonds = bondInfos.stream().filter(o -> !ObjectUtil.isEmpty(o.getValueDate())).collect(Collectors.toList());
             bondInfoDetail.setFirstBond(liveBonds.get(0).getValueDate());
@@ -667,10 +665,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (CollectionUtils.isEmpty(collList)) {
                     bondInfoDetail.setIsCollBond(false).setCollBondsNum(0).setCollBondsLiveNum(0);
                 } else {
+                    //封装集合债简称明细
+                    List<String>shortNameList=new ArrayList<>();
+                    collList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
                     //存续集合债数量
                     bondInfoDetail.setIsCollBond(true)
                             .setCollBondsNum(collList.size())
-                            .setCollBonds(collList)
+                            .setCollBonds(shortNameList)
                             .setCollBondsLiveNum(collList.stream().filter(o -> o.getBondState() == 0).collect(Collectors.toList()).size());
                 }
             } catch (Exception e) {
@@ -685,10 +686,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (CollectionUtils.isEmpty(absList)) {
                     bondInfoDetail.setIsAbsBond(false).setAbsBondsNum(0).setAbsBondsLiveNum(0);
                 } else {
+                    //封装ABS简称明细
+                    List<String>shortNameList=new ArrayList<>();
+                    absList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
                     //存续ABS数量
                     bondInfoDetail.setIsAbsBond(true)
                             .setAbsBondsNum(absList.size())
-                            .setAbsBonds(absList)
+                            .setAbsBonds(shortNameList)
                             .setAbsBondsLiveNum(absList.stream().filter(o -> o.getBondState() == 0).collect(Collectors.toList()).size());
                 }
             } catch (Exception e) {
@@ -703,10 +707,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (CollectionUtils.isEmpty(publicList)) {
                     bondInfoDetail.setIsPublicBond(false).setPublicBondsNum(0).setPublicBondsLiveNum(0);
                 } else {
+                    //封装公募债简称明细
+                    List<String>shortNameList=new ArrayList<>();
+                    publicList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
                     //存续公募债数量
                     bondInfoDetail.setIsPublicBond(true)
                             .setPublicBondsNum(publicList.size())
-                            .setPublicBonds(publicList)
+                            .setPublicBonds(shortNameList)
                             .setPublicBondsLiveNum(publicList.stream().filter(o -> o.getBondState() == 0).collect(Collectors.toList()).size());
                 }
             } catch (Exception e) {
@@ -721,10 +728,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (CollectionUtils.isEmpty(privateList)) {
                     bondInfoDetail.setIsPrivateBond(false).setPrivateBondsNum(0).setPrivateBondsLiveNum(0);
                 } else {
+                    //封装私募债简称明细
+                    List<String>shortNameList=new ArrayList<>();
+                    privateList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
                     //存续私募债数量
                     bondInfoDetail.setIsPrivateBond(true)
                             .setPrivateBondsNum(privateList.size())
-                            .setPrivateBonds(privateList)
+                            .setPrivateBonds(shortNameList)
                             .setPrivateBondsLiveNum(privateList.stream().filter(o -> o.getBondState() == 0).collect(Collectors.toList()).size());
                 }
             } catch (Exception e) {

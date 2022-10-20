@@ -174,7 +174,6 @@
         left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
         <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != '')or (stockCn != null  and stockCn != '')">
             <where>
-                1 = 1 and (
                 <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
 
                 <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
@@ -193,7 +192,6 @@
                     or
                 </if>
                 <if test="coll != null  and coll != ''">e.entity_code is not null</if>
-                )
             </where>
         </if>
         ORDER BY a.entity_code
@@ -210,7 +208,6 @@
         left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
         <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != '')or (stockCn != null  and stockCn != '')">
             <where>
-                1 = 1 and (
                 <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
 
                 <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
@@ -229,7 +226,6 @@
                     or
                 </if>
                 <if test="coll != null  and coll != ''">e.entity_code is not null</if>
-                )
             </where>
         </if>
         ORDER BY a.entity_code
@@ -247,7 +243,6 @@
         left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
         <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != '')or (stockCn != null  and stockCn != '')">
             <where>
-                1 = 1 and (
                 <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
 
                 <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
@@ -266,7 +261,6 @@
                     or
                 </if>
                 <if test="coll != null  and coll != ''">e.entity_code is not null</if>
-                )
             </where>
         </if>
     </select>
