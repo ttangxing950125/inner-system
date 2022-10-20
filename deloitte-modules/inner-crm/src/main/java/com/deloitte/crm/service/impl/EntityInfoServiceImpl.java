@@ -666,8 +666,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     bondInfoDetail.setIsCollBond(false).setCollBondsNum(0).setCollBondsLiveNum(0);
                 } else {
                     //封装集合债简称明细
-                    List<String>shortNameList=new ArrayList<>();
-                    collList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
+                    List<String> shortNameList = new ArrayList<>();
+                    collList.stream().forEach(x -> shortNameList.add(x.getBondShortName()));
                     //存续集合债数量
                     bondInfoDetail.setIsCollBond(true)
                             .setCollBondsNum(collList.size())
@@ -687,8 +687,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     bondInfoDetail.setIsAbsBond(false).setAbsBondsNum(0).setAbsBondsLiveNum(0);
                 } else {
                     //封装ABS简称明细
-                    List<String>shortNameList=new ArrayList<>();
-                    absList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
+                    List<String> shortNameList = new ArrayList<>();
+                    absList.stream().forEach(x -> shortNameList.add(x.getBondShortName()));
                     //存续ABS数量
                     bondInfoDetail.setIsAbsBond(true)
                             .setAbsBondsNum(absList.size())
@@ -708,8 +708,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     bondInfoDetail.setIsPublicBond(false).setPublicBondsNum(0).setPublicBondsLiveNum(0);
                 } else {
                     //封装公募债简称明细
-                    List<String>shortNameList=new ArrayList<>();
-                    publicList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
+                    List<String> shortNameList = new ArrayList<>();
+                    publicList.stream().forEach(x -> shortNameList.add(x.getBondShortName()));
                     //存续公募债数量
                     bondInfoDetail.setIsPublicBond(true)
                             .setPublicBondsNum(publicList.size())
@@ -729,8 +729,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     bondInfoDetail.setIsPrivateBond(false).setPrivateBondsNum(0).setPrivateBondsLiveNum(0);
                 } else {
                     //封装私募债简称明细
-                    List<String>shortNameList=new ArrayList<>();
-                    privateList.stream().forEach(x->shortNameList.add(x.getBondShortName()));
+                    List<String> shortNameList = new ArrayList<>();
+                    privateList.stream().forEach(x -> shortNameList.add(x.getBondShortName()));
                     //存续私募债数量
                     bondInfoDetail.setIsPrivateBond(true)
                             .setPrivateBondsNum(privateList.size())
@@ -746,7 +746,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             EntityAttrValue attrValue = entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda()
                     .eq(EntityAttrValue::getEntityCode, entityCode)
                     .eq(EntityAttrValue::getAttrId, 686).last(" limit 1"));
-            if (!ObjectUtils.isEmpty(attrValue)){
+            if (!ObjectUtils.isEmpty(attrValue)) {
                 bondInfoDetail.setIsCollection(attrValue.getValue());
             }
 
@@ -834,7 +834,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //A股状态 6-成功上市
                 if (status == 6) {
                     entityInfoDetails.setListTypeA("存续");
-                }else {
+                } else {
                     entityInfoDetails.setListTypeA("未上市");
                 }
                 //设置A股信息
@@ -1551,7 +1551,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<Page<TargetEntityBondsVo>> findBondOrEntity(String name, String keyword, Integer pageNum, Integer pageSize) {
-        log.info("  =>> 开始查询 关于 "+ name +" 的 "+keyword+" 信息 <<=  ");
+        log.info("  =>> 开始查询 关于 " + name + " 的 " + keyword + " 信息 <<=  ");
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 20 : pageSize;
         //模糊匹配 查询主体||债券信息
@@ -1578,7 +1578,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .setPages(entityInfoPage.getPages())
                         .setCurrent(entityInfoPage.getCurrent())
                         .setSize(entityInfoPage.getSize());
-                log.info("  =>>  查询到信息并返回 "+entityInfoPage.getSize()+" 条 <<=  ");
+                log.info("  =>>  查询到信息并返回 " + entityInfoPage.getSize() + " 条 <<=  ");
                 log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
                 return R.ok(targetEntityBondsVoPage, SuccessInfo.SUCCESS.getInfo());
             // 模糊匹配债券名
@@ -1593,7 +1593,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (bondInfos.size() == 0) {
                     log.info("  =>>  未查询到相关信息  <<=  ");
                     log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
-                    return R.ok(null,BadInfo.VALID_EMPTY_TARGET.getInfo());
+                    return R.ok(null, BadInfo.VALID_EMPTY_TARGET.getInfo());
                 }
 
                 //查找属性数据 组装
@@ -1606,7 +1606,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         .setPages(bondInfoPage.getPages())
                         .setCurrent(bondInfoPage.getCurrent())
                         .setSize(bondInfoPage.getSize());
-                log.info("  =>>  查询到信息并返回 "+bondInfoPage.getSize()+" 条 <<=  ");
+                log.info("  =>>  查询到信息并返回 " + bondInfoPage.getSize() + " 条 <<=  ");
                 log.info("  >>>>  债券信息管理 - 结束  <<<<  ");
                 return R.ok(targetEntityBondsVoPageBond, SuccessInfo.SUCCESS.getInfo());
             default:
@@ -1628,7 +1628,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<TargetEntityBondsVo> result = new ArrayList<>();
         switch (keyword) {
             case ENTITY:
-                log.info("  =>> 开始查询 id 为 "+ id +" 的 "+BOND+" 信息 <<=  ");
+                log.info("  =>> 开始查询 id 为 " + id + " 的 " + BOND + " 信息 <<=  ");
                 EntityInfo entity = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getId, id));
                 List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
                         .lambda().eq(EntityBondRel::getEntityCode, entity.getEntityCode()));
@@ -1636,12 +1636,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
                             .eq(BondInfo::getBondCode, row.getBdCode()));
                     result.add(this.matchingBondInfo(bondInfo));
-                    log.info("  =>>  查询到信息并返回 "+result.size()+" 条 <<=  ");
+                    log.info("  =>>  查询到信息并返回 " + result.size() + " 条 <<=  ");
                     log.info("  >>>>  债券信息管理 - 结束  <<<<");
                 });
                 return R.ok(result);
             case BOND:
-                log.info("  =>> 开始查询 id 为 "+ id +" 的 "+ENTITY+" 信息 <<=  ");
+                log.info("  =>> 开始查询 id 为 " + id + " 的 " + ENTITY + " 信息 <<=  ");
                 BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getId, id));
                 List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
                         .eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
@@ -1649,7 +1649,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda()
                             .eq(EntityInfo::getEntityCode, item.getEntityCode()));
                     result.add(this.matchingEntityInfo(entityInfo));
-                    log.info("  =>>  查询到信息并返回 "+result.size()+" 条 <<=  ");
+                    log.info("  =>>  查询到信息并返回 " + result.size() + " 条 <<=  ");
                     log.info("  >>>>  债券信息管理 - 结束  <<<<");
                 });
                 return R.ok(result);
@@ -2009,7 +2009,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     StockCnInfo stockCnInfo = stockCnInfos.get(i);
                     //A股状态 6-成功上市
                     Integer stockStatus = stockCnInfo.getStockStatus();
-                    if (!ObjectUtils.isEmpty(stockStatus) && stockStatus==6) {
+                    if (!ObjectUtils.isEmpty(stockStatus) && stockStatus == 6) {
                         ADetail = "A股" + BOND_STATE_LIVE;
                     } else {
                         ADetail = "A股" + BOND_STATE_BACK;
@@ -2046,7 +2046,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     StockThkInfo stockThkInfo = stockThkInfos.get(i);
                     //港股状态 3-成功上市
                     Integer stockStatus = stockThkInfo.getStockStatus();
-                    if (!ObjectUtils.isEmpty(stockStatus) && stockStatus==3) {
+                    if (!ObjectUtils.isEmpty(stockStatus) && stockStatus == 3) {
                         GDetail = "港股" + BOND_STATE_LIVE;
                     } else {
                         //当前时间大于退市时间------退市

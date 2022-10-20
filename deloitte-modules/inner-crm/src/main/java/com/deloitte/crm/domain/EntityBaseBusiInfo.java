@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
-import com.deloitte.crm.constants.Common;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -91,6 +90,13 @@ public class EntityBaseBusiInfo {
     @Excel(name = "营业期限截止日期")
     @Attrs(attrId = 728,attrName = "营业期限终止日期")
     private Date busEndDate;
+
+    /**
+     * 营业范围
+     */
+    @Excel(name = "营业范围")
+    @Attrs(attrId = 998,attrName = "营业范围")
+    private String busRange;
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
