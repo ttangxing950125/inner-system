@@ -118,6 +118,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertGovInfo(GovInfo govInfo) {
+        //曾用名不为空，则新增曾用名记录表
+        String govNameHis = govInfo.getGovNameHis();
+        if (!ObjectUtils.isEmpty(govNameHis)){
+            EntityNameHis entityNameHis = new EntityNameHis();
+            entityNameHis.setDqCode(govInfo.getDqGovCode());
+            entityNameHis.setOldName(govNameHis);
+            entityNameHis.setEntityType(2);
+            entityNameHis.setHappenDate(new Date());
+            entityNameHis.setRemarks(govInfo.getEntityNameHisRemarks());
+            entityNameHis.setSource(1);
+            nameHisMapper.insert(entityNameHis);
+        }
         return govInfoMapper.insertGovInfo(govInfo);
     }
 
