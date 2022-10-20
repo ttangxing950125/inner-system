@@ -52,11 +52,13 @@ public class ProductsMasterRelController  {
      */
     @PostMapping("/getProDucCom")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "body", name = "EntityCode", value = "主体code")
+            @ApiImplicitParam(paramType = "query", name = "entityCode", value = "主体code",dataType = "string"),
+            @ApiImplicitParam(paramType = "query", name = "dataYear", value = "年份",dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "proId", value = "产品id",dataType = "integer")
     })
     @ApiOperation(value = "{查询产品客户敞口信息}", response = ProCustomerDto.class)
-    public R selectProCouByEntityCode(@RequestParam("entityCode") String entityCode,@RequestParam("dataYear") String dataYear) {
-        return R.ok(productsMasterRelService.getProductsMasterRelList(entityCode,dataYear));
+    public R selectProCouByEntityCode(@RequestParam("entityCode") String entityCode,@RequestParam("dataYear") String dataYear,@RequestParam("proId") Integer proId ) {
+        return R.ok(productsMasterRelService.getProductsMasterRelList(entityCode,dataYear,proId));
     }
 
     /**

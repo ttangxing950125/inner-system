@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2022/10/17 11:14
  */
 public interface ProductsMasterRelService extends IService<ProductsMasterRel> {
-    List<ProCustomerDto> getProductsMasterRelList(String entityCode,String dataYear);
+    List<ProCustomerDto> getProductsMasterRelList(String entityCode,String dataYear,Integer ProId);
 
     Boolean updateRel(ProductsMasterRelVo productsMasterRelVo);
 }
