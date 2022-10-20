@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
@@ -45,7 +46,11 @@ public class BondConvertibleChangeInfoServiceImpl extends ServiceImpl<BondConver
 
         for (BondConvertibleChangeInfo bondConvertibleChangeInfos : bondConvertibleChangeInfo) {
             final Date noticeDate = bondConvertibleChangeInfos.getNoticeDate();
+            final String name = bondConvertibleChangeInfos.getName();
             if (noticeDate != null && DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, noticeDate).equals("数据来源：Wind")) {
+                continue;
+            }
+            if (StrUtil.isNotBlank(name) && name.contains("合计")) {
                 continue;
             }
             Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleChangeStrategy.class).doBondImport(bondConvertibleChangeInfos, timeNow, windTask);

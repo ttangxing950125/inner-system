@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -53,7 +54,8 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
     @Resource
-    private BondConvertibleChangeInfoMapper bondConvertibleChangeInfoMapper;
+    private BondConvertibleInfoMapper bondConvertibleInfoMapper;
+
 
     @Override
     public boolean support(Integer windDictId) {
@@ -86,11 +88,11 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         Integer taskId = windTask.getId();
-        Wrapper<BondConvertibleChangeInfo> wrapper = Wrappers.<BondConvertibleChangeInfo>lambdaQuery()
-                .eq(BondConvertibleChangeInfo::getTaskId, taskId)
-                .in(BondConvertibleChangeInfo::getChangeType, 1, 2);
+        Wrapper<BondConvertibleInfo> wrapper = Wrappers.<BondConvertibleInfo>lambdaQuery()
+                .eq(BondConvertibleInfo::getTaskId, taskId)
+                .in(BondConvertibleInfo::getChangeType, 1, 2);
 
-        return bondConvertibleChangeInfoMapper.selectList(wrapper).stream().map(item -> {
+        return bondConvertibleInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
@@ -158,20 +160,23 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
                     }
                 }
             }
-            //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>()
-                    .eq(BondConvertibleChangeInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleChangeInfo::getId).last("LIMIT 1"));
-            if (bondConvertibleChangeInfo == null) {
-                changeType = DataChangeType.INSERT.getId();
-            } else {
-                if (!Objects.equals(bondConvertibleChangeInfo, item)) {
-                    changeType = DataChangeType.UPDATE.getId();
-                }
-            }
-            item.setChangeType(changeType);
+
         }
-        bondConvertibleChangeInfoMapper.insert(item);
+        //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        BondConvertibleInfo bondConvertibleChangeInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>()
+                .eq(BondConvertibleInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleInfo::getId).last("LIMIT 1"));
+        if (bondConvertibleChangeInfo == null) {
+            changeType = DataChangeType.INSERT.getId();
+        } else {
+            if (!Objects.equals(bondConvertibleChangeInfo, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
+        }
+        item.setChangeType(changeType);
+
+        final BondConvertibleInfo bondConvertibleInfo = BeanUtil.copyProperties(item, BondConvertibleInfo.class);
+        bondConvertibleInfoMapper.insert(bondConvertibleInfo);
         return new AsyncResult(new Object());
     }
 }

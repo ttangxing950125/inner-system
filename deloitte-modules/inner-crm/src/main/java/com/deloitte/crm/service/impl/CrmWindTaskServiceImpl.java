@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.cron.TaskExecutor;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -116,6 +117,10 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
         taskContext.setWindTask(windTask);
 //        taskContext.setFileStream(file.getInputStream());
         byte[] dataBytes = file.getBytes();
+        if (ObjectUtil.isEmpty(dataBytes)) {
+            log.error("文件为空");
+            throw new GlobalException("文件为空");
+        }
         ByteArrayInputStream inputStream = new ByteArrayInputStream(dataBytes);
         taskContext.setFileStream(inputStream);
 

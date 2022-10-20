@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 可转债发行预案(BondConvertibleInfo)表实体类
+ * 可交换转载(BondConvertibleInfo)表实体类
  *
  * @author 吴鹏鹏ppp
  * @since 2022-10-13 13:39:43

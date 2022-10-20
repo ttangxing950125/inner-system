@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -55,7 +56,7 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
     @Resource
-    private BondConvertibleInfoMapper bondConvertibleInfoMapper;
+    private BondConvertibleChangeInfoMapper bondConvertibleChangeInfoMapper;
 
 
     @Override
@@ -132,19 +133,21 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
             } else {
                 log.warn(">>>>>>>>开始到导入可转债发行【根据股票code】=>:{}查询【entity_stock_cn_rel】关联关系 数据不存在任务结束！！！！", stockCnInfo.getStockDqCode());
             }
-            //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            final BondConvertibleInfo bondConvertibleInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleInfo::getId).last("LIMIT 1"));
-            if (bondConvertibleInfo == null) {
-                changeType = DataChangeType.INSERT.getId();
-            } else {
-                if (!Objects.equals(bondConvertibleInfo, item)) {
-                    changeType = DataChangeType.UPDATE.getId();
-                }
-            }
-            item.setChangeType(changeType);
-            bondConvertibleInfoMapper.insert(item);
+
         }
+        //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        final BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>().eq(BondConvertibleChangeInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleChangeInfo::getId).last("LIMIT 1"));
+        if (bondConvertibleChangeInfo == null) {
+            changeType = DataChangeType.INSERT.getId();
+        } else {
+            if (!Objects.equals(bondConvertibleChangeInfo, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
+        }
+        item.setChangeType(changeType);
+        final BondConvertibleChangeInfo bondConvertibleChangeInfoBeanCopy = BeanUtil.copyProperties(item, BondConvertibleChangeInfo.class);
+        bondConvertibleChangeInfoMapper.insert(bondConvertibleChangeInfoBeanCopy);
         log.warn(">>>>>>>>开始到导入可转债发行【根据公司代码】=>:{}查询数据不存在任务结束！！！！", item.getCode());
 
         return new AsyncResult(new Object());
@@ -178,11 +181,11 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         List<Integer> changeStatusArr = Arrays.stream(DataChangeType.values()).map(DataChangeType::getId).collect(Collectors.toList());
         Integer taskId = windTask.getId();
-        Wrapper<BondConvertibleInfo> wrapper = Wrappers.<BondConvertibleInfo>lambdaQuery()
-                .eq(BondConvertibleInfo::getTaskId, taskId)
-                .in(BondConvertibleInfo::getChangeType, changeStatusArr);
+        Wrapper<BondConvertibleChangeInfo> wrapper = Wrappers.<BondConvertibleChangeInfo>lambdaQuery()
+                .eq(BondConvertibleChangeInfo::getTaskId, taskId)
+                .in(BondConvertibleChangeInfo::getChangeType, changeStatusArr);
 
-        return bondConvertibleInfoMapper.selectList(wrapper).stream().map(item -> {
+        return bondConvertibleChangeInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

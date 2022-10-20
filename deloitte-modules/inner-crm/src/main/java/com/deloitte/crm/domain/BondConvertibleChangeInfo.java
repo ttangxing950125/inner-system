@@ -80,10 +80,8 @@ public class BondConvertibleChangeInfo implements Serializable {
      */
     @Excel(name = "股东大会公告日")
     private Date shareHoldersDate;
-    /**
-     * 受理日期
-     */
-    @Excel(name = "受理日期")
+
+    //    @Excel(name = "受理日期")
     private Date acceptedDate;
     /**
      * 发审委通过公告日
