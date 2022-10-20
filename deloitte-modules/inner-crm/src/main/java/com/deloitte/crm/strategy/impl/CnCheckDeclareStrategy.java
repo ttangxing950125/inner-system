@@ -11,6 +11,7 @@ import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,9 @@ import java.util.stream.Collectors;
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/27
+ * IPO-审核申报
  */
+@Slf4j
 @Component
 public class CnCheckDeclareStrategy implements WindTaskStrategy {
 
@@ -43,6 +46,8 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
 
     /**
      * 处理文件中的每一行
+     * IPO-审核申报
+     *
      * @param item
      * @param timeNow
      * @param windTask
@@ -60,7 +65,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
             StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
             //没有就创建一个
-            if (stockCnInfo==null){
+            if (stockCnInfo == null) {
                 stockCnInfo = new StockCnInfo();
             }
 
@@ -71,37 +76,42 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
             String entityName = item.getEntityName();
             CnCheckDeclare last = cnCheckDeclareService.findLastByEntityName(entityName);
 
-            if (last==null){
+            if (last == null) {
                 //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
-                //当股票首次出现在  IPO审核申报表 中时，
-                // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
-                stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getName()+"("+item.getAuditStatus()+")");
-
-            }else if (!Objects.equals(last, item)){
+                /**
+                 * IPO审核申报中 只能介于IPO辅导备案中之后才能修改
+                 */
+                if (stockCnInfo.getStockStatus() == null) {
+                    log.info("==> IPO审核申报中 修改A股状态为 《IPO审核申报中》2！！！");
+                    //当股票首次出现在  IPO审核申报表 中时，
+                    // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
+                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.COACH_BACK.getCode()) {
+                    log.info("==> IPO审核申报中 原【股票代码】={} A股状态为:{} 修改A股状态为 《IPO审核申报中》2 ！！", stockCnInfo.getStockCode(), stockCnInfo.getStockStatus());
+                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
+                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
+                } else {
+                    log.warn("==> IPO审核申报中 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
+                }
+            } else if (!Objects.equals(last, item)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
-
-            if (StrUtil.isNotBlank(code)){
+            if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-
-                if (changeType!=null){
+                if (changeType != null) {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(code, item);
                 }
             }
-
-
             item.setChangeType(changeType);
-
             cnCheckDeclareService.save(item);
-
             return new AsyncResult(new Object());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("==> IPO审核申报中处理出现异常:{}", e);
             return new AsyncResult<>(e);
         }
     }
@@ -129,7 +139,8 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnCheckDeclare> util = new ExcelUtil<CnCheckDeclare>(CnCheckDeclare.class);
-        List<CnCheckDeclare> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);;
+        List<CnCheckDeclare> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);
+        ;
 
         return cnCheckDeclareService.doTask(windTask, cnCoachBacks);
     }
@@ -175,7 +186,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
                 .in(CnCheckDeclare::getChangeType, changeStatusArr);
 
 
-        return cnCheckDeclareService.list(wrapper).stream().map(item->{
+        return cnCheckDeclareService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

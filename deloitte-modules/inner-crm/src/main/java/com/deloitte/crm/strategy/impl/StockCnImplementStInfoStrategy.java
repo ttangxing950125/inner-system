@@ -89,8 +89,9 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<StockCnImplementStInfo> util = new ExcelUtil<StockCnImplementStInfo>(StockCnImplementStInfo.class);
-        List<StockCnImplementStInfo> implementStInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(StockCnImplementStInfoService.class).doTask(windTask, implementStInfo);
+        List<StockCnImplementStInfo> list = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(list);
+        return ApplicationContextHolder.get().getBean(StockCnImplementStInfoService.class).doTask(windTask, list);
     }
 
     @Override

@@ -50,6 +50,8 @@ public class ProductsCover implements Serializable {
     @Excel(name = "是否覆盖 0-否 1-是")
     private String isCover;
 
+    private String isGov;
+
     /**
      * $column.columnComment
      */
