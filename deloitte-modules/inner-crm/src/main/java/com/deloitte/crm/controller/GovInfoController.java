@@ -212,7 +212,20 @@ public class GovInfoController extends BaseController {
     public R addOldName(@RequestBody GovInfo govInfo) {
         return govInfoService.addOldName(govInfo);
     }
-
+    /**
+     * 新增地方政府
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/12 17:10
+     */
+    @ApiOperation(value = "新增地方政府")
+    @ApiImplicitParam(name = "govInfo", value = "全数据", paramType = "body", example = "", dataTypeClass = GovInfo.class)
+    @PostMapping("/addGovInfo")
+    public R addGovInfo(@RequestBody GovInfo govInfo) {
+        govInfoService.insertGovInfo(govInfo);
+        return R.ok();
+    }
     /**
      * 修改,停用政府主体的曾用名
      *
@@ -337,20 +350,7 @@ public class GovInfoController extends BaseController {
     }
 
 
-    /**
-     * 新增地方政府
-     *
-     * @return R
-     * @author 冉浩岑
-     * @date 2022/10/12 17:10
-     */
-    @ApiOperation(value = "新增地方政府")
-    @ApiImplicitParam(name = "govInfo", value = "全数据", paramType = "body", example = "", dataTypeClass = GovInfo.class)
-    @PostMapping("/addGovInfo")
-    public R addGovInfo(@RequestBody GovInfo govInfo) {
-        govInfoService.insertGovInfo(govInfo);
-        return R.ok();
-    }
+
 
     /**
      * 政府主体清单-地方政府概览

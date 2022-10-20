@@ -1,19 +1,15 @@
 package com.deloitte.crm.domain;
 
-import com.alibaba.fastjson.JSON;
-
-
-import java.io.Serializable;
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.deloitte.common.core.annotation.Excel;
-import com.deloitte.common.core.web.domain.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 crm_mas_task
@@ -24,6 +20,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Accessors(chain = true)
 public class CrmMasTask implements Serializable
 {
     private static final long serialVersionUID = 1L;

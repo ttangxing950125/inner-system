@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+
 /**
  * @author PenTang
  * @date 2022/10/18 17:35
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/ProMaRelHis")
 @Api(tags = "产品敞口关联关系修改记录")
 public class ProductsMasterRelHisController {
-
+   @Resource
     private ProducysMasterRelHisService producysMasterRelHisService;
     /**
      * 查询修改记录

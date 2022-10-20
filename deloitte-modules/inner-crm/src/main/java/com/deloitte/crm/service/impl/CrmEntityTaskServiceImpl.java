@@ -2,24 +2,25 @@ package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
+import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
+import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.CrmEntityTaskVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -44,6 +45,13 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     @Resource
     private ICrmDailyTaskService crmDailyTaskService;
+
+    @Resource
+    private CrmMasTaskMapper crmMasTaskMapper;
+
+    @Resource
+    private SendEmailService sendEmailService;
+
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务
@@ -113,27 +121,28 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     /**
      * 角色7今日运维模块
-     * @author 正杰
-     * @param date 请传入参数 yyyy-mm-dd
+     *
+     * @param date     请传入参数 yyyy-mm-dd
      * @param pageNum
      * @param pageSize
+     * @return R<List < CrmEntityTask>> 当日任务情况
+     * @author 正杰
      * @date 2022/9/22
-     * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @Override
-    public R<Page<CrmEntityTaskVo>> getTaskInfo(String date,Integer pageNum,Integer pageSize) {
-        pageNum = pageNum==null?1:pageNum;
-        pageSize = pageSize==null?5:pageSize;
+    public R<Page<CrmEntityTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum == null ? 1 : pageNum;
+        pageSize = pageSize == null ? 5 : pageSize;
 
-        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum,pageSize), new QueryWrapper<CrmEntityTask>()
+        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getTaskDate, date));
-        log.info("----查询到的记录数量{}",crmEntityTaskPage.getRecords().size());
+        log.info("----查询到的记录数量{}", crmEntityTaskPage.getRecords().size());
         List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
-        Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum,pageSize,crmEntityTaskPage.getTotal());
+        Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum, pageSize, crmEntityTaskPage.getTotal());
         ArrayList<CrmEntityTaskVo> crmEntityTaskVos = new ArrayList<>();
         res.forEach(row -> {
             CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
-            if(row.getDataShow()!=null) {
+            if (row.getDataShow() != null) {
                 String dataShow = row.getDataShow();
                 //dataShow中的数据 固定格式 以 ，拼接 公司名称以及代码
                 String[] split = dataShow.split(", ");
@@ -159,32 +168,53 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R finishTask(Integer taskId, Integer state) {
+    public R finishTask(Integer taskId, Integer state, String entityCode) {
+        log.info(">>>>>>处理当日任务开始 taskId={}>>entityCode>>>:{}", taskId, entityCode);
         CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId));
-        Assert.notNull(crmEntityTask,BadInfo.VALID_EMPTY_TARGET.getInfo());
-        Assert.isTrue(crmEntityTask.getState() == 0,BadInfo.EXITS_TASK_FINISH.getInfo());
-
+        Assert.notNull(crmEntityTask, BadInfo.VALID_EMPTY_TARGET.getInfo());
+        Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmEntityTask.setState(state);
         baseMapper.updateById(crmEntityTask);
+        //给角色 2 新增一条任务
+        crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
+
         Date taskDate = crmEntityTask.getTaskDate();
 
         List<CrmEntityTask> unFinish = baseMapper
                 .selectList(new QueryWrapper<CrmEntityTask>().lambda()
-                        .like(CrmEntityTask::getTaskDate, DateUtil.format(taskDate,"yyyy-MM-dd"))
+                        .like(CrmEntityTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd"))
                         .eq(CrmEntityTask::getState, 0));
         if (unFinish.size() == 0) {
             //查询日任务 角色7对应的 task_role_type 为 8
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>()
-                    .lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate,"yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8));
-            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+                    .lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8));
+            Assert.notNull(crmDailyTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
             // 当日任务处理完毕 状态码为 3
             crmDailyTask.setTaskStatus(3);
             crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+
+            List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2));
+            CrmDailyTask role2DailyTask = new CrmDailyTask().setTaskRoleType("4").setTaskDate(new Date());
+
+            if (crmEntityTasks.size() == 0) {
+                //没有任务 不发邮件
+                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(1));
+            } else {
+                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(2));
+                //发送邮件
+                asycSendEmailService(4, crmEntityTasks.size());
+            }
+
             return R.ok(SuccessInfo.SUCCESS.getInfo());
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
+    @Async("taskExecutor")
+    private void asycSendEmailService(Integer roleId,Integer taskCount){
+        log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}",roleId,taskCount);
+        sendEmailService.email(4, taskCount);
+    }
 
     /**
      * 创建任务

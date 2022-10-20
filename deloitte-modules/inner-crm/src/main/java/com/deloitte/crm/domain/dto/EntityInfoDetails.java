@@ -1,6 +1,7 @@
 package com.deloitte.crm.domain.dto;
 
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.vo.ProCoverVo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -51,7 +52,9 @@ public class EntityInfoDetails {
     private String listType;
     /**主体产品覆盖情况*/
     // TODO
-    private Object coverageDetail;
+    private List<ProCoverVo> coverageDetail;
+    /** 敞口划分 */
+    private List<String> masterNames;
     /**
      * /**主体发债情况详情
      */

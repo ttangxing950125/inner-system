@@ -87,6 +87,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     private static final Integer DEFAULT_PAGE_NUM_SIZE = 50;
 
+    /** 德勤政府主体唯一识别码前缀 */
+    private static final String frontTitle="GV";
+
     /**
      * 查询【请填写功能名称】
      *
@@ -118,7 +121,46 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertGovInfo(GovInfo govInfo) {
+        //生成政府主体德勤主体唯一识别代码
+        String dqGovCode=getDqGovCode();
+        govInfo.setDqGovCode(dqGovCode);
+
+        //曾用名不为空，则新增曾用名记录表
+        String govNameHis = govInfo.getGovNameHis();
+        if (!ObjectUtils.isEmpty(govNameHis)){
+            EntityNameHis entityNameHis = new EntityNameHis();
+            entityNameHis.setDqCode(govInfo.getDqGovCode());
+            entityNameHis.setOldName(govNameHis);
+            entityNameHis.setEntityType(2);
+            entityNameHis.setHappenDate(new Date());
+            entityNameHis.setRemarks(govInfo.getEntityNameHisRemarks());
+            entityNameHis.setSource(1);
+            nameHisMapper.insert(entityNameHis);
+        }
+        //生成政府德勤主体唯一识别代码
         return govInfoMapper.insertGovInfo(govInfo);
+    }
+
+    /**
+     * 获取德勤政府唯一识别码
+     *
+     * @return String
+     * @author 冉浩岑
+     * @date 2022/10/20 11:52
+    */
+    public String getDqGovCode() {
+        GovInfo latestGov = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().like(GovInfo::getDqGovCode, frontTitle).orderByDesc(GovInfo::getId).last(" limit 1"));
+        if (ObjectUtils.isEmpty(latestGov)){
+            return frontTitle+000001;
+        }
+        Long id = latestGov.getId()+1;
+        int length = id.toString().length();
+        String dqGovCode=frontTitle;
+        for (int i=0;i<6-length;i++){
+            dqGovCode=dqGovCode+0;
+        }
+        dqGovCode=dqGovCode+id;
+        return dqGovCode;
     }
 
     /**
@@ -395,7 +437,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             if (!CollectionUtils.isEmpty(vo.getMore())) {
-                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), map.get("value")));
+                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), entryMap.getValue()));
             }
             rows.add(map);
         });
@@ -814,12 +856,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     private GovAttrByDtoBack setGovGrading(GovAttrByDtoBack govAttrByDto) {
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 24));
-        List<GovRangeValue> nineteenCity = new ArrayList<>();
+        List<GovRangeValue> govGrading = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
             GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            nineteenCity.add(govRangeValue);
+            govGrading.add(govRangeValue);
         });
-        govAttrByDto.setNineteenCity(nineteenCity);
+        govAttrByDto.setGovGrading(govGrading);
         return govAttrByDto;
     }
 
@@ -827,12 +869,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     private GovAttrByDtoBack setGovScale(GovAttrByDtoBack govAttrByDto) {
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 23));
-        List<GovRangeValue> nineteenCity = new ArrayList<>();
+        List<GovRangeValue> govScale = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
             GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            nineteenCity.add(govRangeValue);
+            govScale.add(govRangeValue);
         });
-        govAttrByDto.setNineteenCity(nineteenCity);
+        govAttrByDto.setGovScale(govScale);
         return govAttrByDto;
     }
 
