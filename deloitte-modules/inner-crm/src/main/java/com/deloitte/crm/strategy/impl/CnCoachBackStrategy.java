@@ -15,6 +15,7 @@ import com.deloitte.crm.service.StockCnInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -28,8 +29,9 @@ import java.util.stream.Collectors;
 
 /**
  * @author 吴鹏鹏ppp
- * @date 2022/9/27
+ * @date 2022/9/27 IPO-辅导备案
  */
+@Slf4j
 @Component
 public class CnCoachBackStrategy implements WindTaskStrategy {
 
@@ -47,6 +49,8 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
 
     /**
      * 处理文件中的每一行
+     * IPO-辅导备案
+     *
      * @param cnCoachBack
      * @param timeNow
      * @param windTask
@@ -64,7 +68,7 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
             StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
             //没有就创建一个
-            if (stockCnInfo==null){
+            if (stockCnInfo == null) {
                 stockCnInfo = new StockCnInfo();
             }
 
@@ -76,30 +80,32 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
             String entityName = cnCoachBack.getEntityName();
             CnCoachBack lastCoachBack = cnCoachBackService.findLastByEntityName(entityName);
 
-            if (lastCoachBack==null){
+            if (lastCoachBack == null) {
                 //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在  IPO辅导备案表 中时，记为“IPO辅导备案”
-                stockCnInfo.setStockStatus(StockCnStatus.COACH_BACK.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.COACH_BACK.getName());
-
-            }else if (!Objects.equals(lastCoachBack, cnCoachBack)){
+                Integer stockStatus = stockCnInfo.getStockStatus();
+                if (stockStatus == null) {
+                    log.info("==> IPO-辅导备案 修改A股状态为 《IPO-辅导备案》1 ！！");
+                    stockCnInfo.setStockStatus(StockCnStatus.COACH_BACK.getId());
+                    stockCnInfo.setStatusDesc(StockCnStatus.COACH_BACK.getName());
+                } else {
+                    log.warn("==> IPO-辅导备案 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
+                }
+            } else if (!Objects.equals(lastCoachBack, cnCoachBack)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
-
-            if (StrUtil.isNotBlank(code)){
+            if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-
-                if (changeType!=null){
+                if (changeType != null) {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(code, cnCoachBack);
                 }
             }
-
             //有债券信息，给债券和主体绑定关联关系
-            if (StrUtil.isNotBlank(code) && Objects.equals(changeType, DataChangeType.INSERT.getId())){
+            if (StrUtil.isNotBlank(code) && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
                 //绑定主体关系
                 entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
             }
@@ -139,7 +145,8 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnCoachBack> util = new ExcelUtil<CnCoachBack>(CnCoachBack.class);
-        List<CnCoachBack> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);;
+        List<CnCoachBack> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);
+        ;
 
         return cnCoachBackService.doTask(windTask, cnCoachBacks);
     }
@@ -162,7 +169,7 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                 "代码",
                 "最新公告日",
                 "审核状态"
-                );
+        );
     }
 
     /**
@@ -181,7 +188,7 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                 .in(CnCoachBack::getChangeType, 1, 2);
 
 
-        return cnCoachBackService.list(wrapper).stream().map(item->{
+        return cnCoachBackService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

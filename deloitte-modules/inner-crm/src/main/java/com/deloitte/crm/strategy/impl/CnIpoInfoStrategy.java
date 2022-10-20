@@ -12,6 +12,7 @@ import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,9 @@ import java.util.stream.Collectors;
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/27
+ * IPO-新股发行资料
  */
+@Slf4j
 @Component
 public class CnIpoInfoStrategy implements WindTaskStrategy {
 
@@ -83,15 +86,22 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在  新股发行 中时，记为“发行中”
-                stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
+                if (stockCnInfo.getStockStatus() == null) {
+                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
+                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getId()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
+                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getName());
+                } else {
+                    log.warn("==> 新股发行 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
+                }
 
             } else if (!Objects.equals(last, item)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
 
-            if (last != null && !last.getIpoDate().equals( item.getIpoDate())) {
+            if (last != null && !last.getIpoDate().equals(item.getIpoDate())) {
                 //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
                 // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getId());
@@ -99,33 +109,21 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             }
 
             //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
-            if (
-                    Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getId())
-                            &&
-                            DateUtil.format(timeNow,"yyyy-MM-dd").equals(item.getIpoDate())
-            ) {
+            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getId()) && DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate())) {
                 stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getId());
                 stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getName());
             }
-
-
             //如果是成功上市，发送给敞口划分人
             if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getId())) {
-
                 //查询和当前a股绑定关联关系的主体
                 List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
-
-                entityInfos.forEach(entity->{
+                entityInfos.forEach(entity -> {
                     entity.setList(1);
                 });
-
                 entityInfoService.updateBatchById(entityInfos);
-
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }
-
-
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);

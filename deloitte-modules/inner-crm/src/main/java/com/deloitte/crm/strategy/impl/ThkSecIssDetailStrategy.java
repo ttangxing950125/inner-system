@@ -111,7 +111,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
                 //查询当前港股绑定的主体
                 List<EntityInfo> entityInfos = entityStockThkRelService.findEntityByStockDqCode(stockThkInfo.getStockDqCode());
 
-                entityInfos.forEach(entity->{
+                entityInfos.forEach(entity -> {
                     entity.setList(1);
                 });
 
@@ -125,7 +125,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             //新增港股
             stockThkInfo = stockThkInfoService.saveOrUpdateNew(stockThkInfo);
 
-            if (changeType==null){
+            if (changeType == null) {
                 //保存attr
                 //更新港股属性
                 entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);

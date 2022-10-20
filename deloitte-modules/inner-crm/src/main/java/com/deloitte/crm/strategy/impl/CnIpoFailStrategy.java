@@ -16,6 +16,7 @@ import com.deloitte.crm.service.StockCnInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -31,12 +32,13 @@ import java.util.stream.Collectors;
  * @author 吴鹏鹏ppp
  * @date 2022/9/27
  */
+@Slf4j
 @Component
 public class CnIpoFailStrategy implements WindTaskStrategy {
 
     @Resource
     private CnIpoFailService cnIpoFailService;
-    
+
     @Resource
     private StockCnInfoService stockCnInfoService;
 
@@ -46,6 +48,7 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
 
     /**
      * 处理文件中的每一行
+     *
      * @param item
      * @param timeNow
      * @param windTask
@@ -63,7 +66,7 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
             StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
             //没有就创建一个
-            if (stockCnInfo==null){
+            if (stockCnInfo == null) {
                 stockCnInfo = new StockCnInfo();
                 stockCnInfo.setStockCode(code);
             }
@@ -73,19 +76,23 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
             Integer changeType = null;
             CnIpoFail last = cnIpoFailService.findLastByCode(code);
 
-            if (last==null){
+            if (last == null) {
                 //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在 发行失败 中时，记为“发行失败”
-                stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getId());
-                stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getName());
-
-            }else if (!Objects.equals(last, item)){
+                if (stockCnInfo.getStockStatus() == null) {
+                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getId());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getName());
+                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getId()) {
+                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getId());
+                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getName());
+                }
+            } else if (!Objects.equals(last, item)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
 
-            if (StrUtil.isNotBlank(code)){
+            if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
@@ -118,6 +125,7 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
 
     /**
      * 开始执行任务
+     *
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
@@ -127,7 +135,8 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnIpoFail> util = new ExcelUtil<CnIpoFail>(CnIpoFail.class);
-        List<CnIpoFail> list = util.importExcel(windTaskContext.getFileStream(), true);;
+        List<CnIpoFail> list = util.importExcel(windTaskContext.getFileStream(), true);
+        ;
 
         return cnIpoFailService.doTask(windTask, list);
     }
@@ -174,7 +183,7 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
                 .in(CnIpoFail::getChangeType, changeStatusArr);
 
 
-        return cnIpoFailService.list(wrapper).stream().map(item->{
+        return cnIpoFailService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
