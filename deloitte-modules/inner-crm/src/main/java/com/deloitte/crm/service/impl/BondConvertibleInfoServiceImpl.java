@@ -53,9 +53,6 @@ public class BondConvertibleInfoServiceImpl extends ServiceImpl<BondConvertibleI
             if (convertibleInfo.getNoticeDate() != null && DateUtil.parseDateToStr(DateUtil.YYYY_MM_DD, convertibleInfo.getNoticeDate()).equals("数据来源：Wind")) {
                 continue;
             }
-            if (StrUtil.isNotBlank(convertibleInfo.getName()) && convertibleInfo.getName().contains("合计")) {
-                continue;
-            }
             Future<Object> future = ApplicationContextHolder.get().getBean(BondConvertibleStrategy.class).doBondImport(convertibleInfo, timeNow, windTask);
             futureList.add(future);
         }

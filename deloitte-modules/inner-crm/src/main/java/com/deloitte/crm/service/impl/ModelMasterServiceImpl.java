@@ -172,10 +172,9 @@ public class ModelMasterServiceImpl implements IModelMasterService {
     private final Integer UN_FINISH_STATE = 0;
 
     private final Integer FINISH_DAILY_STATE = 3;
-
-    private final Integer TASK_ROLE_TWO = 4;
-
     private final String YES = "Y";
+
+    private final Integer ROLE_2_ID = 4;
 
     private final Integer ROLE_3_ID = 5;
 
@@ -196,63 +195,43 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         String entityCode = masDto.getEntityCode();
         EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
         Assert.notNull(entityInfo, BadInfo.VALID_EMPTY_TARGET.getInfo());
-        //新增 是否为金融机构 id 640 是为 Y 否为 N
+
+        //判断是否为 金融机构  是的话 => 新增到 entity_financial
         if (YES.equals(masDto.getIsFinance())) {
-            EntityFinancial entityFinancial = new EntityFinancial();
-            // 新增 金融细分领域 id 656
-            entityFinancial.setEntityCode(entityCode);
-            entityFinancial.setMince(masDto.getFinanceSegmentation());
+            EntityFinancial entityFinancial = new EntityFinancial().setMince(masDto.getFinanceSegmentation()).setEntityCode(entityCode);
             entityFinancialService.getBaseMapper().insert(entityFinancial);
+            entityInfo.setFinance(1);
+            log.info("  =>> 新增一条数据至 entity_financial <<=  ");
+        }else{
+            entityInfo.setFinance(0);
         }
-        //修改 wind 行业 id 652
-        entityInfo.setWindMaster(masDto.getWind());
-        //修改 申万 id 650
-        entityInfo.setShenWanMaster(masDto.getShenWan());
-        //修改 是否为金融机构 id 640 是为 Y 否为 N 是金融机构 0-否 1-是
-        entityInfo.setFinance(YES.equals(masDto.getIsFinance()) ? 1 : 0);
+
+        //修改 wind行业 、 申万行业
+        entityInfo.setWindMaster(masDto.getWind()).setShenWanMaster(masDto.getShenWan());;
         iEntityInfoService.updateById(entityInfo);
+        log.info("  =>> 修改一条数据至 entity_info <<=  ");
 
+        insertEntityMaster(masDto);
+        log.info("  =>> 新增一条数据至 entity_master <<=  ");
 
-        //新增  YY-是否为城投机构 id 644
-        EntityMaster entityMaster = new EntityMaster().setEntityCode(entityCode);
-        entityMaster.setYyUrban(YES.equals(masDto.getCity()) ? "1" : "0");
-        //新增  中诚信-是否为城投机构 id 645
-        entityMaster.setZhongxinUrban(YES.equals(masDto.getCityZhong()) ? "1" : "0");
-        //新增  IB-是否为城投机构 id 642
-        entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
-        //新增 敞口的code
-        entityMaster.setMasterCode(masDto.getMasterCode());
-        entityMasterMapper.insertEntityMaster(entityMaster);
-
-        //新增 德勤政府code
-        EntityGovRel entityGovRel = new EntityGovRel();
-        entityGovRel.setEntityCode(entityCode);
-        entityGovRel.setDqGovCode(masDto.getDqGovCode());
-        entityGovRelMapper.insertEntityGovRel(entityGovRel);
+        insertEntityGovRel(masDto);
+        log.info("  =>> 新增一条数据至 entity_gov_info <<=  ");
 
         //更改当条信息任务状态
-        BaseMapper<CrmMasTask> mapper = iCrmMasTaskService.getBaseMapper();
-        CrmMasTask crmMasTask = mapper.selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, masDto.getId()));
-        Assert.notNull(crmMasTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
-        //0-未处理
-        Assert.isTrue(UN_FINISH_STATE.equals(crmMasTask.getState()), BadInfo.EXITS_TASK_FINISH.getInfo());
-        //添加修改人
-        crmMasTask.setHandleUser(SecurityUtils.getUsername());
-        // 修改状态 1 1-已处理
-        crmMasTask.setState(FINISH_STATE);
-        mapper.updateById(crmMasTask);
+        Date currentDate = iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
+        log.info("  =>> 完成任务 taskId = "+masDto.getId()+" <<=  ");
 
         // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
-        List<CrmMasTask> crmMasTasks = mapper.selectList(new QueryWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getTaskDate, crmMasTask.getTaskDate())
-                .eq(CrmMasTask::getState, UN_FINISH_STATE)
-        );
+        List<CrmMasTask> crmMasTasks = iCrmMasTaskService.getBaseMapper().selectList(new QueryWrapper<CrmMasTask>()
+                .lambda().eq(CrmMasTask::getTaskDate, currentDate)
+                .eq(CrmMasTask::getState, UN_FINISH_STATE));
+
         //完成当条任务后 向 crm_supply 添加任务
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setEntityCode(entityCode);
         //设置为 未处理
         crmSupplyTask.setState(0);
-        crmSupplyTask.setTaskDate(crmMasTask.getTaskDate());
+        crmSupplyTask.setTaskDate(currentDate);
         crmSupplyTask.setFrom(masDto.getSourceName());
         crmSupplyTask.setRemark(masDto.getRemarks());
 
@@ -269,19 +248,12 @@ public class ModelMasterServiceImpl implements IModelMasterService {
 
         // 查询到所有任务已经完成 修改当日单表
         if (crmMasTasks.size() == 0) {
-            CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper()
-                    .selectOne(new QueryWrapper<CrmDailyTask>()
-                            .lambda().eq(CrmDailyTask::getTaskDate, crmMasTask.getTaskDate())
-                            .eq(CrmDailyTask::getTaskRoleType, TASK_ROLE_TWO));
-            Assert.notNull(crmDailyTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
-            //当日任务完成状态为 3
-            crmDailyTask.setTaskStatus(FINISH_DAILY_STATE);
-            iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            iCrmDailyTaskService.saveTask(ROLE_2_ID,FINISH_DAILY_STATE,DateUtil.format(currentDate,"yyyy-MM-dd"));
 
             // 发送邮件
-            String dateNow = DateUtil.format(new Date(), "yyyy-MM-dd");
+            String dateNow = DateUtil.format(currentDate, "yyyy-MM-dd");
             CrmDailyTask dailyTask = new CrmDailyTask();
-            dailyTask.setTaskDate(new Date());
+            dailyTask.setTaskDate(currentDate);
 
             List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new LambdaQueryWrapper<CrmSupplyTask>().eq(CrmSupplyTask::getTaskDate, dateNow)
                     .between(CrmSupplyTask::getRoleId, 5L, 7L));
@@ -363,6 +335,37 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      */
     public void createTask(Integer roleId, Integer taskState) {
         iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskDate(new Date()).setTaskStatus(taskState).setTaskRoleType(roleId.toString()));
+    }
+
+    /**
+     * 新增数据至 entity_master
+     * @param masDto
+     */
+    @Transactional(rollbackFor = Exception.class)
+    void insertEntityMaster(MasDto masDto){
+        EntityMaster entityMaster = new EntityMaster();
+        //新增  YY-是否为城投机构
+        entityMaster.setEntityCode(masDto.getEntityCode());
+        entityMaster.setYyUrban(YES.equals(masDto.getCity()) ? "1" : "0");
+        //新增  中诚信-是否为城投机构
+        entityMaster.setZhongxinUrban(YES.equals(masDto.getCityZhong()) ? "1" : "0");
+        //新增  IB-是否为城投机构
+        entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
+        //新增 敞口的code
+        entityMaster.setMasterCode(masDto.getMasterCode());
+        entityMasterMapper.insertEntityMaster(entityMaster);
+    }
+
+    /**
+     * 新增数据至 entity_gov_rel
+     * @param masDto
+     */
+    @Transactional(rollbackFor = Exception.class)
+    void insertEntityGovRel(MasDto masDto){
+        EntityGovRel entityGovRel = new EntityGovRel();
+        entityGovRel.setEntityCode(masDto.getEntityCode());
+        entityGovRel.setDqGovCode(masDto.getDqGovCode());
+        entityGovRelMapper.insertEntityGovRel(entityGovRel);
     }
 
 }

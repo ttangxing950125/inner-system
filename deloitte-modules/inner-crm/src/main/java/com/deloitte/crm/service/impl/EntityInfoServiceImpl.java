@@ -595,10 +595,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //设置产品名称
             isCover.setName(proName + "是否覆盖");
             coverReason.setName(proName + "未覆盖原因");
+            isCover.setValue("0");
             //设置值
             if (!CollectionUtils.isEmpty(covers)) {
-                isCover.setValue(covers.get(0).getIsCover());
-                coverReason.setValue(covers.get(0).getCoverDes());
+                String cover = covers.get(0).getIsCover();
+                if (!ObjectUtils.isEmpty(cover)){
+                    isCover.setValue(cover);
+                    if ("0".equals(cover)){
+                        coverReason.setValue(covers.get(0).getCoverDes());
+                    }
+                }
             }
             proCoverVo.setIsCover(isCover).setCoverReason(coverReason);
             coverVos.add(proCoverVo);
@@ -953,9 +959,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             if (!ObjectUtils.isEmpty(o.getEntityName())) {
                 String oldName = entityInfo.getEntityNameHis();
                 EntityInfo addOldName = new EntityInfo();
-                addOldName.setId(o.getId());
-                addOldName.setEntityNameHis(oldName);
-                addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
+                addOldName.setId(o.getId()).setEntityNameHis(oldName).setEntityNameHisRemarks(o.getEntityNameHisRemarks()).setUpdated(new Date());
                 addOldName(addOldName);
             }
             //修改政府主体代码时，需要修改主体历史表中的政府主体代码
@@ -2181,19 +2185,29 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //港股信息
         StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
         if (!ObjectUtil.isEmpty(entityInfo) && !ObjectUtil.isEmpty(entityInfo.getEntityCode())) {
-            //修改基础属性
+
+            //修改企业主体名称时，需要先添加曾用名
+            if (!ObjectUtils.isEmpty(entityInfo.getEntityName())) {
+                String oldName = entityInfo.getEntityName();
+                EntityInfo addOldName = new EntityInfo();
+                addOldName.setId(entityInfo.getId())
+                          .setEntityNameHis(oldName)
+                          .setUpdated(new Date())
+                          .setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks());
+                addOldName(addOldName);
+            }
+            //修改基础属性，需要将曾用名置空
+            entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
             EntityInfo old = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
             entityInfoLogsUpdatedService.insert(old.getEntityCode(), old.getEntityName(), old, entityInfo);
             entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
         }
         if (!ObjectUtil.isEmpty(stockCnInfo) && !ObjectUtil.isEmpty(stockCnInfo.getStockDqCode())) {
-            //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
             StockCnInfo old = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockShortName(), old, entityInfo);
             stockCnMapper.update(stockCnInfo, new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
         }
         if (!ObjectUtil.isEmpty(stockThkInfo) && !ObjectUtil.isEmpty(stockThkInfo.getStockDqCode())) {
-            //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
             StockThkInfo old = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockName(), old, entityInfo);
             stockThkMapper.update(stockThkInfo, new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));

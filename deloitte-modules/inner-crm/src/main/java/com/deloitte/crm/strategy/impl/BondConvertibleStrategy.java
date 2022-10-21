@@ -137,16 +137,16 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
         }
         //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
         Integer changeType = null;
-        final BondConvertibleInfo bondConvertibleChangeInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleInfo::getId).last("LIMIT 1"));
-        if (bondConvertibleChangeInfo == null) {
+        final BondConvertibleInfo bondConvertibleInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleInfo::getId).last("LIMIT 1"));
+        if (bondConvertibleInfo == null) {
             changeType = DataChangeType.INSERT.getId();
         } else {
-            if (!ObjectUtil.equals(bondConvertibleChangeInfo, item)) {
+            if (!ObjectUtil.equals(bondConvertibleInfo, item)) {
                 changeType = DataChangeType.UPDATE.getId();
             }
         }
         item.setChangeType(changeType);
-        bondConvertibleInfoMapper.insert(bondConvertibleChangeInfo);
+        bondConvertibleInfoMapper.insert(item);
         log.warn(">>>>>>>>开始到导入可转债发行【根据公司代码】=>:{}查询数据不存在任务结束！！！！", item.getCode());
 
         return new AsyncResult(new Object());
@@ -158,9 +158,9 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<BondConvertibleInfo> util = new ExcelUtil<BondConvertibleInfo>(BondConvertibleInfo.class);
-        List<BondConvertibleInfo> bondConvertibleInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        Collections.reverse(bondConvertibleInfo);
-        return ApplicationContextHolder.get().getBean(BondConvertibleInfoService.class).doTask(windTask, bondConvertibleInfo);
+        List<BondConvertibleInfo> list = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(list);
+        return ApplicationContextHolder.get().getBean(BondConvertibleInfoService.class).doTask(windTask, list);
     }
 
     @Override

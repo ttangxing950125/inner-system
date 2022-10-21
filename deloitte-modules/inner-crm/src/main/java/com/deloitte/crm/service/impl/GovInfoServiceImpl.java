@@ -23,6 +23,7 @@ import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
+import com.deloitte.crm.vo.GovInfoDetailVo;
 import com.deloitte.crm.vo.ParentLevelVo;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -78,6 +79,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Resource
     private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
+
     @Resource
     private ProductsCoverMapper productsCoverMapper;
 
@@ -98,6 +100,50 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     private static final String frontTitle = "GV";
 
+    /**
+     * 城市规模
+     */
+    private static final String govScale = "城市规模";
+    /**
+     * 城市分级
+     */
+    private static final String govGrading = "城市分级";
+    /**
+     * 省级行政区
+     */
+    private static final String isProvince = "省级行政区";
+    /**
+     * 地级行政区
+     */
+    private static final String isCity = "地级行政区";
+    /**
+     * 县级行政区
+     */
+    private static final String isCounty = "县级行政区";
+    /**
+     * 经开高新区
+     */
+    private static final String isJKGX = "经开高新区";
+    /**
+     * 八大经济区
+     */
+    private static final String eightER = "八大经济区";
+    /**
+     * 19个城市群
+     */
+    private static final String nineteenCity = "19个城市群";
+    /**
+     * 百强县
+     */
+    private static final String hundred = "百强县";
+    /**
+     * 国家中心城市
+     */
+    private static final String CCity = "国家中心城市";
+    /**
+     * 省会城市
+     */
+    private static final String provincial = "省会城市";
     /**
      * 查询【请填写功能名称】
      *
@@ -145,7 +191,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
-        //生成政府德勤主体唯一识别代码
         return govInfoMapper.insertGovInfo(govInfo);
     }
 
@@ -210,8 +255,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         list.stream().forEach(o -> {
             entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
-            govInfoMapper.updateById(o);
-            //修改政府主体名称时，需要添加曾用名
+            //修改政府主体名称时，需要先添加曾用名
             if (!ObjectUtils.isEmpty(o.getGovName())) {
                 String oldName = o.getGovName();
                 GovInfo addOldName = new GovInfo();
@@ -220,6 +264,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
                 addOldName(addOldName);
             }
+            //修改曾用名后需要将曾用名和曾用名备注置空
+            o.setGovNameHis(null).setEntityNameHisRemarks(null);
+            govInfoMapper.updateById(o);
         });
         return R.ok(list.size());
     }
@@ -384,7 +431,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
-        getSend(govAttrDto.getSend());
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
@@ -403,6 +449,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/26 00:35
      */
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
+        //设置参数信息
+        govAttrByDto = getSend(govAttrByDto);
 
         //获取基础参数信息
         List<MoreIndex> mapList = govAttrByDto.getMapList();
@@ -505,6 +553,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/25 17:05
      */
     public Page<GovInfoResult> getListEntityPage(GovAttrByDto govAttrDto) {
+        //设置参数信息
+        govAttrDto = getSend(govAttrDto);
 
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
@@ -848,15 +898,57 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
 
-    public static void getSend(List<ParentLevelVo>parentLevelVo){
-        out.println("============================");
-        for (ParentLevelVo vo:parentLevelVo){
-            out.println(vo);
+    public static GovAttrByDto getSend(GovAttrByDto govAttrByDto) {
+        List<GovInfoDetailVo> send = govAttrByDto.getSend();
+        if (CollectionUtils.isEmpty(send)) {
+            return govAttrByDto;
         }
-        out.println("============================");
-        out.println("============================");
-        out.println(parentLevelVo);
-        out.println("============================");
+        for (GovInfoDetailVo item : send) {
+            List<String> value = item.getValue();
+            String key = item.getKey();
+            switch (key) {
+                case govScale:
+                    govAttrByDto.setGovScale(value);
+                    break;
+                case govGrading:
+                    govAttrByDto.setGovGrading(value);
+                    break;
+                case isProvince:
+                    govAttrByDto.setIsProvince(value);
+                    break;
+                case isCity:
+                    govAttrByDto.setIsCity(value);
+                    break;
+                case isCounty:
+                    govAttrByDto.setIsCounty(value);
+                    break;
+                case isJKGX:
+                    govAttrByDto.setIsJKGX(value);
+                    break;
+                case eightER:
+                    govAttrByDto.setEightER(value);
+                    break;
+                case nineteenCity:
+                    govAttrByDto.setNineteenCity(value);
+                    break;
+                case hundred:
+                    if (CollectionUtils.isEmpty(value)) {
+                        govAttrByDto.setHundred(Integer.valueOf(value.get(0)));
+                    }
+                    break;
+                case CCity:
+                    if (CollectionUtils.isEmpty(value)) {
+                        govAttrByDto.setCCity(Integer.valueOf(value.get(0)));
+                    }
+                    break;
+                case provincial:
+                    if (CollectionUtils.isEmpty(value)) {
+                        govAttrByDto.setProvincial(Integer.valueOf(value.get(0)));
+                    }
+                    break;
+            }
+        }
+        return govAttrByDto;
     }
 
     @Override

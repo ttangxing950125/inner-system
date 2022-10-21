@@ -15,4 +15,6 @@ public interface ProductsMasterRelService extends IService<ProductsMasterRel> {
     List<ProCustomerDto> getProductsMasterRelList(String entityCode,String dataYear,Integer ProId);
 
     Boolean updateRel(ProductsMasterRelVo productsMasterRelVo);
+
+    boolean updateAuto(String entityCode);
 }

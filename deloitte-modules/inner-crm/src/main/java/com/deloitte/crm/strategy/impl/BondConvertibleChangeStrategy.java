@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  *
  * @Author: chenjiang
  * @Date: 2022/10/13/16:50
- * @Description:
+ * @Description: 可交换转债发行预案
  */
 @Slf4j
 @Component
@@ -66,10 +66,10 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
     public Object doTask(WindTaskContext windTaskContext) throws Exception {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
-        ExcelUtil<BondConvertibleInfo> util = new ExcelUtil<BondConvertibleInfo>(BondConvertibleInfo.class);
-        List<BondConvertibleInfo> list = util.importExcel(windTaskContext.getFileStream(), true);
+        ExcelUtil<BondConvertibleChangeInfo> util = new ExcelUtil<BondConvertibleChangeInfo>(BondConvertibleChangeInfo.class);
+        List<BondConvertibleChangeInfo> list = util.importExcel(windTaskContext.getFileStream(), true);
         Collections.reverse(list);
-        return ApplicationContextHolder.get().getBean(BondConvertibleInfoService.class).doTask(windTask, list);
+        return ApplicationContextHolder.get().getBean(BondConvertibleChangeInfoService.class).doTask(windTask, list);
     }
 
     @Override

@@ -66,4 +66,13 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
      */
     R<List<CrmDailyTask>> queryDailyTask(String taskDate, Long userId);
 
+    /**
+     * 传入对应参数 当月任务列表进行新增或修改
+     * @author 正杰
+     * @param taskRoleType
+     * @param taskStatus
+     * @param date
+     */
+    void saveTask(Integer taskRoleType,Integer taskStatus,String date);
+
 }
