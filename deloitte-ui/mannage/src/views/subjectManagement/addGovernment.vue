@@ -61,13 +61,6 @@
                 >
               </div>
             </el-form-item>
-            <el-form-item label="上级行政单位名称" prop="delivery">
-              <el-input
-                class="t-input"
-                v-model="ruleForm.preGovName"
-                placeholder="输入行政上级单位名称"
-              ></el-input>
-            </el-form-item>
             <el-form-item label="行政单位级别" class="max">
               <el-col :span="11">
                 <el-select
@@ -110,13 +103,6 @@
                 <el-option label="其他" value="3"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="曾用名或别称" prop="delivery">
-              <el-input
-                class="t-input"
-                v-model="ruleForm.govNameHis"
-                placeholder="输入曾用名或别称、顿号区分"
-              ></el-input>
-            </el-form-item>
             <el-form-item label="城市规模" prop="">
               <el-select
                 class="width146"
@@ -130,6 +116,21 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
+            </el-form-item>
+            <el-form-item label="曾用名或别称" prop="delivery">
+              <el-input
+                class="t-input"
+                v-model="ruleForm.govNameHis"
+                placeholder="输入曾用名或别称、顿号区分"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="上级行政单位名称" prop="delivery">
+              <el-input
+                class="t-input"
+                v-model="ruleForm.preGovName"
+                placeholder="输入行政上级单位名称"
+                @change="getGovCode"
+              ></el-input>
             </el-form-item>
             <el-form-item label="城市分级" prop="delivery">
               <el-select
@@ -164,10 +165,14 @@
               label="上级行政单位代码"
               prop="delivery"
             >
-              <el-input
-                class="t-input"
-                v-model="ruleForm.preGovCode"
-              ></el-input>
+               <el-select v-model="ruleForm.preGovCode" placeholder="请选择">
+                    <el-option
+                    v-for="item in options"
+                    :key="item.id"
+                    :label="item.govName"
+                    :value="item.dqGovCode">
+                    </el-option>
+                </el-select>
             </el-form-item>
             <el-form-item
               class="position-add"
@@ -246,7 +251,7 @@
 </template>
 
 <script>
-import { addGovInfo } from "@/api/subject";
+import { addGovInfo, getGovByName } from "@/api/subject";
 import { getGovLevelBig, getGovLevelSmall } from "@/api/task";
 import { checkData, getTypeByAttrId } from "@/api/common";
 export default {
@@ -333,6 +338,7 @@ export default {
       govOption2: [],
       range: [],
       level: [],
+      options: []
     };
   },
   created() {
@@ -440,6 +446,22 @@ export default {
         this.govOption2 = data;
       });
     },
+    getGovCode() {
+         try {
+        this.$modal.loading("Loading...");
+        getGovByName({govName: this.ruleForm.preGovName}).then((res) => {
+          this.options = res.data
+        });
+      } catch (error) {
+        this.$message({
+          showClose: true,
+          message: error,
+          type: "error",
+        });
+      } finally {
+        this.$modal.closeLoading();
+      }
+    }
   },
 };
 </script>

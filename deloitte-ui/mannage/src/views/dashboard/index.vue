@@ -5,7 +5,7 @@
       <div>HELLO!</div>
       <div>今日日期 {{ currentTime }}, {{ week }}。</div>
       <div>
-        当前日期完成任务合计 {{ taskCount && taskCount.taskCount }} 条, 待完成 {{ taskCount && taskCount.taskNoCount }} 条，已完成 {{ taskCount && taskCount.taskCop }} 条，请尽快完成！
+        当前日期完成任务合计 {{ taskCount && taskCount.taskCount || 0 }} 条, 待完成 {{ taskCount && taskCount.taskNoCount || 0 }} 条，已完成 {{ taskCount && taskCount.taskCop || 0 }} 条，请尽快完成！
       </div>
       <span type="text">切换日期：</span>
       <el-date-picker v-model="monthDate" type="month" placeholder="选择月" value-format="yyyy-MM" @change="changeMonth">
@@ -111,7 +111,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.status ? 'green' : 'red'">{{ scope.row.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.state ? 'green' : 'red'">{{ scope.row.state === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -329,7 +329,7 @@
             <el-radio label="N">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="金融细分领域" >
+        <el-form-item v-if="ruleForm.isFinance === 'Y'" label="金融细分领域" >
           <el-select v-model="ruleForm.financeSegmentation" placeholder="">
             <el-option  v-for="(item, index) in options1" :key="index" :label="item" :value="item"></el-option>
           </el-select>
@@ -1071,7 +1071,9 @@ export default {
         resource: "",
         desc: "",
       },
-      addGovForm: {},
+      addGovForm: {
+          govLevelBig: 1
+      },
       rules: {
           name: [
               { required: true, message: "请输入活动名称", trigger: "blur" },
@@ -1763,8 +1765,13 @@ export default {
         const { data } = res
         this.govOption1 = data
       })
+      getGovLevelSmall({id: 1}).then(res => {
+        const { data } = res
+        this.govOption2 = data
+      })
     },
     getSmall(row) {
+        this.ruleForm.govLevelSmall = ''
       getGovLevelSmall({id: row}).then(res => {
         const { data } = res
         this.govOption2 = data
