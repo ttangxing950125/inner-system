@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.Attrs;
 import com.deloitte.crm.annotation.UpdateLog;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -191,6 +192,12 @@ public class GovInfo implements Serializable {
     @Excel(name = "城市分级")
     private String govGrading;
 
+    /**
+     * 地理分区归属
+     */
+    @Excel(name = "地理分区归属")
+    @Attrs(attrId = 19,attrName = "地理分区归属")
+    private String gegphZone;
 
     @Override
     public String toString() {
