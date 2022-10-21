@@ -86,6 +86,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             bondInfo.setBondShortName(shortName);
             bondInfo.setOriCode(newIss.getTradeCode());
             bondInfo.setBondName(newIss.getBondName());
+            bondInfo.setValueDate(newIss.getValueDate());
+            bondInfo.setDueDate(newIss.getExpireDate());
 
             //看之前有没有导入过这个数据
             BondNewIss last = bondNewIssMapper.findLastByShortName(shortName);
@@ -100,6 +102,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (newStatus != null) {
                 bondInfo.setBondStatus(newStatus);
             }
+
+
 
             //保存当前债券
             BondInfo newDbBond = bondInfoService.saveOrUpdate(bondInfo);

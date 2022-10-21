@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.StrUtil;
@@ -44,6 +45,9 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
+    @Resource
+    private IEntityInfoService entityInfoService;
+
     /**
      * 处理文件中的每一行
      * IPO-审核申报
@@ -75,6 +79,17 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
             Integer changeType = null;
             String entityName = item.getEntityName();
             CnCheckDeclare last = cnCheckDeclareService.findLastByEntityName(entityName);
+
+            String windIndustry = item.getWindIndustry();
+            //更新wind行业
+            List<EntityInfo> dbEntities = entityInfoService.findByName(entityName);
+            if (CollUtil.isNotEmpty(dbEntities)){
+                dbEntities.forEach(itemEnt->{
+                    itemEnt.setWindMaster(windIndustry);
+                });
+
+                entityInfoService.updateBatchById(dbEntities);
+            }
 
             if (last == null) {
                 //查询不到之前的数据，代表是新增的
@@ -140,8 +155,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnCheckDeclare> util = new ExcelUtil<CnCheckDeclare>(CnCheckDeclare.class);
         List<CnCheckDeclare> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);
-        ;
-
+        Collections.reverse(cnCoachBacks);
         return cnCheckDeclareService.doTask(windTask, cnCoachBacks);
     }
 
