@@ -307,14 +307,14 @@
                 </el-table-column>
                 <el-table-column
                   fixed
-                  prop="creditCode"
+                  :prop="value === 'GV' ? 'govCode' :'creditCode'"
                   label="德勤主体代码"
                   width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   fixed
-                  prop="entityName"
+                  :prop="value === 'GV' ? 'govName' :'entityName'"
                   :label="value === 'GV' ? '政府名称' : '企业名称'"
                   width="300"
                   class="xxxxxxx"
