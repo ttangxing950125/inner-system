@@ -17,6 +17,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class ParentLevelVo {
     private String name ;
+    private String preName ;
     private Object send ;
     private List<ParentLevelVo> value;
 }
