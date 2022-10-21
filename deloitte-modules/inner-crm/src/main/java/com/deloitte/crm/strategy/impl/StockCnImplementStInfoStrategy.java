@@ -69,6 +69,8 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.INSERT.getId();
         } else {
             final StockCnImplementStInfo last = implementStInfoResult.stream().findFirst().get();
+            last.setNumber(null);
+            implementStInfo.setNumber(null);
             if (!ObjectUtil.equals(last, implementStInfo)) {
                 changeType = DataChangeType.UPDATE.getId();
             }
