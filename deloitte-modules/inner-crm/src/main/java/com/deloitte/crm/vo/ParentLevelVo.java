@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * @author 冉浩岑
  * @date 2022/10/20 17:47
@@ -16,5 +18,5 @@ import lombok.experimental.Accessors;
 public class ParentLevelVo {
     private String name ;
     private Object send ;
-    private Object value;
+    private List<ParentLevelVo> value;
 }

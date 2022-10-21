@@ -19,6 +19,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -153,10 +154,12 @@ public class GovInfoController extends BaseController {
      * @date 2022/9/22 17:49
      */
     @ApiOperation(value = "根据政府名称查询政府主体")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", example = "", dataType="String")})
-     @PostMapping("/getGovByName")
-    public R getGovByName( String govName) {
+    @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", example = "", dataType = "String")
+    @PostMapping("/getGovByName")
+    public R getGovByName(String govName) {
+        if (ObjectUtils.isEmpty(govName)) {
+            return R.fail("请输入需要查询的条件");
+        }
         return govInfoService.getGovByName(govName);
     }
 
@@ -177,8 +180,8 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize) {
-        return govInfoService.getInfoList(type, param,pageNum,pageSize);
+    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+        return govInfoService.getInfoList(type, param, pageNum, pageSize);
     }
 
     /**
@@ -208,10 +211,11 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "govNameHis", value = "主体添加的曾用名或别称", paramType = "body", example = "白云区", dataType = "String"),
             @ApiImplicitParam(name = "entityNameHisRemarks", value = "主体添加的曾用名或别称的备注", paramType = "body", example = "测试", dataType = "String")
     })
-     @PostMapping("/addOldName")
+    @PostMapping("/addOldName")
     public R addOldName(@RequestBody GovInfo govInfo) {
         return govInfoService.addOldName(govInfo);
     }
+
     /**
      * 新增地方政府
      *
@@ -226,6 +230,7 @@ public class GovInfoController extends BaseController {
         govInfoService.insertGovInfo(govInfo);
         return R.ok();
     }
+
     /**
      * 修改,停用政府主体的曾用名
      *
@@ -275,7 +280,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "mapList", value = "更多指标添加指标项", paramType = "body", example = "", dataTypeClass = MoreIndex.class),
             @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "body", example = "1", dataType = "Integer"),
-            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1",dataType = "Integer"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1", dataType = "Integer"),
             @ApiImplicitParam(name = "govScale", value = "城市规模", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "govGrading", value = "城市分级", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "isProvince", value = "省级行政区", paramType = "body", example = "", dataType = "String"),
@@ -350,8 +355,6 @@ public class GovInfoController extends BaseController {
     }
 
 
-
-
     /**
      * 政府主体清单-地方政府概览
      *
@@ -373,7 +376,7 @@ public class GovInfoController extends BaseController {
      * @return R
      * @author 冉浩岑
      * @date 2022/10/18 17:39
-    */
+     */
     @ApiOperation(value = "根据政府名称或者政府code查询政府主体")
     @PostMapping("/getGovByParam")
     public R getGovByParam(String param) {

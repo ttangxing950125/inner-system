@@ -384,6 +384,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
+        getSend(govAttrDto.getSend());
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
@@ -507,7 +508,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
-
         Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
         List<MoreIndex> mapList = govAttrDto.getMapList();
 
@@ -530,6 +530,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         pageResult.setRecords(resultRecords);
         return pageResult;
     }
+
 
     private GovInfoResult getGovInfoResult(GovInfo o, List<MoreIndex> mapList) {
         GovInfoResult govInfoResult = new GovInfoResult();
@@ -844,6 +845,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 //        百强县
 
         return parentLevelVo;
+    }
+
+
+    public static void getSend(List<ParentLevelVo>parentLevelVo){
+        out.println("============================");
+        for (ParentLevelVo vo:parentLevelVo){
+            out.println(vo);
+        }
+        out.println("============================");
+        out.println("============================");
+        out.println(parentLevelVo);
+        out.println("============================");
     }
 
     @Override
