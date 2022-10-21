@@ -25,12 +25,15 @@
         style="width: 98%; margin-top: 15px"
       >
         <el-table-column type="index" sortable label="序号"> </el-table-column>
-        <el-table-column prop="taskDesc" label="任务说明"> </el-table-column>
+        <el-table-column prop="taskDesc" label="任务说明">
+            <template v-slot="{row}">
+                {{ row.taskDesc || '-' }}
+            </template>
+        </el-table-column>
         <el-table-column prop="name" label="任务状态"> 
           <template slot-scope="scope">
             <span :class="scope.row.complete === scope.row.taskCount ? 'green' : 'red'">{{ scope.row.complete !== scope.row.taskCount ? '待完成( '+scope.row.complete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
           </template>
-        </el-table-column>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
@@ -49,14 +52,20 @@
         style="width: 98%; margin-top: 15px"
       >
         <el-table-column type="index" label="序号"> </el-table-column>
-        <el-table-column prop="taskCategory" label="捕获渠道"> </el-table-column>
+        <el-table-column prop="taskCategory" label="捕获渠道">
+             <template v-slot="{row}">
+                {{ row.taskCategory || '-' }}
+            </template>
+        </el-table-column>
         <el-table-column prop="dataShow" label="任务说明"> 
+            <template v-slot="{row}">
+                {{ row.dataShow || '-' }}
+            </template>
         </el-table-column>
         <el-table-column prop="state" label="任务状态"> 
           <template slot-scope="scope">
             <span :class="scope.row.state === 0 ? 'red' : 'green'">{{ stateArr[scope.row.state] }}</span>
           </template>
-        </el-table-column>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
@@ -82,15 +91,19 @@
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column prop="sourceName" label="来源"> </el-table-column>
+        <el-table-column prop="sourceName" label="来源">
+            <template v-slot="{row}">
+                {{ row.sourceName || '-' }}
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityName }}</span>
+            <span>{{ scope.row.entityName || '-'}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.creditCode }}</span>
+            <span>{{ scope.row.creditCode || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
@@ -116,7 +129,11 @@
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column type="index" label="来源">
+            <template slot-scope="scope">
+                <span>{{ scope.row.srouce || '-' }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
             <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
@@ -160,7 +177,11 @@
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column type="index" label="来源">
+            <template slot-scope="scope">
+                <span>{{ scope.row.srouce || '-' }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
             <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
@@ -204,7 +225,11 @@
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column type="index" label="来源">
+            <template slot-scope="scope">
+                <span>{{ scope.row.srouce || '-' }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
             <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
@@ -323,7 +348,7 @@
             <el-radio label="N">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="机构对应域投政府" required>
+        <el-form-item v-if="ruleForm.cityIb === 'Y'" label="机构对应域投政府" required>
           <el-col :span="6">
             <el-select v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
               <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item"></el-option>
@@ -367,6 +392,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.remarks"
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -460,6 +486,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.remarks"
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -502,7 +529,7 @@
             v-if="repalce1 === 0"
             style="margin-left: 5px"
             type="text"
-            @click="checkReplace(addGovForm.name, 'GOV_NAME', 1)"
+            @click="checkReplace(addGovForm.govName, 'GOV_NAME', 1)"
             >查重</el-button
           >
           <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
@@ -520,7 +547,7 @@
             v-if="repalce2 === 0"
             style="margin-left: 5px"
             type="text"
-            @click="checkReplace(addGovForm.code, 'GOV_CODE', 2)"
+            @click="checkReplace(addGovForm.govCode, 'GOV_CODE', 2)"
             >查重</el-button
           >
           <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
@@ -640,6 +667,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.remarks"
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -896,7 +924,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="新增主体统一社会信用代码" prop="creditCode">
+        <el-form-item label="新增主体统一社会信用代码" :prop="!ruleForm.notUse ? 'creditCode' : ''">
           <el-input
             class="t-input"
             v-model="ruleForm.creditCode"
@@ -1249,6 +1277,8 @@ export default {
       this.month = this.monthDate.substr(5, 2)
       this.month = this.month.indexOf('0') === 0 ? this.month.substr(1, 1) : this.month
       this.sureDate(this, false, this.year, this.month-1)
+      this.clickDay = this.monthDate + '-' + this.currentDay
+      this.init(false)
       // sureDate(this, false, )
       try {
         queryList(parmas).then((res)=> {
@@ -1442,7 +1472,7 @@ export default {
       this.drawTable(flagData);
     },
     work(row) {
-      this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.nowTime } });
+      this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.clickDay || this.nowTime } });
     },
     getDay(row) {
       if (!row.path[0].innerText) {
@@ -1517,6 +1547,7 @@ export default {
       this.$set(this.ruleForm, 'wind',  '')
       this.$set(this.ruleForm, 'shenWan',  '')
       this.$set(this.ruleForm, 'creditErrorType',  '')
+      this.$set(this.ruleForm, 'creditCode',  '')
     },
     check(row) {
       this.$modal.loading("loading...");
@@ -1625,6 +1656,14 @@ export default {
       }
     },
     checkReplace(row, type, num) {
+      if (!row) {
+        this.$message({
+          showClose: true,
+          message: '请输入需要查询的值！',
+          type: 'error'
+        });
+        return
+      }
       try {
         this.$modal.loading('Loading...')
         const parmas = {
@@ -1679,6 +1718,7 @@ export default {
               message: '操作成功',
               type: 'success'
             });
+            this.init()
           }
         })
       } catch (error) {
@@ -1990,6 +2030,7 @@ export default {
       handler(newName,oldName){
           if (newName) {
               this.ruleForm.creditCode = ''
+              this.$refs['ruleForm'].clearValidate();
           } else {
               this.ruleForm.creditErrorType = ''
           }
@@ -2157,5 +2198,10 @@ export default {
 }
 .width320 {
   width: 320px;
+}
+::v-deep {
+    .el-textarea__inner{
+      font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
 }
 </style>
