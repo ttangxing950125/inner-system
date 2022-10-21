@@ -49,8 +49,8 @@ public class ProductsController {
     @ApiOperation(value = "下载查询产品")
     @PostMapping("/getProductsExcel")
     @ApiImplicitParam(name = "id",value = "id",paramType = "query",dataType="Integer")
-    public R getProductsExcel(@RequestParam("id") Integer id, HttpServletResponse response) throws Exception{
-       return productsService.getProductsExcel(id, response);
+    public void getProductsExcel(@RequestParam("id") Integer id, HttpServletResponse response) throws Exception{
+      productsService.getProductsExcel(id, response);
 
     }
 

@@ -15,7 +15,7 @@ import java.util.List;
 public interface ProductsService extends IService<Products>  {
     List<Products> getProducts();
 
-    R getProductsExcel(Integer id, HttpServletResponse response);
+    void  getProductsExcel(Integer id, HttpServletResponse response);
 
     R getProductsOne (Integer id);
 }

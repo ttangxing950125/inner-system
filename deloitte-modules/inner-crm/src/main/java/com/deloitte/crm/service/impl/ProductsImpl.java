@@ -57,7 +57,7 @@ public class ProductsImpl extends ServiceImpl<ProductsMapper,Products> implement
      * @date 2022/10/20 17:29
     */
     @Override
-    public R getProductsExcel(Integer id, HttpServletResponse response)  {
+    public void getProductsExcel(Integer id, HttpServletResponse response)  {
         LambdaQueryWrapper<Products> eq = new LambdaQueryWrapper<Products>().eq(Products::getId, id);
         Products one = getOne(eq);
         String path =one.getFilePath();
@@ -97,10 +97,6 @@ public class ProductsImpl extends ServiceImpl<ProductsMapper,Products> implement
         }
     }
 
-
-
-
-        return R.ok("下载成功");
     }
 
    /**

@@ -44,6 +44,11 @@ public class Products implements Serializable {
     private String proName;
 
     /**
+     * 敞口版本
+     */
+    private String masterVer;
+
+    /**
      * 产品版本
      */
     private  String proVersion;

@@ -445,3 +445,27 @@ export function ProMaDir(parmas) {
     data: parmas,
   });
 }
+
+// 下载查询产品
+export function getProductsOne(parmas) {
+  return request({
+    url: "/crm/Products/getProductsOne?id="+parmas.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 下载查询产品 导出
+export function getProductsExcel(parmas) {
+  return request({
+    url: "/crm/Products/getProductsExcel?id="+parmas.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
