@@ -890,12 +890,57 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 //        城市分级
         parentLevelVo = setGovGrading(parentLevelVo);
 //        国家中心城市
-
+        parentLevelVo = setCCity(parentLevelVo);
 //        省会城市
-
+        parentLevelVo = setProcincial(parentLevelVo);
 //        百强县
+        parentLevelVo = setHundred(parentLevelVo);
+        return parentLevelVo;
+    }
+
+    private List<ParentLevelVo> setHundred(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+        province.setName(hundred);
+        List<ParentLevelVo> list = new ArrayList<>();
+
+        ParentLevelVo parentValue = getParentValue(hundred, 1,province.getName());
+        list.add(parentValue);
+
+        province.setValue(list);
+        parentLevelVo.add(province);
 
         return parentLevelVo;
+
+    }
+
+    private List<ParentLevelVo> setProcincial(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+        province.setName(provincial);
+        List<ParentLevelVo> list = new ArrayList<>();
+
+        ParentLevelVo parentValue = getParentValue(provincial, 1,province.getName());
+        list.add(parentValue);
+
+        province.setValue(list);
+        parentLevelVo.add(province);
+
+        return parentLevelVo;
+
+    }
+
+    private List<ParentLevelVo> setCCity(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+        province.setName(CCity);
+        List<ParentLevelVo> list = new ArrayList<>();
+
+        ParentLevelVo parentValue = getParentValue(CCity, 1,province.getName());
+        list.add(parentValue);
+
+        province.setValue(list);
+        parentLevelVo.add(province);
+
+        return parentLevelVo;
+
     }
 
 
@@ -998,7 +1043,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     //返回筛选范围--城市分级
     private List<ParentLevelVo> setGovGrading(List<ParentLevelVo> parentLevelVo) {
         ParentLevelVo province = new ParentLevelVo();
-        province.setName("城市分级");
+        province.setName(govGrading);
         List<ParentLevelVo> list = new ArrayList<>();
 
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
