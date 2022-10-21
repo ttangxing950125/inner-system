@@ -953,9 +953,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             if (!ObjectUtils.isEmpty(o.getEntityName())) {
                 String oldName = entityInfo.getEntityNameHis();
                 EntityInfo addOldName = new EntityInfo();
-                addOldName.setId(o.getId());
-                addOldName.setEntityNameHis(oldName);
-                addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
+                addOldName.setId(o.getId()).setEntityNameHis(oldName).setEntityNameHisRemarks(o.getEntityNameHisRemarks()).setUpdated(new Date());
                 addOldName(addOldName);
             }
             //修改政府主体代码时，需要修改主体历史表中的政府主体代码
@@ -2181,7 +2179,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //港股信息
         StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
         if (!ObjectUtil.isEmpty(entityInfo) && !ObjectUtil.isEmpty(entityInfo.getEntityCode())) {
-            //修改基础属性
+
+            //修改企业主体名称时，需要先添加曾用名
+            if (!ObjectUtils.isEmpty(entityInfo.getEntityName())) {
+                String oldName = entityInfo.getEntityName();
+                EntityInfo addOldName = new EntityInfo();
+                addOldName.setId(entityInfo.getId())
+                          .setEntityNameHis(oldName)
+                          .setUpdated(new Date())
+                          .setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks());
+                addOldName(addOldName);
+            }
+            //修改基础属性，需要将曾用名置空
+            entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
             EntityInfo old = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
             entityInfoLogsUpdatedService.insert(old.getEntityCode(), old.getEntityName(), old, entityInfo);
             entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));

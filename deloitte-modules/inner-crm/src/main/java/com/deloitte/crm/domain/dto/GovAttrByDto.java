@@ -2,7 +2,7 @@ package com.deloitte.crm.domain.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.deloitte.crm.dto.MoreIndex;
-import com.deloitte.crm.vo.ParentLevelVo;
+import com.deloitte.crm.vo.GovInfoDetailVo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,7 +19,7 @@ public class GovAttrByDto implements Serializable
 {
     private List<MoreIndex>mapList;
 
-    private List<ParentLevelVo> send;
+    private List<GovInfoDetailVo> send;
 
     private Integer pageSize;
 
