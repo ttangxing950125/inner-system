@@ -28,13 +28,18 @@ public class ProductsMasterMapping implements Serializable {
     private  Integer id;
 
     /**
-     *产品客户id
+     *products_master_dict的id
      */
-    private Integer proCustId;
+    private Integer proMasDictId;
+
     /**
-     *产品敞口code
+     *crm敞口code
      */
     private String crmMasterCode;
+    /**
+     *产品客户id
+     */
+    private Integer proCustomerId;
 
     /**
      * $column.columnComment

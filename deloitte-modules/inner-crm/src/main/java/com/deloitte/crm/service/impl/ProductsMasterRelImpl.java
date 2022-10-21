@@ -1,20 +1,18 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.io.unit.DataUnit;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.crm.domain.ProductsMasterRel;
-import com.deloitte.crm.domain.ProductsMasterRelHis;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.ProCustomerDto;
-import com.deloitte.crm.mapper.ProductsMasterRelMapper;
-import com.deloitte.crm.mapper.ProducysMasterRelHisMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ProductsMasterRelService;
 import com.deloitte.crm.vo.ProductsMasterRelVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +24,10 @@ import java.util.List;
 public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,ProductsMasterRel> implements ProductsMasterRelService {
         private  ProductsMasterRelMapper mapper;
         private ProducysMasterRelHisMapper producysMasterRelHisMapper;
+
+        private EntityMasterMapper entityMasterMapper;
+
+        private ProductsMasterMappingMapper productsMasterMappingMapper;
         /**
          *查询客户产品敞口映射
          *
@@ -56,7 +58,9 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                 .eq(ProductsMasterRel::getDataYear, productsMasterRelVo.getDataYear());
                 ProductsMasterRel productsMasterRel = getOne(qw);
                 if (productsMasterRel!= null){
-                        boolean b = updateById(productsMasterRel.setProMasDictId(productsMasterRelVo.getDictIdNew()));
+                        productsMasterRel.setProMasDictId(productsMasterRelVo.getDictIdNew());
+                        productsMasterRel.setUpdateMark("人工映射");
+                        boolean b = updateById(productsMasterRel);
                         //新增历史记录表
                         ProductsMasterRelHis productsMasterRelHis = new ProductsMasterRelHis();
                         productsMasterRelHis.setAddHis(DateUtil.getDate());
@@ -75,6 +79,34 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
 
 
         }
+
+
+        /**
+         *自动映射产品敞口
+         *
+         * @return boolean
+         * @author penTang
+         * @date 2022/10/21 11:08
+        */
+        @Override
+        public  boolean updateAuto(String entityCode){
+                EntityMaster entityMaster = entityMasterMapper.selectOne(new LambdaQueryWrapper<EntityMaster>().eq(EntityMaster::getEntityCode, entityCode));
+                if (entityMaster != null){
+                        List<ProductsMasterMapping> productsMasterMappings = productsMasterMappingMapper.selectList(new LambdaQueryWrapper<ProductsMasterMapping>().eq(ProductsMasterMapping::getCrmMasterCode, entityMaster.getMasterCode()));
+                        List<ProductsMasterRel> productsMasterRels = new ArrayList<>();
+                        for (ProductsMasterMapping productsMasterMapping : productsMasterMappings) {
+                                ProductsMasterRel productsMasterRel = new ProductsMasterRel();
+                                productsMasterRel.setProCustId(productsMasterMapping.getProCustomerId());
+                                productsMasterRel.setProMasDictId(productsMasterMapping.getProMasDictId());
+                                productsMasterRel.setEntityCode(entityMaster.getEntityCode());
+
+                        }
+
+
+                }
+                return false;
+        }
+
 
 
 }
