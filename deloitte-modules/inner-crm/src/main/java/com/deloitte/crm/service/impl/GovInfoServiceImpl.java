@@ -179,6 +179,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         String dqGovCode = getDqGovCode();
         govInfo.setDqGovCode(dqGovCode);
 
+        //设置上级政府官方代码 proCode
+        String preGovCode = govInfo.getPreGovCode();
+        if (!ObjectUtils.isEmpty(preGovCode)){
+            GovInfo father = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, preGovCode));
+            String govCode = father.getGovCode();
+            govInfo.setPreCode(govCode);
+        }
+
         //曾用名不为空，则新增曾用名记录表
         String govNameHis = govInfo.getGovNameHis();
         if (!ObjectUtils.isEmpty(govNameHis)) {
@@ -978,17 +986,17 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                     govAttrByDto.setNineteenCity(value);
                     break;
                 case hundred:
-                    if (CollectionUtils.isEmpty(value)) {
+                    if (!CollectionUtils.isEmpty(value)) {
                         govAttrByDto.setHundred(Integer.valueOf(value.get(0)));
                     }
                     break;
                 case CCity:
-                    if (CollectionUtils.isEmpty(value)) {
+                    if (!CollectionUtils.isEmpty(value)) {
                         govAttrByDto.setCCity(Integer.valueOf(value.get(0)));
                     }
                     break;
                 case provincial:
-                    if (CollectionUtils.isEmpty(value)) {
+                    if (!CollectionUtils.isEmpty(value)) {
                         govAttrByDto.setProvincial(Integer.valueOf(value.get(0)));
                     }
                     break;
