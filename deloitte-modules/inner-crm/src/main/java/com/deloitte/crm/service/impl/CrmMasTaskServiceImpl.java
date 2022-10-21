@@ -197,7 +197,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
     @Transactional(rollbackFor=Exception.class)
     public Date finishTask(Integer taskId, String username) {
         CrmMasTask crmMasTask = baseMapper.selectCrmMasTaskById(taskId);
-        Assert.isNull(crmMasTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+        Assert.notNull(crmMasTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
         crmMasTask.setState(1).setHandleUser(username);
         baseMapper.updateById(crmMasTask);
         return crmMasTask.getTaskDate();
