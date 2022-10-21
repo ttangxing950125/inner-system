@@ -171,7 +171,6 @@ export default {
       try {
         getAllByGroup({ type: 2 }).then((res) => {
           const { data } = res;
-          console.log(data)
           this.data = data;
         });
         const params = {
@@ -188,7 +187,6 @@ export default {
         });
         getGovRange({}).then((res) => {
           const { data } = res;
-          console.log(data)
           this.data2 = data
         });
       } catch (error) {
@@ -249,22 +247,32 @@ export default {
     handleCheckChange2(data, checked, indeterminate) {
       //获取所有选中的节点 start
       let res = this.$refs.tree2.getCheckedNodes();
-      let arrDeptId = [];
+      let item = {}      
       res.forEach((e) => {
-        const item = {
-          id: e.id,
-          name: e.send || e.name,
-        };
-        arrDeptId.push(item);
+          if (e.preName){
+            item[e.preName] = []
+          }
+      });      
+      res.forEach((e) => {
+          if (item[e.preName]) {
+              item[e.preName].push(e.send)
+          }
       });
-      this.selected = arrDeptId.length;
-      this.mapList = arrDeptId;
+      const ret = []
+      for (const key in item) {          
+          const items = {
+              key: key,
+              value: item[key]
+          }
+          ret.push(items)
+      }
+
       try {
         this.$modal.loading("loading...");
         const params = {
           pageNum: 1,
           pageSize: 10,
-          mapList: this.mapList,
+          send: ret,
         };
         getListEntityByPage(params).then((res) => {
           const { data } = res;
@@ -277,9 +285,11 @@ export default {
             this.header = e.header;
           });
           this.list.forEach((e) => {
-            more.forEach((i) => {
-              e[i.key] = i.value;
-            });
+            if(more) {
+                more.forEach((i) => {
+                e[i.key] = i.value;
+                });
+            }
           });
         });
       } catch (error) {

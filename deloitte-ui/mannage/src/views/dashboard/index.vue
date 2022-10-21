@@ -1221,50 +1221,58 @@ export default {
         //   this.list7 = data
         // })
         // 角色1相关接口
-        const params = {
-          taskDate: this.nowTime,
-          pageNum: this.queryParams.pageNum,
-          pageSize: this.queryParams.pageSize
-        };
         const paramsMonth = {
-          taskDate: this.monthDate,
+            taskDate: this.monthDate,
         };
-        getTaskByDate(params).then((res) => {
-          const { data } = res
-          this.list = data
-        });
+        if(this.roleId === 'role1') {
+            const params = {
+              taskDate: this.nowTime,
+              pageNum: this.queryParams.pageNum,
+              pageSize: this.queryParams.pageSize
+            };
+            getTaskByDate(params).then((res) => {
+                const { data } = res
+              this.list = data
+            });
+        }
         queryList(paramsMonth).then((res)=> {
           const { data } = res
           if (!page) {
               this.showMsg(data)
           }
         })
-        // 角色 345 相关接口
-        getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
-          const { data } = res
-          this.list3 = data
-        })
-        // 角色 2 相关接口
-        getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
-          const { data } = res
-          this.list2 = data.records
-          this.total = data.total
-          this.queryParams.pages = data.pages
-        })
+        if(this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
+            // 角色 345 相关接口
+            getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
+              const { data } = res
+              this.list3 = data
+            })
+        }
+
+        if(this.roleId === 'role2') {
+            // 角色 2 相关接口
+            getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
+              const { data } = res
+              this.list2 = data.records
+              this.total = data.total
+              this.queryParams.pages = data.pages
+            })
+        }
 
         getTaskCount({TaskDate: this.nowTime}).then(res => {
           const { data } = res
           this.taskCount = data
         })
-
         // 角色7
-        getDayTaskInfo({ date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
-          const { data } = res
-          this.list7 = data.records
-          this.total = data.total
-          this.queryParams.pageNum = data.current
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+        if(this.roleId === 'role6') {
+            getDayTaskInfo({ date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
+              const { data } = res
+              this.list7 = data.records
+              this.total = data.total
+              this.queryParams.pageNum = data.current
+              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
+        }
       } catch (error) {
         console.log(error);
       } finally {

@@ -469,3 +469,15 @@ export function getProductsExcel(parmas) {
     data: parmas,
   });
 }
+
+// 政府级别
+export function getGovLevel(parmas) {
+  return request({
+    url: "/crm/level/getGovLevel",
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
