@@ -210,8 +210,6 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
         arr.add("代码");
         arr.add("公司名称");
-
-
         return arr;
     }
 
@@ -238,9 +236,8 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
             dataMap.put("变化状态", item.getChangeType());
-
             dataMap.put("代码", item.getCode());
-//            dataMap.put("公司名称", item.getEntityName());
+            dataMap.put("公司名称", item.getStockName());
 
 
             return dataMap;
