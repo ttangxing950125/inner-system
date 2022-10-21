@@ -2185,9 +2185,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //港股信息
         StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
         if (!ObjectUtil.isEmpty(entityInfo) && !ObjectUtil.isEmpty(entityInfo.getEntityCode())) {
-
+            EntityInfo o = entityInfoMapper.selectById(entityInfo.getId());
+            String entityName = o.getEntityName();
             //修改企业主体名称时，需要先添加曾用名
-            if (!ObjectUtils.isEmpty(entityInfo.getEntityName())) {
+            if (!ObjectUtils.isEmpty(entityInfo.getEntityName())&&!entityInfo.getEntityName().equals(entityName)) {
                 String oldName = entityInfo.getEntityName();
                 EntityInfo addOldName = new EntityInfo();
                 addOldName.setId(entityInfo.getId())
@@ -2195,9 +2196,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                           .setUpdated(new Date())
                           .setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks());
                 addOldName(addOldName);
+                //修改基础属性，需要将曾用名置空
+                entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
             }
-            //修改基础属性，需要将曾用名置空
-            entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
             EntityInfo old = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
             entityInfoLogsUpdatedService.insert(old.getEntityCode(), old.getEntityName(), old, entityInfo);
             entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));

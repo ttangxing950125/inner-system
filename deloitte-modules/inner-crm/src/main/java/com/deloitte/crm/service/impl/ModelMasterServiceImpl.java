@@ -198,10 +198,11 @@ public class ModelMasterServiceImpl implements IModelMasterService {
 
         //判断是否为 金融机构  是的话 => 新增到 entity_financial
         if (YES.equals(masDto.getIsFinance())) {
-            EntityFinancial entityFinancial = new EntityFinancial().setMince(masDto.getFinanceSegmentation()).setEntityCode(entityCode);
-            entityFinancialService.getBaseMapper().insert(entityFinancial);
+            EntityFinancial entityFinancial = entityFinancialService.getBaseMapper().selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
+            entityFinancial.setMince(masDto.getFinanceSegmentation()).setEntityCode(entityCode);
+            entityFinancialService.updateById(entityFinancial);
             entityInfo.setFinance(1);
-            log.info("  =>> 新增一条数据至 entity_financial <<=  ");
+            log.info("  =>> 修改一条数据至 entity_financial <<=  ");
         }else{
             entityInfo.setFinance(0);
         }
@@ -211,11 +212,11 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         iEntityInfoService.updateById(entityInfo);
         log.info("  =>> 修改一条数据至 entity_info <<=  ");
 
-        insertEntityMaster(masDto);
-        log.info("  =>> 新增一条数据至 entity_master <<=  ");
+        updateEntityMaster(masDto);
+        log.info("  =>> 修改一条数据至 entity_master <<=  ");
 
-        insertEntityGovRel(masDto);
-        log.info("  =>> 新增一条数据至 entity_gov_info <<=  ");
+        updateEntityGovRel(masDto);
+        log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");
 
         //更改当条信息任务状态
         Date currentDate = iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
@@ -342,10 +343,12 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      * @param masDto
      */
     @Transactional(rollbackFor = Exception.class)
-    void insertEntityMaster(MasDto masDto){
-        EntityMaster entityMaster = new EntityMaster();
+    void updateEntityMaster(MasDto masDto){
+        String entityCode = masDto.getEntityCode();
+        EntityMaster entityMaster = entityMasterMapper.selectOne(new QueryWrapper<EntityMaster>().lambda().eq(EntityMaster::getEntityCode, entityCode));
+        Assert.notNull(entityMaster,BadInfo.VALID_EMPTY_TARGET.getInfo());
         //新增  YY-是否为城投机构
-        entityMaster.setEntityCode(masDto.getEntityCode());
+        entityMaster.setEntityCode(entityCode);
         entityMaster.setYyUrban(YES.equals(masDto.getCity()) ? "1" : "0");
         //新增  中诚信-是否为城投机构
         entityMaster.setZhongxinUrban(YES.equals(masDto.getCityZhong()) ? "1" : "0");
@@ -353,7 +356,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
         //新增 敞口的code
         entityMaster.setMasterCode(masDto.getMasterCode());
-        entityMasterMapper.insertEntityMaster(entityMaster);
+        entityMasterMapper.updateById(entityMaster);
     }
 
     /**
@@ -361,11 +364,12 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      * @param masDto
      */
     @Transactional(rollbackFor = Exception.class)
-    void insertEntityGovRel(MasDto masDto){
-        EntityGovRel entityGovRel = new EntityGovRel();
-        entityGovRel.setEntityCode(masDto.getEntityCode());
+    void updateEntityGovRel(MasDto masDto){
+        String entityCode = masDto.getEntityCode();
+        EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
+        entityGovRel.setEntityCode(entityCode);
         entityGovRel.setDqGovCode(masDto.getDqGovCode());
-        entityGovRelMapper.insertEntityGovRel(entityGovRel);
+        entityGovRelMapper.updateById(entityGovRel);
     }
 
 }
