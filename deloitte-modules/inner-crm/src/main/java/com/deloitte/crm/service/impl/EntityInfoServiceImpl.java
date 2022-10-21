@@ -595,18 +595,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //设置产品名称
             isCover.setName(proName + "是否覆盖");
             coverReason.setName(proName + "未覆盖原因");
+            isCover.setValue("0");
             //设置值
             if (!CollectionUtils.isEmpty(covers)) {
                 String cover = covers.get(0).getIsCover();
-                isCover.setValue("0");
                 if (!ObjectUtils.isEmpty(cover)){
                     isCover.setValue(cover);
                     if ("0".equals(cover)){
                         coverReason.setValue(covers.get(0).getCoverDes());
                     }
                 }
-            }else {
-                isCover.setValue("0");
             }
             proCoverVo.setIsCover(isCover).setCoverReason(coverReason);
             coverVos.add(proCoverVo);
