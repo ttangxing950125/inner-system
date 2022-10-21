@@ -1,4 +1,5 @@
 package com.deloitte.crm.controller;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
@@ -142,7 +143,5 @@ public class RoleSevenController {
     public R<EntityInfoVo> checkEntityName(String entityName){
         return iEntityInfoService.checkEntityName(entityName);
     }
-
-
 
 }

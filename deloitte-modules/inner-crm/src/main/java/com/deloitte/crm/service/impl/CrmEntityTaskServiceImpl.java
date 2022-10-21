@@ -212,8 +212,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
-    @Async("taskExecutor")
-    void asycSendEmailService(Integer roleId,Integer taskCount){
+    @Async
+    public void asycSendEmailService(Integer roleId,Integer taskCount){
         log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}",roleId,taskCount);
         sendEmailService.email(roleId, taskCount);
     }

@@ -237,11 +237,11 @@ public class ModelMasterServiceImpl implements IModelMasterService {
 
         //如果 是金融机构 那么 role_id 为6 如果 是城投政府 那么 为 7 如果都是否 那么为 5  => Y 为是
         if (YES.equals(masDto.getIsFinance())) {
-            crmSupplyTask.setRoleId(6L);
-        } else if (YES.equals(masDto.getCityIb())) {
-            crmSupplyTask.setRoleId(7L);
-        } else {
             crmSupplyTask.setRoleId(5L);
+        } else if (YES.equals(masDto.getCityIb())) {
+            crmSupplyTask.setRoleId(6L);
+        } else {
+            crmSupplyTask.setRoleId(7L);
         }
         //新增任务
         crmSupplyTaskMapper.insert(crmSupplyTask);
