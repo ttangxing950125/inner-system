@@ -163,7 +163,7 @@
           <div v-if="currentTab" class="flex1 max">
             <div class="content-title">{{ currentName }}</div>
             <el-divider class="mt10"></el-divider>
-            <el-button class="check-p" type="text" @click="dialogVisible = true">查看产品覆盖与敞口映射规则</el-button>
+            <el-button class="check-p" type="text" @click="checkProject">查看产品覆盖与敞口映射规则</el-button>
           </div>
           <div v-if="currentTab" class="g-tab flex1 mt20">
             <a v-for="(item, index) in years" :key="index" :class="currentYear === item ? 'g-select' : ''" @click="changeYear(item)"
@@ -186,25 +186,23 @@
     </div>
     <el-dialog :title="currentName" :visible.sync="dialogVisible" width="30%">
       <div class="p-top">
-        <span>产品覆盖规则</span>
+        <span class="project-font">产品覆盖规则</span>
       </div>
-      <div class="p-top">
-        <span>版本：</span><span>v2022-10-17</span>
+      <div class="p-top mt20">
+        <span class="version">版本：v </span><span class="green">{{ role.proVersion }}</span>
       </div>
 
-      <div class="p-red">
-        <div>这里是产品经理提供覆盖规则文字说明，这里是产品经理提供覆盖规则文字说 明这里是产品经理提供覆盖规则文字说明这里是产品经理提供覆盖规则文字说 明这里是产品经理提供覆盖规则文字说明，这里是产品经理提供覆盖规则文字
-            提供覆盖规则文字说明，这里是产品经理提供覆盖规则
-            文字说明，这里是产品经理提供覆盖规则文字说明。
-        </div>
+      <div class="p-red mt20">
+        <div>{{ role.proRemark }}</div>
       </div>
-        <div class="p-top">
-        <span>敞口映射规则</span>
+        <div class="p-top mt20">
+        <span class="project-font">敞口映射规则</span>
       </div>
-      <div class="p-top">
-        <span>版本：</span><span>v2022-10-17</span>
+      <div class="p-top mt20">
+        <span class="version">版本：v </span><span class="green">{{ role.proVersion }}</span>
       </div>
-      <el-button type="text" class="p-top" @click="downFile">批量查询匹配模板.xlsx</el-button>
+      <span class="version">最新版本： </span>
+      <el-button type="text" class="p-top mt20" @click="downFile">{{ role.fileName }}</el-button>
       <div slot="footer" class="dialog-footer center">
         <el-button type="primary" @click="dialogVisible = false"
           >确 定</el-button
@@ -215,8 +213,8 @@
 </template>
 
 <script>
-import { replaceStr } from "@/utils/index";
-import { entityMaster, entityByMaster, getDataHis, getDataYear, getProduct, getProDucCom, updateRel, ProMaDir } from "@/api/subject";
+import { replaceStr, download } from "@/utils/index";
+import { entityMaster, entityByMaster, getDataHis, getDataYear, getProduct, getProDucCom, updateRel, ProMaDir, getProductsOne, getProductsExcel } from "@/api/subject";
 export default {
   name: "government",
   data() {
@@ -240,6 +238,7 @@ export default {
       selected: [],
       entityCode: '',
       proCumId: '',
+      role: {},
     };
   },
   created() {
@@ -362,7 +361,21 @@ export default {
       return replaceStr(row, this.input);
     },
     downFile() {
-        console.log(1)
+        try {
+            this.$modal.loading("Loading...")
+            getProductsExcel({id: this.currentTab}).then(res => {
+                download(res, this.role.fileName)
+            })
+        
+        } catch (error) {
+            this.$message({
+            showClose: true,
+            message: error,
+            type: "error",
+            });
+        } finally {
+            this.$modal.closeLoading();
+        } 
     },
     submit(index, row) {
         try {
@@ -429,6 +442,25 @@ export default {
       } finally {
         this.$modal.closeLoading();
       } 
+    },
+    checkProject() {
+        try {
+            this.dialogVisible = true
+            this.$modal.loading("Loading...");
+            getProductsOne({id: this.currentTab}).then(res => {
+                this.role = res.data
+                let fileNameArr = this.role.filePath.split('/')
+                this.role.fileName = fileNameArr[1]
+            })
+        } catch (error) {
+            this.$message({
+            showClose: true,
+            message: error,
+            type: "error",
+            });
+        } finally {
+            this.$modal.closeLoading();
+        } 
     }
   },
 };
@@ -438,7 +470,10 @@ export default {
 .between {
   justify-content: space-between;
 }
-
+.green {
+    color: #86bc25;
+    font-weight: 600;
+}
 .g-t-title {
   font-weight: 600;
 }
@@ -525,5 +560,13 @@ export default {
 }
 .max {
     width: 100%
+}
+.project-font {
+    font-size: 14px;
+    font-weight: 600;
+}
+.version {
+    font-size: 12px;
+    color: #ccc;
 }
 </style>
