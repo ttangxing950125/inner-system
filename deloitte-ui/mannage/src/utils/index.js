@@ -421,7 +421,7 @@ export function getCurrentTime() {
  */
 export function replaceStr(row, keywork) {
   let replaceReg = new RegExp(keywork, "ig");
-  let replaceString = `<span style="color: #ed4014">${keywork}</span>`;
+  let replaceString = `<span style="color: #86bc25">${keywork}</span>`;
   row = row.replace(replaceReg, replaceString);
   return row;
 }

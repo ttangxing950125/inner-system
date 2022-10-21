@@ -54,11 +54,13 @@
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
+                  v-if="!scope.row.check"
                   @click="handleClick(scope.row)"
                   type="text"
                   size="small"
                   >进入修改</el-button
                 >
+                <span v-else class="green">已选中</span>
               </template>
             </el-table-column>
           </el-table>
@@ -69,7 +71,7 @@
           <span class="g-title">目标政府信息</span>
           <span class="s-2">修改中</span>
         </div>
-        <el-button type="text">提交变更</el-button>
+        <el-button type="text" @click="submit">提交变更</el-button>
       </div>
       <el-col
         :sm="24"
@@ -293,7 +295,7 @@
             </el-collapse-item>
             <el-collapse-item>
               <template slot="title">
-                <span style="font-size: 16px">关联政府</span>
+                <span style="font-size: 16px">关联企业</span>
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
@@ -350,6 +352,7 @@ export default {
         getInfoDetailGov({ dqGovCode: code }).then((res) => {
           const { data } = res;
           this.info = data;
+          row.check = true
         });
       } catch (error) {
         console.log(error);
@@ -442,7 +445,7 @@ export default {
 .bottom-title {
   padding-left: 20px;
   .s-2 {
-    color: greenyellow;
+    color: #86bc25;
     font-size: 13px;
     margin-left: 22px;
   }
@@ -481,7 +484,7 @@ export default {
     width: 330px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
   }
   .top-right {
@@ -493,13 +496,13 @@ export default {
     position: relative;
     left: 167%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .g-desc {
   margin-top: 15px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -522,7 +525,10 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
+}
+.green {
+    color: #86bc25;
 }
 </style>
