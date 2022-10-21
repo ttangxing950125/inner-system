@@ -255,17 +255,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         list.stream().forEach(o -> {
             entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
+            GovInfo govInfo = govInfoMapper.selectById(o.getId());
+            String oldName = o.getGovName();
             //修改政府主体名称时，需要先添加曾用名
-            if (!ObjectUtils.isEmpty(o.getGovName())) {
-                String oldName = o.getGovName();
+            if (!ObjectUtils.isEmpty(oldName)&&!oldName.equals(govInfo.getGovName())) {
                 GovInfo addOldName = new GovInfo();
                 addOldName.setId(o.getId());
                 addOldName.setGovNameHis(oldName);
                 addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
                 addOldName(addOldName);
+                //修改曾用名后需要将曾用名和曾用名备注置空
+                o.setGovNameHis(null).setEntityNameHisRemarks(null);
             }
-            //修改曾用名后需要将曾用名和曾用名备注置空
-            o.setGovNameHis(null).setEntityNameHisRemarks(null);
             govInfoMapper.updateById(o);
         });
         return R.ok(list.size());
@@ -1139,4 +1140,5 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         parentLevelVo.setName(name).setSend(value);
         return parentLevelVo;
     }
+
 }
