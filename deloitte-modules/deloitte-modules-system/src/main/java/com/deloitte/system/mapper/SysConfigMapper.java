@@ -1,7 +1,8 @@
 package com.deloitte.system.mapper;
 
-import java.util.List;
 import com.deloitte.system.domain.SysConfig;
+
+import java.util.List;
 
 /**
  * 参数配置 数据层
@@ -65,4 +66,7 @@ public interface SysConfigMapper
      * @return 结果
      */
     public int deleteConfigByIds(Long[] configIds);
+
+     String selctConfigId();
+
 }

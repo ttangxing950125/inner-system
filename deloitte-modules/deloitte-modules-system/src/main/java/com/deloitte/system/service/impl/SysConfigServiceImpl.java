@@ -3,8 +3,11 @@ package com.deloitte.system.service.impl;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import cn.hutool.core.util.ObjectUtil;
+
+import com.deloitte.system.domain.SysConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.deloitte.common.core.constant.Constants;
@@ -13,7 +16,6 @@ import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.text.Convert;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.redis.service.RedisService;
-import com.deloitte.system.domain.SysConfig;
 import com.deloitte.system.mapper.SysConfigMapper;
 import com.deloitte.system.service.ISysConfigService;
 
@@ -25,7 +27,7 @@ import com.deloitte.system.service.ISysConfigService;
 @Service
 public class SysConfigServiceImpl implements ISysConfigService
 {
-    @Autowired
+    @Resource
     private SysConfigMapper configMapper;
 
     @Autowired
@@ -194,6 +196,13 @@ public class SysConfigServiceImpl implements ISysConfigService
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
+    }
+
+    @Override
+    public String getConfigId() {
+
+        String sysConfig = configMapper.selctConfigId();
+        return sysConfig;
     }
 
     /**

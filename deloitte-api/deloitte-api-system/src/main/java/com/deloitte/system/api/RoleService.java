@@ -1,15 +1,11 @@
 package com.deloitte.system.api;
 
-import com.deloitte.common.core.constant.SecurityConstants;
 import com.deloitte.common.core.constant.ServiceNameConstants;
 import com.deloitte.system.api.domain.SysDictData;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.domain.SysUser;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -60,4 +56,6 @@ public interface RoleService {
     @PostMapping("/dict/data/dataYear")
     List<String> selectDataYear();
 
+    @PostMapping("/config/configId")
+    String getSysConfig();
 }

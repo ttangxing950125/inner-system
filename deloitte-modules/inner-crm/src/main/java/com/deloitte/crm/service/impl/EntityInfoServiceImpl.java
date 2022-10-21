@@ -2701,7 +2701,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //entityFinancial
         LambdaQueryWrapper<EntityFinancial> eq = new LambdaQueryWrapper<EntityFinancial>().eq(EntityFinancial::getEntityCode, code);
         EntityFinancial entityFinancial = financialMapper.selectOne(eq);
-        entityInfoCodeDto.setMince(entityFinancial.getMince());
+        if (entityFinancial!=null){
+            entityInfoCodeDto.setMince(entityFinancial.getMince());
+        }
+
         //是否为城投机构
         LambdaQueryWrapper<EntityGovRel> eq1 = new LambdaQueryWrapper<EntityGovRel>().eq(EntityGovRel::getEntityCode, code);
         EntityGovRel entityGovRel = entityGovRelMapper.selectOne(eq1);

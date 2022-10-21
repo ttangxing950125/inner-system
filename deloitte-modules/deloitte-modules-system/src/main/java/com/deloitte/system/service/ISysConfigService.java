@@ -1,7 +1,8 @@
 package com.deloitte.system.service;
 
-import java.util.List;
 import com.deloitte.system.domain.SysConfig;
+
+import java.util.List;
 
 /**
  * 参数配置 服务层
@@ -79,4 +80,7 @@ public interface ISysConfigService
      * @return 结果
      */
     public String checkConfigKeyUnique(SysConfig config);
+
+
+    String  getConfigId();
 }
