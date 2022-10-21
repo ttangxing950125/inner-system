@@ -978,17 +978,17 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                     govAttrByDto.setNineteenCity(value);
                     break;
                 case hundred:
-                    if (CollectionUtils.isEmpty(value)) {
+                    if (!CollectionUtils.isEmpty(value)) {
                         govAttrByDto.setHundred(Integer.valueOf(value.get(0)));
                     }
                     break;
                 case CCity:
-                    if (CollectionUtils.isEmpty(value)) {
+                    if (!CollectionUtils.isEmpty(value)) {
                         govAttrByDto.setCCity(Integer.valueOf(value.get(0)));
                     }
                     break;
                 case provincial:
-                    if (CollectionUtils.isEmpty(value)) {
+                    if (!CollectionUtils.isEmpty(value)) {
                         govAttrByDto.setProvincial(Integer.valueOf(value.get(0)));
                     }
                     break;
