@@ -133,9 +133,9 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     //债券简称
     private final String BOND_CODE = "BOND_CODE";
     //A股代码
-    private final String STOCK_CN_CODE = "STOCK_CN_INFO";
+    private final String STOCK_CN_CODE = "STOCK_CN_CODE";
     //港股代码
-    private final String STOCK_HK_CODE = "STOCK_HK_INFO";
+    private final String STOCK_HK_CODE = "STOCK_HK_CODE";
     //A股简称
     private final String STOCK_A_NAME = "STOCK_A_NAME";
     //港股简称
