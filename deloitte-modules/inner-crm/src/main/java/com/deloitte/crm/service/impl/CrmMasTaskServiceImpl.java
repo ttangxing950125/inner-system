@@ -1,49 +1,32 @@
 package com.deloitte.crm.service.impl;
 
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.common.security.utils.SecurityUtils;
-import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.BadInfo;
-import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.CrmDailyTask;
-import com.deloitte.crm.domain.CrmEntityTask;
+import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.mapper.EntityInfoMapper;
+import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.ICrmMasTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
-import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.CrmMasTaskMapper;
-import com.deloitte.crm.domain.CrmMasTask;
-import com.deloitte.crm.service.ICrmMasTaskService;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -53,6 +36,7 @@ import org.springframework.util.Assert;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasTask> implements ICrmMasTaskService
 {
     private final CrmMasTaskMapper crmMasTaskMapper;
@@ -68,7 +52,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      * @return 【请填写功能名称】
      */
     @Override
-    public CrmMasTask selectCrmMasTaskById(Long id)
+    public CrmMasTask selectCrmMasTaskById(Integer id)
     {
         return crmMasTaskMapper.selectCrmMasTaskById(id);
     }
@@ -174,6 +158,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      */
     @Override
     public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
+        log.info("  =>> 角色2 "+date+" 查询 <<=  ");
         pageNum = pageNum==null?1:pageNum;
         pageSize = pageSize==null?5:pageSize;
         List<CrmMasTaskVo> res = new ArrayList<>();
@@ -186,16 +171,35 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
         ArrayList<CrmMasTaskVo> crmMasTaskVos = new ArrayList<>();
         crmMasTasks.forEach(row->{
             CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
-            EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
-                    .eq(EntityInfo::getEntityCode, row.getEntityCode()));
             BeanUtil.copyProperties(row,crmMasTaskVo);
-            crmMasTaskVo.setEntityName(entityInfo.getEntityName());
-            crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+            if(row.getEntityCode()!=null) {
+                EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
+                        .eq(EntityInfo::getEntityCode, row.getEntityCode()));
+                crmMasTaskVo.setEntityName(entityInfo.getEntityName());
+                crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+            }else{
+                log.info("  =>> 角色2 出现无效信息 taskId = "+row.getId()+" entity_code 为空  <<=  ");
+            }
             crmMasTaskVos.add(crmMasTaskVo);
         });
         result.setRecords(crmMasTaskVos);
-
+        log.info("  =>> 角色2 查询结束  <<=  ");
         return R.ok(result, SuccessInfo.GET_SUCCESS.getInfo());
 
+    }
+
+    /**
+     * 角色2 完成任务
+     * @param taskId
+     * @param username
+     */
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public Date finishTask(Integer taskId, String username) {
+        CrmMasTask crmMasTask = baseMapper.selectCrmMasTaskById(taskId);
+        Assert.isNull(crmMasTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+        crmMasTask.setState(1).setHandleUser(username);
+        baseMapper.updateById(crmMasTask);
+        return crmMasTask.getTaskDate();
     }
 }

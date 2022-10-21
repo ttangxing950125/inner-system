@@ -24,6 +24,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -175,11 +176,11 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmEntityTask.setState(state);
         baseMapper.updateById(crmEntityTask);
-        //给角色 2 新增一条任务
-        crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
-
+        //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
+        if(!ObjectUtils.isEmpty(entityCode)){
+            crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
+        }
         Date taskDate = crmEntityTask.getTaskDate();
-
         List<CrmEntityTask> unFinish = baseMapper
                 .selectList(new QueryWrapper<CrmEntityTask>().lambda()
                         .like(CrmEntityTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd"))
@@ -193,6 +194,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
             crmDailyTask.setTaskStatus(3);
             crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
 
+            // 当日是新增主体的数量 状态码为2 代表是新增主体
             List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2));
             CrmDailyTask role2DailyTask = new CrmDailyTask().setTaskRoleType("4").setTaskDate(new Date());
 
@@ -201,7 +203,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
                 crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(1));
             } else {
                 crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(2));
-                //发送邮件
+                //发送邮件 角色2 的 role ID 固定为 4
                 asycSendEmailService(4, crmEntityTasks.size());
             }
 
@@ -211,9 +213,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     }
 
     @Async("taskExecutor")
-    private void asycSendEmailService(Integer roleId,Integer taskCount){
+    void asycSendEmailService(Integer roleId,Integer taskCount){
         log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}",roleId,taskCount);
-        sendEmailService.email(4, taskCount);
+        sendEmailService.email(roleId, taskCount);
     }
 
     /**

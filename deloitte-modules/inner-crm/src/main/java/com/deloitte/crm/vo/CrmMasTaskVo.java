@@ -20,7 +20,7 @@ public class CrmMasTaskVo {
 
     @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "主键")
-    private Long id;
+    private Integer id;
 
     @Excel(name = "德勤code")
     @ApiModelProperty(value = "德勤code")

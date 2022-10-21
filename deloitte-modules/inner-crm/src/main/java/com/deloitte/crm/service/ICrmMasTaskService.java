@@ -1,14 +1,14 @@
 package com.deloitte.crm.service;
 
-import java.util.Date;
-import java.util.List;
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.vo.CrmMasTaskVo;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -24,7 +24,7 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
-    public CrmMasTask selectCrmMasTaskById(Long id);
+    public CrmMasTask selectCrmMasTaskById(Integer id);
 
     /**
      * 查询【请填写功能名称】列表
@@ -83,5 +83,12 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      * @return R<Page<CrmMasTaskVo>> 当日任务
      */
     R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
+
+    /**
+     * 角色2 完成任务
+     * @param taskId
+     * @param username
+     */
+    Date finishTask(Integer taskId,String username);
 
 }

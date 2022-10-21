@@ -1,13 +1,12 @@
 package com.deloitte.crm.mapper;
 
-import java.util.Date;
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.dto.TaskDto;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -23,7 +22,7 @@ public interface CrmMasTaskMapper extends BaseMapper<CrmMasTask>
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
-    public CrmMasTask selectCrmMasTaskById(Long id);
+    public CrmMasTask selectCrmMasTaskById(Integer id);
 
     /**
      * 查询【请填写功能名称】列表
