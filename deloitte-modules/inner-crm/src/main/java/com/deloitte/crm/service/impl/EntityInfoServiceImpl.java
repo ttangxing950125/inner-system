@@ -910,7 +910,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 infoQuery.eq(EntityInfo::getFinance, 1);
             }
         }
-//        List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam( type,  param, pageNum, pageSize);
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, infoQuery);
         List<EntityInfo> entityInfoList = page.getRecords();
 
