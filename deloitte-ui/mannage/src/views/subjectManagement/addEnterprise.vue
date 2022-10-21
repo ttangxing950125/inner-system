@@ -68,7 +68,7 @@
       </el-col>
     </el-row>
     <el-dialog
-      title="手动新增企业主体"
+      :title="digName"
       :visible.sync="dialogVisible"
       width="50%"
     >
@@ -87,8 +87,7 @@
         </el-form-item>
         <el-form-item label="IB敞口划分" prop="">
           <el-select v-model="ruleForm.masterCode" placeholder="选择新增类型">
-            <el-option label="是IB口径下城投机构" value="1"></el-option>
-            <el-option label="不是IB口径下城投机构" value="0"></el-option>
+            <el-option  v-for="(item, index) in options" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="企业股票类型" prop="">
@@ -200,29 +199,22 @@
         </div>
 
         <el-form-item label="上市板块与交易所">
-          <el-col :span="11">
-            <el-form-item prop="">
-              <el-select
-                v-model="ruleForm.lisSec"
-                placeholder="选择股票上市板块"
-              >
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col class="line" :span="1">-</el-col>
-          <el-col :span="11">
-            <el-form-item prop="date2">
-              <el-select
+            <el-select
+                v-if="this.ruleForm.stockType === 'A'"
                 v-model="ruleForm.exchange"
                 placeholder="选择股票交易所"
               >
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+                <el-option label="深交所" value="深交所"></el-option>
+                <el-option label="沪交所" value="沪交所"></el-option>
+                <el-option label="北交所" value="北交所"></el-option>
               </el-select>
-            </el-form-item>
-          </el-col>
+            <el-select
+                v-if="this.ruleForm.stockType === 'G'"
+                v-model="ruleForm.exchange"
+                placeholder="选择股票交易所"
+              >
+                <el-option label="港交所" value="港交所"></el-option>
+              </el-select>
         </el-form-item>
         <el-form-item label="上市日期" prop="">
           <el-date-picker
@@ -486,6 +478,7 @@
 import * as echarts from "echarts";
 import { createST, createBE } from "@/api/bond";
 import { entityInfoLogsList, logCancel } from "@/api/subject";
+import { getModelMaster } from "@/api/task";
 import { checkData, getFinanceSubIndu } from "@/api/common";
 export default {
   name: "addGovernment",
@@ -566,6 +559,8 @@ export default {
       disabeld: true,
       financeSubIndu: [],
       infomation: {},
+      options: [],
+      digName: ''
     };
   },
   mounted() {
@@ -588,7 +583,9 @@ export default {
     init() {
       try {
         this.$modal.loading("Loading...");
-        entityInfoLogsList({ type: "TYPE_STOCK" }).then((res) => {
+        const type = this.tab === '发债' ? 'TYPE_BOND' : 'TYPE_STOCK'
+        this.digName = this.tab === '发债' ? '手动新增发债主体' : '手动新增企业主体'
+        entityInfoLogsList({ type: type }).then((res) => {
           this.infomation = res.data;
           const keys = Object.keys(this.infomation.cylinderDates);
           const values = Object.values(this.infomation.cylinderDates);
@@ -651,7 +648,11 @@ export default {
       // if (this.tab === "发债") {
       //   this.dialogVisible2 = true;
       // } else {
-      // }
+      // }      
+      getModelMaster({ attrId: 656 }).then((res) => {
+        const { data } = res;
+        this.options = data;
+      });
       getFinanceSubIndu({ attrId: 656 }).then((res) => {
         const { data } = res;
         this.financeSubIndu = data;

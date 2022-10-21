@@ -89,4 +89,6 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
      * @return
      */
     R finishTask(Integer taskId,Integer state,String entityCode);
+
+
 }

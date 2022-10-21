@@ -125,19 +125,12 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
         //获取登录用户
         Long userId = SecurityUtils.getUserId();
+
         QueryWrapper<SysUserRole> userRleQuery = new QueryWrapper<>();
         List<SysUserRole> sysUserRoles = sysUserRoleMapper.selectList(userRleQuery.lambda()
                 .eq(SysUserRole::getUserId, userId)
                 .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
-//
-//        SysUserRole sysUserRole=new SysUserRole();
-//        sysUserRole.setRoleId(5l);
-//        sysUserRoles.add(sysUserRole);
-
-
-
-
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
             return R.ok();

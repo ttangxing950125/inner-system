@@ -92,32 +92,39 @@
             :data="list"
             style="width: 98%; margin-top: 15px"
           >
-            <el-table-column sortable label="生效状态" width="100px">
+            <el-table-column label="生效状态" width="100px">
               <template slot-scope="scope">
                 <span :class="scope.row.status === '0' ? 'green' : 'red'">{{
                   scope.row.status === "0" ? "N" : "Y"
                 }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="govLevel" label="行政级别" sortable>
+            <el-table-column prop="govLevel" label="行政级别">
               <template slot-scope="scope">
                 <span>{{ getLevel(scope.row.govLevelBig) }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="dqGovCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="govName" label="主体名称"> </el-table-column>
+            <el-table-column prop="govName" label="主体名称">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.govName || '-' }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="nameUsedNum" label="曾用名或别称">
               <template slot-scope="scope">
                 <el-button
                   type="text"
                   style="color: rgb(181 182 184)"
                   @click="usedName"
-                  >{{ 1 }}</el-button
+                  >{{ scope.row.nameUsedNum || 0 }}</el-button
                 >
               </template>
             </el-table-column>
             <el-table-column prop="entityNameHisRemarks" label="备注">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.entityNameHisRemarks || '-' }}</span>
+                </template>
             </el-table-column>
             <el-table-column prop="updated" label="更新记录">
               <template slot-scope="scope">
@@ -335,17 +342,17 @@ export default {
     getLevel(row) {
       let ret = "";
       switch (row) {
-        case "1":
-          ret = "1-省级行政区";
+        case 1:
+          ret = "省级行政区";
           break;
-        case "2":
-          ret = "2-地级行政区";
+        case 2:
+          ret = "地级行政区";
           break;
-        case "3":
-          ret = "3-县级行政区";
+        case 3:
+          ret = "县级行政区";
           break;
-        case "4":
-          ret = "4-经开高新区";
+        case 4:
+          ret = "经开高新区";
           break;
       }
       return ret;

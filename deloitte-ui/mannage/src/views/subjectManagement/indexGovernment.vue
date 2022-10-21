@@ -273,6 +273,7 @@ export default {
           pageNum: 1,
           pageSize: 10,
           send: ret,
+          mapList: this.mapList,
         };
         getListEntityByPage(params).then((res) => {
           const { data } = res;
