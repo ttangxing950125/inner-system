@@ -183,7 +183,7 @@ public class GovInfo implements Serializable {
      * 主体状态 是否生效 0-失效 1-生效
      */
     @Excel(name = "城市规模")
-    private String gov_scale;
+    private String govScale;
 
     /**
      * 主体状态 是否生效 0-失效 1-生效
