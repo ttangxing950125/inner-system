@@ -1,5 +1,6 @@
 package com.deloitte.crm.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.common.core.web.controller.BaseController;
@@ -18,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,7 @@ import java.util.List;
  * @author deloitte
  * @date 2022-09-21
  */
+@Slf4j
 @RestController
 @RequestMapping("/govInfo")
 @Api(tags = "政府主体查询修改相关数据")
@@ -310,7 +313,10 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/getListEntityByPage")
     public R getListEntityByPage(@RequestBody GovAttrByDto govAttrDto) {
-        return R.ok(govInfoService.getListEntityByPage(govAttrDto));
+        log.info(">>>>>地方政府-更多指标请求参数:{}", JSON.toJSONString(govAttrDto));
+        R<Object> ok = R.ok(govInfoService.getListEntityByPage(govAttrDto));
+        log.info(">>>>>地方政府-更多指标返回结果集合:{}", JSON.toJSONString(ok));
+        return ok;
     }
 
     /**
