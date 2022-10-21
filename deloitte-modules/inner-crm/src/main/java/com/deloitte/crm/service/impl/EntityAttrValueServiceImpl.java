@@ -147,6 +147,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * 更新entityAttrValue表中债券的相关信息
      * 反射获取obj里的属性，key 为 Excel 注解 的name 属性, value 为实体类的值
      * 默认该方法异步调用， 需要同步请调用 com.deloitte.crm.service.impl.EntityAttrValueServiceImpl#updateBondAttr(java.lang.String, java.lang.Object, boolean)
+     *
      * @param bondCode
      * @param obj
      * @return
@@ -154,26 +155,25 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int updateBondAttr(String bondCode, Object obj) {
-        return  this.updateBondAttr(bondCode, obj, true);
+        return this.updateBondAttr(bondCode, obj, true);
     }
 
     /**
-     *
      * @param bondCode
      * @param obj
      * @param async
      * @return 正常情况返回更新的行数， async为true固定返回-1
      */
     private int updateBondAttr(String bondCode, Object obj, boolean async) {
-        if (async){
-            singleThreadPoll.execute(()->{
+        if (async) {
+            singleThreadPoll.execute(() -> {
                 this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
 
                 bondInfoService.updateBondType(bondCode);
             });
 
             return -1;
-        }else {
+        } else {
             int count = this.updateAttrValue(bondCode, obj, 3, Excel.class, "name");
 
             bondInfoService.updateBondType(bondCode);
@@ -245,20 +245,19 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
 
 
     /**
-     *
      * @param stockDqCode
      * @param obj
      * @param async
      * @return 正常情况返回更新的行数， async为true固定返回-1
      */
     private int updateStockThkAttr(String stockDqCode, Object obj, boolean async) {
-        if (async){
-            singleThreadPoll.execute(()->{
+        if (async) {
+            singleThreadPoll.execute(() -> {
                 this.updateAttrValue(stockDqCode, obj, 4, Excel.class, "name");
             });
 
             return -1;
-        }else {
+        } else {
             return this.updateAttrValue(stockDqCode, obj, 4, Excel.class, "name");
         }
     }
@@ -283,13 +282,13 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      * @return
      */
     public int updateStockCnAttr(String code, Object item, boolean async) {
-        if (async){
-            singleThreadPoll.execute(()->{
+        if (async) {
+            singleThreadPoll.execute(() -> {
                 this.updateAttrValue(code, item, 5, Excel.class, "name");
             });
 
             return -1;
-        }else {
+        } else {
             return this.updateAttrValue(code, item, 5, Excel.class, "name");
         }
     }
@@ -507,14 +506,14 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     public R createBondEntity(EntityByIondVo entityByIondVo) {
         //creditCode和bondShortName进行查重操作
-        if (entityByIondVo.getCreditCode()!=null){
+        if (entityByIondVo.getCreditCode() != null) {
             EntityInfo entityInfo1 = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityByIondVo.getCreditCode()));
-                if (!ObjectUtils.isEmpty(entityInfo1)){
-                    return R.fail("社会信用代码或债券简称重复不能进行新增");
-                }
+            if (!ObjectUtils.isEmpty(entityInfo1)) {
+                return R.fail("社会信用代码或债券简称重复不能进行新增");
+            }
         }
 
-        if (entityByIondVo.getCreditCode()==null&& entityByIondVo.getCreditError()==0 ){
+        if (entityByIondVo.getCreditCode() == null && entityByIondVo.getCreditError() == 0) {
             return R.fail("社会信用代码不能为空");
         }
         BondInfo byShortName = bondInfoMapper.findByShortName(entityByIondVo.getBondShortName(), Boolean.FALSE);
@@ -608,14 +607,14 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R createStockEntity(EntityStockInfoVo entityStockInfoVo) {
-        if (entityStockInfoVo.getCreditCode()!=null){
+        if (entityStockInfoVo.getCreditCode() != null) {
             EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getCreditCode, entityStockInfoVo.getCreditCode()));
-            if (!ObjectUtils.isEmpty(entityInfo)){
+            if (!ObjectUtils.isEmpty(entityInfo)) {
                 return R.fail("新增失败：统一社会性代码重复");
             }
 
         }
-        if (entityStockInfoVo.getCreditCode()==null&& entityStockInfoVo.getCreditError()==0 ){
+        if (entityStockInfoVo.getCreditCode() == null && entityStockInfoVo.getCreditError() == 0) {
             return R.fail("社会信用代码不能为空");
         }
 

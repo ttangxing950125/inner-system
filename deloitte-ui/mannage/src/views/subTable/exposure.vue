@@ -199,7 +199,7 @@
         <span class="project-font">敞口映射规则</span>
       </div>
       <div class="p-top mt20">
-        <span class="version">版本：v </span><span class="green">{{ role.proVersion }}</span>
+        <span class="version">版本：v </span><span class="green">{{ role.masterVer }}</span>
       </div>
       <span class="version">最新版本： </span>
       <el-button type="text" class="p-top mt20" @click="downFile">{{ role.fileName }}</el-button>

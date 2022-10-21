@@ -25,6 +25,11 @@ public class EntityInfoVo {
     private Boolean bo = true;
 
     /**
+     * 查询到的 曾用名相同的主体
+     */
+    private EntityInfo entityInfoHis;
+
+    /**
      * 详细说明信息
      */
     private String msg;

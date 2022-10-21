@@ -137,7 +137,7 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
         ExcelUtil<CnIpoFail> util = new ExcelUtil<CnIpoFail>(CnIpoFail.class);
         List<CnIpoFail> list = util.importExcel(windTaskContext.getFileStream(), true);
         ;
-
+        Collections.reverse(list);
         return cnIpoFailService.doTask(windTask, list);
     }
 

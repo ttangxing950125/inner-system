@@ -69,6 +69,8 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.INSERT.getId();
         } else {
             final StockCnImplementStInfo last = implementStInfoResult.stream().findFirst().get();
+            last.setNumber(null);
+            implementStInfo.setNumber(null);
             if (!ObjectUtil.equals(last, implementStInfo)) {
                 changeType = DataChangeType.UPDATE.getId();
             }
@@ -120,7 +122,7 @@ public class StockCnImplementStInfoStrategy implements WindTaskStrategy {
             dataMap.put("ID", item.getId());
             dataMap.put("变化状态", item.getChangeType());
 
-            dataMap.put("公司代码", item.getCode());
+            dataMap.put("代码", item.getCode());
             dataMap.put("公司名称", item.getName());
 
             return dataMap;

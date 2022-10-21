@@ -135,8 +135,10 @@ public class EntityAttrValueController extends BaseController {
             return entityAttrValueService.createStockEntity(entityStockInfoVo);
         } else if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "STOCK_HK_INFO")) {
             return entityAttrValueService.createStockEntityG(entityStockInfoVo);
+        } else {
+            return R.fail("股票代码参数非法");
         }
-        return R.fail("股票代码错误");
+
     }
 
     /**

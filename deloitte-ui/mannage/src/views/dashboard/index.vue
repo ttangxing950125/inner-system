@@ -270,7 +270,7 @@
         </el-table-column>
       </el-table>
       <pagination
-        v-show="total>0"
+        v-show="total>0 && roleId !== 'role1'"
         :total="total"
         :page.sync="queryParams.pageNum"
         :limit.sync="queryParams.pageSize"
@@ -1221,50 +1221,58 @@ export default {
         //   this.list7 = data
         // })
         // 角色1相关接口
-        const params = {
-          taskDate: this.nowTime,
-          pageNum: this.queryParams.pageNum,
-          pageSize: this.queryParams.pageSize
-        };
         const paramsMonth = {
-          taskDate: this.monthDate,
+            taskDate: this.monthDate,
         };
-        getTaskByDate(params).then((res) => {
-          const { data } = res
-          this.list = data
-        });
+        if(this.roleId === 'role1') {
+            const params = {
+              taskDate: this.nowTime,
+              pageNum: this.queryParams.pageNum,
+              pageSize: this.queryParams.pageSize
+            };
+            getTaskByDate(params).then((res) => {
+                const { data } = res
+              this.list = data
+            });
+        }
         queryList(paramsMonth).then((res)=> {
           const { data } = res
           if (!page) {
               this.showMsg(data)
           }
         })
-        // 角色 345 相关接口
-        getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
-          const { data } = res
-          this.list3 = data
-        })
-        // 角色 2 相关接口
-        getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
-          const { data } = res
-          this.list2 = data.records
-          this.total = data.total
-          this.queryParams.pages = data.pages
-        })
+        if(this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
+            // 角色 345 相关接口
+            getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
+              const { data } = res
+              this.list3 = data
+            })
+        }
+
+        if(this.roleId === 'role2') {
+            // 角色 2 相关接口
+            getTaskInfo({date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
+              const { data } = res
+              this.list2 = data.records
+              this.total = data.total
+              this.queryParams.pages = data.pages
+            })
+        }
 
         getTaskCount({TaskDate: this.nowTime}).then(res => {
           const { data } = res
           this.taskCount = data
         })
-
         // 角色7
-        getDayTaskInfo({ date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
-          const { data } = res
-          this.list7 = data.records
-          this.total = data.total
-          this.queryParams.pageNum = data.current
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+        if(this.roleId === 'role6') {
+            getDayTaskInfo({ date: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then((res) => {
+              const { data } = res
+              this.list7 = data.records
+              this.total = data.total
+              this.queryParams.pageNum = data.current
+              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
+        }
       } catch (error) {
         console.log(error);
       } finally {
@@ -1496,19 +1504,21 @@ export default {
       row.path[1].localName === 'td' ? row.path[1].className = 'thisDay' : row.path[2].className = 'thisDay'
       try {
         this.$modal.loading("loading...");
-        const parmas = {
-          date: this.monthDate+ '-' +clickDay,
-          pageNum: 1,
-          pageSize: this.queryParams.pageSize
-        };
-        this.clickDay = this.monthDate+ '-' +clickDay
-        getDayTaskInfo(parmas).then((res) => {
-          const { data } = res
-          this.list7 = data.records
-          this.total = data.total
-          this.queryParams.pageNum = data.current
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+        if(this.roleId === 'role6') {
+            const parmas = {
+            date: this.monthDate+ '-' +clickDay,
+            pageNum: 1,
+            pageSize: this.queryParams.pageSize
+            };
+            this.clickDay = this.monthDate+ '-' +clickDay
+            getDayTaskInfo(parmas).then((res) => {
+            const { data } = res
+            this.list7 = data.records
+            this.total = data.total
+            this.queryParams.pageNum = data.current
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
+        }
         const params = {
           taskDate: this.monthDate+ '-' +clickDay,
           pageNum: 1,
@@ -1524,13 +1534,15 @@ export default {
           this.list3 = data
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
-        getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
-          const { data } = res
-          this.list2 = data.records
-          this.total = data.total
-          this.queryParams.pages = data.pages
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+        if(this.roleId === 'role2') {
+            getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
+            const { data } = res
+            this.list2 = data.records
+            this.total = data.total
+            this.queryParams.pages = data.pages
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
+        }
         getTaskCount({TaskDate: this.monthDate+ '-' +clickDay}).then(res => {
           const { data } = res
           this.taskCount = data

@@ -54,11 +54,13 @@
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
+                  v-if="!scope.row.check"
                   @click="handleClick(scope.row)"
                   type="text"
                   size="small"
                   >进入修改</el-button
                 >
+                <span v-else class="green">已选中</span>
               </template>
             </el-table-column>
           </el-table>
@@ -67,9 +69,9 @@
       <div class="clearf">
         <div class="bottom-title">
           <span class="g-title">目标政府信息</span>
-          <span class="s-2">修改中</span>
+          <span v-if="eight.length > 0" class="s-2">修改中</span>
         </div>
-        <el-button type="text">提交变更</el-button>
+        <el-button v-if="eight.length > 0" type="text" @click="submit">提交变更</el-button>
       </div>
       <el-col
         :sm="24"
@@ -82,18 +84,18 @@
             >注意：带星号字段需同故宫附表维护更新，请进入附表管理模块进行修改</span
           >
           <el-collapse accordion class="collpase">
-            <el-collapse-item>
+            <el-collapse-item v-if="info.govInfo">
               <template slot="title">
                 <span style="font-size: 16px">基本信息</span>
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">德勤主体代码（企业）</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.dqGovCode"
-                    @change="item.edit = true"
-                  ></el-input>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.govInfo.dqGovCode
+                    }}
+                  </div>
                 </div>
                 <div class="flex1">
                   <div class="first">政府主体名称</div>
@@ -149,7 +151,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.govInfo">
               <template slot="title">
                 <span style="font-size: 16px">行政区划</span>
               </template>
@@ -158,91 +160,121 @@
                   <div class="first">政府主体官方行政代码</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.govInfo.govCode
                     }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">政府主体行政单位级别-大类</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.govName"
-                    @change="item.edit = true"
-                  ></el-input>
+                   <el-select v-model="info.govInfo.govLevelBig" placeholder="请选择">
+                        <el-option
+                        v-for="item in bigLevel"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                        </el-option>
+                    </el-select>
                 </div>
                 <div class="flex1">
                   <div class="first">政府主体行政单位级别-小类</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.govName"
-                    @change="item.edit = true"
-                  ></el-input>
+                    <el-select v-model="info.govInfo.govLevelSmall" placeholder="请选择">
+                        <el-option
+                        v-for="item in smallLevel"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                        </el-option>
+                    </el-select>
                 </div>
                 <div class="flex1">
                   <div class="first">是否为省会城市</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.govName"
-                    @change="item.edit = true"
-                  ></el-input>
+                  <el-select v-model="info.govInfo.provincial" placeholder="请选择">
+                        <el-option
+                        label="是"
+                        :value="1">
+                        </el-option>
+                        <el-option
+                        label="否"
+                        :value="0">
+                        </el-option>
+                    </el-select>
                 </div>
                 <div class="flex1">
                   <div class="first">地理分区归属</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.govNameHis"
-                    @change="item.edit = true"
-                  ></el-input>
+                  <el-select v-model="info.govInfo.gegphZone" placeholder="请选择">
+                        <el-option
+                        v-for="item in eight"
+                        :key="item.send"
+                        :label="item.name"
+                        :value="item.send">
+                        </el-option>
+                    </el-select>
                 </div>
                 <div class="flex1">
                   <div class="first">八大经济区归属</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
-                    @change="item.edit = true"
-                  ></el-input>
+                    <el-select v-model="info.govInfo.economyRegion" placeholder="请选择">
+                        <el-option
+                        v-for="item in eight"
+                        :key="item.send"
+                        :label="item.name"
+                        :value="item.send">
+                        </el-option>
+                    </el-select>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">19个城市群归属</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
-                    @change="item.edit = true"
-                  ></el-input>
+                   <el-select v-model="info.govInfo.cityGroup" placeholder="请选择">
+                        <el-option
+                        v-for="item in eight"
+                        :key="item.send"
+                        :label="item.name"
+                        :value="item.send">
+                        </el-option>
+                    </el-select>
                 </div>
                 <div class="flex1">
                   <div class="first">是否为国家中心城市</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
-                    @change="item.edit = true"
-                  ></el-input>
+                    <el-select v-model="info.govInfo.countryCenter" placeholder="请选择">
+                        <el-option
+                        label="是"
+                        :value="1">
+                        </el-option>
+                        <el-option
+                        label="否"
+                        :value="0">
+                        </el-option>
+                    </el-select>
                 </div>
                 <div class="flex1">
                   <div class="first">城市规模</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.govInfo.govScale }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">城市分级</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.govInfo.govGrading }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">是否为百强县</div>
-                 <el-input
-                    class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
-                    @change="item.edit = true"
-                  ></el-input>
+                  <el-select v-model="info.govInfo.hundred" placeholder="请选择">
+                        <el-option
+                        label="是"
+                        :value="1">
+                        </el-option>
+                        <el-option
+                        label="否"
+                        :value="0">
+                        </el-option>
+                    </el-select>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.govInfo">
               <template slot="title">
                 <span style="font-size: 16px">关联政府</span>
               </template>
@@ -251,7 +283,7 @@
                   <div class="first">上级行政单位名称</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.govInfo.preGovName
                     }}
                   </div>
                 </div>
@@ -259,14 +291,13 @@
                   <div class="first">上级行政单位官方行政代码</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.govName"
-                    @change="item.edit = true"
+                    v-model="info.govInfo.preCode"
                   ></el-input>
                 </div>
                 <div class="flex1">
                   <div class="first">上级行政单位德勤代码</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.govInfo.preGovCode }}
                   </div>
                 </div>
               </el-col>
@@ -274,33 +305,33 @@
                 <div class="flex1">
                   <div class="first">失效后关联政府主体名称</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.govInfo.newGovName }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">失效后关联政府主体官方行政代码</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.govInfo.newGovCode }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">失效后关联政府主体德勤代码</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.govInfo.newDqCode }}
                   </div>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.relationEntity">
               <template slot="title">
-                <span style="font-size: 16px">关联政府</span>
+                <span style="font-size: 16px">关联企业</span>
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">关联城投企业数量</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.relationEntity
                     }}
                   </div>
                 </div>
@@ -317,7 +348,9 @@
 import {
   getGovByName,
   getInfoDetailGov,
-  updateInfoList
+  updateInfoList,
+  getGovLevel,
+  getGovRange
 } from "@/api/subject";
 import { replaceStr } from "@/utils/index";
 export default {
@@ -335,6 +368,9 @@ export default {
         3: "县级行政区",
         4: "经开，高新区，新区等",
       },
+      bigLevel: [],
+      smallLevel: [],
+      eight: []
     };
   },
   created() {
@@ -350,6 +386,21 @@ export default {
         getInfoDetailGov({ dqGovCode: code }).then((res) => {
           const { data } = res;
           this.info = data;
+          row.check = true
+        });
+        getGovLevel({}).then((res) => {
+          const { data } = res;
+          data.forEach(e => {
+             if (e.level === 1) {
+                 this.bigLevel.push(e)
+             }else {
+                 this.smallLevel.push(e)
+             }
+          });
+        });
+        getGovRange({}).then((res) => {
+          const { data } = res;
+          this.eight = data[4].value
         });
       } catch (error) {
         console.log(error);
@@ -385,7 +436,7 @@ export default {
      submit() {
       try {
         this.$modal.loading("Loading...");
-        updateInfoList(this.info).then((res) => {
+        updateInfoList(this.info.govInfo).then((res) => {
           if (res.code === 200) {
             this.$message({
               showClose: true,
@@ -442,7 +493,7 @@ export default {
 .bottom-title {
   padding-left: 20px;
   .s-2 {
-    color: greenyellow;
+    color: #86bc25;
     font-size: 13px;
     margin-left: 22px;
   }
@@ -481,7 +532,7 @@ export default {
     width: 330px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
   }
   .top-right {
@@ -493,13 +544,13 @@ export default {
     position: relative;
     left: 167%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .g-desc {
   margin-top: 15px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -522,7 +573,10 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
+}
+.green {
+    color: #86bc25;
 }
 </style>

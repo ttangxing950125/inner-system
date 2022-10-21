@@ -85,7 +85,7 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
             dataMap.put("ID", item.getId());
             dataMap.put("变化状态", item.getChangeType());
 
-            dataMap.put("公司代码", item.getCode());
+            dataMap.put("代码", item.getCode());
             dataMap.put("公司名称", item.getName());
 
             return dataMap;
@@ -115,6 +115,8 @@ public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.INSERT.getId();
         } else {
             final StockCnUndoStInfo stockCnUndoStInfo = undoStInfoResultLists.stream().findFirst().get();
+            stockCnUndoStInfo.setNumber(null);
+            undoStInfo.setNumber(null);
             if (!Objects.equals(stockCnUndoStInfo, undoStInfo)) {
                 changeType = DataChangeType.UPDATE.getId();
             }

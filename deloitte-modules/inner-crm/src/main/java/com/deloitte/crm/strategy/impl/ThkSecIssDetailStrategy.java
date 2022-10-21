@@ -98,6 +98,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
             Date ipoDate = thkSecIssInfos.getIpoDate();
 
+            boolean ipoNow = DateUtil.compare(ipoDate, timeNow) == 0;
 
             //当股票状态已经是“发行中”时，当【上市日期】 = 今天 时，状态改为“成功上市”
             if (Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus()) && DateUtil.compare(ipoDate, timeNow) == 0) {
