@@ -8,12 +8,15 @@ import com.deloitte.crm.dto.ProCustomerDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ProductsMasterRelService;
 import com.deloitte.crm.vo.ProductsMasterRelVo;
+import com.deloitte.system.api.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.sf.jsqlparser.parser.feature.Feature.insert;
 
 /**
  * @author PenTang
@@ -28,6 +31,8 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
         private EntityMasterMapper entityMasterMapper;
 
         private ProductsMasterMappingMapper productsMasterMappingMapper;
+
+        private RoleService roleService;
         /**
          *查询客户产品敞口映射
          *
@@ -99,14 +104,27 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                                 productsMasterRel.setProCustId(productsMasterMapping.getProCustomerId());
                                 productsMasterRel.setProMasDictId(productsMasterMapping.getProMasDictId());
                                 productsMasterRel.setEntityCode(entityMaster.getEntityCode());
-
+                                productsMasterRel.setDataYear(roleService.getConfigId());
+                                productsMasterRels.add(productsMasterRel);
                         }
+                        for (ProductsMasterRel productsMasterRel : productsMasterRels) {
+                                ProductsMasterRel one = getOne(new LambdaQueryWrapper<ProductsMasterRel>()
+                                        .eq(ProductsMasterRel::getEntityCode, productsMasterRel.getEntityCode())
+                                        .eq(ProductsMasterRel::getDataYear, productsMasterRel.getDataYear())
+                                        .eq(ProductsMasterRel::getProCustId, productsMasterRel.getProCustId())
+                                );
+                                if (one != null) {
+                                        productsMasterRel.setId(one.getId());
+                                        boolean b = updateById(productsMasterRel);
+                                }else{
+                                        boolean save = save(productsMasterRel);
+                                }
+                        }
+                        return true;
 
-
+                }else {
+                        return false;
                 }
-                return false;
         }
-
-
 
 }

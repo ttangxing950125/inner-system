@@ -48,7 +48,7 @@ public class ProductCoverController {
     public R getProCov(@Validated @RequestBody EntityOrGovByAttrVo entityOrGovByAttrVo) {
         //查询政府覆盖
         if (ObjectUtils.equals(entityOrGovByAttrVo.getEntityType(), "GV")) {
-            return R.ok(iGovInfoService.getGovEntityResult(entityOrGovByAttrVo));
+            return iGovInfoService.getGovEntityResult(entityOrGovByAttrVo);
         //查询企业覆盖情况
         } else {
             return R.ok(productsCoverService.getProducts(entityOrGovByAttrVo));

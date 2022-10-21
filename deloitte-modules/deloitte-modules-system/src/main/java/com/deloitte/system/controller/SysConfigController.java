@@ -3,6 +3,7 @@ package com.deloitte.system.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.deloitte.system.domain.SysConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,6 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.common.security.utils.SecurityUtils;
-import com.deloitte.system.domain.SysConfig;
 import com.deloitte.system.service.ISysConfigService;
 
 /**
@@ -135,5 +135,11 @@ public class SysConfigController extends BaseController
     {
         configService.resetConfigCache();
         return AjaxResult.success();
+    }
+
+    @PostMapping("/configId")
+    public String getConfigId(){
+        String configId = configService.getConfigId();
+        return configId;
     }
 }

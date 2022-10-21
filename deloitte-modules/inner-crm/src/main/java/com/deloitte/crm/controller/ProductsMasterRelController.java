@@ -76,6 +76,22 @@ public class ProductsMasterRelController  {
         return R.ok(productsMasterRelService.updateRel(productsMasterRelVo));
     }
 
+       /**
+        *自动映射
+        *
+        * @param entityCode
+        * @return R
+        * @author penTang
+        * @date 2022/10/21 15:12
+       */
+       @PostMapping("/AutoRel")
+       @ApiImplicitParams({
+               @ApiImplicitParam(paramType = "body", name = "entityCode", value = "主体code",dataType = "String")
+       })
+       @ApiOperation(value = "{修改产品信息}", response =Boolean.class)
+        public  R updateOrSaveRel(@RequestParam("entityCode")String entityCode){
+        return R.ok(productsMasterRelService.updateAuto(entityCode));
 
+        }
 
 }
