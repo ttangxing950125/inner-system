@@ -599,9 +599,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //设置值
             if (!CollectionUtils.isEmpty(covers)) {
                 String cover = covers.get(0).getIsCover();
-                if (!ObjectUtils.isEmpty(cover)){
+                if (!ObjectUtils.isEmpty(cover)) {
                     isCover.setValue(cover);
-                    if ("0".equals(cover)){
+                    if ("0".equals(cover)) {
                         coverReason.setValue(covers.get(0).getCoverDes());
                     }
                 }
@@ -897,9 +897,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         } else if (type == 4) {
             infoQuery.eq(EntityInfo::getFinance, 1);
         }
-        infoQuery.like(EntityInfo::getEntityCode, param);
-        infoQuery.or().like(EntityInfo::getEntityName, param);
-
+        if (!ObjectUtils.isEmpty(param)) {
+            infoQuery.like(EntityInfo::getEntityCode, param);
+            infoQuery.or().like(EntityInfo::getEntityName, param);
+            if (type == 1) {
+                infoQuery.eq(EntityInfo::getList, 1);
+            } else if (type == 2) {
+                infoQuery.eq(EntityInfo::getIssueBonds, 1);
+            } else if (type == 3) {
+                infoQuery.eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0);
+            } else if (type == 4) {
+                infoQuery.eq(EntityInfo::getFinance, 1);
+            }
+        }
 //        List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam( type,  param, pageNum, pageSize);
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, infoQuery);
         List<EntityInfo> entityInfoList = page.getRecords();
@@ -1837,7 +1847,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityNameHis His = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
         if (ObjectUtils.isEmpty(Info) && ObjectUtils.isEmpty(His)) {
             return R.ok(new EntityInfoVo().setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
-        }else if(ObjectUtils.isEmpty(Info)){
+        } else if (ObjectUtils.isEmpty(Info)) {
             EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, His.getDqCode()));
             return R.ok(new EntityInfoVo().setBo(false).setEntityInfoHis(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
         }
@@ -2188,13 +2198,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             EntityInfo o = entityInfoMapper.selectById(entityInfo.getId());
             String entityName = o.getEntityName();
             //修改企业主体名称时，需要先添加曾用名
-            if (!ObjectUtils.isEmpty(entityInfo.getEntityName())&&!entityInfo.getEntityName().equals(entityName)) {
+            if (!ObjectUtils.isEmpty(entityInfo.getEntityName()) && !entityInfo.getEntityName().equals(entityName)) {
                 String oldName = entityInfo.getEntityName();
                 EntityInfo addOldName = new EntityInfo();
                 addOldName.setId(entityInfo.getId())
-                          .setEntityNameHis(oldName)
-                          .setUpdated(new Date())
-                          .setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks());
+                        .setEntityNameHis(oldName)
+                        .setUpdated(new Date())
+                        .setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks());
                 addOldName(addOldName);
                 //修改基础属性，需要将曾用名置空
                 entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
@@ -2702,7 +2712,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //entityFinancial
         LambdaQueryWrapper<EntityFinancial> eq = new LambdaQueryWrapper<EntityFinancial>().eq(EntityFinancial::getEntityCode, code);
         EntityFinancial entityFinancial = financialMapper.selectOne(eq);
-        if (entityFinancial!=null){
+        if (entityFinancial != null) {
             entityInfoCodeDto.setMince(entityFinancial.getMince());
         }
 

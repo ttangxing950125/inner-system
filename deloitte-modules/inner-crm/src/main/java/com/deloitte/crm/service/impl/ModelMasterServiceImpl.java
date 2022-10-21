@@ -244,7 +244,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             crmSupplyTask.setRoleId(5L);
         }
         //新增任务
-        crmSupplyTaskMapper.insertCrmSupplyTask(crmSupplyTask);
+        crmSupplyTaskMapper.insert(crmSupplyTask);
 
         // 查询到所有任务已经完成 修改当日单表
         if (crmMasTasks.size() == 0) {
