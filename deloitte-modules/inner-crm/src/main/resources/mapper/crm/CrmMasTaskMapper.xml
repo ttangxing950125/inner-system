@@ -30,7 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectCrmMasTaskById" parameterType="Long" resultMap="CrmMasTaskResult">
+    <select id="selectCrmMasTaskById" parameterType="Integer" resultMap="CrmMasTaskResult">
         <include refid="selectCrmMasTaskVo"/>
         where id = #{id}
     </select>

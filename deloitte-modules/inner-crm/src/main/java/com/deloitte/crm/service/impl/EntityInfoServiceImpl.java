@@ -595,10 +595,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //设置产品名称
             isCover.setName(proName + "是否覆盖");
             coverReason.setName(proName + "未覆盖原因");
+            isCover.setValue("0");
             //设置值
             if (!CollectionUtils.isEmpty(covers)) {
-                isCover.setValue(covers.get(0).getIsCover());
-                coverReason.setValue(covers.get(0).getCoverDes());
+                String cover = covers.get(0).getIsCover();
+                if (!ObjectUtils.isEmpty(cover)){
+                    isCover.setValue(cover);
+                    if ("0".equals(cover)){
+                        coverReason.setValue(covers.get(0).getCoverDes());
+                    }
+                }
             }
             proCoverVo.setIsCover(isCover).setCoverReason(coverReason);
             coverVos.add(proCoverVo);
@@ -2197,13 +2203,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
         }
         if (!ObjectUtil.isEmpty(stockCnInfo) && !ObjectUtil.isEmpty(stockCnInfo.getStockDqCode())) {
-            //修改A故信息 -- TODO 是否修改最新的一条信息，还是都修改
             StockCnInfo old = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockShortName(), old, entityInfo);
             stockCnMapper.update(stockCnInfo, new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
         }
         if (!ObjectUtil.isEmpty(stockThkInfo) && !ObjectUtil.isEmpty(stockThkInfo.getStockDqCode())) {
-            //修改港股信息 -- TODO 是否修改最新的一条信息，还是都修改
             StockThkInfo old = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockName(), old, entityInfo);
             stockThkMapper.update(stockThkInfo, new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
