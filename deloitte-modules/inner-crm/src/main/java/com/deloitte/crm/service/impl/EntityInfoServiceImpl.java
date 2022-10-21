@@ -1813,15 +1813,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<EntityInfoVo> checkCreditCode(String creditCode) {
-        List<EntityInfo> entityInfos = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>().lambda()
-                .eq(EntityInfo::getCreditCode, creditCode));
-        if (entityInfos.size() == 0) {
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, creditCode));
+        if (entityInfo == null) {
             return R.ok(new EntityInfoVo().setBo(true)
                     .setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
         }
         return R.ok(new EntityInfoVo().setBo(false)
                 .setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo())
-                .setEntityInfo(entityInfos.get(0)));
+                .setEntityInfo(entityInfo));
     }
 
     /**
@@ -1834,14 +1833,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<EntityInfoVo> checkEntityName(String entityName) {
-        List<EntityInfo> entName = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>().lambda()
-                .eq(EntityInfo::getEntityName, entityName));
-        if (entName.size() != 0) {
-            return R.ok(new EntityInfoVo()
-                    .setBo(false).setEntityInfo(entName.get(0)));
+        EntityInfo Info = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName));
+        EntityNameHis His = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
+        if (ObjectUtils.isEmpty(Info) && ObjectUtils.isEmpty(His)) {
+            return R.ok(new EntityInfoVo().setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
+        }else if(ObjectUtils.isEmpty(Info)){
+            EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, His.getDqCode()));
+            return R.ok(new EntityInfoVo().setBo(false).setEntityInfoHis(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
         }
-        return R.ok(new EntityInfoVo()
-                .setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
+        return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(Info).setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
     }
 
     /**
