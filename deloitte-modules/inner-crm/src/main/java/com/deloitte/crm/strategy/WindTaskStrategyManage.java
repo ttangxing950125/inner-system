@@ -43,8 +43,8 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
         CrmWindTask windTask = windTaskContext.getWindTask();
         WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
         if (supportItem == null) {
-            log.warn("上下文获取WindTaskStrategy为空缺少taskDictId={}, 任务结束!!!!!", windTask.getTaskDictId());
-            return null;
+            log.error("上下文获取WindTaskStrategy为空缺少taskDictId={}, 任务结束!!!!!", windTask.getTaskDictId());
+            throw new GlobalException("空缺少taskDictId:" + windTask.getTaskDictId() + "的任务");
         }
         return supportItem.doTask(windTaskContext);
     }

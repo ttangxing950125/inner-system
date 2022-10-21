@@ -2,6 +2,7 @@ package com.deloitte.crm.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Data
 @Builder
+@TableName("bond_convertible_change_info")
 public class BondConvertibleChangeInfo implements Serializable {
     private static final long serialVersionUID = 420836123005045364L;
     /**
