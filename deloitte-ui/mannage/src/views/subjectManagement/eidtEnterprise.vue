@@ -182,7 +182,7 @@
                   <div class="first">是否上市</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -190,7 +190,7 @@
                   <div class="first">上市类型汇总</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.listType || '-' 
                     }}
                   </div>
                 </div>
@@ -198,7 +198,7 @@
                   <div class="first">A股上市状态</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.listTypeA || '-'
                     }}
                   </div>
                 </div>
@@ -206,7 +206,7 @@
                   <div class="first">A股上市交易所</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.govName"
+                    v-model="info.stockCnInfo.exchange"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
@@ -214,7 +214,7 @@
                   <div class="first">A股股票代码</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.govNameHis"
+                    v-model="info.stockCnInfo.stockCode"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
@@ -224,7 +224,7 @@
                   <div class="first">A股上市日期</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    v-model="info.stockCnInfo.listDate"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
@@ -232,31 +232,31 @@
                   <div class="first">A股退市日期</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
+                    v-model="info.stockCnInfo.delistingDate"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
                   <div class="first">A股证券简称</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.stockCnInfo.stockShortName }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">A股曾用证券简称</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.stockCnInfo.shortNameHisA && info.stockCnInfo.shortNameHisA.join() }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">A股证券简称变更日期</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.stockCnInfo.updated }}
                   </div>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.bondInfoDetail">
               <template slot="title">
                 <span style="font-size: 16px">发债情况</span>
               </template>
@@ -265,7 +265,7 @@
                   <div class="first">是否发债（含历史）</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.bondInfoDetail && (info.bondInfoDetail.isBond ? 'Y' : 'N')
                     }}
                   </div>
                 </div>
@@ -273,56 +273,56 @@
                   <div class="first">是否可以收数</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.bondInfoDetail && info.bondInfoDetail.isCollection === '1' ? 'Y' : 'N' 
                     }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">首次发债时间</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.firstBond }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">是否发行集合债</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail && info.bondInfoDetail.isCollBond ? 'Y' : 'N' }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">发行集合债明细</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.collBonds && info.bondInfoDetail.collBonds.join() }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">存续集合债数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.collBondsLiveNum }}
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">是否发行ABB</div>
+                  <div class="first">是否发行ABS</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.isAbsBond ? 'Y' : 'N' }}
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">发行ABB 明细</div>
+                  <div class="first">发行ABS 明细</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.absBonds && info.bondInfoDetail.absBonds.join() }}
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">发行ABB 数量</div>
+                  <div class="first">发行ABS 数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.absBondsNum}}
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">存续ABB 数量</div>
+                  <div class="first">存续ABS 数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.absBondsLiveNum }}
                   </div>
                 </div>
               </el-col>
@@ -330,54 +330,54 @@
                 <div class="flex1">
                   <div class="first">是否发行公募债</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.isPublicBond ? 'Y' : 'N' }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">发行公募债明细</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.publicBonds && info.bondInfoDetail.publicBonds.join() }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">发行公募债数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.publicBondsNum }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">存续公募债数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.publicBondsLiveNum }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">是否发行私募债</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.isPrivateBond ? 'Y' : 'N' }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">发行私募债明细</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.privateBonds && info.bondInfoDetail.privateBonds.join() }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">发行私募债数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.privateBondsNum }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">存续私募债数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo && info.govInfo.updated }}
+                    {{ info.bondInfoDetail.privateBondsLiveNum }}
                   </div>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">金融机构</span>
               </template>
@@ -386,7 +386,7 @@
                   <div class="first">是否为金融机构</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityInfo.finance === 1 ? 'Y' : 'N' 
                     }}
                   </div>
                 </div>
@@ -394,15 +394,15 @@
                   <div class="first">所处细分行业</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityFinancial.mince 
                     }}
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">封口监管机构</div>
+                  <div class="first">对口监管机构</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityFinancial.regulators
                     }}
                   </div>
                 </div>
@@ -410,13 +410,13 @@
                   <div class="first">是否发行同业存单（银行）</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityFinancial.isIssPeerDep === 1 ? 'Y' : 'N'
                     }}
                   </div>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">敞口划分</span>
               </template>
@@ -425,7 +425,7 @@
                   <div class="first">申万（2021）行业划分明细</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityInfo.shenWanMaster
                     }}
                   </div>
                 </div>
@@ -433,7 +433,7 @@
                   <div class="first">wind行业划分明细</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityInfo.windMaster
                     }}
                   </div>
                 </div>
@@ -441,7 +441,7 @@
                   <div class="first">旧辖口行业划分</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -451,7 +451,7 @@
                   <div class="first">客户敞口行业划分汇集</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.masterNames && info.masterNames.join()
                     }}
                   </div>
                 </div>
@@ -459,7 +459,7 @@
                   <div class="first">产业链CICS行业划分明细</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityInfo.cicsIndustryDetails
                     }}
                   </div>
                 </div>
@@ -470,77 +470,31 @@
                 <span style="font-size: 16px">产品覆盖情况</span>
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
-                <div class="flex1">
-                  <div class="first">IB是否覆盖</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">IB未覆盖原因</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">xx是否覆盖</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">xx未覆盖原因</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">地产是否覆盖</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">地产未覆盖原因</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">xx是否覆盖</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">xx未覆盖原因</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
+                <div v-for="(item, index) in info.coverageDetail" :key="index" >
+                    <div class="flex1">
+                        <div class="first">{{ item.isCover.name }}</div>
+                        <div class="scond" style="color: #a7a7a7">
+                            {{
+                            item.isCover.value === '1' || !item.isCover.value ? '-' : item.isCover.value
+                            }}
+                        </div>
+                    </div>
+                    <div class="flex1">
+                        <div class="first">{{ item.coverReason.name }}</div>
+                        <div class="scond" style="color: #a7a7a7">
+                            {{
+                            item.coverReason.value
+                            }}
+                        </div>
+                    </div>
                 </div>
               </el-col>
-              <el-col :sm="24" :lg="12" class="form-card">
+              <!-- <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">客户敞口行业划分汇集</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -548,7 +502,7 @@
                   <div class="first">产业链CICS行业划分明细</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -556,7 +510,7 @@
                   <div class="first">产业链是否覆盖</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -564,7 +518,7 @@
                   <div class="first">产业链未覆盖原因</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -572,7 +526,7 @@
                   <div class="first">ESC是否覆盖</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
@@ -580,13 +534,13 @@
                   <div class="first">ESC未覆盖原因</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
                     }}
                   </div>
                 </div>
-              </el-col>
+              </el-col> -->
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.entityBaseBusiInfo">
               <template slot="title">
                 <span style="font-size: 16px">其他一般工商信息</span>
               </template>
@@ -595,7 +549,7 @@
                   <div class="first">注册地址</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.regAddr
                     }}
                   </div>
                 </div>
@@ -603,7 +557,7 @@
                   <div class="first">注册地所在省</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.regProvince
                     }}
                   </div>
                 </div>
@@ -611,7 +565,7 @@
                   <div class="first">法人名称</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.ceoName
                     }}
                   </div>
                 </div>
@@ -619,7 +573,7 @@
                   <div class="first">法人类型</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.ceoType
                     }}
                   </div>
                 </div>
@@ -627,7 +581,7 @@
                   <div class="first">公司类型</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.comType
                     }}
                   </div>
                 </div>
@@ -635,7 +589,7 @@
                   <div class="first">成立日期</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.establishDate
                     }}
                   </div>
                 </div>
@@ -643,7 +597,7 @@
                   <div class="first">营业期限开始日期</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.busStartDate
                     }}
                   </div>
                 </div>
@@ -651,7 +605,7 @@
                   <div class="first">营业期限截止日期</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.busEndDate
                     }}
                   </div>
                 </div>
@@ -659,73 +613,7 @@
                   <div class="first">营业范围</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">营业期限开始日期</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">营业期限截止日期</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-              </el-col>
-              <el-col :sm="24" :lg="12" class="form-card">
-                <div class="flex1">
-                  <div class="first">客户敞口行业划分汇集</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">产业链CICS行业划分明细</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">产业链是否覆盖</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">产业链未覆盖原因</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">ESC是否覆盖</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
-                    }}
-                  </div>
-                </div>
-                <div class="flex1">
-                  <div class="first">ESC未覆盖原因</div>
-                  <div class="scond" style="color: #a7a7a7">
-                    {{
-                      info.govInfo && levelStr[info.govInfo.govType] 
+                      info.entityBaseBusiInfo.busRange
                     }}
                   </div>
                 </div>
@@ -762,7 +650,12 @@ export default {
       currentTime: "",
       list: [],
       currentTab: "",
-      info: {},
+      info: {
+          stockCnInfo: {}
+      },
+      levelStr: {
+
+      }
     };
   },
   created() {
@@ -778,7 +671,6 @@ export default {
         const code = row.entityInfo.entityCode;
         getInfoDetail({ entityCode: code }).then((res) => {
           const { data } = res;
-          console.log(data);
           this.info = data;
         });
       } catch (error) {
@@ -857,16 +749,16 @@ export default {
     submit() {
       try {
         this.$modal.loading("Loading...");
-        const entityInfoDetails = {
-          entityInfo: this.info.entityInfo,
-          stockCnInfo: {
-            stockDqCode: this.info.stockDqCode,
-          },
-          stockThkInfo: {
-            stockDqCode: this.info.stockDqCode,
-          },
-        };
-        updateInfoDetail(entityInfoDetails).then((res) => {
+        // const entityInfoDetails = {
+        //   entityInfo: this.info.entityInfo,
+        //   stockCnInfo: {
+        //     stockDqCode: this.info.stockDqCode,
+        //   },
+        //   stockThkInfo: {
+        //     stockDqCode: this.info.stockDqCode,
+        //   },
+        // };
+        updateInfoDetail(this.info).then((res) => {
           if (res.code === 200) {
             this.$message({
               showClose: true,

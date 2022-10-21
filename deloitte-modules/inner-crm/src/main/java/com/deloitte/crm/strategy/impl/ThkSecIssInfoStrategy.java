@@ -46,6 +46,7 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
 
     /**
      * 导入ThkSecIssInfo表的数据
+     *
      * @param secIssInfo
      * @param timeNow
      * @param windTask
@@ -63,15 +64,14 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
 
             StockThkInfo stockThkInfo = stockThkInfoService.findByCode(secIssInfoCode);
             //没有就创建一个
-            if (stockThkInfo==null){
+            if (stockThkInfo == null) {
                 stockThkInfo = new StockThkInfo();
                 stockThkInfo.setStockCode(secIssInfoCode);
                 stockThkInfo.setStockStatus(1);
-                stockThkInfo.setStatusDesc("聆讯中("+secIssInfo.getStatus()+")");
+                stockThkInfo.setStatusDesc("聆讯中(" + secIssInfo.getStatus() + ")");
             }
 
             stockThkInfo.setStockName(secIssInfo.getName());
-
 
 
             //主体名
@@ -81,9 +81,9 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
             Integer changeType = null;
             //查询这条数据有没有
             ThkSecIssInfo lastThkSecIssInfo = thkSecIssInfoService.findLastByEntityName(entityName);
-            if (lastThkSecIssInfo==null){
+            if (lastThkSecIssInfo == null) {
                 changeType = DataChangeType.INSERT.getId();
-            }else if (!Objects.equals(lastThkSecIssInfo, secIssInfo)){
+            } else if (!Objects.equals(lastThkSecIssInfo, secIssInfo)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
@@ -98,11 +98,11 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
             thkSecIssInfoService.save(secIssInfo);
 
             //如果是新增数据，并且有主体名，就要自动绑定关联关系了
-            if (Objects.equals(DataChangeType.INSERT.getId(), changeType) && StrUtil.isNotBlank(entityName)){
+            if (Objects.equals(DataChangeType.INSERT.getId(), changeType) && StrUtil.isNotBlank(entityName)) {
                 entityStockThkRelService.bindRelOrCreateTask(stockThkInfo, entityName, windTask, secIssInfo);
             }
 
-            if (changeType!=null){
+            if (changeType != null) {
                 //更新港股属性
                 entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), secIssInfo);
             }
@@ -138,8 +138,8 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<ThkSecIssInfo> util = new ExcelUtil<ThkSecIssInfo>(ThkSecIssInfo.class);
-        List<ThkSecIssInfo> thkSecIssInfos = util.importExcel(windTaskContext.getFileStream(), true);;
-
+        List<ThkSecIssInfo> thkSecIssInfos = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(thkSecIssInfos);
         return thkSecIssInfoService.doTask(windTask, thkSecIssInfos);
     }
 
@@ -182,7 +182,7 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
                 .in(ThkSecIssInfo::getChangeType, 1, 2);
 
 
-        return thkSecIssInfoService.list(wrapper).stream().map(item->{
+        return thkSecIssInfoService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

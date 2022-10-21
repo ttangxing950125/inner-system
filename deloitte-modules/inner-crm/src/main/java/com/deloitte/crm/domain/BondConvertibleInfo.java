@@ -2,7 +2,9 @@ package com.deloitte.crm.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 可转债发行预案(BondConvertibleInfo)表实体类
+ * 可交换转载(BondConvertibleInfo)表实体类
  *
  * @author 吴鹏鹏ppp
  * @since 2022-10-13 13:39:43
@@ -22,6 +24,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@TableName("bond_convertible_info")
 public class BondConvertibleInfo implements Serializable {
     private static final long serialVersionUID = -29871335378267450L;
     /**
@@ -266,6 +269,12 @@ public class BondConvertibleInfo implements Serializable {
      */
 //    @Excel(name = "更新时间")
     private Date updated;
+
+
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
 
 }

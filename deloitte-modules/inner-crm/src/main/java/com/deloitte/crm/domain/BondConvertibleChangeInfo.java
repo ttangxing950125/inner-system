@@ -2,7 +2,9 @@ package com.deloitte.crm.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.utils.EqualsUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +13,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 可交换转债发行预案(BondConvertibleChangeInfo)表实体类
@@ -22,6 +25,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@TableName("bond_convertible_change_info")
 public class BondConvertibleChangeInfo implements Serializable {
     private static final long serialVersionUID = 420836123005045364L;
     /**
@@ -80,10 +84,8 @@ public class BondConvertibleChangeInfo implements Serializable {
      */
     @Excel(name = "股东大会公告日")
     private Date shareHoldersDate;
-    /**
-     * 受理日期
-     */
-    @Excel(name = "受理日期")
+
+    //    @Excel(name = "受理日期")
     private Date acceptedDate;
     /**
      * 发审委通过公告日
@@ -261,11 +263,21 @@ public class BondConvertibleChangeInfo implements Serializable {
      */
 //    @Excel(name = "创建时间,根据当前时间戳 CURRENT_TIMESTAMP ,更新")
     private Date created;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, noticeDate, code, name, projectProgress, planDate, shareHoldersDate, acceptedDate, iecPassDate, auditResultsDate, csrcApproveDate, interneTappDate, offlineDate, registrationShareHoldersDate, stockHoldersDate, onlineSuccessRateDate, onlineSuccessResultDate, onlinePaymentDate, listingDate, issuingWay, issuingYear, issuingType, rate, issuingScale, issuingClause, frequencyPayment, paymentDesc, leadUnderwriter, callProvision, putProvision, convertibleTerms, downwardRevisionClause, scrcIndustry, windIndustry, allIndustries, convertibleBondIs, bondThatCode, bondThatName, issueDateRate, bookValuePlan, sharesClosedYesterday, onlineSubscriptionCode, created, updated);
+    }
+
     /**
      * 更新时间
      */
 //    @Excel(name = "更新时间，根据当前时间戳 CURRENT_TIMESTAMP ,更新")
     private Date updated;
 
+    @Override
+    public boolean equals(Object o) {
+        return EqualsUtil.equalsAnnoField(this, o, Excel.class);
+    }
 
 }

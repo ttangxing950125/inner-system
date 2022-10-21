@@ -44,14 +44,15 @@ public class BondDelIssStrategy implements WindTaskStrategy {
 
     /**
      * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
+     *
      * @param delIss
      * @param timeNow
      * @return 如果这条 delIss 是新增的，changeType返回1
-     *         如果这条 delIss 是原有基础上有修改，changeType返回2
+     * 如果这条 delIss 是原有基础上有修改，changeType返回2
      */
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
-    public Future<BondInfoDto> doBondImport(BondDelIss delIss, Date timeNow, CrmWindTask windTask){
+    public Future<BondInfoDto> doBondImport(BondDelIss delIss, Date timeNow, CrmWindTask windTask) {
         try {
             //查询债券是否存在
             String shortName = delIss.getBondShortName();
@@ -59,8 +60,8 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             Integer changeType = null;
 
             //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(shortName,Boolean.FALSE);
-            if (bondInfo==null){
+            BondInfo bondInfo = bondInfoService.findByShortName(shortName, Boolean.FALSE);
+            if (bondInfo == null) {
                 bondInfo = new BondInfo();
             }
 
@@ -69,14 +70,14 @@ public class BondDelIssStrategy implements WindTaskStrategy {
 
             //查询有没有这条数据
             List<BondDelIss> bondDelIsses = bondDelIssService.findByBondName(shortName);
-            if (CollUtil.isEmpty(bondDelIsses)){
+            if (CollUtil.isEmpty(bondDelIsses)) {
                 changeType = DataChangeType.INSERT.getId();
             }
 
 
             //当债券进入 推迟或取消发行债券表 时，记为“推迟发行”
             bondInfo.setBondStatus(BondStatus.DELAY_ISSUE.getId());
-            if (Objects.equals(delIss.getEvent(), BondStatus.ISSUE_FAIL.getName() )){
+            if (Objects.equals(delIss.getEvent(), BondStatus.ISSUE_FAIL.getName())) {
                 bondInfo.setBondStatus(BondStatus.ISSUE_FAIL.getId());
             }
             bondInfo = bondInfoService.saveOrUpdate(bondInfo);
@@ -84,7 +85,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             //更新债券属性
             //更新当前债券属性
             int updateCount = entityAttrValueService.updateBondAttr(bondInfo.getBondCode(), delIss);
-            if (changeType==null && updateCount>0){
+            if (changeType == null && updateCount > 0) {
                 changeType = DataChangeType.UPDATE.getId();
             }
 
@@ -106,6 +107,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
 
     /**
      * 是否支持当前wind任务
+     *
      * @param windDictId
      * @return
      */
@@ -116,6 +118,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
 
     /**
      * 开始执行任务
+     *
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
@@ -126,13 +129,14 @@ public class BondDelIssStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<BondDelIss> util = new ExcelUtil<BondDelIss>(BondDelIss.class);
         List<BondDelIss> delIsses = util.importExcel(windTaskContext.getFileStream(), true);
-
+        Collections.reverse(delIsses);
 
         return bondDelIssService.doTask(windTask, delIsses);
     }
 
     /**
      * 获得任务详情页，上传的数据的表头
+     *
      * @param windTask
      * @return
      */
@@ -158,6 +162,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
      * 获得任务详情页，上传的详情数据
      * key：表头
      * value：库中的数据
+     *
      * @param windTask
      * @return
      */
@@ -169,7 +174,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
                 .in(BondDelIss::getChangeType, 1, 2);
 
 
-        return bondDelIssService.list(wrapper).stream().map(item->{
+        return bondDelIssService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());

@@ -22,8 +22,8 @@ public enum WindTaskEnum {
 
     BOND_NEW_ISS(15, 2, "债券发行", "新债发行-新发行债券"),
     BOND_DEL_ISS(14, 2, "债券发行", "新债发行-推迟或取消发行债券"),
-    BOND_CONVERTIBLE(16, 2, "债券发行", "可转债发行预案"),
-    BOND_CONVERTIBLE_CHANGE(17, 2, "债券发行", "可交换转债发行预案"),
+    BOND_CONVERTIBLE(17, 2, "债券发行", "可转债发行预案"),
+    BOND_CONVERTIBLE_CHANGE(18, 2, "债券发行", "可交换转债发行预案"),
 
 
 

@@ -19,11 +19,12 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
-import com.deloitte.crm.dto.ProductCoverDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
+import com.deloitte.crm.vo.GovInfoDetailVo;
+import com.deloitte.crm.vo.ParentLevelVo;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -93,8 +94,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     private static final Integer DEFAULT_PAGE_NUM_SIZE = 50;
 
-    /** 德勤政府主体唯一识别码前缀 */
-    private static final String frontTitle="GV";
+    /**
+     * 德勤政府主体唯一识别码前缀
+     */
+    private static final String frontTitle = "GV";
 
     /**
      * 查询【请填写功能名称】
@@ -128,12 +131,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     public int insertGovInfo(GovInfo govInfo) {
         //生成政府主体德勤主体唯一识别代码
-        String dqGovCode=getDqGovCode();
+        String dqGovCode = getDqGovCode();
         govInfo.setDqGovCode(dqGovCode);
 
         //曾用名不为空，则新增曾用名记录表
         String govNameHis = govInfo.getGovNameHis();
-        if (!ObjectUtils.isEmpty(govNameHis)){
+        if (!ObjectUtils.isEmpty(govNameHis)) {
             EntityNameHis entityNameHis = new EntityNameHis();
             entityNameHis.setDqCode(govInfo.getDqGovCode());
             entityNameHis.setOldName(govNameHis);
@@ -153,19 +156,19 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @return String
      * @author 冉浩岑
      * @date 2022/10/20 11:52
-    */
+     */
     public String getDqGovCode() {
         GovInfo latestGov = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().like(GovInfo::getDqGovCode, frontTitle).orderByDesc(GovInfo::getId).last(" limit 1"));
-        if (ObjectUtils.isEmpty(latestGov)){
-            return frontTitle+000001;
+        if (ObjectUtils.isEmpty(latestGov)) {
+            return frontTitle + 000001;
         }
-        Long id = latestGov.getId()+1;
+        Long id = latestGov.getId() + 1;
         int length = id.toString().length();
-        String dqGovCode=frontTitle;
-        for (int i=0;i<6-length;i++){
-            dqGovCode=dqGovCode+0;
+        String dqGovCode = frontTitle;
+        for (int i = 0; i < 6 - length; i++) {
+            dqGovCode = dqGovCode + 0;
         }
-        dqGovCode=dqGovCode+id;
+        dqGovCode = dqGovCode + id;
         return dqGovCode;
     }
 
@@ -207,9 +210,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public R updateInfoList(List<GovInfo> list) {
 
         list.stream().forEach(o -> {
-            entityInfoLogsUpdatedService.insert(o.getDqGovCode(),o.getGovName(),o,o);
-            govInfoMapper.updateById(o);
-            //修改政府主体名称时，需要添加曾用名
+            entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
+            //修改政府主体名称时，需要先添加曾用名
             if (!ObjectUtils.isEmpty(o.getGovName())) {
                 String oldName = o.getGovName();
                 GovInfo addOldName = new GovInfo();
@@ -218,6 +220,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
                 addOldName(addOldName);
             }
+            //修改曾用名后需要将曾用名和曾用名备注置空
+            o.setGovNameHis(null).setEntityNameHisRemarks(null);
+            govInfoMapper.updateById(o);
         });
         return R.ok(list.size());
     }
@@ -400,6 +405,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/26 00:35
      */
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
+        //设置参数信息
+        govAttrByDto=getSend(govAttrByDto);
 
         //获取基础参数信息
         List<MoreIndex> mapList = govAttrByDto.getMapList();
@@ -502,10 +509,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/25 17:05
      */
     public Page<GovInfoResult> getListEntityPage(GovAttrByDto govAttrDto) {
+        //设置参数信息
+        govAttrDto=getSend(govAttrDto);
 
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
-
         Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
         List<MoreIndex> mapList = govAttrDto.getMapList();
 
@@ -528,6 +536,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         pageResult.setRecords(resultRecords);
         return pageResult;
     }
+
 
     private GovInfoResult getGovInfoResult(GovInfo o, List<MoreIndex> mapList) {
         GovInfoResult govInfoResult = new GovInfoResult();
@@ -780,7 +789,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         Page<GovInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
-        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName,entityOrGovByAttrVo.getEntityName());
+        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
         Page<GovInfo> page1 = govInfoMapper.selectPage(page, eq);
         List<GovInfo> records = page1.getRecords();
         ArrayList<GovInfoBynameDto> govInfoBynameDtos = new ArrayList<>();
@@ -792,8 +801,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 LambdaQueryWrapper<Products> eq1 = new LambdaQueryWrapper<Products>().eq(Products::getId, integer);
                 Products products = productsMapper.selectOne(eq1);
                 LambdaQueryWrapper<ProductsCover> qw = new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, record.getDqGovCode())
-                        .eq(ProductsCover::getProId,integer)
-                        .eq(ProductsCover::getIsGov,1);
+                        .eq(ProductsCover::getProId, integer)
+                        .eq(ProductsCover::getIsGov, 1);
                 ProductsCover productsCover = productsCoverMapper.selectOne(qw);
                 Map.put(products.getProName(), productsCover.getCoverDes());
                 maps.add(Map);
@@ -821,26 +830,95 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
 
     @Override
-    public GovAttrByDtoBack getGovRange() {
-        GovAttrByDtoBack govAttrByDto = new GovAttrByDtoBack();
+    public List<ParentLevelVo> getGovRange() {
+
+        List<ParentLevelVo> parentLevelVo = new ArrayList<>();
+
 //        省级行政区 1 地级行政区 2 县级行政区 3 经开高新区 4
-        govAttrByDto = setAdministrationRegion(govAttrByDto);
+        parentLevelVo = setAdministrationRegion(parentLevelVo);
 //        八大经济区
-        govAttrByDto = setEightEconomicsRegion(govAttrByDto);
+        parentLevelVo = setEightEconomicsRegion(parentLevelVo);
 //        19个城市群
-        govAttrByDto = setNineteenCityGroup(govAttrByDto);
+        parentLevelVo = setNineteenCityGroup(parentLevelVo);
 //        城市规模
-        govAttrByDto = setGovScale(govAttrByDto);
+        parentLevelVo = setGovScale(parentLevelVo);
 //        城市分级
-        govAttrByDto = setGovGrading(govAttrByDto);
+        parentLevelVo = setGovGrading(parentLevelVo);
 //        国家中心城市
 
 //        省会城市
 
 //        百强县
 
+        return parentLevelVo;
+    }
+
+
+    public static GovAttrByDto getSend(GovAttrByDto govAttrByDto){
+        List<GovInfoDetailVo> send = govAttrByDto.getSend();
+        if (CollectionUtils.isEmpty(send)){
+            return govAttrByDto;
+        }
+        for (GovInfoDetailVo item:send){
+            List<String> value = item.getValue();
+            if (govScale.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setGovScale(value);
+            }
+            if (govGrading.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setGovGrading(value);
+            }
+            if (isProvince.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setIsProvince(value);
+            }
+            if (isCity.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setIsCity(value);
+            }
+            if (isCounty.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setIsCounty(value);
+            }
+            if (isJKGX.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setIsJKGX(value);
+            }
+            if (eightER.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setEightER(value);
+            }
+            if (nineteenCity.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setNineteenCity(value);
+            }
+            if (hundred.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setHundred(Integer.valueOf(value.get(0)));
+            }
+            if (CCity.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setCCity(Integer.valueOf(value.get(0)));
+            }
+            if (provincial.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
+                govAttrByDto.setProvincial(Integer.valueOf(value.get(0)));
+            }
+        }
         return govAttrByDto;
     }
+    /** 城市规模 */
+    private static String govScale="城市规模";
+    /** 城市分级 */
+    private static  String govGrading="城市分级";
+    /** 省级行政区 */
+    private static  String isProvince="省级行政区";
+    /** 地级行政区 */
+    private static  String isCity="地级行政区";
+    /** 县级行政区 */
+    private static  String isCounty="县级行政区";
+    /** 经开高新区 */
+    private static  String isJKGX="经开高新区";
+    /** 八大经济区 */
+    private static  String eightER ="八大经济区";
+    /** 19个城市群 */
+    private static  String nineteenCity="19个城市群";
+    /** 百强县 */
+    private static  String hundred="百强县";
+    /** 国家中心城市 */
+    private static  String CCity="国家中心城市";
+    /** 省会城市 */
+    private static  String provincial="省会城市";
 
     @Override
     public GovView getGovView() {
@@ -879,104 +957,155 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public List<GovInfo> getGovByParam(String param) {
         return govInfoMapper.selectList(new QueryWrapper<GovInfo>().lambda()
-                            .like(GovInfo::getDqGovCode, param)
-                            .or().like(GovInfo::getGovName, param)
-                            .or().like(GovInfo::getGovCode, param)
+                .like(GovInfo::getDqGovCode, param)
+                .or().like(GovInfo::getGovName, param)
+                .or().like(GovInfo::getGovCode, param)
         );
     }
 
     //返回筛选范围--城市分级
-    private GovAttrByDtoBack setGovGrading(GovAttrByDtoBack govAttrByDto) {
+    private List<ParentLevelVo> setGovGrading(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+        List<ParentLevelVo> list = new ArrayList<>();
+
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 24));
-        List<GovRangeValue> govGrading = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
-            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            govGrading.add(govRangeValue);
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue());
+            list.add(parentValue);
         });
-        govAttrByDto.setGovGrading(govGrading);
-        return govAttrByDto;
+
+        province.setName("城市分级");
+        province.setValue(list);
+        parentLevelVo.add(province);
+
+        return parentLevelVo;
+
     }
 
     //返回筛选范围--城市规模
-    private GovAttrByDtoBack setGovScale(GovAttrByDtoBack govAttrByDto) {
+    private List<ParentLevelVo> setGovScale(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+        List<ParentLevelVo> list = new ArrayList<>();
+
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 23));
-        List<GovRangeValue> govScale = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
-            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            govScale.add(govRangeValue);
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue());
+            list.add(parentValue);
         });
-        govAttrByDto.setGovScale(govScale);
-        return govAttrByDto;
+
+        province.setName("城市规模");
+        province.setValue(list);
+        parentLevelVo.add(province);
+
+        return parentLevelVo;
+
     }
 
     //返回筛选范围--设置19个城市群
-    private GovAttrByDtoBack setNineteenCityGroup(GovAttrByDtoBack govAttrByDto) {
+    private List<ParentLevelVo> setNineteenCityGroup(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+
+        List<ParentLevelVo> list = new ArrayList<>();
+
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 21));
-        List<GovRangeValue> nineteenCity = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
-            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            nineteenCity.add(govRangeValue);
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue());
+            list.add(parentValue);
         });
-        govAttrByDto.setNineteenCity(nineteenCity);
-        return govAttrByDto;
+        province.setName("19个城市群");
+        province.setValue(list);
+        parentLevelVo.add(province);
+
+        return parentLevelVo;
     }
 
     //返回筛选范围--设置八大经济区
-    private GovAttrByDtoBack setEightEconomicsRegion(GovAttrByDtoBack govAttrByDto) {
+    private List<ParentLevelVo> setEightEconomicsRegion(List<ParentLevelVo> parentLevelVo) {
+        ParentLevelVo province = new ParentLevelVo();
+
+        List<ParentLevelVo> list = new ArrayList<>();
+
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 20));
-        List<GovRangeValue> eightER = new ArrayList<>();
         entityAttrIntypes.stream().forEach(o -> {
-            GovRangeValue govRangeValue = new GovRangeValue(o.getValue(), o.getValue());
-            eightER.add(govRangeValue);
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue());
+            list.add(parentValue);
         });
-        govAttrByDto.setEightER(eightER);
-        return govAttrByDto;
+        province.setName("八大经济区");
+        province.setValue(list);
+        parentLevelVo.add(province);
+
+        return parentLevelVo;
     }
 
     //返回筛选范围--设置城市级别数据
-    private GovAttrByDtoBack setAdministrationRegion(GovAttrByDtoBack govAttrByDto) {
+    private List<ParentLevelVo> setAdministrationRegion(List<ParentLevelVo> parentLevelVo) {
+
         QueryWrapper<GovLevel> levelQuery = new QueryWrapper<>();
         Map<Long, List<GovLevel>> levelMap = govLevelMapper.selectList(levelQuery.lambda().isNotNull(GovLevel::getParentId))
                 .stream().collect(Collectors.groupingBy(GovLevel::getParentId));
         for (Long parentId : levelMap.keySet()) {
             if (parentId == 1L) {
+                ParentLevelVo province = new ParentLevelVo();
+
+                List<ParentLevelVo> list = new ArrayList<>();
                 List<GovLevel> govLevels = levelMap.get(parentId);
-                List<GovRangeValue> isProvince = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    GovRangeValue govRangeValue = new GovRangeValue(level.getName(), level.getId());
-                    isProvince.add(govRangeValue);
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId());
+                    list.add(parentValue);
                 }
-                govAttrByDto.setIsProvince(isProvince);
+
+                province.setName("省级行政区");
+                province.setValue(list);
+                parentLevelVo.add(province);
             } else if (parentId == 2L) {
+                ParentLevelVo city = new ParentLevelVo();
+
                 List<GovLevel> govLevels = levelMap.get(parentId);
-                List<GovRangeValue> isCity = new ArrayList<>();
+                List<ParentLevelVo> list = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    GovRangeValue govRangeValue = new GovRangeValue(level.getName(), level.getId());
-                    isCity.add(govRangeValue);
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId());
+                    list.add(parentValue);
                 }
-                govAttrByDto.setIsCity(isCity);
+                city.setName("地级行政区");
+                city.setValue(list);
+                parentLevelVo.add(city);
             } else if (parentId == 3L) {
+                ParentLevelVo country = new ParentLevelVo();
+
                 List<GovLevel> govLevels = levelMap.get(parentId);
-                List<GovRangeValue> isCounty = new ArrayList<>();
+                List<ParentLevelVo> list = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    GovRangeValue govRangeValue = new GovRangeValue(level.getName(), level.getId());
-                    isCounty.add(govRangeValue);
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId());
+                    list.add(parentValue);
                 }
-                govAttrByDto.setIsCounty(isCounty);
+                country.setName("县级行政区");
+                country.setValue(list);
+                parentLevelVo.add(country);
+
             } else if (parentId == 4L) {
+                ParentLevelVo isJKGX = new ParentLevelVo();
+
                 List<GovLevel> govLevels = levelMap.get(parentId);
-                List<GovRangeValue> isJKGX = new ArrayList<>();
+                List<ParentLevelVo> list = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    GovRangeValue govRangeValue = new GovRangeValue(level.getName(), level.getId());
-                    isJKGX.add(govRangeValue);
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId());
+                    list.add(parentValue);
                 }
-                govAttrByDto.setIsJKGX(isJKGX);
+                isJKGX.setName("经开高新区");
+                isJKGX.setValue(list);
+                parentLevelVo.add(isJKGX);
             }
         }
-        return govAttrByDto;
+        return parentLevelVo;
+    }
+
+    public ParentLevelVo getParentValue(String name, Object value) {
+        ParentLevelVo parentLevelVo = new ParentLevelVo();
+        parentLevelVo.setName(name).setSend(value);
+        return parentLevelVo;
     }
 }

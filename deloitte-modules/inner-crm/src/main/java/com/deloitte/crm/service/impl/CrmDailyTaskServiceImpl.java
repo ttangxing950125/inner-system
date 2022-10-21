@@ -1,7 +1,9 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
@@ -10,13 +12,14 @@ import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
-import com.deloitte.crm.mapper.SysUserRoleMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -35,13 +38,10 @@ import java.util.stream.Collectors;
  */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, CrmDailyTask> implements ICrmDailyTaskService {
 
-    private CrmDailyTaskMapper mapper;
-
     private RoleService roleService;
-
-    private SysUserRoleMapper sysUserRoleMapper;
 
     /**
      * 更新状态为 2-有任务未全部处理完
@@ -91,7 +91,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
                         .filter(row -> row.getRoleKey().equals(o))
                         .collect(Collectors.toList())
                         .get(0);
-                crmDailyTasks.addAll(mapper.selectCrmDailyTaskListByDate(startDate, endTime, sysRole.getRoleId().intValue()));
+                crmDailyTasks.addAll(baseMapper.selectCrmDailyTaskListByDate(startDate, endTime, sysRole.getRoleId().intValue()));
             }
         });
         return crmDailyTasks;
@@ -149,4 +149,28 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
         return null;
     }
+
+
+    /**
+     * 传入对应参数 当月任务列表进行新增或修改
+     * @author 正杰
+     * @param taskRoleType
+     * @param taskStatus
+     * @param date
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveTask(Integer taskRoleType, Integer taskStatus, String date) {
+        if(date == null){
+            log.info("  =>> 角色 id 为"+taskRoleType+" 新增 "+DateUtil.now()+" 任务:状态为 "+ taskStatus +" <<=");
+            baseMapper.insert(new CrmDailyTask().setTaskRoleType(taskRoleType.toString()).setTaskStatus(taskStatus).setTaskDate(new Date()));
+        }else{
+            log.info("  =>> 角色 id 为"+taskRoleType+" 修改 "+date+" 任务:状态为 "+ taskStatus +" <<=");
+            CrmDailyTask crmDailyTask = baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, taskStatus));
+            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+            baseMapper.updateById(crmDailyTask.setTaskStatus(taskStatus));
+        }
+    }
+
+
 }

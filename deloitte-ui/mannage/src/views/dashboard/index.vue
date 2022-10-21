@@ -23,14 +23,18 @@
         :data="list"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" sortable label="序号"> </el-table-column>
-        <el-table-column prop="taskDesc" label="任务说明"> </el-table-column>
+        <el-table-column prop="taskDesc" label="任务说明">
+            <template v-slot="{row}">
+                {{ row.taskDesc || '-' }}
+            </template>
+        </el-table-column>
         <el-table-column prop="name" label="任务状态"> 
           <template slot-scope="scope">
             <span :class="scope.row.complete === scope.row.taskCount ? 'green' : 'red'">{{ scope.row.complete !== scope.row.taskCount ? '待完成( '+scope.row.complete+'/'+scope.row.taskCount+ ' )' : '已完成( '+scope.row.taskCount+'/'+scope.row.taskCount+ ' )' }}</span>
           </template>
-        </el-table-column>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
@@ -47,16 +51,23 @@
         :data="list7"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号"> </el-table-column>
-        <el-table-column prop="taskCategory" label="捕获渠道"> </el-table-column>
+        <el-table-column prop="taskCategory" label="捕获渠道">
+             <template v-slot="{row}">
+                {{ row.taskCategory || '-' }}
+            </template>
+        </el-table-column>
         <el-table-column prop="dataShow" label="任务说明"> 
+            <template v-slot="{row}">
+                {{ row.dataShow || '-' }}
+            </template>
         </el-table-column>
         <el-table-column prop="state" label="任务状态"> 
           <template slot-scope="scope">
             <span :class="scope.row.state === 0 ? 'red' : 'green'">{{ stateArr[scope.row.state] }}</span>
           </template>
-        </el-table-column>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
@@ -73,24 +84,29 @@
         </el-table-column>
       </el-table>
       <el-table
-      v-if="roleId === 'role2'"
+        v-if="roleId === 'role2'"
         v-loading="loading"
         class="table-content"
         :data="list2"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column prop="sourceName" label="来源"> </el-table-column>
+        <el-table-column prop="sourceName" label="来源">
+            <template v-slot="{row}">
+                {{ row.sourceName || '-' }}
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityName }}</span>
+            <span>{{ scope.row.entityName || '-'}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.creditCode }}</span>
+            <span>{{ scope.row.creditCode || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
@@ -113,10 +129,15 @@
         :data="list3"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column type="index" label="来源">
+            <template slot-scope="scope">
+                <span>{{ scope.row.srouce || '-' }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
             <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
@@ -157,10 +178,15 @@
         :data="list3"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column type="index" label="来源">
+            <template slot-scope="scope">
+                <span>{{ scope.row.srouce || '-' }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
             <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
@@ -201,10 +227,15 @@
         :data="list3"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
-        <el-table-column type="index" label="来源"> </el-table-column>
+        <el-table-column type="index" label="来源">
+            <template slot-scope="scope">
+                <span>{{ scope.row.srouce || '-' }}</span>
+            </template>
+        </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
             <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
@@ -246,7 +277,7 @@
         @pagination="getList"
       />
     </div>
-    <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%">
+    <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%" :before-close="handleClose">
       <el-form
         :model="ruleForm"
         :rules="rules"
@@ -323,7 +354,7 @@
             <el-radio label="N">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="机构对应域投政府" required>
+        <el-form-item v-if="ruleForm.cityIb === 'Y'" label="机构对应域投政府" required>
           <el-col :span="6">
             <el-select v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
               <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item"></el-option>
@@ -331,7 +362,7 @@
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.city" placeholder="选择地区" @change="getCounty">
+            <el-select v-model="ruleForm.district" placeholder="选择地区" @change="getCounty">
               <el-option v-for="(item, index) in city" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
@@ -367,6 +398,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.remarks"
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -460,6 +492,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.remarks"
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -502,7 +535,7 @@
             v-if="repalce1 === 0"
             style="margin-left: 5px"
             type="text"
-            @click="checkReplace(addGovForm.name, 'GOV_NAME', 1)"
+            @click="checkReplace(addGovForm.govName, 'GOV_NAME', 1)"
             >查重</el-button
           >
           <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
@@ -520,7 +553,7 @@
             v-if="repalce2 === 0"
             style="margin-left: 5px"
             type="text"
-            @click="checkReplace(addGovForm.code, 'GOV_CODE', 2)"
+            @click="checkReplace(addGovForm.govCode, 'GOV_CODE', 2)"
             >查重</el-button
           >
           <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
@@ -640,6 +673,7 @@
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 6 }"
             v-model="ruleForm.remarks"
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -896,7 +930,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="新增主体统一社会信用代码" prop="creditCode">
+        <el-form-item label="新增主体统一社会信用代码" :prop="!ruleForm.notUse ? 'creditCode' : ''">
           <el-input
             class="t-input"
             v-model="ruleForm.creditCode"
@@ -1018,12 +1052,8 @@ export default {
   name: "Index",
   data() {
     return {
-      bodyDig: false,
-      replaceDig: false,
-      role2NowTime: '',
+        role2NowTime: '',
       list: [],
-      fsDig: false,
-      ibDig: false,
       loading: false,
       currentTime: "",
       week: "",
@@ -1033,7 +1063,7 @@ export default {
       dialogVisible: false,
       noUse: false,
       ruleForm: {
-        name: "",
+          name: "",
         region: "",
         date1: "",
         date2: "",
@@ -1043,55 +1073,52 @@ export default {
       },
       addGovForm: {},
       rules: {
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
+          name: [
+              { required: true, message: "请输入活动名称", trigger: "blur" },
           { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
         region: [
-          { required: true, message: "请选择活动区域", trigger: "change" },
+            { required: true, message: "请选择活动区域", trigger: "change" },
         ],
         date1: [
-          {
-            type: "date",
+            {
+                type: "date",
             required: true,
             message: "请选择日期",
             trigger: "change",
           },
         ],
         date2: [
-          {
-            type: "date",
+            {
+                type: "date",
             required: true,
             message: "请选择时间",
             trigger: "change",
           },
         ],
         type: [
-          {
-            type: "array",
+            {
+                type: "array",
             required: true,
             message: "请至少选择一个活动性质",
             trigger: "change",
           },
         ],
         resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
+            { required: true, message: "请选择活动资源", trigger: "change" },
         ],
         creditCode: [
-          { required: true, message: "请输入统一社会信用代码", trigger: "blur" },
+            { required: true, message: "请输入统一社会信用代码", trigger: "blur" },
         ],
         entityName: [
-          { required: true, message: "请输入新建主体名称", trigger: "blur" },
+            { required: true, message: "请输入新建主体名称", trigger: "blur" },
         ],
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
       },
       edit2: false,
       edit1: false,
-      addGovernmentDig: false,
-      remarkDig: false,
-      governmentDig: false,
       stateArr: {
-        0: '未处理',
+          0: '未处理',
         1: '已有主体',
         2: '新增主体',
       },
@@ -1099,20 +1126,20 @@ export default {
       month: '',
       monthMm: '',
       notUseoptions: [
-        {
-          value: 1,
+          {
+              value: 1,
           label: '吊销'
         },
         {
-          value: 2,
+            value: 2,
           label: '注销'
         },
         {
-          value: 3,
+            value: 3,
           label: '非大陆注册机构'
         },
         {
-          value: 4,
+            value: 4,
           label: '其他未知原因'
         }
       ],
@@ -1138,6 +1165,13 @@ export default {
       repalce2: 0,
       govOption2: [],
       govOption1: [],
+      bodyDig: false,
+      replaceDig: false,
+      fsDig: false,
+      ibDig: false,
+      addGovernmentDig: false,
+      remarkDig: false,
+      governmentDig: false,
       detaileDig: false,
       roleId: localStorage.getItem('roleId'),
       selectRole7: [],
@@ -1249,6 +1283,8 @@ export default {
       this.month = this.monthDate.substr(5, 2)
       this.month = this.month.indexOf('0') === 0 ? this.month.substr(1, 1) : this.month
       this.sureDate(this, false, this.year, this.month-1)
+      this.clickDay = this.monthDate + '-' + this.currentDay
+      this.init(false)
       // sureDate(this, false, )
       try {
         queryList(parmas).then((res)=> {
@@ -1442,7 +1478,7 @@ export default {
       this.drawTable(flagData);
     },
     work(row) {
-      this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.nowTime } });
+      this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.clickDay || this.nowTime } });
     },
     getDay(row) {
       if (!row.path[0].innerText) {
@@ -1515,7 +1551,9 @@ export default {
       this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
       this.$set(this.ruleForm, 'wind',  '')
-        this.$set(this.ruleForm, 'shenWan',  '')
+      this.$set(this.ruleForm, 'shenWan',  '')
+      this.$set(this.ruleForm, 'creditErrorType',  '')
+      this.$set(this.ruleForm, 'creditCode',  '')
     },
     check(row) {
       this.$modal.loading("loading...");
@@ -1624,6 +1662,14 @@ export default {
       }
     },
     checkReplace(row, type, num) {
+      if (!row) {
+        this.$message({
+          showClose: true,
+          message: '请输入需要查询的值！',
+          type: 'error'
+        });
+        return
+      }
       try {
         this.$modal.loading('Loading...')
         const parmas = {
@@ -1671,14 +1717,13 @@ export default {
         this.$modal.loading('Loading...')
         insertMas(this.ruleForm).then(res => {
           const { data } = res
-          if (data === null) {
-            this.governmentDig = false
-            this.$message({
-              showClose: true,
-              message: '操作成功',
-              type: 'success'
-            });
-          }
+          this.dialogVisible = false
+          this.$message({
+            showClose: true,
+            message: '操作成功',
+            type: 'success'
+          });
+          this.init()
         })
       } catch (error) {
         this.$message({
@@ -1806,7 +1851,7 @@ export default {
       })
     },
     getCounty(row) {
-      this.ruleForm.city = row.govName
+      this.ruleForm.district = row.govName
       getGovLevel({preGovCode: row.dqGovCode}).then(res => {
         const { data } = res
         this.county = data
@@ -1979,9 +2024,18 @@ export default {
     // 角色345流程结束
     handleClose() {
         this.ruleForm = {}
+        this.addGovForm = {}
         this.creditCodePass = false
         this.entityNamePass = false
         this.bodyDig = false
+        this.replaceDig = false
+        this.fsDig = false
+        this.ibDig = false
+        this.addGovernmentDig = false
+        this.remarkDig = false
+        this.governmentDig = false
+        this.detaileDig = false
+        this.dialogVisible = false
     }
   },
   watch: {
@@ -1989,6 +2043,7 @@ export default {
       handler(newName,oldName){
           if (newName) {
               this.ruleForm.creditCode = ''
+              this.$refs['ruleForm'].clearValidate();
           } else {
               this.ruleForm.creditErrorType = ''
           }
@@ -2156,5 +2211,10 @@ export default {
 }
 .width320 {
   width: 320px;
+}
+::v-deep {
+    .el-textarea__inner{
+      font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
 }
 </style>

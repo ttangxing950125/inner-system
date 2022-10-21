@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  *
  * @Author: chenjiang
  * @Date: 2022/10/13/16:50
- * @Description:
+ * @Description: 可交换转债发行预案
  */
 @Slf4j
 @Component
@@ -55,6 +56,7 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
     @Resource
     private BondConvertibleChangeInfoMapper bondConvertibleChangeInfoMapper;
 
+
     @Override
     public boolean support(Integer windDictId) {
         return Objects.equals(WindTaskEnum.BOND_CONVERTIBLE_CHANGE.getId(), windDictId);
@@ -65,8 +67,9 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
         MultipartFile file = windTaskContext.getFile();
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<BondConvertibleChangeInfo> util = new ExcelUtil<BondConvertibleChangeInfo>(BondConvertibleChangeInfo.class);
-        List<BondConvertibleChangeInfo> bondConvertibleChangeInfo = util.importExcel(windTaskContext.getFileStream(), true);
-        return ApplicationContextHolder.get().getBean(BondConvertibleChangeInfoService.class).doTask(windTask, bondConvertibleChangeInfo);
+        List<BondConvertibleChangeInfo> list = util.importExcel(windTaskContext.getFileStream(), true);
+        Collections.reverse(list);
+        return ApplicationContextHolder.get().getBean(BondConvertibleChangeInfoService.class).doTask(windTask, list);
     }
 
     @Override
@@ -88,7 +91,6 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
         Wrapper<BondConvertibleChangeInfo> wrapper = Wrappers.<BondConvertibleChangeInfo>lambdaQuery()
                 .eq(BondConvertibleChangeInfo::getTaskId, taskId)
                 .in(BondConvertibleChangeInfo::getChangeType, 1, 2);
-
         return bondConvertibleChangeInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
@@ -157,19 +159,19 @@ public class BondConvertibleChangeStrategy implements WindTaskStrategy {
                     }
                 }
             }
-            //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>()
-                    .eq(BondConvertibleChangeInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleChangeInfo::getId).last("LIMIT 1"));
-            if (bondConvertibleChangeInfo == null) {
-                changeType = DataChangeType.INSERT.getId();
-            } else {
-                if (!Objects.equals(bondConvertibleChangeInfo, item)) {
-                    changeType = DataChangeType.UPDATE.getId();
-                }
-            }
-            item.setChangeType(changeType);
+
         }
+        //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        BondConvertibleChangeInfo last = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>().eq(BondConvertibleChangeInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleChangeInfo::getId).last("LIMIT 1"));
+        if (last == null) {
+            changeType = DataChangeType.INSERT.getId();
+        } else {
+            if (!Objects.equals(last, item)) {
+                changeType = DataChangeType.UPDATE.getId();
+            }
+        }
+        item.setChangeType(changeType);
         bondConvertibleChangeInfoMapper.insert(item);
         return new AsyncResult(new Object());
     }

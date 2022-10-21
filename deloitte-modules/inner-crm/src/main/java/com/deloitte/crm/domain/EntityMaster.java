@@ -6,11 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
-import com.deloitte.crm.constants.Common;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -55,20 +53,6 @@ public class EntityMaster implements Serializable {
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @TableField(value = "`update`")
     private Date update;
-
-    /**
-     * model_master 的 master_code
-     */
-    @Excel(name = "wind口径下行业划分")
-    @Attrs(attrId = 652,attrName = "wind口径下行业划分")
-    private String windMaster;
-
-    /**
-     * entity_info的entity_code
-     */
-    @Excel(name = "申万行业划分")
-    @Attrs(attrId = 650,attrName = "申万(2021)行业划分明细")
-    private String shenWanMaster;
 
     /**
      * entity_info的entity_code

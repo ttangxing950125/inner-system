@@ -139,6 +139,7 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultMoneyTotal> util = new ExcelUtil<DefaultMoneyTotal>(DefaultMoneyTotal.class);
         List<DefaultMoneyTotal> list = util.importExcel(file.getInputStream(), true);
+        Collections.reverse(list);
         DefaultMoneyTotalService defaultMoneyTotalService = ApplicationContextHolder.get().getBean(DefaultMoneyTotalService.class);
         return defaultMoneyTotalService.doTask(windTask, list);
 

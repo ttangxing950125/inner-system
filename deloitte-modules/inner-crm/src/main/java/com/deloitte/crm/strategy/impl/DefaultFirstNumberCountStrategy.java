@@ -81,8 +81,9 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
         ExcelUtil<DefaultFirstNumberCount> util = new ExcelUtil<DefaultFirstNumberCount>(DefaultFirstNumberCount.class);
         List<DefaultFirstNumberCount> list = util.importExcel(file.getInputStream(), true);
-
+        Collections.reverse(list);
         DefaultFirstNumberCountService defaultFirstNumberCountService = ApplicationContextHolder.get().getBean(DefaultFirstNumberCountService.class);
+
         return defaultFirstNumberCountService.doTask(windTask, list);
     }
 
@@ -178,7 +179,7 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         Integer changeType = null;
         //看之前有没有导入过这个数据 根据 "债券代码"
         List<DefaultFirstNumberCount> DBDefaultFirstNumberCount = defaultFirstNumberCountMapper.selectList(new QueryWrapper<DefaultFirstNumberCount>()
-                .lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, bondInfo.getBondCode())
+                .lambda().eq(DefaultFirstNumberCount::getDefaultBondsCode, defaultFirstNumberCount.getDefaultBondsCode())
                 .orderBy(true, false, DefaultFirstNumberCount::getId)
                 .last("LIMIT 1"));
         if (CollUtil.isEmpty(DBDefaultFirstNumberCount)) {

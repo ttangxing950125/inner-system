@@ -1,6 +1,5 @@
 package com.deloitte.crm.domain.dto;
 
-import com.deloitte.crm.domain.BondInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,14 +20,15 @@ public class BondInfoDetail {
      * 是否发债（含历史）
      */
     private Boolean isBond;
-    /**
-     * 是否可以收数
-     */
-    private Boolean isColl;
+
     /**
      * 首次发债时间
      */
     private String firstBond;
+    /**
+     * 是否可以收数
+     */
+    private String isCollection;
 
 
     /**
@@ -38,7 +38,7 @@ public class BondInfoDetail {
     /**
      * 发行集合债明细
      */
-    private List<BondInfo> collBonds;
+    private List<String> collBonds;
     /**
      * 发行集合债数量
      */
@@ -57,7 +57,7 @@ public class BondInfoDetail {
     /**
      * 发行ABS明细
      */
-    private List<BondInfo> absBonds;
+    private List<String> absBonds;
     /**
      * 发行ABS数量
      */
@@ -74,7 +74,7 @@ public class BondInfoDetail {
     /**
      * 发行公募债明细
      */
-    private List<BondInfo> publicBonds;
+    private List<String> publicBonds;
     /**
      * 发行公募债数量
      */
@@ -91,7 +91,7 @@ public class BondInfoDetail {
     /**
      * 发行私募债明细
      */
-    private List<BondInfo> privateBonds;
+    private List<String> privateBonds;
     /**
      * 发行私募债数量
      */
@@ -101,9 +101,6 @@ public class BondInfoDetail {
      */
     private Integer privateBondsLiveNum;
 
-    /**
-     * 是否可以收数
-     */
-    private String isCollection;
+
 }
 

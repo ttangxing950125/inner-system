@@ -23,7 +23,7 @@
             【 <span style="color: red">暂未导入今日更新文件</span> 】
           </div>
           <div v-if="item.taskStatus === 1">
-            【 <span style="color: greenyellow">已导入更新文件</span> 】
+            【 <span style="color: #86BC25">已导入更新文件</span> 】
           </div>
           <div v-if="item.taskStatus === 2">
             【 <span style="color: yellow">导入中</span> 】
@@ -154,7 +154,7 @@ export default {
   margin-top: 15px;
   margin-left: 25px;
   span {
-    color: greenyellow;
+    color: #86BC25;
   }
   a {
     font-size: 14px;
@@ -179,7 +179,7 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86BC25;
   }
 }
 </style>
