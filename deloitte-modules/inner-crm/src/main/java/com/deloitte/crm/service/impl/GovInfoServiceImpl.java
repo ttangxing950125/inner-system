@@ -79,6 +79,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Resource
     private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
+
     @Resource
     private ProductsCoverMapper productsCoverMapper;
 
@@ -99,6 +100,50 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     private static final String frontTitle = "GV";
 
+    /**
+     * 城市规模
+     */
+    private static final String govScale = "城市规模";
+    /**
+     * 城市分级
+     */
+    private static final String govGrading = "城市分级";
+    /**
+     * 省级行政区
+     */
+    private static final String isProvince = "省级行政区";
+    /**
+     * 地级行政区
+     */
+    private static final String isCity = "地级行政区";
+    /**
+     * 县级行政区
+     */
+    private static final String isCounty = "县级行政区";
+    /**
+     * 经开高新区
+     */
+    private static final String isJKGX = "经开高新区";
+    /**
+     * 八大经济区
+     */
+    private static final String eightER = "八大经济区";
+    /**
+     * 19个城市群
+     */
+    private static final String nineteenCity = "19个城市群";
+    /**
+     * 百强县
+     */
+    private static final String hundred = "百强县";
+    /**
+     * 国家中心城市
+     */
+    private static final String CCity = "国家中心城市";
+    /**
+     * 省会城市
+     */
+    private static final String provincial = "省会城市";
     /**
      * 查询【请填写功能名称】
      *
@@ -146,7 +191,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
-        //生成政府德勤主体唯一识别代码
         return govInfoMapper.insertGovInfo(govInfo);
     }
 
@@ -406,7 +450,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
         //设置参数信息
-        govAttrByDto=getSend(govAttrByDto);
+        govAttrByDto = getSend(govAttrByDto);
 
         //获取基础参数信息
         List<MoreIndex> mapList = govAttrByDto.getMapList();
@@ -510,7 +554,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     public Page<GovInfoResult> getListEntityPage(GovAttrByDto govAttrDto) {
         //设置参数信息
-        govAttrDto=getSend(govAttrDto);
+        govAttrDto = getSend(govAttrDto);
 
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
@@ -854,71 +898,58 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
 
-    public static GovAttrByDto getSend(GovAttrByDto govAttrByDto){
+    public static GovAttrByDto getSend(GovAttrByDto govAttrByDto) {
         List<GovInfoDetailVo> send = govAttrByDto.getSend();
-        if (CollectionUtils.isEmpty(send)){
+        if (CollectionUtils.isEmpty(send)) {
             return govAttrByDto;
         }
-        for (GovInfoDetailVo item:send){
+        for (GovInfoDetailVo item : send) {
             List<String> value = item.getValue();
-            if (govScale.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setGovScale(value);
-            }
-            if (govGrading.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setGovGrading(value);
-            }
-            if (isProvince.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setIsProvince(value);
-            }
-            if (isCity.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setIsCity(value);
-            }
-            if (isCounty.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setIsCounty(value);
-            }
-            if (isJKGX.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setIsJKGX(value);
-            }
-            if (eightER.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setEightER(value);
-            }
-            if (nineteenCity.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setNineteenCity(value);
-            }
-            if (hundred.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setHundred(Integer.valueOf(value.get(0)));
-            }
-            if (CCity.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setCCity(Integer.valueOf(value.get(0)));
-            }
-            if (provincial.equals(item.getKey())&&CollectionUtils.isEmpty(value)){
-                govAttrByDto.setProvincial(Integer.valueOf(value.get(0)));
+            String key = item.getKey();
+            switch (key) {
+                case govScale:
+                    govAttrByDto.setGovScale(value);
+                    break;
+                case govGrading:
+                    govAttrByDto.setGovGrading(value);
+                    break;
+                case isProvince:
+                    govAttrByDto.setIsProvince(value);
+                    break;
+                case isCity:
+                    govAttrByDto.setIsCity(value);
+                    break;
+                case isCounty:
+                    govAttrByDto.setIsCounty(value);
+                    break;
+                case isJKGX:
+                    govAttrByDto.setIsJKGX(value);
+                    break;
+                case eightER:
+                    govAttrByDto.setEightER(value);
+                    break;
+                case nineteenCity:
+                    govAttrByDto.setNineteenCity(value);
+                    break;
+                case hundred:
+                    if (CollectionUtils.isEmpty(value)) {
+                        govAttrByDto.setHundred(Integer.valueOf(value.get(0)));
+                    }
+                    break;
+                case CCity:
+                    if (CollectionUtils.isEmpty(value)) {
+                        govAttrByDto.setCCity(Integer.valueOf(value.get(0)));
+                    }
+                    break;
+                case provincial:
+                    if (CollectionUtils.isEmpty(value)) {
+                        govAttrByDto.setProvincial(Integer.valueOf(value.get(0)));
+                    }
+                    break;
             }
         }
         return govAttrByDto;
     }
-    /** 城市规模 */
-    private static String govScale="城市规模";
-    /** 城市分级 */
-    private static  String govGrading="城市分级";
-    /** 省级行政区 */
-    private static  String isProvince="省级行政区";
-    /** 地级行政区 */
-    private static  String isCity="地级行政区";
-    /** 县级行政区 */
-    private static  String isCounty="县级行政区";
-    /** 经开高新区 */
-    private static  String isJKGX="经开高新区";
-    /** 八大经济区 */
-    private static  String eightER ="八大经济区";
-    /** 19个城市群 */
-    private static  String nineteenCity="19个城市群";
-    /** 百强县 */
-    private static  String hundred="百强县";
-    /** 国家中心城市 */
-    private static  String CCity="国家中心城市";
-    /** 省会城市 */
-    private static  String provincial="省会城市";
 
     @Override
     public GovView getGovView() {
