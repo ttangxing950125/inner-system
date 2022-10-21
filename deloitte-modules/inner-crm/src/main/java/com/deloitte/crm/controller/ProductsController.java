@@ -46,7 +46,7 @@ public class ProductsController {
      * @author penTang
      * @date 2022/10/20 17:26
     */
-    @ApiOperation(value = "下载查询产品")
+    @ApiOperation(value = "下载产品excel")
     @PostMapping("/getProductsExcel")
     @ApiImplicitParam(name = "id",value = "id",paramType = "query",dataType="Integer")
     public void getProductsExcel(@RequestParam("id") Integer id, HttpServletResponse response) throws Exception{

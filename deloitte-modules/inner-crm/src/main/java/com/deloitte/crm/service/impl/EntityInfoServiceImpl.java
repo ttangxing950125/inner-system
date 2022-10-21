@@ -910,7 +910,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 infoQuery.eq(EntityInfo::getFinance, 1);
             }
         }
-//        List<EntityInfo> entityInfoList = entityInfoMapper.selectGovInfoListByTypeAndParam( type,  param, pageNum, pageSize);
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, infoQuery);
         List<EntityInfo> entityInfoList = page.getRecords();
 
@@ -2367,11 +2366,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        more.put(products.getProName(), "未覆盖");
+                    if (!proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            more.put(products.getProName(), "未覆盖");
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
+
                 } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
                     exportEntityCheckDto.setEndByResult("未覆盖");
@@ -2379,11 +2382,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        more.put(products.getProName(), "未覆盖");
+                    if (!proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            more.put(products.getProName(), "未覆盖");
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 } else if (exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
                     exportEntityCheckDto.setEndByResult("未覆盖");
@@ -2391,11 +2397,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        more.put(products.getProName(), "未覆盖");
+                    if (!proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            more.put(products.getProName(), "未覆盖");
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
                     exportEntityCheckDto.setEndByResult("未覆盖");
@@ -2403,11 +2412,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        more.put(products.getProName(), "未覆盖");
+                    if (proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            more.put(products.getProName(), "未覆盖");
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE1)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
                     exportEntityCheckDto.setEndByResult("已覆盖");
@@ -2418,18 +2430,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                                .eq(ProductsCover::getProId, proId));
-                        if (productsCover != null) {
-                            more.put(products.getProName(), productsCover.getCoverDes());
-                        } else {
-                            more.put(products.getProName(), "未覆盖");
-                        }
+                    if (!proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
+                                    .eq(ProductsCover::getProId, proId));
+                            if (productsCover != null) {
+                                more.put(products.getProName(), productsCover.getCoverDes());
+                            } else {
+                                more.put(products.getProName(), "未覆盖");
+                            }
 
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE1) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不适用");
                     exportEntityCheckDto.setEndByResult("已覆盖");
@@ -2440,18 +2455,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                                .eq(ProductsCover::getProId, proId));
-                        if (productsCover != null) {
-                            more.put(products.getProName(), productsCover.getCoverDes());
-                        } else {
-                            more.put(products.getProName(), "未覆盖");
-                        }
+                    if (proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
+                                    .eq(ProductsCover::getProId, proId));
+                            if (productsCover != null) {
+                                more.put(products.getProName(), productsCover.getCoverDes());
+                            } else {
+                                more.put(products.getProName(), "未覆盖");
+                            }
 
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 }
                 //冲突检查(不一致或者一致无冲突)
                 if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
@@ -2465,18 +2483,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         //组装产品的覆盖情况
                         Map<String, String> more = exportEntityCheckDto.getMore();
                         List<Integer> proIds = importDto.getProIds();
-                        for (Integer proId : proIds) {
-                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                            ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                                    .eq(ProductsCover::getProId, proId));
-                            if (productsCover != null) {
-                                more.put(products.getProName(), productsCover.getCoverDes());
-                            } else {
-                                more.put(products.getProName(), "未覆盖");
-                            }
+                        if (!proIds.isEmpty()) {
+                            for (Integer proId : proIds) {
+                                Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                                ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
+                                        .eq(ProductsCover::getProId, proId));
+                                if (productsCover != null) {
+                                    more.put(products.getProName(), productsCover.getCoverDes());
+                                } else {
+                                    more.put(products.getProName(), "未覆盖");
+                                }
 
+                            }
+                            exportEntityCheckDto.setMore(more);
                         }
-                        exportEntityCheckDto.setMore(more);
+
                     } else {
                         exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
                         exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
@@ -2484,11 +2505,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         //组装产品的覆盖情况
                         Map<String, String> more = exportEntityCheckDto.getMore();
                         List<Integer> proIds = importDto.getProIds();
-                        for (Integer proId : proIds) {
-                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                            more.put(products.getProName(), "未覆盖");
+                        if (!proIds.isEmpty()) {
+                            for (Integer proId : proIds) {
+                                Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                                more.put(products.getProName(), "未覆盖");
+                            }
+                            exportEntityCheckDto.setMore(more);
                         }
-                        exportEntityCheckDto.setMore(more);
+
                     }
                 } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE3) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE2)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
@@ -2497,11 +2521,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        more.put(products.getProName(), "未覆盖");
+                    if (!proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            more.put(products.getProName(), "未覆盖");
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 } else if (exportEntityCheckDto.getCreditCodeByRecord().equals(Common.CHECK_TYPE2) && exportEntityCheckDto.getEntityNameByRecord().equals(Common.CHECK_TYPE3)) {
                     exportEntityCheckDto.setCreditCodeIsEntityName("不一致");
                     exportEntityCheckDto.setEndByResult("匹配冲突,需人工介入");
@@ -2509,11 +2536,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    for (Integer proId : proIds) {
-                        Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
-                        more.put(products.getProName(), "未覆盖");
+                    if (!proIds.isEmpty()) {
+                        for (Integer proId : proIds) {
+                            Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
+                            more.put(products.getProName(), "未覆盖");
+                        }
+                        exportEntityCheckDto.setMore(more);
                     }
-                    exportEntityCheckDto.setMore(more);
+
                 }
                 //数据匹配结束入容器
                 entityByBatchList.add(exportEntityCheckDto);
@@ -2595,11 +2625,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         ExcelWriter writer = ExcelUtil.getWriter(true);
         //合并一级表头
 
-        writer.merge(0, 0, 0, 1, "原始数据", true)
+        ExcelWriter merge = writer.merge(0, 0, 0, 1, "原始数据", true)
                 .merge(0, 0, 2, 5, "判别1-统一社会信用代码", true)
                 .merge(0, 0, 6, 9, "判别二：企业全称", true)
-                .merge(0, 0, 11, 14, "最终结果", true)
-                .merge(0, 0, 15, importDto.getProIds().size(), "产品覆盖情况", true);
+                .merge(0, 0, 11, 14, "最终结果", true);
+        if(importDto.getProIds().size()!= 0){
+            merge.merge(0, 0, 15, 15+importDto.getProIds().size()-1, "产品覆盖情况", true);
+        }
         writer.passCurrentRow();// 跳过当前行
         CellUtil.setCellValue(writer.getOrCreateCell(10, 0), "冲突检查", writer.getStyleSet(), true);
 
@@ -2621,9 +2653,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("最终匹配主体代码结果", o.getEntityCodeByResult());
             map.put("最终匹配主体全称结果", o.getEntityNameByResult());
             map.put("最终统一社会信用代码结果", o.getCreditCodeByResult());
-            for (String s : o.getMore().keySet()) {
-                map.put(s, o.getMore().get(s));
+            if (o.getMore()!= null){
+                for (String s : o.getMore().keySet()) {
+                    map.put(s, o.getMore().get(s));
+                }
             }
+
             rows.add(map);
         });
         //一次性写出内容，强制输出标题
