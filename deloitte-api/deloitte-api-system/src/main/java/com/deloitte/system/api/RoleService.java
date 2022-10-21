@@ -57,5 +57,5 @@ public interface RoleService {
     List<String> selectDataYear();
 
     @PostMapping("/config/configId")
-    String getSysConfig();
+    String getConfigId();
 }

@@ -104,7 +104,7 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                                 productsMasterRel.setProCustId(productsMasterMapping.getProCustomerId());
                                 productsMasterRel.setProMasDictId(productsMasterMapping.getProMasDictId());
                                 productsMasterRel.setEntityCode(entityMaster.getEntityCode());
-                                productsMasterRel.setDataYear(roleService.getSysConfig());
+                                productsMasterRel.setDataYear(roleService.getConfigId());
                                 productsMasterRels.add(productsMasterRel);
                         }
                         for (ProductsMasterRel productsMasterRel : productsMasterRels) {
