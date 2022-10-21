@@ -111,22 +111,39 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
             }
 
+
+            //上市日期是否是今天
+            boolean ipoNow = DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate());
+
             //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
             if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getCode()) && DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate())) {
                 stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getCode());
                 stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getMessage());
             }
+
+            String windIndustry = item.getWindIndustry();
+
+            List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
+            entityInfos.forEach(entityInfo -> {
+                entityInfo.setWindMaster(windIndustry);
+            });
+
             //如果是成功上市，发送给敞口划分人
             if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getCode())) {
                 //查询和当前a股绑定关联关系的主体
-                List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
                 entityInfos.forEach(entity -> {
                     entity.setList(1);
                 });
-                entityInfoService.updateBatchById(entityInfos);
-                //新敞口划分任务
-                crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
+
+                if (ipoNow){
+                    //新敞口划分任务
+                    crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
+                }
+
             }
+
+            entityInfoService.updateBatchById(entityInfos);
+
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
@@ -172,7 +189,6 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
         ExcelUtil<CnIpoInfo> util = new ExcelUtil<CnIpoInfo>(CnIpoInfo.class);
         List<CnIpoInfo> list = util.importExcel(null, file.getInputStream(), 1, true);
         return cnIpoInfoService.doTask(windTask, list);
-//        return null;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.StrUtil;
@@ -8,10 +9,7 @@ import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
 import com.deloitte.crm.constants.StockThkStatus;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.service.CnCoachBackService;
-import com.deloitte.crm.service.EntityStockCnRelService;
-import com.deloitte.crm.service.IEntityAttrValueService;
-import com.deloitte.crm.service.StockCnInfoService;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
@@ -46,6 +44,9 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
 
     @Resource
     private IEntityAttrValueService entityAttrValueService;
+
+    @Resource
+    private IEntityInfoService entityInfoService;
 
     /**
      * 处理文件中的每一行
@@ -104,6 +105,20 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                     entityAttrValueService.updateStockCnAttr(code, cnCoachBack);
                 }
             }
+
+            String windIndustry = cnCoachBack.getWindIndustry();
+
+            //更新wind行业
+            List<EntityInfo> dbEntities = entityInfoService.findByName(entityName);
+            if (CollUtil.isNotEmpty(dbEntities)){
+                dbEntities.forEach(item->{
+                    item.setWindMaster(windIndustry);
+                });
+
+                entityInfoService.updateBatchById(dbEntities);
+            }
+
+
             //有债券信息，给债券和主体绑定关联关系
             if (StrUtil.isNotBlank(code) && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
                 //绑定主体关系
