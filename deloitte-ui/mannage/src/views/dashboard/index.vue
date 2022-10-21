@@ -1504,19 +1504,21 @@ export default {
       row.path[1].localName === 'td' ? row.path[1].className = 'thisDay' : row.path[2].className = 'thisDay'
       try {
         this.$modal.loading("loading...");
-        const parmas = {
-          date: this.monthDate+ '-' +clickDay,
-          pageNum: 1,
-          pageSize: this.queryParams.pageSize
-        };
-        this.clickDay = this.monthDate+ '-' +clickDay
-        getDayTaskInfo(parmas).then((res) => {
-          const { data } = res
-          this.list7 = data.records
-          this.total = data.total
-          this.queryParams.pageNum = data.current
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+        if(this.roleId === 'role6') {
+            const parmas = {
+            date: this.monthDate+ '-' +clickDay,
+            pageNum: 1,
+            pageSize: this.queryParams.pageSize
+            };
+            this.clickDay = this.monthDate+ '-' +clickDay
+            getDayTaskInfo(parmas).then((res) => {
+            const { data } = res
+            this.list7 = data.records
+            this.total = data.total
+            this.queryParams.pageNum = data.current
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
+        }
         const params = {
           taskDate: this.monthDate+ '-' +clickDay,
           pageNum: 1,
@@ -1532,13 +1534,15 @@ export default {
           this.list3 = data
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
-        getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
-          const { data } = res
-          this.list2 = data.records
-          this.total = data.total
-          this.queryParams.pages = data.pages
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+        if(this.roleId === 'role2') {
+            getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
+            const { data } = res
+            this.list2 = data.records
+            this.total = data.total
+            this.queryParams.pages = data.pages
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
+        }
         getTaskCount({TaskDate: this.monthDate+ '-' +clickDay}).then(res => {
           const { data } = res
           this.taskCount = data
