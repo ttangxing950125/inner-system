@@ -61,7 +61,7 @@
             <el-tree
               class="filter-tree"
               :data="data2"
-              :props="{ label: 'name', children: 'children' }"
+              :props="{ label: 'name', children: 'value' }"
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree2"
@@ -141,20 +141,7 @@ export default {
       filterTextFirst: "",
       filterTextScend: "",
       data: [],
-      data2: [
-        {
-          name: "东北综合经济区",
-          value: {},
-        },
-        {
-          name: "北部沿海综合经济区",
-          value: {},
-        },
-        {
-          name: "东部沿海综合经济区",
-          value: {},
-        },
-      ],
+      data2: [],
       tableLoading: false,
       mapList: [],
       moreData: [],
@@ -184,6 +171,7 @@ export default {
       try {
         getAllByGroup({ type: 2 }).then((res) => {
           const { data } = res;
+          console.log(data)
           this.data = data;
         });
         const params = {
@@ -200,7 +188,8 @@ export default {
         });
         getGovRange({}).then((res) => {
           const { data } = res;
-          this.data2 = data.eightER;
+          console.log(data)
+          this.data2 = data
         });
       } catch (error) {
         console.log(error);
@@ -264,7 +253,7 @@ export default {
       res.forEach((e) => {
         const item = {
           id: e.id,
-          name: e.name,
+          name: e.send || e.name,
         };
         arrDeptId.push(item);
       });
