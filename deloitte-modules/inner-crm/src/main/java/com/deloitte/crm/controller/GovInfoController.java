@@ -160,9 +160,17 @@ public class GovInfoController extends BaseController {
         if (ObjectUtils.isEmpty(govName)) {
             return R.fail("请输入需要查询的条件");
         }
+        if (EASY_NAME_CITY.equals(govName)||EASY_NAME_AREA.equals(govName)||EASY_NAME_COUNTRY.equals(govName)){
+            return R.fail("简陋搜索条件--"+govName);
+        }
         return govInfoService.getGovByName(govName);
     }
-
+    /** 简陋搜索条件--市 */
+    public static String EASY_NAME_CITY="市";
+    /** 简陋搜索条件--区 */
+    public static String EASY_NAME_AREA="区";
+    /** 简陋搜索条件--县 */
+    public static String EASY_NAME_COUNTRY="县";
     /**
      * 政府主体分类查询
      *
