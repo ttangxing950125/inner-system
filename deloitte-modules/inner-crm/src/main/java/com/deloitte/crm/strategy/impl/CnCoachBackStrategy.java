@@ -161,8 +161,7 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnCoachBack> util = new ExcelUtil<CnCoachBack>(CnCoachBack.class);
         List<CnCoachBack> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);
-        ;
-
+        Collections.reverse(cnCoachBacks);
         return cnCoachBackService.doTask(windTask, cnCoachBacks);
     }
 

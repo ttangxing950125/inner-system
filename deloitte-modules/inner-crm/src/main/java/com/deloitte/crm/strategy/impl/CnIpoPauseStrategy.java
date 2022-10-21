@@ -137,7 +137,7 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnIpoPause> util = new ExcelUtil<CnIpoPause>(CnIpoPause.class);
         List<CnIpoPause> list = util.importExcel(windTaskContext.getFileStream(), true);;
-
+        Collections.reverse(list);
         return cnIpoPauseService.doTask(windTask, list);
     }
 

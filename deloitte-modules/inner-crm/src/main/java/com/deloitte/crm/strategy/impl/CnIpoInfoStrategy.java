@@ -188,6 +188,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnIpoInfo> util = new ExcelUtil<CnIpoInfo>(CnIpoInfo.class);
         List<CnIpoInfo> list = util.importExcel(null, file.getInputStream(), 1, true);
+        Collections.reverse(list);
         return cnIpoInfoService.doTask(windTask, list);
     }
 

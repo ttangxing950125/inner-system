@@ -580,8 +580,8 @@ export default {
       };
       getCov(parmas).then((res) => {
         const { data } = res;
-        data.records.forEach((e) => {
-          if (e.result) {
+        (data.records).forEach((e) => {
+          if (e.result.length > 0) {
             e.result.forEach((r) => {
               e[r.key] = r.value;
               e.color = r.color;

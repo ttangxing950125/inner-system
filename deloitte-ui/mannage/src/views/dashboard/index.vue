@@ -270,7 +270,7 @@
         </el-table-column>
       </el-table>
       <pagination
-        v-show="total>0"
+        v-show="total>0 && roleId !== 'role1'"
         :total="total"
         :page.sync="queryParams.pageNum"
         :limit.sync="queryParams.pageSize"
