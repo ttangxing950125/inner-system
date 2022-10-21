@@ -23,6 +23,7 @@
         :data="list"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" sortable label="序号"> </el-table-column>
         <el-table-column prop="taskDesc" label="任务说明">
@@ -50,6 +51,7 @@
         :data="list7"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号"> </el-table-column>
         <el-table-column prop="taskCategory" label="捕获渠道">
@@ -82,12 +84,13 @@
         </el-table-column>
       </el-table>
       <el-table
-      v-if="roleId === 'role2'"
+        v-if="roleId === 'role2'"
         v-loading="loading"
         class="table-content"
         :data="list2"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
@@ -126,6 +129,7 @@
         :data="list3"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
@@ -174,6 +178,7 @@
         :data="list3"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
@@ -222,6 +227,7 @@
         :data="list3"
         align="center"
         style="width: 98%; margin-top: 15px"
+        :before-close="handleClose"
       >
         <el-table-column type="index" label="序号">
         </el-table-column>
@@ -271,7 +277,7 @@
         @pagination="getList"
       />
     </div>
-    <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%">
+    <el-dialog title="敞口划分" :visible.sync="dialogVisible" width="50%" :before-close="handleClose">
       <el-form
         :model="ruleForm"
         :rules="rules"
@@ -356,7 +362,7 @@
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.city" placeholder="选择地区" @change="getCounty">
+            <el-select v-model="ruleForm.district" placeholder="选择地区" @change="getCounty">
               <el-option v-for="(item, index) in city" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
@@ -1046,12 +1052,8 @@ export default {
   name: "Index",
   data() {
     return {
-      bodyDig: false,
-      replaceDig: false,
-      role2NowTime: '',
+        role2NowTime: '',
       list: [],
-      fsDig: false,
-      ibDig: false,
       loading: false,
       currentTime: "",
       week: "",
@@ -1061,7 +1063,7 @@ export default {
       dialogVisible: false,
       noUse: false,
       ruleForm: {
-        name: "",
+          name: "",
         region: "",
         date1: "",
         date2: "",
@@ -1071,55 +1073,52 @@ export default {
       },
       addGovForm: {},
       rules: {
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
+          name: [
+              { required: true, message: "请输入活动名称", trigger: "blur" },
           { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
         ],
         region: [
-          { required: true, message: "请选择活动区域", trigger: "change" },
+            { required: true, message: "请选择活动区域", trigger: "change" },
         ],
         date1: [
-          {
-            type: "date",
+            {
+                type: "date",
             required: true,
             message: "请选择日期",
             trigger: "change",
           },
         ],
         date2: [
-          {
-            type: "date",
+            {
+                type: "date",
             required: true,
             message: "请选择时间",
             trigger: "change",
           },
         ],
         type: [
-          {
-            type: "array",
+            {
+                type: "array",
             required: true,
             message: "请至少选择一个活动性质",
             trigger: "change",
           },
         ],
         resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
+            { required: true, message: "请选择活动资源", trigger: "change" },
         ],
         creditCode: [
-          { required: true, message: "请输入统一社会信用代码", trigger: "blur" },
+            { required: true, message: "请输入统一社会信用代码", trigger: "blur" },
         ],
         entityName: [
-          { required: true, message: "请输入新建主体名称", trigger: "blur" },
+            { required: true, message: "请输入新建主体名称", trigger: "blur" },
         ],
         desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
       },
       edit2: false,
       edit1: false,
-      addGovernmentDig: false,
-      remarkDig: false,
-      governmentDig: false,
       stateArr: {
-        0: '未处理',
+          0: '未处理',
         1: '已有主体',
         2: '新增主体',
       },
@@ -1127,20 +1126,20 @@ export default {
       month: '',
       monthMm: '',
       notUseoptions: [
-        {
-          value: 1,
+          {
+              value: 1,
           label: '吊销'
         },
         {
-          value: 2,
+            value: 2,
           label: '注销'
         },
         {
-          value: 3,
+            value: 3,
           label: '非大陆注册机构'
         },
         {
-          value: 4,
+            value: 4,
           label: '其他未知原因'
         }
       ],
@@ -1166,6 +1165,13 @@ export default {
       repalce2: 0,
       govOption2: [],
       govOption1: [],
+      bodyDig: false,
+      replaceDig: false,
+      fsDig: false,
+      ibDig: false,
+      addGovernmentDig: false,
+      remarkDig: false,
+      governmentDig: false,
       detaileDig: false,
       roleId: localStorage.getItem('roleId'),
       selectRole7: [],
@@ -1711,15 +1717,13 @@ export default {
         this.$modal.loading('Loading...')
         insertMas(this.ruleForm).then(res => {
           const { data } = res
-          if (data === null) {
-            this.governmentDig = false
-            this.$message({
-              showClose: true,
-              message: '操作成功',
-              type: 'success'
-            });
-            this.init()
-          }
+          this.dialogVisible = false
+          this.$message({
+            showClose: true,
+            message: '操作成功',
+            type: 'success'
+          });
+          this.init()
         })
       } catch (error) {
         this.$message({
@@ -1847,7 +1851,7 @@ export default {
       })
     },
     getCounty(row) {
-      this.ruleForm.city = row.govName
+      this.ruleForm.district = row.govName
       getGovLevel({preGovCode: row.dqGovCode}).then(res => {
         const { data } = res
         this.county = data
@@ -2020,9 +2024,18 @@ export default {
     // 角色345流程结束
     handleClose() {
         this.ruleForm = {}
+        this.addGovForm = {}
         this.creditCodePass = false
         this.entityNamePass = false
         this.bodyDig = false
+        this.replaceDig = false
+        this.fsDig = false
+        this.ibDig = false
+        this.addGovernmentDig = false
+        this.remarkDig = false
+        this.governmentDig = false
+        this.detaileDig = false
+        this.dialogVisible = false
     }
   },
   watch: {
