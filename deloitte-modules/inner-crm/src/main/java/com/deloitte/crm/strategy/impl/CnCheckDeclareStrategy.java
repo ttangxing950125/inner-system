@@ -140,8 +140,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
 //        读取文件
         ExcelUtil<CnCheckDeclare> util = new ExcelUtil<CnCheckDeclare>(CnCheckDeclare.class);
         List<CnCheckDeclare> cnCoachBacks = util.importExcel(windTaskContext.getFileStream(), true);
-        ;
-
+        Collections.reverse(cnCoachBacks);
         return cnCheckDeclareService.doTask(windTask, cnCoachBacks);
     }
 
