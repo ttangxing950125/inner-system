@@ -160,7 +160,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -209,7 +209,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -258,7 +258,7 @@
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status ? 'green' : 'red'">{{ cope.row.crmSupplyTask &&  cope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
