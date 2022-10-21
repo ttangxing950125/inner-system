@@ -268,6 +268,7 @@ public class BondConvertibleInfo implements Serializable {
 //    @Excel(name = "更新时间")
     private Date updated;
 
+
     @Override
     public boolean equals(Object o) {
         return EqualsUtil.equalsAnnoField(this, o, Excel.class);

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 可交换转债发行预案(BondConvertibleChangeInfo)表实体类
@@ -260,6 +261,12 @@ public class BondConvertibleChangeInfo implements Serializable {
      */
 //    @Excel(name = "创建时间,根据当前时间戳 CURRENT_TIMESTAMP ,更新")
     private Date created;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, noticeDate, code, name, projectProgress, planDate, shareHoldersDate, acceptedDate, iecPassDate, auditResultsDate, csrcApproveDate, interneTappDate, offlineDate, registrationShareHoldersDate, stockHoldersDate, onlineSuccessRateDate, onlineSuccessResultDate, onlinePaymentDate, listingDate, issuingWay, issuingYear, issuingType, rate, issuingScale, issuingClause, frequencyPayment, paymentDesc, leadUnderwriter, callProvision, putProvision, convertibleTerms, downwardRevisionClause, scrcIndustry, windIndustry, allIndustries, convertibleBondIs, bondThatCode, bondThatName, issueDateRate, bookValuePlan, sharesClosedYesterday, onlineSubscriptionCode, created, updated);
+    }
+
     /**
      * 更新时间
      */

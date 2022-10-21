@@ -56,7 +56,7 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
     @Resource
     private EntityBondRelMapper entityBondRelMapper;
     @Resource
-    private BondConvertibleChangeInfoMapper bondConvertibleChangeInfoMapper;
+    private BondConvertibleInfoMapper bondConvertibleInfoMapper;
 
 
     @Override
@@ -137,17 +137,16 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
         }
         //这条CnDelistInfo 是新增还是修改 1-新增 2-修改
         Integer changeType = null;
-        final BondConvertibleChangeInfo bondConvertibleChangeInfo = bondConvertibleChangeInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleChangeInfo>().eq(BondConvertibleChangeInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleChangeInfo::getId).last("LIMIT 1"));
+        final BondConvertibleInfo bondConvertibleChangeInfo = bondConvertibleInfoMapper.selectOne(new LambdaQueryWrapper<BondConvertibleInfo>().eq(BondConvertibleInfo::getCode, item.getCode()).orderBy(true, false, BondConvertibleInfo::getId).last("LIMIT 1"));
         if (bondConvertibleChangeInfo == null) {
             changeType = DataChangeType.INSERT.getId();
         } else {
-            if (!Objects.equals(bondConvertibleChangeInfo, item)) {
+            if (!ObjectUtil.equals(bondConvertibleChangeInfo, item)) {
                 changeType = DataChangeType.UPDATE.getId();
             }
         }
         item.setChangeType(changeType);
-        final BondConvertibleChangeInfo bondConvertibleChangeInfoBeanCopy = BeanUtil.copyProperties(item, BondConvertibleChangeInfo.class);
-        bondConvertibleChangeInfoMapper.insert(bondConvertibleChangeInfoBeanCopy);
+        bondConvertibleInfoMapper.insert(bondConvertibleChangeInfo);
         log.warn(">>>>>>>>开始到导入可转债发行【根据公司代码】=>:{}查询数据不存在任务结束！！！！", item.getCode());
 
         return new AsyncResult(new Object());
@@ -181,11 +180,11 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
         List<Integer> changeStatusArr = Arrays.stream(DataChangeType.values()).map(DataChangeType::getId).collect(Collectors.toList());
         Integer taskId = windTask.getId();
-        Wrapper<BondConvertibleChangeInfo> wrapper = Wrappers.<BondConvertibleChangeInfo>lambdaQuery()
-                .eq(BondConvertibleChangeInfo::getTaskId, taskId)
-                .in(BondConvertibleChangeInfo::getChangeType, changeStatusArr);
+        Wrapper<BondConvertibleInfo> wrapper = Wrappers.<BondConvertibleInfo>lambdaQuery()
+                .eq(BondConvertibleInfo::getTaskId, taskId)
+                .in(BondConvertibleInfo::getChangeType, changeStatusArr);
 
-        return bondConvertibleChangeInfoMapper.selectList(wrapper).stream().map(item -> {
+        return bondConvertibleInfoMapper.selectList(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
