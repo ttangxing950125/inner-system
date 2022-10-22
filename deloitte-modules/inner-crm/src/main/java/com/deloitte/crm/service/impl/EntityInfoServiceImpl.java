@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelReader;
@@ -2311,6 +2312,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, ImportDto importDto) {
+
+        List<Integer> ids = importDto.getProIds();
+        if (CollUtil.isEmpty(ids)){
+            ids = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+        }
+
         try {
             //读取excel
             List<EntityByBatchDto> entityByBatchDtos = this.getEntityAndBondInfoV(file);
