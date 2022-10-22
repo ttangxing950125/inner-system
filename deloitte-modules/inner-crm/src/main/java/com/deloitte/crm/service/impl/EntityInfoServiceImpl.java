@@ -2316,6 +2316,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<Integer> ids = importDto.getProIds();
         if (CollUtil.isEmpty(ids)){
             ids = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+            importDto.setProIds(ids);
         }
 
         try {
