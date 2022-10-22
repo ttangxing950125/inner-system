@@ -1,15 +1,15 @@
 package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
-import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.domain.dto.SupplyTaskDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.utils.TimeFormatUtil;
+import com.deloitte.crm.vo.SupplyTaskVo;
 import com.deloitte.system.api.domain.SysUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -121,8 +121,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     /** 角色5 -- 7 */
     private static Long ROLE_FIVE = 7L;
     @Override
-    public R getRoleSupplyTask(String taskDate) {
-
+    public R getRoleSupplyTask(String taskDate, Integer pageNum,Integer pageSize) {
+        if (ObjectUtils.isEmpty(pageNum)){
+            return R.fail("请选择页码");
+        }
+        if (ObjectUtils.isEmpty(pageSize)){
+            pageSize=9;
+        }
         //获取登录用户
         Long userId = SecurityUtils.getUserId();
 
@@ -131,65 +136,108 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .eq(SysUserRole::getUserId, userId)
                 .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
+
+//        sysUserRoles.add(new SysUserRole().setRoleId(7L));
+
+
+
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
             return R.ok();
         }
         Long roleId = sysUserRoles.get(0).getRoleId();
         QueryWrapper<CrmSupplyTask> taskQuery = new QueryWrapper<>();
-        List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(taskQuery.lambda()
+        Page<CrmSupplyTask>pageInfo=new Page<>(pageNum,pageSize);
+        //获取角色的任务数据
+        Page<CrmSupplyTask> taskPage = crmSupplyTaskMapper.selectPage(pageInfo,taskQuery.lambda()
                 .eq(CrmSupplyTask::getRoleId, roleId)
                 .eq(CrmSupplyTask::getTaskDate, taskDate)
         );
+        List<CrmSupplyTask> crmSupplyTasks=taskPage.getRecords();
         if (CollectionUtils.isEmpty(crmSupplyTasks)) {
             return R.ok();
         }
-        List<SupplyTaskDto> taskList = new ArrayList<>();
+        //封装响应的页面数据
+        List<SupplyTaskVo> taskList = new ArrayList<>();
 
         crmSupplyTasks.stream().forEach(o -> {
-            SupplyTaskDto taskDto = new SupplyTaskDto();
-            taskDto.setCrmSupplyTask(o);
-            String entityCode = o.getEntityCode();
-            QueryWrapper<EntityInfo> entityQuery = new QueryWrapper<>();
-            EntityInfo entityInfo = entityInfoMapper.selectOne(entityQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
-            taskDto.setEntityInfo(entityInfo);
-            if (ObjectUtils.isEmpty(entityInfo)) {
-                QueryWrapper<GovInfo> govQuery = new QueryWrapper<>();
-                GovInfo govInfo = govInfoMapper.selectOne(govQuery.lambda().eq(GovInfo::getDqGovCode, entityCode));
-                taskDto.setGovInfo(govInfo);
-            }
-            QueryWrapper<EntityAttr> attrQuery = new QueryWrapper<>();
-
-            String value = "";
-            if (roleId == ROLE_THREE) {
-                value = Common.ATTR_FIN;
-            } else if (roleId == ROLE_FOUR) {
-                value = Common.ATTR_CITY;
-            } else if (roleId == ROLE_FIVE) {
-                value = Common.ATTR_ISS;
-            }
-            List<EntityAttr> entityAttrs = attrMapper.selectList(attrQuery.lambda().eq(EntityAttr::getAttrCateName, value));
-            if (!CollectionUtils.isEmpty(entityAttrs)) {
-                List<Long> ids = new ArrayList<>();
-                entityAttrs.stream().forEach(x -> {
-                    ids.add(x.getId());
-                });
-                QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
-                List<EntityAttrValue> attrValueList = valueMapper.selectList(valueQuery.lambda().in(EntityAttrValue::getAttrId, ids));
-                taskDto.setValues(attrValueList);
-
-                QueryWrapper<EntityGovRel> relQueryWrapper = new QueryWrapper<>();
-                Long aLong = entityGovRelMapper.selectCount(relQueryWrapper.lambda().eq(EntityGovRel::getEntityCode, o.getEntityCode()));
-                if (aLong>0){
-                    taskDto.setIsUi(IS_URBAN_INVESTMENT);
-                }else {
-                    taskDto.setIsUi(NOT_URBAN_INVESTMENT);
-                }
-            }
-            taskList.add(taskDto);
+            //创建单个响应对象,设置角色3，4，5通用属性
+            SupplyTaskVo taskVo=setNormalValue(o,roleId);
+            taskList.add(taskVo);
         });
-        return R.ok(taskList);
+        //响应的分页数据
+        Page<SupplyTaskVo> resultPage = new Page<>(pageNum,pageSize);
+        resultPage.setTotal(taskPage.getTotal()).setRecords(taskList);
+        return R.ok(resultPage);
     }
+
+    private SupplyTaskVo setNormalValue(CrmSupplyTask o,Long roleId) {
+        SupplyTaskVo taskVo = new SupplyTaskVo();
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, o.getEntityCode()).last(" limit 1"));
+        String entityCode = entityInfo.getEntityCode();
+        // 唯一识别字段
+        taskVo.setEntityCode(entityCode);
+
+        // 来源
+        taskVo.setSource(o.getFrom());
+        // 企业名称
+        taskVo.setSource(entityInfo.getEntityName());
+        // 统一社会信用代码代码
+        taskVo.setCreditCode(entityInfo.getCreditCode());
+        // 是否为金融机构
+        taskVo.setList(entityInfo.getList());
+        // 任务状态
+        taskVo.setState(o.getState());
+
+        String value="";
+
+        if (roleId == ROLE_THREE) {
+            //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
+            value = getThreeValue(entityCode);
+            taskVo.setFinIndustryGroup(value);
+        } else if (roleId == ROLE_FOUR) {
+            //角色4     城投机构对应地方政府名称
+            value = getFourValue(entityCode);
+            taskVo.setGovName(value);
+        } else if (roleId == ROLE_FIVE) {
+            //角色5    是否为城投机构
+            value = getFiveValue(entityCode);
+            taskVo.setIsUi(value);
+        }
+        return taskVo;
+    }
+
+    private String getFiveValue(String entityCode) {
+        Long count = entityGovRelMapper.selectCount(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
+        if (count>0){
+            return IS_URBAN_INVESTMENT;
+        }
+        return NOT_URBAN_INVESTMENT;
+    }
+
+    private String getFourValue(String entityCode) {
+        //角色4     城投机构对应地方政府名称
+        EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
+        if (ObjectUtils.isEmpty(entityGovRel)){
+            return null;
+        }
+        GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, entityGovRel.getDqGovCode()).last(" limit 1"));
+        if (ObjectUtils.isEmpty(govInfo)){
+            return null;
+        }
+        return govInfo.getGovName();
+    }
+
+    private String getThreeValue(String entityCode) {
+        //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
+        EntityAttrValue attrValue = valueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
+                .lambda().eq(EntityAttrValue::getAttrId, 656).eq(EntityAttrValue::getEntityCode, entityCode).last(" limit 1"));
+        if (ObjectUtils.isEmpty(attrValue)){
+            return null;
+        }
+        return attrValue.getValue();
+    }
+
     //是城投机构
     private static String IS_URBAN_INVESTMENT="Y";
     //不是城投机构

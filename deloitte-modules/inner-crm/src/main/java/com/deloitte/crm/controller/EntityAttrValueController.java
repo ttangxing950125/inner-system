@@ -131,9 +131,9 @@ public class EntityAttrValueController extends BaseController {
      * @date 2022/9/28 23:09
      */
     public R createStockEntity(@Validated @RequestBody EntityStockInfoVo entityStockInfoVo) {
-        if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "STOCK_CN_INFO")) {
+        if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "A")) {
             return entityAttrValueService.createStockEntity(entityStockInfoVo);
-        } else if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "STOCK_HK_INFO")) {
+        } else if (ObjectUtils.equals(entityStockInfoVo.getStockType(), "G")) {
             return entityAttrValueService.createStockEntityG(entityStockInfoVo);
         } else {
             return R.fail("股票代码参数非法");

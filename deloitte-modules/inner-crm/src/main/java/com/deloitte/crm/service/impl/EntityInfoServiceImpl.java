@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelReader;
@@ -2311,6 +2312,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, ImportDto importDto) {
+
+
+
         try {
             //读取excel
             List<EntityByBatchDto> entityByBatchDtos = this.getEntityAndBondInfoV(file);
@@ -2366,6 +2370,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
                     if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2382,6 +2390,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
                     if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2397,6 +2409,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
                     if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2412,7 +2428,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    if (proIds.isEmpty()) {
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
+                    if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                             more.put(products.getProName(), "未覆盖");
@@ -2430,6 +2450,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
                     if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2455,7 +2479,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
-                    if (proIds.isEmpty()) {
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
+                    if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                             ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
@@ -2483,6 +2511,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         //组装产品的覆盖情况
                         Map<String, String> more = exportEntityCheckDto.getMore();
                         List<Integer> proIds = importDto.getProIds();
+                        //判断空指针
+                        if (CollUtil.isEmpty(proIds)){
+                            proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                        }
                         if (!proIds.isEmpty()) {
                             for (Integer proId : proIds) {
                                 Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2505,6 +2537,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         //组装产品的覆盖情况
                         Map<String, String> more = exportEntityCheckDto.getMore();
                         List<Integer> proIds = importDto.getProIds();
+                        //判断空指针
+                        if (CollUtil.isEmpty(proIds)){
+                            proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                        }
                         if (!proIds.isEmpty()) {
                             for (Integer proId : proIds) {
                                 Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2521,6 +2557,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
                     if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2536,6 +2576,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //组装产品的覆盖情况
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
+                    //判断空指针
+                    if (CollUtil.isEmpty(proIds)){
+                        proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+                    }
                     if (!proIds.isEmpty()) {
                         for (Integer proId : proIds) {
                             Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
@@ -2629,8 +2673,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 .merge(0, 0, 2, 5, "判别1-统一社会信用代码", true)
                 .merge(0, 0, 6, 9, "判别二：企业全称", true)
                 .merge(0, 0, 11, 14, "最终结果", true);
-        if(importDto.getProIds().size()!= 0){
-            merge.merge(0, 0, 15, 15+importDto.getProIds().size()-1, "产品覆盖情况", true);
+        List<Integer> proIds = importDto.getProIds();
+        //判断空指针
+        if (CollUtil.isEmpty(proIds)){
+            proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+        }
+        if(proIds.size()!= 0){
+            merge.merge(0, 0, 15, 15+proIds.size()-1, "产品覆盖情况", true);
         }
         writer.passCurrentRow();// 跳过当前行
         CellUtil.setCellValue(writer.getOrCreateCell(10, 0), "冲突检查", writer.getStyleSet(), true);
