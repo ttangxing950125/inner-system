@@ -325,7 +325,6 @@
                   :key="index"
                   :prop="item.proName"
                   :label="item.proName"
-                  width="120"
                   :class="item.color === 1 ? 'red' : 'green'"
                 >
                   <template slot-scope="scope">
@@ -457,7 +456,17 @@ export default {
         pageSize: 10,
       },
       total2: 0,
-      rettHeaer: [],
+      rettHeaer: [
+          {
+              proName: ''
+          },
+          {
+              proName: ''
+          },
+          {
+              proName: ''
+          }
+      ],
       uuid: '',
       timer: null,
       uploadStatus: false,
@@ -658,6 +667,7 @@ export default {
         let form = new FormData()
         form.append('file', params.file)
         form.uuid = this.uuid
+        form.proIds = this.value1
         importExcelByEntity(form).then((res) => {
             clearTimeout(this.timer);
             this.uploadStatus = true

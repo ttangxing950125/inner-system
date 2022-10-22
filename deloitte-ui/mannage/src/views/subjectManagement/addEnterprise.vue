@@ -22,7 +22,10 @@
             今日新发债主体 <span>{{ infomation.addToday || 0 }}</span> 个，涉及
             x 个发债主体。其中 x 个为未收录主体， x 给为已收录主体新发债
           </div>
-          <div class="mt20" id="xchart" style="height: 240px; width: 100%" />
+          <div class="mt20" v-if="none" id="xchart" style="height: 240px; width: 100%" />
+          <div class="mt20 none" v-else  >
+              暂无数据
+          </div>
         </el-card>
       </el-col>
       <el-col
@@ -52,7 +55,11 @@
             <el-table-column prop="name" label="证券简称"> </el-table-column>
             <el-table-column prop="entityCode" label="德勤主体代码">
             </el-table-column>
-            <el-table-column prop="remarks" label="详细信息"> </el-table-column>
+            <el-table-column prop="remarks" label="详细信息">
+                <template slot-scope="scope">
+                    {{ scope.row.remarks || '-' }}
+                </template>
+            </el-table-column>
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
@@ -560,7 +567,8 @@ export default {
       financeSubIndu: [],
       infomation: {},
       options: [],
-      digName: ''
+      digName: '',
+      none: false
     };
   },
   mounted() {
@@ -587,8 +595,9 @@ export default {
         this.digName = this.tab === '发债' ? '手动新增发债主体' : '手动新增企业主体'
         entityInfoLogsList({ type: type }).then((res) => {
           this.infomation = res.data;
-          const keys = Object.keys(this.infomation.cylinderDates);
-          const values = Object.values(this.infomation.cylinderDates);
+          const keys = Object.keys(this.infomation.cylinderDatas);
+          const values = Object.values(this.infomation.cylinderDatas);
+          this.none = keys.length > 0 ? true : false
           this.xEcharts(keys, values);
         });
       } catch (error) {
@@ -644,11 +653,11 @@ export default {
       this.$router.back();
     },
     editData() {
-      this.dialogVisible = true;
-      // if (this.tab === "发债") {
-      //   this.dialogVisible2 = true;
-      // } else {
-      // }      
+      if (this.tab === "发债") {
+          this.dialogVisible2 = true;
+      } else {
+          this.dialogVisible = true;
+      }      
       getModelMaster({ attrId: 656 }).then((res) => {
         const { data } = res;
         this.options = data;
@@ -889,5 +898,10 @@ export default {
 .green {
   margin-left: 5px;
   color: greenyellow;
+}
+.none {
+         margin: 0 auto;
+    width: 100px;
+    margin-top: 20px;
 }
 </style>
