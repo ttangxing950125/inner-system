@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.text.DecimalFormat;
@@ -478,9 +479,23 @@ public class BondInfoServiceImpl implements IBondInfoService {
         }else{
             BondEntityInfoVo temp = new BondEntityInfoVo().setTable(2).setId(bondInfo.getId().intValue());
             //是否为集合债 "1.Y":"0.N"
-            result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll",bondInfo.getColl()==null?null:bondInfo.getColl().toString()));
+            Boolean coll = bondInfo.getColl();
+            if(ObjectUtils.isEmpty(coll)){
+                result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll",null));
+            }else if(coll){
+                result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll","Y"));
+            }else{
+                result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll","N"));
+            }
             //是否为ABS "1.Y":"0.N"
-            result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs",bondInfo.getAbs()==null?null:bondInfo.getAbs().toString()));
+            Boolean abs = bondInfo.getAbs();
+            if(ObjectUtils.isEmpty(abs)){
+                result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs",null));
+            }else if(abs){
+                result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs","Y"));
+            }else{
+                result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs","N"));
+            }
             //债券交易代码
             result.add(new BondEntityInfoVo(temp,false,"债券交易代码","",bondInfo.getOriCode()));
             //债券全称
@@ -492,9 +507,9 @@ public class BondInfoServiceImpl implements IBondInfoService {
             //债务关系有效性 / 存续状态 "0.存续":"1.违约"
             result.add(new BondEntityInfoVo(temp,true,"债务关系有效性 / 存续状态","bond_state",bondInfo.getBondState()==null?null:bondInfo.getBondState().toString()));
             //起息日
-            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate()==null?null:bondInfo.getValueDate().toString()).setTable(4));
+            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate()==null?null:bondInfo.getValueDate()).setTable(4));
             //到期日
-            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate()==null?null:bondInfo.getValueDate().toString()).setTable(4));
+            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate()==null?null:bondInfo.getValueDate()).setTable(4));
             return result;
         }
     }
@@ -512,6 +527,10 @@ public class BondInfoServiceImpl implements IBondInfoService {
                 entityInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 2:
+                //如果该变动字段是 是否为集合债 那么关键字为 coll Y为1 N为0
+                if(Objects.equals(filedName, "coll")){value = value=="Y"?"1":"0";}
+                //如果该变动字段是 是否为ABS 那么关键字为 abs Y为1 N为0
+                if(Objects.equals(filedName, "abs")){value = value=="Y"?"1":"0";}
                 bondInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 3:
