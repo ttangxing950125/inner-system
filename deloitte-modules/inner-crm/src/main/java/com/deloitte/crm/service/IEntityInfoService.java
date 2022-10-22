@@ -10,6 +10,7 @@ import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.domain.dto.EntityListView;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.vo.EntityInfoVo;
+import com.deloitte.crm.vo.EntitySupplyMsg;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -247,7 +248,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
-    void addEntityeMsg(EntityInfo entityInfo);
+    void addEntityeMsg(EntitySupplyMsg entityInfo);
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
