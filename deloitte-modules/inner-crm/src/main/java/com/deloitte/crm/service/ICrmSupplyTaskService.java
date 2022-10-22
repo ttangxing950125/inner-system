@@ -62,7 +62,7 @@ public interface ICrmSupplyTaskService
      */
     public int deleteCrmSupplyTaskById(Long id);
 
-    R getRoleSupplyTask(String taskDate);
+    R getRoleSupplyTask(String taskDate, Integer pageNum,Integer pageSize);
 
 
     TaskStatistics getTaskStatistics();

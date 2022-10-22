@@ -2313,7 +2313,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, ImportDto importDto) {
 
-        List<Integer> ids = importDto.getProIds();
 
 
         try {
