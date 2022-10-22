@@ -77,7 +77,6 @@ public class EntityStockInfoVo {
 
     /** 上市板块*/
     @ApiModelProperty(value="上市板块")
-    @NotNull(message = "上市板块-不能为空")
     private String lisSec ;
 
     /** 交易所*/

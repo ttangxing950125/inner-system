@@ -1,4 +1,5 @@
 package com.deloitte.crm.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.domain.ProductsMasterRelHis;
 import com.deloitte.crm.mapper.ProducysMasterRelHisMapper;
@@ -26,7 +27,8 @@ public class ProducysMasterRelHisImpl extends ServiceImpl<ProducysMasterRelHisMa
     */
     @Override
     public List<ProductsMasterRelHis> getHis(){
-        return list();
+        LambdaQueryWrapper<ProductsMasterRelHis> QueryWrapper = new LambdaQueryWrapper<ProductsMasterRelHis>().orderBy(true, false, ProductsMasterRelHis::getId);
+        return list(QueryWrapper);
     }
 
 
