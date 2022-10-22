@@ -3,7 +3,7 @@
     <div class="home">
       <div class="mt20">
         <div class="flex1">
-          <h3 class="g-t-title">债券交易信息表</h3>
+          <h3 class="g-t-title">主体敞口划分</h3>
           <div class="mt20">
             <el-button @click="notice = !notice" type="text" class="notice" size="small"
               >{{ notice ? '收起近期敞口划分变更公告' : '展开近期敞口划分变更公告' }}</el-button

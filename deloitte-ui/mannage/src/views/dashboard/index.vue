@@ -140,27 +140,27 @@
         </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityName || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.creditCode || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.list === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
+        <el-table-column prop="dataShow" label="金融机构细分行业">
           <template slot-scope="scope">
-            <span>{{ scope.row.values[0] && scope.row.values[0].value }}</span>
+            <span>{{ scope.row.finIndustryGroup || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.state ? 'green' : 'red'">{{ scope.row.state === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -187,29 +187,29 @@
                 <span>{{ scope.row.srouce || '-' }}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="taskCategory" label="企业名称">
+         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityName || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.creditCode || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.list === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.values[0] && scope.row.values[0].value }}</span>
+            <span>{{ scope.row.govName || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.state ? 'green' : 'red'">{{ scope.row.state === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -236,29 +236,29 @@
                 <span>{{ scope.row.srouce || '-' }}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="taskCategory" label="企业名称">
+         <el-table-column prop="taskCategory" label="企业名称">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.entityName }}</span>
+            <span>{{ scope.row.entityName || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="统一社会信用代码">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.creditCode }}</span>
+            <span>{{ scope.row.creditCode || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为城投机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.isUi }}</span>
+            <span>{{ scope.row.isUi === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="taskCategory" label="是否为金融机构">
+          <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.entityInfo && scope.row.entityInfo.finance === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.list === 1 ? 'Y' : 'N' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
           <template slot-scope="scope">
-            <span :class="scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status ? 'green' : 'red'">{{ scope.row.crmSupplyTask &&  scope.row.crmSupplyTask.status === 1 ? '已完成' : '未完成' }}</span>
+            <span :class="scope.row.state ? 'green' : 'red'">{{ scope.row.state === 1 ? '已完成' : '未完成' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
@@ -638,8 +638,8 @@
         </el-form-item>
         <el-divider></el-divider>
         <el-form-item label="政府持股方式" >
-          <el-select class="width320" v-model="ruleForm.shareMethod" placeholder="选择省份">
-            <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item.govName"></el-option>
+          <el-select class="width320" v-model="ruleForm.shareMethod" placeholder="请选择">
+            <el-option v-for="(item, index) in govOptions" :key="index" :label="item.name" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="政府对当前城投支持力度" prop="delivery">
@@ -1188,7 +1188,29 @@ export default {
           1: 'shadow',
           2: 'shadow-yellow',
           3: 'shadow-green',
-      }
+      },
+      govOptions: [
+          {
+              name: '政府直接100%控股',
+              value: '政府直接100%控股',
+          },
+          {
+              name: '政府直接控股',
+              value: '政府直接控股',
+          },
+          {
+              name: '一级孙公司',
+              value: '一级孙公司',
+          },
+          {
+              name: '二级孙公司',
+              value: '二级孙公司',
+          },
+          {
+              name: '三级孙公司及以上',
+              value: '三级孙公司及以上',
+          }
+      ]
     };
   },
   mounted() {
@@ -1245,9 +1267,11 @@ export default {
         })
         if(this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
             // 角色 345 相关接口
-            getRoleSupplyTask({taskDate: this.nowTime }).then(res => {
+            getRoleSupplyTask({taskDate: this.nowTime, pageNum: 1, pageSize: 10 }).then(res => {
               const { data } = res
-              this.list3 = data
+              this.list3 = data.records
+              this.queryParams.pages = data.current
+              this.total = data.total
             })
         }
 
@@ -1257,7 +1281,7 @@ export default {
               const { data } = res
               this.list2 = data.records
               this.total = data.total
-              this.queryParams.pages = data.pages
+              this.queryParams.pages = data.current
             })
         }
 
@@ -1533,7 +1557,9 @@ export default {
         });
         getRoleSupplyTask(params).then((res) => {
           const { data } = res
-          this.list3 = data
+          this.list3 = data.records
+            this.queryParams.pages = data.current
+            this.total = data.total
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
         if(this.roleId === 'role2') {
@@ -1806,31 +1832,20 @@ export default {
     workRole3(row) {
       try {
         this.remarkDig = true
-        this.ruleForm.entityName = row.entityInfo.entityName
-        this.ruleForm.creditCode = row.entityInfo.creditCode
-        this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
-        this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
-        this.$set(this.ruleForm, 'wind',  '')
-        this.$set(this.ruleForm, 'shenWan',  '')
+        this.ruleForm.entityName = row.entityName
+        this.ruleForm.creditCode = row.creditCode
+        this.ruleForm.id = row.id
+        this.$set(this.ruleForm, 'entityCode',  row.entityCode)
+        this.$set(this.ruleForm, 'id',  row.id)
         this.$modal.loading("loading...");
         const params = {
-          entityCode: row.entityInfo.entityCode,
-          roleId: 5,
+          entityCode: row.entityCode,
+          roleId: 3,
         }
         getTaskByEntityCode(params).then(res => {
           const { data } = res
-          let sw = ''
-          let wind = ''
-          data.attrValueList.forEach(e => {
-            if ( e.attrId === 97 ) {
-              sw += e.value // 申万
-            }
-            if ( e.attrId === 99 ) {
-              wind += e.value // wind行业划分明细值
-            }
-          })
-          this.$set(this.ruleForm, 'shenWanMaster', sw)
-          this.$set(this.ruleForm, 'windMaster', wind)
+            this.$set(this.ruleForm, 'shenWanMaster', data.entityInfo.shenWanMaster)
+            this.$set(this.ruleForm, 'windMaster', data.entityInfo.windMaster)
         })
 
         getGovLevel({preGovCode: ''}).then(res => {
@@ -1892,6 +1907,7 @@ export default {
                 message: '操作成功',
                 type: 'success'
               });
+              this.init()
             }
           })
         }
@@ -1904,6 +1920,7 @@ export default {
                 message: '操作成功',
                 type: 'success'
               });
+              this.init()
             }
           })
         }
@@ -1916,6 +1933,7 @@ export default {
                 message: '操作成功',
                 type: 'success'
               });
+              this.init()
             }
           })
         }
@@ -1945,11 +1963,12 @@ export default {
         this.$modal.loading("loading...");
         this.governmentDig = true
         this.ruleForm.entityName = row.entityInfo.entityName
+        this.ruleForm.id = row.id
         this.ruleForm.creditCode = row.entityInfo.creditCode
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
-        this.$set(this.ruleForm, 'wind',  '')
-        this.$set(this.ruleForm, 'shenWan',  '')
+        this.$set(this.ruleForm, 'wind',  row.windMaster)
+        this.$set(this.ruleForm, 'shenWan',  row.shenWanMaster)
         const params = {
           entityCode: row.entityInfo.entityCode,
           roleId: 5,
@@ -1996,6 +2015,7 @@ export default {
         this.fsDig = true
         this.ruleForm.entityName = row.entityInfo.entityName
         this.ruleForm.creditCode = row.entityInfo.creditCode
+        this.ruleForm.id = row.id
         this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
         this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
         this.$set(this.ruleForm, 'wind',  '')

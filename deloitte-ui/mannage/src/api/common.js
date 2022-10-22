@@ -120,7 +120,7 @@ export function getFinanceSubIndu(params) {
 // 批量查询并导出excel结果
 export function importExcelByEntity(params) {
   return request({
-    url: "/crm/entityInfo/importExcelByEntity?uuid=" + params.uuid,
+    url: "/crm/entityInfo/importExcelByEntity?uuid=" + params.uuid+'&proIds=' + params.proIds,
     headers: {
       isToken: true,
       responseType:'blob'

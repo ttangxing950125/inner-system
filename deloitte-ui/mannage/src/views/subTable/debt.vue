@@ -36,11 +36,12 @@
         <el-table class="table-content" :data="list" style="margin-top: 15px">
           <el-table-column type="index" sortable label="序号">
           </el-table-column>
-          <el-table-column prop="entityCode" label="德勤主体代码" sortable>
+          <el-table-column :prop="tab === 1 ? 'entityCode' : 'transactionCode'" :label="tab === 1 ? '德勤主体代码' : '债券代码'" sortable>
           </el-table-column>
-          <el-table-column prop="entityName" label="企业名称">
+          <el-table-column :prop="tab === 1 ? 'entityName' : 'shortName'" :label="tab === 1 ? '企业名称' : '债券名称'">
             <template slot-scope="scope">
-              <div v-html="replaceFun(scope.row.entityName)"></div>
+              <div v-if="scope.row.entityName" v-html="replaceFun(scope.row.entityName)"></div>
+              <div v-if="scope.row.shortName" v-html="replaceFun(scope.row.shortName)"></div>
             </template>
           </el-table-column>
           <el-table-column prop="creditCode" label="统一社会信用代码">
@@ -87,7 +88,7 @@
           ></el-table-column>
           <el-table-column label="公私募类型">
             <template slot-scope="scope">
-              <span>{{ scope.row.raiseType === 0 ? "公募" : "私募" }}</span>
+              <span>{{ scope.row.raiseType && scope.row.raiseType === 0 ? "公募" : "私募" }}</span>
             </template>
           </el-table-column>
           <!-- <el-table-column label="是否违约">
@@ -120,12 +121,36 @@
             >
               <div class="first">{{ item.name }}</div>
               <el-input
-                v-if="item.enableEdite"
+                v-if="item.enableEdite && item.name !== '债券类型' && item.name !== '债务关系有效性 / 存续状态'"
                 class="t-input"
                 v-model="item.value"
                 @change="item.edit = true"
               ></el-input>
-              <div v-else class="content">{{ item.value || "-" }}</div>
+              <el-select v-if="item.name === '债券类型'" class="t-input" v-model="item.value" @change="item.edit = true" placeholder="请选择">
+                    <el-option
+                    label="是"
+                    value="1">
+                    </el-option>
+                    <el-option
+                    label="是"
+                    value="0">
+                    </el-option>
+                </el-select>
+              <el-select v-if="item.name === '债务关系有效性 / 存续状态'" class="t-input" v-model="item.value" @change="item.edit = true" placeholder="请选择">
+                    <el-option
+                    label="存续"
+                    value="0">
+                    </el-option>
+                    <el-option
+                    label="违约"
+                    value="1">
+                    </el-option>
+                    <el-option
+                    label="兑付"
+                    value="2">
+                    </el-option>
+                </el-select>
+              <div v-if="!item.enableEdite" class="content">{{ item.value || "-" }}</div>
             </div>
           </el-col>
           <el-col :sm="24" :lg="12" class="form-card">
@@ -141,7 +166,7 @@
                 v-model="item.value"
                 @change="item.edit = true"
               ></el-input>
-              <div v-else class="content">{{ item.value || "-" }}</div>
+              <div v-if="!item.enableEdite" class="content">{{ item.value || "-" }}</div>
             </div>
           </el-col>
           <span v-if="xContent.length === 0">暂无数据</span>
@@ -275,6 +300,10 @@ export default {
   },
   data() {
     return {
+       stateArr: {
+           'true': '是',
+           'false': '否',
+       },
       input: "",
       list: [],
       list2: [],
@@ -328,6 +357,7 @@ export default {
       total: 0,
       wind1: [],
       wind2: [],
+      
     };
   },
   created() {},
@@ -345,9 +375,13 @@ export default {
           const { data } = res;
           this.list = [];
           this.total = data.total;
-          this.queryParams.pageNum = data.pages;
+          this.queryParams.pageNum = data.current;
           data.records.forEach((e) => {
-            this.list.push(e.entityVo);
+              if (this.tab === 1) {
+                  this.list.push(e.entityVo);
+              }else {
+                  this.list.push(e.bondVo);
+              }
           });
         });
       } catch (error) {
@@ -397,7 +431,12 @@ export default {
           const { data } = res;
           this.list2 = [];
           data.forEach((e) => {
-            this.list2.push(e.bondVo);
+              if (this.tab === 1) {
+
+                  this.list2.push(e.bondVo);
+              }else {
+                  this.list2.push(e.entityVo)
+              }
           });
         });
       } catch (error) {
