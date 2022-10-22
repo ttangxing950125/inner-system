@@ -201,7 +201,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
         //获取企业基础信息
         QueryWrapper<EntityInfo> entityuInfoQuery = new QueryWrapper<>();
-        EntityInfo entityInfo = entityInfoMapper.selectOne(entityuInfoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode));
+        EntityInfo entityInfo = entityInfoMapper.selectOne(entityuInfoQuery.lambda().eq(EntityInfo::getEntityCode, entityCode).last(" limit 1"));
         entitySupplyBack.setEntityInfo(entityInfo);
 
         //获取属性信息
