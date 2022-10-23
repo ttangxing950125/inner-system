@@ -13,10 +13,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -71,7 +68,7 @@ public class RoleMainController {
     })
     @Log(title = "【校验字段】", businessType = BusinessType.OTHER)
     @PostMapping("/checkData")
-    public R<CheckVo> checkData(String keyword, String target){
+    public R<CheckVo> checkData(@RequestParam("keyword")String keyword,@RequestParam("target") String target){
         return R.ok(entityInfoManager.matchByKeyword(keyword,target));
     }
 
