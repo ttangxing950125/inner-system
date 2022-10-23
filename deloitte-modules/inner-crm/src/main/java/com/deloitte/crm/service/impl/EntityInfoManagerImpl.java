@@ -210,26 +210,26 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                         .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
                 );
                 if (stockCnInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockCnInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else {return new CheckVo().setData(stockCnInfo).setMsg(BadInfo.EXITS_STOCK_CODE.getInfo());}
                 //港股查重
             case STOCK_HK_CODE:
                 StockThkInfo stockTHKInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target)
                         .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
                 );
                 if (stockTHKInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockTHKInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else {return new CheckVo().setData(stockTHKInfo).setMsg(BadInfo.EXITS_STOCK_CODE.getInfo());}
             case STOCK_A_NAME:
                 StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target)
                         .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
                 );
                 if (stockCnInfoByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockCnInfoByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else {return new CheckVo().setData(stockCnInfoByName).setMsg(BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
             case STOCK_HK_NAME:
                 StockThkInfo stockTHKInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target)
                         .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
                 );
                 if (stockTHKInfoByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockTHKInfoByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else {return new CheckVo().setData(stockTHKInfoByName).setMsg(BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
             default:
                 return new CheckVo().setMsg(BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }
