@@ -2309,8 +2309,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public List<ExportEntityCheckDto> checkBatchEntity(MultipartFile file, ImportDto importDto) {
 
-
-
         try {
             //读取excel
             List<EntityByBatchDto> entityByBatchDtos = this.getEntityAndBondInfoV(file);

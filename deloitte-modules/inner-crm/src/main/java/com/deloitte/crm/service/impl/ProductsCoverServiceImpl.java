@@ -47,7 +47,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      * @date 2022/10/12 18:58
      */
     @Override
-    public Page<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
+    public Page <ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         // 获取 需要查询的产品
         List<Integer> proId = entityOrGovByAttrVo.getProId();
         //参数进行校验
