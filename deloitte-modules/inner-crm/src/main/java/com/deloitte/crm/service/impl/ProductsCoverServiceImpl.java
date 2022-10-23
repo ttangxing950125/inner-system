@@ -48,9 +48,12 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      */
     @Override
     public Page<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
-        // 获取 需要查询的产品(去重)
-        List<Integer> proId =entityOrGovByAttrVo.getProId().stream().distinct().collect(Collectors.toList());
-
+        // 获取 需要查询的产品
+        List<Integer> proId = entityOrGovByAttrVo.getProId();
+        //参数进行校验
+        if (proId.contains("9999")) {
+            proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+        }
         //返回结果
         List<ProductCoverDto> result = new ArrayList<>();
 
@@ -65,11 +68,12 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         List<EntityInfo> records = page1.getRecords();
 
         //组装返回结果
+        List<Integer> proIds = proId;
         records.forEach(o -> {
             //返回添加列的结果
             ArrayList<HashMap<String, String>> maps = new ArrayList<>();
             ProductCoverDto temp = new ProductCoverDto();
-            for (Integer integer : proId) {
+            for (Integer integer : proIds) {
                 HashMap<String, String> stringStringHashMap = new HashMap<>();
                 //当前主体关联的产品覆盖情况
                 ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()));
