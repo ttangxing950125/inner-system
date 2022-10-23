@@ -154,7 +154,7 @@ export function changeState(params) {
 // 登录用户角色的信息补充任务 角色6
 export function getRoleSupplyTask(params) {
   return request({
-    url: "/crm/roletff/getRoleSupplyTask?taskDate=" + params.taskDate,
+    url: "/crm/roletff/getRoleSupplyTask?taskDate=" + params.taskDate + '&pageNum=' + params.pageNum + '&pageSize=' + params.pageSize,
     headers: {
       isToken: true,
       "Content-Type": "application/x-www-form-urlencoded",

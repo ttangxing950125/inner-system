@@ -39,7 +39,7 @@
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree1"
-              @check-change="handleCheckChange"
+              @check="handleCheckChange"
             >
             </el-tree>
           </div>
@@ -64,7 +64,7 @@
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree2"
-              @check-change="handleCheckChange2"
+              @check="handleCheckChange2"
             >
             </el-tree>
           </div>

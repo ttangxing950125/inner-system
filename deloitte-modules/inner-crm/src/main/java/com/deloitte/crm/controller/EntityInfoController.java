@@ -17,6 +17,7 @@ import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
+import com.deloitte.crm.vo.EntitySupplyMsg;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -386,14 +387,14 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "财报收数根据entityCode补充录入信息--主表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "entityCode", value = "主体编码", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "reportType", value = "关注报告类型", paramType = "body", example = "", dataType = "String"),
+            @ApiImplicitParam(name = "reportType", value = "关注报告类型", paramType = "body", example = "", dataTypeClass = List.class),
             @ApiImplicitParam(name = "listType", value = "财报类型", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shenWanMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addEntityeMsg")
-    public R addEntityeMsg(@RequestBody EntityInfo entityInfo) {
+    public R addEntityeMsg(@RequestBody EntitySupplyMsg entityInfo) {
         entityInfoService.addEntityeMsg(entityInfo);
         return R.ok();
     }

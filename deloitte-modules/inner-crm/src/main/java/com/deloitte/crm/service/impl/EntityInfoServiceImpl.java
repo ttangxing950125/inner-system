@@ -2171,16 +2171,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addEntityeMsg(EntityInfo entityInfo) {
+    public void addEntityeMsg(EntitySupplyMsg entitySupplyMsg) {
+
+        EntityInfo entityInfo = entitySupplyMsg.getEntityInfo();
         Integer id = entityInfo.getId();
         crmSupplyTaskService.completeTaskById(id);
         updateOrInsertEntityInfoByEntityCode(entityInfo);
-
-        QueryWrapper<EntityInfo> entityQuery = new QueryWrapper<>();
-        int update = entityInfoMapper.update(entityInfo, entityQuery.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-        if (update < 1) {
-            entityInfoMapper.insert(entityInfo);
-        }
     }
 
     @Override

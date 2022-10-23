@@ -177,7 +177,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         String entityCode = entityInfo.getEntityCode();
         // 唯一识别字段
         taskVo.setEntityCode(entityCode);
-
+        // 任务id来源
+        taskVo.setId(o.getId());
         // 来源
         taskVo.setSource(o.getFrom());
         // 企业名称

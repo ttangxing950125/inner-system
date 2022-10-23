@@ -242,7 +242,7 @@ export default {
           param: this.input,
           pageSize: this.queryParams.pageSize,
           pageNum: this.queryParams.pageNum,
-          type: this.currentTab,
+          type: '',
         };
         getInfoListGov(parmas).then((res) => {
           const { data } = res;
