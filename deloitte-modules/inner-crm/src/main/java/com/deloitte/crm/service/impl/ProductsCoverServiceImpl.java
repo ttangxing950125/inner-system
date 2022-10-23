@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author PenTang
@@ -47,8 +48,9 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      */
     @Override
     public Page<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
-        // 获取 需要查询的产品
-        List<Integer> proId = entityOrGovByAttrVo.getProId();
+        // 获取 需要查询的产品(去重)
+        List<Integer> proId =entityOrGovByAttrVo.getProId().stream().distinct().collect(Collectors.toList());
+
         //返回结果
         List<ProductCoverDto> result = new ArrayList<>();
 
