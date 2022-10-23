@@ -51,7 +51,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         // 获取 需要查询的产品
         List<Integer> proId = entityOrGovByAttrVo.getProId();
         //参数进行校验
-        if (proId.contains("9999")) {
+        if (proId.contains(9999)) {
             proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
         }
         //返回结果
