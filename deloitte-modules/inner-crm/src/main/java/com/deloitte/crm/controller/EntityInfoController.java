@@ -17,7 +17,7 @@ import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
-import com.deloitte.crm.vo.EntitySupplyMsg;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -394,8 +394,8 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addEntityeMsg")
-    public R addEntityeMsg(@RequestBody EntitySupplyMsg entityInfo) {
-        entityInfoService.addEntityeMsg(entityInfo);
+    public R addEntityeMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
+        entityInfoService.addEntityeMsg(entitySupplyMsgBack);
         return R.ok();
     }
 
