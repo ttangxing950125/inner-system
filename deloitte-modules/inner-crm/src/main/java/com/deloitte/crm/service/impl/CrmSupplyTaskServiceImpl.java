@@ -137,7 +137,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
 
-//        sysUserRoles.add(new SysUserRole().setRoleId(7L));
+        sysUserRoles.add(new SysUserRole().setRoleId(7L));
 
 
 
@@ -182,7 +182,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         // 来源
         taskVo.setSource(o.getFrom());
         // 企业名称
-        taskVo.setSource(entityInfo.getEntityName());
+        taskVo.setEntityName(entityInfo.getEntityName());
         // 统一社会信用代码代码
         taskVo.setCreditCode(entityInfo.getCreditCode());
         // 是否为金融机构
