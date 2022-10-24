@@ -451,4 +451,22 @@ public class EntityInfoController extends BaseController {
     public R getListView(Integer type) {
         return R.ok(entityInfoService.getListView(type));
     }
+
+    /**
+     * 角色3，4，5补充录入查询和回显
+     *
+     * @param entityCode
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/24 11:13
+    */
+    @ApiOperation(value = "角色3，4，5补充录入查询和回显")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "entityCode", value = "主体Code", paramType = "query", example = "IB011161", dataType = "String"),
+            @ApiImplicitParam(name = "type", value = "查询数据类型 1，金融机构 2，城投机构 3，补充收数", paramType = "query", example = "1", dataType = "Integer")
+    })
+    @PostMapping("/getEntityBackSupply")
+    public R getEntityBackSupply(String entityCode,Integer type){
+        return entityInfoService.getEntityBackSupply(entityCode,type);
+    }
 }

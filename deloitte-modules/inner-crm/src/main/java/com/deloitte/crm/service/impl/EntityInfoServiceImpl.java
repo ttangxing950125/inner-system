@@ -2164,7 +2164,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 财报收数根据entityCode补充录入信息--主表
      *
-     * @param entityInfo
+     * @param entitySupplyMsg
      * @return void
      * @author 冉浩岑
      * @date 2022/10/12 9:51
@@ -2815,6 +2815,36 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         return entityInfoCodeDto;
+    }
+
+    /**
+     * 角色3，4，5补充录入查询和回显
+     *
+     * @param entityCode
+     * @param type   1，金融机构 2，城投机构 3，补充收数
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/24 11:31
+    */
+    @Override
+    public R getEntityBackSupply(String entityCode,Integer type) {
+        if (ObjectUtils.isEmpty(type)){
+            return R.fail("为传入查询类型");
+        }
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode).last(" limit 1"));
+        if (ObjectUtils.isEmpty(entityInfo)){
+            return R.ok();
+        }
+        EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
+        entitySupplyMsgBack.setEntityInfo(entityInfo);
+        if (1==type){
+            EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
+            entitySupplyMsgBack.setEntityFinancial(entityFinancial);
+        }else if (2==type){
+            EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
+            entitySupplyMsgBack.setEntityGovRel(entityGovRel);
+        }
+        return R.ok(entitySupplyMsgBack);
     }
 
 }
