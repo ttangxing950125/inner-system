@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,6 +18,7 @@ import java.util.Date;
  * @date 2022-09-21
  */
 @Data
+@Accessors(chain = true)
 public class EntityNameHis implements Serializable
 {
     private static final long serialVersionUID = 1L;

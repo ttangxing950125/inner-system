@@ -7,6 +7,7 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.vo.CrmEntityTaskVo;
 import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
@@ -40,6 +41,8 @@ public class RoleSevenController {
     private final ICrmEntityTaskService iCrmEntityTaskService;
 
     private final IEntityInfoService iEntityInfoService;
+
+    private final IEntityNameHisService iEntityNameHisService;
 
     /**
      * 角色7今日运维模块
@@ -109,7 +112,7 @@ public class RoleSevenController {
     })
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
-    public R editEntityNameHis(String entityCode,String entityNewName){
+    public R editEntityNameHis(@NotNull(message = "德勤代码不能为空")String entityCode,@NotNull(message = "主体名称不能为空")String entityNewName){
         log.info("  =>> 角色7 修改主体名称 将其命名为{} <<=  ",entityNewName);
         return iEntityInfoService.editEntityNameHis(entityCode,entityNewName);
     }
@@ -177,6 +180,20 @@ public class RoleSevenController {
         return iEntityInfoService.editeCreditCode(entityCode,creditCode);
     }
 
-
+    /**
+     * 新增库中主体的曾用名 by正杰
+     * @param entityCode
+     * @param entityName
+     * @return
+     */
+    @ApiOperation(value="新增库中主体的曾用名 by正杰")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="entityCode",value="传入 德勤内部代码", paramType = "query",dataType = "String",example = "IB000001"),
+            @ApiImplicitParam(name="entityName",value="传入 主体名称" , paramType = "query",dataType = "String",example = "哈尔滨哈投投资股份有限公司")})
+    @Log(title = "【 新增库中主体的曾用名 】", businessType = BusinessType.OTHER)
+    @PostMapping("/addEntityNameHis")
+    public R addEntityNameHis(@NotNull(message = "德勤代码不能未空")String entityCode,@NotNull(message = "主体新名称不能为空")String entityName){
+        return iEntityNameHisService.addEntityNameHis(entityCode,entityName);
+    }
 
 }
