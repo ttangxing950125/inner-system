@@ -2814,7 +2814,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    public R getEntityBackSupply(Long id) {
+    public R getEntityBackSupply(Integer id) {
         if (ObjectUtils.isEmpty(id)) {
             return R.fail("请传入任务id");
         }
@@ -2828,59 +2828,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return R.ok();
         }
         //设置回显的基础信息
-        EntitySupplyMsgBack entitySupplyMsgBack = getBaseInfo(entityInfo, crmSupplyTask.getFrom());
-
+        EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
+        entitySupplyMsgBack.setTaskId(id);
+        entitySupplyMsgBack.setEntityInfo(entityInfo);
+        //设置回显的信息 来源属性
+        entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());
         Long roleId = crmSupplyTask.getRoleId();
         // roleId=5 -- 角色3
         if (roleId == 5l) {
-            entitySupplyMsgBack = getRoleThreeInfo(entitySupplyMsgBack, entityCode);
+            EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
+            entitySupplyMsgBack.setEntityFinancial(entityFinancial);
         }
         // roleId=6 -- 角色4
         if (roleId == 6l) {
-            entitySupplyMsgBack = getRoleFourInfo(entitySupplyMsgBack, entityCode);
+            EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
+            entitySupplyMsgBack.setEntityGovRel(entityGovRel);
         }
-
         return R.ok(entitySupplyMsgBack);
     }
-
-    private EntitySupplyMsgBack getRoleFourInfo(EntitySupplyMsgBack entitySupplyMsgBack, String entityCode) {
-
-        EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
-
-        entitySupplyMsgBack.setShareMethod(entityGovRel.getShareMethod())
-                .setSupport(entityGovRel.getSupport())
-                .setJudgment(entityGovRel.getJudgment())
-                .setShareRatio(entityGovRel.getShareRatio())
-                .setShareRatioYear(entityGovRel.getShareRatioYear())
-                .setRemarks(entityGovRel.getRemarks());
-
-        return entitySupplyMsgBack;
-    }
-
-    private EntitySupplyMsgBack getRoleThreeInfo(EntitySupplyMsgBack entitySupplyMsgBack, String entityCode) {
-        EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
-
-        entitySupplyMsgBack.setBelPlace(entityFinancial.getBelPlace())
-                .setBelJurisdiction(entityFinancial.getBelJurisdiction())
-                .setRegulators(entityFinancial.getRegulators())
-                .setRemarks(entityFinancial.getRemarks());
-
-        return entitySupplyMsgBack;
-    }
-
-    //设置回显的基础信息
-    private EntitySupplyMsgBack getBaseInfo(EntityInfo entityInfo, String source) {
-        EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
-
-        entitySupplyMsgBack.setEntityName(entityInfo.getEntityName())
-                .setCreditCode(entityInfo.getCreditCode())
-                .setWindMaster(entityInfo.getWindMaster())
-                .setShenWanMaster(entityInfo.getShenWanMaster())
-                .setListType(entityInfo.getListType())
-                .setReportType(entityInfo.getReportType())
-                .setSource(source);
-
-        return entitySupplyMsgBack;
-    }
-
 }

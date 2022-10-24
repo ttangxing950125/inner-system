@@ -463,7 +463,7 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "角色3，4，5补充录入查询和回显")
     @ApiImplicitParam(name = "id", value = "任务id", paramType = "query", example = "24", dataType = "Long")
     @PostMapping("/getEntityBackSupply")
-    public R getEntityBackSupply(Long id){
+    public R getEntityBackSupply(Integer id){
         return entityInfoService.getEntityBackSupply(id);
     }
 }

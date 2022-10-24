@@ -57,7 +57,7 @@ public class CrmSupplyTaskController extends BaseController {
      */
     @RequiresPermissions("crm:supplyTask:query")
     @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id) {
+    public AjaxResult getInfo(@PathVariable("id") Integer id) {
         return AjaxResult.success(crmSupplyTaskService.selectCrmSupplyTaskById(id));
     }
 

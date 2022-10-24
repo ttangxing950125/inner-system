@@ -20,7 +20,7 @@ public interface ICrmSupplyTaskService
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
-    public CrmSupplyTask selectCrmSupplyTaskById(Long id);
+    public CrmSupplyTask selectCrmSupplyTaskById(Integer id);
 
     /**
      * 查询【请填写功能名称】列表

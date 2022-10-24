@@ -276,5 +276,5 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @author 冉浩岑
      * @date 2022/10/24 11:13
      */
-    R getEntityBackSupply(Long id);
+    R getEntityBackSupply(Integer id);
 }

@@ -56,7 +56,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
      * @return 【请填写功能名称】
      */
     @Override
-    public CrmSupplyTask selectCrmSupplyTaskById(Long id) {
+    public CrmSupplyTask selectCrmSupplyTaskById(Integer id) {
         return crmSupplyTaskMapper.selectCrmSupplyTaskById(id);
     }
 
@@ -198,8 +198,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
             taskVo.setFinIndustryGroup(value);
         } else if (roleId == ROLE_FOUR) {
             //角色4     城投机构对应地方政府名称
-            value = getFourValue(entityCode);
-            taskVo.setGovName(value);
+            taskVo=getFourValue(taskVo,entityCode);
         } else if (roleId == ROLE_FIVE) {
             //角色5    是否为城投机构
             value = getFiveValue(entityCode);
@@ -216,7 +215,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         return NOT_URBAN_INVESTMENT;
     }
 
-    private String getFourValue(String entityCode) {
+    private SupplyTaskVo getFourValue(SupplyTaskVo taskVo,String entityCode) {
         //角色4     城投机构对应地方政府名称
         EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
         if (ObjectUtils.isEmpty(entityGovRel)){
@@ -226,7 +225,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         if (ObjectUtils.isEmpty(govInfo)){
             return null;
         }
-        return govInfo.getGovName();
+        taskVo.setGovName(govInfo.getGovName());
+        return taskVo;
     }
 
     private String getThreeValue(String entityCode) {

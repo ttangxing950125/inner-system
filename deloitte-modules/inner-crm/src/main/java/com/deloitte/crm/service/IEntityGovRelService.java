@@ -1,7 +1,7 @@
 package com.deloitte.crm.service;
 
 import com.deloitte.crm.domain.EntityGovRel;
-import com.deloitte.crm.domain.dto.EntityGovRelDto;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 
 import java.util.List;
 
@@ -63,5 +63,5 @@ public interface IEntityGovRelService
 
     Long getEntityGovCount(String dqCode);
 
-    void addGovEntitySubtableMsg(EntityGovRelDto entityGovRel);
+    void addGovEntitySubtableMsg( EntitySupplyMsgBack entitySupplyMsgBack);
 }
