@@ -57,7 +57,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
      */
     @Override
     public CrmSupplyTask selectCrmSupplyTaskById(Integer id) {
-        return crmSupplyTaskMapper.selectCrmSupplyTaskById(id);
+
+        return crmSupplyTaskMapper.selectById(id);
     }
 
     /**
