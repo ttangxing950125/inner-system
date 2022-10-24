@@ -65,7 +65,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return 结果
      */
     public int updateEntityInfo(EntityInfo entityInfo);
-    public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo);
+    public long updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo);
 
     /**
      * 批量删除【请填写功能名称】

@@ -367,16 +367,18 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @return 结果
      */
     @Override
-    public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
+    public long updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
 
         //设置主键为空，防止修改主键
         entityInfo.setId(null);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
-        int update = entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-        if (update < 1) {
+        long count = entityInfoMapper.selectCount(queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+        if (count>0){
+            long update = entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+        }else {
             return entityInfoMapper.insert(entityInfo);
         }
-        return update;
+        return count;
     }
 
     /**
