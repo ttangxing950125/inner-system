@@ -129,6 +129,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityMasterMapper entityMasterMapper;
 
+
     /**
      * 主体
      */
@@ -403,16 +404,17 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      *
      * @param creditCode    统一社会信用代码
      * @param entityNewName 主体新名称
-     * @param remarks       备注
      * @return 修改返回信息
      * @author 正杰
      * @date 2022/9/22
      */
     @Override
-    public R editEntityNameHis(String creditCode, String entityNewName, String remarks) {
+    @Transactional(rollbackFor = Exception.class)
+    public R editEntityNameHis(String creditCode, String entityNewName) {
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
                 .lambda().eq(EntityInfo::getCreditCode, creditCode));
-        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, remarks));
+        if(ObjectUtils.isEmpty(entity)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null));
     }
 
     /**
@@ -1845,7 +1847,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return R.ok(new EntityInfoVo().setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
         } else if (ObjectUtils.isEmpty(Info)) {
             EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, His.getDqCode()));
-            return R.ok(new EntityInfoVo().setBo(false).setEntityInfoHis(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
+            return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
         }
         return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(Info).setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
     }
@@ -2160,7 +2162,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 财报收数根据entityCode补充录入信息--主表
      *
-     * @param entitySupplyMsg
      * @return void
      * @author 冉浩岑
      * @date 2022/10/12 9:51
@@ -2845,4 +2846,36 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return R.ok(entitySupplyMsgBack);
     }
+
+    /**
+     * 校验 统一社会信用代码，主体名称
+     * @author 正杰
+     * @param creditCode
+     * @param entityName
+     * @return
+     */
+    @Override
+    public R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName) {
+        log.info("  =>> 校验新增主体字段 社会信用代码:{}，主体名称{} <<=  ",creditCode,entityName);
+        if(creditCode==null){
+            EntityInfo byName = this.checkName(entityName);
+            log.info("  =>> 查询到主体 {}  <<=  ",byName);
+            if(ObjectUtils.isEmpty(byName)){return R.ok(new EntityInfoVo().setStatus(0),SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+            }else{return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(3),BadInfo.EXITS_ENTITY_NAME.getInfo());}
+        }else{
+            if(!creditCode.matches(Common.REGEX_CREDIT_CODE)){return R.fail(BadInfo.VALID_PARAM.getInfo());}
+            EntityInfo byCredit = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, creditCode));
+            EntityInfo byName = this.checkName(entityName);
+            if(ObjectUtils.isEmpty(byCredit)&&ObjectUtils.isEmpty(byName)){return R.ok(new EntityInfoVo().setStatus(0),SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+            if(ObjectUtils.isEmpty(byCredit)){return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(1),BadInfo.EXITS_ENTITY_NAME.getInfo());}
+            if(ObjectUtils.isEmpty(byName)){return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(2),BadInfo.EXITS_CREDIT_CODE.getInfo());}
+            return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(3),BadInfo.EXITS_ENTITY_CODE.getInfo());
+        }
+    }
+
+    public EntityInfo checkName(String entityName){
+        EntityInfo entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName));
+        return entityInfo;
+    }
+
 }

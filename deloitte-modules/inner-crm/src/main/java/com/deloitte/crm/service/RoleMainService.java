@@ -23,4 +23,15 @@ public interface RoleMainService {
      */
     String getRoleByUser();
 
+    /**
+     *   ***********************
+     *   * 根据当前用户查询每日任务 *
+     *   ***********************
+     *
+     * @param taskDate
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    R queryDailyTaskByDay(String taskDate, Integer pageNum, Integer pageSize);
 }

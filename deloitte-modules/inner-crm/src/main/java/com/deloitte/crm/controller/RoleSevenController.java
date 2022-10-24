@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @author 正杰
  * @description: 该类为 角色7的总控制层
@@ -98,20 +100,18 @@ public class RoleSevenController {
      * @date 2022/9/22
      * @param creditCode 统一社会信用代码
      * @param entityNewName 主体新名称
-     * @param remarks 备注
      * @return 修改返回信息
      */
     @ApiOperation(value="修改主体信息中的主体名称 & 汇总曾用名 by正杰")
     @ApiImplicitParams({
             @ApiImplicitParam(name="creditCode",value="统一社会信用代码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="remarks",value="备注",paramType = "query",dataType = "String")
+            @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String")
     })
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
-    public R editEntityNameHis(String creditCode,String entityNewName,String remarks){
-        //修改主体名称  =>  修改主体曾用名
-        return iEntityInfoService.editEntityNameHis(creditCode,entityNewName,remarks);
+    public R editEntityNameHis(String creditCode,String entityNewName){
+        log.info("  =>> 角色7 修改主体名称 将其命名为{} <<=  ",entityNewName);
+        return iEntityInfoService.editEntityNameHis(creditCode,entityNewName);
     }
 
     /**
@@ -142,6 +142,23 @@ public class RoleSevenController {
     @PostMapping("/checkEntityName")
     public R<EntityInfoVo> checkEntityName(String entityName){
         return iEntityInfoService.checkEntityName(entityName);
+    }
+
+    /**
+     * 校验 统一社会信用代码，主体名称
+     * @author 正杰
+     * @param creditCode
+     * @param entityName
+     * @return
+     */
+    @ApiOperation(value="校验主体名称及代码 by正杰")
+    @ApiImplicitParams({
+    @ApiImplicitParam(name="creditCode",value="传入 社会信用代码", paramType = "query",dataType = "String",example = "91230100128025258G"),
+    @ApiImplicitParam(name="entityName",value="传入 主体名称" , paramType = "query",dataType = "String",example = "哈尔滨哈投投资股份有限公司")})
+    @Log(title = "【 校验主体名称及代码 】", businessType = BusinessType.OTHER)
+    @PostMapping("/validateCodeAndName")
+    public R<EntityInfoVo> validateCodeAndName(String creditCode,@NotNull(message = "主体名称不能为空") String entityName){
+        return iEntityInfoService.validateCodeAndName(creditCode,entityName);
     }
 
 }
