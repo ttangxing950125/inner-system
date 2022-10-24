@@ -412,7 +412,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
                 .lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entity)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null));
+        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null),SuccessInfo.SUCCESS.getInfo());
     }
 
     /**

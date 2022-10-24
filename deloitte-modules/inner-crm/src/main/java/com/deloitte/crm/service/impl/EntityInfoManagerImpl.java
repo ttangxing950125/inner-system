@@ -69,7 +69,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
         //如果备注为空 自动改为系统自动生成
         if (StrUtil.isBlank(remarks)) {remarks = "系统自动生成";}
         String username = SecurityUtils.getUsername();
-        if (StrUtil.isBlank(username)) {return BadInfo.VALID_EMPTY_USERNAME.getInfo();}
+//        if (StrUtil.isBlank(username)) {return BadInfo.VALID_EMPTY_USERNAME.getInfo();}
         if (ObjectUtils.isEmpty(entity)) {return BadInfo.VALID_EMPTY_TARGET.getInfo();}
 
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
