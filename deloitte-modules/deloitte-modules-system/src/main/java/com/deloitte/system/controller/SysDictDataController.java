@@ -96,7 +96,15 @@ public class SysDictDataController extends BaseController
             data = new ArrayList<SysDictData>();
         }
         return AjaxResult.success(data);
+
+
+
+
+
     }
+
+
+
 
     /**
      * 新增字典类型

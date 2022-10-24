@@ -317,8 +317,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public GovInfoDto getGovInfo() {
-        List<GovInfo> list = this.list();
+        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus, 1);
+        List<GovInfo> list = this.list(eq);
+
         GovInfoDto govInfoDto = new GovInfoDto();
+
 // gov_level_big 是否 省  1-是
         List<GovInfo> province = list.stream()
                 .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 1)

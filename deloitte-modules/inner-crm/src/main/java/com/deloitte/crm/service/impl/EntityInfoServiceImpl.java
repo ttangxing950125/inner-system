@@ -213,7 +213,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public EntityInfoDto getEntityInfo() {
 
         EntityInfoDto entityInfoDto = new EntityInfoDto();
-        List<EntityInfo> list = this.list();
+        LambdaQueryWrapper<EntityInfo> eq = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getStatus, 1);
+        List<EntityInfo> list = this.list(eq);
 
         //issue_bonds 是否发债 0-未发债 1-已发债
         List<EntityInfo> bonds = list.stream()
@@ -2164,7 +2165,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 财报收数根据entityCode补充录入信息--主表
      *
-     * @param entityInfo
+     * @param entitySupplyMsg
      * @return void
      * @author 冉浩岑
      * @date 2022/10/12 9:51

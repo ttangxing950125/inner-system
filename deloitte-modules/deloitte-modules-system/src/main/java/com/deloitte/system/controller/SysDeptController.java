@@ -7,6 +7,7 @@ import com.deloitte.common.core.web.controller.BaseController;
 import com.deloitte.common.core.web.domain.AjaxResult;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.common.security.annotation.Logical;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.system.api.domain.SysDept;
@@ -32,7 +33,7 @@ public class SysDeptController extends BaseController {
     /**
      * 获取部门列表
      */
-    @RequiresPermissions("system:dept:list")
+    @RequiresPermissions(value = "system:dept:list")
     @GetMapping("/list")
     public AjaxResult list(SysDept dept) {
         List<SysDept> depts = deptService.selectDeptList(dept);
