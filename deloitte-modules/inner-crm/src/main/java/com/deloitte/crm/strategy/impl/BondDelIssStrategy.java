@@ -1,6 +1,7 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/25
+ * 新债发行-推迟或取消发行债券
  */
 @Component
 public class BondDelIssStrategy implements WindTaskStrategy {
@@ -72,9 +74,12 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             List<BondDelIss> bondDelIsses = bondDelIssService.findByBondName(shortName);
             if (CollUtil.isEmpty(bondDelIsses)) {
                 changeType = DataChangeType.INSERT.getId();
+            }else {
+                 BondDelIss last = bondDelIsses.stream().findFirst().get();
+                if (!Objects.equals(last, delIss)) {
+                    changeType = DataChangeType.UPDATE.getId();
+                }
             }
-
-
             //当债券进入 推迟或取消发行债券表 时，记为“推迟发行”
             bondInfo.setBondStatus(BondStatus.DELAY_ISSUE.getId());
             if (Objects.equals(delIss.getEvent(), BondStatus.ISSUE_FAIL.getName())) {
