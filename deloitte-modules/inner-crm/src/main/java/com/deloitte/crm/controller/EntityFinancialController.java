@@ -2,8 +2,8 @@ package com.deloitte.crm.controller;
 
 
 import com.deloitte.common.core.domain.R;
-import com.deloitte.crm.domain.dto.EntityFinancialDto;
 import com.deloitte.crm.service.EntityFinancialService;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -49,8 +49,8 @@ public class EntityFinancialController {
             @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addFinEntitySubtableMsg")
-    public R addFinEntitySubtableMsg(@RequestBody EntityFinancialDto entityFinancial) {
-        entityFinancialService.addFinEntitySubtableMsg(entityFinancial);
+    public R addFinEntitySubtableMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
+        entityFinancialService.addFinEntitySubtableMsg(entitySupplyMsgBack);
         return R.ok();
     }
 }

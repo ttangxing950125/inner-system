@@ -213,8 +213,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public EntityInfoDto getEntityInfo() {
 
         EntityInfoDto entityInfoDto = new EntityInfoDto();
-        LambdaQueryWrapper<EntityInfo> eq = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getStatus, 1);
-        List<EntityInfo> list = this.list(eq);
+        List<EntityInfo> list = this.list();
 
         //issue_bonds 是否发债 0-未发债 1-已发债
         List<EntityInfo> bonds = list.stream()
@@ -368,16 +367,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @return 结果
      */
     @Override
-    public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
-
+    public long updateEntityInfoByEntityCodeWithOutId(EntityInfo entityInfo) {
         //设置主键为空，防止修改主键
         entityInfo.setId(null);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
-        int update = entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-        if (update < 1) {
-            return entityInfoMapper.insert(entityInfo);
-        }
-        return update;
+        return entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+
     }
 
     /**
@@ -405,19 +400,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
      * => 新增主体曾用名
-     *
-     * @param creditCode    统一社会信用代码
-     * @param entityNewName 主体新名称
-     * @param remarks       备注
-     * @return 修改返回信息
      * @author 正杰
      * @date 2022/9/22
+     * @param entityCode 德勤code
+     * @param entityNewName 主体新名称
+     * @return 修改返回信息
      */
     @Override
-    public R editEntityNameHis(String creditCode, String entityNewName, String remarks) {
+    @Transactional(rollbackFor = Exception.class)
+    public R editEntityNameHis(String entityCode, String entityNewName) {
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
-                .lambda().eq(EntityInfo::getCreditCode, creditCode));
-        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, remarks));
+                .lambda().eq(EntityInfo::getEntityCode, entityCode));
+        if(ObjectUtils.isEmpty(entity)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null));
     }
 
     /**
@@ -1850,7 +1845,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             return R.ok(new EntityInfoVo().setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
         } else if (ObjectUtils.isEmpty(Info)) {
             EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, His.getDqCode()));
-            return R.ok(new EntityInfoVo().setBo(false).setEntityInfoHis(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
+            return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
         }
         return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(Info).setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
     }
@@ -2165,19 +2160,17 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * 财报收数根据entityCode补充录入信息--主表
      *
-     * @param entitySupplyMsg
      * @return void
      * @author 冉浩岑
      * @date 2022/10/12 9:51
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addEntityeMsg(EntitySupplyMsg entitySupplyMsg) {
-
-        EntityInfo entityInfo = entitySupplyMsg.getEntityInfo();
-        Integer id = entityInfo.getId();
+    public void addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+        EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
+        Integer id = entitySupplyMsgBack.getTaskId();
         crmSupplyTaskService.completeTaskById(id);
-        updateOrInsertEntityInfoByEntityCode(entityInfo);
+        updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 
     @Override
@@ -2816,6 +2809,91 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         return entityInfoCodeDto;
+    }
+
+    @Override
+    public R getEntityBackSupply(Integer id) {
+        if (ObjectUtils.isEmpty(id)) {
+            return R.fail("请传入任务id");
+        }
+        CrmSupplyTask crmSupplyTask = crmSupplyTaskService.selectCrmSupplyTaskById(id);
+        if (ObjectUtils.isEmpty(crmSupplyTask)) {
+            return R.fail();
+        }
+        String entityCode = crmSupplyTask.getEntityCode();
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode).last(" limit 1"));
+        if (ObjectUtils.isEmpty(entityInfo)) {
+            return R.ok();
+        }
+        //设置回显的基础信息
+        EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
+        entitySupplyMsgBack.setTaskId(id);
+        entitySupplyMsgBack.haveEntityInfo(entityInfo);
+        //设置回显的信息 来源属性
+        entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());
+        Long roleId = crmSupplyTask.getRoleId();
+        // roleId=5 -- 角色3
+        if (roleId == 5l) {
+            EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
+            entitySupplyMsgBack.haveEntityFinancial(entityFinancial);
+        }
+        // roleId=6 -- 角色4
+        if (roleId == 6l) {
+            EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
+            entitySupplyMsgBack.haveEntityGovRel(entityGovRel);
+        }
+        return R.ok(entitySupplyMsgBack);
+    }
+
+    /**
+     * 校验 统一社会信用代码，主体名称
+     * @author 正杰
+     * @param creditCode
+     * @param entityName
+     * @return
+     */
+    @Override
+    public R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName) {
+        log.info("  =>> 校验新增主体字段 社会信用代码:{}，主体名称{} <<=  ",creditCode,entityName);
+        if(creditCode==null){
+            EntityInfo byName = this.checkName(entityName);
+            log.info("  =>> 查询到主体 {}  <<=  ",byName);
+            if(ObjectUtils.isEmpty(byName)){return R.ok(new EntityInfoVo().setStatus(0),SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+            }else{return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(3),BadInfo.EXITS_ENTITY_NAME.getInfo());}
+        }else{
+            if(!creditCode.matches(Common.REGEX_CREDIT_CODE)){return R.fail(BadInfo.VALID_PARAM.getInfo());}
+            EntityInfo byCredit = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, creditCode));
+            EntityInfo byName = this.checkName(entityName);
+            if(ObjectUtils.isEmpty(byCredit)&&ObjectUtils.isEmpty(byName)){return R.ok(new EntityInfoVo().setStatus(0),SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());}
+            if(ObjectUtils.isEmpty(byCredit)){return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(1),BadInfo.EXITS_ENTITY_NAME.getInfo());}
+            if(ObjectUtils.isEmpty(byName)){return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(2),BadInfo.EXITS_CREDIT_CODE.getInfo());}
+            return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(3),BadInfo.EXITS_ENTITY_CODE.getInfo());
+        }
+    }
+
+    public EntityInfo checkName(String entityName){
+        EntityInfo entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName));
+        return entityInfo;
+    }
+
+    /**
+     * 修改库中主体的统一社会信用代码 by正杰
+     * @param entityCode
+     * @param creditCode
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R editeCreditCode(String entityCode, String creditCode) {
+        if(!creditCode.matches(Common.REGEX_CREDIT_CODE)){return R.fail(BadInfo.VALID_PARAM.getInfo());}
+        log.info("  =>> 角色7 更改统一社会信用代码：开始 <<=  ");
+        EntityInfo entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
+        if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        log.info("  =>> 主体{} 将社会代码 {} 更变为 {} <<=  ",entityInfo.getEntityName(),entityInfo.getCreditCode(),creditCode);
+        entityInfo.setCreditCode(creditCode);
+        baseMapper.updateById(entityInfo);
+        log.info("  =>> 角色7 更改统一社会信用代码：结束 <<=  ");
+        return R.ok();
     }
 
 }

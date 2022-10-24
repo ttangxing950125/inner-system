@@ -17,7 +17,7 @@ import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
-import com.deloitte.crm.vo.EntitySupplyMsg;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -283,7 +283,7 @@ public class EntityInfoController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "mapList", value = "更多指标添加指标项", paramType = "body", example = "", dataTypeClass = MoreIndex.class),
             @ApiImplicitParam(name = "pageSize", value = "页面size", paramType = "body", example = "1", dataType = "Integer"),
-            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1",dataType = "Integer"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "body", example = "1", dataType = "Integer"),
             @ApiImplicitParam(name = "publicType", value = "公募债券", paramType = "body", example = "1", dataType = "Integer"),
             @ApiImplicitParam(name = "privateType", value = "私募债券", paramType = "body", example = "1", dataType = "Integer"),
             @ApiImplicitParam(name = "abs", value = "ABS", paramType = "body", example = "1", dataType = "Integer"),
@@ -295,6 +295,7 @@ public class EntityInfoController extends BaseController {
     public R getListEntityByPage(@RequestBody EntityAttrByDto entityAttrDto) {
         return R.ok(entityInfoService.getListEntityByPage(entityAttrDto));
     }
+
     /**
      * 企业主体分类概览
      *
@@ -356,10 +357,9 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/importExcelByEntity")
     public R importExcelByEntity(@RequestParam("file") MultipartFile file, ImportDto importDto) {
         List<ExportEntityCheckDto> exportEntityCheckDtos = entityInfoService.checkBatchEntity(file, importDto);
-        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos,importDto);
+        R excelWriter = entityInfoService.getExcelWriter(exportEntityCheckDtos, importDto);
         return excelWriter;
     }
-
 
 
     /**
@@ -394,31 +394,31 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addEntityeMsg")
-    public R addEntityeMsg(@RequestBody EntitySupplyMsg entityInfo) {
-        entityInfoService.addEntityeMsg(entityInfo);
+    public R addEntityeMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
+        entityInfoService.addEntityeMsg(entitySupplyMsgBack);
         return R.ok();
     }
 
     /**
-     *根据名称查询主体的相关信息(产品客户划分情况)
+     * 根据名称查询主体的相关信息(产品客户划分情况)
      *
      * @return R
      * @author penTang
      * @date 2022/10/17 9:53
-    */
+     */
     @ApiOperation(value = "敞口划分根据主体名称查询信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name",value = "主体名称" ,paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+            @ApiImplicitParam(name = "name", value = "主体名称", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     })
     @PostMapping("/entityMaster")
-    public R  selectEntityInfoByName(@RequestParam("name") String name) {
+    public R selectEntityInfoByName(@RequestParam("name") String name) {
         return R.ok(entityInfoService.selectEntityInfoListByName(name));
 
     }
 
     /**
-     *根据名code
-     *查询主体信息
+     * 根据名code
+     * 查询主体信息
      *
      * @return R
      * @author penTang
@@ -426,15 +426,12 @@ public class EntityInfoController extends BaseController {
      */
     @ApiOperation(value = "根据主体code查询主体信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "code",paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
+            @ApiImplicitParam(name = "code", paramType = "body", example = "", dataTypeClass = EntityAttrByDto.class)
     })
     @PostMapping("/entityByMaster")
-    public R  selectEntityInfoByCode(@RequestParam("code") String code) {
-        return  R.ok(entityInfoService.selectEntityDto(code));
+    public R selectEntityInfoByCode(@RequestParam("code") String code) {
+        return R.ok(entityInfoService.selectEntityDto(code));
     }
-
-
-
 
 
     /**
@@ -444,11 +441,26 @@ public class EntityInfoController extends BaseController {
      * @return R
      * @author 冉浩岑
      * @date 2022/10/17 8:49
-    */
+     */
     @ApiOperation(value = "企业主体清单-查询概览")
     @ApiImplicitParam(name = "type", value = "查询类型", paramType = "query", example = "1", dataType = "Integer")
     @PostMapping("/getListView")
     public R getListView(Integer type) {
         return R.ok(entityInfoService.getListView(type));
+    }
+
+    /**
+     * 角色3，4，5补充录入查询和回显
+     *
+     * @param id
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/24 11:13
+     */
+    @ApiOperation(value = "角色3，4，5补充录入查询和回显")
+    @ApiImplicitParam(name = "id", value = "任务id", paramType = "query", example = "24", dataType = "Long")
+    @PostMapping("/getEntityBackSupply")
+    public R<EntitySupplyMsgBack> getEntityBackSupply(Integer id) {
+        return entityInfoService.getEntityBackSupply(id);
     }
 }

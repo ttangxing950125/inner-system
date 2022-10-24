@@ -75,7 +75,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         arr.add("导入日期");
         arr.add("变化状态");
         arr.add("代码");
-        arr.add("公司名称");
+        arr.add("证券简称");
         return arr;
     }
 
@@ -93,7 +93,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
             dataMap.put("变化状态", item.getChangeType());
 
             dataMap.put("证券代码", item.getCode());
-            dataMap.put("公司名称", item.getName());
+            dataMap.put("证券简称", item.getName());
 
             return dataMap;
         }).collect(Collectors.toList());

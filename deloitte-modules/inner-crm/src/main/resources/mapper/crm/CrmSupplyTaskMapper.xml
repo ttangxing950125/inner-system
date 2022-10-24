@@ -16,7 +16,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectCrmSupplyTaskVo">
-        select id, entity_code, role_id, task_date, state, handle_user, created, updated from crm_supply_task
+        select id, entity_code, role_id, task_date, state, handle_user, created, updated,`from` from crm_supply_task
     </sql>
 
     <select id="selectCrmSupplyTaskList" parameterType="CrmSupplyTask" resultMap="CrmSupplyTaskResult">
@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
-    <select id="selectCrmSupplyTaskById" parameterType="Long" resultMap="CrmSupplyTaskResult">
+    <select id="selectCrmSupplyTaskById" parameterType="Integer" resultMap="CrmSupplyTaskResult">
         <include refid="selectCrmSupplyTaskVo"/>
         where id = #{id}
     </select>

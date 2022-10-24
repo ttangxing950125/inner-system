@@ -7,6 +7,7 @@ import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.crm.dto.EntityDto;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.vo.CrmEntityTaskVo;
 import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author 正杰
@@ -38,6 +41,8 @@ public class RoleSevenController {
     private final ICrmEntityTaskService iCrmEntityTaskService;
 
     private final IEntityInfoService iEntityInfoService;
+
+    private final IEntityNameHisService iEntityNameHisService;
 
     /**
      * 角色7今日运维模块
@@ -96,22 +101,20 @@ public class RoleSevenController {
      * => 新增主体曾用名
      * @author 正杰
      * @date 2022/9/22
-     * @param creditCode 统一社会信用代码
+     * @param entityCode 德勤code
      * @param entityNewName 主体新名称
-     * @param remarks 备注
      * @return 修改返回信息
      */
     @ApiOperation(value="修改主体信息中的主体名称 & 汇总曾用名 by正杰")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="creditCode",value="统一社会信用代码",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String"),
-            @ApiImplicitParam(name="remarks",value="备注",paramType = "query",dataType = "String")
+            @ApiImplicitParam(name="entityCode",value="德勤code",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String")
     })
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
-    public R editEntityNameHis(String creditCode,String entityNewName,String remarks){
-        //修改主体名称  =>  修改主体曾用名
-        return iEntityInfoService.editEntityNameHis(creditCode,entityNewName,remarks);
+    public R editEntityNameHis(@NotNull(message = "德勤代码不能为空")String entityCode,@NotNull(message = "主体名称不能为空")String entityNewName){
+        log.info("  =>> 角色7 修改主体名称 将其命名为{} <<=  ",entityNewName);
+        return iEntityInfoService.editEntityNameHis(entityCode,entityNewName);
     }
 
     /**
@@ -142,6 +145,55 @@ public class RoleSevenController {
     @PostMapping("/checkEntityName")
     public R<EntityInfoVo> checkEntityName(String entityName){
         return iEntityInfoService.checkEntityName(entityName);
+    }
+
+    /**
+     * 校验 统一社会信用代码，主体名称
+     * @author 正杰
+     * @param creditCode
+     * @param entityName
+     * @return
+     */
+    @ApiOperation(value="校验主体名称及代码 by正杰")
+    @ApiImplicitParams({
+    @ApiImplicitParam(name="creditCode",value="传入 社会信用代码", paramType = "query",dataType = "String",example = "91230100128025258G"),
+    @ApiImplicitParam(name="entityName",value="传入 主体名称" , paramType = "query",dataType = "String",example = "哈尔滨哈投投资股份有限公司")})
+    @Log(title = "【 校验主体名称及代码 】", businessType = BusinessType.OTHER)
+    @PostMapping("/validateCodeAndName")
+    public R<EntityInfoVo> validateCodeAndName(String creditCode,@NotNull(message = "主体名称不能为空") String entityName){
+        return iEntityInfoService.validateCodeAndName(creditCode,entityName);
+    }
+
+    /**
+     * 修改库中主体的统一社会信用代码 by正杰
+     * @param entityCode
+     * @param creditCode
+     * @return
+     */
+    @ApiOperation(value="修改库中主体的统一社会信用代码 by正杰")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="entityCode",value="传入 德勤内部代码", paramType = "query",dataType = "String",example = "IB000001"),
+            @ApiImplicitParam(name="creditCode",value="传入 社会信用代码" , paramType = "query",dataType = "String",example = "91230100128025258G")})
+    @Log(title = "【 修改库中主体的统一社会信用代码 】", businessType = BusinessType.OTHER)
+    @PostMapping("/editeCreditCode")
+    public R editeCreditCode(@NotNull(message = "德勤代码不能未空") String entityCode,@NotNull(message = "统一社会信用代码不能为空") String creditCode){
+        return iEntityInfoService.editeCreditCode(entityCode,creditCode);
+    }
+
+    /**
+     * 新增库中主体的曾用名 by正杰
+     * @param entityCode
+     * @param entityName
+     * @return
+     */
+    @ApiOperation(value="新增库中主体的曾用名 by正杰")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="entityCode",value="传入 德勤内部代码", paramType = "query",dataType = "String",example = "IB000001"),
+            @ApiImplicitParam(name="entityName",value="传入 主体名称" , paramType = "query",dataType = "String",example = "哈尔滨哈投投资股份有限公司")})
+    @Log(title = "【 新增库中主体的曾用名 】", businessType = BusinessType.OTHER)
+    @PostMapping("/addEntityNameHis")
+    public R addEntityNameHis(@NotNull(message = "德勤代码不能未空")String entityCode,@NotNull(message = "主体新名称不能为空")String entityName){
+        return iEntityNameHisService.addEntityNameHis(entityCode,entityName);
     }
 
 }

@@ -9,21 +9,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
-
 /**
- * (EntityFinancial)表实体类
+ * EntityFinancial 导入工具类
  *
- * @author 吴鹏鹏ppp
- * @since 2022-10-11 17:11:57
+ * @author 冉浩岑
+ * @since 2022-10-21 17:11:57
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Accessors(chain = true)
-public class EntityFinancialDto implements Serializable {
-    private static final long serialVersionUID = 218444696023577627L;
+public class EntityFinancialDto {
+
     @Excel(name = "${column.comment}")
     private Integer id;
     /**
@@ -46,7 +44,6 @@ public class EntityFinancialDto implements Serializable {
      */
     @Excel(name = "对口监管机构")
     private String regulators;
-
     /**
      * 对口监管机构
      */
@@ -97,4 +94,18 @@ public class EntityFinancialDto implements Serializable {
     @Excel(name = "申万行业划分")
     private String shenWanMaster;
 
+
+
+    /** 对象映射，配合前端接参数 */
+    private EntityInfo city;
+    private String county;
+    private String creditCode;
+    private Object date1;
+    private Object date2;
+    private String delivery;
+    private String desc;
+    private String district;
+    private String entityName;
+    private String name;
+    private String resource;
 }

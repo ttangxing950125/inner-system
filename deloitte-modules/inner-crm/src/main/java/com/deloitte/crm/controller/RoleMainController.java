@@ -7,6 +7,7 @@ import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.RoleMainService;
 import com.deloitte.crm.vo.CheckVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,6 +31,8 @@ public class RoleMainController {
 
     private final EntityInfoManager entityInfoManager;
     private final ICrmDailyTaskService crmDailyTaskService;
+
+    private final RoleMainService roleMainService;
 
 
     /**
@@ -57,8 +60,7 @@ public class RoleMainController {
         @ApiImplicitParam(name ="pageSize",value = "分页页数",example = "5",paramType = "query",dataType = "Integer")
     })
     public R queryDailyTaskByDay(String taskDate, Integer pageNum, Integer pageSize){
-
-        return null;
+        return roleMainService.queryDailyTaskByDay(taskDate,pageNum,pageSize);
     }
 
     @ApiOperation(value="校验字段 by正杰")

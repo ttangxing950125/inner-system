@@ -53,7 +53,7 @@ public class BondDelIssServiceImpl extends ServiceImpl<BondDelIssMapper, BondDel
 
         //入历史记录库
         for (BondDelIss delIss : delIsses) {
-            if (StrUtil.isBlank(delIss.getBondShortName())){
+            if (StrUtil.isBlank(delIss.getBondShortName())) {
                 continue;
             }
             //多线程保存债券信息，更新attrvalue表
@@ -88,15 +88,14 @@ public class BondDelIssServiceImpl extends ServiceImpl<BondDelIssMapper, BondDel
 
     /**
      * 根据债券简称查询数据
+     *
      * @param shortName
      * @return
      */
     @Override
     public List<BondDelIss> findByBondName(String shortName) {
-        LambdaUpdateWrapper<BondDelIss> wrapper = Wrappers.<BondDelIss>lambdaUpdate()
-                .eq(BondDelIss::getBondShortName, shortName);
-
-
+        LambdaUpdateWrapper<BondDelIss> wrapper = Wrappers.<BondDelIss>lambdaUpdate().eq(BondDelIss::getBondShortName, shortName)
+                .orderBy(true, false, BondDelIss::getId).last("LIMIT 1");
         return this.list(wrapper);
     }
 }

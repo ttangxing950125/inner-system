@@ -2,18 +2,21 @@ package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.constants.StockInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.vo.CheckVo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @AllArgsConstructor
+@Slf4j
 public class EntityInfoManagerImpl implements EntityInfoManager {
 
     private final EntityInfoMapper entityInfoMapper;
@@ -60,12 +64,13 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String updateEntityName(EntityInfo entity,String entityNewName,String remarks) {
         //如果备注为空 自动改为系统自动生成
-        if (remarks == null) {remarks = "系统自动生成";}
+        if (StrUtil.isBlank(remarks)) {remarks = "系统自动生成";}
         String username = SecurityUtils.getUsername();
-        if (username == null) {return BadInfo.VALID_EMPTY_USERNAME.getInfo();}
-        if (entity == null) {return BadInfo.VALID_EMPTY_TARGET.getInfo();}
+        if (StrUtil.isBlank(username)) {return BadInfo.VALID_EMPTY_USERNAME.getInfo();}
+        if (ObjectUtils.isEmpty(entity)) {return BadInfo.VALID_EMPTY_TARGET.getInfo();}
 
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
         String oldName = entity.getEntityName();
@@ -75,7 +80,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
                     + "\r\n"
                     + "；"
-                    + new Date()
+                    + DateUtil.format(new Date(),"yyyy-MM-dd")
                     + " "
                     + SecurityUtils.getUsername()
                     + " "

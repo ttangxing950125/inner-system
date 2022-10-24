@@ -6,10 +6,6 @@ import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.domain.EntityInfo;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 【请填写功能名称】对象 entity_gov_rel
@@ -19,10 +15,8 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class EntityGovRelDto implements Serializable
+public class EntityGovRelDto
 {
-    private static final long serialVersionUID = 1L;
-
     /** $column.columnComment */
     private Integer id;
 
@@ -59,9 +53,6 @@ public class EntityGovRelDto implements Serializable
                 .setJudgment(this.judgment)
                 .setShareRatio(this.shareRatio)
                 .setShareRatioYear(this.shareRatioYear)
-                .setStatus(this.status)
-                .setCreated(this.created)
-                .setUpdated(this.updated)
                 .setRemarks(this.remarks);
         return entityGovRel;
     }
@@ -96,22 +87,8 @@ public class EntityGovRelDto implements Serializable
     private String shareRatioYear;
 
     /** 德勤政府code */
-    @Excel(name = "状态 0-禁用 1-启用")
-    private String status;
-
-    /** 德勤政府code */
     @Excel(name = "备注")
     private String remarks;
-
-    /** 德勤政府code */
-    @Excel(name = "created")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date created;
-
-    /** 德勤政府code */
-    @Excel(name = "updated")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date updated;
 
     @Override
     public String toString() {

@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -19,11 +20,13 @@ public class EntityDto {
 
     /** $column.columnComment */
     @ApiModelProperty(name="id",value="主键")
+    @NotNull(message = "任务id不能为空")
     private Integer id;
 
     /** 企业名 */
     @Excel(name = "企业名")
     @ApiModelProperty(name="entityName",value="企业名")
+    @NotNull(message = "企业名称不能为空")
     private String entityName;
 
     /** IB+自000001开始排序，每个企业唯一 */

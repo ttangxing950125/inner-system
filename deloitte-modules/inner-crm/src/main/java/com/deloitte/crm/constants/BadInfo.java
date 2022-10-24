@@ -13,6 +13,7 @@ public enum BadInfo {
     EXITS_ENTITY_NAME("该主体名称已存在"),
     EXITS_ENTITY_DIFFERENT_NAME("主体存在，主体名称不同"),
     EXITS_ENTITY_CODE("该主体已存在，无法新增"),
+    EXITS_CREDIT_CODE("该统一社会信用代码已存在"),
     EXITS_BOND_CODE("该债券已存在"),
     EXITS_STOCK_CODE("该股票代码重复"),
     EXITS_STOCK_SHO_NAME("该股票简称重复"),

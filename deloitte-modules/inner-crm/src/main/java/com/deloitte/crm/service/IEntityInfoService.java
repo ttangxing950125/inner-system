@@ -10,7 +10,7 @@ import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.domain.dto.EntityListView;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.vo.EntityInfoVo;
-import com.deloitte.crm.vo.EntitySupplyMsg;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -65,7 +65,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return 结果
      */
     public int updateEntityInfo(EntityInfo entityInfo);
-    public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo);
+    public long updateEntityInfoByEntityCodeWithOutId(EntityInfo entityInfo);
 
     /**
      * 批量删除【请填写功能名称】
@@ -102,15 +102,13 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
      * => 新增主体曾用名
-     *
-     * @param creditCode    统一社会信用代码
-     * @param entityNewName 主体新名称
-     * @param remarks       备注
-     * @return 修改返回信息
      * @author 正杰
      * @date 2022/9/22
+     * @param entityCode 德勤code
+     * @param entityNewName 主体新名称
+     * @return 修改返回信息
      */
-    R editEntityNameHis(String creditCode, String entityNewName, String remarks);
+    R editEntityNameHis(String entityCode, String entityNewName);
 
     /**
      * 根据名称查询主体
@@ -248,7 +246,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
-    void addEntityeMsg(EntitySupplyMsg entityInfo);
+    void addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack);
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
@@ -257,13 +255,41 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
 
     /**
-     * 根据 id 字段名 修改
-     * @param id
-     * @param filedName
-     * @param value
+     *根据名称查询主体的相关信息(产品客户划分情况)
+     *
+     * @param name
+     * @return List<EntityInfo>
+     * @author penTang
+     * @date 2022/10/17 9:53
      */
     List<EntityInfo> selectEntityInfoListByName(String name);
 
 
     EntityInfoCodeDto selectEntityDto(String code);
+    /**
+     * 角色3，4，5补充录入查询和回显
+     *
+     * @param id
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/24 11:13
+     */
+    R getEntityBackSupply(Integer id);
+
+    /**
+     * 校验 统一社会信用代码，主体名称
+     * @author 正杰
+     * @param creditCode
+     * @param entityName
+     * @return
+     */
+    R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName);
+
+    /**
+     * 修改库中主体的统一社会信用代码 by正杰
+     * @param entityCode
+     * @param creditCode
+     * @return
+     */
+    R editeCreditCode(String entityCode, String creditCode);
 }
