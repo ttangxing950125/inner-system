@@ -50,7 +50,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         }
 
         EntityInfo entityInfo = entityFinancialDto.getEntityInfo();
-        entityInfoService.updateOrInsertEntityInfoByEntityCode(entityInfo);
+        entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 
     @Autowired

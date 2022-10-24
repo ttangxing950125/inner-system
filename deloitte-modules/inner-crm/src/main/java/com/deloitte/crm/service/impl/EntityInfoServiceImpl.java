@@ -367,18 +367,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @return 结果
      */
     @Override
-    public long updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo) {
-
+    public long updateEntityInfoByEntityCodeWithOutId(EntityInfo entityInfo) {
         //设置主键为空，防止修改主键
         entityInfo.setId(null);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
-        long count = entityInfoMapper.selectCount(queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-        if (count>0){
-            long update = entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
-        }else {
-            return entityInfoMapper.insert(entityInfo);
-        }
-        return count;
+        return entityInfoMapper.update(entityInfo, queryWrapper.lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+
     }
 
     /**
@@ -2178,7 +2172,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityInfo entityInfo = entitySupplyMsg.getEntityInfo();
         Integer id = entityInfo.getId();
         crmSupplyTaskService.completeTaskById(id);
-        updateOrInsertEntityInfoByEntityCode(entityInfo);
+        updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 
     @Override
@@ -2367,7 +2361,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2387,7 +2381,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2406,7 +2400,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2425,7 +2419,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2447,7 +2441,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2476,7 +2470,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2508,7 +2502,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         Map<String, String> more = exportEntityCheckDto.getMore();
                         List<Integer> proIds = importDto.getProIds();
                         //判断空指针
-                        if (CollUtil.isEmpty(proIds)){
+                        if (CollUtil.isEmpty(proIds)) {
                             proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                         }
                         if (!proIds.isEmpty()) {
@@ -2534,7 +2528,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         Map<String, String> more = exportEntityCheckDto.getMore();
                         List<Integer> proIds = importDto.getProIds();
                         //判断空指针
-                        if (CollUtil.isEmpty(proIds)){
+                        if (CollUtil.isEmpty(proIds)) {
                             proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                         }
                         if (!proIds.isEmpty()) {
@@ -2554,7 +2548,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2573,7 +2567,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     Map<String, String> more = exportEntityCheckDto.getMore();
                     List<Integer> proIds = importDto.getProIds();
                     //判断空指针
-                    if (CollUtil.isEmpty(proIds)){
+                    if (CollUtil.isEmpty(proIds)) {
                         proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
                     }
                     if (!proIds.isEmpty()) {
@@ -2671,11 +2665,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 .merge(0, 0, 11, 14, "最终结果", true);
         List<Integer> proIds = importDto.getProIds();
         //判断空指针
-        if (CollUtil.isEmpty(proIds)){
+        if (CollUtil.isEmpty(proIds)) {
             proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
         }
-        if(proIds.size()!= 0){
-            merge.merge(0, 0, 15, 15+proIds.size()-1, "产品覆盖情况", true);
+        if (proIds.size() != 0) {
+            merge.merge(0, 0, 15, 15 + proIds.size() - 1, "产品覆盖情况", true);
         }
         writer.passCurrentRow();// 跳过当前行
         CellUtil.setCellValue(writer.getOrCreateCell(10, 0), "冲突检查", writer.getStyleSet(), true);
@@ -2698,7 +2692,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("最终匹配主体代码结果", o.getEntityCodeByResult());
             map.put("最终匹配主体全称结果", o.getEntityNameByResult());
             map.put("最终统一社会信用代码结果", o.getCreditCodeByResult());
-            if (o.getMore()!= null){
+            if (o.getMore() != null) {
                 for (String s : o.getMore().keySet()) {
                     map.put(s, o.getMore().get(s));
                 }
@@ -2821,29 +2815,29 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R getEntityBackSupply(Long id) {
-        if (ObjectUtils.isEmpty(id)){
+        if (ObjectUtils.isEmpty(id)) {
             return R.fail("请传入任务id");
         }
         CrmSupplyTask crmSupplyTask = crmSupplyTaskService.selectCrmSupplyTaskById(id);
-        if (ObjectUtils.isEmpty(crmSupplyTask)){
+        if (ObjectUtils.isEmpty(crmSupplyTask)) {
             return R.fail();
         }
         String entityCode = crmSupplyTask.getEntityCode();
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode).last(" limit 1"));
-        if (ObjectUtils.isEmpty(entityInfo)){
+        if (ObjectUtils.isEmpty(entityInfo)) {
             return R.ok();
         }
         //设置回显的基础信息
-        EntitySupplyMsgBack entitySupplyMsgBack = getBaseInfo(entityInfo,crmSupplyTask.getFrom());
+        EntitySupplyMsgBack entitySupplyMsgBack = getBaseInfo(entityInfo, crmSupplyTask.getFrom());
 
         Long roleId = crmSupplyTask.getRoleId();
         // roleId=5 -- 角色3
-        if (roleId==5l){
-            entitySupplyMsgBack = getRoleThreeInfo(entitySupplyMsgBack,entityCode);
+        if (roleId == 5l) {
+            entitySupplyMsgBack = getRoleThreeInfo(entitySupplyMsgBack, entityCode);
         }
         // roleId=6 -- 角色4
-        if (roleId==6l){
-            entitySupplyMsgBack = getRoleFourInfo(entitySupplyMsgBack,entityCode);
+        if (roleId == 6l) {
+            entitySupplyMsgBack = getRoleFourInfo(entitySupplyMsgBack, entityCode);
         }
 
         return R.ok(entitySupplyMsgBack);
@@ -2854,11 +2848,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
 
         entitySupplyMsgBack.setShareMethod(entityGovRel.getShareMethod())
-                           .setSupport(entityGovRel.getSupport())
-                           .setJudgment(entityGovRel.getJudgment())
-                           .setShareRatio(entityGovRel.getShareRatio())
-                           .setShareRatioYear(entityGovRel.getShareRatioYear())
-                           .setRemarks(entityGovRel.getRemarks());
+                .setSupport(entityGovRel.getSupport())
+                .setJudgment(entityGovRel.getJudgment())
+                .setShareRatio(entityGovRel.getShareRatio())
+                .setShareRatioYear(entityGovRel.getShareRatioYear())
+                .setRemarks(entityGovRel.getRemarks());
 
         return entitySupplyMsgBack;
     }
@@ -2867,24 +2861,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
 
         entitySupplyMsgBack.setBelPlace(entityFinancial.getBelPlace())
-                           .setBelJurisdiction(entityFinancial.getBelJurisdiction())
-                           .setRegulators(entityFinancial.getRegulators())
-                           .setRemarks(entityFinancial.getRemarks());
+                .setBelJurisdiction(entityFinancial.getBelJurisdiction())
+                .setRegulators(entityFinancial.getRegulators())
+                .setRemarks(entityFinancial.getRemarks());
 
         return entitySupplyMsgBack;
     }
 
     //设置回显的基础信息
-    private EntitySupplyMsgBack getBaseInfo(EntityInfo entityInfo,String source) {
+    private EntitySupplyMsgBack getBaseInfo(EntityInfo entityInfo, String source) {
         EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
 
         entitySupplyMsgBack.setEntityName(entityInfo.getEntityName())
-                           .setCreditCode(entityInfo.getCreditCode())
-                           .setWindMaster(entityInfo.getWindMaster())
-                           .setShenWanMaster(entityInfo.getShenWanMaster())
-                           .setListType(entityInfo.getListType())
-                           .setReportType(entityInfo.getReportType())
-                           .setSource(source);
+                .setCreditCode(entityInfo.getCreditCode())
+                .setWindMaster(entityInfo.getWindMaster())
+                .setShenWanMaster(entityInfo.getShenWanMaster())
+                .setListType(entityInfo.getListType())
+                .setReportType(entityInfo.getReportType())
+                .setSource(source);
 
         return entitySupplyMsgBack;
     }
