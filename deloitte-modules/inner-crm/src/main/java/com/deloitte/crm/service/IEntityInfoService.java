@@ -257,13 +257,24 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
 
     /**
-     * 根据 id 字段名 修改
-     * @param id
-     * @param filedName
-     * @param value
+     *根据名称查询主体的相关信息(产品客户划分情况)
+     *
+     * @param name
+     * @return List<EntityInfo>
+     * @author penTang
+     * @date 2022/10/17 9:53
      */
     List<EntityInfo> selectEntityInfoListByName(String name);
 
 
     EntityInfoCodeDto selectEntityDto(String code);
+    /**
+     * 角色3，4，5补充录入查询和回显
+     *
+     * @param entityCode
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/24 11:13
+     */
+    R getEntityBackSupply(String entityCode,Integer type);
 }
