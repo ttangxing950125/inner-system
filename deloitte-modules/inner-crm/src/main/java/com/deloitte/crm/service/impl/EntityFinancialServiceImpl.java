@@ -27,6 +27,9 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
 
     @Autowired
     private IEntityInfoService entityInfoService;
+
+    @Autowired
+    private ICrmSupplyTaskService crmSupplyTaskService;
     /**
      * 金融机构根据entityCode补充录入副表信息
      *
@@ -39,7 +42,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
     public void addFinEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
         crmSupplyTaskService.completeTaskById(entitySupplyMsgBack.getTaskId());
         //保存
-        EntityFinancial entityFinancial = entitySupplyMsgBack.getEntityFinancial();
+        EntityFinancial entityFinancial = entitySupplyMsgBack.newEntityFinancial();
         QueryWrapper<EntityFinancial> financialQuery = new QueryWrapper<>();
         Long count = financialMapper.selectCount(financialQuery.lambda().eq(EntityFinancial::getEntityCode, entityFinancial.getEntityCode()));
         if (count>0){
@@ -47,10 +50,8 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         }else {
             financialMapper.insert(entityFinancial);
         }
-        EntityInfo entityInfo = entitySupplyMsgBack.getEntityInfo();
+        EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 
-    @Autowired
-    private ICrmSupplyTaskService crmSupplyTaskService;
 }

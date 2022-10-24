@@ -111,9 +111,9 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addGovEntitySubtableMsg( EntitySupplyMsgBack entitySupplyMsgBack) {
+    public void addGovEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
         crmSupplyTaskService.completeTaskById(entitySupplyMsgBack.getTaskId());
-        EntityGovRel entityGovRel = entitySupplyMsgBack.getEntityGovRel();
+        EntityGovRel entityGovRel = entitySupplyMsgBack.newEntityGovRel();
         QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
         long count = entityGovRelMapper.selectCount(govQuery.lambda().eq(EntityGovRel::getEntityCode, entityGovRel.getEntityCode()));
         if (count > 0) {
@@ -121,7 +121,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
         } else {
             entityGovRelMapper.insert(entityGovRel);
         }
-        EntityInfo entityInfo = entitySupplyMsgBack.getEntityInfo();
+        EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 

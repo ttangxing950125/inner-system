@@ -2169,7 +2169,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
-        EntityInfo entityInfo = entitySupplyMsgBack.getEntityInfo();
+        EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         Integer id = entitySupplyMsgBack.getTaskId();
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
@@ -2830,19 +2830,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //设置回显的基础信息
         EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
         entitySupplyMsgBack.setTaskId(id);
-        entitySupplyMsgBack.setEntityInfo(entityInfo);
+        entitySupplyMsgBack.haveEntityInfo(entityInfo);
         //设置回显的信息 来源属性
         entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());
         Long roleId = crmSupplyTask.getRoleId();
         // roleId=5 -- 角色3
         if (roleId == 5l) {
             EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
-            entitySupplyMsgBack.setEntityFinancial(entityFinancial);
+            entitySupplyMsgBack.haveEntityFinancial(entityFinancial);
         }
         // roleId=6 -- 角色4
         if (roleId == 6l) {
             EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
-            entitySupplyMsgBack.setEntityGovRel(entityGovRel);
+            entitySupplyMsgBack.haveEntityGovRel(entityGovRel);
         }
         return R.ok(entitySupplyMsgBack);
     }

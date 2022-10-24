@@ -121,7 +121,7 @@ public class EntitySupplyMsgBack {
     private String dqGovCode;
 
 
-    public EntityGovRel getEntityGovRel() {
+    public EntityGovRel newEntityGovRel() {
         EntityGovRel entityGovRel = new EntityGovRel();
         entityGovRel.setEntityCode(this.entityCode)
                 .setDqGovCode(this.dqGovCode)
@@ -134,7 +134,7 @@ public class EntitySupplyMsgBack {
         return entityGovRel;
     }
 
-    public void setEntityGovRel(EntityGovRel entityGovRel) {
+    public void haveEntityGovRel(EntityGovRel entityGovRel) {
         this.entityCode = entityGovRel.getEntityCode();
         this.dqGovCode = entityGovRel.getDqGovCode();
         this.shareMethod = entityGovRel.getShareMethod();
@@ -145,7 +145,7 @@ public class EntitySupplyMsgBack {
         this.remarks = entityGovRel.getRemarks();
     }
 
-    public EntityInfo getEntityInfo() {
+    public EntityInfo newEntityInfo() {
         EntityInfo entityInfo = new EntityInfo();
         entityInfo.setEntityCode(this.entityCode)
                 .setEntityName(this.entityName)
@@ -168,7 +168,7 @@ public class EntitySupplyMsgBack {
         return entityInfo;
     }
 
-    public void setEntityInfo(EntityInfo entityInfo) {
+    public void haveEntityInfo(EntityInfo entityInfo) {
         this.entityCode = entityInfo.getEntityCode();
         this.entityName = entityInfo.getEntityName();
         this.creditCode = entityInfo.getCreditCode();
@@ -191,7 +191,7 @@ public class EntitySupplyMsgBack {
         }
     }
 
-    public EntityFinancial getEntityFinancial() {
+    public EntityFinancial newEntityFinancial() {
         EntityFinancial entityFinancial = new EntityFinancial();
         entityFinancial.setEntityCode(this.entityCode)
                 .setBelJurisdiction(this.belJurisdiction)
@@ -201,7 +201,7 @@ public class EntitySupplyMsgBack {
         return entityFinancial;
     }
 
-    public void setEntityFinancial(EntityFinancial entityFinancial) {
+    public void haveEntityFinancial(EntityFinancial entityFinancial) {
         this.entityCode = entityFinancial.getEntityCode();
         this.belJurisdiction = entityFinancial.getBelJurisdiction();
         this.belPlace = entityFinancial.getBelPlace();
