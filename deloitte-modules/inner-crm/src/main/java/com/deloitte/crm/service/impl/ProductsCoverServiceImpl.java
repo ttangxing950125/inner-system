@@ -1,5 +1,4 @@
 package com.deloitte.crm.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
 /**
  * @author PenTang
  * @date 2022/10/12 16:51
@@ -98,7 +96,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             temp.setResult(maps);
             result.add(temp);
         });
-        Page<ProductCoverDto> oageResult = new Page<>();
+        Page<ProductCoverDto> oageResult = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         oageResult.setRecords(result).setTotal(page1.getTotal());
         return oageResult;
     }

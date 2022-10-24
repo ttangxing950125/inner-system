@@ -879,7 +879,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             govInfoBynameDto.setResult(maps);
             govInfoBynameDtos.add(govInfoBynameDto);
         }
-        Page<GovInfoBynameDto> pageResult = new Page<>();
+        Page<GovInfoBynameDto> pageResult = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         pageResult.setRecords(govInfoBynameDtos).setTotal(page1.getTotal());
         return R.ok(pageResult);
     }
