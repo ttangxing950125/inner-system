@@ -126,7 +126,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService
             entityGovRelMapper.insert(entityGovRel);
         }
         EntityInfo entityInfo = entityGovRelDto.getEntityInfo();
-        entityInfoService.updateOrInsertEntityInfoByEntityCode(entityInfo);
+        entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 
 }

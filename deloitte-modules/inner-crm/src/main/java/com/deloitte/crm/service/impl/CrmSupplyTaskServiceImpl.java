@@ -137,7 +137,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
 
-        sysUserRoles.add(new SysUserRole().setRoleId(7L));
+//        sysUserRoles.add(new SysUserRole().setRoleId(7L));
 
 
 

@@ -65,7 +65,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return 结果
      */
     public int updateEntityInfo(EntityInfo entityInfo);
-    public int updateOrInsertEntityInfoByEntityCode(EntityInfo entityInfo);
+    public long updateEntityInfoByEntityCodeWithOutId(EntityInfo entityInfo);
 
     /**
      * 批量删除【请填写功能名称】
@@ -271,10 +271,10 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     /**
      * 角色3，4，5补充录入查询和回显
      *
-     * @param entityCode
+     * @param id
      * @return R
      * @author 冉浩岑
      * @date 2022/10/24 11:13
      */
-    R getEntityBackSupply(String entityCode,Integer type);
+    R getEntityBackSupply(Long id);
 }
