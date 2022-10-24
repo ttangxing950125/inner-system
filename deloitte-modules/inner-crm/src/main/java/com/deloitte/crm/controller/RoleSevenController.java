@@ -98,20 +98,20 @@ public class RoleSevenController {
      * => 新增主体曾用名
      * @author 正杰
      * @date 2022/9/22
-     * @param creditCode 统一社会信用代码
+     * @param entityCode 德勤code
      * @param entityNewName 主体新名称
      * @return 修改返回信息
      */
     @ApiOperation(value="修改主体信息中的主体名称 & 汇总曾用名 by正杰")
     @ApiImplicitParams({
-            @ApiImplicitParam(name="creditCode",value="统一社会信用代码",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="entityCode",value="德勤code",paramType = "query",dataType = "String"),
             @ApiImplicitParam(name="entityNewName",value="主体新名称",paramType = "query",dataType = "String")
     })
     @Log(title = "【修改主体信息中的主体名称 & 汇总曾用名】", businessType = BusinessType.UPDATE)
     @PostMapping("/editEntityNameHis")
-    public R editEntityNameHis(String creditCode,String entityNewName){
+    public R editEntityNameHis(String entityCode,String entityNewName){
         log.info("  =>> 角色7 修改主体名称 将其命名为{} <<=  ",entityNewName);
-        return iEntityInfoService.editEntityNameHis(creditCode,entityNewName);
+        return iEntityInfoService.editEntityNameHis(entityCode,entityNewName);
     }
 
     /**
@@ -160,5 +160,23 @@ public class RoleSevenController {
     public R<EntityInfoVo> validateCodeAndName(String creditCode,@NotNull(message = "主体名称不能为空") String entityName){
         return iEntityInfoService.validateCodeAndName(creditCode,entityName);
     }
+
+    /**
+     * 修改库中主体的统一社会信用代码 by正杰
+     * @param entityCode
+     * @param creditCode
+     * @return
+     */
+    @ApiOperation(value="修改库中主体的统一社会信用代码 by正杰")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="entityCode",value="传入 德勤内部代码", paramType = "query",dataType = "String",example = "IB000001"),
+            @ApiImplicitParam(name="creditCode",value="传入 社会信用代码" , paramType = "query",dataType = "String",example = "91230100128025258G")})
+    @Log(title = "【 修改库中主体的统一社会信用代码 】", businessType = BusinessType.OTHER)
+    @PostMapping("/editeCreditCode")
+    public R editeCreditCode(@NotNull(message = "德勤代码不能未空") String entityCode,@NotNull(message = "统一社会信用代码不能为空") String creditCode){
+        return iEntityInfoService.editeCreditCode(entityCode,creditCode);
+    }
+
+
 
 }

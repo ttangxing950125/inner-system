@@ -401,18 +401,17 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
      * => 新增主体曾用名
-     *
-     * @param creditCode    统一社会信用代码
-     * @param entityNewName 主体新名称
-     * @return 修改返回信息
      * @author 正杰
      * @date 2022/9/22
+     * @param entityCode 德勤code
+     * @param entityNewName 主体新名称
+     * @return 修改返回信息
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R editEntityNameHis(String creditCode, String entityNewName) {
+    public R editEntityNameHis(String entityCode, String entityNewName) {
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
-                .lambda().eq(EntityInfo::getCreditCode, creditCode));
+                .lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entity)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
         return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null));
     }
@@ -2876,6 +2875,26 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public EntityInfo checkName(String entityName){
         EntityInfo entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName));
         return entityInfo;
+    }
+
+    /**
+     * 修改库中主体的统一社会信用代码 by正杰
+     * @param entityCode
+     * @param creditCode
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R editeCreditCode(String entityCode, String creditCode) {
+        if(!creditCode.matches(Common.REGEX_CREDIT_CODE)){return R.fail(BadInfo.VALID_PARAM.getInfo());}
+        log.info("  =>> 角色7 更改统一社会信用代码：开始 <<=  ");
+        EntityInfo entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
+        if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        log.info("  =>> 主体{} 将社会代码 {} 更变为 {} <<=  ",entityInfo.getEntityName(),entityInfo.getCreditCode(),creditCode);
+        entityInfo.setCreditCode(creditCode);
+        baseMapper.updateById(entityInfo);
+        log.info("  =>> 角色7 更改统一社会信用代码：结束 <<=  ");
+        return R.ok();
     }
 
 }

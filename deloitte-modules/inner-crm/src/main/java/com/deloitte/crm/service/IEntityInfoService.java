@@ -102,14 +102,13 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     /**
      * => 修改主体信息中的主体名称 & 汇总曾用名
      * => 新增主体曾用名
-     *
-     * @param creditCode    统一社会信用代码
-     * @param entityNewName 主体新名称
-     * @return 修改返回信息
      * @author 正杰
      * @date 2022/9/22
+     * @param entityCode 德勤code
+     * @param entityNewName 主体新名称
+     * @return 修改返回信息
      */
-    R editEntityNameHis(String creditCode, String entityNewName);
+    R editEntityNameHis(String entityCode, String entityNewName);
 
     /**
      * 根据名称查询主体
@@ -285,4 +284,12 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return
      */
     R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName);
+
+    /**
+     * 修改库中主体的统一社会信用代码 by正杰
+     * @param entityCode
+     * @param creditCode
+     * @return
+     */
+    R editeCreditCode(String entityCode, String creditCode);
 }
