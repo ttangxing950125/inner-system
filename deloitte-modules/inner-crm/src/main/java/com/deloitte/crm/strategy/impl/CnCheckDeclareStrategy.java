@@ -68,7 +68,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
             item.setTaskId(windTask.getId());
             //查询a股是否存在
             String code = item.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code).eq(StockCnInfo::getStockStatus, Boolean.FALSE));
+            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
             //没有就创建一个
             if (stockCnInfo == null) {
                 log.warn("==> IPO-审核申报 查询A股不存在 创建A股信息!");
