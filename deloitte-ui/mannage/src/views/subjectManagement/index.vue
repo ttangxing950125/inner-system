@@ -557,7 +557,6 @@ export default {
             }
           });
           this.list = data.records;
-          console.log(this.list);
           this.total = data.total;
           this.queryParams.pageNum = data.current;
         });
@@ -598,6 +597,7 @@ export default {
           }
         });
         this.list = data.records;
+        
         this.total = data.total;
         this.queryParams.pageNum = data.current;
       });
@@ -689,8 +689,15 @@ export default {
             }
         })
     },
-    changeType() {
+    changeType(row) {
         this.value1 = this.value === 'GV' ? [] : this.value1
+        if (row === 'GV') {
+            this.options2.forEach(e => {
+                if (e.id !== 9999) {
+                    this.selectHeaer.push(e);
+                }
+            })
+        }
     },
     handleClose() {
         this.uploadStatus = false
