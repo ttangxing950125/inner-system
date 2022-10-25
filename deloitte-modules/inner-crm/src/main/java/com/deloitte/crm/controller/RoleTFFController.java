@@ -34,13 +34,13 @@ public class RoleTFFController {
      */
     @ApiOperation(value = "获取登录用户角色的信息补充任务")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskDate", value = "当天日期", example = "2022-09-29",paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query",example = "1", dataType = "Integer"),
-            @ApiImplicitParam(name = "pageSize", value = "页面大小", paramType = "query", example = "9",dataType = "Integer")
+            @ApiImplicitParam(name = "taskDate", value = "当天日期", example = "2022-09-29", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", paramType = "query", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "pageSize", value = "页面大小", paramType = "query", example = "9", dataType = "Integer")
     })
 
     @PostMapping("/getRoleSupplyTask")
-    public R getRoleSupplyTask(String taskDate, Integer pageNum,Integer pageSize) {
-        return iCrmSupplyTaskService.getRoleSupplyTask(taskDate,pageNum,pageSize);
+    public R getRoleSupplyTask(String taskDate, Integer pageNum, Integer pageSize) {
+        return iCrmSupplyTaskService.getRoleSupplyTask(taskDate, pageNum, pageSize);
     }
 }

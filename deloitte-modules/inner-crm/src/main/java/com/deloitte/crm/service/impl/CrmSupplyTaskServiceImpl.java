@@ -115,19 +115,27 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     public int deleteCrmSupplyTaskById(Long id) {
         return crmSupplyTaskMapper.deleteCrmSupplyTaskById(id);
     }
-    /** 角色3 -- 5 */
+
+    /**
+     * 角色3 -- 5
+     */
     private static Long ROLE_THREE = 5L;
-    /** 角色4 -- 6 */
+    /**
+     * 角色4 -- 6
+     */
     private static Long ROLE_FOUR = 6L;
-    /** 角色5 -- 7 */
+    /**
+     * 角色5 -- 7
+     */
     private static Long ROLE_FIVE = 7L;
+
     @Override
-    public R getRoleSupplyTask(String taskDate, Integer pageNum,Integer pageSize) {
-        if (ObjectUtils.isEmpty(pageNum)){
+    public R getRoleSupplyTask(String taskDate, Integer pageNum, Integer pageSize) {
+        if (ObjectUtils.isEmpty(pageNum)) {
             return R.fail("请选择页码");
         }
-        if (ObjectUtils.isEmpty(pageSize)){
-            pageSize=9;
+        if (ObjectUtils.isEmpty(pageSize)) {
+            pageSize = 9;
         }
         //获取登录用户
         Long userId = SecurityUtils.getUserId();
@@ -146,13 +154,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         }
         Long roleId = sysUserRoles.get(0).getRoleId();
         QueryWrapper<CrmSupplyTask> taskQuery = new QueryWrapper<>();
-        Page<CrmSupplyTask>pageInfo=new Page<>(pageNum,pageSize);
+        Page<CrmSupplyTask> pageInfo = new Page<>(pageNum, pageSize);
         //获取角色的任务数据
-        Page<CrmSupplyTask> taskPage = crmSupplyTaskMapper.selectPage(pageInfo,taskQuery.lambda()
+        Page<CrmSupplyTask> taskPage = crmSupplyTaskMapper.selectPage(pageInfo, taskQuery.lambda()
                 .eq(CrmSupplyTask::getRoleId, roleId)
                 .eq(CrmSupplyTask::getTaskDate, taskDate)
         );
-        List<CrmSupplyTask> crmSupplyTasks=taskPage.getRecords();
+        List<CrmSupplyTask> crmSupplyTasks = taskPage.getRecords();
         if (CollectionUtils.isEmpty(crmSupplyTasks)) {
             return R.ok();
         }
@@ -161,16 +169,16 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
         crmSupplyTasks.stream().forEach(o -> {
             //创建单个响应对象,设置角色3，4，5通用属性
-            SupplyTaskVo taskVo=setNormalValue(o,roleId);
+            SupplyTaskVo taskVo = setNormalValue(o, roleId);
             taskList.add(taskVo);
         });
         //响应的分页数据
-        Page<SupplyTaskVo> resultPage = new Page<>(pageNum,pageSize);
+        Page<SupplyTaskVo> resultPage = new Page<>(pageNum, pageSize);
         resultPage.setTotal(taskPage.getTotal()).setRecords(taskList);
         return R.ok(resultPage);
     }
 
-    private SupplyTaskVo setNormalValue(CrmSupplyTask o,Long roleId) {
+    private SupplyTaskVo setNormalValue(CrmSupplyTask o, Long roleId) {
         SupplyTaskVo taskVo = new SupplyTaskVo();
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, o.getEntityCode()).last(" limit 1"));
         String entityCode = entityInfo.getEntityCode();
@@ -189,7 +197,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         // 任务状态
         taskVo.setState(o.getState());
 
-        String value="";
+        String value = "";
 
         if (roleId == ROLE_THREE) {
             //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
@@ -197,7 +205,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
             taskVo.setFinIndustryGroup(value);
         } else if (roleId == ROLE_FOUR) {
             //角色4     城投机构对应地方政府名称
-            taskVo=getFourValue(taskVo,entityCode);
+            taskVo = getFourValue(taskVo, entityCode);
         } else if (roleId == ROLE_FIVE) {
             //角色5    是否为城投机构
             value = getFiveValue(entityCode);
@@ -208,20 +216,20 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
     private String getFiveValue(String entityCode) {
         Long count = entityGovRelMapper.selectCount(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
-        if (count>0){
+        if (count > 0) {
             return IS_URBAN_INVESTMENT;
         }
         return NOT_URBAN_INVESTMENT;
     }
 
-    private SupplyTaskVo getFourValue(SupplyTaskVo taskVo,String entityCode) {
+    private SupplyTaskVo getFourValue(SupplyTaskVo taskVo, String entityCode) {
         //角色4     城投机构对应地方政府名称
         EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
-        if (ObjectUtils.isEmpty(entityGovRel)){
+        if (ObjectUtils.isEmpty(entityGovRel)) {
             return null;
         }
         GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, entityGovRel.getDqGovCode()).last(" limit 1"));
-        if (ObjectUtils.isEmpty(govInfo)){
+        if (ObjectUtils.isEmpty(govInfo)) {
             return null;
         }
         taskVo.setGovName(govInfo.getGovName());
@@ -232,20 +240,21 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
         EntityAttrValue attrValue = valueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
                 .lambda().eq(EntityAttrValue::getAttrId, 656).eq(EntityAttrValue::getEntityCode, entityCode).last(" limit 1"));
-        if (ObjectUtils.isEmpty(attrValue)){
+        if (ObjectUtils.isEmpty(attrValue)) {
             return null;
         }
         return attrValue.getValue();
     }
 
     //是城投机构
-    private static String IS_URBAN_INVESTMENT="Y";
+    private static String IS_URBAN_INVESTMENT = "Y";
     //不是城投机构
-    private static String NOT_URBAN_INVESTMENT="N";
+    private static String NOT_URBAN_INVESTMENT = "N";
+
     @Override
     public TaskStatistics getTaskStatistics() {
         Long userId = SecurityUtils.getUserId();
-        TaskStatistics taskStatistics=new TaskStatistics();
+        TaskStatistics taskStatistics = new TaskStatistics();
 
         //获取登录用户
         QueryWrapper<SysUserRole> userRleQuery = new QueryWrapper<>();
@@ -253,13 +262,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .eq(SysUserRole::getUserId, userId)
                 .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
-        if (CollectionUtils.isEmpty(sysUserRoles)){
+        if (CollectionUtils.isEmpty(sysUserRoles)) {
             return null;
         }
         SysUserRole sysUserRole = sysUserRoles.get(0);
 
         Long roleId = sysUserRole.getRoleId();
-        String currentTime = TimeFormatUtil.getDayTime("yyyy-MM-dd",0);
+        String currentTime = TimeFormatUtil.getDayTime("yyyy-MM-dd", 0);
         //设置日期
         taskStatistics.setTodayDate(currentTime);
         //设置周几
@@ -272,18 +281,18 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .eq(CrmSupplyTask::getTaskDate, currentTime)
         );
         //统计任务完成情况
-        if (CollectionUtils.isEmpty(supplyTasks)){
+        if (CollectionUtils.isEmpty(supplyTasks)) {
             taskStatistics.setTaskComplete(0).setTaskTotal(0).setTaskWait(0);
-        }else {
+        } else {
             //等待完成的任务
-            AtomicReference<Integer> wait= new AtomicReference<>(0);
+            AtomicReference<Integer> wait = new AtomicReference<>(0);
             //已经完成的任务
-            AtomicReference<Integer> complete= new AtomicReference<>(0);
-            supplyTasks.stream().forEach(o->{
+            AtomicReference<Integer> complete = new AtomicReference<>(0);
+            supplyTasks.stream().forEach(o -> {
                 Integer state = o.getState();
-                if (state==0){
+                if (state == 0) {
                     wait.getAndSet(wait.get() + 1);
-                }else if (state==1){
+                } else if (state == 1) {
                     complete.getAndSet(complete.get() + 1);
                 }
             });
