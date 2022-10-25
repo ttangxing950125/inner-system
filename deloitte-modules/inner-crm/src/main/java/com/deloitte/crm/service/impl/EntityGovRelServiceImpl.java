@@ -140,7 +140,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
 
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
-        return R.fail("修改成功");
+        return R.ok("修改成功");
     }
 
 }
