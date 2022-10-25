@@ -3,6 +3,7 @@ package com.deloitte.crm.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.dto.TaskDto;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -63,5 +64,5 @@ public interface CrmSupplyTaskMapper extends BaseMapper<CrmSupplyTask>
     public int deleteCrmSupplyTaskByIds(Long[] ids);
 
 
-    TaskDto selctCrmCount(String taskDate);
+    TaskDto selctCrmCount(@Param("taskDate") String taskDate,@Param("roleId") Long roleId);
 }
