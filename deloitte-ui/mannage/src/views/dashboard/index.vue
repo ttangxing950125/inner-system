@@ -1269,9 +1269,9 @@ export default {
             // 角色 345 相关接口
             getRoleSupplyTask({taskDate: this.nowTime, pageNum: 1, pageSize: 10 }).then(res => {
               const { data } = res
-              this.list3 = data.records
-              this.queryParams.pages = data.current
-              this.total = data.total
+              this.list3 = data && data.records
+              this.queryParams.pages = data && data.current
+              this.total = data && data.total || 0
             })
         }
 
@@ -1556,10 +1556,10 @@ export default {
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
         getRoleSupplyTask(params).then((res) => {
-          const { data } = res
-          this.list3 = data.records
-            this.queryParams.pages = data.current
-            this.total = data.total
+            const { data } = res
+            this.list3 = data && data.records
+            this.queryParams.pages = data && data.current
+            this.total = data && data.total || 0
           // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
         });
         if(this.roleId === 'role2') {
@@ -1962,15 +1962,15 @@ export default {
       try {
         this.$modal.loading("loading...");
         this.governmentDig = true
-        this.ruleForm.entityName = row.entityInfo.entityName
+        this.ruleForm.entityName = row.entityName
         this.ruleForm.id = row.id
-        this.ruleForm.creditCode = row.entityInfo.creditCode
-        this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
-        this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.ruleForm.creditCode = row.creditCode
+        this.$set(this.ruleForm, 'entityCode',  row.entityCode)
+        this.$set(this.ruleForm, 'id',  row.id)
         this.$set(this.ruleForm, 'wind',  row.windMaster)
         this.$set(this.ruleForm, 'shenWan',  row.shenWanMaster)
         const params = {
-          entityCode: row.entityInfo.entityCode,
+          entityCode: row.entityCode,
           roleId: 5,
         }
         getTaskByEntityCode(params).then(res => {
@@ -2013,15 +2013,15 @@ export default {
       try {
         this.$modal.loading("loading...");
         this.fsDig = true
-        this.ruleForm.entityName = row.entityInfo.entityName
-        this.ruleForm.creditCode = row.entityInfo.creditCode
+        this.ruleForm.entityName = row.entityName
+        this.ruleForm.creditCode = row.creditCode
         this.ruleForm.id = row.id
-        this.$set(this.ruleForm, 'entityCode',  row.entityInfo.entityCode)
-        this.$set(this.ruleForm, 'id',  row.crmSupplyTask.id)
+        this.$set(this.ruleForm, 'entityCode',  row.entityCode)
+        this.$set(this.ruleForm, 'id',  row.id)
         this.$set(this.ruleForm, 'wind',  '')
         this.$set(this.ruleForm, 'shenWan',  '')
         const params = {
-          entityCode: row.entityInfo.entityCode,
+          entityCode: row.entityCode,
           roleId: 5,
         }
         getTaskByEntityCode(params).then(res => {
