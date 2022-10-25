@@ -145,14 +145,10 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         CrmMasTask crmMasTask = iCrmMasTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, id));
         Assert.notNull(crmMasTask, BadInfo.VALID_EMPTY_TARGET.getInfo());
         String entityCode = crmMasTask.getEntityCode();
-        EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
+        EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode).eq(EntityInfo::getStatus,1));
         Assert.notNull(entityInfo, BadInfo.VALID_EMPTY_TARGET.getInfo());
         //数据组装
-        modelMasterInfoVo.setEntityName(entityInfo.getEntityName()).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName());
-        //wind行业划分
-        attrs.putAll(iEntityAttrValueService.findAttrValue(entityCode, 652));
-        //申万行业划分
-        attrs.putAll(iEntityAttrValueService.findAttrValue(entityCode, 650));
+        modelMasterInfoVo.setEntityName(entityInfo.getEntityName()).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWindMaster(entityInfo.getWindMaster()).setShenWanMaster(entityInfo.getShenWanMaster());
         return R.ok(modelMasterInfoVo.setAttrs(attrs));
     }
 
