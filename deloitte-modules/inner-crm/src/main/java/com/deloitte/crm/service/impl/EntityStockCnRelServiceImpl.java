@@ -57,7 +57,6 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
     public boolean bindRelOrCreateTask(StockCnInfo stockCnInfo, String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack) {
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
-
         //之前数据库中没有该主体
         if (CollUtil.isEmpty(entityInfos)) {
             //创建任务
