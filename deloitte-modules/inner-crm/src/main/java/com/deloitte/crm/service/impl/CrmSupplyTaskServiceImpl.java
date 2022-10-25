@@ -236,14 +236,17 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         return taskVo;
     }
 
+    @Autowired
+    private EntityFinancialMapper entityFinancialMapper;
+
     private String getThreeValue(String entityCode) {
         //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
-        EntityAttrValue attrValue = valueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                .lambda().eq(EntityAttrValue::getAttrId, 656).eq(EntityAttrValue::getEntityCode, entityCode).last(" limit 1"));
-        if (ObjectUtils.isEmpty(attrValue)) {
+        EntityFinancial financial = entityFinancialMapper.selectOne(new QueryWrapper<EntityFinancial>()
+                .lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
+        if (ObjectUtils.isEmpty(financial)) {
             return null;
         }
-        return attrValue.getValue();
+        return financial.getMince();
     }
 
     //是城投机构
