@@ -379,7 +379,7 @@ public class EntityInfoController extends BaseController {
     /**
      * 财报收数根据entityCode补充录入信息--主表
      *
-     * @param entityInfo
+     * @param entitySupplyMsgBack
      * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:51
@@ -395,8 +395,7 @@ public class EntityInfoController extends BaseController {
     })
     @PostMapping("/addEntityeMsg")
     public R addEntityeMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
-        entityInfoService.addEntityeMsg(entitySupplyMsgBack);
-        return R.ok();
+        return entityInfoService.addEntityeMsg(entitySupplyMsgBack);
     }
 
     /**

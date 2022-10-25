@@ -121,7 +121,7 @@ public class EntityGovRelController extends BaseController
     /**
      * 城投机构根据entityCode补充录入副表信息
      *
-     * @param entityGovRel
+     * @param entitySupplyMsgBack
      * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:56
@@ -141,7 +141,6 @@ public class EntityGovRelController extends BaseController
     })
     @PostMapping("/addGovEntitySubtableMsg")
     public R addGovEntitySubtableMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
-        entityGovRelService.addGovEntitySubtableMsg(entitySupplyMsgBack);
-        return R.ok();
+        return entityGovRelService.addGovEntitySubtableMsg(entitySupplyMsgBack);
     }
 }

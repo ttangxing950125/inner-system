@@ -136,13 +136,15 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @editeBy 正杰
      * @date 2022/9/21 18:06
      * @editeDate 2022/9/29
-     *
      */
     @Override
     public R<List<CrmDailyTask>> queryDailyTask(String taskDate, Long userId) {
         Date date;
-        try {date = DateUtil.parseDate(taskDate);} catch (Exception e)
-        {return R.fail(BadInfo.ERROR_PARAM_DATE.getInfo());}
+        try {
+            date = DateUtil.parseDate(taskDate);
+        } catch (Exception e) {
+            return R.fail(BadInfo.ERROR_PARAM_DATE.getInfo());
+        }
 
         Date begin = DateUtil.beginOfMonth(date);
         Date end = DateUtil.endOfMonth(date);
@@ -153,21 +155,22 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
     /**
      * 传入对应参数 当月任务列表进行新增或修改
-     * @author 正杰
+     *
      * @param taskRoleType
      * @param taskStatus
      * @param date
+     * @author 正杰
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveTask(Integer taskRoleType, Integer taskStatus, String date) {
-        if(date == null){
-            log.info("  =>> 角色 id 为"+taskRoleType+" 新增 "+DateUtil.now()+" 任务:状态为 "+ taskStatus +" <<=");
+        if (date == null) {
+            log.info("  =>> 角色 id 为" + taskRoleType + " 新增 " + DateUtil.now() + " 任务:状态为 " + taskStatus + " <<=");
             baseMapper.insert(new CrmDailyTask().setTaskRoleType(taskRoleType.toString()).setTaskStatus(taskStatus).setTaskDate(new Date()));
-        }else{
-            log.info("  =>> 角色 id 为"+taskRoleType+" 修改 "+date+" 任务:状态为 "+ taskStatus +" <<=");
+        } else {
+            log.info("  =>> 角色 id 为" + taskRoleType + " 修改 " + date + " 任务:状态为 " + taskStatus + " <<=");
             CrmDailyTask crmDailyTask = baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, taskStatus));
-            Assert.notNull(crmDailyTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
+            Assert.notNull(crmDailyTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
             baseMapper.updateById(crmDailyTask.setTaskStatus(taskStatus));
         }
     }

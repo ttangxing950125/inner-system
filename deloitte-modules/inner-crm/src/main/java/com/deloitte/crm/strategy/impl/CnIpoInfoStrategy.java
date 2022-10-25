@@ -1,5 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
@@ -104,7 +105,7 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 changeType = DataChangeType.UPDATE.getId();
             }
 
-            if (last != null && !StrUtil.equals(last.getIpoDate(),item.getIpoDate())) {
+            if (last != null && !StrUtil.equals(last.getIpoDate(), item.getIpoDate())) {
                 //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
                 // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
@@ -124,35 +125,29 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             String windIndustry = item.getWindIndustry();
 
             List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
-            entityInfos.forEach(entityInfo -> {
-                entityInfo.setWindMaster(windIndustry);
-            });
-
+            if (!CollectionUtil.isEmpty(entityInfos)) {
+                entityInfos.forEach(entityInfo -> {
+                    entityInfo.setWindMaster(windIndustry);
+                });
+            }
             //如果是成功上市，发送给敞口划分人
             if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getCode())) {
                 //查询和当前a股绑定关联关系的主体
                 entityInfos.forEach(entity -> {
                     entity.setList(1);
                 });
-
-                if (ipoNow){
+                if (ipoNow) {
                     //新敞口划分任务
                     crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
                 }
-
             }
-
             entityInfoService.updateBatchById(entityInfos);
-
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
                 stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-
                 //更新a股属性
                 entityAttrValueService.updateStockCnAttr(code, item);
             }
-
-
             item.setChangeType(changeType);
 
             cnIpoInfoService.save(item);
