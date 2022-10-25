@@ -529,6 +529,11 @@ export default {
             id: 9999,
             proName: "全部产品",
           });
+            this.options2.forEach((k) => {
+                if (k.id !== 9999) {
+                this.rettHeaer.push(k);
+                }
+            });
         });
         let proId = [];
         if (this.value1.length === 1 && this.value1[0] === 9999) {
@@ -557,7 +562,6 @@ export default {
             }
           });
           this.list = data.records;
-          console.log(this.list);
           this.total = data.total;
           this.queryParams.pageNum = data.current;
         });
@@ -598,6 +602,7 @@ export default {
           }
         });
         this.list = data.records;
+        
         this.total = data.total;
         this.queryParams.pageNum = data.current;
       });
@@ -646,7 +651,8 @@ export default {
     },
     selectChange(row) {
       this.selectHeaer = [];
-      if (row.length === 1 && row[0] === 9999) {
+      const all = row.indexOf(9999)
+      if ((row.length === 1 && row[0] === 9999) || all >= 0) {
         this.options2.forEach((k) => {
             if (k.id !== 9999) {
               this.selectHeaer.push(k);
@@ -689,8 +695,15 @@ export default {
             }
         })
     },
-    changeType() {
+    changeType(row) {
         this.value1 = this.value === 'GV' ? [] : this.value1
+        if (row === 'GV') {
+            this.options2.forEach(e => {
+                if (e.id !== 9999) {
+                    this.selectHeaer.push(e);
+                }
+            })
+        }
     },
     handleClose() {
         this.uploadStatus = false

@@ -113,6 +113,8 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(code, item);
                 }
+
+
                 //有债券信息，给债券和主体绑定关联关系
                 if (changeType != null) {
                     List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);

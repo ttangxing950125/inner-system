@@ -1167,7 +1167,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             if (!CollectionUtils.isEmpty(vo.getMore())) {
-                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), map.get("value")));
+                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), entryMap.getValue()));
             }
             rows.add(map);
         });
@@ -2922,7 +2922,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    public R getEntityBackSupply(Integer id) {
+    public R<EntitySupplyMsgBack> getEntityBackSupply(Integer id) {
         if (ObjectUtils.isEmpty(id)) {
             return R.fail("请传入任务id");
         }
