@@ -135,7 +135,7 @@
         </el-table-column>
         <el-table-column type="index" label="来源">
             <template slot-scope="scope">
-                <span>{{ scope.row.srouce || '-' }}</span>
+                <span>{{ scope.row.source || '-' }}</span>
             </template>
         </el-table-column>
         <el-table-column prop="taskCategory" label="企业名称">
@@ -184,7 +184,7 @@
         </el-table-column>
         <el-table-column type="index" label="来源">
             <template slot-scope="scope">
-                <span>{{ scope.row.srouce || '-' }}</span>
+                <span>{{ scope.row.source || '-' }}</span>
             </template>
         </el-table-column>
          <el-table-column prop="taskCategory" label="企业名称">
@@ -233,7 +233,7 @@
         </el-table-column>
         <el-table-column type="index" label="来源">
             <template slot-scope="scope">
-                <span>{{ scope.row.srouce || '-' }}</span>
+                <span>{{ scope.row.source || '-' }}</span>
             </template>
         </el-table-column>
          <el-table-column prop="taskCategory" label="企业名称">
@@ -496,7 +496,7 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
         <el-button type="primary" @click="subRule345(3)"
           >保存并提交</el-button
         >
@@ -677,7 +677,7 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
         <el-button type="primary" @click="subRule345(4)"
           >保存并提交</el-button
         >
@@ -756,7 +756,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
         <el-button type="primary" @click="subRule345(5)">保存并提交</el-button>
       </span>
     </el-dialog>
@@ -941,7 +941,7 @@
             v-if="!creditCodePass"
             style="margin-left: 5px"
             type="text"
-            @click="check(ruleForm.creditCode)"
+            @click="check(ruleForm.creditCode, 'code')"
             >{{ "查重" }}</el-button>
             <span v-if="creditCodePass === 2" style="color:greenyellow">无重复，可新增</span>
             <span v-if="creditCodePass === 1" style="color:red">存在重复 无法新增</span>
@@ -968,7 +968,7 @@
             v-if="!entityNamePass"
             style="margin-left: 5px"
             type="text"
-            @click="check(ruleForm.entityName)"
+            @click="check(ruleForm.entityName, 'name')"
             >{{ "查重" }}</el-button>
             <span v-if="entityNamePass === 2" style="color:greenyellow; margin-left: 5px">无重复，可新增</span>
             <span v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</span>
@@ -1025,8 +1025,7 @@ import {
           // getMouthTaskInfo,
           checkCreditCode,
           getRoleSupplyTask,
-          getTaskByEntityCode,
-          addEntityAttrValuesNew,
+          getEntityBackSupply,
           getTaskInfo,
           getTable,
           getFinances,
@@ -1041,7 +1040,8 @@ import {
           getTaskCount,
           addFinEntitySubtableMsg,
           addGovEntitySubtableMsg,
-          addEntityeMsg
+          addEntityeMsg,
+          checkEntityName
         } from "@/api/task";
 import { getGovLevel, getAttrByOrganName, getTypeByAttrId, checkData } from '@/api/common'
 import pagination from "../../components/Pagination";
@@ -1248,8 +1248,6 @@ export default {
         const paramsMonth = {
             taskDate: this.monthDate,
         };
-        console.log(this.clickDay)
-        console.log(this.nowTime)
         if(this.roleId === 'role1') {
             const params = {
               taskDate: this.nowTime,
@@ -1269,7 +1267,6 @@ export default {
         })
         if(this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
             // 角色 345 相关接口
-          console.log( this.nowTime)
             getRoleSupplyTask({taskDate: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
               const { data } = res
               this.list3 = data && data.records
@@ -1518,7 +1515,6 @@ export default {
       this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.clickDay || this.nowTime } });
     },
     getDay(row) {
-      console.log("getDay")
       if (!row.path[0].innerText) {
         return
       }
@@ -1602,21 +1598,41 @@ export default {
       this.$set(this.ruleForm, 'creditErrorType',  '')
       this.$set(this.ruleForm, 'creditCode',  '')
     },
-    check(row) {
+    check(row, key) {
+        if(!row) {
+            this.$message({
+                showClose: true,
+                message: '请输入查重字段',
+                type: 'error'
+            });
+            return
+        }
       this.$modal.loading("loading...");
       try {
-        checkCreditCode({creditCode: row}).then(res => {
-          const { data } = res
-          if (data.bo === false) {
-            this.replaceDig = true
-            this.replaceData = data.entityInfo
-            this.creditCodePass = 1 // 信用代码查重没过
-            this.entityNamePass = 1 // 新增主体名称查重没过
-          } else {
-            this.creditCodePass = 2 // 信用代码查重通过
-            this.entityNamePass = 2 // 新增主体名称查重通过
-          }
-        })
+        if(key === 'code') {
+            checkCreditCode({creditCode: row}).then(res => {
+            const { data } = res
+            if (data.bo === false) {
+                this.replaceDig = true
+                this.replaceData = data.entityInfo
+                this.creditCodePass = 1 // 信用代码查重没过
+            } else {
+                this.creditCodePass = 2 // 信用代码查重通过
+            }
+            })
+        }else {
+            checkEntityName({entityName: row}).then(res => {
+              const { data } = res
+              console.log(res)
+              if (data.bo === false) {
+                this.replaceDig = true
+                this.replaceData = data.entityInfo
+                this.entityNamePass = 1 // 新增主体名称查重没过
+              } else {
+                this.entityNamePass = 2 // 新增主体名称查重通过
+              }
+            })
+        }
       } catch (error) {
         console.log(error)
       } finally{
@@ -1842,17 +1858,18 @@ export default {
         this.ruleForm.entityName = row.entityName
         this.ruleForm.creditCode = row.creditCode
         this.ruleForm.id = row.id
+        this.ruleForm.source = row.source
+        this.ruleForm.state = row.state
         this.$set(this.ruleForm, 'entityCode',  row.entityCode)
         this.$set(this.ruleForm, 'id',  row.id)
         this.$modal.loading("loading...");
         const params = {
-          entityCode: row.entityCode,
-          roleId: 3,
+          id: row.id,
         }
-        getTaskByEntityCode(params).then(res => {
+        getEntityBackSupply(params).then(res => {
           const { data } = res
-            this.$set(this.ruleForm, 'shenWanMaster', data.entityInfo.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.entityInfo.windMaster)
+            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            this.$set(this.ruleForm, 'windMaster', data.windMaster)
         })
 
         getGovLevel({preGovCode: ''}).then(res => {
@@ -1893,7 +1910,10 @@ export default {
       })
     },
     getCounty(row) {
+        console.log(row.govName)
       this.ruleForm.district = row.govName
+      this.$set(this.ruleForm, 'district', row.govName)
+      console.log(this.ruleForm.district)
       getGovLevel({preGovCode: row.dqGovCode}).then(res => {
         const { data } = res
         this.county = data
@@ -1972,28 +1992,19 @@ export default {
         this.ruleForm.entityName = row.entityName
         this.ruleForm.id = row.id
         this.ruleForm.creditCode = row.creditCode
+        this.ruleForm.source = row.source
+        this.ruleForm.state = row.state
         this.$set(this.ruleForm, 'entityCode',  row.entityCode)
         this.$set(this.ruleForm, 'id',  row.id)
         this.$set(this.ruleForm, 'wind',  row.windMaster)
         this.$set(this.ruleForm, 'shenWan',  row.shenWanMaster)
         const params = {
-          entityCode: row.entityCode,
-          roleId: 5,
+          id: row.id,
         }
-        getTaskByEntityCode(params).then(res => {
+        getEntityBackSupply(params).then(res => {
           const { data } = res
-          let sw = ''
-          let wind = ''
-          data.attrValueList.forEach(e => {
-            if ( e.attrId === 97 ) {
-              sw += e.value // 申万
-            }
-            if ( e.attrId === 99 ) {
-              wind += e.value // wind行业划分明细值
-            }
-          })
-          this.$set(this.ruleForm, 'shenWanMaster', sw)
-          this.$set(this.ruleForm, 'windMaster', wind)
+          this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            this.$set(this.ruleForm, 'windMaster', data.windMaster)
         })
         getGovLevel({preGovCode: ''}).then(res => {
           const { data } = res
@@ -2023,6 +2034,8 @@ export default {
         this.ruleForm.entityName = row.entityName
         this.ruleForm.creditCode = row.creditCode
         this.ruleForm.id = row.id
+        this.ruleForm.source = row.source
+        this.ruleForm.state = row.state
         this.$set(this.ruleForm, 'entityCode',  row.entityCode)
         this.$set(this.ruleForm, 'id',  row.id)
         this.$set(this.ruleForm, 'wind',  '')
@@ -2031,20 +2044,10 @@ export default {
           entityCode: row.entityCode,
           roleId: 5,
         }
-        getTaskByEntityCode(params).then(res => {
+        getEntityBackSupply(params).then(res => {
           const { data } = res
-          let sw = ''
-          let wind = ''
-          data.attrValueList.forEach(e => {
-            if ( e.attrId === 97 ) {
-              sw += e.value // 申万
-            }
-            if ( e.attrId === 99 ) {
-              wind += e.value // wind行业划分明细值
-            }
-          })
-          this.$set(this.ruleForm, 'shenWanMaster', sw)
-          this.$set(this.ruleForm, 'windMaster', wind)
+          this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            this.$set(this.ruleForm, 'windMaster', data.windMaster)
         })
         const ret = {
           organName: '财报收数'
