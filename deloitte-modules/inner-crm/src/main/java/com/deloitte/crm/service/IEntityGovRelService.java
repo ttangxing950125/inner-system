@@ -1,5 +1,6 @@
 package com.deloitte.crm.service;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 
@@ -63,5 +64,5 @@ public interface IEntityGovRelService
 
     Long getEntityGovCount(String dqCode);
 
-    void addGovEntitySubtableMsg( EntitySupplyMsgBack entitySupplyMsgBack);
+    R addGovEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack);
 }

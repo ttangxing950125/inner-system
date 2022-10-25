@@ -1,6 +1,7 @@
 package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityFinancial;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 
@@ -12,5 +13,5 @@ import com.deloitte.crm.vo.EntitySupplyMsgBack;
  */
 public interface EntityFinancialService extends IService<EntityFinancial> {
 
-    void addFinEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack);
+    R addFinEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack);
 }
