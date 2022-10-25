@@ -452,12 +452,10 @@ export function getProductsOne(parmas) {
     url: "/crm/Products/getProductsOne?id="+parmas.id,
     headers: {
       isToken: true,
-      responseType:'blob'
     },
-    responseType:'blob',
     method: "post",
     data: parmas,
-  },{responseType:'blob'}, {responseType:'blob'});
+  });
 }
 
 // 下载查询产品 导出
@@ -466,10 +464,12 @@ export function getProductsExcel(parmas) {
     url: "/crm/Products/getProductsExcel?id="+parmas.id,
     headers: {
       isToken: true,
+      responseType:'blob'
     },
+    responseType:'blob',
     method: "post",
     data: parmas,
-  });
+  },{responseType:'blob'}, {responseType:'blob'});
 }
 
 // 政府级别
