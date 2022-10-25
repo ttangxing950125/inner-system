@@ -140,8 +140,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
 //        sysUserRoles.add(new SysUserRole().setRoleId(7L));
 
-
-
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
             return R.ok();

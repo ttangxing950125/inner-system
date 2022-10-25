@@ -27,9 +27,13 @@ import java.util.List;
 public class EntitySupplyMsgBack {
 //    统一基础信息
     /**
-     * 德勤企业识别码
+     * 任务ID
      */
     private Integer taskId;
+    /**
+     * 任务状态
+     */
+    private Integer state;
 
     /**
      * 德勤企业识别码
@@ -172,8 +176,8 @@ public class EntitySupplyMsgBack {
         this.entityCode = entityInfo.getEntityCode();
         this.entityName = entityInfo.getEntityName();
         this.creditCode = entityInfo.getCreditCode();
-        this.windMaster = entityInfo.getEntityCode();
-        this.shenWanMaster = entityInfo.getEntityCode();
+        this.windMaster = entityInfo.getWindMaster();
+        this.shenWanMaster = entityInfo.getShenWanMaster();
         this.listType = entityInfo.getEntityCode();
         String reportType = entityInfo.getReportType();
 
