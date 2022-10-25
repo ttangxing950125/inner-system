@@ -282,7 +282,7 @@
         :model="ruleForm"
         :rules="rules"
         ref="ruleForm"
-        label-width="185px"
+        label-width="200px"
         label-position="left"
       >
       <el-form-item label="企业名称" >
@@ -1922,7 +1922,7 @@ export default {
         if (row === 3) {
           addFinEntitySubtableMsg(this.ruleForm).then(res => {
             if (res.code === 200) {
-              this.governmentDig = false
+              this.remarkDig = false
               this.$message({
                 showClose: true,
                 message: '操作成功',
