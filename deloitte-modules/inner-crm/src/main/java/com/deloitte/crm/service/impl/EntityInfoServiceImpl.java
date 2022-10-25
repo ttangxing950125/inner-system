@@ -2922,7 +2922,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     @Override
-    public R getEntityBackSupply(Integer id) {
+    public R<EntitySupplyMsgBack> getEntityBackSupply(Integer id) {
         if (ObjectUtils.isEmpty(id)) {
             return R.fail("请传入任务id");
         }

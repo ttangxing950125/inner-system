@@ -105,9 +105,9 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
 
                 if (changeType != null) {
                     //更新a股属性
-//                    entityAttrValueService.updateStockCnAttr(code, item);
+                    entityAttrValueService.updateStockCnAttr(code, item);
                 }
-                if (changeType != null && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+                if (changeType != null ) {
                     //查询状态status=1
                     List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
                     if (CollUtil.isNotEmpty(entityInfos)) {
