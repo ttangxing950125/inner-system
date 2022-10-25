@@ -26,7 +26,6 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
-import com.deloitte.crm.excelUtils.ExcelImport;
 import com.deloitte.crm.excelUtils.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
@@ -89,6 +88,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
+
+    @Autowired
+    private ICrmDailyTaskService crmDailyTaskService;
 
     private ProductsMasterRelMapper productsMasterRelMapper;
 
@@ -2318,11 +2322,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
+        //检验是否更新每日任务表
+        crmDailyTaskService.checkDailyTask(crmSupplyTask);
         return R.ok("修改成功");
     }
-
-    @Autowired
-    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
