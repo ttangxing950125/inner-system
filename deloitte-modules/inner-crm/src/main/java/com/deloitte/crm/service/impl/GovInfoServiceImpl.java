@@ -867,9 +867,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                         .eq(ProductsCover::getIsGov, 1);
                 ProductsCover productsCover = productsCoverMapper.selectOne(qw);
                 if(productsCover==null){
-                    Map.put(products.getProName(), "未覆盖");
+                    Map.put("key", products.getProName());
+                    Map.put("value", "未覆盖");
+                    Map.put("color", "0");
                 }else {
-                    Map.put(products.getProName(), productsCover.getCoverDes());
+                    Map.put("key", products.getProName());
+                    Map.put("value", productsCover.getCoverDes());
+                    Map.put("color", productsCover.getIsCover());
                 }
                 maps.add(Map);
             }
