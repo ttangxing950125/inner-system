@@ -36,8 +36,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectCrmSupplyTaskVo"/>
         where id = #{id}
     </select>
-    <select id="selctCrmCount" resultType="com.deloitte.crm.dto.TaskDto" parameterType="String">
-        SELECT COUNT(id) AS taskCount,COUNT(if(state = 0,TRUE,NULL)) AS taskNoCount,COUNT(if(state = 1,TRUE,NULL)) AS taskCop FROM crm_supply_task  WHERE task_date=#{taskDate}
+    <select id="selctCrmCount" resultType="com.deloitte.crm.dto.TaskDto">
+        SELECT COUNT(id) AS taskCount,COUNT(if(state = 0,TRUE,NULL)) AS taskNoCount,COUNT(if(state = 1,TRUE,NULL)) AS taskCop FROM crm_supply_task  WHERE task_date=#{taskDate} AND role_id=#{roleId}
    </select>
 
     <insert id="insertCrmSupplyTask" parameterType="CrmSupplyTask" useGeneratedKeys="true" keyProperty="id">

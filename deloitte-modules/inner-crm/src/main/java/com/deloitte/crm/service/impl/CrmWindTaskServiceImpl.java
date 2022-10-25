@@ -299,7 +299,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 return crmMasTaskMapper.selectCrmMasTaskCount(taskDate);
 
             } else if (roleInfo.getRoleId() == 5 || roleInfo.getRoleId() == 6 || roleInfo.getRoleId() == 7) {
-                return crmSupplyTaskMapper.selctCrmCount(taskDate);
+                return crmSupplyTaskMapper.selctCrmCount(taskDate,roleInfo.getRoleId());
             } else if (roleInfo.getRoleId() == 8) {
                 crmEntityTaskMapper.selctCrmEntityTaskCount(taskDate);
             }
