@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -316,8 +317,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public GovInfoDto getGovInfo() {
-        List<GovInfo> list = this.list();
+        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus, 1);
+        List<GovInfo> list = this.list(eq);
+
         GovInfoDto govInfoDto = new GovInfoDto();
+
 // gov_level_big 是否 省  1-是
         List<GovInfo> province = list.stream()
                 .filter(row -> row.getGovLevelBig() != null && row.getGovLevelBig() == 1)
@@ -849,7 +853,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         for (GovInfo record : records) {
             GovInfoBynameDto govInfoBynameDto = new GovInfoBynameDto();
             ArrayList<HashMap<String, String>> maps = new ArrayList<>();
-            for (Integer integer : entityOrGovByAttrVo.getProId()) {
+            List<Integer> proId = entityOrGovByAttrVo.getProId();
+            //判断空指针
+            if (CollUtil.isEmpty(proId)){
+                proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+            }
+            for (Integer integer : proId) {
                 HashMap<String, String> Map = new HashMap<>();
                 LambdaQueryWrapper<Products> eq1 = new LambdaQueryWrapper<Products>().eq(Products::getId, integer);
                 Products products = productsMapper.selectOne(eq1);
@@ -857,7 +866,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                         .eq(ProductsCover::getProId, integer)
                         .eq(ProductsCover::getIsGov, 1);
                 ProductsCover productsCover = productsCoverMapper.selectOne(qw);
-                Map.put(products.getProName(), productsCover.getCoverDes());
+                if(productsCover==null){
+                    Map.put(products.getProName(), "未覆盖");
+                }else {
+                    Map.put(products.getProName(), productsCover.getCoverDes());
+                }
                 maps.add(Map);
             }
             govInfoBynameDto.setDqCode(record.getDqGovCode());
@@ -869,7 +882,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             govInfoBynameDto.setResult(maps);
             govInfoBynameDtos.add(govInfoBynameDto);
         }
-        Page<GovInfoBynameDto> pageResult = new Page<>();
+        Page<GovInfoBynameDto> pageResult = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         pageResult.setRecords(govInfoBynameDtos).setTotal(page1.getTotal());
         return R.ok(pageResult);
     }

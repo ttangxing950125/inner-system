@@ -1,5 +1,4 @@
 package com.deloitte.auth.service;
-
 import cn.hutool.core.util.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

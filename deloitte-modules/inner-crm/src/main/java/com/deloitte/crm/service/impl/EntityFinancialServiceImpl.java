@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.crm.domain.EntityFinancial;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.dto.EntityFinancialDto;
 import com.deloitte.crm.mapper.EntityFinancialMapper;
 import com.deloitte.crm.service.EntityFinancialService;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,29 +27,31 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
 
     @Autowired
     private IEntityInfoService entityInfoService;
+
+    @Autowired
+    private ICrmSupplyTaskService crmSupplyTaskService;
     /**
      * 金融机构根据entityCode补充录入副表信息
      *
-     * @param entityFinancialDto
      * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:10
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addFinEntitySubtableMsg(EntityFinancialDto entityFinancialDto) {
-        crmSupplyTaskService.completeTaskById(entityFinancialDto.getId());
+    public void addFinEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+        crmSupplyTaskService.completeTaskById(entitySupplyMsgBack.getTaskId());
         //保存
-        EntityFinancial entityFinancial = entityFinancialDto.getEntityFinancial();
+        EntityFinancial entityFinancial = entitySupplyMsgBack.newEntityFinancial();
         QueryWrapper<EntityFinancial> financialQuery = new QueryWrapper<>();
-        int update = financialMapper.update(entityFinancial, financialQuery.lambda().eq(EntityFinancial::getEntityCode, entityFinancial.getEntityCode()));
-        if (update<1){
+        Long count = financialMapper.selectCount(financialQuery.lambda().eq(EntityFinancial::getEntityCode, entityFinancial.getEntityCode()));
+        if (count>0){
+            financialMapper.update(entityFinancial, financialQuery.lambda().eq(EntityFinancial::getEntityCode, entityFinancial.getEntityCode()));
+        }else {
             financialMapper.insert(entityFinancial);
         }
-        EntityInfo entityInfo = entityFinancialDto.getEntityInfo();
-        entityInfoService.updateOrInsertEntityInfoByEntityCode(entityInfo);
+        EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
+        entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
     }
 
-    @Autowired
-    private ICrmSupplyTaskService crmSupplyTaskService;
 }

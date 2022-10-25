@@ -1248,6 +1248,8 @@ export default {
         const paramsMonth = {
             taskDate: this.monthDate,
         };
+        console.log(this.clickDay)
+        console.log(this.nowTime)
         if(this.roleId === 'role1') {
             const params = {
               taskDate: this.nowTime,
@@ -1267,7 +1269,8 @@ export default {
         })
         if(this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
             // 角色 345 相关接口
-            getRoleSupplyTask({taskDate: this.nowTime, pageNum: 1, pageSize: 10 }).then(res => {
+          console.log( this.nowTime)
+            getRoleSupplyTask({taskDate: this.nowTime, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
               const { data } = res
               this.list3 = data && data.records
               this.queryParams.pages = data && data.current
@@ -1515,12 +1518,15 @@ export default {
       this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.clickDay || this.nowTime } });
     },
     getDay(row) {
+      console.log("getDay")
       if (!row.path[0].innerText) {
         return
       }
       const clickDay = row.path[0].innerText >= 10 ? row.path[0].innerText : '0'+row.path[0].innerText
       const tbodyObj = row.path[3].localName === 'tbody' ? row.path[3].children : row.path[4].children
       const tbodyArr = Array.from(tbodyObj)
+
+      this.clickDay = this.monthDate+ '-' +clickDay
       tbodyArr.forEach(e => {
         const tr = Array.from(e.children)
         tr.forEach(i => {
@@ -1536,7 +1542,6 @@ export default {
             pageNum: 1,
             pageSize: this.queryParams.pageSize
             };
-            this.clickDay = this.monthDate+ '-' +clickDay
             getDayTaskInfo(parmas).then((res) => {
             const { data } = res
             this.list7 = data.records
@@ -1548,7 +1553,7 @@ export default {
         const params = {
           taskDate: this.monthDate+ '-' +clickDay,
           pageNum: 1,
-          pageSize: 20
+          pageSize: this.queryParams.pageSize
         };
         getTaskByDate(params).then((res) => {
           const { data } = res
@@ -1580,6 +1585,8 @@ export default {
       } finally {
         this.$modal.closeLoading();
       }
+
+
     },
     // 角色7 流程开始 
     addBody(row) {

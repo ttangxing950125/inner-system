@@ -2,18 +2,21 @@ package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.constants.StockInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.vo.CheckVo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @AllArgsConstructor
+@Slf4j
 public class EntityInfoManagerImpl implements EntityInfoManager {
 
     private final EntityInfoMapper entityInfoMapper;
@@ -60,12 +64,13 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String updateEntityName(EntityInfo entity,String entityNewName,String remarks) {
         //如果备注为空 自动改为系统自动生成
-        if (remarks == null) {remarks = "系统自动生成";}
+        if (StrUtil.isBlank(remarks)) {remarks = "系统自动生成";}
         String username = SecurityUtils.getUsername();
-        if (username == null) {return BadInfo.VALID_EMPTY_USERNAME.getInfo();}
-        if (entity == null) {return BadInfo.VALID_EMPTY_TARGET.getInfo();}
+//        if (StrUtil.isBlank(username)) {return BadInfo.VALID_EMPTY_USERNAME.getInfo();}
+        if (ObjectUtils.isEmpty(entity)) {return BadInfo.VALID_EMPTY_TARGET.getInfo();}
 
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
         String oldName = entity.getEntityName();
@@ -75,7 +80,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
                     + "\r\n"
                     + "；"
-                    + new Date()
+                    + DateUtil.format(new Date(),"yyyy-MM-dd")
                     + " "
                     + SecurityUtils.getUsername()
                     + " "
@@ -178,58 +183,58 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             case BOND_SHORT_NAME:
                 BondInfo bondName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondShortName, target)
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE));
-                if(bondName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                if(bondName==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(bondName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             //债券全称
             case BOND_FULL_NAME:
                 BondInfo bondFName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE));
-                if(bondFName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                if(bondFName==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(bondFName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
 
             //新地方政府地方名称
             case GOV_NAME:
                 GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
-                if(govByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                if(govByName==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(govByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             //新地方政府行政编码
             case GOV_CODE:
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
-                if(govByCode==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                if(govByCode==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(govByCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
                 //债券代码查重
             case BOND_CODE:
                 BondInfo bondOriCode = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getOriCode, target)
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (bondOriCode==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
+                if (bondOriCode==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(bondOriCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
                 //A股查重
             case STOCK_CN_CODE:
                 StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockCode, target)
                         .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (stockCnInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockCnInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                if (stockCnInfo==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else {return new CheckVo().setData(stockCnInfo).setMsg(BadInfo.EXITS_STOCK_CODE.getInfo());}
                 //港股查重
             case STOCK_HK_CODE:
                 StockThkInfo stockTHKInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target)
                         .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (stockTHKInfo==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockTHKInfo).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                if (stockTHKInfo==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else {return new CheckVo().setData(stockTHKInfo).setMsg(BadInfo.EXITS_STOCK_CODE.getInfo());}
             case STOCK_A_NAME:
                 StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target)
                         .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (stockCnInfoByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockCnInfoByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                if (stockCnInfoByName==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else {return new CheckVo().setData(stockCnInfoByName).setMsg(BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
             case STOCK_HK_NAME:
                 StockThkInfo stockTHKInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target)
                         .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (stockTHKInfoByName==null){return new CheckVo().setMsg(SuccessInfo.SUCCESS.getInfo());
-                }else {return new CheckVo().setData(stockTHKInfoByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
+                if (stockTHKInfoByName==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else {return new CheckVo().setData(stockTHKInfoByName).setMsg(BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
             default:
                 return new CheckVo().setMsg(BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }

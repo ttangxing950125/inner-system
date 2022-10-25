@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
+ * 角色3，4，5任务列表返回信息类
  * @author 冉浩岑
  * @date 2022/10/22 10:33
  */
@@ -15,6 +16,8 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class SupplyTaskVo {
+    /** 任务id */
+    private Integer id;
     /** 唯一识别字段 */
     private String entityCode;
 

@@ -7,16 +7,14 @@ import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.RoleMainService;
 import com.deloitte.crm.vo.CheckVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,6 +31,8 @@ public class RoleMainController {
 
     private final EntityInfoManager entityInfoManager;
     private final ICrmDailyTaskService crmDailyTaskService;
+
+    private final RoleMainService roleMainService;
 
 
     /**
@@ -60,8 +60,7 @@ public class RoleMainController {
         @ApiImplicitParam(name ="pageSize",value = "分页页数",example = "5",paramType = "query",dataType = "Integer")
     })
     public R queryDailyTaskByDay(String taskDate, Integer pageNum, Integer pageSize){
-
-        return null;
+        return roleMainService.queryDailyTaskByDay(taskDate,pageNum,pageSize);
     }
 
     @ApiOperation(value="校验字段 by正杰")
@@ -71,7 +70,7 @@ public class RoleMainController {
     })
     @Log(title = "【校验字段】", businessType = BusinessType.OTHER)
     @PostMapping("/checkData")
-    public R<CheckVo> checkData(String keyword, String target){
+    public R<CheckVo> checkData(@RequestParam("keyword")String keyword,@RequestParam("target") String target){
         return R.ok(entityInfoManager.matchByKeyword(keyword,target));
     }
 

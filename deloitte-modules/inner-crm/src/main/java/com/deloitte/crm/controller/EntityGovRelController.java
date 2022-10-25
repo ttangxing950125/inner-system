@@ -9,8 +9,8 @@ import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.EntityGovRel;
-import com.deloitte.crm.domain.dto.EntityGovRelDto;
 import com.deloitte.crm.service.IEntityGovRelService;
+import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -140,8 +140,8 @@ public class EntityGovRelController extends BaseController
             @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addGovEntitySubtableMsg")
-    public R addGovEntitySubtableMsg(@RequestBody EntityGovRelDto entityGovRel) {
-        entityGovRelService.addGovEntitySubtableMsg(entityGovRel);
+    public R addGovEntitySubtableMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
+        entityGovRelService.addGovEntitySubtableMsg(entitySupplyMsgBack);
         return R.ok();
     }
 }

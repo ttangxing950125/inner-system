@@ -1,5 +1,4 @@
 package com.deloitte.crm.service.impl;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.stream.Collectors;
 /**
  * @author PenTang
  * @date 2022/10/12 16:51
@@ -46,9 +45,13 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      * @date 2022/10/12 18:58
      */
     @Override
-    public Page<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
+    public Page <ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         // 获取 需要查询的产品
         List<Integer> proId = entityOrGovByAttrVo.getProId();
+        //参数进行校验
+        if (proId.contains(9999)) {
+            proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
+        }
         //返回结果
         List<ProductCoverDto> result = new ArrayList<>();
 
@@ -63,11 +66,12 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         List<EntityInfo> records = page1.getRecords();
 
         //组装返回结果
+        List<Integer> proIds = proId;
         records.forEach(o -> {
             //返回添加列的结果
             ArrayList<HashMap<String, String>> maps = new ArrayList<>();
             ProductCoverDto temp = new ProductCoverDto();
-            for (Integer integer : proId) {
+            for (Integer integer : proIds) {
                 HashMap<String, String> stringStringHashMap = new HashMap<>();
                 //当前主体关联的产品覆盖情况
                 ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()));
@@ -92,7 +96,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             temp.setResult(maps);
             result.add(temp);
         });
-        Page<ProductCoverDto> oageResult = new Page<>();
+        Page<ProductCoverDto> oageResult = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         oageResult.setRecords(result).setTotal(page1.getTotal());
         return oageResult;
     }

@@ -1,5 +1,6 @@
 package com.deloitte.crm.service;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityNameHis;
 
 import java.util.List;
@@ -73,4 +74,12 @@ public interface IEntityNameHisService
     List<Map<String,Object>> getGovHisNameList(String param);
 
     List<Map<String,Object>> getEntityHisNameList(String param);
+
+    /**
+     * 新增库中主体的曾用名 by正杰
+     * @param entityCode
+     * @param entityName
+     * @return
+     */
+    R addEntityNameHis(String entityCode, String entityName);
 }
