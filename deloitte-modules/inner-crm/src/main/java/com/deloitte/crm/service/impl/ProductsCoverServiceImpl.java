@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 import cn.hutool.core.collection.CollUtil;
-import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,6 +16,7 @@ import com.deloitte.crm.service.ProductsCoverService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

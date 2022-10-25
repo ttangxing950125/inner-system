@@ -1,8 +1,11 @@
 package com.deloitte.crm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityGovRelService;
@@ -11,6 +14,7 @@ import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -28,7 +32,8 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
     private ICrmSupplyTaskService crmSupplyTaskService;
     @Autowired
     private IEntityInfoService entityInfoService;
-
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
     /**
      * 查询【请填写功能名称】
      *
@@ -111,8 +116,14 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addGovEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
-        crmSupplyTaskService.completeTaskById(entitySupplyMsgBack.getTaskId());
+    public R addGovEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+        Integer taskId = entitySupplyMsgBack.getTaskId();
+        CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(taskId);
+
+        if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
+            return R.fail("已完成的任务，不能重复提交");
+        }
+        crmSupplyTaskService.completeTaskById(taskId);
         EntityGovRel entityGovRel = entitySupplyMsgBack.newEntityGovRel();
         QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
         long count = entityGovRelMapper.selectCount(govQuery.lambda().eq(EntityGovRel::getEntityCode, entityGovRel.getEntityCode()));
@@ -123,6 +134,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
         }
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
+        return R.fail("修改成功");
     }
 
 }

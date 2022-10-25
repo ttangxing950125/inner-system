@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -23,8 +22,8 @@ import java.util.Date;
 @Data
 @Builder
 @Accessors(chain = true)
-public class EntityInfoLogs implements Serializable {
-    private static final long serialVersionUID = -95463303364821198L;
+public class EntityInfoLogs {
+
     /**
      * 主键
      */
@@ -64,7 +63,10 @@ public class EntityInfoLogs implements Serializable {
     @Excel(name = "入库时的主体名")
     private String entityName;
     /**
-     * 操作来源
+     * 数据来源:
+     * 手动新增企业主体(债券) - 1
+     * 手动新增企业主体(证券) -2
+     * 角色7新增主体 -3
      */
     @Excel(name = "操作来源")
     private Integer source;

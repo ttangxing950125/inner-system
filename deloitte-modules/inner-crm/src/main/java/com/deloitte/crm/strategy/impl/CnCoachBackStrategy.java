@@ -2,6 +2,7 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -63,31 +64,26 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
         try {
             //设置属性
             cnCoachBack.setTaskId(windTask.getId());
-
-            //查询a股是否存在
+            //查询a股是否存在只查询 未删除的
             String code = cnCoachBack.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
-
+            String entityName = cnCoachBack.getEntityName();
+            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
             //没有就创建一个
             if (stockCnInfo == null) {
+                log.warn("==> IPO-辅导备案 查询A股不存在 创建A股信息!");
                 stockCnInfo = new StockCnInfo();
             }
-
             stockCnInfo.setStockCode(code);
-
-
             //这条CnCoachBack是新增还是修改 1-新增 2-修改
             Integer changeType = null;
-            String entityName = cnCoachBack.getEntityName();
+            //TODO 后期带上删除标识
             CnCoachBack lastCoachBack = cnCoachBackService.findLastByEntityName(entityName);
-
             if (lastCoachBack == null) {
-                //查询不到之前的数据，代表是新增的
                 changeType = DataChangeType.INSERT.getId();
                 //当股票首次出现在  IPO辅导备案表 中时，记为“IPO辅导备案”
                 Integer stockStatus = stockCnInfo.getStockStatus();
                 if (stockStatus == null) {
-                    log.info("==> IPO-辅导备案 修改A股状态为 《IPO-辅导备案》1 ！！");
+                    log.info("==> IPO-辅导备案 【股票代码】={} 修改A股状态为 《IPO-辅导备案》1 ！！", code);
                     stockCnInfo.setStockStatus(StockCnStatus.COACH_BACK.getCode());
                     stockCnInfo.setStatusDesc(StockCnStatus.COACH_BACK.getMessage());
                 } else {
@@ -104,31 +100,27 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(code, cnCoachBack);
                 }
+                //有债券信息，给债券和主体绑定关联关系
+                if (changeType != null && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+                    //绑定主体关系
+                    entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
+                }
+            } else {
+                log.warn("==> IPO-辅导备案 数据导入 出现code为空的！！！！！！！！！！！！！！！！！");
             }
 
             String windIndustry = cnCoachBack.getWindIndustry();
-
             //更新wind行业
             List<EntityInfo> dbEntities = entityInfoService.findByName(entityName);
-            if (CollUtil.isNotEmpty(dbEntities)){
-                dbEntities.forEach(item->{
+            if (CollUtil.isNotEmpty(dbEntities)) {
+                dbEntities.forEach(item -> {
                     item.setWindMaster(windIndustry);
                 });
-
                 entityInfoService.updateBatchById(dbEntities);
             }
 
-
-            //有债券信息，给债券和主体绑定关联关系
-            if (StrUtil.isNotBlank(code) && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
-                //绑定主体关系
-                entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
-            }
-
             cnCoachBack.setChangeType(changeType);
-
             cnCoachBackService.save(cnCoachBack);
-
             return new AsyncResult(new Object());
         } catch (Exception e) {
             e.printStackTrace();

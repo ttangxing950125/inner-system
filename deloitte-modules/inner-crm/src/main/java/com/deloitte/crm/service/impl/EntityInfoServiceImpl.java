@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.core.utils.bean.BeanUtils;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
@@ -40,6 +40,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -105,6 +106,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityAttrValueMapper entityAttrValueMapper;
 
     private EntityBondRelMapper entityBondRelMapper;
+
+    private EntityStockCnRelMapper entityStockCnRelMapper;
+
+    private EntityStockThkRelMapper entityStockThkRelMapper;
 
     private GovInfoMapper govInfoMapper;
 
@@ -274,8 +279,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return entityInfoMapper.selectEntityInfoList(entityInfo);
     }
 
+    @Override
+    public R insertEntityInfo(EntityDto entityDto) {
+        return null;
+    }
+
     /**
-     * @param entityDto
+     * 新增主体 并绑定关联债券||股票信息
+     * @param entityInfoInsertDTO
      * @return
      * @author 正杰
      * @date 2022/9/22
@@ -283,13 +294,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R insertEntityInfo(EntityDto entityDto) {
-        //此处的entityDto的id为 task的id
-        EntityInfo entityInfo = new EntityInfo();
-        Integer taskId = entityDto.getId();
-        entityDto.setId(null);
-        BeanUtils.copyBeanProp(entityInfo, entityDto);
+    public R insertEntityInfoByDaily(EntityInfoInsertDTO entityInfoInsertDTO) {
+        String creditCode = entityInfoInsertDTO.getCreditCode();
+        String entityName = entityInfoInsertDTO.getEntityName().replace(" ","");
+        Integer taskId = entityInfoInsertDTO.getTaskId();
+        String username = StrUtil.isBlank(SecurityUtils.getUsername())?"角色7测试":SecurityUtils.getUsername();
+        log.info("  =>> 角色7 新增主体 {} ：开始 <<=  ",entityName);
+
         // 插入后获取id;
+        EntityInfo entityInfo = new EntityInfo().setEntityName(entityName).setCreater(username);
         baseMapper.insert(entityInfo);
         Integer id = entityInfo.getId();
 
@@ -298,10 +311,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfo.setEntityCode(entityCode);
 
         // 判断社会信用代码是否适用 => 适用为 空 并为其赋值 5 否则有数字
-        Integer creditErrorType = entityDto.getCreditErrorType();
+        Integer creditErrorType = entityInfoInsertDTO.getCreditErrorType();
         if (creditErrorType == null) {
             creditErrorType = 5;
-            entityInfo.setCreditError(0);
+            entityInfo.setCreditError(1);
             entityInfo.setCreditErrorType(creditErrorType);
         }
         switch (creditErrorType) {
@@ -322,31 +335,105 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 entityInfo.setCreditCode(this.appendCreditCode("CU", entityCode));
                 break;
             case 5:
-                entityInfo.setCreditCode(entityDto.getCreditCode());
+                Assert.isTrue(!StrUtil.isBlank(creditCode)||creditCode.matches(Common.REGEX_CREDIT_CODE),BadInfo.VALID_CREDIT_CODE.getInfo());
+                entityInfo.setCreditCode(creditCode);
                 break;
             default:
-                return R.fail(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
+                throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
         }
+        log.info("  =>> 主体 {} 统一社会代码为 {} <<=  ",entityName,entityInfo.getCreditCode());
 
         //添加当前用户
-        String username = SecurityUtils.getUsername();
         entityInfo.setUpdater(username);
         //默认生效 代码为 1
         entityInfo.setStatus(1);
         //再次修改当条信息
         baseMapper.updateById(entityInfo);
+        log.info("  =>> 角色7 主体 {} 信息初始化完成 <<=  ",entityName);
 
-        //将新增的信息保存至 entity_info_logs
-        EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
-        //数据装配新增基础信息
-        entityInfoLogs.setEntityCode(entityCode)
-                .setEntityName(entityInfo.getEntityName())
-                .setOperName(username);
-        entityInfoLogsService.getBaseMapper().insert(entityInfoLogs);
-
+        //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
+        String dataCode = entityInfoInsertDTO.getDataCode();
+        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
+        log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ",entityName);
+        switch (entityInfoInsertDTO.getDataSource()){
+            case 1:
+                this.bindBondInfo(entityInfoInsertDTO,entityCode,username);
+                break;
+            case 2:
+                this.bindStockThkInfo(entityInfoInsertDTO,entityCode,username);
+                break;
+            case 3:
+                this.bindStockCnInfo(entityInfoInsertDTO,entityCode,username);
+                break;
+            default:
+                throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
+        }
         //修改当日任务 新增主体状态码为 2
         return iCrmEntityTaskService.finishTask(taskId, 2, entityCode);
     }
+
+    /** 绑定 债券 bond_info */
+    @Transactional(rollbackFor = Exception.class)
+    void bindBondInfo(EntityInfoInsertDTO entityInfoInsertDTO,String entityCode,String username){
+        log.info("  =>> 关联信息导入 bond_info 与 entity_bond_rel <<=  ");
+        String dataCode = entityInfoInsertDTO.getDataCode();
+        BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondCode, dataCode).eq(BondInfo::getIsDeleted, 0));
+        Assert.notNull(bondInfo,BadInfo.EMPTY_BOND_INFO.getInfo());
+        if(ObjectUtils.isEmpty(entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getEntityCode,entityCode).eq(EntityBondRel::getBdCode,dataCode)))){
+            entityBondRelMapper.insert(new EntityBondRel().setEntityCode(entityCode).setBdCode(dataCode).setStatus(1));
+            log.info("  =>> 成功新增一条关联信息 至entity_bond_rel <<== ");
+        }else{log.info("  =>> 库中已存有一条关联数据 至entity_bond_rel <<== ");}
+
+        String oriCode = bondInfo.getOriCode();
+        String bondShortName = bondInfo.getBondShortName();
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(oriCode).setName(bondShortName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        this.bindEntityInfoLogs(entityInfoLogs);
+    }
+
+    /** 绑定 港股 stock_thk_info */
+    @Transactional(rollbackFor = Exception.class)
+    void bindStockThkInfo(EntityInfoInsertDTO entityInfoInsertDTO,String entityCode,String username){
+        log.info("  =>> 主体导入 stock_thk_info 与 entity_stock_thk_rel <<=  ");
+        String dataCode = entityInfoInsertDTO.getDataCode();
+        StockThkInfo stockThkInfo = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, dataCode).eq(StockThkInfo::getIsDeleted, 0));
+        Assert.notNull(stockThkInfo,BadInfo.EMPTY_THK_STOCK_INFO.getInfo());
+        if(ObjectUtils.isEmpty(entityStockThkRelMapper.selectOne(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode).eq(EntityStockThkRel::getStockDqCode, dataCode)))){
+            entityStockThkRelMapper.insert(new EntityStockThkRel().setEntityCode(entityCode).setStockDqCode(dataCode).setStatus(true));
+            log.info("  =>> 成功新增一条关联信息 entity_stock_thk_rel <<== ");
+        }else{log.info("  =>> 库中已存有一条关联数据 entity_stock_thk_rel <<== ");}
+
+        String stockCode = stockThkInfo.getStockCode();
+        String stockName = stockThkInfo.getStockName();
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        this.bindEntityInfoLogs(entityInfoLogs);
+    }
+
+    /** 绑定 A股 stock_cn_info */
+    @Transactional(rollbackFor = Exception.class)
+    void bindStockCnInfo(EntityInfoInsertDTO entityInfoInsertDTO,String entityCode,String username){
+        log.info("  =>> 主体导入 stock_cn_info 与 entity_stock_cn_rel <<=  ");
+        String dataCode = entityInfoInsertDTO.getDataCode();
+        StockCnInfo stockCnInfo = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, dataCode).eq(StockCnInfo::getIsDeleted, 0));
+        Assert.notNull(stockCnInfo,BadInfo.EMPTY_THK_STOCK_INFO.getInfo());
+        if(ObjectUtils.isEmpty(entityStockThkRelMapper.selectOne(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode,entityCode).eq(EntityStockThkRel::getStockDqCode,dataCode)))){
+            entityStockThkRelMapper.insert(new EntityStockThkRel().setEntityCode(entityCode).setStockDqCode(dataCode).setStatus(true));
+            log.info("  =>> 成功新增一条关联信息 entity_stock_cn_rel <<== ");
+        }else{log.info("  =>> 库中已存有一条关联数据 entity_stock_cn_rel <<== ");}
+
+        String stockCode = stockCnInfo.getStockCode();
+        String stockShortName = stockCnInfo.getStockShortName();
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockShortName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        this.bindEntityInfoLogs(entityInfoLogs);
+    }
+
+    /** 新增一条 entity_info_logs 的数据 */
+    @Transactional(rollbackFor = Exception.class)
+    void bindEntityInfoLogs(EntityInfoLogs entityInfoLogs){
+        log.info("  =>> 新增一条信息至 entity_info_logs <<=  ");
+        entityInfoLogsService.getBaseMapper().insert(entityInfoLogs);
+    }
+
+
 
     /**
      * 修改【请填写功能名称】
@@ -1080,7 +1167,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             map.put("创建日期", DateUtil.parseDateToStr("yyyy/MM/dd", info.getCreated()));
             map.put("创建人", info.getCreater());
             if (!CollectionUtils.isEmpty(vo.getMore())) {
-                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), map.get("value")));
+                vo.getMore().forEach(entryMap -> map.put(entryMap.getKey(), entryMap.getValue()));
             }
             rows.add(map);
         });
@@ -1683,11 +1770,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //发债主体
         Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
-        //既上市主体又发债主体
-        Long unListBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
+        //既上市又发债主体
+        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既没上市主体又不发债主体
-        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0));
+        Long unListBonds = entityInfoMapper.selectCount(query.lambda().ne(EntityInfo::getList, 1).ne(EntityInfo::getIssueBonds, 1));
         query.clear();
         //金融
         Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1));
@@ -1710,14 +1797,26 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //上市主体
         Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1));
         query.clear();
+        //单纯上市主体
+        query.and(wrapper -> wrapper.lambda().eq(EntityInfo::getList, 1))
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+        Long onlyList = entityInfoMapper.selectCount(query);
+        query.clear();
         //发债主体
         Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
+        //单纯发债主体
+        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1));
+        Long onlyBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
+        query.clear();
         //既上市主体又发债主体
-        Long unListBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
+        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既没上市主体又不发债主体
-        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0));
+        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+        Long unListBonds = entityInfoMapper.selectCount(query);
         query.clear();
         //金融
         Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1));
@@ -1729,6 +1828,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         result.put("listBonds", listBonds);
         result.put("unListBonds", unListBonds);
         result.put("finance", finance);
+        result.put("onlyList", onlyList);
+        result.put("onlyBonds", onlyBonds);
         return result;
     }
 
@@ -2166,12 +2267,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+    public R addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         Integer id = entitySupplyMsgBack.getTaskId();
+        CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(id);
+
+        if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
+            return R.fail("已完成的任务，不能重复提交");
+        }
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
+        return R.ok("修改成功");
     }
+
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -2854,6 +2964,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName) {
+        if(StrUtil.isBlank(entityName)){return R.fail(BadInfo.PARAM_EMPTY.getInfo());}
+        entityName = entityName.replace(" ","");
         log.info("  =>> 校验新增主体字段 社会信用代码:{}，主体名称{} <<=  ",creditCode,entityName);
         if(creditCode==null){
             EntityInfo byName = this.checkName(entityName);

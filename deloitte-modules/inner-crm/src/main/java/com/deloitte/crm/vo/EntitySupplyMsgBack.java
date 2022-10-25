@@ -139,14 +139,16 @@ public class EntitySupplyMsgBack {
     }
 
     public void haveEntityGovRel(EntityGovRel entityGovRel) {
-        this.entityCode = entityGovRel.getEntityCode();
-        this.dqGovCode = entityGovRel.getDqGovCode();
-        this.shareMethod = entityGovRel.getShareMethod();
-        this.support = entityGovRel.getSupport();
-        this.judgment = entityGovRel.getJudgment();
-        this.shareRatio = entityGovRel.getShareRatio();
-        this.shareRatioYear = entityGovRel.getShareRatioYear();
-        this.remarks = entityGovRel.getRemarks();
+        if (!ObjectUtils.isEmpty(entityGovRel)){
+            this.entityCode = entityGovRel.getEntityCode();
+            this.dqGovCode = entityGovRel.getDqGovCode();
+            this.shareMethod = entityGovRel.getShareMethod();
+            this.support = entityGovRel.getSupport();
+            this.judgment = entityGovRel.getJudgment();
+            this.shareRatio = entityGovRel.getShareRatio();
+            this.shareRatioYear = entityGovRel.getShareRatioYear();
+            this.remarks = entityGovRel.getRemarks();
+        }
     }
 
     public EntityInfo newEntityInfo() {
@@ -173,24 +175,26 @@ public class EntitySupplyMsgBack {
     }
 
     public void haveEntityInfo(EntityInfo entityInfo) {
-        this.entityCode = entityInfo.getEntityCode();
-        this.entityName = entityInfo.getEntityName();
-        this.creditCode = entityInfo.getCreditCode();
-        this.windMaster = entityInfo.getWindMaster();
-        this.shenWanMaster = entityInfo.getShenWanMaster();
-        this.listType = entityInfo.getEntityCode();
-        String reportType = entityInfo.getReportType();
+        if (!ObjectUtils.isEmpty(entityInfo)){
+            this.entityCode = entityInfo.getEntityCode();
+            this.entityName = entityInfo.getEntityName();
+            this.creditCode = entityInfo.getCreditCode();
+            this.windMaster = entityInfo.getWindMaster();
+            this.shenWanMaster = entityInfo.getShenWanMaster();
+            this.listType = entityInfo.getEntityCode();
+            String reportType = entityInfo.getReportType();
 
-        if (!ObjectUtils.isEmpty(reportType)) {
-            String[] split = reportType.split(",");
-            if (split.length > 0) {
-                List<String> list = new ArrayList<>();
-                for (String var : split) {
-                    if (!ObjectUtils.isEmpty(var)) {
-                        list.add(var);
+            if (!ObjectUtils.isEmpty(reportType)) {
+                String[] split = reportType.split(",");
+                if (split.length > 0) {
+                    List<String> list = new ArrayList<>();
+                    for (String var : split) {
+                        if (!ObjectUtils.isEmpty(var)) {
+                            list.add(var);
+                        }
                     }
+                    this.reportType = list;
                 }
-                this.reportType = list;
             }
         }
     }
@@ -206,10 +210,12 @@ public class EntitySupplyMsgBack {
     }
 
     public void haveEntityFinancial(EntityFinancial entityFinancial) {
-        this.entityCode = entityFinancial.getEntityCode();
-        this.belJurisdiction = entityFinancial.getBelJurisdiction();
-        this.belPlace = entityFinancial.getBelPlace();
-        this.regulators = entityFinancial.getRegulators();
-        this.remarks = entityFinancial.getRemarks();
+        if (!ObjectUtils.isEmpty(entityFinancial)){
+            this.entityCode = entityFinancial.getEntityCode();
+            this.belJurisdiction = entityFinancial.getBelJurisdiction();
+            this.belPlace = entityFinancial.getBelPlace();
+            this.regulators = entityFinancial.getRegulators();
+            this.remarks = entityFinancial.getRemarks();
+        }
     }
 }
