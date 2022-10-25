@@ -49,6 +49,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
 
+    @Autowired
+    private EntityFinancialMapper entityFinancialMapper;
     /**
      * 查询【请填写功能名称】
      *
@@ -236,8 +238,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         return taskVo;
     }
 
-    @Autowired
-    private EntityFinancialMapper entityFinancialMapper;
 
     private String getThreeValue(String entityCode) {
         //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
