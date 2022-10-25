@@ -213,8 +213,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public EntityInfoDto getEntityInfo() {
 
         EntityInfoDto entityInfoDto = new EntityInfoDto();
-        List<EntityInfo> list = this.list();
-
+        LambdaQueryWrapper<EntityInfo> eq = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getStatus, 1);
+        List<EntityInfo> list = this.list(eq);
         //issue_bonds 是否发债 0-未发债 1-已发债
         List<EntityInfo> bonds = list.stream()
                 .filter(row -> row.getIssueBonds() != null && row.getIssueBonds() == 1)
