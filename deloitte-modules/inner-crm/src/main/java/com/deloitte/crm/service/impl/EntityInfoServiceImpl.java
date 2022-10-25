@@ -2833,12 +2833,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());
         Long roleId = crmSupplyTask.getRoleId();
         // roleId=5 -- 角色3
-        if (roleId == 5l) {
+        if (roleId == 5L) {
             EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
             entitySupplyMsgBack.haveEntityFinancial(entityFinancial);
         }
         // roleId=6 -- 角色4
-        if (roleId == 6l) {
+        if (roleId == 6L) {
             EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
             entitySupplyMsgBack.haveEntityGovRel(entityGovRel);
         }
