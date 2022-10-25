@@ -114,7 +114,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
                     entityAttrValueService.updateStockCnAttr(code, item);
                 }
                 //有债券信息，给债券和主体绑定关联关系
-                if (changeType != null && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+                if (changeType != null) {
                     List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
                     if (CollUtil.isNotEmpty(entityInfos)) {
                         List<EntityInfo> mapEntityInfos = entityInfos.stream().map(e -> e.setWindMaster(windIndustry)).collect(Collectors.toList());
