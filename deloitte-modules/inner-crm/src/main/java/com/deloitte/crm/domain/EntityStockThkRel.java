@@ -1,15 +1,16 @@
 package com.deloitte.crm.domain;
 
-import java.util.Date;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * (EntityStockThkRel)表实体类
@@ -21,6 +22,7 @@ import lombok.Builder;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class EntityStockThkRel implements Serializable {
     private static final long serialVersionUID = -56167360334527808L;
 

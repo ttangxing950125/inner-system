@@ -46,7 +46,7 @@ public class EntityBondRel {
     private String bdCode;
 
     /**
-     * 关系状态
+     * 关系状态 1 是启用 0是禁用
      */
     @Excel(name = "关系状态")
     private Integer status;

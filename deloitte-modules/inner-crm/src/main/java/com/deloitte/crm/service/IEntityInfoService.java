@@ -292,4 +292,14 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return
      */
     R editeCreditCode(String entityCode, String creditCode);
+
+    /**
+     * 新增主体 并绑定关联债券||股票信息
+     * @param entityInfoInsertDTO
+     * @return
+     * @author 正杰
+     * @date 2022/9/22
+     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
+     */
+    R insertEntityInfoByDaily(EntityInfoInsertDTO entityInfoInsertDTO);
 }
