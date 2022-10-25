@@ -141,6 +141,8 @@ public enum Common {
      */
     public static final String REGEX_CREDIT_CODE = "\\S{18}";
 
+    public static final String REGEX_ENTITY_CODE = "\\S{8}";
+
     public static final String ENTITY_CODE = "主体code";
 
     public static final String UPDATED = "修改时间";

@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.common.security.utils.SecurityUtils;
@@ -2854,6 +2855,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName) {
+        if(StrUtil.isBlank(entityName)){return R.fail(BadInfo.PARAM_EMPTY.getInfo());}
+        entityName = entityName.replace(" ","");
         log.info("  =>> 校验新增主体字段 社会信用代码:{}，主体名称{} <<=  ",creditCode,entityName);
         if(creditCode==null){
             EntityInfo byName = this.checkName(entityName);
