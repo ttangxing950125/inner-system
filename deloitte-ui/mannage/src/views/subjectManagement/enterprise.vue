@@ -219,7 +219,7 @@
           <div class="g-desc flex1">
             <router-link
               :to="{
-                name: 'indexEnterprise',
+                name: '/subjectManagement/indexGovernment',
                 query: { name: tabArr[currentTab] },
               }"
             >
@@ -227,18 +227,18 @@
             </router-link>
             <router-link
               :to="{
-                name: 'addEnterprise',
+                name: '/subjectManagement/addEnterprise',
                 query: { name: tabArr[currentTab] },
               }"
             >
               <a href="">新增主体</a>
             </router-link>
-            <router-link :to="{ name: 'eidtEnterprise' }">
+            <router-link :to="{ name: '/subjectManagement/eidtEnterprise' }">
               <a href="">修改信息</a>
             </router-link>
             <router-link
               :to="{
-                name: 'historyEnterprise',
+                name: '/subjectManagement/historyEnterprise',
                 query: { name: tabArr[currentTab] },
               }"
             >

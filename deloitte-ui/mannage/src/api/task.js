@@ -420,3 +420,27 @@ export function addEntityeMsg(params) {
     data: params,
   });
 }
+
+// 角色3，4，5补充录入查询和回显
+export function getEntityBackSupply(params) {
+  return request({
+    url: "/crm/entityInfo/getEntityBackSupply?id=" + params.id,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 校验主体名称是否存在 
+export function checkEntityName(params) {
+  return request({
+    url: "/crm/roleSeven/checkEntityName?entityName=" + params.entityName,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
