@@ -412,7 +412,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityInfo entity = baseMapper.selectOne(new QueryWrapper<EntityInfo>()
                 .lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entity)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null));
+        return R.ok(entityInfoManager.updateEntityName(entity, entityNewName, null),SuccessInfo.SUCCESS.getInfo());
     }
 
     /**
@@ -2827,7 +2827,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         //设置回显的基础信息
         EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
-        entitySupplyMsgBack.setTaskId(id);
+        entitySupplyMsgBack.setTaskId(id).setState(crmSupplyTask.getState());
         entitySupplyMsgBack.haveEntityInfo(entityInfo);
         //设置回显的信息 来源属性
         entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());

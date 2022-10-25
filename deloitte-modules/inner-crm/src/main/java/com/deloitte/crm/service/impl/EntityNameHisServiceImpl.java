@@ -151,6 +151,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 .setDqCode(entityCode)
                 .setOldName(entityName)
                 .setHappenDate(new Date())
+                .setRemarks("系统自动生成")
                 .setCreater(SecurityUtils.getUsername()));
 
         // 对主体曾用名列表进行操作

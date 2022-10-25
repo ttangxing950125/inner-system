@@ -46,7 +46,7 @@ public class EntityFinancialController {
             @ApiImplicitParam(name = "remarks", value = "备注", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "windMaster", value = "wind行业划分", paramType = "body", example = "", dataType = "String"),
             @ApiImplicitParam(name = "shenWanMaster", value = "申万行业划分", paramType = "body", example = "", dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
+            @ApiImplicitParam(name = "taskId", value = "任务Id", paramType = "body", example = "", dataType = "Integer")
     })
     @PostMapping("/addFinEntitySubtableMsg")
     public R addFinEntitySubtableMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
