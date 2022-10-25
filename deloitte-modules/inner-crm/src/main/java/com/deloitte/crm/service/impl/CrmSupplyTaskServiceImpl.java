@@ -193,7 +193,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         // 统一社会信用代码代码
         taskVo.setCreditCode(entityInfo.getCreditCode());
         // 是否为金融机构
-        taskVo.setList(entityInfo.getList());
+        taskVo.setList(entityInfo.getFinance());
         // 任务状态
         taskVo.setState(o.getState());
 

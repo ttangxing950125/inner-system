@@ -403,4 +403,17 @@ public class GovInfoController extends BaseController {
     public R getGovByParam(String param) {
         return R.ok(govInfoService.getGovByParam(param));
     }
+
+    /**
+     * 导出政府主体基本信息
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/25 17:39
+     */
+    @ApiOperation(value = "导出政府主体基本信息")
+    @GetMapping("/exportGov")
+    public void exportGov() throws Exception {
+
+    }
 }

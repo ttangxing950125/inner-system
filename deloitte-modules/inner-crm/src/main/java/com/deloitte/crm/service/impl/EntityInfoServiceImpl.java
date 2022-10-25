@@ -26,6 +26,8 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
+import com.deloitte.crm.excelUtils.ExcelImport;
+import com.deloitte.crm.excelUtils.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.TimeFormatUtil;
@@ -371,6 +373,45 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //修改当日任务 新增主体状态码为 2
         return iCrmEntityTaskService.finishTask(taskId, 2, entityCode);
     }
+
+    @Autowired
+    private EntityImportMapper entityImportMapper;
+    @Override
+    public void exportEntity(HttpServletResponse response) {
+        List<EntityImport> entityImports = entityImportMapper.selectList(new QueryWrapper<EntityImport>());
+        if (CollectionUtils.isEmpty(entityImports)){
+            return;
+        }
+        List<Object> head = Arrays.asList("企业名称","企业德勤唯一识别码","统一社会信用代码","是否上市 0.否 1.是",
+                "是否金融机构 0.否 1.是","是否发债 0.否 1.是","是否生效 0.否 1.是","统一社会信用代码是否异常 0-正常 1-异常",
+                "社会信用代码异常备注","统一社会信用代码状态描述，1、吊销 2、注销 3、非大陆注册机构 4、其他未知原因 5、正常","所有的曾用名或别称");
+        for (EntityImport entityImport:entityImports){
+            out.println(1);
+        }
+
+        // 表头数据
+        // 用户1数据
+        List<Object> user1 = new ArrayList<>();
+        user1.add("诸葛亮");
+        user1.add(60);
+        user1.add("男");
+        user1.add("https://profile.csdnimg.cn/A/7/3/3_sunnyzyq");
+        // 用户2数据
+        List<Object> user2 = new ArrayList<>();
+        user2.add("大乔");
+        user2.add(28);
+        user2.add("女");
+        user2.add("https://profile.csdnimg.cn/6/1/9/0_m0_48717371");
+        // 将数据汇总
+        List<List<Object>> sheetDataList = new ArrayList<>();
+        sheetDataList.add(head);
+        sheetDataList.add(user1);
+        sheetDataList.add(user2);
+        // 导出数据
+        ExcelUtils.export(response,"用户表", sheetDataList);
+    }
+
+
 
     /** 绑定 债券 bond_info */
     @Transactional(rollbackFor = Exception.class)
