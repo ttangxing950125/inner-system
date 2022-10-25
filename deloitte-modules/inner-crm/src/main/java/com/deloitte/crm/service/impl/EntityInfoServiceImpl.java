@@ -213,8 +213,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public EntityInfoDto getEntityInfo() {
 
         EntityInfoDto entityInfoDto = new EntityInfoDto();
-        List<EntityInfo> list = this.list();
-
+        LambdaQueryWrapper<EntityInfo> eq = new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getStatus, 1);
+        List<EntityInfo> list = this.list(eq);
         //issue_bonds 是否发债 0-未发债 1-已发债
         List<EntityInfo> bonds = list.stream()
                 .filter(row -> row.getIssueBonds() != null && row.getIssueBonds() == 1)
@@ -2833,12 +2833,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());
         Long roleId = crmSupplyTask.getRoleId();
         // roleId=5 -- 角色3
-        if (roleId == 5l) {
+        if (roleId == 5L) {
             EntityFinancial entityFinancial = financialMapper.selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
             entitySupplyMsgBack.haveEntityFinancial(entityFinancial);
         }
         // roleId=6 -- 角色4
-        if (roleId == 6l) {
+        if (roleId == 6L) {
             EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode).last(" limit 1"));
             entitySupplyMsgBack.haveEntityGovRel(entityGovRel);
         }

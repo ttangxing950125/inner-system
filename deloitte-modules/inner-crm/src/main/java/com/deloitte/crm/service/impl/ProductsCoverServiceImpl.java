@@ -1,4 +1,6 @@
 package com.deloitte.crm.service.impl;
+import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,6 +18,7 @@ import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.stat.descriptive.summary.Product;
 import org.springframework.stereotype.Service;
+import sun.plugin2.util.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +52,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         // 获取 需要查询的产品
         List<Integer> proId = entityOrGovByAttrVo.getProId();
         //参数进行校验
-        if (proId.contains(9999)) {
+        if (proId.contains(9999) || CollectionUtils.isEmpty(proId)) {
             proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
         }
         //返回结果
