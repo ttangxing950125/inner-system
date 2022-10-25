@@ -50,7 +50,6 @@ public class EntityFinancialController {
     })
     @PostMapping("/addFinEntitySubtableMsg")
     public R addFinEntitySubtableMsg(@RequestBody EntitySupplyMsgBack entitySupplyMsgBack) {
-        entityFinancialService.addFinEntitySubtableMsg(entitySupplyMsgBack);
-        return R.ok();
+        return entityFinancialService.addFinEntitySubtableMsg(entitySupplyMsgBack);
     }
 }

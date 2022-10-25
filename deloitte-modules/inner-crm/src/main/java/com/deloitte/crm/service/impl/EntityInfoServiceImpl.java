@@ -1797,14 +1797,26 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //上市主体
         Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1));
         query.clear();
+        //单纯上市主体
+        query.and(wrapper -> wrapper.lambda().eq(EntityInfo::getList, 1))
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+        Long onlyList = entityInfoMapper.selectCount(query);
+        query.clear();
         //发债主体
         Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
+        query.clear();
+        //单纯发债主体
+        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1));
+        Long onlyBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既上市主体又发债主体
         Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既没上市主体又不发债主体
-        Long unListBonds = entityInfoMapper.selectCount(query.lambda().ne(EntityInfo::getList, 1).ne(EntityInfo::getIssueBonds, 1));
+        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+        Long unListBonds = entityInfoMapper.selectCount(query);
         query.clear();
         //金融
         Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1));
@@ -1816,6 +1828,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         result.put("listBonds", listBonds);
         result.put("unListBonds", unListBonds);
         result.put("finance", finance);
+        result.put("onlyList", onlyList);
+        result.put("onlyBonds", onlyBonds);
         return result;
     }
 
@@ -2253,12 +2267,21 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+    public R addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         Integer id = entitySupplyMsgBack.getTaskId();
+        CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(id);
+
+        if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
+            return R.fail("已完成的任务，不能重复提交");
+        }
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
+        return R.ok("修改成功");
     }
+
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

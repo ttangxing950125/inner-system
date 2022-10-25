@@ -246,7 +246,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     String appendPrefixDiy(String prefixWord,Integer prefixLength,Integer target);
 
-    void addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack);
+    R addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack);
 
     void updateInfoDetail(EntityInfoDetails entityInfoDetails);
 
