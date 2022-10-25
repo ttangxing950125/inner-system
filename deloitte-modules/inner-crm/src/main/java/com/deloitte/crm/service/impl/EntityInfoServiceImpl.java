@@ -386,33 +386,33 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (CollectionUtils.isEmpty(entityImports)){
             return;
         }
+        // 将数据汇总
+        List<List<Object>> sheetDataList = new ArrayList<>();
         List<Object> head = Arrays.asList("企业名称","企业德勤唯一识别码","统一社会信用代码","是否上市 0.否 1.是",
                 "是否金融机构 0.否 1.是","是否发债 0.否 1.是","是否生效 0.否 1.是","统一社会信用代码是否异常 0-正常 1-异常",
                 "社会信用代码异常备注","统一社会信用代码状态描述，1、吊销 2、注销 3、非大陆注册机构 4、其他未知原因 5、正常","所有的曾用名或别称");
-        for (EntityImport entityImport:entityImports){
-            out.println(1);
-        }
-
-        // 表头数据
-        // 用户1数据
-        List<Object> user1 = new ArrayList<>();
-        user1.add("诸葛亮");
-        user1.add(60);
-        user1.add("男");
-        user1.add("https://profile.csdnimg.cn/A/7/3/3_sunnyzyq");
-        // 用户2数据
-        List<Object> user2 = new ArrayList<>();
-        user2.add("大乔");
-        user2.add(28);
-        user2.add("女");
-        user2.add("https://profile.csdnimg.cn/6/1/9/0_m0_48717371");
-        // 将数据汇总
-        List<List<Object>> sheetDataList = new ArrayList<>();
         sheetDataList.add(head);
-        sheetDataList.add(user1);
-        sheetDataList.add(user2);
+        for (EntityImport entityImport:entityImports){
+            //添加行数据
+            List<Object> sheetData = new ArrayList<>();
+            sheetData.add(entityImport.getEntityName());
+            sheetData.add(entityImport.getEntityCode());
+            sheetData.add(entityImport.getCreditCode());
+            sheetData.add(entityImport.getList());
+            sheetData.add(entityImport.getFinance());
+            sheetData.add(entityImport.getIssueBonds());
+            sheetData.add(entityImport.getStatus());
+            sheetData.add(entityImport.getCreditError());
+            sheetData.add(entityImport.getCreditErrorRemark());
+            sheetData.add(entityImport.getCreditErrorType());
+            sheetData.add(entityImport.getEntityNameHis());
+
+            //添加总数据
+            sheetDataList.add(sheetData);
+        }
         // 导出数据
-        ExcelUtils.export(response,"用户表", sheetDataList);
+        ExcelUtils.export(response,"企业主体表", sheetDataList);
+        log.info("导出企业主体表完毕");
     }
 
 

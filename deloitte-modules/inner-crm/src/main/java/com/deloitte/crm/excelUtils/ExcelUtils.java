@@ -12,6 +12,7 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -867,7 +868,7 @@ public class ExcelUtils {
         // 设置样式
         cell.setCellStyle(style);
         // 数据为空时
-        if (o == null) {
+        if (ObjectUtils.isEmpty(o)) {
             cell.setCellType(CellType.STRING);
             cell.setCellValue("");
             return CELL_OTHER;
