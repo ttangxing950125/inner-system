@@ -13,6 +13,7 @@ import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.utils.AttrValueUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @author 吴鹏鹏ppp
  * @since 2022-09-25 18:28:36
  */
+@Slf4j
 @Service("entityStockCnRelService")
 public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMapper, EntityStockCnRel> implements EntityStockCnRelService {
 
@@ -43,6 +45,7 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
     /**
      * 绑定主体和a股的关联关系，如果没有这个企业，就创建新增企业的任务
+     *
      * @param stockCnInfo
      * @param entityName
      * @param windTask
@@ -56,7 +59,7 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
 
         //之前数据库中没有该主体
-        if (CollUtil.isEmpty(entityInfos)){
+        if (CollUtil.isEmpty(entityInfos)) {
             //创建任务
             CrmEntityTask entityTask = new CrmEntityTask();
 
@@ -67,8 +70,8 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
             entityTask.setSourceType(3);
             entityTask.setSourceId(stockCnInfo.getId());
             entityTask.setTaskDate(windTask.getTaskDate());
-            String showData = "公司中文名称:"+entityName;
-            showData += ", 代码:"+cnCoachBack.getCode();
+            String showData = "公司中文名称:" + entityName;
+            showData += ", 代码:" + cnCoachBack.getCode();
 
             entityTask.setDataShow(showData);
 
@@ -101,7 +104,7 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
             //查询关联关系
             EntityStockCnRel dbRel = baseMapper.findByEntityStockDeCode(entityCode, stockDqCode);
 
-            if (dbRel!=null){
+            if (dbRel != null) {
                 continue;
             }
 
@@ -120,28 +123,23 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
     /**
      * 查询和德勤code的a股所属主体
+     *
      * @param dqCode
      * @return
      */
     @Override
     public List<EntityInfo> findByStockCode(String dqCode) {
         //查询rel对象
-        Wrapper<EntityStockCnRel> wrapper = Wrappers.<EntityStockCnRel>lambdaQuery()
-                .eq(EntityStockCnRel::getStockDqCode, dqCode);
-
+        Wrapper<EntityStockCnRel> wrapper = Wrappers.<EntityStockCnRel>lambdaQuery().eq(EntityStockCnRel::getStockDqCode, dqCode);
         List<EntityStockCnRel> list = this.list(wrapper);
-
-        if (CollUtil.isEmpty(list)){
+        if (CollUtil.isEmpty(list)) {
+            log.warn(">>>>>根据股票code>:{} 查询中间关联关系为空!!!!!", dqCode);
             return new ArrayList<>();
         }
-
         //查询主体
-        List<String> entityCodes = list.stream()
-                .map(EntityStockCnRel::getEntityCode)
-                .collect(Collectors.toList());
+        List<String> entityCodes = list.stream().map(EntityStockCnRel::getEntityCode).collect(Collectors.toList());
 
-        Wrapper<EntityInfo> entityWrapper = Wrappers.<EntityInfo>lambdaQuery()
-                .in(EntityInfo::getEntityCode, entityCodes);
+        Wrapper<EntityInfo> entityWrapper = Wrappers.<EntityInfo>lambdaQuery().in(EntityInfo::getEntityCode, entityCodes);
 
         return entityInfoService.list(entityWrapper);
     }
