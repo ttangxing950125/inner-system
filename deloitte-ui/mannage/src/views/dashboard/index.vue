@@ -1855,19 +1855,13 @@ export default {
     workRole3(row) {
       try {
         this.remarkDig = true
-        this.ruleForm.entityName = row.entityName
-        this.ruleForm.creditCode = row.creditCode
-        this.ruleForm.id = row.id
-        this.ruleForm.source = row.source
-        this.ruleForm.state = row.state
-        this.$set(this.ruleForm, 'entityCode',  row.entityCode)
-        this.$set(this.ruleForm, 'id',  row.id)
         this.$modal.loading("loading...");
         const params = {
           id: row.id,
         }
         getEntityBackSupply(params).then(res => {
           const { data } = res
+          this.ruleForm = data
             this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
             this.$set(this.ruleForm, 'windMaster', data.windMaster)
         })
@@ -1989,20 +1983,12 @@ export default {
       try {
         this.$modal.loading("loading...");
         this.governmentDig = true
-        this.ruleForm.entityName = row.entityName
-        this.ruleForm.id = row.id
-        this.ruleForm.creditCode = row.creditCode
-        this.ruleForm.source = row.source
-        this.ruleForm.state = row.state
-        this.$set(this.ruleForm, 'entityCode',  row.entityCode)
-        this.$set(this.ruleForm, 'id',  row.id)
-        this.$set(this.ruleForm, 'wind',  row.windMaster)
-        this.$set(this.ruleForm, 'shenWan',  row.shenWanMaster)
         const params = {
           id: row.id,
         }
         getEntityBackSupply(params).then(res => {
           const { data } = res
+          this.ruleForm = data
           this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
             this.$set(this.ruleForm, 'windMaster', data.windMaster)
         })
@@ -2031,21 +2017,12 @@ export default {
       try {
         this.$modal.loading("loading...");
         this.fsDig = true
-        this.ruleForm.entityName = row.entityName
-        this.ruleForm.creditCode = row.creditCode
-        this.ruleForm.id = row.id
-        this.ruleForm.source = row.source
-        this.ruleForm.state = row.state
-        this.$set(this.ruleForm, 'entityCode',  row.entityCode)
-        this.$set(this.ruleForm, 'id',  row.id)
-        this.$set(this.ruleForm, 'wind',  '')
-        this.$set(this.ruleForm, 'shenWan',  '')
         const params = {
-          entityCode: row.entityCode,
-          roleId: 5,
+          id: row.id,
         }
         getEntityBackSupply(params).then(res => {
           const { data } = res
+          this.ruleForm = data
           this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
             this.$set(this.ruleForm, 'windMaster', data.windMaster)
         })
