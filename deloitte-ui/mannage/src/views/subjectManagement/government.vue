@@ -65,19 +65,19 @@
           <div class="g-desc flex1">
             <router-link
               :to="{
-                name: 'indexGovernment',
+                path: '/subjectManagement/indexGovernment',
                 query: { name: tabArr[currentTab] },
               }"
             >
               <a href="">更多指标</a>
             </router-link>
-            <router-link :to="{ name: 'addGovernment' }">
+            <router-link :to="{ path: '/subjectManagement/addGovernment' }">
               <a href="">新增主体</a>
             </router-link>
-            <router-link :to="{ name: 'eidtGovernment' }">
+            <router-link :to="{ path: '/subjectManagement/eidtGovernment' }">
               <a href="">修改信息</a>
             </router-link>
-            <router-link :to="{ name: 'historyGovernment' }">
+            <router-link :to="{ path: '/subjectManagement/historyGovernment' }">
               <a href="">更新记录</a>
             </router-link>
             <el-input
