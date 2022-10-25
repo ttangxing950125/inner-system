@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -70,7 +71,7 @@ public class RoleMainController {
     })
     @Log(title = "【校验字段】", businessType = BusinessType.OTHER)
     @PostMapping("/checkData")
-    public R<CheckVo> checkData(@RequestParam("keyword")String keyword,@RequestParam("target") String target){
+    public R<CheckVo> checkData(@RequestParam("keyword")@NotNull(message = "关键字不能为空") String keyword,@RequestParam("target")@NotNull(message = "目标字段不能为空") String target){
         return R.ok(entityInfoManager.matchByKeyword(keyword,target));
     }
 

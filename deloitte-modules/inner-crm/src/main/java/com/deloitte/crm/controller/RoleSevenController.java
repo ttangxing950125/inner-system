@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
-import com.deloitte.crm.dto.EntityDto;
+import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
@@ -81,7 +81,8 @@ public class RoleSevenController {
     }
 
     /**
-     * @param entityDto
+     * 新增主体 并绑定关联债券||股票信息
+     * @param entityInfoInsertDTO
      * @return
      * @author 正杰
      * @date 2022/9/22
@@ -90,10 +91,10 @@ public class RoleSevenController {
     //@RequiresPermissions("crm:entityInfo:add")
     @ApiOperation(value="新增主体 by正杰")
     @Log(title = "【确定该主体是新增后,填写具体要新增主体的信息】", businessType = BusinessType.INSERT)
-    @ApiImplicitParam(name = "entityDto", value = "注意 此处id为 当日任务id", paramType = "body" , dataTypeClass = EntityDto.class)
+    @ApiImplicitParam(name = "entityInfoInsertDTO", value = "新增dto类对象", paramType = "body" , dataTypeClass = EntityInfoInsertDTO.class)
     @PostMapping("/add")
-    public R addEntity(@RequestBody EntityDto entityDto) {
-        return iEntityInfoService.insertEntityInfo(entityDto);
+    public R addEntity(@RequestBody EntityInfoInsertDTO entityInfoInsertDTO) {
+        return iEntityInfoService.insertEntityInfoByDaily(entityInfoInsertDTO);
     }
 
     /**

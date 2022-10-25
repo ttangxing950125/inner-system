@@ -8,12 +8,21 @@ import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.GovLevel;
 import com.deloitte.crm.domain.ModelMaster;
 import com.deloitte.crm.dto.MasDto;
-import com.deloitte.crm.service.*;
+import com.deloitte.crm.service.ICrmMasTaskService;
+import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.service.IGovLevelService;
+import com.deloitte.crm.service.IModelMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
 import com.deloitte.crm.vo.ModelMasterInfoVo;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -60,6 +69,7 @@ public class RoleTwoController {
      */
     @ApiOperation(value="敞口划分，选中单行开始工作 传入id后返回窗口 by正杰")
     @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer")
+    @ApiResponse(code = 200,message = "操作成功",response = ModelMasterInfoVo.class)
     @Log(title = "敞口划分，选中单行开始工作", businessType = BusinessType.OTHER)
     @PostMapping("/getTable")
     public R<ModelMasterInfoVo> getTable(Integer id){
