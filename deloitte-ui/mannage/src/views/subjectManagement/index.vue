@@ -307,7 +307,7 @@
                 </el-table-column>
                 <el-table-column
                   fixed
-                  :prop="value === 'GV' ? 'govCode' :'creditCode'"
+                  :prop="value === 'GV' ? 'dqCode' :'entityCode'"
                   label="德勤主体代码"
                   width="200"
                 >
@@ -319,6 +319,11 @@
                   width="300"
                   class="xxxxxxx"
                 >
+                 <template slot-scope="scope">
+                    <div>
+                      {{ value === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName }}
+                    </div>
+                  </template>
                 </el-table-column>
                 <el-table-column
                   v-for="(item, index) in rettHeaer"
