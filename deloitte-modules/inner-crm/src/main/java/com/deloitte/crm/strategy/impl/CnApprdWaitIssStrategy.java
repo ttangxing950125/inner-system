@@ -1,14 +1,14 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
-import com.deloitte.crm.domain.CnApprdWaitIss;
-import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
@@ -38,12 +38,15 @@ public class CnApprdWaitIssStrategy implements WindTaskStrategy {
 
     @Resource
     private CnApprdWaitIssService cnApprdWaitIssService;
-
+    @Resource
+    private IEntityInfoService entityInfoService;
     @Resource
     private StockCnInfoService stockCnInfoService;
 
     @Resource
     private IEntityAttrValueService entityAttrValueService;
+    @Resource
+    private EntityStockCnRelService entityStockCnRelService;
 
 
     /**
@@ -64,7 +67,9 @@ public class CnApprdWaitIssStrategy implements WindTaskStrategy {
 
             //查询a股是否存在
             String code = item.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
+//            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
+            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code)
+                    .eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
 
             //没有就创建一个
             if (stockCnInfo == null) {
@@ -106,6 +111,29 @@ public class CnApprdWaitIssStrategy implements WindTaskStrategy {
                 if (changeType != null) {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(code, item);
+                }
+                if (changeType != null && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+                    //查询状态status=1
+                    List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
+                    if (CollUtil.isNotEmpty(entityInfos)) {
+                       /* List<EntityInfo> mapEntityInfos = entityInfos.stream().map(e -> e.setWindMaster(windIndustry)).collect(Collectors.toList());
+                        entityInfoService.updateBatchById(mapEntityInfos);*/
+                        for (EntityInfo info : entityInfos) {
+                            String entityCode = info.getEntityCode();
+                            String stockDqCode = stockCnInfo.getStockDqCode();
+                            //查询关联关系
+                            EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityCode).eq(EntityStockCnRel::getStockDqCode, stockDqCode).eq(EntityStockCnRel::getStatus, Boolean.FALSE));
+                            if (dbRel != null) {
+                                continue;
+                            }
+                            //新增关联关系
+                            EntityStockCnRel cnRel = new EntityStockCnRel();
+                            cnRel.setEntityCode(entityCode);
+                            cnRel.setStockDqCode(stockDqCode);
+                            cnRel.setStatus(Boolean.TRUE);
+                            entityStockCnRelService.getBaseMapper().insert(cnRel);
+                        }
+                    }
                 }
             }
 
