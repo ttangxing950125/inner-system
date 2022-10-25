@@ -2827,7 +2827,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         //设置回显的基础信息
         EntitySupplyMsgBack entitySupplyMsgBack = new EntitySupplyMsgBack();
-        entitySupplyMsgBack.setTaskId(id);
+        entitySupplyMsgBack.setTaskId(id).setState(crmSupplyTask.getState());
         entitySupplyMsgBack.haveEntityInfo(entityInfo);
         //设置回显的信息 来源属性
         entitySupplyMsgBack.setSource(crmSupplyTask.getFrom());
