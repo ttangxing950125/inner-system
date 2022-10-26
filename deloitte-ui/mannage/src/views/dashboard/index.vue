@@ -1614,10 +1614,12 @@ export default {
       this.bodyDig = true
       this.addBodyId = row.id
       this.selectRole7 = JSON.parse(row.details)
+      this.selectInfoRole7 = JSON.parse(row.infos)
       this.ruleForm.bondFullName = this.selectRole7.债券全称
       this.ruleForm.bondShortName = this.selectRole7.债券简称
       this.ruleForm.created = row.created
-      this.ruleForm.id = row.id
+      this.ruleForm.taskId = row.id
+      this.ruleForm.dataSource = row.dataSource
       this.ruleForm.dataCode = row.dataCode
       this.$set(this.ruleForm, 'wind',  '')
       this.$set(this.ruleForm, 'shenWan',  '')
