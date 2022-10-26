@@ -456,7 +456,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         log.info("  =>> 主体导入 stock_cn_info 与 entity_stock_cn_rel <<=  ");
         String dataCode = entityInfoInsertDTO.getDataCode();
         StockCnInfo stockCnInfo = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, dataCode).eq(StockCnInfo::getIsDeleted, 0));
-        Optional.ofNullable(stockCnInfo).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_THK_STOCK_INFO.getInfo()));
+        if (stockCnInfo==null){
+            log.warn("a股code查询不到a股，不绑定关系。{},{}",dataCode, entityCode);
+            return;
+        }
+//        Optional.ofNullable(stockCnInfo).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_THK_STOCK_INFO.getInfo()));
         if (ObjectUtils.isEmpty(entityStockThkRelMapper.selectOne(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode).eq(EntityStockThkRel::getStockDqCode, dataCode)))) {
             entityStockThkRelMapper.insert(new EntityStockThkRel().setEntityCode(entityCode).setStockDqCode(dataCode).setStatus(true));
             log.info("  =>> 成功新增一条关联信息 entity_stock_cn_rel <<== ");

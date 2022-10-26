@@ -91,7 +91,6 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
             entityTaskService.createTask(entityTask);
 
-            return true;
         }
 
         //是否绑定过关联关系

@@ -88,9 +88,7 @@ public class RoleTwoController {
     @Log(title = "新增政府", businessType = BusinessType.INSERT)
     @PostMapping("/insertGov")
     public R insertGov(@RequestBody GovInfo govInfo){
-        int i = iGovInfoService.insertGovInfo(govInfo);
-        if (i==0){return R.fail();}
-        return R.ok();
+        return iGovInfoService.insertGovInfo(govInfo);
     }
 
     /**

@@ -179,7 +179,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertGovInfo(GovInfo govInfo) {
+    public R insertGovInfo(GovInfo govInfo) {
+
+        //校验是否重复提交
+        Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govInfo.getGovCode()));
+        if (count > 0) {
+            return R.fail("请勿重复提交，请修改官方行政代码后再提交");
+        }
+        count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, govInfo.getGovName()));
+        if (count > 0) {
+            return R.fail("请勿重复提交，请修改主体名称后再提交");
+        }
+
         //生成政府主体德勤主体唯一识别代码
         String dqGovCode = getDqGovCode();
         govInfo.setDqGovCode(dqGovCode);
@@ -204,7 +215,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
-        return govInfoMapper.insertGovInfo(govInfo);
+        govInfoMapper.insertGovInfo(govInfo);
+        return R.ok("新增政府主体成功");
     }
 
     /**
@@ -264,9 +276,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public R updateInfoList(List<GovInfo> list) {
-
-        list.stream().forEach(o -> {
+    public R updateInfoList(GovInfo o) {
             entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
             GovInfo govInfo = govInfoMapper.selectById(o.getId());
             String oldName = o.getGovName();
@@ -281,8 +291,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 o.setGovNameHis(null).setEntityNameHisRemarks(null);
             }
             govInfoMapper.updateById(o);
-        });
-        return R.ok(list.size());
+        return R.ok("修改成功");
     }
 
     @Override
