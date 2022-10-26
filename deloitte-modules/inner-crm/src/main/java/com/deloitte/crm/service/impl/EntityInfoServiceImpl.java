@@ -353,7 +353,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
         String dataCode = entityInfoInsertDTO.getDataCode();
-        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
+//        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
         log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ",entityName);
         switch (entityInfoInsertDTO.getDataSource()){
             case 1:

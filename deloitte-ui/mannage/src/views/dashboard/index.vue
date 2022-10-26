@@ -915,12 +915,17 @@
         <el-form-item label="导入日期">
           <span>{{ ruleForm.created }}</span>
         </el-form-item>
-        <el-form-item label="债券简称">
+
+        <el-form-item :label="key" :key="key" v-for="(value, key) in selectInfosRole7">
+          <span>{{ value?value:'-' }}</span>
+        </el-form-item>
+
+        <!--<el-form-item label="债券简称">
           <span>{{ ruleForm.bondShortName }}</span>
         </el-form-item>
         <el-form-item label="债券全称">
           <span>{{ ruleForm.bondFullName }}</span>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="其他信息">
           <el-button
             style="margin-left: 5px"
@@ -1190,6 +1195,7 @@ export default {
       detaileDig: false,
       roleId: localStorage.getItem('roleId'),
       selectRole7: [],
+      selectInfosRole7: {},
       taskCount: {},
       queryParams: {
         pageNum: 1,
@@ -1605,10 +1611,15 @@ export default {
       this.bodyDig = true
       this.addBodyId = row.id
       this.selectRole7 = JSON.parse(row.details)
-      this.ruleForm.bondFullName = this.selectRole7.债券全称
-      this.ruleForm.bondShortName = this.selectRole7.债券简称
+      this.selectInfosRole7 = JSON.parse(row.infos)
+      // this.ruleForm.bondFullName = this.selectRole7.债券全称
+      // this.ruleForm.bondShortName = this.selectRole7.债券简称
+      console.log(row)
       this.ruleForm.created = row.created
+      this.ruleForm.dataSource = row.dataSource
+      this.ruleForm.dataCode = row.dataCode
       this.ruleForm.id = row.id
+      this.ruleForm.taskId = row.id
       this.ruleForm.dataCode = row.dataCode
       this.$set(this.ruleForm, 'wind',  '')
       this.$set(this.ruleForm, 'shenWan',  '')
