@@ -50,7 +50,7 @@ module.exports = {
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
-        target: `http://localhost:8080`,
+        target: `https://ibond.deloitte.com.cn:8080/crm-after/`,
         // target: `http://192.168.31.223:9204`,
         changeOrigin: true,
         pathRewrite: {
