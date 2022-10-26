@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
@@ -29,10 +30,7 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +51,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
     @Autowired
     private CrmDailyTaskMapper crmDailyTaskMapper;
+
     /**
      * 更新状态为 2-有任务未全部处理完
      *
@@ -179,8 +178,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             baseMapper.insert(new CrmDailyTask().setTaskRoleType(taskRoleType.toString()).setTaskStatus(taskStatus).setTaskDate(new Date()));
         } else {
             log.info("  =>> 角色 id 为" + taskRoleType + " 修改 " + date + " 任务:状态为 " + taskStatus + " <<=");
-            CrmDailyTask crmDailyTask = baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, taskStatus));
-            Assert.notNull(crmDailyTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
+            CrmDailyTask crmDailyTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, taskStatus))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
             baseMapper.updateById(crmDailyTask.setTaskStatus(taskStatus));
         }
     }
@@ -192,11 +190,11 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
         List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new QueryWrapper<CrmSupplyTask>().lambda()
                 .eq(CrmSupplyTask::getRoleId, roleId).eq(CrmSupplyTask::getTaskDate, taskDate));
-        if (CollectionUtils.isEmpty(crmSupplyTasks)){
+        if (CollectionUtils.isEmpty(crmSupplyTasks)) {
             return;
         }
         List<CrmSupplyTask> collect = crmSupplyTasks.stream().filter(o -> ObjectUtils.isEmpty(o.getState()) || 1 != o.getState()).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(collect)){
+        if (!CollectionUtils.isEmpty(collect)) {
             return;
         }
         CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda()
