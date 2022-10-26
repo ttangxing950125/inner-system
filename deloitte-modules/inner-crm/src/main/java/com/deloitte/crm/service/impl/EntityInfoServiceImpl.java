@@ -3048,7 +3048,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(1), BadInfo.EXITS_ENTITY_NAME.getInfo());
             }
             if (ObjectUtils.isEmpty(byName)) {
-                return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(2), BadInfo.EXITS_CREDIT_CODE.getInfo());
+                return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(2), BadInfo.EXITS_CREDIT_CODE.getInfo());
             }
             return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(3), BadInfo.EXITS_ENTITY_CODE.getInfo());
         }
