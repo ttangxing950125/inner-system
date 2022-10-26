@@ -1,6 +1,7 @@
 package com.deloitte.crm.strategy;
 
 import com.deloitte.common.core.exception.GlobalException;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.crm.domain.CrmWindTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -44,7 +45,7 @@ public class WindTaskStrategyManage implements ApplicationContextAware {
         WindTaskStrategy supportItem = getSupportItem(windTask.getTaskDictId());
         if (supportItem == null) {
             log.error("上下文获取WindTaskStrategy为空缺少taskDictId={}, 任务结束!!!!!", windTask.getTaskDictId());
-            throw new GlobalException("空缺少taskDictId:" + windTask.getTaskDictId() + "的任务");
+            throw new ServiceException("空缺少taskDictId:" + windTask.getTaskDictId() + "的任务");
         }
         return supportItem.doTask(windTaskContext);
     }

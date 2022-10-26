@@ -107,8 +107,6 @@ public class CrmWindTaskController extends BaseController {
     })
     @ApiResponse(code = 200, message = "返回200就代表任务创建成功在后台执行了")
     public AjaxResult doTask(@PathVariable("taskId") Long taskId, @RequestPart(required = true) MultipartFile file) throws Exception {
-
-
         return AjaxResult.success(crmWindTaskService.doTask(taskId, file));
     }
 

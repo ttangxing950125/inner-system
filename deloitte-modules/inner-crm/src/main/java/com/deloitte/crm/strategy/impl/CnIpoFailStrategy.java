@@ -94,10 +94,10 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
 
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
-                stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
                 //更新a股属性
-                entityAttrValueService.updateStockCnAttr(code, item);
+                entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
             }
 
 

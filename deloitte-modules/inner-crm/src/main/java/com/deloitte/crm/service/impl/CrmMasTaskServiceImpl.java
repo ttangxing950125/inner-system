@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
@@ -13,10 +14,13 @@ import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.EntityMaster;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.mapper.EntityMasterMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmMasTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.IEntityMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +49,8 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
     private ICrmDailyTaskService dailyTaskService;
 
     private IEntityInfoService iEntityInfoService;
+
+    private EntityMasterMapper entityMasterMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -127,13 +133,22 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
             return false;
         }
 
-        List<CrmMasTask> masTasks = entityInfos.stream().map(item -> {
-            CrmMasTask masTask = new CrmMasTask();
-            masTask.setSourceName(taskCategory);
-            masTask.setEntityCode(item.getEntityCode());
-            masTask.setTaskDate(taskDate);
-            return masTask;
-        }).collect(Collectors.toList());
+        List<CrmMasTask> masTasks = entityInfos.stream()
+                .filter((item -> {
+                    EntityMaster entityMaster = entityMasterMapper.selectOne(
+                            Wrappers.<EntityMaster>lambdaQuery()
+                                    .eq(EntityMaster::getEntityCode, item.getEntityCode())
+                    );
+
+                    return entityMaster == null;
+                })).map(item -> {
+
+                    CrmMasTask masTask = new CrmMasTask();
+                    masTask.setSourceName(taskCategory);
+                    masTask.setEntityCode(item.getEntityCode());
+                    masTask.setTaskDate(taskDate);
+                    return masTask;
+                }).collect(Collectors.toList());
 
         //保存进库
         this.saveBatch(masTasks);
@@ -174,7 +189,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
                 crmMasTaskVo.setEntityName(entityInfo.getEntityName());
                 crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
             } else {
-                log.info("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  ");
+                log.warn("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  !!!");
             }
             crmMasTaskVos.add(crmMasTaskVo);
         });
