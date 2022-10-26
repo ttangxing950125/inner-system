@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/25
+ * 新债发行-新发行债券-20220801-20220914
  */
 @Component
 public class BondNewIssueStrategy implements WindTaskStrategy {
@@ -102,7 +103,6 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (newStatus != null) {
                 bondInfo.setBondStatus(newStatus);
             }
-
 
 
             //保存当前债券
