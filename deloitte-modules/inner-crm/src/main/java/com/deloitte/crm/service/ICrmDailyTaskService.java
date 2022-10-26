@@ -85,6 +85,4 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
      * @param date
      */
     void saveTask(Integer taskRoleType,Integer taskStatus,String date);
-
-    void checkDailyTask(CrmSupplyTask crmSupplyTask);
 }
