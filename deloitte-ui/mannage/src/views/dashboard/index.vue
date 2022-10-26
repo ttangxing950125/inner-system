@@ -282,7 +282,7 @@
         :model="ruleForm"
         :rules="rules"
         ref="ruleForm"
-        label-width="200px"
+        label-width="210px"
         label-position="left"
       >
       <el-form-item label="企业名称" >
@@ -382,10 +382,10 @@
           >
         </el-form-item>
 
-        <el-form-item label="机构对应域投政府行政代码" prop="delivery">
+        <el-form-item label="机构对应城投政府行政代码" prop="delivery">
           <span>{{ ruleForm.govCode || '(-)' }}</span>
         </el-form-item>
-        <el-form-item label="机构对应域投政府德勤内部代码" prop="delivery">
+        <el-form-item label="机构对应城投政府德勤内部代码" prop="delivery">
           <span>{{ ruleForm.dqGovCode || '(-)' }}</span>
         </el-form-item>
         <el-form-item label="敞口划分" >
@@ -733,7 +733,7 @@
           >
         </el-form-item>
         <el-divider></el-divider>
-        <el-form-item label="财报列示类型" >
+        <el-form-item label="财报列示类型" prop="listType">
           <el-select class="width320" v-model="ruleForm.listType" placeholder="选择类型">
             <el-option
               v-for="item in options2"
@@ -744,7 +744,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="关注报告类型" prop="delivery">
+        <el-form-item label="关注报告类型" prop="reportType">
           <el-select class="width320" v-model="ruleForm.reportType" multiple placeholder="请选择">
             <el-option
               v-for="item in options1"
@@ -915,12 +915,17 @@
         <el-form-item label="导入日期">
           <span>{{ ruleForm.created }}</span>
         </el-form-item>
-        <el-form-item label="债券简称">
+
+        <el-form-item :label="key" :key="key" v-for="(value, key) in selectInfoRole7">
+          <span>{{ value?value:'-' }}</span>
+        </el-form-item>
+
+        <!--<el-form-item label="债券简称">
           <span>{{ ruleForm.bondShortName }}</span>
         </el-form-item>
         <el-form-item label="债券全称">
           <span>{{ ruleForm.bondFullName }}</span>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="其他信息">
           <el-button
             style="margin-left: 5px"
@@ -1076,7 +1081,7 @@ export default {
       dialogVisible: false,
       noUse: false,
       ruleForm: {
-          name: "",
+        name: "",
         region: "",
         date1: "",
         date2: "",
@@ -1190,6 +1195,7 @@ export default {
       detaileDig: false,
       roleId: localStorage.getItem('roleId'),
       selectRole7: [],
+      selectInfoRole7:{},
       taskCount: {},
       queryParams: {
         pageNum: 1,
@@ -1545,6 +1551,9 @@ export default {
           i.className = ''
         })
       });
+      if (row.path[1].localName === 'tr') {
+          return
+      }
       row.path[1].localName === 'td' ? row.path[1].className = 'thisDay' : row.path[2].className = 'thisDay'
       try {
         this.$modal.loading("loading...");
