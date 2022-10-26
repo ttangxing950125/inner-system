@@ -77,32 +77,23 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private IEntityNameHisService iEntityNameHisService;
 
-    @Autowired
     private EntityStockCnRelMapper cnRelMapper;
 
-    @Autowired
     private EntityStockThkRelMapper thkRelMapper;
 
-    @Autowired
     private EntityFinancialMapper financialMapper;
 
-    @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
-    @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
-    @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
 
     private ProductsMasterRelMapper productsMasterRelMapper;
 
-    @Autowired
     private StockCnInfoMapper stockCnMapper;
 
-    @Autowired
     private StockThkInfoMapper stockThkMapper;
-
 
     private ProductsMasterDictMapper productsMasterDictMapper;
 
@@ -127,15 +118,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityNameHisMapper entityNameHisMapper;
 
     private ProductsCoverMapper productsCoverMapper;
+
     private ICrmEntityTaskService iCrmEntityTaskService;
 
     private ProductsMapper productmapper;
 
-
     private RedisService redisService;
 
     private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
-
 
     private EntityGovRelMapper entityGovRelMapper;
 
