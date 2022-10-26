@@ -101,11 +101,11 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
             }
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
-                stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
 
                 if (changeType != null) {
                     //更新a股属性
-                    entityAttrValueService.updateStockCnAttr(code, item);
+                    entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
                 }
                 if (changeType != null ) {
                     //查询状态status=1
@@ -117,7 +117,7 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                             String entityCode = info.getEntityCode();
                             String stockDqCode = stockCnInfo.getStockDqCode();
                             //查询关联关系
-                            EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityCode).eq(EntityStockCnRel::getStockDqCode, stockDqCode).eq(EntityStockCnRel::getStatus, Boolean.FALSE));
+                            EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityCode).eq(EntityStockCnRel::getStockDqCode, stockDqCode).eq(EntityStockCnRel::getStatus, Boolean.TRUE));
                             if (dbRel != null) {
                                 continue;
                             }

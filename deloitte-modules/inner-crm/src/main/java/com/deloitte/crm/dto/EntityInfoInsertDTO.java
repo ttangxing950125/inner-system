@@ -26,14 +26,14 @@ public class EntityInfoInsertDTO {
     /**
      * 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
      */
-    @NotNull(message = "信息数据来源不能为空")
+//    @NotNull(message = "信息数据来源不能为空")
     @ApiModelProperty(name="dataSource",value = "信息来源表")
     private Integer dataSource;
 
     /**
      * 数据来源 code
      */
-    @NotNull(message = "来源主表code不能为空")
+//    @NotNull(message = "来源主表code不能为空")
     @ApiModelProperty(name="dataCode",value = "来源主表code")
     private String dataCode;
 

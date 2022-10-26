@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
+import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
-import com.deloitte.crm.vo.CrmEntityTaskVo;
 import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
@@ -54,11 +54,11 @@ public class RoleSevenController {
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @ApiOperation(value="查询当日任务 by正杰")
-    @ApiResponse(code = 200,message = "操作成功",response = CrmEntityTaskVo.class)
+    @ApiResponse(code = 200,message = "操作成功",response = CrmEntityTask.class)
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String",example = "2022-10-12")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(String date,Integer pageNum, Integer pageSize){
+    public R<Page<CrmEntityTask>> getDayTaskInfo(String date, Integer pageNum, Integer pageSize){
         log.info("==> 角色7当日查询 <==");
         return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
     }
