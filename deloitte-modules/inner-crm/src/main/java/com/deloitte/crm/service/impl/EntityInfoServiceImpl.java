@@ -351,11 +351,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //再次修改当条信息
         baseMapper.updateById(entityInfo);
         log.info("  =>> 角色7 主体 {} 信息初始化完成 <<=  ", entityName);
-
-        //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
-        String dataCode = entityInfoInsertDTO.getDataCode();
-        Assert.isTrue(!StrUtil.isBlank(dataCode) || dataCode.matches(Common.REGEX_ENTITY_CODE), BadInfo.VALID_DATA_CODE.getInfo());
-        log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ", entityName);
         switch (entityInfoInsertDTO.getDataSource()) {
             case 1:
                 this.bindBondInfo(entityInfoInsertDTO, entityCode, username);
@@ -369,6 +364,26 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             default:
                 throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
         }
+        //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
+        String dataCode = entityInfoInsertDTO.getDataCode();
+//        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
+        log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ", entityName);
+        if (StrUtil.isNotBlank(dataCode)) {
+            switch (entityInfoInsertDTO.getDataSource()) {
+                case 1:
+                    this.bindBondInfo(entityInfoInsertDTO, entityCode, username);
+                    break;
+                case 2:
+                    this.bindStockThkInfo(entityInfoInsertDTO, entityCode, username);
+                    break;
+                case 3:
+                    this.bindStockCnInfo(entityInfoInsertDTO, entityCode, username);
+                    break;
+                default:
+                    throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
+            }
+        }
+
         //修改当日任务 新增主体状态码为 2
         return iCrmEntityTaskService.finishTask(taskId, 2, entityCode);
     }
@@ -1808,7 +1823,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public Map<String, Object> getOverviewByGroup() {
-        long start = System.currentTimeMillis();
         QueryWrapper<EntityInfo> query = new QueryWrapper<>();
         //全部主体
         Long count = entityInfoMapper.selectCount(query);
@@ -1816,21 +1830,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1));
         query.clear();
         //单纯上市主体
-        query.and(wrapper -> wrapper.lambda().eq(EntityInfo::getList, 1)).and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+        query.and(wrapper -> wrapper.lambda().eq(EntityInfo::getList, 1))
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
         Long onlyList = entityInfoMapper.selectCount(query);
         query.clear();
         //发债主体
         Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //单纯发债主体
-        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList)).and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1));
+        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1));
         Long onlyBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既上市主体又发债主体
         Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既没上市主体又不发债主体
-        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList)).and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+        query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
         Long unListBonds = entityInfoMapper.selectCount(query);
         query.clear();
         //金融
@@ -1845,8 +1862,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         result.put("finance", finance);
         result.put("onlyList", onlyList);
         result.put("onlyBonds", onlyBonds);
-        long end = System.currentTimeMillis();
-        log.info("==> 企业主体分类概览完成 完成，耗时：" + (end - start) + " ms");
         return result;
     }
 
@@ -3008,7 +3023,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(1), BadInfo.EXITS_ENTITY_NAME.getInfo());
             }
             if (ObjectUtils.isEmpty(byName)) {
-                return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(2), BadInfo.EXITS_CREDIT_CODE.getInfo());
+                return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(2), BadInfo.EXITS_CREDIT_CODE.getInfo());
             }
             return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(3), BadInfo.EXITS_ENTITY_CODE.getInfo());
         }

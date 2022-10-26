@@ -143,7 +143,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         ArrayList<CrmEntityTaskVo> crmEntityTaskVos = new ArrayList<>();
         res.forEach(row -> {
             CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
-            if (row.getDataShow() != null) {
+            /*if (row.getDataShow() != null) {
                 String dataShow = row.getDataShow();
                 //dataShow中的数据 固定格式 以 ，拼接 公司名称以及代码
                 String[] split = dataShow.split(", ");
@@ -152,7 +152,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
                 String bondShortName = split[2].split(":")[1];
                 crmEntityTaskVo.setBondFullName(bondFullName);
                 crmEntityTaskVo.setBondShortName(bondShortName);
-            }
+            }*/
             BeanUtil.copyProperties(row, crmEntityTaskVo);
             crmEntityTaskVos.add(crmEntityTaskVo);
         });

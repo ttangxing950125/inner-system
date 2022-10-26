@@ -307,21 +307,21 @@
                 </el-table-column>
                 <el-table-column
                   fixed
-                  :prop="value === 'GV' ? 'dqCode' :'entityCode'"
+                  :prop="selectType === 'GV' ? 'dqCode' :'entityCode'"
                   label="德勤主体代码"
                   width="200"
                 >
                 </el-table-column>
                 <el-table-column
                   fixed
-                  :prop="value === 'GV' ? 'govName' :'entityName'"
-                  :label="value === 'GV' ? '政府名称' : '企业名称'"
+                  :prop="selectType === 'GV' ? 'govName' :'entityName'"
+                  :label="selectType === 'GV' ? '政府名称' : '企业名称'"
                   width="300"
                   class="xxxxxxx"
                 >
                  <template slot-scope="scope">
                     <div>
-                      {{ value === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName }}
+                      {{ selectType === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName }}
                     </div>
                   </template>
                 </el-table-column>
@@ -340,6 +340,7 @@
                 </el-table-column>
               </el-table>
             </div>
+          </div>
             <pagination
               v-show="total > 0"
               :total="total"
@@ -347,7 +348,6 @@
               :limit.sync="queryParams.pageSize"
               @pagination="getList"
             />
-          </div>
         </el-card>
       </el-col>
     </el-row>
@@ -476,7 +476,8 @@ export default {
       timer: null,
       uploadStatus: false,
       fileName: '批量检查结果.xlsx',
-      uploadLoading: false
+      uploadLoading: false,
+      selectType: false
     };
   },
   mounted() {
@@ -607,7 +608,7 @@ export default {
           }
         });
         this.list = data.records;
-        
+        this.selectType = this.value
         this.total = data.total;
         this.queryParams.pageNum = data.current;
       });
@@ -757,7 +758,7 @@ export default {
   .right-number {
     width: 50px;
     position: relative;
-    left: 156%;
+    left: 240px;
     top: 30%;
     color: #86bc25;
   }
