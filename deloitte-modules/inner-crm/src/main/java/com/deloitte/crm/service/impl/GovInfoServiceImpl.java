@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
@@ -790,8 +791,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     @Override
     public R<String> getPreGovName(String govCode) {
-        GovInfo govInfo = baseMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govCode));
-        Assert.notNull(govInfo, BadInfo.VALID_EMPTY_TARGET.getInfo());
+        GovInfo govInfo = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govCode))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         return R.ok(govInfo.getGovName());
     }
 
@@ -1110,7 +1110,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         List<List<Object>> sheetDataList = new ArrayList<>();
         List<Object> head = Arrays.asList("政府名称", "政府官方行政编码", "政府德勤唯一识别码",
                 "上级政府官方行政编码", "上级政府德勤唯一识别码", "上级政府名称",
-                "政府主体行政单位级别-大类", "政府主体行政单位级别-小类","是否生效 0.失效 1.生效");
+                "政府主体行政单位级别-大类", "政府主体行政单位级别-小类", "是否生效 0.失效 1.生效");
         sheetDataList.add(head);
         for (GovInfo govInfo : govInfoList) {
             //添加行数据
@@ -1127,7 +1127,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             Integer govLevelSmall = govInfo.getGovLevelSmall();
             //大类小类信息上级政府统一社会信用代码
             //大类信息
-            if (!CollectionUtils.isEmpty(levelMap.keySet()) && !ObjectUtils.isEmpty(govLevelBig)&& !CollectionUtils.isEmpty(levelMap.get(Long.valueOf(govLevelBig)))) {
+            if (!CollectionUtils.isEmpty(levelMap.keySet()) && !ObjectUtils.isEmpty(govLevelBig) && !CollectionUtils.isEmpty(levelMap.get(Long.valueOf(govLevelBig)))) {
                 sheetData.add(levelMap.get(Long.valueOf(govLevelBig)).get(0).getName());
             } else {
                 sheetData.add(govLevelBig);

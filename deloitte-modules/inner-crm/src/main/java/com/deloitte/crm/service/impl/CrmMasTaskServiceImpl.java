@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
@@ -26,19 +27,19 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * 【请填写功能名称】Service业务层处理
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
 @Service
 @AllArgsConstructor
 @Slf4j
-public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasTask> implements ICrmMasTaskService
-{
+public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasTask> implements ICrmMasTaskService {
     private final CrmMasTaskMapper crmMasTaskMapper;
 
     private ICrmDailyTaskService dailyTaskService;
@@ -47,73 +48,67 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
     /**
      * 查询【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
     @Override
-    public CrmMasTask selectCrmMasTaskById(Integer id)
-    {
+    public CrmMasTask selectCrmMasTaskById(Integer id) {
         return crmMasTaskMapper.selectCrmMasTaskById(id);
     }
 
     /**
      * 查询【请填写功能名称】列表
-     * 
+     *
      * @param crmMasTask 【请填写功能名称】
      * @return 【请填写功能名称】
      */
     @Override
-    public List<CrmMasTask> selectCrmMasTaskList(CrmMasTask crmMasTask)
-    {
+    public List<CrmMasTask> selectCrmMasTaskList(CrmMasTask crmMasTask) {
         return crmMasTaskMapper.selectCrmMasTaskList(crmMasTask);
     }
 
     /**
      * 新增【请填写功能名称】
-     * 
+     *
      * @param crmMasTask 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int insertCrmMasTask(CrmMasTask crmMasTask)
-    {
+    public int insertCrmMasTask(CrmMasTask crmMasTask) {
         return crmMasTaskMapper.insertCrmMasTask(crmMasTask);
     }
 
     /**
      * 修改【请填写功能名称】
-     * 
+     *
      * @param crmMasTask 【请填写功能名称】
      * @return 结果
      */
     @Override
-    public int updateCrmMasTask(CrmMasTask crmMasTask)
-    {
+    public int updateCrmMasTask(CrmMasTask crmMasTask) {
         return crmMasTaskMapper.updateCrmMasTask(crmMasTask);
     }
 
     /**
      * 批量删除【请填写功能名称】
-     * 
+     *
      * @param ids 需要删除的【请填写功能名称】主键
      * @return 结果
      */
     @Override
-    public int deleteCrmMasTaskByIds(Long[] ids)
-    {
+    public int deleteCrmMasTaskByIds(Long[] ids) {
         return crmMasTaskMapper.deleteCrmMasTaskByIds(ids);
     }
 
     /**
      * 删除【请填写功能名称】信息
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
     @Override
-    public int deleteCrmMasTaskById(Long id)
-    {
+    public int deleteCrmMasTaskById(Long id) {
         return crmMasTaskMapper.deleteCrmMasTaskById(id);
     }
 
@@ -128,7 +123,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createTasks(List<EntityInfo> entityInfos, String taskCategory, Date taskDate) {
-        if (CollUtil.isEmpty(entityInfos)){
+        if (CollUtil.isEmpty(entityInfos)) {
             return false;
         }
 
@@ -151,34 +146,35 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
     /**
      * 角色2今日运维模块
+     *
+     * @param date 请传入参数 yyyy-MM
+     * @return R<Page < CrmMasTaskVo>> 当日任务
      * @author 正杰
      * @date 2022/9/27
-     * @param date 请传入参数 yyyy-MM
-     * @return R<Page<CrmMasTaskVo>> 当日任务
      */
     @Override
     public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
-        log.info("  =>> 角色2 "+date+" 查询 <<=  ");
-        pageNum = pageNum==null?1:pageNum;
-        pageSize = pageSize==null?5:pageSize;
+        log.info("  =>> 角色2 " + date + " 查询 <<=  ");
+        pageNum = pageNum == null ? 1 : pageNum;
+        pageSize = pageSize == null ? 5 : pageSize;
         List<CrmMasTaskVo> res = new ArrayList<>();
         Date dateDay = DateUtil.parseDate(date);
         Page<CrmMasTask> crmMasTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmMasTask>()
                 .lambda().eq(CrmMasTask::getTaskDate, dateDay));
         List<CrmMasTask> crmMasTasks = crmMasTaskPage.getRecords();
 
-        Page<CrmMasTaskVo> result = new Page<>(pageNum,pageSize,crmMasTaskPage.getTotal());
+        Page<CrmMasTaskVo> result = new Page<>(pageNum, pageSize, crmMasTaskPage.getTotal());
         ArrayList<CrmMasTaskVo> crmMasTaskVos = new ArrayList<>();
-        crmMasTasks.forEach(row->{
+        crmMasTasks.forEach(row -> {
             CrmMasTaskVo crmMasTaskVo = new CrmMasTaskVo();
-            BeanUtil.copyProperties(row,crmMasTaskVo);
-            if(row.getEntityCode()!=null) {
+            BeanUtil.copyProperties(row, crmMasTaskVo);
+            if (row.getEntityCode() != null) {
                 EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                         .eq(EntityInfo::getEntityCode, row.getEntityCode()));
                 crmMasTaskVo.setEntityName(entityInfo.getEntityName());
                 crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
-            }else{
-                log.info("  =>> 角色2 出现无效信息 taskId = "+row.getId()+" entity_code 为空  <<=  ");
+            } else {
+                log.info("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  ");
             }
             crmMasTaskVos.add(crmMasTaskVo);
         });
@@ -190,15 +186,15 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
     /**
      * 角色2 完成任务
+     *
      * @param taskId
      * @param username
      */
     @Override
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Date finishTask(Integer taskId, String username) {
-        CrmMasTask crmMasTask = baseMapper.selectCrmMasTaskById(taskId);
-        Assert.notNull(crmMasTask,BadInfo.EMPTY_TASK_TABLE.getInfo());
-        Assert.isTrue(crmMasTask.getState()==0,BadInfo.EXITS_TASK_FINISH.getInfo());
+        CrmMasTask crmMasTask = Optional.ofNullable(baseMapper.selectCrmMasTaskById(taskId)).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+        Assert.isTrue(crmMasTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmMasTask.setState(1).setHandleUser(username);
         baseMapper.updateById(crmMasTask);
         return crmMasTask.getTaskDate();

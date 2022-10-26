@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
@@ -27,6 +28,7 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 角色7，根据导入的数据新增主体的任务Service业务层处理
@@ -147,13 +149,12 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     @Transactional(rollbackFor = Exception.class)
     public R finishTask(Integer taskId, Integer state, String entityCode) {
         log.info(">>>>>>处理当日任务开始 taskId={}>>entityCode>>>:{}", taskId, entityCode);
-        CrmEntityTask crmEntityTask = baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId));
-        Assert.notNull(crmEntityTask, BadInfo.VALID_EMPTY_TARGET.getInfo());
+        CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmEntityTask.setState(state);
         baseMapper.updateById(crmEntityTask);
         //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
-        if(!ObjectUtils.isEmpty(entityCode)){
+        if (!ObjectUtils.isEmpty(entityCode)) {
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType,4));
             if(ObjectUtils.isEmpty(crmDailyTask)){
@@ -170,9 +171,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
                         .eq(CrmEntityTask::getState, 0));
         if (unFinish.size() == 0) {
             //查询日任务 角色7对应的 task_role_type 为 8
-            CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>()
-                    .lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8));
-            Assert.notNull(crmDailyTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
+            CrmDailyTask crmDailyTask = Optional.ofNullable(crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
             // 当日任务处理完毕 状态码为 3
             crmDailyTask.setTaskStatus(3);
             crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
@@ -192,8 +191,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     }
 
     @Async
-    public void asycSendEmailService(Integer roleId,Integer taskCount){
-        log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}",roleId,taskCount);
+    public void asycSendEmailService(Integer roleId, Integer taskCount) {
+        log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}", roleId, taskCount);
         sendEmailService.email(roleId, taskCount);
     }
 
