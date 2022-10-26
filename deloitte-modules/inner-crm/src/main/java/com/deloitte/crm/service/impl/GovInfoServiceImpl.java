@@ -365,11 +365,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         Page<GovInfo> pageInfo = new Page(pageNum, pageSize);
         LambdaQueryWrapper<GovInfo> govInfoQuery = new LambdaQueryWrapper<>();
-        if (!ObjectUtil.isEmpty(type)) {
-            govInfoQuery.eq(GovInfo::getGovType, type);
-        }
+//        if (!ObjectUtil.isEmpty(type)) {
+//            govInfoQuery.eq(GovInfo::getGovType, type);
+//        }
         if (!ObjectUtil.isEmpty(param)) {
-            govInfoQuery.and(query->query.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param));
+            govInfoQuery.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param);
         }
 
         Page<GovInfo> govInfoPage = govInfoMapper.selectPage(pageInfo, govInfoQuery);
