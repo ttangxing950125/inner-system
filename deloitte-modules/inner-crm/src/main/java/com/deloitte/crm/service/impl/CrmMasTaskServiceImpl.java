@@ -189,7 +189,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
                 crmMasTaskVo.setEntityName(entityInfo.getEntityName());
                 crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
             } else {
-                log.info("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  ");
+                log.warn("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  !!!");
             }
             crmMasTaskVos.add(crmMasTaskVo);
         });
