@@ -73,7 +73,7 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
      * @date 2022/9/22
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
-    R<Page<CrmEntityTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
+    R<Page<CrmEntityTask>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
 
     /**
      * 创建任务
