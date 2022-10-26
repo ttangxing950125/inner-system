@@ -245,8 +245,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParam(name = "govInfo", value = "全数据", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/addGovInfo")
     public R addGovInfo(@RequestBody GovInfo govInfo) {
-        govInfoService.insertGovInfo(govInfo);
-        return R.ok();
+        return govInfoService.insertGovInfo(govInfo);
     }
 
     /**

@@ -178,14 +178,25 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertGovInfo(GovInfo govInfo) {
+    public R insertGovInfo(GovInfo govInfo) {
+
+        //校验是否重复提交
+        Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govInfo.getGovCode()));
+        if (count > 0) {
+            return R.fail("请勿重复提交，请修改官方行政代码后再提交");
+        }
+        count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, govInfo.getGovName()));
+        if (count > 0) {
+            return R.fail("请勿重复提交，请修改主体名称后再提交");
+        }
+
         //生成政府主体德勤主体唯一识别代码
         String dqGovCode = getDqGovCode();
         govInfo.setDqGovCode(dqGovCode);
 
         //设置上级政府官方代码 proCode
         String preGovCode = govInfo.getPreGovCode();
-        if (!ObjectUtils.isEmpty(preGovCode)){
+        if (!ObjectUtils.isEmpty(preGovCode)) {
             GovInfo father = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, preGovCode));
             String govCode = father.getGovCode();
             govInfo.setPreCode(govCode);
@@ -203,7 +214,8 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
-        return govInfoMapper.insertGovInfo(govInfo);
+        govInfoMapper.insertGovInfo(govInfo);
+        return R.ok("新增政府主体成功");
     }
 
     /**
@@ -362,9 +374,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         Page<GovInfo> pageInfo = new Page(pageNum, pageSize);
         LambdaQueryWrapper<GovInfo> govInfoQuery = new LambdaQueryWrapper<>();
-        if (!ObjectUtil.isEmpty(type)) {
-            govInfoQuery.eq(GovInfo::getGovType, type);
-        }
+//        if (!ObjectUtil.isEmpty(type)) {
+//            govInfoQuery.eq(GovInfo::getGovType, type);
+//        }
         if (!ObjectUtil.isEmpty(param)) {
             govInfoQuery.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param);
         }

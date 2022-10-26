@@ -54,7 +54,7 @@ public interface IGovInfoService  extends IService<GovInfo>
      * @param govInfo 【请填写功能名称】
      * @return 结果
      */
-    public int insertGovInfo(GovInfo govInfo);
+    public R insertGovInfo(GovInfo govInfo);
 
     /**
      * 修改【请填写功能名称】
