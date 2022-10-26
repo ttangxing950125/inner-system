@@ -54,7 +54,7 @@ public class DefaultMoneyTotalServiceImpl extends ServiceImpl<DefaultMoneyTotalM
          * Future 的升级版 CompletableFuture 作为 Future 升级版 构建多个异步并发任务 多任务执行 提高执行效率
          * @see java.util.concurrent.CompletableFuture
          * {@link com.deloitte.crm.config.SpringAsyncConfig}
-         * @since 1.8
+         *
          */
         CopyOnWriteArrayList<Future> futureList = new CopyOnWriteArrayList();
 

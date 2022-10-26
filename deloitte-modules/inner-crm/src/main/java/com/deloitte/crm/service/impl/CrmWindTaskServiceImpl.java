@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.exception.GlobalException;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.RoleInfo;
@@ -89,42 +90,33 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
     @Override
     public Object doTask(Long taskId, MultipartFile file) throws Exception {
         //查询当前任务
-//        CrmWindTask windTask = crmWindTaskMapper.selectCrmWindTaskById(taskId);
         CrmWindTask windTask = crmWindTaskMapper.selectById(taskId);
         if (windTask == null) {
-            throw new GlobalException("没有该任务");
+            throw new ServiceException("没有该任务");
         }
-        //任务是否完成，已完成不允许上传
+        /*//任务是否完成，已完成不允许上传
         if (!Objects.equals(windTask.getComplete(), 0)) {
             throw new GlobalException("只能处理未处理的任务");
-        }
-
+        }*/
         Date taskDate = windTask.getTaskDate();
-
         Date timeNow = DateUtil.parseDate(DateUtil.getDate());
-
         int compare = DateUtil.compare(taskDate, timeNow, "yyyy-MM-dd");
-
         //只能完成当天的
         if (compare != 0) {
-            throw new GlobalException("只能完成当天的任务");
+            throw new ServiceException("只能完成当天的任务");
         }
-
         WindTaskContext taskContext = new WindTaskContext();
         taskContext.setFile(file);
         taskContext.setTimeNow(timeNow);
         taskContext.setWindTask(windTask);
-//        taskContext.setFileStream(file.getInputStream());
         byte[] dataBytes = file.getBytes();
         if (ObjectUtil.isEmpty(dataBytes)) {
             log.error("文件为空");
-            throw new GlobalException("文件为空");
+            throw new ServiceException("文件为空");
         }
         ByteArrayInputStream inputStream = new ByteArrayInputStream(dataBytes);
         taskContext.setFileStream(inputStream);
-
         windTaskStrategyManage.doTask(taskContext);
-
         return true;
     }
 
@@ -297,7 +289,7 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
             } else if (roleInfo.getRoleId() == 4) {
                 return crmMasTaskMapper.selectCrmMasTaskCount(taskDate);
             } else if (roleInfo.getRoleId() == 5 || roleInfo.getRoleId() == 6 || roleInfo.getRoleId() == 7) {
-                return crmSupplyTaskMapper.selctCrmCount(taskDate,roleInfo.getRoleId());
+                return crmSupplyTaskMapper.selctCrmCount(taskDate, roleInfo.getRoleId());
             } else if (roleInfo.getRoleId() == 8) {
                 crmEntityTaskMapper.selctCrmEntityTaskCount(taskDate);
             }
