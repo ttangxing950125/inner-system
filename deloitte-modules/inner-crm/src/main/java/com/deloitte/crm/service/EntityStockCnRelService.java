@@ -29,4 +29,13 @@ public interface EntityStockCnRelService extends IService<EntityStockCnRel> {
      * @return
      */
     List<EntityInfo> findByStockCode(String code);
+
+    /**
+     * 创建主体任务
+     * @param entityName
+     * @param windTask
+     * @param cnCoachBack
+     * @return
+     */
+    boolean createTask(String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack);
 }

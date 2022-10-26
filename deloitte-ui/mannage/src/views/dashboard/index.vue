@@ -116,7 +116,7 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button @click="workRole2(scope.row)" type="text" size="small"
+            <el-button :disabled="scope.row.state!=0" @click="workRole2(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
           </template>
@@ -330,7 +330,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="ruleForm.isFinance === 'Y'" label="金融细分领域" >
-          <el-select v-model="ruleForm.financeSegmentation" placeholder="">
+          <el-select :filterable="true" v-model="ruleForm.financeSegmentation" placeholder="">
             <el-option  v-for="(item, index) in options1" :key="index" :label="item" :value="item"></el-option>
           </el-select>
         </el-form-item>
@@ -356,19 +356,19 @@
         </el-form-item>
         <el-form-item v-if="ruleForm.cityIb === 'Y'" label="机构对应域投政府" required>
           <el-col :span="6">
-            <el-select v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
+            <el-select  :filterable="true" v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
               <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.district" placeholder="选择地区" @change="getCounty">
+            <el-select  :filterable="true" v-model="ruleForm.district" placeholder="选择地区" @change="getCounty">
               <el-option v-for="(item, index) in city" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.county" placeholder="选择县" @change="getGov">
+            <el-select  :filterable="true" v-model="ruleForm.county" placeholder="选择县" @change="getGov">
               <el-option v-for="(item, index) in county" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
@@ -389,7 +389,7 @@
           <span>{{ ruleForm.dqGovCode || '(-)' }}</span>
         </el-form-item>
         <el-form-item label="敞口划分" >
-          <el-select v-model="ruleForm.masterCode" placeholder="">
+          <el-select el-select :filterable="true" v-model="ruleForm.masterCode" placeholder="">
             <el-option  v-for="(item, index) in options2" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
           </el-select>
         </el-form-item>
@@ -460,30 +460,30 @@
         <el-divider></el-divider>
         <el-form-item label="所属地区">
           <el-col :span="6">
-            <el-select v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
+            <el-select el-select :filterable="true" v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
               <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.city" placeholder="选择地区" @change="getCounty">
+            <el-select el-select :filterable="true" v-model="ruleForm.city" placeholder="选择地区" @change="getCounty">
               <el-option v-for="(item, index) in city" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.county" placeholder="选择县">
+            <el-select el-select :filterable="true" v-model="ruleForm.county" placeholder="选择县">
               <el-option v-for="(item, index) in county" :key="index" :label="item.govName" :value="item.govName"></el-option>
             </el-select>
           </el-col>
         </el-form-item>
         <el-form-item label="所属辖区" >
-          <el-select class="width146" v-model="ruleForm.belJurisdiction" :multiple="xmultiple" placeholder="选择辖区">
+          <el-select el-select :filterable="true" class="width146" v-model="ruleForm.belJurisdiction" :multiple="xmultiple" placeholder="选择辖区">
             <el-option v-for="(item, index) in jurisdiction" :key="index" :label="item.value" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="对口监管机构">
-          <el-select class="width146" v-model="ruleForm.regulators" :multiple="jmultiple"  placeholder="选择机构">
+          <el-select el-select :filterable="true" class="width146" v-model="ruleForm.regulators" :multiple="jmultiple"  placeholder="选择机构">
             <el-option v-for="(item, index) in supervise" :key="index" :label="item.value" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -515,7 +515,7 @@
         label-position="left"
       >
         <el-form-item label="新增地方政府级别-大类" >
-          <el-select class="width320" v-model="addGovForm.govLevelBig" @change="getSmall">
+          <el-select :filterable="true" class="width320" v-model="addGovForm.govLevelBig" @change="getSmall">
             <el-option v-for="(item, index) in govOption1" :key="index" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -1170,7 +1170,8 @@ export default {
       addBodyId: '',
       list7: [],
       list3: [],
-      region: [],
+      region: "",
+      district: "",
       city: [],
       county: [],
       xmultiple: false,
@@ -1718,6 +1719,7 @@ export default {
     workRole2(row) {
       try {
         this.dialogVisible = true
+        this.ruleForm={};
         this.ruleForm.entityName = row.entityName
         this.ruleForm.creditCode = row.creditCode
         this.ruleForm.sourceName = row.sourceName
@@ -1728,8 +1730,8 @@ export default {
         this.$modal.loading("loading...");
         getTable({id: row.id}).then(res => {
           const { data } = res
-          this.ruleForm.wind = data.attrs.wind行业划分明细.value
-          this.ruleForm.sw = data.attrs['申万(2021)行业划分明细'].value
+          this.ruleForm.wind = data.windMaster
+          this.ruleForm.shenWan = data.shenWanMaster
         })
         getFinances({}).then(res => {
           const { data } = res
@@ -1921,14 +1923,18 @@ export default {
       }
     },
     getCity(row) {
-      this.ruleForm.region = row.govName
+      this.ruleForm.region = row.govName;
+      this.ruleForm.govCode = row.govCode;
+      this.ruleForm.dqGovCode = row.dqGovCode;
       getGovLevel({preGovCode: row.dqGovCode}).then(res => {
         const { data } = res
         this.city = data
       })
     },
     getCounty(row) {
-        console.log(row.govName)
+      // this.ruleForm.region = row.govName;
+      this.ruleForm.govCode = row.govCode;
+      this.ruleForm.dqGovCode = row.dqGovCode;
       this.ruleForm.district = row.govName
       this.$set(this.ruleForm, 'district', row.govName)
       console.log(this.ruleForm.district)
