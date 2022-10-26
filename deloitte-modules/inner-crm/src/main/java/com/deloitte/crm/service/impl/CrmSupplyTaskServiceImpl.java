@@ -219,9 +219,11 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     private String getFiveValue(String entityCode) {
         Long count = entityGovRelMapper.selectCount(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
         if (count > 0) {
-            return IS_URBAN_INVESTMENT;
+            return "1";
+//            return IS_URBAN_INVESTMENT;
         }else {
-            return NOT_URBAN_INVESTMENT;
+//            return NOT_URBAN_INVESTMENT;
+            return "0";
         }
     }
 
