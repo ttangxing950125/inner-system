@@ -350,11 +350,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //再次修改当条信息
         baseMapper.updateById(entityInfo);
         log.info("  =>> 角色7 主体 {} 信息初始化完成 <<=  ",entityName);
-
-        //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
-        String dataCode = entityInfoInsertDTO.getDataCode();
-//        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
-        log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ",entityName);
         switch (entityInfoInsertDTO.getDataSource()){
             case 1:
                 this.bindBondInfo(entityInfoInsertDTO,entityCode,username);
@@ -368,6 +363,26 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             default:
                 throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
         }
+        //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
+        String dataCode = entityInfoInsertDTO.getDataCode();
+//        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
+        log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ",entityName);
+        if (StrUtil.isNotBlank(dataCode)){
+            switch (entityInfoInsertDTO.getDataSource()){
+                case 1:
+                    this.bindBondInfo(entityInfoInsertDTO,entityCode,username);
+                    break;
+                case 2:
+                    this.bindStockThkInfo(entityInfoInsertDTO,entityCode,username);
+                    break;
+                case 3:
+                    this.bindStockCnInfo(entityInfoInsertDTO,entityCode,username);
+                    break;
+                default:
+                    throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
+            }
+        }
+
         //修改当日任务 新增主体状态码为 2
         return iCrmEntityTaskService.finishTask(taskId, 2, entityCode);
     }
