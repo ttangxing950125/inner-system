@@ -36,7 +36,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -370,7 +369,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             govInfoQuery.eq(GovInfo::getGovType, type);
         }
         if (!ObjectUtil.isEmpty(param)) {
-            govInfoQuery.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param);
+            govInfoQuery.and(query->query.like(GovInfo::getGovName, param).or().like(GovInfo::getDqGovCode, param));
         }
 
         Page<GovInfo> govInfoPage = govInfoMapper.selectPage(pageInfo, govInfoQuery);
