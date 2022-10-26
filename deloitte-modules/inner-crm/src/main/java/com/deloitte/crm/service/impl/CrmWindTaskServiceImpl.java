@@ -1,46 +1,45 @@
 package com.deloitte.crm.service.impl;
 
-import java.io.ByteArrayInputStream;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.cron.TaskExecutor;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
-import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.CrmWindTask;
+import com.deloitte.crm.dto.CrmWindTaskDto;
 import com.deloitte.crm.dto.TaskDto;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
+import com.deloitte.crm.mapper.CrmWindTaskMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategyManage;
 import com.deloitte.crm.vo.CrmTaskVo;
 import com.deloitte.crm.vo.WindTaskDetailsVo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.crm.dto.CrmWindTaskDto;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.CrmWindTaskMapper;
-import com.deloitte.crm.domain.CrmWindTask;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-
-import org.springframework.web.bind.annotation.RequestBody;
+import java.io.ByteArrayInputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * 角色1的每日任务，导入wind文件的任务Service业务层处理
@@ -297,7 +296,6 @@ public class CrmWindTaskServiceImpl extends ServiceImpl<CrmWindTaskMapper, CrmWi
                 return crmWindTaskMapper.selctCrmCount(taskDate);
             } else if (roleInfo.getRoleId() == 4) {
                 return crmMasTaskMapper.selectCrmMasTaskCount(taskDate);
-
             } else if (roleInfo.getRoleId() == 5 || roleInfo.getRoleId() == 6 || roleInfo.getRoleId() == 7) {
                 return crmSupplyTaskMapper.selctCrmCount(taskDate,roleInfo.getRoleId());
             } else if (roleInfo.getRoleId() == 8) {

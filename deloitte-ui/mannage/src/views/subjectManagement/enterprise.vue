@@ -537,11 +537,11 @@ export default {
       return res;
     },
     bonds() {
-      const res = ((this.overviewData.bonds / this.sumCount) * 100).toFixed(2);
+      const res = ((this.overviewData.onlyList / this.sumCount) * 100).toFixed(2);
       return res;
     },
     bondsList() {
-      const res = ((this.overviewData.list / this.sumCount) * 100).toFixed(2);
+      const res = ((this.overviewData.onlyBonds / this.sumCount) * 100).toFixed(2);
       return res;
     },
     listBonds() {

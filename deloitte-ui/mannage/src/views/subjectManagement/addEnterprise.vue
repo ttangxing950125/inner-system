@@ -156,8 +156,8 @@
               v-model="ruleForm.entityName"
               placeholder="请输入企业完整名称"
             ></el-input>
-            <span class="red" v-if="repalce3 === 2">存在重复无法添加</span>
-            <span class="green" v-if="repalce3 === 1">无重复，可新增</span>
+            <span class="red" v-if="repalce4 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce4 === 1">无重复，可新增</span>
             <el-button
               v-if="!repalce3"
               style="margin-left: 5px"
@@ -174,8 +174,8 @@
               v-model="ruleForm.creditCode"
               placeholder="请输入企业统一社会信用代码"
             ></el-input>
-            <span class="red" v-if="repalce3 === 2">存在重复无法添加</span>
-            <span class="green" v-if="repalce3 === 1">无重复，可新增</span>
+            <span class="red" v-if="repalce5 === 2">存在重复无法添加</span>
+            <span class="green" v-if="repalce5 === 1">无重复，可新增</span>
             <el-button
               v-if="!repalce4"
               style="margin-left: 5px"
@@ -205,23 +205,23 @@
           </el-select>
         </div>
 
-        <el-form-item label="上市板块与交易所">
+        <el-form-item v-if="ruleForm.stockType" label="上市板块与交易所">
             <el-select
-                v-if="this.ruleForm.stockType === 'A'"
+                v-if="ruleForm.stockType === 'A'"
                 v-model="ruleForm.exchange"
                 placeholder="选择股票交易所"
               >
                 <el-option label="深交所" value="深交所"></el-option>
                 <el-option label="沪交所" value="沪交所"></el-option>
                 <el-option label="北交所" value="北交所"></el-option>
-              </el-select>
+            </el-select>
             <el-select
-                v-if="this.ruleForm.stockType === 'G'"
+                v-if="ruleForm.stockType === 'G'"
                 v-model="ruleForm.exchange"
                 placeholder="选择股票交易所"
               >
                 <el-option label="港交所" value="港交所"></el-option>
-              </el-select>
+            </el-select>
         </el-form-item>
         <el-form-item label="上市日期" prop="">
           <el-date-picker
@@ -759,12 +759,24 @@ export default {
         checkData(parmas).then((res) => {
           const { data } = res;
           let ret = false;
-          if (!data) {
+          if (!data.data) {
             ret = 1;
           } else {
             ret = 2;
           }
           switch (keyword) {
+            case "STOCK_CN_CODE":
+              this.repalce1 = ret;
+              break;
+            case "STOCK_HK_CODE":
+                this.repalce1 = ret;
+                break;
+            case "STOCK_A_NAME":
+              this.repalce2 = ret;
+              break;
+            case "STOCK_HK_NAME":
+              this.repalce2 = ret;
+              break;
             case "BOND_FULL_NAME":
               this.repalce1 = ret;
               break;

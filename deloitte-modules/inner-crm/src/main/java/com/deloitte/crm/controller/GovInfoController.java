@@ -403,4 +403,31 @@ public class GovInfoController extends BaseController {
     public R getGovByParam(String param) {
         return R.ok(govInfoService.getGovByParam(param));
     }
+
+    /**
+     * 导出政府主体基本信息
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/25 17:39
+     */
+    @ApiOperation(value = "导出政府主体基本信息")
+    @GetMapping("/exportGov")
+    public void exportGov(HttpServletResponse response) throws Exception {
+        govInfoService.exportEntity(response);
+    }
+
+    /**
+     * 整表根据父级 code 更新政府主体父子级对应关系
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/26 9:42
+    */
+    @RequiresPermissions("crm:govInfo:edit")
+    @ApiOperation(value = "根据父级 code 更新政府主体父子级对应关系")
+    @PostMapping("/updateGovInfosByPreCode")
+    public void updateGovInfosByPreCode()   {
+        govInfoService.updateGovInfosByPreCode();
+    }
 }

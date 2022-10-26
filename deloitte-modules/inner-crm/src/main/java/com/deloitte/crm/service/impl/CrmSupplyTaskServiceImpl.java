@@ -49,6 +49,8 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
 
+    @Autowired
+    private EntityFinancialMapper entityFinancialMapper;
     /**
      * 查询【请填写功能名称】
      *
@@ -193,7 +195,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         // 统一社会信用代码代码
         taskVo.setCreditCode(entityInfo.getCreditCode());
         // 是否为金融机构
-        taskVo.setList(entityInfo.getList());
+        taskVo.setList(entityInfo.getFinance());
         // 任务状态
         taskVo.setState(o.getState());
 
@@ -236,14 +238,15 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         return taskVo;
     }
 
+
     private String getThreeValue(String entityCode) {
         //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
-        EntityAttrValue attrValue = valueMapper.selectOne(new QueryWrapper<EntityAttrValue>()
-                .lambda().eq(EntityAttrValue::getAttrId, 656).eq(EntityAttrValue::getEntityCode, entityCode).last(" limit 1"));
-        if (ObjectUtils.isEmpty(attrValue)) {
+        EntityFinancial financial = entityFinancialMapper.selectOne(new QueryWrapper<EntityFinancial>()
+                .lambda().eq(EntityFinancial::getEntityCode, entityCode).last(" limit 1"));
+        if (ObjectUtils.isEmpty(financial)) {
             return null;
         }
-        return attrValue.getValue();
+        return financial.getMince();
     }
 
     //是城投机构
