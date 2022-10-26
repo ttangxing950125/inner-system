@@ -9,6 +9,7 @@ import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import com.deloitte.crm.vo.ParentLevelVo;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -118,4 +119,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     List<GovInfo> getGovByParam(String param);
 
+    void exportEntity(HttpServletResponse response);
+
+    void updateGovInfosByPreCode();
 }

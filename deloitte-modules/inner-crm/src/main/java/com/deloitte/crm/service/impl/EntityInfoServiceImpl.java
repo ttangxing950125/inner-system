@@ -378,12 +378,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return iCrmEntityTaskService.finishTask(taskId, 2, entityCode);
     }
 
-    @Autowired
-    private EntityImportMapper entityImportMapper;
     @Override
     public void exportEntity(HttpServletResponse response) {
-        List<EntityImport> entityImports = entityImportMapper.selectList(new QueryWrapper<EntityImport>());
-        if (CollectionUtils.isEmpty(entityImports)){
+        List<EntityInfo> entityInfoList = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>());
+        if (CollectionUtils.isEmpty(entityInfoList)){
             return;
         }
         // 将数据汇总
@@ -392,20 +390,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 "是否金融机构 0.否 1.是","是否发债 0.否 1.是","是否生效 0.否 1.是","统一社会信用代码是否异常 0-正常 1-异常",
                 "社会信用代码异常备注","统一社会信用代码状态描述，1、吊销 2、注销 3、非大陆注册机构 4、其他未知原因 5、正常","所有的曾用名或别称");
         sheetDataList.add(head);
-        for (EntityImport entityImport:entityImports){
+        for (EntityInfo entityInfo:entityInfoList){
             //添加行数据
             List<Object> sheetData = new ArrayList<>();
-            sheetData.add(entityImport.getEntityName());
-            sheetData.add(entityImport.getEntityCode());
-            sheetData.add(entityImport.getCreditCode());
-            sheetData.add(entityImport.getList());
-            sheetData.add(entityImport.getFinance());
-            sheetData.add(entityImport.getIssueBonds());
-            sheetData.add(entityImport.getStatus());
-            sheetData.add(entityImport.getCreditError());
-            sheetData.add(entityImport.getCreditErrorRemark());
-            sheetData.add(entityImport.getCreditErrorType());
-            sheetData.add(entityImport.getEntityNameHis());
+            sheetData.add(entityInfo.getEntityName());
+            sheetData.add(entityInfo.getEntityCode());
+            sheetData.add(entityInfo.getCreditCode());
+            sheetData.add(entityInfo.getList());
+            sheetData.add(entityInfo.getFinance());
+            sheetData.add(entityInfo.getIssueBonds());
+            sheetData.add(entityInfo.getStatus());
+            sheetData.add(entityInfo.getCreditError());
+            sheetData.add(entityInfo.getCreditErrorRemark());
+            sheetData.add(entityInfo.getCreditErrorType());
+            sheetData.add(entityInfo.getEntityNameHis());
 
             //添加总数据
             sheetDataList.add(sheetData);
