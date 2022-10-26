@@ -445,15 +445,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     void bindStockThkInfo(EntityInfoInsertDTO entityInfoInsertDTO, String entityCode, String username) {
         log.info("  =>> 主体导入 stock_thk_info 与 entity_stock_thk_rel <<=  ");
         String dataCode = entityInfoInsertDTO.getDataCode();
-        StockThkInfo stockThkInfo = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, dataCode).eq(StockThkInfo::getIsDeleted, 0));
-        Assert.notNull(stockThkInfo, BadInfo.EMPTY_THK_STOCK_INFO.getInfo());
+        StockThkInfo stockThkInfo = Optional.ofNullable(stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, dataCode).eq(StockThkInfo::getIsDeleted, 0))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_THK_STOCK_INFO.getInfo()));
         if (ObjectUtils.isEmpty(entityStockThkRelMapper.selectOne(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode).eq(EntityStockThkRel::getStockDqCode, dataCode)))) {
             entityStockThkRelMapper.insert(new EntityStockThkRel().setEntityCode(entityCode).setStockDqCode(dataCode).setStatus(true));
             log.info("  =>> 成功新增一条关联信息 entity_stock_thk_rel <<== ");
         } else {
-            log.info("  =>> 库中已存有一条关联数据 entity_stock_thk_rel <<== ");
+            log.warn("  =>> 库中已存有一条关联数据 entity_stock_thk_rel <<== ");
         }
-
         String stockCode = stockThkInfo.getStockCode();
         String stockName = stockThkInfo.getStockName();
         EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);

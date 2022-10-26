@@ -522,12 +522,10 @@ public class BondInfoServiceImpl implements IBondInfoService {
         if (!bondEntityInfoVo.getEnableEdite()) {
             return;
         }
-        Integer id = bondEntityInfoVo.getId();
+        Integer id = Optional.ofNullable(bondEntityInfoVo.getId()).orElseThrow(() -> new ServiceException(BadInfo.PARAM_EMPTY.getInfo()));
         String value = bondEntityInfoVo.getValue();
         String filedName = bondEntityInfoVo.getFiledName();
-        Assert.notNull(id, BadInfo.PARAM_EMPTY.getInfo());
         Assert.isTrue(bondEntityInfoVo.getTable() == 3 || rule.containsKey(filedName), BadInfo.VALID_PARAM.getInfo());
-
         switch (bondEntityInfoVo.getTable()) {
             case 1:
                 entityInfoMapper.editByBondInfoManager(id, filedName, value);
@@ -544,8 +542,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
                 bondInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 3:
-                EntityAttrValue entityAttrValue = iEntityAttrValueService.getBaseMapper().selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, id));
-                Assert.notNull(entityAttrValue, BadInfo.VALID_EMPTY_TARGET.getInfo());
+                EntityAttrValue entityAttrValue = Optional.ofNullable(iEntityAttrValueService.getBaseMapper().selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, id))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
                 entityAttrValue.setValue(value);
                 iEntityAttrValueService.updateById(entityAttrValue);
                 break;
