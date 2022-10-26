@@ -156,7 +156,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "政府主体批量修改")
     @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
-    public R updateInfoList(@RequestBody List<GovInfo> govInfoList) {
+    public R updateInfoList(@RequestBody GovInfo govInfoList) {
         return R.ok(govInfoService.updateInfoList(govInfoList));
     }
 
@@ -245,8 +245,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParam(name = "govInfo", value = "全数据", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/addGovInfo")
     public R addGovInfo(@RequestBody GovInfo govInfo) {
-        govInfoService.insertGovInfo(govInfo);
-        return R.ok();
+        return govInfoService.insertGovInfo(govInfo);
     }
 
     /**

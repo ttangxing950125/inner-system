@@ -54,7 +54,7 @@ public interface IGovInfoService  extends IService<GovInfo>
      * @param govInfo 【请填写功能名称】
      * @return 结果
      */
-    public int insertGovInfo(GovInfo govInfo);
+    public R insertGovInfo(GovInfo govInfo);
 
     /**
      * 修改【请填写功能名称】
@@ -80,7 +80,7 @@ public interface IGovInfoService  extends IService<GovInfo>
      */
     public int deleteGovInfoById(Long id);
 
-    R updateInfoList(List<GovInfo> list);
+    R updateInfoList(GovInfo list);
 
     R getInfoDetail(String dqGovCode);
 
