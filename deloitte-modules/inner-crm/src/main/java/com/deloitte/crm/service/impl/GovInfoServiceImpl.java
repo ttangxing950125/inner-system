@@ -1108,9 +1108,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         }
         // 将数据汇总
         List<List<Object>> sheetDataList = new ArrayList<>();
-        List<Object> head = Arrays.asList("政府名称", "政府统一社会信用代码", "政府德勤唯一识别码",
-                "上级政府统一社会信用代码", "上级政府德勤唯一识别码", "上级政府名称",
-                "政府主体行政单位级别-大类", "政府主体行政单位级别-小类");
+        List<Object> head = Arrays.asList("政府名称", "政府官方行政编码", "政府德勤唯一识别码",
+                "上级政府官方行政编码", "上级政府德勤唯一识别码", "上级政府名称",
+                "政府主体行政单位级别-大类", "政府主体行政单位级别-小类","是否生效 0.失效 1.生效");
         sheetDataList.add(head);
         for (GovInfo govInfo : govInfoList) {
             //添加行数据
@@ -1125,7 +1125,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             sheetData.add(govInfo.getPreGovName());
             Integer govLevelBig = govInfo.getGovLevelBig();
             Integer govLevelSmall = govInfo.getGovLevelSmall();
-            //大类小类信息
+            //大类小类信息上级政府统一社会信用代码
             //大类信息
             if (!CollectionUtils.isEmpty(levelMap.keySet()) && !ObjectUtils.isEmpty(govLevelBig)&& !CollectionUtils.isEmpty(levelMap.get(Long.valueOf(govLevelBig)))) {
                 sheetData.add(levelMap.get(Long.valueOf(govLevelBig)).get(0).getName());
@@ -1138,7 +1138,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             } else {
                 sheetData.add(govLevelSmall);
             }
-
+            sheetData.add(govInfo.getStatus());
             //添加总数据
             sheetDataList.add(sheetData);
         }
