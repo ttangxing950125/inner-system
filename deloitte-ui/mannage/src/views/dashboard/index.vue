@@ -915,12 +915,17 @@
         <el-form-item label="导入日期">
           <span>{{ ruleForm.created }}</span>
         </el-form-item>
-        <el-form-item label="债券简称">
+
+        <el-form-item :label="key" :key="key" v-for="(value, key) in selectInfoRole7">
+          <span>{{ value?value:'-' }}</span>
+        </el-form-item>
+
+        <!--<el-form-item label="债券简称">
           <span>{{ ruleForm.bondShortName }}</span>
         </el-form-item>
         <el-form-item label="债券全称">
           <span>{{ ruleForm.bondFullName }}</span>
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item label="其他信息">
           <el-button
             style="margin-left: 5px"
@@ -1063,7 +1068,7 @@ export default {
       dialogVisible: false,
       noUse: false,
       ruleForm: {
-          name: "",
+        name: "",
         region: "",
         date1: "",
         date2: "",
@@ -1177,6 +1182,7 @@ export default {
       detaileDig: false,
       roleId: localStorage.getItem('roleId'),
       selectRole7: [],
+      selectInfoRole7:{},
       taskCount: {},
       queryParams: {
         pageNum: 1,
@@ -1593,6 +1599,8 @@ export default {
       this.ruleForm.bondShortName = row.bondShortName
       this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
+      console.log(row)
+      this.selectInfoRole7 = JSON.parse(row.infos)
       this.$set(this.ruleForm, 'wind',  '')
       this.$set(this.ruleForm, 'shenWan',  '')
       this.$set(this.ruleForm, 'creditErrorType',  '')

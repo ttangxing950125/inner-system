@@ -101,13 +101,24 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), cnCoachBack);
                 }
-                //有债券信息，给债券和主体绑定关联关系
-                if (changeType != null && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+
+            } else {
+                log.warn("==> IPO-辅导备案 数据导入 出现code为空的！！！！！！！！！！！！！！！！！");
+            }
+
+            //有债券信息，给债券和主体绑定关联关系
+            if (Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+                if (StrUtil.isNotBlank(code)){
+                    log.warn("无code创建主体任务");
+                    //绑定主体关系
+                    entityStockCnRelService.createTask(entityName, windTask, cnCoachBack);
+                }else {
+                    log.info("有code创建主体任务");
                     //绑定主体关系
                     entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
                 }
-            } else {
-                log.warn("==> IPO-辅导备案 数据导入 出现code为空的！！！！！！！！！！！！！！！！！");
+
+
             }
 
 
