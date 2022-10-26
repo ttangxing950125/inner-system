@@ -330,7 +330,14 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      * 角色2 生成任务
      */
     public void createTask(Integer roleId, Integer taskState) {
-        iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskDate(new Date()).setTaskStatus(taskState).setTaskRoleType(roleId.toString()));
+        BaseMapper<CrmDailyTask> baseMapper = iCrmDailyTaskService.getBaseMapper();
+        CrmDailyTask crmDailyTask = baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
+        if(ObjectUtils.isEmpty(crmDailyTask)){
+            baseMapper.insert(new CrmDailyTask().setTaskDate(new Date()).setTaskStatus(taskState).setTaskRoleType(roleId.toString()));
+        }else{
+            crmDailyTask.setTaskStatus(2);
+            baseMapper.updateById(crmDailyTask);
+        }
     }
 
     /**

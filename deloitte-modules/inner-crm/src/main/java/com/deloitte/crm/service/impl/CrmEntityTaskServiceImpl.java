@@ -155,6 +155,13 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
         if(!ObjectUtils.isEmpty(entityCode)){
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
+            CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType,4));
+            if(ObjectUtils.isEmpty(crmDailyTask)){
+                crmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskRoleType("4").setTaskStatus(2).setTaskDate(new Date()));
+            }else{
+                crmDailyTask.setTaskStatus(2);
+                crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            }
         }
         Date taskDate = crmEntityTask.getTaskDate();
         List<CrmEntityTask> unFinish = baseMapper
@@ -174,11 +181,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
             List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2));
             CrmDailyTask role2DailyTask = new CrmDailyTask().setTaskRoleType("4").setTaskDate(new Date());
 
-            if (crmEntityTasks.size() == 0) {
-                //没有任务 不发邮件
-                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(1));
-            } else {
-                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(2));
+            if (crmEntityTasks.size() != 0) {
                 //发送邮件 角色2 的 role ID 固定为 4
                 asycSendEmailService(4, crmEntityTasks.size());
             }

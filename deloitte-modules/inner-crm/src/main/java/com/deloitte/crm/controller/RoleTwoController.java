@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -125,7 +126,7 @@ public class RoleTwoController {
     @ApiImplicitParam(name="masDto",value="masDto对象",dataTypeClass = MasDto.class )
     @Log(title = "提交表单", businessType = BusinessType.INSERT)
     @PostMapping("/insertMas")
-    public R insertMas(@RequestBody MasDto masDto){
+    public R insertMas(@RequestBody @NotNull(message = "表单数据不能为空") MasDto masDto){
         return iModelMasterService.insert(masDto);
     }
 
