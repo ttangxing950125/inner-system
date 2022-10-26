@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,7 +17,6 @@ import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.SendEmailService;
-import com.deloitte.crm.vo.CrmEntityTaskVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -28,7 +26,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -133,33 +130,12 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      * @date 2022/9/22
      */
     @Override
-    public R<Page<CrmEntityTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
+    public R<Page<CrmEntityTask>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
-
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
                 .lambda().eq(CrmEntityTask::getTaskDate, date));
-        log.info("----查询到的记录数量{}", crmEntityTaskPage.getRecords().size());
-        List<CrmEntityTask> res = crmEntityTaskPage.getRecords();
-        Page<CrmEntityTaskVo> crmEntityTaskVoPage = new Page<>(pageNum, pageSize, crmEntityTaskPage.getTotal());
-        ArrayList<CrmEntityTaskVo> crmEntityTaskVos = new ArrayList<>();
-        res.forEach(row -> {
-            CrmEntityTaskVo crmEntityTaskVo = new CrmEntityTaskVo();
-            if (row.getDataShow() != null) {
-                String dataShow = row.getDataShow();
-                //dataShow中的数据 固定格式 以 ，拼接 公司名称以及代码
-                String[] split = dataShow.split(", ");
-                //每个值 中间以 : 隔开 例如 dataShow = 发行人全称:湖南省人民政府, 交易代码:Z22092924.IB, 债券简称:22湖南债一般(八期)IB
-                String bondFullName = split[0].split(":")[1];
-                String bondShortName = split[2].split(":")[1];
-                crmEntityTaskVo.setBondFullName(bondFullName);
-                crmEntityTaskVo.setBondShortName(bondShortName);
-            }
-            BeanUtil.copyProperties(row, crmEntityTaskVo);
-            crmEntityTaskVos.add(crmEntityTaskVo);
-        });
-        crmEntityTaskVoPage.setRecords(crmEntityTaskVos);
-        return R.ok(crmEntityTaskVoPage, SuccessInfo.GET_SUCCESS.getInfo());
+        return R.ok(crmEntityTaskPage, SuccessInfo.GET_SUCCESS.getInfo());
     }
 
     /**
@@ -180,6 +156,13 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
         if (!ObjectUtils.isEmpty(entityCode)) {
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
+            CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType,4));
+            if(ObjectUtils.isEmpty(crmDailyTask)){
+                crmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskRoleType("4").setTaskStatus(2).setTaskDate(new Date()));
+            }else{
+                crmDailyTask.setTaskStatus(2);
+                crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            }
         }
         Date taskDate = crmEntityTask.getTaskDate();
         List<CrmEntityTask> unFinish = baseMapper
@@ -197,11 +180,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
             List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2));
             CrmDailyTask role2DailyTask = new CrmDailyTask().setTaskRoleType("4").setTaskDate(new Date());
 
-            if (crmEntityTasks.size() == 0) {
-                //没有任务 不发邮件
-                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(1));
-            } else {
-                crmDailyTaskService.getBaseMapper().insert(role2DailyTask.setTaskStatus(2));
+            if (crmEntityTasks.size() != 0) {
                 //发送邮件 角色2 的 role ID 固定为 4
                 asycSendEmailService(4, crmEntityTasks.size());
             }
