@@ -77,32 +77,23 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private IEntityNameHisService iEntityNameHisService;
 
-    @Autowired
     private EntityStockCnRelMapper cnRelMapper;
 
-    @Autowired
     private EntityStockThkRelMapper thkRelMapper;
 
-    @Autowired
     private EntityFinancialMapper financialMapper;
 
-    @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
-    @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
-    @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
 
     private ProductsMasterRelMapper productsMasterRelMapper;
 
-    @Autowired
     private StockCnInfoMapper stockCnMapper;
 
-    @Autowired
     private StockThkInfoMapper stockThkMapper;
-
 
     private ProductsMasterDictMapper productsMasterDictMapper;
 
@@ -127,15 +118,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityNameHisMapper entityNameHisMapper;
 
     private ProductsCoverMapper productsCoverMapper;
+
     private ICrmEntityTaskService iCrmEntityTaskService;
 
     private ProductsMapper productmapper;
 
-
     private RedisService redisService;
 
     private EntityInfoLogsUpdatedService entityInfoLogsUpdatedService;
-
 
     private EntityGovRelMapper entityGovRelMapper;
 
@@ -3048,7 +3038,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(1), BadInfo.EXITS_ENTITY_NAME.getInfo());
             }
             if (ObjectUtils.isEmpty(byName)) {
-                return R.ok(new EntityInfoVo().setEntityInfo(byName).setStatus(2), BadInfo.EXITS_CREDIT_CODE.getInfo());
+                return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(2), BadInfo.EXITS_CREDIT_CODE.getInfo());
             }
             return R.ok(new EntityInfoVo().setEntityInfo(byCredit).setStatus(3), BadInfo.EXITS_ENTITY_CODE.getInfo());
         }

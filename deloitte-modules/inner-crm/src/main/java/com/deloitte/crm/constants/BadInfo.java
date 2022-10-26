@@ -26,6 +26,7 @@ public enum BadInfo {
     EXITS_ENTITY_OLD_NAME("该主体已使用过曾用名"),
     EXITS_TASK_FINISH("该任务已经完成"),
     EMPTY_TASK_TABLE("未查询到当日任务列表"),
+    EMPTY_ENTITY_INFO("未能查到主体表信息"),
     EMPTY_LOGIN_USER("未能获取到当前角色"),
     EMPTY_BOND_INFO("没有找到债券信息"),
     EMPTY_THK_STOCK_INFO("没有找到港股信息"),

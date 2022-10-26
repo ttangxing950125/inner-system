@@ -3,6 +3,7 @@ package com.deloitte.crm.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Validate;
 
 import javax.validation.constraints.NotNull;
 
@@ -19,11 +20,13 @@ public class MasDto {
      * 数据来源
      */
     @ApiModelProperty(value = "数据来源")
+    @NotNull(message = "数据来源不能为空")
     private String sourceName;
 
     /**
      * mas 的 id
      */
+    @NotNull(message = "crm_mas_task的id不能为空")
     @ApiModelProperty(value = "mas 的 id")
     private Integer id;
 
@@ -71,6 +74,7 @@ public class MasDto {
      */
     @ApiModelProperty(value = "是否为城投机构（YY)")
     @NotNull(message = "是否为城投机构 不能为空")
+    @Validate
     private String city;
 
     /**
