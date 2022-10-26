@@ -49,6 +49,13 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
 
+    @Autowired
+    private EntityFinancialMapper entityFinancialMapper;
+    //是城投机构
+    private static String IS_URBAN_INVESTMENT = "Y";
+    //不是城投机构
+    private static String NOT_URBAN_INVESTMENT = "N";
+
     /**
      * 查询【请填写功能名称】
      *
@@ -193,7 +200,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         // 统一社会信用代码代码
         taskVo.setCreditCode(entityInfo.getCreditCode());
         // 是否为金融机构
-        taskVo.setList(entityInfo.getList());
+        taskVo.setList(entityInfo.getFinance());
         // 任务状态
         taskVo.setState(o.getState());
 
@@ -217,9 +224,12 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     private String getFiveValue(String entityCode) {
         Long count = entityGovRelMapper.selectCount(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
         if (count > 0) {
-            return IS_URBAN_INVESTMENT;
+            return "1";
+//            return IS_URBAN_INVESTMENT;
+        }else {
+//            return NOT_URBAN_INVESTMENT;
+            return "0";
         }
-        return NOT_URBAN_INVESTMENT;
     }
 
     private SupplyTaskVo getFourValue(SupplyTaskVo taskVo, String entityCode) {
@@ -236,8 +246,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         return taskVo;
     }
 
-    @Autowired
-    private EntityFinancialMapper entityFinancialMapper;
 
     private String getThreeValue(String entityCode) {
         //角色3  金融机构细分行业  attrId = 656,attrName = "金融机构细分行业"
@@ -248,11 +256,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         }
         return financial.getMince();
     }
-
-    //是城投机构
-    private static String IS_URBAN_INVESTMENT = "Y";
-    //不是城投机构
-    private static String NOT_URBAN_INVESTMENT = "N";
 
     @Override
     public TaskStatistics getTaskStatistics() {
