@@ -219,7 +219,7 @@
           <div class="g-desc flex1">
             <router-link
               :to="{
-                name: '/subjectManagement/indexGovernment',
+                name: '/subjectManagement/indexEnterprise',
                 query: { name: tabArr[currentTab] },
               }"
             >

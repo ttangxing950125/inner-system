@@ -124,8 +124,8 @@ export function checkCreditCode(date) {
 export function editEntityNameHis(params) {
   return request({
     url:
-      "/crm/roleSeven/editEntityNameHis?creditCode=" +
-      params.creditCode +
+      "/crm/roleSeven/editEntityNameHis?entityCode=" +
+      params.entityCode +
       "&entityNewName=" +
       params.entityNewName,
     headers: {
@@ -444,3 +444,40 @@ export function checkEntityName(params) {
     data: params,
   });
 }
+
+// 校验主体名称及代码 
+export function validateCodeAndName(params) {
+  return request({
+    url: "/crm/roleSeven/validateCodeAndName?creditCode=" + params.creditCode + '&entityName=' + params.entityName,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 新增库中主体的曾用名 
+export function addEntityNameHis(params) {
+  return request({
+    url: "/crm/roleSeven/addEntityNameHis?entityCode=" + params.entityCode + '&entityName=' + params.entityName,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+
+// 修改库中主体的统一社会信用代码 
+export function editeCreditCode(params) {
+  return request({
+    url: "/crm/roleSeven/editeCreditCode?entityCode=" + params.entityCode + '&creditCode=' + params.creditCode,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: params,
+  });
+}
+

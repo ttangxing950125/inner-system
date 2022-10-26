@@ -507,7 +507,7 @@ export default {
         entityInfoList({}).then((res) => {
           const { data } = res;
           this.entity = data;
-          this.entitySum = eval(Object.values(data).join("+"));
+          this.entitySum = data.entitySum
           this.entitySumPercent = this.getPercent(
             data.entitySum,
             this.entitySum

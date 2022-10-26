@@ -150,7 +150,7 @@
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.list === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.list === 1 ? '是' : '否' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="金融机构细分行业">
@@ -199,7 +199,7 @@
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.list === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.list === 1 ? '是' : '否' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="城投机构对应地方政府名称">
@@ -248,12 +248,12 @@
         </el-table-column>
         <el-table-column prop="taskCategory" label="是否为城投机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.isUi === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.isUi === 1 ? '是' : '否' }}</span>
           </template>
         </el-table-column>
           <el-table-column prop="taskCategory" label="是否为金融机构">
           <template slot-scope="scope">
-            <span>{{ scope.row.list === 1 ? 'Y' : 'N' }}</span>
+            <span>{{ scope.row.list === 1 ? '是' : '否' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="dataShow" label="任务状态"> 
@@ -937,14 +937,6 @@
             @change="changeInput"
             :disabled="ruleForm.notUse"
             ></el-input>
-            <el-button
-            v-if="!creditCodePass"
-            style="margin-left: 5px"
-            type="text"
-            @click="check(ruleForm.creditCode, 'code')"
-            >{{ "查重" }}</el-button>
-            <span v-if="creditCodePass === 2" style="color:greenyellow">无重复，可新增</span>
-            <span v-if="creditCodePass === 1" style="color:red">存在重复 无法新增</span>
         </el-form-item>
         <div class="notUse">
           <el-checkbox class="mr60" v-model="ruleForm.notUse">不适用</el-checkbox>
@@ -968,27 +960,42 @@
             v-if="!entityNamePass"
             style="margin-left: 5px"
             type="text"
-            @click="check(ruleForm.entityName, 'name')"
+            @click="check(ruleForm.entityName, ruleForm.creditCode)"
             >{{ "查重" }}</el-button>
             <span v-if="entityNamePass === 2" style="color:greenyellow; margin-left: 5px">无重复，可新增</span>
-            <span v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</span>
+            <a @click="showMoreData" v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</a>
         </el-form-item>
       </el-form>
-      <el-button class="ml40" type="success" plain :disabled="disabled" @click="submitAdd">确认新增</el-button>
+      <el-button class="ml40" type="success" plain :disabled="checkStatus !== 0" @click="submitAdd">确认新增</el-button>
     </el-dialog>
     <el-dialog
-      title="库内重复情况"
+        class="red-title"
+      title="库内已存在相同主体"
       :visible.sync="replaceDig"
-      width="40%">
+      width="50%">
       <div class="dig-width">
         <el-col :sm="24" :lg="12" class="form-card">
           <div class="flex1 mt10">
             <div class="first">统一社会信用代码</div>
-            <div class="content">{{ replaceData.creditCode }}</div>
+            <el-button
+            v-if="checkStatus === 1"
+            style="margin-left: 5px; margin-top: -7px; margin-right: 50px;"
+            type="text"
+            >{{ replaceData.creditCode }}
+            </el-button>
+            <div v-if="checkStatus !== 1" class="content">{{ replaceData.creditCode }}</div>
+            <div class="input-content">{{ inputCode }}</div>
+            <el-button
+            :disabled="checkStatus !== 1"
+            style="margin-left: 10px; margin-top: -10px;"
+            type="text"
+            @click="saveCode(replaceData.entityCode)"
+            >{{ '修改' }}</el-button>
           </div>
           <div class="flex1 mt10">
             <div class="first">企业名称</div>
             <div class="content">{{ replaceData.entityName }}</div>
+            <div class="input-content">{{ inputName }}</div>
           </div>
           <div class="flex1 mt10">
             <div class="first">企业曾用名</div>
@@ -1000,6 +1007,10 @@
           </div>
         </el-col>
       </div>
+        <div class="flex1 btn-save">
+            <el-button :disabled="checkStatus !== 2" type="primary" @click="editNew(replaceData.entityCode)">修改输入为新名称</el-button>
+            <el-button :disabled="checkStatus !== 2" type="primary" @click="editUsed(replaceData.entityCode, replaceData.entityName)">设置输入名为曾用名</el-button>
+        </div>
     </el-dialog>
     <el-dialog
       title="详情"
@@ -1023,7 +1034,6 @@ import {
           queryList,
           getDayTaskInfo,
           // getMouthTaskInfo,
-          checkCreditCode,
           getRoleSupplyTask,
           getEntityBackSupply,
           getTaskInfo,
@@ -1041,7 +1051,10 @@ import {
           addFinEntitySubtableMsg,
           addGovEntitySubtableMsg,
           addEntityeMsg,
-          checkEntityName
+          validateCodeAndName,
+          editEntityNameHis,
+          addEntityNameHis,
+          editeCreditCode
         } from "@/api/task";
 import { getGovLevel, getAttrByOrganName, getTypeByAttrId, checkData } from '@/api/common'
 import pagination from "../../components/Pagination";
@@ -1210,7 +1223,10 @@ export default {
               name: '三级孙公司及以上',
               value: '三级孙公司及以上',
           }
-      ]
+      ],
+      checkStatus: false,
+      inputCode: '',
+      inputName: ''
     };
   },
   mounted() {
@@ -1588,59 +1604,56 @@ export default {
     addBody(row) {
       this.bodyDig = true
       this.addBodyId = row.id
-      this.ruleForm.bondFullName = row.bondFullName
-      this.ruleForm.created = row.created
-      this.ruleForm.bondShortName = row.bondShortName
-      this.ruleForm.id = row.id
       this.selectRole7 = JSON.parse(row.details)
+      this.ruleForm.bondFullName = this.selectRole7.债券全称
+      this.ruleForm.bondShortName = this.selectRole7.债券简称
+      this.ruleForm.created = row.created
+      this.ruleForm.id = row.id
+      this.ruleForm.dataCode = row.dataCode
       this.$set(this.ruleForm, 'wind',  '')
       this.$set(this.ruleForm, 'shenWan',  '')
       this.$set(this.ruleForm, 'creditErrorType',  '')
       this.$set(this.ruleForm, 'creditCode',  '')
     },
-    check(row, key) {
-        if(!row) {
+    check(name, code) {
+        if(!name || !code) {
             this.$message({
                 showClose: true,
-                message: '请输入查重字段',
+                message: '请输入主体名称或者信用代码',
                 type: 'error'
             });
             return
         }
       this.$modal.loading("loading...");
       try {
-        if(key === 'code') {
-            checkCreditCode({creditCode: row}).then(res => {
-            const { data } = res
-            if (data.bo === false) {
-                this.replaceDig = true
-                this.replaceData = data.entityInfo
-                this.creditCodePass = 1 // 信用代码查重没过
-            } else {
-                this.creditCodePass = 2 // 信用代码查重通过
-            }
-            })
-        }else {
-            checkEntityName({entityName: row}).then(res => {
-              const { data } = res
-              console.log(res)
-              if (data.bo === false) {
-                this.replaceDig = true
-                this.replaceData = data.entityInfo
-                this.entityNamePass = 1 // 新增主体名称查重没过
-              } else {
-                this.entityNamePass = 2 // 新增主体名称查重通过
-              }
-            })
-        }
+          validateCodeAndName({creditCode: code, entityName: name}).then(res => {
+          const { data } = res
+          this.checkStatus = data.status
+          this.inputCode = code
+          this.inputName = name
+          if (data.status === 0) {
+              this.entityNamePass = 2 // 查重通过
+          }
+          if (data.status > 0) {
+              this.$message({
+                showClose: true,
+                message: res.msg,
+                type: 'error'
+            });
+              this.replaceData = data.entityInfo
+              this.entityNamePass = 1 // 查重没过
+          }
+          })
       } catch (error) {
         console.log(error)
       } finally{
         this.$modal.closeLoading();
       }
     },
+    showMoreData() {
+        this.replaceDig = true
+    },
     changeInput() {
-      this.creditCodePass = false
       this.entityNamePass = false
     },
     submitAdd() {
@@ -2063,6 +2076,78 @@ export default {
         this.governmentDig = false
         this.detaileDig = false
         this.dialogVisible = false
+    },
+    editNew(code) {
+        try {
+            this.$modal.loading("loading...");
+            editEntityNameHis({entityCode: code, entityNewName: this.inputName}).then(res => {
+                if(res.code === 200) {
+                    this.$message({
+                        message: '操作成功',
+                        type: 'success'
+                    });
+                    this.replaceDig = false
+                    this.bodyDig = false
+                    this.init()
+                }
+            })
+        } catch (error) {
+             this.$message({
+                showClose: true,
+                message: error,
+                type: 'error'
+            });
+        } finally {
+            this.$modal.closeLoading()
+        }
+    },
+    editUsed(code, name) {
+        try {
+            this.$modal.loading("loading...");
+            addEntityNameHis({entityCode: code, entityNewName: name}).then(res => {
+                if(res.code === 200) {
+                    this.$message({
+                        message: '操作成功',
+                        type: 'success'
+                    });
+                    this.replaceDig = false
+                    this.bodyDig = false
+                    this.init()
+                }
+            })
+        } catch (error) {
+             this.$message({
+                showClose: true,
+                message: error,
+                type: 'error'
+            });
+        } finally {
+            this.$modal.closeLoading()
+        }
+    },
+    saveCode(code) {
+        try {
+            this.$modal.loading("loading...");
+            editeCreditCode({entityCode: code, creditCode: this.inputCode}).then(res => {
+                if(res.code === 200) {
+                    this.$message({
+                        message: '操作成功',
+                        type: 'success'
+                    });
+                    this.replaceDig = false
+                    this.bodyDig = false
+                    this.init()
+                }
+            })
+        } catch (error) {
+             this.$message({
+                showClose: true,
+                message: error,
+                type: 'error'
+            });
+        } finally {
+            this.$modal.closeLoading()
+        }
     }
   },
   watch: {
@@ -2217,12 +2302,12 @@ export default {
 }
 .flex1 {
   .first {
-    width: 200px;
+    width: 175px;
   }
   .content {
     color: #a7a7a7;
     margin-top: 3px;
-    width: 240px;
+    width: 199px;
   }
 }
 .replace-title {
@@ -2242,6 +2327,26 @@ export default {
 ::v-deep {
     .el-textarea__inner{
       font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    }
+}
+.btn-save {
+    padding-left: 20px;
+    padding-right: 20px;
+    justify-content: space-between;
+}
+.input-content {
+    color: #d7d6d6;
+    width: 199px;
+        margin-top: 3px;
+}
+.x-input{
+    width: 200px;
+    margin-top: -7px;
+    margin-right: 10px;
+}
+.red-title {
+    ::v-deep .el-dialog__title {
+        color: red
     }
 }
 </style>
