@@ -20,6 +20,7 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
+import com.deloitte.crm.excelUtils.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
@@ -27,6 +28,7 @@ import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import com.deloitte.crm.vo.GovInfoDetailVo;
 import com.deloitte.crm.vo.ParentLevelVo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -58,6 +60,7 @@ import static java.lang.System.out;
  * @date 2022-09-21
  */
 @Service
+@Slf4j
 @AllArgsConstructor
 public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> implements IGovInfoService {
     @Resource
@@ -1063,6 +1066,66 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 .or().like(GovInfo::getGovName, param)
                 .or().like(GovInfo::getGovCode, param)
         );
+    }
+
+    @Override
+    public void updateGovInfosByPreCode() {
+        List<GovInfo> govInfoList = govInfoMapper.selectList(new QueryWrapper<GovInfo>());
+        for (GovInfo govInfo:govInfoList){
+            String preGovCode = govInfo.getPreGovCode();
+            //父级政府 code 为空时不更新父子级信息
+            if (ObjectUtils.isEmpty(preGovCode)){
+                continue;
+            }
+            GovInfo preGov = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, preGovCode).last(" limit 1"));
+            //父级政府为空时不更新父子级信息
+            if (ObjectUtils.isEmpty(preGov)){
+                continue;
+            }
+            //不为空且和父级属性都匹配时不更新父子级信息
+            if (!ObjectUtils.isEmpty(govInfo.getPreCode())&& !ObjectUtils.isEmpty(govInfo.getPreGovName())&&
+                    govInfo.getPreCode().equals(preGov.getGovCode())&& govInfo.getPreGovName().equals(preGov.getGovName())){
+                continue;
+            }
+            //跟新子级记录中的 父级政府社会统一识别code 和 父级政府名称
+            govInfo.setPreCode(preGov.getGovCode()).setPreGovName(preGov.getGovName());
+            govInfoMapper.updateById(govInfo);
+        }
+    }
+
+    @Override
+    public void exportEntity(HttpServletResponse response) {
+        List<GovInfo> govInfoList = govInfoMapper.selectList(new QueryWrapper<GovInfo>());
+        if (CollectionUtils.isEmpty(govInfoList)){
+            return;
+        }
+        // 将数据汇总
+        List<List<Object>> sheetDataList = new ArrayList<>();
+        List<Object> head = Arrays.asList("政府名称","政府统一社会信用代码","政府德勤唯一识别码",
+                                          "上级政府统一社会信用代码","上级政府德勤唯一识别码","上级政府名称",
+                                          "政府主体行政单位级别-大类","政府主体行政单位级别-小类");
+        sheetDataList.add(head);
+        for (GovInfo govInfo:govInfoList){
+            //添加行数据
+            List<Object> sheetData = new ArrayList<>();
+            //政府信息
+            sheetData.add(govInfo.getGovName());
+            sheetData.add(govInfo.getGovCode());
+            sheetData.add(govInfo.getDqGovCode());
+            //父级政府信息
+            sheetData.add(govInfo.getPreCode());
+            sheetData.add(govInfo.getPreGovCode());
+            sheetData.add(govInfo.getPreGovName());
+            //大类小类信息
+            sheetData.add(govInfo.getGovLevelBig());
+            sheetData.add(govInfo.getGovLevelSmall());
+
+            //添加总数据
+            sheetDataList.add(sheetData);
+        }
+        // 导出数据
+        ExcelUtils.export(response,"政府主体表", sheetDataList);
+        log.info("导出政府主体表完毕");
     }
 
     //返回筛选范围--城市分级

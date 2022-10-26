@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.domain.CrmSupplyTask;
 
 import java.util.Date;
 import java.util.List;
@@ -74,5 +75,13 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
      * @param date
      */
     void saveTask(Integer taskRoleType,Integer taskStatus,String date);
-
+    /**
+     * 检验是否完成每日 supply 任务，更新 dailyTask
+     *
+     * @param crmSupplyTask
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/25 21:32
+    */
+    void checkDailyTask(CrmSupplyTask crmSupplyTask);
 }

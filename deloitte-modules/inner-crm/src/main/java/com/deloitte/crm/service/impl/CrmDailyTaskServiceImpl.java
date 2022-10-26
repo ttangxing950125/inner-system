@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
@@ -11,15 +12,19 @@ import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
+import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -43,6 +48,11 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
     private RoleService roleService;
 
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
+
+    @Autowired
+    private CrmDailyTaskMapper crmDailyTaskMapper;
     /**
      * 更新状态为 2-有任务未全部处理完
      *
@@ -173,6 +183,26 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             Assert.notNull(crmDailyTask, BadInfo.EMPTY_TASK_TABLE.getInfo());
             baseMapper.updateById(crmDailyTask.setTaskStatus(taskStatus));
         }
+    }
+
+    @Override
+    public void checkDailyTask(CrmSupplyTask crmSupplyTask) {
+        Long roleId = crmSupplyTask.getRoleId();
+        Date taskDate = crmSupplyTask.getTaskDate();
+
+        List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new QueryWrapper<CrmSupplyTask>().lambda()
+                .eq(CrmSupplyTask::getRoleId, roleId).eq(CrmSupplyTask::getTaskDate, taskDate));
+        if (CollectionUtils.isEmpty(crmSupplyTasks)){
+            return;
+        }
+        List<CrmSupplyTask> collect = crmSupplyTasks.stream().filter(o -> ObjectUtils.isEmpty(o.getState()) || 1 != o.getState()).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(collect)){
+            return;
+        }
+        CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda()
+                .eq(CrmDailyTask::getTaskDate, taskDate).eq(CrmDailyTask::getTaskRoleType, roleId).last(" limit 1"));
+        crmDailyTask.setTaskStatus(3).setUpdated(new Date());
+        crmDailyTaskMapper.updateById(crmDailyTask);
     }
 
 
