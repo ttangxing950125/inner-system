@@ -1126,14 +1126,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             Integer govLevelBig = govInfo.getGovLevelBig();
             Integer govLevelSmall = govInfo.getGovLevelSmall();
             //大类小类信息
+            //大类信息
             if (!CollectionUtils.isEmpty(levelMap.keySet()) && !ObjectUtils.isEmpty(govLevelBig)&& !CollectionUtils.isEmpty(levelMap.get(Long.valueOf(govLevelBig)))) {
-                //大类信息
                 sheetData.add(levelMap.get(Long.valueOf(govLevelBig)).get(0).getName());
             } else {
                 sheetData.add(govLevelBig);
             }
+            //小类信息
             if (!CollectionUtils.isEmpty(levelMap.keySet()) && !ObjectUtils.isEmpty(govLevelSmall) && !CollectionUtils.isEmpty(levelMap.get(Long.valueOf(govLevelSmall)))) {
-                //小类信息
                 sheetData.add(levelMap.get(Long.valueOf(govLevelSmall)).get(0).getName());
             } else {
                 sheetData.add(govLevelSmall);
