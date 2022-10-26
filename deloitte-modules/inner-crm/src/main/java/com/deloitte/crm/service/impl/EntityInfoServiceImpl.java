@@ -1823,6 +1823,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public Map<String, Object> getOverviewByGroup() {
+        long start = System.currentTimeMillis();
         QueryWrapper<EntityInfo> query = new QueryWrapper<>();
         //全部主体
         Long count = entityInfoMapper.selectCount(query);
@@ -1862,6 +1863,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         result.put("finance", finance);
         result.put("onlyList", onlyList);
         result.put("onlyBonds", onlyBonds);
+        long end = System.currentTimeMillis();
+        log.info("==> 企业主体分类概览 查询完成，耗时：" + (end - start) + " ms");
         return result;
     }
 
