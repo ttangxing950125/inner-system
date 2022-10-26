@@ -120,8 +120,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityNameHisMapper entityNameHisMapper;
 
-    private ICrmDailyTaskService crmDailyTaskService;
-
     private ProductsCoverMapper productsCoverMapper;
     private ICrmEntityTaskService iCrmEntityTaskService;
 
@@ -136,6 +134,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityGovRelMapper entityGovRelMapper;
 
     private EntityMasterMapper entityMasterMapper;
+
+    private ICrmDailyTaskService crmDailyTaskService;
 
     /**
      * 主体
@@ -2350,6 +2350,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
+
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
         return R.ok("修改成功");

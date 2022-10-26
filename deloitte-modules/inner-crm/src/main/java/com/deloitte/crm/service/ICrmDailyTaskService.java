@@ -17,6 +17,16 @@ import java.util.List;
 public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
 
     /**
+     * 检验是否完成每日 supply 任务，更新 dailyTask
+     *
+     * @param crmSupplyTask
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/25 21:32
+     */
+    void checkDailyTask(CrmSupplyTask crmSupplyTask);
+
+    /**
      * 更新状态为 2-有任务未全部处理完
      * @param timeNow
      * @param roleInfo
