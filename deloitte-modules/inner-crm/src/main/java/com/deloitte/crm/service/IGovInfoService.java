@@ -80,7 +80,7 @@ public interface IGovInfoService  extends IService<GovInfo>
      */
     public int deleteGovInfoById(Long id);
 
-    R updateInfoList(List<GovInfo> list);
+    R updateInfoList(GovInfo list);
 
     R getInfoDetail(String dqGovCode);
 

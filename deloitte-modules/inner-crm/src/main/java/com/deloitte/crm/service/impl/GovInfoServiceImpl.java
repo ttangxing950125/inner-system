@@ -276,9 +276,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public R updateInfoList(List<GovInfo> list) {
-
-        list.stream().forEach(o -> {
+    public R updateInfoList(GovInfo o) {
             entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
             GovInfo govInfo = govInfoMapper.selectById(o.getId());
             String oldName = o.getGovName();
@@ -293,8 +291,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 o.setGovNameHis(null).setEntityNameHisRemarks(null);
             }
             govInfoMapper.updateById(o);
-        });
-        return R.ok(list.size());
+        return R.ok("修改成功");
     }
 
     @Override
