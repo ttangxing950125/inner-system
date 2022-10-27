@@ -93,8 +93,8 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                                 productsMasterRelHis.setEntityCode(productsMasterRelVo.getEntityCode());
                                 productsMasterRelHis.setEntityNameHis(productsMasterRelVo.getEntityName());
                                 productsMasterRelHis.setProCustId(productsMasterRelVo.getProCustId());
-                                productsMasterRelHis.setMasterDictId(productsMasterRelVo.getDictIdOld());
-                                productsMasterRelHis.setMasterName(productsMasterRelVo.getMasterNameOld());
+                                productsMasterRelHis.setMasterDictId(productsMasterRelVo.getDictIdOld() == null ? null : productsMasterRelVo.getDictIdOld() );
+                                productsMasterRelHis.setMasterName(productsMasterRelVo.getMasterNameOld() == null ? null : productsMasterRelVo.getMasterNameOld());
                                 productsMasterRelHis.setMasterDictIdNew(productsMasterRelVo.getDictIdNew());
                                 productsMasterRelHis.setMasterNameNew(productsMasterRelVo.getMasterNameNew());
                                 producysMasterRelHisMapper.insert(productsMasterRelHis);
