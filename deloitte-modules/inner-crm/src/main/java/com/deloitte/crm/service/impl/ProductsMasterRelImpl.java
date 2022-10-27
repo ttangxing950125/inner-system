@@ -161,6 +161,7 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                                 );
                                 if (one != null) {
                                         productsMasterRel.setId(one.getId());
+                                        productsMasterRel.setUpdateMark("自动映射");
                                         boolean b = updateById(productsMasterRel);
                                 }else{
                                         boolean save = save(productsMasterRel);
