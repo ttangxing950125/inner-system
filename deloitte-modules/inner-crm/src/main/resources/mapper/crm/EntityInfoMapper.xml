@@ -217,10 +217,11 @@
                     or
                 </if>
                 <if test="coll != null  and coll != ''">c.coll = #{coll}</if>
+
                 <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != ''))and (stockThk != null  and stockThk != '')">
                     or
                 </if>
-                <if test="coll != stockThk  and stockThk != ''">d.entity_code is not null</if>
+                <if test="stockThk != null  and stockThk != ''">d.entity_code is not null</if>
 
                 <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != ''))and (stockCn != null  and stockCn != '')">
                     or
@@ -255,7 +256,7 @@
                 <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != ''))and (stockThk != null  and stockThk != '')">
                     or
                 </if>
-                <if test="coll != stockThk  and stockThk != ''">d.entity_code is not null</if>
+                <if test="stockThk != null  and stockThk != ''">d.entity_code is not null</if>
 
                 <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != ''))and (stockCn != null  and stockCn != '')">
                     or
