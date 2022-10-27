@@ -79,7 +79,29 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                         producysMasterRelHisMapper.insert(productsMasterRelHis);
                         return b;
                 }else{
-                        return false;
+                        ProductsMasterRel productsMasterRelSave = new ProductsMasterRel();
+                        productsMasterRelSave.setEntityCode(productsMasterRelVo.getEntityCode());
+                        productsMasterRelSave.setDataYear(productsMasterRelVo.getDataYear());
+                        productsMasterRelSave.setProCustId(productsMasterRelVo.getProCustId());
+                        productsMasterRelSave.setProMasDictId(productsMasterRelVo.getDictIdNew());
+                        productsMasterRel.setUpdateMark("人工映射");
+                        boolean save = save(productsMasterRel);
+                        if (save) {
+                                //新增历史记录表
+                                ProductsMasterRelHis productsMasterRelHis = new ProductsMasterRelHis();
+                                productsMasterRelHis.setAddHis(DateUtil.getDate());
+                                productsMasterRelHis.setEntityCode(productsMasterRelVo.getEntityCode());
+                                productsMasterRelHis.setEntityNameHis(productsMasterRelVo.getEntityName());
+                                productsMasterRelHis.setProCustId(productsMasterRelVo.getProCustId());
+                                productsMasterRelHis.setMasterDictId(productsMasterRelVo.getDictIdOld());
+                                productsMasterRelHis.setMasterName(productsMasterRelVo.getMasterNameOld());
+                                productsMasterRelHis.setMasterDictIdNew(productsMasterRelVo.getDictIdNew());
+                                productsMasterRelHis.setMasterNameNew(productsMasterRelVo.getMasterNameNew());
+                                producysMasterRelHisMapper.insert(productsMasterRelHis);
+                                return true;
+                        }
+                        return save;
+
                 }
 
 

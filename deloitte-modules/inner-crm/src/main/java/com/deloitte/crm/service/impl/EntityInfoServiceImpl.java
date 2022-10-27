@@ -2905,7 +2905,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             entityInfoCodeDto.setIsGov("Y");
             LambdaQueryWrapper<GovInfo> eq2 = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getDqGovCode, entityGovRel.getDqGovCode());
             GovInfo govInfo = govInfoMapper.selectOne(eq2);
-            entityInfoCodeDto.setGovName(govInfo.getGovName());
+            if (govInfo != null) {
+                entityInfoCodeDto.setGovName(govInfo.getGovName());
+            }
+
         } else {
             entityInfoCodeDto.setIsGov("N");
         }

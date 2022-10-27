@@ -17,10 +17,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="futureList" resultType="com.deloitte.crm.dto.ProCustomerDto">
 
         SELECT a.id AS proCumId, a.products_id ,a.customer,b.pro_name,d.master_name,d.id AS dictId FROM products_customer a
-            INNER JOIN  products b ON a.products_id=b.id
-            INNER JOIN products_master_rel c ON a.id = c.pro_cust_id
-            INNER JOIN products_master_dict d ON c.pro_mas_dict_id=d.id
-        WHERE c.entity_code= #{entityCode} AND a.`status`= 1 AND data_year=#{dataYear} AND a.products_id =#{proId}
+            left JOIN  products b ON a.products_id=b.id
+            left JOIN products_master_rel c ON a.id = c.pro_cust_id
+            left JOIN products_master_dict d ON c.pro_mas_dict_id=d.id
+        and c.entity_code= #{entityCode} AND a.`status`= 1 AND data_year=#{dataYear} where a.products_id =#{proId}
 
     </select>
 
