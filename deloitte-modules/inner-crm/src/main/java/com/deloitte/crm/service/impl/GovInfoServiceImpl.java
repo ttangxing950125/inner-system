@@ -865,7 +865,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         Page<GovInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
-        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus,1).like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
+        LambdaQueryWrapper<GovInfo> eq;
+        if (entityOrGovByAttrVo.getEntityName()==null || entityOrGovByAttrVo.getEntityName().equals("") ){
+
+            eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus,1);
+        }else {
+            eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus,1).like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
+
+        }
         Page<GovInfo> page1 = govInfoMapper.selectPage(page, eq);
         List<GovInfo> records = page1.getRecords();
         ArrayList<GovInfoBynameDto> govInfoBynameDtos = new ArrayList<>();

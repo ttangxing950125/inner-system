@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.Products;
 import com.deloitte.crm.domain.ProductsCover;
 import com.deloitte.crm.dto.ProductCoverDto;
@@ -58,7 +59,14 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         //分页查询多少主体
         Page<EntityInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         QueryWrapper<EntityInfo> like = new QueryWrapper<EntityInfo>();
-        LambdaQueryWrapper<EntityInfo> like1 = like.lambda().eq(EntityInfo::getStatus,1).like(EntityInfo::getEntityName, entityOrGovByAttrVo.getEntityName());
+        LambdaQueryWrapper<EntityInfo> like1;
+        if (entityOrGovByAttrVo.getEntityName()==null || entityOrGovByAttrVo.getEntityName().equals("") ){
+            like1 = like.lambda().eq(EntityInfo::getStatus,1);
+        }else {
+            like1 = like.lambda().eq(EntityInfo::getStatus,1).like(EntityInfo::getEntityName, entityOrGovByAttrVo.getEntityName());
+        }
+
+
         if (like1 == null) {
             R.fail("未查询到该主体");
         }
