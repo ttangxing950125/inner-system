@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -226,10 +225,14 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         //如果 是金融机构 那么 role_id 为6 如果 是城投政府 那么 为 7 如果都是否 那么为 5  => Y 为是
         if (YES.equals(masDto.getIsFinance())) {
             crmSupplyTask.setRoleId(5L);
+            //修改每日任务状态
+            this.editeDailyTaskByRoleTwo(5);
         } else if (YES.equals(masDto.getCityIb())) {
             crmSupplyTask.setRoleId(6L);
+            this.editeDailyTaskByRoleTwo(6);
         } else {
             crmSupplyTask.setRoleId(7L);
+            this.editeDailyTaskByRoleTwo(7);
         }
         //新增任务
         crmSupplyTaskMapper.insert(crmSupplyTask);
@@ -280,6 +283,12 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             }
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
+    }
+
+    public void editeDailyTaskByRoleTwo(Integer roleId){
+        CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate,DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
+        if(ObjectUtils.isEmpty(crmDailyTask)){iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskStatus(2).setTaskDate(new Date()).setTaskRoleType(roleId.toString()));}
+        else{crmDailyTask.setTaskStatus(2);iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);}
     }
 
     /**
