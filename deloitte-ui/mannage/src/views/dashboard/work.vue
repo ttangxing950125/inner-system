@@ -37,7 +37,7 @@
         >
           <div class="flex1">
             <h3 class="title1">
-              新增待确认记录( <span style="color: red">0</span> )
+              新增待确认记录( <span style="color: red">{{ item.data.length }}</span> )
             </h3>
           </div>
           <el-table
@@ -54,7 +54,8 @@
               :label="e"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row[e] || '-' }}</span>
+                <span v-if="e === '变化状态'">{{ scope.row.变化状态 === 1 ? "新增" : "修改" }}</span>
+                <span v-else>{{ scope.row[e] || '-' }}</span>
               </template>
             </el-table-column>
           </el-table>

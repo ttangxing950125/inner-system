@@ -1992,7 +1992,7 @@ export default {
         if (row === 5) {
           addEntityeMsg(this.ruleForm).then(res => {
             if (res.code === 200) {
-              this.governmentDig = false
+              this.fsDig = false
               this.$message({
                 showClose: true,
                 message: '操作成功',
@@ -2021,6 +2021,9 @@ export default {
         });
       } finally {
         this.$modal.closeLoading();
+        this.governmentDig = false
+        this.fsDig = false
+        this.remarkDig = false
       }
     },
     workRole4(row) {
