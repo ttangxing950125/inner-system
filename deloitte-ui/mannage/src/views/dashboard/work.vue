@@ -37,7 +37,7 @@
         >
           <div class="flex1">
             <h3 class="title1">
-              新增待确认记录( <span style="color: red">{{ item.data.length }}</span> )
+              新增待确认记录( <span style="color: red">{{ item.data && item.data.length || 0}}</span> )
             </h3>
           </div>
           <el-table
