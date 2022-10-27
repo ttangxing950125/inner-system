@@ -462,4 +462,18 @@ public class EntityInfoController extends BaseController {
     public R<EntitySupplyMsgBack> getEntityBackSupply(Integer id) {
         return entityInfoService.getEntityBackSupply(id);
     }
+
+
+    /**
+     * 导出企业主体基本信息
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/25 17:39
+     */
+    @ApiOperation(value = "导出企业主体基本信息")
+    @GetMapping("/exportEntity")
+    public void exportEntity(HttpServletResponse response) {
+        entityInfoService.exportEntity(response);
+    }
 }

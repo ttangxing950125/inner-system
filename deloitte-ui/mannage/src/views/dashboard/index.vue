@@ -330,7 +330,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="ruleForm.isFinance === 'Y'" label="金融细分领域" >
-          <el-select v-model="ruleForm.financeSegmentation" placeholder="">
+          <el-select :filterable="true" v-model="ruleForm.financeSegmentation" placeholder="">
             <el-option  v-for="(item, index) in options1" :key="index" :label="item" :value="item"></el-option>
           </el-select>
         </el-form-item>
@@ -356,19 +356,19 @@
         </el-form-item>
         <el-form-item v-if="ruleForm.cityIb === 'Y'" label="机构对应域投政府" required>
           <el-col :span="6">
-            <el-select v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
+            <el-select :filterable="true"  v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
               <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.district" placeholder="选择地区" @change="getCounty">
+            <el-select :filterable="true" v-model="ruleForm.district" placeholder="选择地区" @change="getCounty">
               <el-option v-for="(item, index) in city" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.county" placeholder="选择县" @change="getGov">
+            <el-select :filterable="true" v-model="ruleForm.county" placeholder="选择县" @change="getGov">
               <el-option v-for="(item, index) in county" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
@@ -389,7 +389,7 @@
           <span>{{ ruleForm.dqGovCode || '(-)' }}</span>
         </el-form-item>
         <el-form-item label="敞口划分" >
-          <el-select v-model="ruleForm.masterCode" placeholder="">
+          <el-select :filterable="true" v-model="ruleForm.masterCode" placeholder="">
             <el-option  v-for="(item, index) in options2" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
           </el-select>
         </el-form-item>
@@ -460,30 +460,30 @@
         <el-divider></el-divider>
         <el-form-item label="所属地区">
           <el-col :span="6">
-            <el-select v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
+            <el-select :filterable="true" v-model="ruleForm.region" placeholder="选择省份" @change="getCity">
               <el-option v-for="(item, index) in region" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.city" placeholder="选择地区" @change="getCounty">
+            <el-select :filterable="true" v-model="ruleForm.city" placeholder="选择地区" @change="getCounty">
               <el-option v-for="(item, index) in city" :key="index" :label="item.govName" :value="item"></el-option>
             </el-select>
           </el-col>
           <el-col class="line" :span="1">-</el-col>
           <el-col :span="6">
-            <el-select v-model="ruleForm.county" placeholder="选择县">
+            <el-select :filterable="true" v-model="ruleForm.county" placeholder="选择县">
               <el-option v-for="(item, index) in county" :key="index" :label="item.govName" :value="item.govName"></el-option>
             </el-select>
           </el-col>
         </el-form-item>
         <el-form-item label="所属辖区" >
-          <el-select class="width146" v-model="ruleForm.belJurisdiction" :multiple="xmultiple" placeholder="选择辖区">
+          <el-select :filterable="true" class="width146" v-model="ruleForm.belJurisdiction" :multiple="xmultiple" placeholder="选择辖区">
             <el-option v-for="(item, index) in jurisdiction" :key="index" :label="item.value" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="对口监管机构">
-          <el-select class="width146" v-model="ruleForm.regulators" :multiple="jmultiple"  placeholder="选择机构">
+          <el-select :filterable="true" class="width146" v-model="ruleForm.regulators" :multiple="jmultiple"  placeholder="选择机构">
             <el-option v-for="(item, index) in supervise" :key="index" :label="item.value" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -515,12 +515,12 @@
         label-position="left"
       >
         <el-form-item label="新增地方政府级别-大类" >
-          <el-select class="width320" v-model="addGovForm.govLevelBig" @change="getSmall">
+          <el-select :filterable="true" class="width320" v-model="addGovForm.govLevelBig" @change="getSmall">
             <el-option v-for="(item, index) in govOption1" :key="index" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="新增地方政府级别-小类" >
-          <el-select class="width320" v-model="addGovForm.govLevelSmall" placeholder="">
+          <el-select :filterable="true" class="width320" v-model="addGovForm.govLevelSmall" placeholder="">
             <el-option v-for="(item, index) in govOption2" :key="index" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -638,7 +638,7 @@
         </el-form-item>
         <el-divider></el-divider>
         <el-form-item label="政府持股方式" >
-          <el-select class="width320" v-model="ruleForm.shareMethod" placeholder="请选择">
+          <el-select :filterable="true" class="width320" v-model="ruleForm.shareMethod" placeholder="请选择">
             <el-option v-for="(item, index) in govOptions" :key="index" :label="item.name" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -664,7 +664,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="政府部门实际持股比例年份" >
-          <el-select class="width320" v-model="ruleForm.shareRatioYear" placeholder="选择年份">
+          <el-select :filterable="true" class="width320" v-model="ruleForm.shareRatioYear" placeholder="选择年份">
             <el-option v-for="(item,index) in years" :key="index" :label="item.value" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -734,7 +734,7 @@
         </el-form-item>
         <el-divider></el-divider>
         <el-form-item label="财报列示类型" prop="listType">
-          <el-select class="width320" v-model="ruleForm.listType" placeholder="选择类型">
+          <el-select :filterable="true" class="width320" v-model="ruleForm.listType" placeholder="选择类型">
             <el-option
               v-for="item in options2"
               :key="item.value"
@@ -745,7 +745,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="关注报告类型" prop="reportType">
-          <el-select class="width320" v-model="ruleForm.reportType" multiple placeholder="请选择">
+          <el-select :filterable="true" class="width320" v-model="ruleForm.reportType" multiple placeholder="请选择">
             <el-option
               v-for="item in options1"
               :key="item.value"
@@ -946,7 +946,7 @@
         <div class="notUse">
           <el-checkbox class="mr60" v-model="ruleForm.notUse">不适用</el-checkbox>
           <span class="mr10" >不适用原因</span>
-          <el-select :disabled="!ruleForm.notUse" v-model="ruleForm.creditErrorType" placeholder="请选择">
+          <el-select :filterable="true" :disabled="!ruleForm.notUse" v-model="ruleForm.creditErrorType" placeholder="请选择">
             <el-option
               v-for="item in notUseoptions"
               :key="item.value"
@@ -965,7 +965,7 @@
             v-if="!entityNamePass"
             style="margin-left: 5px"
             type="text"
-            @click="check(ruleForm.entityName, ruleForm.creditCode)"
+            @click="check(ruleForm.entityName, ruleForm.creditCode, ruleForm.notUse)"
             >{{ "查重" }}</el-button>
             <span v-if="entityNamePass === 2" style="color:greenyellow; margin-left: 5px">无重复，可新增</span>
             <a @click="showMoreData" v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</a>
@@ -1576,18 +1576,23 @@ export default {
           pageNum: 1,
           pageSize: this.queryParams.pageSize
         };
-        getTaskByDate(params).then((res) => {
-          const { data } = res
-          this.list = data
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
-        getRoleSupplyTask(params).then((res) => {
+        if (this.roleId==='role1'){
+          getTaskByDate(params).then((res) => {
+            const { data } = res
+            this.list = data
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+          });
+        }
+        if(this.roleId === 'role3'||this.roleId === 'role4'||this.roleId === 'role5') {
+          getRoleSupplyTask(params).then((res) => {
             const { data } = res
             this.list3 = data && data.records
             this.queryParams.pages = data && data.current
             this.total = data && data.total || 0
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+          });
+        }
+
         if(this.roleId === 'role2') {
             getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
             const { data } = res
@@ -1628,11 +1633,22 @@ export default {
       this.$set(this.ruleForm, 'creditErrorType',  '')
       this.$set(this.ruleForm, 'creditCode',  '')
     },
-    check(name, code) {
-        if(!name || !code) {
+    check(name, code, disabeld) {
+        console.log(disabeld)
+        const nameCheck = disabeld ? true : code
+        console.log(nameCheck)
+        if(!nameCheck) {
             this.$message({
                 showClose: true,
-                message: '请输入主体名称或者信用代码',
+                message: '请输入信用代码',
+                type: 'error'
+            });
+            return
+        }
+        if(!name) {
+            this.$message({
+                showClose: true,
+                message: '请输入主体名称',
                 type: 'error'
             });
             return
