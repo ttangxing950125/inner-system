@@ -1,17 +1,14 @@
 package com.deloitte.crm.service.impl;
 
-import com.deloitte.crm.service.IEntityCaptureSpeedService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.crm.domain.EntityCaptureSpeed;
+import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
 
 /**
- * Created with IntelliJ IDEA.
- *
- * @Author: chenjiang
- * @Date: 2022/10/27/14:21
- * @Description:
+ * @author 冉浩岑
+ * @date 2022/10/27 14:19
  */
-@Service
-@Slf4j
-public class EntityCaptureSpeedServiceImpl implements IEntityCaptureSpeedService {
+public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpeedMapper, EntityCaptureSpeed> implements EntityCaptureSpeedService {
+
 }
