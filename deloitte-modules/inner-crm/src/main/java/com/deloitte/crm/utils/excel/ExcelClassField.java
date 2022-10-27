@@ -1,4 +1,4 @@
-package com.deloitte.crm.excelUtils;
+package com.deloitte.crm.utils.excel;
 
 import java.util.LinkedHashMap;
 
