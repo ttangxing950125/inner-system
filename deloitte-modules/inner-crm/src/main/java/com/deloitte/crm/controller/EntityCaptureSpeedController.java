@@ -32,7 +32,7 @@ public class EntityCaptureSpeedController {
      */
     @GetMapping(value = "/search/{entityNameOrCode}")
     public R search(@PathVariable("entityNameOrCode") String entityNameOrCode, HttpServletRequest request, HttpServletResponse response) {
-       return entityCaptureSpeedService.search(entityNameOrCode);
+        return entityCaptureSpeedService.search(entityNameOrCode);
     }
 
 }

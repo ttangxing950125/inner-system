@@ -32,8 +32,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpeedMapper, EntityCaptureSpeed> implements EntityCaptureSpeedService {
-    @Resource
-    private IEntityInfoService entityInfoService;
 
     @Autowired
     private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
