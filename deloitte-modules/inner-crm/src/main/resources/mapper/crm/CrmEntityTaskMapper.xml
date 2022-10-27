@@ -100,7 +100,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     <select id="selctCrmEntityTaskCount" resultType="com.deloitte.crm.dto.TaskDto" parameterType="String">
 
-        SELECT COUNT(id) AS taskCount,COUNT(if(state = 0,TRUE,NULL)) AS taskNoCount,COUNT(if(state = 1,TRUE,NULL)) AS taskCop FROM crm_entity_task  WHERE task_date=#{taskDate}
+        SELECT COUNT(id) AS taskCount,COUNT(if(state = 0,TRUE,NULL)) AS taskNoCount,COUNT(if(state != 0,TRUE,NULL)) AS taskCop FROM crm_entity_task  WHERE task_date=#{taskDate}
     </select>
 
 </mapper>
