@@ -726,21 +726,27 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     private EntityInfoDetails getCoverageDetail(EntityInfoDetails entityInfoDetails, String entityCode) {
+
+        Map<Integer, List<ProductsCover>> collect =new HashMap<>();
+
         //查询产品覆盖相关
         List<ProductsCover> productsCovers = productsCoverMapper.selectList(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getEntityCode, entityCode));
-        if (CollectionUtils.isEmpty(productsCovers)) {
-            return entityInfoDetails;
+        if (!CollectionUtils.isEmpty(productsCovers)) {
+            collect = productsCovers.stream().collect(Collectors.groupingBy(ProductsCover::getProId));
         }
-        Map<Integer, List<ProductsCover>> collect = productsCovers.stream().collect(Collectors.groupingBy(ProductsCover::getProId));
+
         //创建产品覆盖集合
         List<ProCoverVo> coverVos = new ArrayList<>();
 
         List<Products> products = productmapper.selectList(new QueryWrapper<>());
 
+        Map<Integer, List<ProductsCover>> finalCollect = collect;
         products.stream().forEach(o -> {
             String proName = o.getProName();
-            List<ProductsCover> covers = collect.get(o.getId());
-
+            List<ProductsCover> covers = new ArrayList<>();
+            if (!finalCollect.isEmpty()){
+                covers = finalCollect.get(o.getId());
+            }
             ProCoverVo proCoverVo = new ProCoverVo();
             //设置产品是否覆盖
             NameValueVo isCover = new NameValueVo();
@@ -766,7 +772,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfoDetails.setCoverageDetail(coverVos);
         return entityInfoDetails;
     }
-
 
     private EntityInfoDetails getProductsMaster(EntityInfoDetails entityInfoDetails, String entityCode) {
         //查询敞口相关
