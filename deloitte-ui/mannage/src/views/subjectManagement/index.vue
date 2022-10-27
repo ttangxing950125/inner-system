@@ -702,6 +702,7 @@ export default {
         })
     },
     changeType(row) {
+        this.selectHeaer = []
         this.value1 = this.value === 'GV' ? [] : this.value1
         if (row === 'GV') {
             this.options2.forEach(e => {

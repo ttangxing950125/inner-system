@@ -965,7 +965,7 @@
             v-if="!entityNamePass"
             style="margin-left: 5px"
             type="text"
-            @click="check(ruleForm.entityName, ruleForm.creditCode)"
+            @click="check(ruleForm.entityName, ruleForm.creditCode, ruleForm.notUse)"
             >{{ "查重" }}</el-button>
             <span v-if="entityNamePass === 2" style="color:greenyellow; margin-left: 5px">无重复，可新增</span>
             <a @click="showMoreData" v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</a>
@@ -1628,11 +1628,22 @@ export default {
       this.$set(this.ruleForm, 'creditErrorType',  '')
       this.$set(this.ruleForm, 'creditCode',  '')
     },
-    check(name, code) {
-        if(!name || !code) {
+    check(name, code, disabeld) {
+        console.log(disabeld)
+        const nameCheck = disabeld ? true : code
+        console.log(nameCheck)
+        if(!nameCheck) {
             this.$message({
                 showClose: true,
-                message: '请输入主体名称或者信用代码',
+                message: '请输入信用代码',
+                type: 'error'
+            });
+            return
+        }
+        if(!name) {
+            this.$message({
+                showClose: true,
+                message: '请输入主体名称',
                 type: 'error'
             });
             return
