@@ -2,7 +2,6 @@ package com.deloitte.crm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.crm.domain.BondConvertibleChangeInfo;
-import com.deloitte.crm.domain.BondConvertibleInfo;
 import com.deloitte.crm.domain.CrmWindTask;
 
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
 public interface BondConvertibleChangeInfoService extends IService<BondConvertibleChangeInfo> {
     /**
      * @param windTask
-     * @param cnCoachBacks
+     * @param bondConvertibleChangeInfo
      * @return
      */
     Object doTask(CrmWindTask windTask, List<BondConvertibleChangeInfo> bondConvertibleChangeInfo);
