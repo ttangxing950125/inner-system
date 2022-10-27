@@ -1576,18 +1576,23 @@ export default {
           pageNum: 1,
           pageSize: this.queryParams.pageSize
         };
-        getTaskByDate(params).then((res) => {
-          const { data } = res
-          this.list = data
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
-        getRoleSupplyTask(params).then((res) => {
+        if (this.roleId==='role1'){
+          getTaskByDate(params).then((res) => {
+            const { data } = res
+            this.list = data
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+          });
+        }
+        if(this.roleId === 'role3'||this.roleId === 'role4'||this.roleId === 'role5') {
+          getRoleSupplyTask(params).then((res) => {
             const { data } = res
             this.list3 = data && data.records
             this.queryParams.pages = data && data.current
             this.total = data && data.total || 0
-          // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-        });
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+          });
+        }
+
         if(this.roleId === 'role2') {
             getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
             const { data } = res

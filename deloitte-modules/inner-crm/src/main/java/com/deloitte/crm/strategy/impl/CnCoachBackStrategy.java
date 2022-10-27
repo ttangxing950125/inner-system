@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -95,19 +96,31 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
             }
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
-                stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
                 if (changeType != null) {
                     //更新a股属性
-                    entityAttrValueService.updateStockCnAttr(code, cnCoachBack);
+                    entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), cnCoachBack);
                 }
-                //有债券信息，给债券和主体绑定关联关系
-                if (changeType != null && Objects.equals(changeType, DataChangeType.INSERT.getId())) {
-                    //绑定主体关系
-                    entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
-                }
+
             } else {
                 log.warn("==> IPO-辅导备案 数据导入 出现code为空的！！！！！！！！！！！！！！！！！");
             }
+
+            //有债券信息，给债券和主体绑定关联关系
+            if (Objects.equals(changeType, DataChangeType.INSERT.getId())) {
+                if (StrUtil.isNotBlank(code)){
+                    log.warn("无code创建主体任务");
+                    //绑定主体关系
+                    entityStockCnRelService.createTask(entityName, windTask, cnCoachBack);
+                }else {
+                    log.info("有code创建主体任务");
+                    //绑定主体关系
+                    entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
+                }
+
+
+            }
+
 
             String windIndustry = cnCoachBack.getWindIndustry();
             //更新wind行业

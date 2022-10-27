@@ -88,7 +88,7 @@
           ></el-table-column>
           <el-table-column label="公私募类型">
             <template slot-scope="scope">
-              <span>{{ scope.row.raiseType && scope.row.raiseType === 0 ? "公募" : "私募" }}</span>
+              <span>{{ scope.row.raiseType === 0 ? "公募" : "私募" }}</span>
             </template>
           </el-table-column>
           <!-- <el-table-column label="是否违约">
@@ -128,11 +128,11 @@
               ></el-input>
               <el-select v-if="item.name === '债券类型'" class="t-input" v-model="item.value" @change="item.edit = true" placeholder="请选择">
                     <el-option
-                    label="是"
+                    label="私募"
                     value="1">
                     </el-option>
                     <el-option
-                    label="是"
+                    label="公募"
                     value="0">
                     </el-option>
                 </el-select>
