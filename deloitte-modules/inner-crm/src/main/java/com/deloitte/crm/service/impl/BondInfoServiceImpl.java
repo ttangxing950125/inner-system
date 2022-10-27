@@ -3,6 +3,7 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.AttrValueMappingMap;
 import com.deloitte.crm.constants.BadInfo;
@@ -207,10 +208,10 @@ public class BondInfoServiceImpl implements IBondInfoService {
      * @return
      */
     @Override
-    public BondInfo findByShortName(String shortName,Boolean isDeleted) {
+    public BondInfo findByShortName(String shortName, Boolean isDeleted) {
         BondInfo bondInfo = redisService.getCacheMapValue(CacheName.BOND_CACHE, shortName);
         if (bondInfo == null) {
-            bondInfo = bondInfoMapper.findByShortName(shortName,isDeleted);
+            bondInfo = bondInfoMapper.findByShortName(shortName, isDeleted);
             redisService.setCacheMapValue(CacheName.BOND_CACHE, shortName, bondInfo);
         }
 
@@ -256,24 +257,23 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Override
     public R<List<BondEntityInfoVo>> findAllDetail(String entityCode, String bondCode) {
         //组装主体信息 主体属性来自 table = entity_info
-        EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
-        Assert.notNull(entityInfo,BadInfo.VALID_EMPTY_TARGET.getInfo());
+        final EntityInfo entityInfo = Optional.ofNullable(iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode)))
+                .orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         //主体相关信息
         List<BondEntityInfoVo> result = new ArrayList<>(getDataFromEntityInfo(entityInfo, null));
-
         //组装债券信息 债券属性来自 table = bond_info
         BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondCode, bondCode));
         //债券相关信息
-        result.addAll(getDataFromEntityInfo(null,bondInfo));
+        result.addAll(getDataFromEntityInfo(null, bondInfo));
 
 
         //TODO 组装主体债券的具体属性信息 属性来自 table = entity_attr_value
 
         //TODO 债务关系来源
-        result.add(new BondEntityInfoVo("债务关系来源",null));
+        result.add(new BondEntityInfoVo("债务关系来源", null));
 
         //前发行人名称 此处用的发行人全称
-        result.add(getDataFromEntityAttrValue( 59,bondCode));
+        result.add(getDataFromEntityAttrValue(59, bondCode));
         EntityAttrValue issuerName = entityAttrValueMapper.findValueByCodeAndAttrId(59, bondCode);
 
         /**
@@ -281,35 +281,35 @@ public class BondInfoServiceImpl implements IBondInfoService {
          */
         EntityInfo issuerEntity = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                 .eq(EntityInfo::getEntityName, issuerName.getValue()));
-        if(issuerEntity!=null){
+        if (issuerEntity != null) {
             //前发行人德勤主体代码
-            result.add(new BondEntityInfoVo(issuerEntity.getId(),1,false,"前发行人德勤主体代码","entity_code",issuerEntity.getEntityCode()));
+            result.add(new BondEntityInfoVo(issuerEntity.getId(), 1, false, "前发行人德勤主体代码", "entity_code", issuerEntity.getEntityCode()));
             //前发行人统一社会信用代码
-            result.add(new BondEntityInfoVo(issuerEntity.getId(),1,false,"前发行人统一社会信用代码","credit_code",issuerEntity.getCreditCode()));
-        }else{
-            result.add(new BondEntityInfoVo("前发行人德勤主体代码","entity_code"));
-            result.add(new BondEntityInfoVo("前发行人统一社会信用代码","credit_code"));
+            result.add(new BondEntityInfoVo(issuerEntity.getId(), 1, false, "前发行人统一社会信用代码", "credit_code", issuerEntity.getCreditCode()));
+        } else {
+            result.add(new BondEntityInfoVo("前发行人德勤主体代码", "entity_code"));
+            result.add(new BondEntityInfoVo("前发行人统一社会信用代码", "credit_code"));
         }
 
         //TODO 接收方名称
-        result.add(new BondEntityInfoVo("接收方名称",null));
+        result.add(new BondEntityInfoVo("接收方名称", null));
 
         //TODO 接收方德勤主体代码
-        result.add(new BondEntityInfoVo("接收方德勤主体代码",null));
+        result.add(new BondEntityInfoVo("接收方德勤主体代码", null));
 
         //TODO 接收方统一社会信用代码
-        result.add(new BondEntityInfoVo("接收方统一社会信用代码",null));
+        result.add(new BondEntityInfoVo("接收方统一社会信用代码", null));
 
         //是否违约
-        result.add(getDataFromEntityAttrValue(108,bondCode));
+        result.add(getDataFromEntityAttrValue(108, bondCode));
 
         //违约类型
-        result.add(getDataFromEntityAttrValue(111,bondCode).setEnableEdite(false));
+        result.add(getDataFromEntityAttrValue(111, bondCode).setEnableEdite(false));
 
         //违约日期
-        result.add(getDataFromEntityAttrValue(109,bondCode).setEnableEdite(false));
+        result.add(getDataFromEntityAttrValue(109, bondCode).setEnableEdite(false));
 
-        return R.ok(result,SuccessInfo.SUCCESS.getInfo());
+        return R.ok(result, SuccessInfo.SUCCESS.getInfo());
     }
 
     /**
@@ -323,21 +323,22 @@ public class BondInfoServiceImpl implements IBondInfoService {
     @Transactional(rollbackFor = Exception.class)
     public R editAllDetail(List<BondEntityInfoVo> bondInfoEditVo) {
         HashMap<String, String> rule = new HashMap<>();
-        rule.put("entity_name","");
-        rule.put("coll","");
-        rule.put("abs","");
-        rule.put("bond_name","");
-        rule.put("bond_short_name","");
-        rule.put("raise_type","");
-        rule.put("bond_state","");
-        rule.put("value_date","");
-        rule.put("due_date","");
-        bondInfoEditVo.forEach(row->this.edit(row,rule));
+        rule.put("entity_name", "");
+        rule.put("coll", "");
+        rule.put("abs", "");
+        rule.put("bond_name", "");
+        rule.put("bond_short_name", "");
+        rule.put("raise_type", "");
+        rule.put("bond_state", "");
+        rule.put("value_date", "");
+        rule.put("due_date", "");
+        bondInfoEditVo.forEach(row -> this.edit(row, rule));
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
     /**
      * 自动更新债券公私募状态、abs状态、集合债状态
+     *
      * @param dqBondCode
      * @return
      */
@@ -345,13 +346,13 @@ public class BondInfoServiceImpl implements IBondInfoService {
     public boolean updateBondType(String dqBondCode) {
         //根据code查询债券
         BondInfo bondInfo = bondInfoMapper.findByDqCode(dqBondCode);
-        if (bondInfo==null){
+        if (bondInfo == null) {
             return false;
         }
 
         //59 发行人全称
         EntityAttrValue publisher = entityAttrValueMapper.findValueByCodeAndAttrId(59, dqBondCode);
-        if (publisher!=null){
+        if (publisher != null) {
             //集合债，判断规则：基于34行的【发行人全称】字段识别，如字段内容中包含逗号（“,”），判断为“是”；
             String value = publisher.getValue();
             bondInfo.setColl(value.contains(","));
@@ -361,18 +362,18 @@ public class BondInfoServiceImpl implements IBondInfoService {
         //ABS，判断规则：基于60行的【Wind债券类型(二级)】字段识别，如字段内容为以下之一的，判断为“是”：“交易商协会ABN”、“证监会主管ABS”、“银保监会主管ABS”、“项目收益票据”；
         EntityAttrValue abs = entityAttrValueMapper.findValueByCodeAndAttrId(85, dqBondCode);
         List<String> absList = Arrays.asList("交易商协会ABN", "证监会主管ABS", "银保监会主管ABS", "项目收益票据");
-        if (abs!=null){
+        if (abs != null) {
             String value = abs.getValue();
             bondInfo.setAbs(absList.contains(value));
         }
 
         //72	债券信息
         EntityAttrValue raise = entityAttrValueMapper.findValueByCodeAndAttrId(72, dqBondCode);
-        if (raise!=null){
+        if (raise != null) {
             String value = raise.getValue();
-            if (Objects.equals(value,"公募")){
+            if (Objects.equals(value, "公募")) {
                 bondInfo.setRaiseType(0);
-            }else if (Objects.equals(value,"私募")) {
+            } else if (Objects.equals(value, "私募")) {
                 bondInfo.setRaiseType(1);
             }
         }
@@ -384,10 +385,11 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
     /**
      * 手动添加债券信息
-     * @author 正杰
-     * @date 2022/10/11
+     *
      * @param bondInfoManualDto
      * @return 操作成功与否信息
+     * @author 正杰
+     * @date 2022/10/11
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -438,16 +440,17 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
     /**
      * 封装 BondEntityInfoVo 单个对象 => entity_attr_value
+     *
      * @param attrId
      * @param code
      * @return
      */
-    public BondEntityInfoVo getDataFromEntityAttrValue(Integer attrId,String code){
+    public BondEntityInfoVo getDataFromEntityAttrValue(Integer attrId, String code) {
         EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
         EntityAttrValue entityAttrValue = iEntityAttrValueService.getBaseMapper().selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getEntityCode, code).eq(EntityAttrValue::getAttrId, attrId));
-        if(entityAttrValue==null){
+        if (entityAttrValue == null) {
             //没查到值的时候
-            return new BondEntityInfoVo(entityAttr.getName(),attrId.toString());
+            return new BondEntityInfoVo(entityAttr.getName(), attrId.toString());
         }
         return new BondEntityInfoVo()
                 .setId(entityAttrValue.getId())
@@ -460,82 +463,86 @@ public class BondInfoServiceImpl implements IBondInfoService {
 
     /**
      * 封装 BondEntityInfoVo 多个对象
+     *
      * @param entityInfo
      * @return
      */
-    public List<BondEntityInfoVo> getDataFromEntityInfo(EntityInfo entityInfo,BondInfo bondInfo){
+    public List<BondEntityInfoVo> getDataFromEntityInfo(EntityInfo entityInfo, BondInfo bondInfo) {
         List<BondEntityInfoVo> result = new ArrayList<>();
-        if(bondInfo==null){
+        if (bondInfo == null) {
             BondEntityInfoVo temp = new BondEntityInfoVo().setTable(1).setId(entityInfo.getId());
             //债务主体德勤代码
-            result.add(new BondEntityInfoVo(temp,false,"债务主体德勤代码","",entityInfo.getEntityCode()));
+            result.add(new BondEntityInfoVo(temp, false, "债务主体德勤代码", "", entityInfo.getEntityCode()));
             //债务主体名称
-            result.add(new BondEntityInfoVo(temp,true,"债务主体名称","entity_name",entityInfo.getEntityName()));
+            result.add(new BondEntityInfoVo(temp, true, "债务主体名称", "entity_name", entityInfo.getEntityName()));
             //债务主体名称_原始
-            result.add(new BondEntityInfoVo(temp,false,"债务主体名称_原始","",entityInfo.getEntityNameHis()));
+            result.add(new BondEntityInfoVo(temp, false, "债务主体名称_原始", "", entityInfo.getEntityNameHis()));
             //债务主体统一社会信用代码
-            result.add(new BondEntityInfoVo(temp,false,"债务主体统一社会信用代码","",entityInfo.getCreditCode()));
+            result.add(new BondEntityInfoVo(temp, false, "债务主体统一社会信用代码", "", entityInfo.getCreditCode()));
             return result;
-        }else{
+        } else {
             BondEntityInfoVo temp = new BondEntityInfoVo().setTable(2).setId(bondInfo.getId().intValue());
             //是否为集合债 "1.Y":"0.N"
             Boolean coll = bondInfo.getColl();
-            if(ObjectUtils.isEmpty(coll)){
-                result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll",null));
-            }else if(coll){
-                result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll","Y"));
-            }else{
-                result.add(new BondEntityInfoVo(temp,true,"是否为集合债","coll","N"));
+            if (ObjectUtils.isEmpty(coll)) {
+                result.add(new BondEntityInfoVo(temp, true, "是否为集合债", "coll", null));
+            } else if (coll) {
+                result.add(new BondEntityInfoVo(temp, true, "是否为集合债", "coll", "Y"));
+            } else {
+                result.add(new BondEntityInfoVo(temp, true, "是否为集合债", "coll", "N"));
             }
             //是否为ABS "1.Y":"0.N"
             Boolean abs = bondInfo.getAbs();
-            if(ObjectUtils.isEmpty(abs)){
-                result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs",null));
-            }else if(abs){
-                result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs","Y"));
-            }else{
-                result.add(new BondEntityInfoVo(temp,true,"是否为ABS","abs","N"));
+            if (ObjectUtils.isEmpty(abs)) {
+                result.add(new BondEntityInfoVo(temp, true, "是否为ABS", "abs", null));
+            } else if (abs) {
+                result.add(new BondEntityInfoVo(temp, true, "是否为ABS", "abs", "Y"));
+            } else {
+                result.add(new BondEntityInfoVo(temp, true, "是否为ABS", "abs", "N"));
             }
             //债券交易代码
-            result.add(new BondEntityInfoVo(temp,false,"债券交易代码","",bondInfo.getOriCode()));
+            result.add(new BondEntityInfoVo(temp, false, "债券交易代码", "", bondInfo.getOriCode()));
             //债券全称
-            result.add(new BondEntityInfoVo(temp,true,"债券全称","bond_name",bondInfo.getBondName()));
+            result.add(new BondEntityInfoVo(temp, true, "债券全称", "bond_name", bondInfo.getBondName()));
             //债券简称
-            result.add(new BondEntityInfoVo(temp,true,"债券简称","bond_short_name",bondInfo.getBondShortName()));
+            result.add(new BondEntityInfoVo(temp, true, "债券简称", "bond_short_name", bondInfo.getBondShortName()));
             //债券类型 "0.公募债券":"1.私募债"
-            result.add(new BondEntityInfoVo(temp,true,"债券类型","raise_type",bondInfo.getRaiseType()==null?null:bondInfo.getRaiseType().toString()));
+            result.add(new BondEntityInfoVo(temp, true, "债券类型", "raise_type", bondInfo.getRaiseType() == null ? null : bondInfo.getRaiseType().toString()));
             //债务关系有效性 / 存续状态 "0.存续":"1.违约"
-            result.add(new BondEntityInfoVo(temp,true,"债务关系有效性 / 存续状态","bond_state",bondInfo.getBondState()==null?null:bondInfo.getBondState().toString()));
+            result.add(new BondEntityInfoVo(temp, true, "债务关系有效性 / 存续状态", "bond_state", bondInfo.getBondState() == null ? null : bondInfo.getBondState().toString()));
             //起息日
-            result.add(new BondEntityInfoVo(temp,true,"起息日","value_date",bondInfo.getValueDate()==null?null:bondInfo.getValueDate()).setTable(4));
+            result.add(new BondEntityInfoVo(temp, true, "起息日", "value_date", bondInfo.getValueDate() == null ? null : bondInfo.getValueDate()).setTable(4));
             //到期日
-            result.add(new BondEntityInfoVo(temp,true,"到期日","due_date",bondInfo.getDueDate()==null?null:bondInfo.getValueDate()).setTable(4));
+            result.add(new BondEntityInfoVo(temp, true, "到期日", "due_date", bondInfo.getDueDate() == null ? null : bondInfo.getValueDate()).setTable(4));
             return result;
         }
     }
 
-    public void edit(BondEntityInfoVo bondEntityInfoVo,Map<String,String> rule){
-        if(!bondEntityInfoVo.getEnableEdite()){return;}
-        Integer id = bondEntityInfoVo.getId();
+    public void edit(BondEntityInfoVo bondEntityInfoVo, Map<String, String> rule) {
+        if (!bondEntityInfoVo.getEnableEdite()) {
+            return;
+        }
+        Integer id = Optional.ofNullable(bondEntityInfoVo.getId()).orElseThrow(() -> new ServiceException(BadInfo.PARAM_EMPTY.getInfo()));
         String value = bondEntityInfoVo.getValue();
         String filedName = bondEntityInfoVo.getFiledName();
-        Assert.notNull(id,BadInfo.PARAM_EMPTY.getInfo());
-        Assert.isTrue(bondEntityInfoVo.getTable()==3||rule.containsKey(filedName),BadInfo.VALID_PARAM.getInfo());
-
-        switch (bondEntityInfoVo.getTable()){
+        Assert.isTrue(bondEntityInfoVo.getTable() == 3 || rule.containsKey(filedName), BadInfo.VALID_PARAM.getInfo());
+        switch (bondEntityInfoVo.getTable()) {
             case 1:
                 entityInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 2:
                 //如果该变动字段是 是否为集合债 那么关键字为 coll Y为1 N为0
-                if(Objects.equals(filedName, "coll")){value = value=="Y"?"1":"0";}
+                if (Objects.equals(filedName, "coll")) {
+                    value = value == "Y" ? "1" : "0";
+                }
                 //如果该变动字段是 是否为ABS 那么关键字为 abs Y为1 N为0
-                if(Objects.equals(filedName, "abs")){value = value=="Y"?"1":"0";}
+                if (Objects.equals(filedName, "abs")) {
+                    value = value == "Y" ? "1" : "0";
+                }
                 bondInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;
             case 3:
-                EntityAttrValue entityAttrValue = iEntityAttrValueService.getBaseMapper().selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, id));
-                Assert.notNull(entityAttrValue,BadInfo.VALID_EMPTY_TARGET.getInfo());
+                EntityAttrValue entityAttrValue = Optional.ofNullable(iEntityAttrValueService.getBaseMapper().selectOne(new QueryWrapper<EntityAttrValue>().lambda().eq(EntityAttrValue::getId, id))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
                 entityAttrValue.setValue(value);
                 iEntityAttrValueService.updateById(entityAttrValue);
                 break;
