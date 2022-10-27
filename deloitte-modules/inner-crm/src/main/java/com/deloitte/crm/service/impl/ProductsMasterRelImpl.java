@@ -33,6 +33,8 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
         private ProductsMasterMappingMapper productsMasterMappingMapper;
 
         private RoleService roleService;
+
+        private  ProductsMasterDictMapper productsMasterDictmapper;
         /**
          *查询客户产品敞口映射
          *
@@ -43,8 +45,30 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
         */
         @Override
         public List<ProCustomerDto> getProductsMasterRelList(String entityCode,String dataYear,Integer ProId) {
+                List<ProCustomerDto> proCustomerDtos = mapper.futureList(ProId);
+                System.out.println(proCustomerDtos);
+                for (ProCustomerDto proCustomerDto : proCustomerDtos) {
+                        LambdaQueryWrapper<ProductsMasterRel> qw = new LambdaQueryWrapper<ProductsMasterRel>()
+                                .eq(ProductsMasterRel::getEntityCode, entityCode)
+                                .eq(ProductsMasterRel::getProCustId, proCustomerDto.getProCumId())
+                                .eq(ProductsMasterRel::getDataYear, dataYear);
+                        ProductsMasterRel productsMasterRel = getOne(qw);
 
-            return mapper.futureList(entityCode,dataYear,ProId);
+                        if (productsMasterRel==null){
+                                proCustomerDto.setDictId(null);
+                                proCustomerDto.setMasterName(null);
+
+                        }else{
+                                LambdaQueryWrapper<ProductsMasterDict> eq = new LambdaQueryWrapper<ProductsMasterDict>().eq(ProductsMasterDict::getId, productsMasterRel.getProMasDictId())
+                                        .eq(ProductsMasterDict::getProCustId, proCustomerDto.getProCumId());
+                                ProductsMasterDict productsMasterDict = productsMasterDictmapper.selectOne(eq);
+                                proCustomerDto.setDictId(productsMasterRel.getProMasDictId().toString());
+                                proCustomerDto.setMasterName(productsMasterDict.getMasterName());
+                        }
+                }
+
+
+                return  proCustomerDtos;
         }
                 /**
                  修改敞口关联关系
@@ -84,8 +108,8 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                         productsMasterRelSave.setDataYear(productsMasterRelVo.getDataYear());
                         productsMasterRelSave.setProCustId(productsMasterRelVo.getProCustId());
                         productsMasterRelSave.setProMasDictId(productsMasterRelVo.getDictIdNew());
-                        productsMasterRel.setUpdateMark("人工映射");
-                        boolean save = save(productsMasterRel);
+                        productsMasterRelSave.setUpdateMark("人工映射");
+                        boolean save = save(productsMasterRelSave);
                         if (save) {
                                 //新增历史记录表
                                 ProductsMasterRelHis productsMasterRelHis = new ProductsMasterRelHis();
@@ -93,14 +117,14 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                                 productsMasterRelHis.setEntityCode(productsMasterRelVo.getEntityCode());
                                 productsMasterRelHis.setEntityNameHis(productsMasterRelVo.getEntityName());
                                 productsMasterRelHis.setProCustId(productsMasterRelVo.getProCustId());
-                                productsMasterRelHis.setMasterDictId(productsMasterRelVo.getDictIdOld() == null ? null : productsMasterRelVo.getDictIdOld() );
-                                productsMasterRelHis.setMasterName(productsMasterRelVo.getMasterNameOld() == null ? null : productsMasterRelVo.getMasterNameOld());
+                                productsMasterRelHis.setMasterDictId(productsMasterRelVo.getDictIdOld()==null ? 0 : productsMasterRelVo.getDictIdOld());
+                                productsMasterRelHis.setMasterName(productsMasterRelVo.getMasterNameOld()==null ? null : productsMasterRelVo.getMasterNameOld());
                                 productsMasterRelHis.setMasterDictIdNew(productsMasterRelVo.getDictIdNew());
                                 productsMasterRelHis.setMasterNameNew(productsMasterRelVo.getMasterNameNew());
                                 producysMasterRelHisMapper.insert(productsMasterRelHis);
                                 return true;
                         }
-                        return save;
+                        return true;
 
                 }
 
