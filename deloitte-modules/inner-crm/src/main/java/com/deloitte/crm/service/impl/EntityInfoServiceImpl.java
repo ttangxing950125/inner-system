@@ -1018,7 +1018,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
-//        EntityInfo entityInfo = new EntityInfo();
 //        企业主体类型 1、上市 2、发债 3、非上市，非发债 4、金融机构
         if (ObjectUtil.isEmpty(pageNum)) {
             pageNum = DEFAULT_PAGENUM;
@@ -1066,7 +1065,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //封装结果集
         List<EntityInfoList> records = new ArrayList<>();
         //相响分页结果
-//        Page<Map<String, Object>> resultPage = new Page<>(pageNum, pageSize);
         Page<EntityInfoList> resultPage = new Page<>(pageNum, pageSize);
 
         resultPage.setTotal(page.getTotal()).setCurrent(page.getCurrent());
