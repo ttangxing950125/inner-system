@@ -51,7 +51,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">政府主体</div>
-              <el-button type="text ">导出全部</el-button>
+              <el-button type="text " @click="exprotGov">导出全部</el-button>
               <div class="right-number">{{ goveSum }}</div>
             </div>
           </div>
@@ -144,7 +144,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">企业主体</div>
-              <el-button type="text ">导出全部</el-button>
+              <el-button type="text " @click="exprotEntity">导出全部</el-button>
               <div class="right-number">{{ entitySum }}</div>
             </div>
           </div>
@@ -403,7 +403,7 @@
 </template>
 
 <script>
-import { govList, entityInfoList, getProduct, getCov } from "@/api/subject";
+import { govList, entityInfoList, getProduct, getCov, exportGov, exportEntity } from "@/api/subject";
 import { importExcelByEntity, getChecking  } from "@/api/common";
 import { download } from '@/utils/index'
 import fileUpload from "../../components/FileUpload/httpUpload.vue";
@@ -716,6 +716,30 @@ export default {
         this.uploadStatus = false
         this.percentage = 0
         this.dialogVisible = false
+    },
+    exprotGov() {
+        try {
+        this.$modal.loading('Loading...')
+        exportGov({}).then(res => {
+            download(res, '政府总览.xlsx')
+        })
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading()
+      }
+    },
+    exprotEntity() {
+        try {
+        this.$modal.loading('Loading...')
+        exportEntity({}).then(res => {
+            download(res, '企业总览.xlsx')
+        })
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading()
+      }
     }
   },
   computed: {

@@ -483,3 +483,31 @@ export function getGovLevel(parmas) {
     data: parmas,
   });
 }
+
+// 总览政府导出
+export function exportGov(parmas) {
+  return request({
+    url: "/crm/govInfo/exportGov ",
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    responseType:'blob',
+    method: "get",
+    data: parmas,
+  },{responseType:'blob'}, {responseType:'blob'});
+}
+
+// 总览企业导出
+export function exportEntity(parmas) {
+  return request({
+    url: "/crm/entityInfo/exportEntity  ",
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    responseType:'blob',
+    method: "get",
+    data: parmas,
+  },{responseType:'blob'}, {responseType:'blob'});
+}
