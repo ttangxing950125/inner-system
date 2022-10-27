@@ -104,24 +104,24 @@
             >注意：带星号字段需同故宫附表维护更新，请进入附表管理模块进行修改</span
           >
           <el-collapse accordion class="collpase">
-            <el-collapse-item>
+            <el-collapse-item  v-if="info.entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">基本信息</span>
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">德勤主体代码（企业）</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.entityInfo && info.entityInfo.entityCode"
-                    @change="item.edit = true"
-                  ></el-input>
+                  <div class="scond" style="color: #a7a7a7">
+                    {{
+                      info.entityInfo.entityCode
+                    }}
+                  </div>
                 </div>
                 <div class="flex1">
                   <div class="first">统一社会信用代码</div>
                   <el-input
                     class="t-input"
-                    v-model="info.entityInfo && info.entityInfo.creditCode"
+                    v-model="info.entityInfo.creditCode"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
@@ -129,7 +129,7 @@
                   <div class="first">统一社会信用代码是否异常</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.entityInfo && info.entityInfo.creditError === 0
+                      info.entityInfo.creditError === 0
                         ? "正常"
                         : "异常"
                     }}
@@ -138,14 +138,14 @@
                 <div class="flex1">
                   <div class="first">统一社会信用代码异常备注</div>
                   <div class="scond" style="color: #a7a7a7">
-                    {{ info.entityInfo && info.entityInfo.creditErrorRemark }}
+                    {{ info.entityInfo.creditErrorRemark }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">年报列示类型</div>
                   <el-input
                     class="t-input"
-                    v-model="info.entityInfo && info.entityInfo.listType"
+                    v-model="info.entityInfo.listType"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
@@ -155,25 +155,25 @@
                   <div class="first">企业名称</div>
                   <el-input
                     class="t-input"
-                    v-model="info.entityInfo && info.entityInfo.entityName"
+                    v-model="info.entityInfo.entityName"
                     @change="item.edit = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
                   <div class="first">企业曾用名</div>
                   <div class="scond" style="color: #a7a7a7">
-                    {{ info.entityInfo && info.entityInfo.entityNameHis }}
+                    {{ info.entityInfo.entityNameHis }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">企业更名日期</div>
                   <div class="scond" style="color: #a7a7a7">
-                    {{ info.entityInfo && info.entityInfo.updated }}
+                    {{ info.entityInfo.updated }}
                   </div>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item>
+            <el-collapse-item v-if="info.stockCnInfo">
               <template slot="title">
                 <span style="font-size: 16px">上市情况</span>
               </template>

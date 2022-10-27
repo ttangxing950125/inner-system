@@ -1614,10 +1614,14 @@ export default {
       this.bodyDig = true
       this.addBodyId = row.id
       this.selectRole7 = JSON.parse(row.details)
-      this.ruleForm.bondFullName = this.selectRole7.债券全称
-      this.ruleForm.bondShortName = this.selectRole7.债券简称
+      this.selectInfoRole7 = JSON.parse(row.infos)
+      // this.ruleForm.bondFullName = this.selectRole7.债券全称
+      // this.ruleForm.bondShortName = this.selectRole7.债券简称
       this.ruleForm.created = row.created
+      this.ruleForm.dataSource = row.dataSource
+      this.ruleForm.dataCode = row.dataCode
       this.ruleForm.id = row.id
+      this.ruleForm.taskId = row.id
       this.ruleForm.dataCode = row.dataCode
       this.$set(this.ruleForm, 'wind',  '')
       this.$set(this.ruleForm, 'shenWan',  '')
@@ -1726,8 +1730,8 @@ export default {
         this.$modal.loading("loading...");
         getTable({id: row.id}).then(res => {
           const { data } = res
-          this.ruleForm.wind = data.attrs.wind行业划分明细.value
-          this.ruleForm.sw = data.attrs['申万(2021)行业划分明细'].value
+          this.ruleForm.wind = data.windMaster
+          this.ruleForm.sw = data.shenWanMaster
         })
         getFinances({}).then(res => {
           const { data } = res
@@ -1920,16 +1924,18 @@ export default {
     },
     getCity(row) {
       this.ruleForm.region = row.govName
+      this.ruleForm.dqGovCode = row.dqGovCode
+      this.ruleForm.govCode = row.govCode
       getGovLevel({preGovCode: row.dqGovCode}).then(res => {
         const { data } = res
         this.city = data
       })
     },
     getCounty(row) {
-        console.log(row.govName)
       this.ruleForm.district = row.govName
+      this.ruleForm.dqGovCode = row.dqGovCode
+      this.ruleForm.govCode = row.govCode
       this.$set(this.ruleForm, 'district', row.govName)
-      console.log(this.ruleForm.district)
       getGovLevel({preGovCode: row.dqGovCode}).then(res => {
         const { data } = res
         this.county = data
