@@ -46,7 +46,7 @@ public class CrmDailyTask implements Serializable {
      * 2-有任务未全部处理完
      * 3-任务处理完毕
      */
-    @Excel(name = "任务文件状态 0-禁用 1-启用")
+    @Excel(name = "1-今日无任务 2-有任务未全部处理完 3-任务处理完毕")
     private Integer taskStatus;
 
     /**
