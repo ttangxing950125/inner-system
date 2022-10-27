@@ -58,7 +58,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         //分页查询多少主体
         Page<EntityInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         QueryWrapper<EntityInfo> like = new QueryWrapper<EntityInfo>();
-        LambdaQueryWrapper<EntityInfo> like1 = like.lambda().like(EntityInfo::getEntityName, entityOrGovByAttrVo.getEntityName());
+        LambdaQueryWrapper<EntityInfo> like1 = like.lambda().eq(EntityInfo::getStatus,1).like(EntityInfo::getEntityName, entityOrGovByAttrVo.getEntityName());
         if (like1 == null) {
             R.fail("未查询到该主体");
         }
