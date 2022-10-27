@@ -353,20 +353,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfo.setStatus(1);
         //再次修改当条信息
         baseMapper.updateById(entityInfo);
-        log.info("  =>> 角色7 主体 {} 信息初始化完成 <<=  ", entityName);
-        switch (entityInfoInsertDTO.getDataSource()) {
-            case 1:
-                this.bindBondInfo(entityInfoInsertDTO, entityCode, username);
-                break;
-            case 2:
-                this.bindStockThkInfo(entityInfoInsertDTO, entityCode, username);
-                break;
-            case 3:
-                this.bindStockCnInfo(entityInfoInsertDTO, entityCode, username);
-                break;
-            default:
-                throw new RuntimeException(BadInfo.COULD_NOT_FIND_SOURCE.getInfo());
-        }
         //当新增后的 关联数据也进行存储 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info
         String dataCode = entityInfoInsertDTO.getDataCode();
 //        Assert.isTrue(!StrUtil.isBlank(dataCode)||dataCode.matches(Common.REGEX_ENTITY_CODE),BadInfo.VALID_DATA_CODE.getInfo());
@@ -3053,7 +3039,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             }
         } else {
             if (!creditCode.matches(Common.REGEX_CREDIT_CODE)) {
-                return R.fail(BadInfo.VALID_PARAM.getInfo());
+                return R.fail(BadInfo.VALID_CREDIT_CODE.getInfo());
             }
             EntityInfo byCredit = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, creditCode));
             EntityInfo byName = this.checkName(entityName);
