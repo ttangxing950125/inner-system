@@ -1862,31 +1862,34 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //全部主体
         Long count = entityInfoMapper.selectCount(query);
         //上市主体
-        Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1));
+        Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getStatus, 1));
         query.clear();
         //单纯上市主体
         query.and(wrapper -> wrapper.lambda().eq(EntityInfo::getList, 1))
-                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getStatus, 1));
         Long onlyList = entityInfoMapper.selectCount(query);
         query.clear();
         //发债主体
-        Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
+        Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1).eq(EntityInfo::getStatus, 1));
         query.clear();
         //单纯发债主体
         query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
-                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1));
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getStatus, 1));
         Long onlyBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既上市主体又发债主体
-        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
+        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1).eq(EntityInfo::getStatus, 1));
         query.clear();
         //既没上市主体又不发债主体
         query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
-                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getStatus, 1));
         Long unListBonds = entityInfoMapper.selectCount(query);
         query.clear();
         //金融
-        Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1));
+        Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1).eq(EntityInfo::getStatus, 1));
 
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
