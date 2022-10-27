@@ -2248,7 +2248,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (ObjectUtil.isEmpty(ADetail)) {
             listDetail = GDetail;
         } else {
-            if (ObjectUtil.isEmpty(ADetail)) {
+            if (ObjectUtil.isEmpty(GDetail)) {
                 listDetail = ADetail;
             } else {
                 listDetail = ADetail + "," + GDetail;
