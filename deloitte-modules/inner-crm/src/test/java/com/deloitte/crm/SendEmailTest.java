@@ -16,8 +16,8 @@ import javax.annotation.Resource;
 public class SendEmailTest {
     @Resource
     private SendEmailService sendEmailService;
-    @Resource
-    EntityCaptureSpeedMapper entityCaptureSpeedMapper;
+    /*@Resource
+    EntityCaptureSpeedMapper entityCaptureSpeedMapper;*/
 
     @Test
     void testSend() {
@@ -26,9 +26,9 @@ public class SendEmailTest {
                         "请尽快登陆平台完成相关任务。");
     }
 
-    @Test
+   /* @Test
     void test02() {
         System.out.println(JSON.toJSONString(entityCaptureSpeedMapper.search("哈尔滨")));
-    }
+    }*/
 
 }
