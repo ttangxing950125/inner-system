@@ -7,7 +7,6 @@ import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
-import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.service.IEntityGovRelService;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -35,8 +34,6 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
     private IEntityInfoService entityInfoService;
     @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
-    @Autowired
-    private ICrmDailyTaskService crmDailyTaskService;
     /**
      * 查询【请填写功能名称】
      *
@@ -137,10 +134,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
         }
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
-
-        //检验是否更新每日任务表
-        crmDailyTaskService.checkDailyTask(crmSupplyTask);
-        return R.ok("修改成功");
+        return R.fail("修改成功");
     }
 
 }

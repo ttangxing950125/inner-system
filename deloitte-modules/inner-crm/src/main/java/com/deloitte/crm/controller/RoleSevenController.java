@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
-import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -59,7 +58,7 @@ public class RoleSevenController {
     @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String",example = "2022-10-12")
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmEntityTask>> getDayTaskInfo(String date, Integer pageNum, Integer pageSize){
+    public R<Page<CrmEntityTaskVo>> getDayTaskInfo(String date,Integer pageNum, Integer pageSize){
         log.info("==> 角色7当日查询 <==");
         return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
     }

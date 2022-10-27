@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
-import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
@@ -307,8 +306,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
      */
     @Override
     public Map<String, AttrValueMapDto> findAttrValue(String entityCode, Integer attrId) {
-        EntityAttr entityAttr = Optional.ofNullable(entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
-
+        EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
+        Assert.notNull(entityAttr, BadInfo.VALID_EMPTY_TARGET.getInfo());
         HashMap<String, AttrValueMapDto> res = new HashMap<>();
         if (entityAttr.getMultiple()) {
             List<EntityAttrIntype> entityAttrIntypes = entityAttrIntypeService.getBaseMapper().selectList(new QueryWrapper<EntityAttrIntype>().lambda().eq(EntityAttrIntype::getAttrId, attrId));
@@ -350,7 +349,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     public Boolean saveAttrValue(String entityCode, AttrValueMapDto attrValueMapDto) {
         Integer valueId = attrValueMapDto.getValueId();
         Integer attrId = attrValueMapDto.getAttrId();
-        final EntityAttr entityAttr = Optional.ofNullable(entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
+        EntityAttr entityAttr = entityAttrService.getBaseMapper().selectOne(new QueryWrapper<EntityAttr>().lambda().eq(EntityAttr::getId, attrId));
+        Assert.notNull(entityAttr, BadInfo.VALID_EMPTY_TARGET.getInfo());
         if (valueId == null) {
             if (entityAttr.getMultiple()) {
                 List<AttrValueMapDto> targetList = new ArrayList<>();
@@ -374,7 +374,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
                 List<AttrValueMapDto> targetList = new ArrayList<>();
                 targetList.addAll(this.getAllChildrenId(attrValueMapDto, targetList));
                 targetList.forEach(row -> {
-                    EntityAttrValue entityAttrValue = Optional.ofNullable(baseMapper.selectById(row.getValueId())).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
+                    EntityAttrValue entityAttrValue = baseMapper.selectById(row.getValueId());
+                    Assert.notNull(entityAttrValue, BadInfo.VALID_EMPTY_TARGET.getInfo());
                     entityAttrValue.setValue(row.getValueId().toString());
                     baseMapper.updateById(entityAttrValue);
                 });

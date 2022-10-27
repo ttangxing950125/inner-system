@@ -92,6 +92,7 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
             entityTaskService.createTask(entityTask);
 
+            return true;
         }
 
 
@@ -140,54 +141,5 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
         Wrapper<EntityInfo> entityWrapper = Wrappers.<EntityInfo>lambdaQuery().in(EntityInfo::getEntityCode, entityCodes);
 
         return entityInfoService.list(entityWrapper);
-    }
-
-    /**
-     * 创建主体任务
-     *
-     * @param entityName
-     * @param windTask
-     * @param cnCoachBack
-     * @return
-     */
-    @Override
-    public boolean createTask(String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack) {
-
-        //根据名称查询主体
-        List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
-        //之前数据库中没有该主体
-        if (CollUtil.isEmpty(entityInfos)) {
-            //创建任务
-            CrmEntityTask entityTask = new CrmEntityTask();
-
-            entityTask.setTaskCategory(windTask.getTaskCategory());
-            entityTask.setDataSource(3);
-
-            entityTask.setSourceType(3);
-            entityTask.setTaskDate(windTask.getTaskDate());
-            String showData = "公司中文名称:" + entityName;
-            showData += ", 代码:" + cnCoachBack.getCode();
-
-            entityTask.setDataShow(showData);
-
-            //infoMap
-            HashMap<String, Object> infoMap = new HashMap<>();
-            infoMap.put("公司中文名称", entityName);
-
-
-            try {
-                Map<String, Object> data = AttrValueUtils.parseObj(cnCoachBack, Excel.class, "name");
-
-                entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
-                entityTask.setDetails(objectMapper.writeValueAsString(data));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            entityTaskService.createTask(entityTask);
-
-        }
-
-        return true;
     }
 }

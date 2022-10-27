@@ -9,7 +9,6 @@ import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import com.deloitte.crm.vo.ParentLevelVo;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +53,7 @@ public interface IGovInfoService  extends IService<GovInfo>
      * @param govInfo 【请填写功能名称】
      * @return 结果
      */
-    public R insertGovInfo(GovInfo govInfo);
+    public int insertGovInfo(GovInfo govInfo);
 
     /**
      * 修改【请填写功能名称】
@@ -80,7 +79,7 @@ public interface IGovInfoService  extends IService<GovInfo>
      */
     public int deleteGovInfoById(Long id);
 
-    R updateInfoList(GovInfo list);
+    R updateInfoList(List<GovInfo> list);
 
     R getInfoDetail(String dqGovCode);
 
@@ -119,7 +118,4 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     List<GovInfo> getGovByParam(String param);
 
-    void exportEntity(HttpServletResponse response);
-
-    void updateGovInfosByPreCode();
 }

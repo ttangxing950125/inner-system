@@ -22,12 +22,12 @@ import javax.annotation.Resource;
 
 /**
  * 【请填写功能名称】Service业务层处理
- *
+ * 
  * @author deloitte
  * @date 2022-09-21
  */
 @Service
-public class EntityBondRelServiceImpl implements IEntityBondRelService
+public class EntityBondRelServiceImpl implements IEntityBondRelService 
 {
     @Autowired
     private EntityBondRelMapper entityBondRelMapper;
@@ -91,6 +91,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
             entityTaskService.createTask(entityTask);
 
+            return true;
         }
 
         //是否绑定过关联关系
@@ -129,7 +130,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     /**
      * 查询【请填写功能名称】列表
-     *
+     * 
      * @param entityBondRel 【请填写功能名称】
      * @return 【请填写功能名称】
      */
@@ -141,7 +142,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     /**
      * 新增【请填写功能名称】
-     *
+     * 
      * @param entityBondRel 【请填写功能名称】
      * @return 结果
      */
@@ -153,7 +154,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     /**
      * 修改【请填写功能名称】
-     *
+     * 
      * @param entityBondRel 【请填写功能名称】
      * @return 结果
      */
@@ -165,7 +166,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     /**
      * 批量删除【请填写功能名称】
-     *
+     * 
      * @param ids 需要删除的【请填写功能名称】主键
      * @return 结果
      */
@@ -177,7 +178,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     /**
      * 删除【请填写功能名称】信息
-     *
+     * 
      * @param id 【请填写功能名称】主键
      * @return 结果
      */

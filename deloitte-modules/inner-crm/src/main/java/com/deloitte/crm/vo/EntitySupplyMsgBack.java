@@ -181,7 +181,7 @@ public class EntitySupplyMsgBack {
             this.creditCode = entityInfo.getCreditCode();
             this.windMaster = entityInfo.getWindMaster();
             this.shenWanMaster = entityInfo.getShenWanMaster();
-            this.listType = entityInfo.getListType();
+            this.listType = entityInfo.getEntityCode();
             String reportType = entityInfo.getReportType();
 
             if (!ObjectUtils.isEmpty(reportType)) {

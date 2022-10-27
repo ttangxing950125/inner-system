@@ -14,7 +14,6 @@ import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -303,6 +302,4 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * 新增【确定该主体是新增后,填写具体要新增主体的信息】
      */
     R insertEntityInfoByDaily(EntityInfoInsertDTO entityInfoInsertDTO);
-
-    void exportEntity(HttpServletResponse response);
 }

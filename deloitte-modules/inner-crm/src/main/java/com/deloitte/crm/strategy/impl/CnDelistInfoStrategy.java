@@ -110,7 +110,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         if (stockCnInfo != null) {
             stockCnInfo.setIsDeleted(Boolean.TRUE);//TODO 1-删除 0-未删除 默认都是未删除
             stockCnInfo.setDelistingDate(DateUtil.formatDate(item.getDelistDate()));
-            stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+            stockCnInfoService.saveOrUpdateNew(stockCnInfo);
             final LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockCnInfo.getStockDqCode()));
             if (entityStockCnRel != null) {
@@ -133,10 +133,8 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         }
         item.setChangeType(changeType);
 
-        if (changeType!=null){
-            //更新a股属性
-            entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
-        }
+        //更新a股属性
+//        entityAttrValueService.updateStockCnAttr(code, item);
         //添加
         cnDelistInfoMapper.insert(item);
 

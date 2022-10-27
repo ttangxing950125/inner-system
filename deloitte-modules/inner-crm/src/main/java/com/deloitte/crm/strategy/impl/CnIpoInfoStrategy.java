@@ -144,9 +144,9 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
             entityInfoService.updateBatchById(entityInfos);
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
-                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+                stockCnInfoService.saveOrUpdateNew(stockCnInfo);
                 //更新a股属性
-                entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
+                entityAttrValueService.updateStockCnAttr(code, item);
             }
             item.setChangeType(changeType);
 

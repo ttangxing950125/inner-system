@@ -108,10 +108,10 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
             }
             if (StrUtil.isNotBlank(code)) {
                 //保存a股信息
-                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+                stockCnInfoService.saveOrUpdateNew(stockCnInfo);
                 if (changeType != null) {
                     //更新a股属性
-                    entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
+                    entityAttrValueService.updateStockCnAttr(code, item);
                 }
 
 
@@ -125,11 +125,7 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
                             String entityCode = info.getEntityCode();
                             String stockDqCode = stockCnInfo.getStockDqCode();
                             //查询关联关系
-                            EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(
-                                    new LambdaQueryWrapper<EntityStockCnRel>()
-                                            .eq(EntityStockCnRel::getEntityCode, entityCode)
-                                            .eq(EntityStockCnRel::getStockDqCode, stockDqCode)
-                                            .eq(EntityStockCnRel::getStatus, Boolean.TRUE));
+                            EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityCode).eq(EntityStockCnRel::getStockDqCode, stockDqCode).eq(EntityStockCnRel::getStatus, Boolean.FALSE));
                             if (dbRel != null) {
                                 continue;
                             }
