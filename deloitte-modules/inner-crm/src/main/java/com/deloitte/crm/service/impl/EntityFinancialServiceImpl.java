@@ -74,6 +74,8 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
+        //更新任务进度
+        crmDailyTaskService.checkDailyTask(crmSupplyTask);
         return R.ok("修改成功");
     }
 
