@@ -163,6 +163,7 @@ public class RoleSevenController {
     @Log(title = "【 校验主体名称及代码 】", businessType = BusinessType.OTHER)
     @PostMapping("/validateCodeAndName")
     public R<EntityInfoVo> validateCodeAndName(String creditCode,@NotNull(message = "主体名称不能为空") String entityName){
+
         return iEntityInfoService.validateCodeAndName(creditCode,entityName);
     }
 

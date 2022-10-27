@@ -3043,7 +3043,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         entityName = entityName.replace(" ", "");
         log.info("  =>> 校验新增主体字段 社会信用代码:{}，主体名称{} <<=  ", creditCode, entityName);
-        if (creditCode == null) {
+        if (StrUtil.isBlank(creditCode)) {
             EntityInfo byName = this.checkName(entityName);
             log.info("  =>> 查询到主体 {}  <<=  ", byName);
             if (ObjectUtils.isEmpty(byName)) {
