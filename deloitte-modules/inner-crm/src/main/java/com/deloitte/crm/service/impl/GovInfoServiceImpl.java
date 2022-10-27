@@ -903,6 +903,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 }
                 maps.add(Map);
             }
+            govInfoBynameDto.setStatus(record.getStatus());
             govInfoBynameDto.setDqCode(record.getDqGovCode());
             govInfoBynameDto.setGovCode(record.getGovCode());
             govInfoBynameDto.setGovName(record.getGovName());
