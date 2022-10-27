@@ -8,15 +8,11 @@ import com.deloitte.crm.domain.EntityFinancial;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityFinancialMapper;
-import com.deloitte.crm.service.EntityFinancialService;
-import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.service.ICrmSupplyTaskService;
-import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 /**
  * (EntityFinancial)表服务实现类
@@ -41,6 +37,9 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
 
     @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
+
+    @Autowired
+    private EntityCaptureSpeedService entityCaptureSpeedService;
     /**
      * 金融机构根据entityCode补充录入副表信息
      *
@@ -56,9 +55,10 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         Integer taskId = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(taskId);
 
+         /*//已完成的任务，不允许重复提交
         if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
             return R.fail("已完成的任务，不能重复提交");
-        }
+        }*/
 
         crmSupplyTaskService.completeTaskById(taskId);
         //保存
@@ -75,7 +75,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
         //更新任务进度
-        crmDailyTaskService.checkDailyTask(crmSupplyTask);
+        entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
         return R.ok("修改成功");
     }
 

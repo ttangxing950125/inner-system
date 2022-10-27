@@ -97,6 +97,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private StockThkInfoMapper stockThkMapper;
 
+    @Autowired
+    private EntityCaptureSpeedService entityCaptureSpeedService;
 
     private ProductsMasterDictMapper productsMasterDictMapper;
 
@@ -2332,15 +2334,17 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         Integer id = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(id);
-
+        /*//已完成的任务，不允许重复提交
         if (!ObjectUtils.isEmpty(crmSupplyTask) && !ObjectUtils.isEmpty(crmSupplyTask.getId()) && crmSupplyTask.getId() == 1) {
             return R.fail("已完成的任务，不能重复提交");
-        }
+        }*/
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
 
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
+        //更新任务进度
+        entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
         return R.ok("修改成功");
     }
 
