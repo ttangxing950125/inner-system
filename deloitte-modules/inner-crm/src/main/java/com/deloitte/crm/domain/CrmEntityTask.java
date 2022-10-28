@@ -29,12 +29,8 @@ public class CrmEntityTask
     /**
      * 捕获时的主体名
      */
+    @ApiModelProperty(value = "捕获时的主体名")
     private String entityName;
-
-    /**
-     * 任务进度表的id
-     */
-    private Integer speedId;
 
     /**
      * 来源主表code
