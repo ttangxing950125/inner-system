@@ -19,7 +19,7 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
-import com.deloitte.crm.excelUtils.ExcelUtils;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;

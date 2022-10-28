@@ -26,7 +26,7 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
-import com.deloitte.crm.excelUtils.ExcelUtils;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.TimeFormatUtil;
@@ -2404,7 +2404,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
 
         //更新任务进度
-        entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
+        entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask,entityInfo);
         return R.ok("修改成功");
     }
 
