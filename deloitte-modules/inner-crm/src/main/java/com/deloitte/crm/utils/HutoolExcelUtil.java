@@ -11,10 +11,8 @@ import cn.hutool.poi.excel.cell.CellUtil;
 import cn.hutool.poi.excel.sax.Excel07SaxReader;
 import cn.hutool.poi.excel.sax.handler.RowHandler;
 import com.deloitte.common.core.exception.GlobalException;
-import com.deloitte.common.core.exception.ServiceException;
 import com.google.common.base.Strings;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +25,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Slf4j
 @Component
 public class HutoolExcelUtil {
 
@@ -86,7 +83,7 @@ public class HutoolExcelUtil {
         try {
             out = response.getOutputStream();
         } catch (IOException e) {
-            log.error("获取流异常：{}", e);
+            e.printStackTrace();
         }
         writer.flush(out, true);
         // 关闭writer，释放内存
@@ -106,7 +103,7 @@ public class HutoolExcelUtil {
         String fileName = file.getOriginalFilename();
         // 上传文件为空
         if (Strings.isNullOrEmpty(fileName)) {
-            throw new ServiceException("导入文件不能为空");
+            throw new GlobalException("导入文件不能为空");
         }
         //上传文件大小为1000条数据
 //        if (file.getSize() > 1024 * 1024 * 10) {
@@ -115,7 +112,7 @@ public class HutoolExcelUtil {
 //        }
         // 上传文件名格式不正确
         if (fileName.lastIndexOf(".") != -1 && !".xlsx".equals(fileName.substring(fileName.lastIndexOf(".")))) {
-            throw new ServiceException("文件名格式不正确, 请使用后缀名为.XLSX的文件");
+            throw new GlobalException("文件名格式不正确, 请使用后缀名为.XLSX的文件");
         }
 
         //读取数据
@@ -142,8 +139,8 @@ public class HutoolExcelUtil {
             }
             return list;
         } catch (Exception e) {
-            log.error("导入的数据有误>>>>ex:{}", e);
-            throw new ServiceException("导入的数据有误，请导入正确数据！");
+            e.printStackTrace();
+            throw new GlobalException("导入的数据有误，请导入正确数据！");
         }
     }
 
@@ -161,11 +158,11 @@ public class HutoolExcelUtil {
         String fileName = file.getOriginalFilename();
         // 上传文件为空
         if (Strings.isNullOrEmpty(fileName)) {
-            throw new ServiceException("导入文件不能为空");
+            throw new GlobalException("导入文件不能为空");
         }
         // 上传文件名格式不正确
         if (fileName.lastIndexOf(".") != -1 && !".xlsx".equals(fileName.substring(fileName.lastIndexOf(".")))) {
-            throw new ServiceException("文件名格式不正确, 请使用后缀名为.XLSX的文件");
+            throw new GlobalException("文件名格式不正确, 请使用后缀名为.XLSX的文件");
         }
         //读取数据
         try {
@@ -190,14 +187,14 @@ public class HutoolExcelUtil {
                 }
             }
             return list;
-        } catch (ServiceException e) {
-            log.error("e.getMessage()");
-            throw new ServiceException(e.getMessage());
-        } catch (Exception e) {
-            throw new ServiceException("导入的数据有误，请导入正确数据！");
+        }catch (GlobalException e){
+            e.printStackTrace();
+            throw new GlobalException(e.getMessage());
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new GlobalException("导入的数据有误，请导入正确数据！");
         }
     }
-
     /**
      * 通过实现handle方法编写我们要对每行数据的操作方式
      */
@@ -215,14 +212,14 @@ public class HutoolExcelUtil {
     }
 
 
+
     /**
      * 以String类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛异常
+     * @param ex 抛出异常类，传了就抛异常
      * @return 没有获取到就返回null
      */
-    public static String readCellStringValue(Cell cell, RuntimeException ex) {
+    public static String readCellStringValue(Cell cell, RuntimeException ex){
         Object value = CellUtil.getCellValue(cell);
         if (value == null) {
             return null;
@@ -230,7 +227,7 @@ public class HutoolExcelUtil {
         String res = null;
         try {
             res = value.toString();
-        } catch (Exception e) {
+        }catch (Exception e) {
             if (ex != null) {
                 throw ex;
             }
@@ -240,12 +237,11 @@ public class HutoolExcelUtil {
 
     /**
      * 以boolean类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛出异常
+     * @param ex 抛出异常类，传了就抛出异常
      * @return 没有获取到就返回null
      */
-    public static Boolean readCellBooleanValue(Cell cell, RuntimeException ex) {
+    public static Boolean readCellBooleanValue(Cell cell, RuntimeException ex){
         Object value = CellUtil.getCellValue(cell);
         if (value == null) {
             return null;
@@ -253,7 +249,7 @@ public class HutoolExcelUtil {
         Boolean res = null;
         try {
             res = (Boolean) value;
-        } catch (Exception e) {
+        }catch (Exception e) {
             if (ex != null) {
                 throw ex;
             }
@@ -263,12 +259,11 @@ public class HutoolExcelUtil {
 
     /**
      * 以Long类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛出异常
+     * @param ex 抛出异常类，传了就抛出异常
      * @return 没有获取到就返回null
      */
-    public static Long readCellLongValue(Cell cell, RuntimeException ex) {
+    public static Long readCellLongValue(Cell cell, RuntimeException ex){
         Object value = CellUtil.getCellValue(cell);
         if (value == null) {
             return null;
@@ -276,7 +271,7 @@ public class HutoolExcelUtil {
         Long res = null;
         try {
             res = (Long) value;
-        } catch (Exception e) {
+        }catch (Exception e){
             if (ex != null) {
                 throw ex;
             }
@@ -286,9 +281,8 @@ public class HutoolExcelUtil {
 
     /**
      * 以Integer类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛出异常
+     * @param ex 抛出异常类，传了就抛出异常
      * @return 没有获取到就返回null
      */
     public static Integer readCellIntegerValue(Cell cell, RuntimeException ex) {
@@ -301,7 +295,7 @@ public class HutoolExcelUtil {
             //CellUtil转化的时候是返回的Long类型
             Long longValue = (Long) value;
             res = longValue.intValue();
-        } catch (Exception e) {
+        }catch (Exception e){
             if (ex != null) {
                 throw ex;
             }
@@ -311,12 +305,11 @@ public class HutoolExcelUtil {
 
     /**
      * 以Double类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛出异常
+     * @param ex 抛出异常类，传了就抛出异常
      * @return 没有获取到就返回null
      */
-    public static Double readCellDoubleValue(Cell cell, RuntimeException ex) {
+    public static Double readCellDoubleValue(Cell cell, RuntimeException ex){
         Object value = CellUtil.getCellValue(cell);
         if (value == null) {
             return null;
@@ -324,7 +317,7 @@ public class HutoolExcelUtil {
         Double res = null;
         try {
             res = (Double) value;
-        } catch (Exception e) {
+        }catch (Exception e){
             if (ex != null) {
                 throw ex;
             }
@@ -334,12 +327,11 @@ public class HutoolExcelUtil {
 
     /**
      * 以BigDecimal类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛出异常
+     * @param ex 抛出异常类，传了就抛出异常
      * @return 没有获取到就返回null
      */
-    public static BigDecimal readCellBigDecimalValue(Cell cell, RuntimeException ex) {
+    public static BigDecimal readCellBigDecimalValue(Cell cell, RuntimeException ex){
         Object value = CellUtil.getCellValue(cell);
         if (value == null) {
             return null;
@@ -347,7 +339,7 @@ public class HutoolExcelUtil {
         BigDecimal res = null;
         try {
             res = new BigDecimal(value.toString());
-        } catch (Exception e) {
+        }catch (Exception e){
             if (ex != null) {
                 throw ex;
             }
@@ -357,12 +349,11 @@ public class HutoolExcelUtil {
 
     /**
      * 以LocalDateTime类型返回cell的值
-     *
      * @param cell
-     * @param ex   抛出异常类，传了就抛出异常
+     * @param ex 抛出异常类，传了就抛出异常
      * @return 没有获取到就返回null
      */
-    public static LocalDateTime readCellLocalDateTime(Cell cell, RuntimeException ex) {
+    public static LocalDateTime readCellLocalDateTime(Cell cell, RuntimeException ex){
         Object value = CellUtil.getCellValue(cell);
         if (value == null) {
             return null;
@@ -371,7 +362,7 @@ public class HutoolExcelUtil {
         try {
             DateTime time = (DateTime) value;
             res = DateUtil.toLocalDateTime(time);
-        } catch (Exception e) {
+        }catch (Exception e){
             if (ex != null) {
                 throw ex;
             }

@@ -1,4 +1,4 @@
-package com.deloitte.crm.utils.excel;
+package com.deloitte.crm.excelUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
