@@ -170,10 +170,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.state !== 1" @click="workRole3(scope.row)" type="text" size="small"
+            <el-button @click="workRole3(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
@@ -220,10 +219,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.state !== 1" @click="workRole4(scope.row)" type="text" size="small"
+            <el-button @click="workRole4(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
@@ -270,10 +268,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.state !== 1" @click="workRole5(scope.row)" type="text" size="small"
+            <el-button @click="workRole5(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
@@ -1485,7 +1482,8 @@
       checkStatus: false,
       inputCode: '',
       inputName: '',
-      dnow: ''
+      dnow: '',
+      clickDayStr: false
     };
   },
   mounted() {
@@ -1539,14 +1537,9 @@
             getTaskByDate(params).then((res) => {
               const {data} = res
               this.list = data
+              this.sureDate(this, false, this.year, this.monthMm-1, parseInt(this.clickDayStr))
             });
           }
-          queryList(paramsMonth).then((res) => {
-            const {data} = res
-            if (!page) {
-              this.showMsg(data)
-            }
-          })
           if (this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
             // 角色 345 相关接口
             getRoleSupplyTask({
@@ -1558,6 +1551,7 @@
               this.list3 = data && data.records
               this.queryParams.pages = data && data.current
               this.total = data && data.total || 0
+              this.sureDate(this, false, this.year, this.monthMm-1, parseInt(this.clickDayStr))
             })
           }
 
@@ -1572,6 +1566,7 @@
               this.list2 = data.records
               this.total = data.total
               this.queryParams.pages = data.current
+              this.sureDate(this, false, this.year, this.monthMm-1, parseInt(this.clickDayStr))
             })
           }
 
@@ -1590,9 +1585,13 @@
               this.list7 = data.records
               this.total = data.total
               this.queryParams.pageNum = data.current
-              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+              this.sureDate(this, false, this.year, this.monthMm-1, parseInt(this.clickDayStr))
             });
           }
+            queryList(paramsMonth).then((res) => {
+            const {data} = res
+            this.showMsg(data)
+            })
         } catch (error) {
           console.log(error);
         } finally {
@@ -1611,6 +1610,7 @@
         const parmas = {
           taskDate: this.monthDate
         }
+        this.clickDayStr = false
         this.year = this.monthDate.substr(0, 4)
         this.month = this.monthDate.substr(5, 2)
         this.month = this.month.indexOf('0') === 0 ? this.month.substr(1, 1) : this.month
@@ -1833,6 +1833,7 @@
         if (row.path[1].localName === 'tr') {
           return
         }
+        this.clickDayStr = row.path[0].innerText
         row.path[1].localName === 'td' ? row.path[1].className = 'thisDay' : row.path[2].className = 'thisDay'
         try {
           this.$modal.loading("loading...");
@@ -1912,6 +1913,50 @@
       this.$set(this.ruleForm, 'creditErrorType',  '')
       this.$set(this.ruleForm, 'creditCode',  '')
     },
+    check(name, code, disabeld) {
+        const nameCheck = disabeld ? true : code
+        if (!nameCheck) {
+          this.$message({
+            showClose: true,
+            message: '请输入信用代码',
+            type: 'error'
+          });
+          return
+        }
+        if (!name) {
+          this.$message({
+            showClose: true,
+            message: '请输入主体名称',
+            type: 'error'
+          });
+          return
+        }
+        this.$modal.loading("loading...");
+        try {
+            validateCodeAndName({creditCode: code, entityName: name}).then(res => {
+            const {data} = res
+            this.checkStatus = data.status
+            this.inputCode = code
+            this.inputName = name
+            if (data.status === 0) {
+                this.entityNamePass = 2 // 查重通过
+            }
+            if (data.status > 0) {
+                 this.$message({
+                    showClose: true,
+                    message: res.msg,
+                    type: 'error'
+                })
+                this.replaceData = data.entityInfo
+                this.entityNamePass = 1 // 查重没过
+            }
+            })
+            } catch (error) {
+                console.log(error)
+            } finally {
+                this.$modal.closeLoading();
+            }
+      },
       showMoreData() {
         this.replaceDig = true
       },
