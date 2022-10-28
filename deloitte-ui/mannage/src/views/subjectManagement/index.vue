@@ -51,7 +51,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">政府主体</div>
-              <el-button type="text " @click="exprotGov">导出全部</el-button>
+              <el-button type="text "  style="text-decoration:underline" @click="exprotGov">导出全部</el-button>
               <div class="right-number">{{ toThousands(goveSum) }}</div>
             </div>
           </div>
@@ -144,7 +144,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">企业主体</div>
-              <el-button type="text " @click="exprotEntity">导出全部</el-button>
+              <el-button type="text "  style="text-decoration:underline" @click="exprotEntity">导出全部</el-button>
               <div class="right-number">{{ toThousands(entitySum) }}</div>
             </div>
           </div>
@@ -805,7 +805,7 @@ export default {
   .right-number {
     width: 50px;
     position: relative;
-    right: -115%;
+    right: -177%;
     top: 30%;
     color: #86bc25;
   }
