@@ -12,8 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * @author 吴鹏鹏ppp
@@ -40,13 +42,14 @@ public class SendEmailTest {
 
     @Test
     void test03() {
-        CrmTypeInfo crmTypeInfo=new CrmTypeInfo();
+        CrmTypeInfo crmTypeInfo = new CrmTypeInfo();
         crmTypeInfo.setName("非传统电信运营商");
         crmTypeInfo.setType("1");
         crmTypeInfo.setCode("WIN015");
         crmTypeInfo.setParentCode("WIN014");
         final Set<CrmTypeInfo> crmTypeInfos = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(1));
-        System.out.println(">>>>"+JSON.toJSONString(crmTypeInfos));
+         crmTypeInfos.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel));
+        System.out.println(">>>>" + JSON.toJSONString(crmTypeInfos));
 
     }
 
