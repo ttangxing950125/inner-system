@@ -1,7 +1,10 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.math.MathUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ThkSecIssDetailStrategy implements WindTaskStrategy {
+    @Resource
+    private CrmTypeInfoService crmTypeInfoService;
 
     @Resource
     private IThkSecIssDetailService thkSecIssDetailService;
@@ -76,11 +81,32 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             stockThkInfo.setStockCode(code);
             stockThkInfo.setStockName(thkSecIssInfos.getName());
 
+            /***
+             *部分代码逻辑沿用BondDelIssStrategy
+             * {@link com.deloitte.crm.strategy.impl.BondDelIssStrategy#doBondImport(BondDelIss, Date, CrmWindTask)}
+             */
+            //推迟或取消发行债券 均为二级发行
+            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, thkSecIssInfos.getBelWind()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+            if (crmTypeInfo != null) {
+                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
+                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                    if (CollectionUtil.isEmpty(hashSetResult)) {
+                        thkSecIssInfos.setBelWind(crmTypeInfo.getName());
+                    } else {
+                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                        thkSecIssInfos.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
+                    }
+                } else {
+                    thkSecIssInfos.setBelWind(crmTypeInfo.getName());
+                }
+            }
+
             //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
             Integer changeType = null;
 
             //查询这条数据有没有
             ThkSecIssDetail lastThkSecIssInfo = thkSecIssDetailService.findLastByCode(code);
+
             if (lastThkSecIssInfo == null) {
 
                 changeType = DataChangeType.INSERT.getId();
