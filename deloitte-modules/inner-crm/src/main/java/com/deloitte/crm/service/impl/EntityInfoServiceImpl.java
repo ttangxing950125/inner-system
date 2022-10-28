@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.common.security.utils.SecurityUtils;
@@ -26,10 +27,10 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
-import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.TimeFormatUtil;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
@@ -80,6 +81,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityStockCnRelMapper cnRelMapper;
 
     @Autowired
+    private EntityBaseBusiInfoMapper entityBaseBusiInfoMapper;
+
+    @Autowired
     private EntityStockThkRelMapper thkRelMapper;
 
     @Autowired
@@ -88,6 +92,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
+    @Autowired
+    private EntityBaseBusiInfoService entityBaseBusiInfoService;
 
     private ProductsMasterRelMapper productsMasterRelMapper;
 
@@ -99,6 +105,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Autowired
     private EntityCaptureSpeedService entityCaptureSpeedService;
+
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     private ProductsMasterDictMapper productsMasterDictMapper;
 
@@ -460,6 +469,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     /**
      * 绑定 A股 stock_cn_info
+     * A股没有 dataCode 所以进行生成
      */
     @Transactional(rollbackFor = Exception.class)
     void bindStockCnInfo(EntityInfoInsertDTO entityInfoInsertDTO, String entityCode, String username) {
@@ -998,9 +1008,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         return entityInfoDetails;
     }
-
-    @Autowired
-    private EntityBaseBusiInfoService entityBaseBusiInfoService;
 
     /**
      * 根据多个主体code查询
@@ -2352,11 +2359,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
         //更新任务进度
         entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
+
         return R.ok("修改成功");
     }
-
-    @Autowired
-    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -2369,6 +2374,18 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         StockCnInfo stockCnInfo = entityInfoDetails.getStockCnInfo();
         //港股信息
         StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
+
+        //修改金融机构信息
+        EntityFinancial entityFinancial = entityInfoDetails.getEntityFinancial();
+        if (!ObjectUtils.isEmpty(entityFinancial)){
+            financialMapper.updateById(entityFinancial.setUpdated(new Date()));
+        }
+        //修改主体其他一般工商信息
+        EntityBaseBusiInfo entityBaseBusiInfo = entityInfoDetails.getEntityBaseBusiInfo();
+        if (!ObjectUtils.isEmpty(entityBaseBusiInfo)){
+            entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo.setUpdated(new Date()));
+        }
+
         if (!ObjectUtil.isEmpty(entityInfo) && !ObjectUtil.isEmpty(entityInfo.getEntityCode())) {
             EntityInfo o = entityInfoMapper.selectById(entityInfo.getId());
             String entityName = o.getEntityName();
@@ -2384,19 +2401,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //修改基础属性，需要将曾用名置空
                 entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
             }
-            EntityInfo old = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+            EntityInfo old = entityInfoMapper.selectById(entityInfo.getId());
             entityInfoLogsUpdatedService.insert(old.getEntityCode(), old.getEntityName(), old, entityInfo);
-            entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+            entityInfo.setUpdated(new Date()).setUpdater(SecurityUtils.getUsername());
+            entityInfoMapper.updateById(entityInfo);
         }
         if (!ObjectUtil.isEmpty(stockCnInfo) && !ObjectUtil.isEmpty(stockCnInfo.getStockDqCode())) {
-            StockCnInfo old = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
+            StockCnInfo old = stockCnMapper.selectById(stockCnInfo.getId());
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockShortName(), old, entityInfo);
-            stockCnMapper.update(stockCnInfo, new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
+            stockCnInfo.setUpdated(new Date());
+            stockCnMapper.updateById(stockCnInfo);
         }
         if (!ObjectUtil.isEmpty(stockThkInfo) && !ObjectUtil.isEmpty(stockThkInfo.getStockDqCode())) {
-            StockThkInfo old = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
+            StockThkInfo old = stockThkMapper.selectById(stockThkInfo.getId());
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockName(), old, entityInfo);
-            stockThkMapper.update(stockThkInfo, new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
+            stockThkInfo.setUpdated(new Date());
+            stockThkMapper.updateById(stockThkInfo);
         }
     }
 

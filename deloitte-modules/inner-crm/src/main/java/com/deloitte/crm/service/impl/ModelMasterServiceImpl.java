@@ -201,8 +201,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         updateEntityMaster(masDto);
         log.info("  =>> 修改一条数据至 entity_master <<=  ");
 
-        updateEntityGovRel(masDto);
-        log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");
+        if (YES.equals(masDto.getCityIb())){ updateEntityGovRel(masDto); log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");}
 
         //更改当条信息任务状态
         Date currentDate = iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
@@ -261,7 +260,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             Long role5 = groupingByMap.computeIfPresent(7L, (k, v) -> v != 0 ? v : 0L);
             //角色3 角色id为 5L
             if (role3 != 0 && role3 != null) {
-                sendEmailService.email(ROLE_3_ID, role3.intValue());
+                sendEmailService.email(ROLE_3_ID, role3.intValue(),dateNow);
                 //无任务为 1 有任务未完成 2
                 this.createTask(ROLE_3_ID, 2);
             } else {
@@ -269,14 +268,14 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             }
             //角色4 角色id为 6L
             if (role4 != 0 && role4 != null) {
-                sendEmailService.email(ROLE_4_ID, role4.intValue());
+                sendEmailService.email(ROLE_4_ID, role4.intValue(),dateNow);
                 this.createTask(ROLE_4_ID, 2);
             } else {
                 this.createTask(ROLE_4_ID, 1);
             }
             //角色5 角色id为 7L
             if (role5 != 0 && role5 != null) {
-                sendEmailService.email(ROLE_5_ID, role5.intValue());
+                sendEmailService.email(ROLE_5_ID, role5.intValue(),dateNow);
                 this.createTask(ROLE_5_ID, 2);
             } else {
                 this.createTask(ROLE_5_ID, 1);

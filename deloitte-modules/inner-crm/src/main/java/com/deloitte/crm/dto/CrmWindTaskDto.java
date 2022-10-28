@@ -12,6 +12,11 @@ import io.swagger.annotations.ApiModelProperty;
 public class CrmWindTaskDto {
     @ApiModelProperty(value = "任务描述")
     private Integer taskCateId;
+
+
+     private String taskCategory;
+
+
     /** 任务描述 */
     @ApiModelProperty(value = "任务描述")
     private String  taskDesc;
@@ -52,6 +57,14 @@ public class CrmWindTaskDto {
 
     public void setComplete(String notComplete) {
         this.complete = notComplete;
+    }
+
+    public String getTaskCategory() {
+        return taskCategory;
+    }
+
+    public void setTaskCategory(String taskCategory) {
+        this.taskCategory = taskCategory;
     }
 
     @Override
