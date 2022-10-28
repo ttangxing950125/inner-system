@@ -26,8 +26,20 @@ public class CrmEntityTask
 {
     private static final Long serialVersionUID = 1L;
 
+
+
     @TableId(type = IdType.AUTO)
     private Integer id;
+
+    /**
+     * 捕获时的主体名
+     */
+    private String entityName;
+
+    /**
+     * 任务进度表的id
+     */
+    private Integer speedId;
 
     /**
      * 来源主表code

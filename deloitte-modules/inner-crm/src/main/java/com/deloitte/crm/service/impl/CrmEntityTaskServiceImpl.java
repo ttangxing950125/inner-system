@@ -12,8 +12,10 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.SendEmailService;
@@ -52,6 +54,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     @Resource
     private SendEmailService sendEmailService;
 
+    @Resource
+    private EntityCaptureSpeedService entityCaptureSpeedService;
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务
@@ -198,7 +202,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     /**
      * 创建任务
-     *
+     * 测试暂存区
      * @param crmEntityTask
      * @return
      */
@@ -207,6 +211,14 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     public CrmEntityTask createTask(CrmEntityTask crmEntityTask) {
         //当前日期
         Date taskDate = crmEntityTask.getTaskDate();
+
+        //生成entity_capture_speed数据
+        EntityCaptureSpeed captureSpeed = new EntityCaptureSpeed();
+        captureSpeed.setSource(crmEntityTask.getTaskCategory());
+        captureSpeed.setEntityName(crmEntityTask.getEntityName());
+        captureSpeed.setCaptureTime(new Date());
+
+        entityCaptureSpeedService.save(captureSpeed);
 
         crmEntityTaskMapper.insert(crmEntityTask);
 

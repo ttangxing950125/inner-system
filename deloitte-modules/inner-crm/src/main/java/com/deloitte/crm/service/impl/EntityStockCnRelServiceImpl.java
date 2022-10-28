@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityStockCnRelMapper;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.EntityStockCnRelService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -42,6 +43,9 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
     @Resource
     private ObjectMapper objectMapper;
+
+    @Resource
+    private EntityCaptureSpeedService entityCaptureSpeedService;
 
     /**
      * 绑定主体和a股的关联关系，如果没有这个企业，就创建新增企业的任务
@@ -86,11 +90,14 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
+
+
+                entityTask.setEntityName(entityName);
+                entityTaskService.createTask(entityTask);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            entityTaskService.createTask(entityTask);
 
         }
 
