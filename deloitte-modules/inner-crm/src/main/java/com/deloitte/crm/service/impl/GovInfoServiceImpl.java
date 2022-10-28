@@ -868,9 +868,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         LambdaQueryWrapper<GovInfo> eq;
         if (entityOrGovByAttrVo.getEntityName()==null || entityOrGovByAttrVo.getEntityName().equals("") ){
 
-            eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus,1);
+            eq = new LambdaQueryWrapper<GovInfo>();
         }else {
-            eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus,1).like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
+            eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
 
         }
         Page<GovInfo> page1 = govInfoMapper.selectPage(page, eq);
@@ -903,6 +903,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 }
                 maps.add(Map);
             }
+            govInfoBynameDto.setStatus(record.getStatus());
             govInfoBynameDto.setDqCode(record.getDqGovCode());
             govInfoBynameDto.setGovCode(record.getGovCode());
             govInfoBynameDto.setGovName(record.getGovName());

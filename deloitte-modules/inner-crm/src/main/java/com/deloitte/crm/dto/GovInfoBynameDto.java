@@ -29,6 +29,8 @@ public class GovInfoBynameDto {
     /** 官方行政区划 */
     private String levelName;
 
+    private  Integer status;
+
     /**
      *返回列数据
      */
