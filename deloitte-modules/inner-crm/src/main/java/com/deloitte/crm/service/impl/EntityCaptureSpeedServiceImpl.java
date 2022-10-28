@@ -5,6 +5,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.domain.EntityCaptureSpeed;
+import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.EntityCaptureSpeedDto;
 import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
@@ -34,8 +35,9 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
      * @date 2022/10/27 14:25
      */
     @Override
-    public void sendTFFSpeed(CrmSupplyTask crmSupplyTask) {
+    public void sendTFFSpeed(CrmSupplyTask crmSupplyTask, EntityInfo entityInfo) {
         Integer speedId = crmSupplyTask.getSpeedId();
+
         if (ObjectUtils.isEmpty(speedId)) {
             return;
         }
@@ -45,6 +47,7 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
         }
         EntityCaptureSpeed updateSpeed = new EntityCaptureSpeed();
         updateSpeed.setId(speedId).setSupplement(1).setUpdated(new Date()).setUpdater(SecurityUtils.getUsername());
+        updateSpeed.setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode());
         entityCaptureSpeedMapper.updateById(updateSpeed);
     }
 
