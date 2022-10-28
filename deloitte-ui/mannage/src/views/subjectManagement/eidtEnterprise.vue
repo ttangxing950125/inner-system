@@ -69,11 +69,13 @@
             <el-table-column label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
+                  v-if="!scope.row.edit"
                   @click="handleClick(scope.row)"
                   type="text"
                   size="small"
                   >进入修改</el-button
                 >
+                <span v-else class="green">修改中</span>
               </template>
             </el-table-column>
           </el-table>
@@ -89,7 +91,7 @@
       <div class="clearf">
         <div class="bottom-title">
           <span class="g-title">目标企业信息</span>
-          <span class="s-2">修改中</span>
+          <span v-if="clickEdit" class="s-2">修改中</span>
         </div>
         <el-button type="text" @click="submit">提交变更</el-button>
       </div>
@@ -103,8 +105,8 @@
           <span style="color: red"
             >注意：带星号字段需同故宫附表维护更新，请进入附表管理模块进行修改</span
           >
-          <el-collapse accordion class="collpase">
-            <el-collapse-item  v-if="info.entityInfo">
+          <el-collapse accordion class="collpase" v-model="activeNames" >
+            <el-collapse-item name="info" v-if="info.entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">基本信息</span>
               </template>
@@ -173,7 +175,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item v-if="info.stockCnInfo">
+            <el-collapse-item name="stockCnInfo" v-if="info.stockCnInfo">
               <template slot="title">
                 <span style="font-size: 16px">上市情况</span>
               </template>
@@ -256,7 +258,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item v-if="info.bondInfoDetail">
+            <el-collapse-item name="bondInfoDetail" v-if="info.bondInfoDetail">
               <template slot="title">
                 <span style="font-size: 16px">发债情况</span>
               </template>
@@ -377,7 +379,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item v-if="info.entityInfo">
+            <el-collapse-item name="entityInfo" v-if="info.entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">金融机构</span>
               </template>
@@ -394,7 +396,7 @@
                   <div class="first">所处细分行业</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.entityFinancial.mince 
+                      info.entityFinancial && info.entityFinancial.mince 
                     }}
                   </div>
                 </div>
@@ -402,7 +404,7 @@
                   <div class="first">对口监管机构</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.entityFinancial.regulators
+                      info.entityFinancial && info.entityFinancial.regulators
                     }}
                   </div>
                 </div>
@@ -410,13 +412,13 @@
                   <div class="first">是否发行同业存单（银行）</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.entityFinancial.isIssPeerDep === 1 ? 'Y' : 'N'
+                      info.entityFinancial && info.entityFinancial.isIssPeerDep === 1 ? 'Y' : 'N'
                     }}
                   </div>
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item v-if="info.entityInfo">
+            <el-collapse-item name="ck" v-if="info.entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">敞口划分</span>
               </template>
@@ -540,7 +542,7 @@
                 </div>
               </el-col> -->
             </el-collapse-item>
-            <el-collapse-item v-if="info.entityBaseBusiInfo">
+            <el-collapse-item name="entityBaseBusiInfo" v-if="info.entityBaseBusiInfo">
               <template slot="title">
                 <span style="font-size: 16px">其他一般工商信息</span>
               </template>
@@ -655,7 +657,9 @@ export default {
       },
       levelStr: {
 
-      }
+      },
+      activeNames: 'info',
+      clickEdit: false
     };
   },
   created() {
@@ -668,6 +672,12 @@ export default {
     handleClick(row) {
       try {
         this.$modal.loading("Loading...");
+        this.list.forEach(e => {
+            e.edit = false
+        })
+        console.log(this.list)
+        row.edit = true
+        this.clickEdit = true
         const code = row.entityInfo.entityCode;
         getInfoDetail({ entityCode: code }).then((res) => {
           const { data } = res;
@@ -815,7 +825,7 @@ export default {
 .bottom-title {
   padding-left: 20px;
   .s-2 {
-    color: greenyellow;
+    color: #86bc25;
     font-size: 13px;
     margin-left: 22px;
   }
@@ -827,6 +837,10 @@ export default {
 }
 .g-title {
   font-weight: 600;
+}
+.green {
+    color: #86bc25;
+    font-size: 12px;
 }
 .select-body {
   margin: 0 auto;
@@ -854,7 +868,7 @@ export default {
     width: 330px;
     margin-top: 12%;
     span {
-      color: greenyellow;
+      color: #86bc25;
     }
   }
   .top-right {
@@ -866,13 +880,13 @@ export default {
     position: relative;
     left: 167%;
     top: 30%;
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 .g-desc {
   margin-top: 15px;
   span {
-    color: greenyellow;
+    color: #86bc25;
   }
   a {
     font-size: 14px;
@@ -895,7 +909,7 @@ export default {
     margin-right: 10px;
   }
   .g-select {
-    color: greenyellow;
+    color: #86bc25;
   }
 }
 </style>

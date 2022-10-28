@@ -1,7 +1,6 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -102,37 +101,42 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), cnCoachBack);
                 }
+
             } else {
                 log.warn("==> IPO-辅导备案 数据导入 出现code为空的！！！！！！！！！！！！！！！！！");
             }
+
             //有债券信息，给债券和主体绑定关联关系
             if (Objects.equals(changeType, DataChangeType.INSERT.getId())) {
-                if (StrUtil.isNotBlank(code)) {
+                if (StrUtil.isNotBlank(code)){
                     log.warn("无code创建主体任务");
                     //绑定主体关系
                     entityStockCnRelService.createTask(entityName, windTask, cnCoachBack);
-                } else {
+                }else {
                     log.info("有code创建主体任务");
                     //绑定主体关系
                     entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
                 }
+
+
             }
+
+
             String windIndustry = cnCoachBack.getWindIndustry();
-            //TODO 更新wind行业 ============================================================
+            //更新wind行业
             List<EntityInfo> dbEntities = entityInfoService.findByName(entityName);
             if (CollUtil.isNotEmpty(dbEntities)) {
-                log.info("==> 通过企业名称:{},查询EntityInfo主体信息为:{}", entityName, JSON.toJSONString(dbEntities));
-                List<EntityInfo> collect = dbEntities.stream().map(e -> e.setWindMaster(windIndustry)).collect(Collectors.toList());
-                entityInfoService.updateBatchById(collect);
-            } else {
-                log.info("==> 通过企业名称:{},查询EntityInfo主体信息为空!!!!!!!!!!!!!", entityName);
+                dbEntities.forEach(item -> {
+                    item.setWindMaster(windIndustry);
+                });
+                entityInfoService.updateBatchById(dbEntities);
             }
-            //TODO 更新wind行业 ============================================================
+
             cnCoachBack.setChangeType(changeType);
             cnCoachBackService.save(cnCoachBack);
             return new AsyncResult(new Object());
         } catch (Exception e) {
-            log.error("==> 导入IPO-辅导备案出现异常:{}", e);
+            e.printStackTrace();
             return new AsyncResult<>(e);
         }
     }

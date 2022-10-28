@@ -32,7 +32,7 @@ public class EntityFinancialController {
     /**
      * 金融机构根据entityCode补充录入副表信息
      *
-     * @param entitySupplyMsgBack
+     * @param entityFinancial
      * @return R
      * @author 冉浩岑
      * @date 2022/10/12 9:10

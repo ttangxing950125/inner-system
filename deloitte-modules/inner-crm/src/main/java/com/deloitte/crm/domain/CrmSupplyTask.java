@@ -27,10 +27,6 @@ public class CrmSupplyTask implements Serializable
     private Integer id;
 
     /** 德勤code */
-    @Excel(name = "任务进度id")
-    private Integer speedId;
-
-    /** 德勤code */
     @Excel(name = "德勤code")
     private String entityCode;
 

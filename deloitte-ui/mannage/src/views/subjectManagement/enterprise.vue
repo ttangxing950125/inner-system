@@ -142,7 +142,7 @@
                 style="width: 400px"
                 placeholder="搜索主体名称 / 代码 / 统一社会信用代码"
               ></el-input>
-              <el-button class="mr10" type="primary" @click="select"
+              <el-button class="mr10 green-btn" type="primary" @click="select"
                 >查询</el-button
               >
             </div>
@@ -155,29 +155,31 @@
                 class="table-content"
                 :data="list"
                 style="width: 98%; margin-top: 20px"
+                align="center"
               >
+                <el-table-column fixed type="index" width="50" align="center" label="序号">
                 </el-table-column>
-                <el-table-column prop="date" label="德勤主体代码" sortable>
+                <el-table-column prop="date" align="center" label="德勤主体代码">
                   <template slot-scope="scope">
                     <div>{{ scope.row.entityInfo.entityCode }}</div>
                   </template>
                 </el-table-column>
-                <el-table-column prop="name" label="统一社会信用代码">
+                <el-table-column prop="name" align="center" label="统一社会信用代码">
                   <template slot-scope="scope">
                     <div>{{ scope.row.entityInfo.creditCode }}</div>
                   </template>
                 </el-table-column>
-                <el-table-column prop="province" label="企业名称">
+                <el-table-column prop="province" align="center" label="企业名称">
                   <template slot-scope="scope">
                     <div v-html="replaceFun(scope.row.entityInfo.entityName)"></div>
                   </template>
                 </el-table-column>
-                <el-table-column prop="city" label="上市情况">
+                <el-table-column prop="city" align="center" label="上市情况">
                   <template slot-scope="scope">
                     <div :class="scope.row.listDetail ? 'green' : ''">{{ scope.row.listDetail || '未曾上市' }}</div>
                   </template>
                 </el-table-column>
-                <el-table-column prop="city" label="发债情况">
+                <el-table-column prop="city" align="center" label="发债情况">
                   <template slot-scope="scope">
                     <div :class="scope.row.bondDetail ? 'green' : ''">{{ scope.row.bondDetail || '未曾发债' }}</div>
                   </template>
@@ -256,6 +258,7 @@
             class="table-content"
             :data="list2"
             :height="500"
+            align="center"
             style="width: 98%; margin-top: 15px"
           >
             <el-table-column prop="name" label="存续状态" width="80">
@@ -378,17 +381,7 @@ export default {
           this.total = data.total;
           this.queryParams.pageNum = data.current;
         });
-        const parmas2 = {
-          param: "",
-          pageNum: this.queryParams2.pageNum,
-          pageSize: this.queryParams2.pageSize,
-        };
-        getQuickOfCoverage(parmas2).then((res) => {
-          const { data } = res;
-          this.list = data.records;
-          this.total2 = data.total;
-          this.queryParams2.pageNum = data.current;
-        });
+    
         getListView({type: this.currentTab}).then(res => {
           const { data } = res;
           this.overview = data

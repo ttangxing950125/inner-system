@@ -3,7 +3,6 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -32,32 +31,21 @@ public class CrmMasTask implements Serializable
 
     /** 德勤code */
     @Excel(name = "德勤code")
-    @ApiModelProperty(value = "德勤code")
     private String entityCode;
 
-    /**
-     * entity_capture_speed id
-     */
-    @ApiModelProperty(value = "查看进度的id")
-    private Integer speedId;
-
     @Excel(name = "来源")
-    @ApiModelProperty(value = "来源")
     private String sourceName;
 
     /** $column.columnComment */
-    @ApiModelProperty(value = "任务日期")
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date taskDate;
 
     /** 任务处理状态 0-未处理 1-已处理 */
     @Excel(name = "任务处理状态 0-未处理 1-已处理")
-    @ApiModelProperty(value = "任务处理状态 0-未处理 1-已处理")
     private Integer state;
 
     /** 处理人，完成人 */
     @Excel(name = "处理人，完成人")
-    @ApiModelProperty(value = "处理人，完成人")
     private String handleUser;
 
     /** $column.columnComment */
