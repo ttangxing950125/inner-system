@@ -121,7 +121,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     R addOldName(EntityInfo entityInfo);
 
-    R updateOldName(String dqCode, String oldName, String newOldName, String status);
+    R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks);
 
     R getInfoDetailByEntityCode(String entityCode);
 
