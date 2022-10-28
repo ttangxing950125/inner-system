@@ -33,7 +33,6 @@ public class EntityInfoInsertDTO {
     /**
      * 数据来源 code
      */
-//    @NotNull(message = "来源主表code不能为空")
     @ApiModelProperty(name="dataCode",value = "来源主表code")
     private String dataCode;
 

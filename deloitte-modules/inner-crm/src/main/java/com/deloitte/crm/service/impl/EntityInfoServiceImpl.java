@@ -1967,47 +1967,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     /**
-     * 校验统一社会信用代码是否存在 by正杰
-     *
-     * @param creditCode
-     * @return
-     * @author 正杰
-     * @date 2022/9/28
-     */
-    @Override
-    public R<EntityInfoVo> checkCreditCode(String creditCode) {
-        EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, creditCode));
-        if (entityInfo == null) {
-            return R.ok(new EntityInfoVo().setBo(true)
-                    .setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
-        }
-        return R.ok(new EntityInfoVo().setBo(false)
-                .setMsg(BadInfo.EXITS_ENTITY_CODE.getInfo())
-                .setEntityInfo(entityInfo));
-    }
-
-    /**
-     * 校验主体名称是否存在
-     *
-     * @param entityName
-     * @return R
-     * @author 正杰
-     * @date 2022/9/28
-     */
-    @Override
-    public R<EntityInfoVo> checkEntityName(String entityName) {
-        EntityInfo Info = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName));
-        EntityNameHis His = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
-        if (ObjectUtils.isEmpty(Info) && ObjectUtils.isEmpty(His)) {
-            return R.ok(new EntityInfoVo().setBo(true).setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo()));
-        } else if (ObjectUtils.isEmpty(Info)) {
-            EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, His.getDqCode()));
-            return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(entityInfo).setMsg(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo()));
-        }
-        return R.ok(new EntityInfoVo().setBo(false).setEntityInfo(Info).setMsg(BadInfo.EXITS_ENTITY_NAME.getInfo()));
-    }
-
-    /**
      * 快速查询
      *
      * @param param
@@ -2017,7 +1976,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @author 冉浩岑
      * @date 2022/10/8 15:53
      */
-
     @Override
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
         if (ObjectUtil.isEmpty(pageNum)) {
