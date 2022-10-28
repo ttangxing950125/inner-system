@@ -283,6 +283,7 @@
               <template slot-scope="scope">
                 <a
                   :class="scope.row.nameUsedNum > 0 ? 'green' : ''"
+                  style="text-decoration:underline"
                   @click="checkName(scope.row)"
                   >{{
                     scope.row.nameUsedNum > 0 ? scope.row.nameUsedNum : "暂无"
@@ -312,6 +313,58 @@
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog
+        title="曾用名-或别称管理"
+        :visible.sync="dialogVisible"
+        width="45%">
+        <div>{{ selectName }}</div>
+        <div>{{ selectCode }}</div>
+            <el-table
+            class="table-content"
+            :data="usedData"
+            align="center"
+            style="width: 98%; margin-top: 15px"
+          >
+            <el-table-column fixed type="index" width="50" align="center" label="序号">
+            </el-table-column>
+            <el-table-column prop="oldName" align="center" label="曾用名或别称" width="200">
+            </el-table-column>
+            <el-table-column prop="remarks" align="center" label="添加详情">
+            </el-table-column>
+            <el-table-column prop="created" align="center" label="添加时间" >
+            </el-table-column>
+            <el-table-column prop="created" align="center" label="操作">
+                <template slot-scope="scope">
+                    <el-button @click="stopUsed" type="text" size="small"
+                    >停用</el-button
+                    >
+                </template>
+            </el-table-column>
+          </el-table>
+          <el-button @click="addUsed" type="text" size="small"
+            >添加别称</el-button>
+    </el-dialog>
+    <el-dialog
+        title="添加别称"
+        :visible.sync="addUsedDig"
+        width="40%">
+        <div>{{ selectName }}</div>
+        <div>{{ selectCode }}</div>
+       <el-form ref="form" :model="form" label-width="100px">
+        <el-form-item label="曾用名或别称">
+            <el-input v-model="form.entityName"></el-input>
+        </el-form-item>
+         <el-form-item label="新增备注">
+            <el-input type="textarea" v-model="form.entityNameHisRemarks"></el-input>
+        </el-form-item>
+        <el-form-item label="更名日期">
+            <el-date-picker type="date" placeholder="选择日期" v-model="form.updated" style="width: 100%;"></el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button class="green-btn" type="primary" @click="subAddUsed">立即创建</el-button>
+        </el-form-item>
+        </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -319,7 +372,10 @@ import {
   getOverviewByGroup,
   getInfoList,
   getQuickOfCoverage,
-  getListView
+  getListView,
+  getNameListByDqCoded,
+  updateOldName,
+  addOldName
 } from "@/api/subject";
 import { replaceStr } from "@/utils/index";
 import pagination from "../../components/Pagination";
@@ -355,7 +411,17 @@ export default {
         pageSize: 10,
       },
       total2: 0,
-      overview: {}
+      overview: {},
+      usedData: [],
+      dialogVisible: false,
+      addUsedDig: false,
+      selectCode: '',
+      selectName: '',
+      form: {
+          entityName: '',
+          entityNameHisRemarks: '',
+          updated: '',
+      }
     };
   },
   created() {
@@ -443,8 +509,79 @@ export default {
       }
     },
     checkName(row) {
-      console.log(row);
+        console.log(row)
+        try {
+            this.dialogVisible = true
+            this.$modal.loading("Loading...");
+            const parmas = {
+            dqCode: row.entityCode
+            };
+            this.selectCode = row.entityCode
+            this.selectName = row.entityName
+            getNameListByDqCoded(parmas).then((res) => {
+                const { data } = res;
+                this.usedData = data
+            });
+        } catch (error) {
+            console.log(error);
+        } finally {
+            this.$modal.closeLoading();
+        }
+      
     },
+    stopUsed(row) {
+    try {
+        this.dialogVisible = true
+        this.$modal.loading("Loading...");
+        const parmas = {
+          dqCode: this.selectCode,
+          status: 1,
+        };
+        updateOldName(parmas).then((res) => {
+            this.dialogVisible = false
+            this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+      
+    },
+    addUsed() {
+    try {
+        this.addUsedDig = true
+        this.$modal.loading("Loading...");
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+      
+    },
+    subAddUsed() {
+    try {
+        this.addUsedDig = true
+        this.$modal.loading("Loading...");
+        this.form.entityCode = this.selectCode
+        addOldName(this.form).then(res => {
+            this.addUsedDig = false
+             this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+        })
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
+      
+    },
+    
     replaceFun(row) {
       return replaceStr(row, this.nameInput);
     },

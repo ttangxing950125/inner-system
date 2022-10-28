@@ -261,7 +261,9 @@ export function updateOldName(parmas) {
       "&oldName=" +
       parmas.oldName +
       "&status=" +
-      parmas.status,
+      parmas.status +
+      "&remarks=" +
+      parmas.remarks,
     headers: {
       isToken: true,
     },
@@ -487,7 +489,7 @@ export function getGovLevel(parmas) {
 // 总览政府导出
 export function exportGov(parmas) {
   return request({
-    url: "/crm/govInfo/exportGov ",
+    url: "/crm/govInfo/exportGov",
     headers: {
       isToken: true,
       responseType:'blob'
@@ -501,7 +503,7 @@ export function exportGov(parmas) {
 // 总览企业导出
 export function exportEntity(parmas) {
   return request({
-    url: "/crm/entityInfo/exportEntity  ",
+    url: "/crm/entityInfo/exportEntity",
     headers: {
       isToken: true,
       responseType:'blob'
@@ -510,4 +512,28 @@ export function exportEntity(parmas) {
     method: "get",
     data: parmas,
   },{responseType:'blob'}, {responseType:'blob'});
+}
+
+// 根据德勤code查询曾用名列表
+export function getNameListByDqCoded(parmas) {
+  return request({
+    url: "/crm/his/getNameListByDqCoded?dqCode="+parmas.dqCode,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
+
+// 新增曾用名
+export function addOldName(parmas) {
+  return request({
+    url: "/crm/entityInfo/addOldName?entityCode="+parmas.entityCode+'&entityName='+parmas.entityName+'&entityNameHisRemarks='+parmas.entityNameHisRemarks+'&updated='+parmas.updated,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
 }
