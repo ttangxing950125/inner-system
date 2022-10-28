@@ -1,16 +1,15 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.service.EntityStockThkRelService;
-import com.deloitte.crm.service.IEntityAttrValueService;
-import com.deloitte.crm.service.StockThkInfoService;
-import com.deloitte.crm.service.ThkSecIssInfoService;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
@@ -43,6 +42,8 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
 
     @Resource
     private IEntityAttrValueService entityAttrValueService;
+    @Resource
+    private CrmTypeInfoService crmTypeInfoService;
 
     /**
      * 导入ThkSecIssInfo表的数据
@@ -76,6 +77,25 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
 
             //主体名
             String entityName = secIssInfo.getEntityCnName();
+            /***
+             *部分代码逻辑沿用BondDelIssStrategy
+             * {@link com.deloitte.crm.strategy.impl.BondDelIssStrategy#doBondImport(BondDelIss, Date, CrmWindTask)}
+             */
+            //推迟或取消发行债券 均为二级发行
+            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, secIssInfo.getBelWind()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+            if (crmTypeInfo != null) {
+                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
+                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                    if (CollectionUtil.isEmpty(hashSetResult)) {
+                        secIssInfo.setBelWind(crmTypeInfo.getName());
+                    } else {
+                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                        secIssInfo.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
+                    }
+                } else {
+                    secIssInfo.setBelWind(crmTypeInfo.getName());
+                }
+            }
 
             //这条ThkSecIssInfo是新增还是修改 1-新增 2-修改
             Integer changeType = null;
@@ -87,7 +107,6 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
             }
-
             secIssInfo.setChangeType(changeType);
 
             //新增港股

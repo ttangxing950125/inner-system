@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -48,8 +49,11 @@ public class SendEmailTest {
         crmTypeInfo.setCode("WIN015");
         crmTypeInfo.setParentCode("WIN014");
         final Set<CrmTypeInfo> crmTypeInfos = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(1));
-         crmTypeInfos.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel));
-        System.out.println(">>>>" + JSON.toJSONString(crmTypeInfos));
+        final List<CrmTypeInfo> collect = crmTypeInfos.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).collect(Collectors.toList());
+        final List<String> collect1 = collect.stream().map(CrmTypeInfo::getName).collect(Collectors.toList());
+        String str2 = collect1.stream().collect(Collectors.joining("--"));
+        System.out.println(">>>>" + JSON.toJSONString(collect));
+        System.out.println(">>>>22222" + str2);
 
     }
 
