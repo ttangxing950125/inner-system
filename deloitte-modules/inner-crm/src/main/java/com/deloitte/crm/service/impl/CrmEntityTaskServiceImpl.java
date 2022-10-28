@@ -213,7 +213,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         //当前日期
         Date taskDate = crmEntityTask.getTaskDate();
 
-        crmEntityTaskMapper.insert(crmEntityTask);
+
 
         //生成entity_capture_speed数据
         EntityCaptureSpeed captureSpeed = new EntityCaptureSpeed();
@@ -222,7 +222,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         captureSpeed.setCaptureTime(new Date());
 
         entityCaptureSpeedService.save(captureSpeed);
+        crmEntityTask.setSpeedId(captureSpeed.getId());
 
+        crmEntityTaskMapper.insert(crmEntityTask);
 
         //修改今天角色6的任务为有任务未处理
         crmDailyTaskService.updateToUnhandled(taskDate, RoleInfo.ROLE6);
