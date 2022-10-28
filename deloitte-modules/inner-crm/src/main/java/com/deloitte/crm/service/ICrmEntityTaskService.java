@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmEntityTask;
-import com.deloitte.crm.vo.CrmEntityTaskVo;
 
 import java.util.List;
 
@@ -85,7 +84,7 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
     /**
      * 处理当日任务
      * @param taskId
-     * @param state
+     * @param state 0-未处理 1-已有主体未关联 2-新增主体 3-已有主体已关联
      * @return
      */
     R finishTask(Integer taskId,Integer state,String entityCode);
