@@ -215,7 +215,7 @@ public class EntityInfoController extends BaseController {
     }
 
     /**
-     * 修改,停用政府主体的曾用名
+     * 修改,停用企业主体的曾用名
      *
      * @param dqCode
      * @param oldName
@@ -225,7 +225,7 @@ public class EntityInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/25 13:22
      */
-    @ApiOperation(value = "修改,停用政府主体的曾用名")
+    @ApiOperation(value = "修改,停用企业主体的曾用名")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "dqCode", value = "德勤统一识别码", paramType = "query", example = "1", dataType = "String"),
             @ApiImplicitParam(name = "oldName", value = "原本的曾用名", paramType = "query", example = "原始曾用名", dataType = "String"),
