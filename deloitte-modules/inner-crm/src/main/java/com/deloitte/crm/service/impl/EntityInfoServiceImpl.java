@@ -246,13 +246,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //即是上市又是发债
         List<EntityInfo> listAndBonds = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 1)
-                .filter(row -> (row.getFinance() != null && row.getIssueBonds() != null) && row.getIssueBonds() == 1)
+                .filter(row ->   row.getIssueBonds() != null && row.getIssueBonds() == 1)
                 .collect(Collectors.toList());
 
         //!即是上市又是发债
         List<EntityInfo> notListAndBonds = list.stream()
                 .filter(row -> row.getList() != null && row.getList() == 0)
-                .filter(row -> (row.getFinance() != null && row.getIssueBonds() != null) && row.getIssueBonds() == 0)
+                .filter(row ->  row.getIssueBonds() != null && row.getIssueBonds() == 0)
                 .collect(Collectors.toList());
         entityInfoDto.setIssueBonds(bonds.size());
         entityInfoDto.setEntitySum(list.size());
