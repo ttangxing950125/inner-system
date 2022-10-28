@@ -182,7 +182,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
             if (crmEntityTasks.size() != 0) {
                 //发送邮件 角色2 的 role ID 固定为 4
-                asycSendEmailService(4, crmEntityTasks.size());
+                asycSendEmailService(4, crmEntityTasks.size(),DateUtil.format(taskDate, "yyyy-MM-dd"));
             }
 
             return R.ok(SuccessInfo.SUCCESS.getInfo());
@@ -191,9 +191,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     }
 
     @Async
-    public void asycSendEmailService(Integer roleId, Integer taskCount) {
+    public void asycSendEmailService(Integer roleId, Integer taskCount,String taskDate) {
         log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}", roleId, taskCount);
-        sendEmailService.email(roleId, taskCount);
+        sendEmailService.email(roleId, taskCount,taskDate);
     }
 
     /**

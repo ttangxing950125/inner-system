@@ -26,10 +26,10 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
-import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.TimeFormatUtil;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
@@ -460,6 +460,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     /**
      * 绑定 A股 stock_cn_info
+     * A股没有 dataCode 所以进行生成
      */
     @Transactional(rollbackFor = Exception.class)
     void bindStockCnInfo(EntityInfoInsertDTO entityInfoInsertDTO, String entityCode, String username) {
