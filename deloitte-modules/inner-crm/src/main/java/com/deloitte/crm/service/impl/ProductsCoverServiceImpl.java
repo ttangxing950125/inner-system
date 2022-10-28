@@ -101,6 +101,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             temp.setEntityCode(o.getEntityCode());
             temp.setCreditCode(o.getCreditCode());
             temp.setEntityName(o.getEntityName());
+            temp.setStatus(o.getStatus());
             temp.setResult(maps);
             result.add(temp);
         });
