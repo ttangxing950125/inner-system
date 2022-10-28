@@ -46,7 +46,7 @@ public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTy
 
     private Set<CrmTypeInfo> getDataUpList(List<CrmTypeInfo> categories, CrmTypeInfo crmTypeInfo) {
         if (CollectionUtil.isNotEmpty(categories)) {
-            Set<CrmTypeInfo> set = new TreeSet<>();
+            Set<CrmTypeInfo> set = new HashSet<>();
             String parentCode = crmTypeInfo.getParentCode();
             List<CrmTypeInfo> crmTypeInfos = categories.stream().filter(item -> item.getCode().equals(parentCode)).collect(Collectors.toList());
             if (CollectionUtil.isNotEmpty(crmTypeInfos)) {
