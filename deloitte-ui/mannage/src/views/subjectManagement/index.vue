@@ -314,6 +314,16 @@
                 </el-table-column>
                 <el-table-column
                   fixed
+                  prop="status"
+                  label="是否生效"
+                  width="200"
+                >
+                 <template slot-scope="scope">
+                    <div>{{ scope.row.status && scope.row.status === 1 ? '是' : '否' }}</div>
+                 </template>
+                </el-table-column>
+                <el-table-column
+                  fixed
                   :prop="selectType === 'GV' ? 'govName' :'entityName'"
                   :label="selectType === 'GV' ? '政府名称' : '企业名称'"
                   width="300"
@@ -499,7 +509,7 @@ export default {
         govList({}).then((res) => {
           const { data } = res;
           this.goverment = data;
-          this.goveSum = eval(Object.values(data).join("+"));
+          this.goveSum = data.govSum
           this.govSumPercent = this.getPercent(data.govSum, this.goveSum);
           this.provincePercent = this.getPercent(data.province, this.goveSum);
           this.cityPercent = this.getPercent(data.city, this.goveSum);
@@ -756,12 +766,12 @@ export default {
   },
   computed: {
     govePercent() {
-      const res = (this.goveSum / (this.goveSum + this.entitySum)).toFixed(4);
-      return res * 100;
+      const res = ((this.goveSum / (this.goveSum + this.entitySum))*100).toFixed(2);
+      return res;
     },
     entityPercent() {
-      const res = (this.entitySum / (this.goveSum + this.entitySum)).toFixed(4);
-      return res * 100;
+      const res = ((this.entitySum / (this.goveSum + this.entitySum))*100).toFixed(2);
+      return res;
     },
   },
 };

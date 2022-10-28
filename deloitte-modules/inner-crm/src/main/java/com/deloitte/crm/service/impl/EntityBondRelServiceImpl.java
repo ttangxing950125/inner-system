@@ -9,6 +9,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.utils.AttrValueUtils;
@@ -40,6 +41,9 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
     @Resource
     private ObjectMapper objectMapper;
+
+    @Resource
+    private EntityCaptureSpeedService entityCaptureSpeedService;
 
     /**
      * 绑定指定主体和债券的关系
@@ -85,11 +89,13 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
+
+                entityTask.setEntityName(issorName);
+
+                entityTaskService.createTask(entityTask);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            entityTaskService.createTask(entityTask);
 
         }
 

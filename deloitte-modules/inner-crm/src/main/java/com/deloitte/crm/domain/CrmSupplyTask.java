@@ -63,6 +63,10 @@ public class CrmSupplyTask implements Serializable
     @Excel(name = "来源")
     @TableField("`from`")
     private String from;
+    /**
+     * 捕获ID
+     */
+    private Integer speedId;
 
     @Override
     public String toString() {

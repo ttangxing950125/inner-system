@@ -32,4 +32,5 @@ public class CrmTypeInfoController {
     public R<List<CrmTypeInfo>> findTreeByType(String parentCode, @PathVariable Integer type){
         return R.ok(crmTypeInfoService.findTreeByType(parentCode, type));
     }
+    
 }

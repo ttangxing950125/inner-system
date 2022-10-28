@@ -773,7 +773,7 @@
         </el-form-item>
       </el-form>
       <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="subRule345(5)">保存并提交</el-button>
+        <el-button type="primary" class="green-btn" @click="subRule345(5)">保存并提交</el-button>
       </span>
     </el-dialog>
     <el-dialog
@@ -1481,22 +1481,23 @@
             name: '三级孙公司及以上',
             value: '三级孙公司及以上',
           }
-        ],
-        checkStatus: false,
-        inputCode: '',
-        inputName: ''
-      };
-    },
-    mounted() {
-      this.getCurrentTime();
-      this.getDaysInfo();
-      this.init();
-    },
-    computed: {
-      disabled() {
-        return this.creditCodePass !== 2 && this.entityNamePass !== 2
-      }
-    },
+      ],
+      checkStatus: false,
+      inputCode: '',
+      inputName: '',
+      dnow: ''
+    };
+  },
+  mounted() {
+    this.getCurrentTime();
+    this.getDaysInfo();
+    this.init();
+  },
+  computed: {
+    disabled () {
+      return this.creditCodePass !== 2 && this.entityNamePass !== 2
+    }
+  },
     methods: {
       getTypeWindList(){
         getTypeWindList({type:1})
@@ -1688,15 +1689,15 @@
       drawTable(jsonHtml) {
         var _this = this;
         var str = `
-  <tr class="xiqi">
-   <td class="isRed">日</td>
-   <td>一</td>
-   <td>二</td>
-   <td>三</td>
-   <td>四</td>
-   <td>五</td>
-   <td class="isRed">六</td>
-  </tr>`;
+        <tr class="xiqi">
+        <td class="isRed">日</td>
+        <td>一</td>
+        <td>二</td>
+        <td>三</td>
+        <td>四</td>
+        <td>五</td>
+        <td class="isRed">六</td>
+        </tr>`;
         let idx = "",
           date_str = "",
           isRed = "",
@@ -1842,125 +1843,75 @@
               pageSize: this.queryParams.pageSize
             };
             getDayTaskInfo(parmas).then((res) => {
-              const {data} = res
-              this.list7 = data.records
-              this.total = data.total
-              this.queryParams.pageNum = data.current
-              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            const { data } = res
+            this.list7 = data.records
+            this.total = data.total
+            this.queryParams.pageNum = data.current
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
             });
-          }
-          const params = {
-            taskDate: this.monthDate + '-' + clickDay,
-            pageNum: 1,
-            pageSize: this.queryParams.pageSize
-          };
-          if (this.roleId === 'role1') {
-            getTaskByDate(params).then((res) => {
-              const {data} = res
-              this.list = data
-              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-            });
-          }
-          if (this.roleId === 'role3' || this.roleId === 'role4' || this.roleId === 'role5') {
-            getRoleSupplyTask(params).then((res) => {
-              const {data} = res
-              this.list3 = data && data.records
-              this.queryParams.pages = data && data.current
-              this.total = data && data.total || 0
-              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-            });
-          }
-
-          if (this.roleId === 'role2') {
-            getTaskInfo({
-              date: this.monthDate + '-' + clickDay,
-              pageNum: this.queryParams.pageNum,
-              pageSize: this.queryParams.pageSize
-            }).then(res => {
-              const {data} = res
-              this.list2 = data.records
-              this.total = data.total
-              this.queryParams.pages = data.pages
-              // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
-            });
-          }
-          getTaskCount({TaskDate: this.monthDate + '-' + clickDay}).then(res => {
-            const {data} = res
-            this.taskCount = data
-          })
-        } catch (error) {
-          console.log(error)
-        } finally {
-          this.$modal.closeLoading();
         }
-
-
-      },
-      // 角色7 流程开始
-      addBody(row) {
-        this.bodyDig = true
-        this.addBodyId = row.id
-        this.selectRole7 = JSON.parse(row.details)
-        this.selectInfoRole7 = JSON.parse(row.infos)
-        // this.ruleForm.bondFullName = this.selectRole7.债券全称
-        // this.ruleForm.bondShortName = this.selectRole7.债券简称
-        this.ruleForm.created = row.created
-        this.ruleForm.dataSource = row.dataSource
-        this.ruleForm.dataCode = row.dataCode
-        this.ruleForm.id = row.id
-        this.ruleForm.taskId = row.id
-        this.ruleForm.dataCode = row.dataCode
-        this.$set(this.ruleForm, 'wind', '')
-        this.$set(this.ruleForm, 'shenWan', '')
-        this.$set(this.ruleForm, 'creditErrorType', '')
-        this.$set(this.ruleForm, 'creditCode', '')
-      },
-      check(name, code, disabeld) {
-        console.log(disabeld)
-        const nameCheck = disabeld ? true : code
-        console.log(nameCheck)
-        if (!nameCheck) {
-          this.$message({
-            showClose: true,
-            message: '请输入信用代码',
-            type: 'error'
+        const params = {
+          taskDate: this.monthDate+ '-' +clickDay,
+          pageNum: 1,
+          pageSize: this.queryParams.pageSize
+        };
+        if (this.roleId==='role1'){
+          getTaskByDate(params).then((res) => {
+            const { data } = res
+            this.list = data
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
           });
-          return
         }
-        if (!name) {
-          this.$message({
-            showClose: true,
-            message: '请输入主体名称',
-            type: 'error'
+        if(this.roleId === 'role3'||this.roleId === 'role4'||this.roleId === 'role5') {
+          getRoleSupplyTask(params).then((res) => {
+            const { data } = res
+            this.list3 = data && data.records
+            this.queryParams.pages = data && data.current
+            this.total = data && data.total || 0
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
           });
-          return
         }
-        this.$modal.loading("loading...");
-        try {
-          validateCodeAndName({creditCode: code, entityName: name}).then(res => {
-            const {data} = res
-            this.checkStatus = data.status
-            this.inputCode = code
-            this.inputName = name
-            if (data.status === 0) {
-              this.entityNamePass = 2 // 查重通过
-            }
-            if (data.status > 0) {
-              this.$message({
-                showClose: true,
-                message: res.msg,
-                type: 'error'
-              });
-              this.replaceData = data.entityInfo
-              this.entityNamePass = 1 // 查重没过
-            }
-          })
-        } catch (error) {
-          console.log(error)
-        } finally {
-          this.$modal.closeLoading();
+
+        if(this.roleId === 'role2') {
+            getTaskInfo({date: this.monthDate+ '-' +clickDay, pageNum: this.queryParams.pageNum, pageSize: this.queryParams.pageSize }).then(res => {
+            const { data } = res
+            this.list2 = data.records
+            this.total = data.total
+            this.queryParams.pages = data.pages
+            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            });
         }
+        getTaskCount({TaskDate: this.monthDate+ '-' +clickDay}).then(res => {
+          const { data } = res
+          this.taskCount = data
+        })
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$modal.closeLoading();
+      }
+
+
       },
+    // 角色7 流程开始 
+    addBody(row) {
+      this.bodyDig = true
+      this.addBodyId = row.id
+      this.selectRole7 = JSON.parse(row.details)
+      this.selectInfoRole7 = JSON.parse(row.infos)
+      // this.ruleForm.bondFullName = this.selectRole7.债券全称
+      // this.ruleForm.bondShortName = this.selectRole7.债券简称
+      this.ruleForm.created = row.created
+      this.ruleForm.dataSource = row.dataSource
+      this.ruleForm.dataCode = row.dataCode
+      this.ruleForm.id = row.id
+      this.ruleForm.taskId = row.id
+      this.ruleForm.dataCode = row.dataCode
+      this.$set(this.ruleForm, 'wind',  '')
+      this.$set(this.ruleForm, 'shenWan',  '')
+      this.$set(this.ruleForm, 'creditErrorType',  '')
+      this.$set(this.ruleForm, 'creditCode',  '')
+    },
       showMoreData() {
         this.replaceDig = true
       },
