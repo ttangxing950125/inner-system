@@ -1,8 +1,11 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
@@ -10,6 +13,7 @@ import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.service.BondDelIssService;
+import com.deloitte.crm.service.CrmTypeInfoService;
 import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.strategy.WindTaskContext;
@@ -44,6 +48,9 @@ public class BondDelIssStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
+    @Resource
+    private CrmTypeInfoService CrmTypeInfoService;
+
     /**
      * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
      *
@@ -74,11 +81,22 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             List<BondDelIss> bondDelIsses = bondDelIssService.findByBondName(shortName);
             if (CollUtil.isEmpty(bondDelIsses)) {
                 changeType = DataChangeType.INSERT.getId();
-            }else {
-                 BondDelIss last = bondDelIsses.stream().findFirst().get();
+            } else {
+                BondDelIss last = bondDelIsses.stream().findFirst().get();
                 if (!Objects.equals(last, delIss)) {
                     changeType = DataChangeType.UPDATE.getId();
                 }
+            }
+            //推迟或取消发行债券 均为二级发行
+            List<CrmTypeInfo> crmTypeInfosLists = CrmTypeInfoService.getBaseMapper().selectList(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, delIss.getWinSecondIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE));
+            if (CollectionUtil.isNotEmpty(crmTypeInfosLists)) {
+                CrmTypeInfo crmTypeInfo = crmTypeInfosLists.stream().findFirst().get();
+                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
+                    List<CrmTypeInfo> treeByType = CrmTypeInfoService.findTreeByType(crmTypeInfo.getParentCode(), Integer.valueOf(crmTypeInfo.getType()));
+                } else {
+                    delIss.setWindIndustry(crmTypeInfo.getName());
+                }
+
             }
             //当债券进入 推迟或取消发行债券表 时，记为“推迟发行”
             bondInfo.setBondStatus(BondStatus.DELAY_ISSUE.getId());
