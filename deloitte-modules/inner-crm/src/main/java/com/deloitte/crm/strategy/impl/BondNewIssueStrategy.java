@@ -1,6 +1,7 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/25
+ * 新债发行-新发行债券-20220801-20220914
  */
 @Component
 public class BondNewIssueStrategy implements WindTaskStrategy {
@@ -94,6 +96,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (last == null) {
                 resStatus = DataChangeType.INSERT.getId();
             } else {
+                last.setWindIndustry(null);
+                newIss.setWindIndustry(null);
                 if (!Objects.equals(last, newIss)) {
                     resStatus = DataChangeType.UPDATE.getId();
                 }
@@ -102,7 +106,6 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (newStatus != null) {
                 bondInfo.setBondStatus(newStatus);
             }
-
 
 
             //保存当前债券
@@ -114,6 +117,23 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
 
             //设置newIss的状态
             newIss.setChangeType(resStatus);
+            /***
+             * 设置Wind行业 新增发行也需记录wind行业，格式为 发行人Wind行业(一级)-发行人Wind行业(二级)
+             */
+            String windIndustry = null;
+            //发行人Wind行业(一级)
+            String issorIndustryFirst = newIss.getIssorIndustryFirst();
+            //发行人Wind行业(二级)
+            String issorIndustrySecond = newIss.getIssorIndustrySecond();
+            if (StringUtils.isNotEmpty(issorIndustryFirst)) {
+                if (StringUtils.isNotEmpty(issorIndustrySecond)) {
+                    windIndustry = issorIndustryFirst + "--" + issorIndustrySecond;
+                } else {
+                    windIndustry = issorIndustryFirst;
+                }
+            }
+
+            newIss.setWindIndustry(windIndustry);
 
             bondNewIssMapper.insert(newIss);
 
@@ -286,3 +306,4 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
         }).collect(Collectors.toList());
     }
 }
+
