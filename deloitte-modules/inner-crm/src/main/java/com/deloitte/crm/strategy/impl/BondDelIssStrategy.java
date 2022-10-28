@@ -99,12 +99,12 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             if (crmTypeInfo != null) {
                 if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
                     Set<CrmTypeInfo> hashSetResult = CrmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
-                    if (hashSetResult == null) {
+                    if (CollectionUtil.isEmpty(hashSetResult)) {
                         delIss.setWindIndustry(crmTypeInfo.getName());
                     } else {
-                        List<CrmTypeInfo> collect = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).collect(Collectors.toList());
-                        List<String> collect1 = collect.stream().map(CrmTypeInfo::getName).collect(Collectors.toList());
-                        delIss.setWindIndustry(collect1.stream().collect(Collectors.joining("--")) + "--" + crmTypeInfo.getName());
+                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel))
+                                .map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                        delIss.setWindIndustry(WindIndustryApend + "--" + crmTypeInfo.getName());
                     }
                 } else {
                     delIss.setWindIndustry(crmTypeInfo.getName());
