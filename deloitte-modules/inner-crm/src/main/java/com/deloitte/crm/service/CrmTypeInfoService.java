@@ -15,13 +15,15 @@ import java.util.Set;
 public interface CrmTypeInfoService extends IService<CrmTypeInfo> {
 
     /**
-     *查询树结构根据分类
-     * @author 吴鹏鹏
+     * 查询树结构根据分类
+     *
      * @param type
      * @return
+     * @author 吴鹏鹏
      */
-    List<CrmTypeInfo> findTreeByType(String parentCode,Integer type);
+    List<CrmTypeInfo> findTreeByType(String parentCode, Integer type);
 
-    Set<CrmTypeInfo> findCodeByParent(CrmTypeInfo crmTypeInfo,Integer type);
+    Set<CrmTypeInfo> findCodeByParent(CrmTypeInfo crmTypeInfo, Integer type);
 
+    Boolean cacheAll();
 }
