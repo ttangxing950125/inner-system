@@ -571,15 +571,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R addOldName(EntityInfo entity) {
+        //获取原本的主体信息
         EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
         //校验曾用名是否存在
         String entityCode = entityInfo.getEntityCode();
         QueryWrapper<EntityNameHis> queryWrapper = new QueryWrapper<>();
         String nameHis = entity.getEntityNameHis();
-        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda()
+        Long count = nameHisMapper.selectCount(queryWrapper.lambda()
                 .eq(EntityNameHis::getDqCode, entityCode)
                 .eq(EntityNameHis::getOldName, nameHis));
-        if (aLong > 0) {
+        if (count > 0) {
             return R.fail(REPET_OLD_NAME);
         }
         //获取操作用户
@@ -589,24 +590,34 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (ObjectUtils.isEmpty(entityNameHis)) {
             entityInfo.setEntityNameHis(entity.getEntityNameHis());
         } else {
-            entityInfo.setEntityNameHis(entityNameHis + EntityUtils.NAME_USED_SIGN + entity.getEntityNameHis());
+            entityInfo.setEntityNameHis(entityNameHis + "," + entity.getEntityNameHis());
         }
         String nameHisRemarks = entity.getEntityNameHisRemarks();
+        String remarks = "";
         if (ObjectUtils.isEmpty(nameHisRemarks)) {
-            entityInfo.setEntityNameHisRemarks(entity.getUpdated() + remoter + entity.getEntityNameHisRemarks());
+            remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " 系统自动生成";
         } else {
-            entityInfo.setEntityNameHisRemarks(entityNameHis + EntityUtils.NAME_USED_REMARK_SIGN + entity.getUpdated() + remoter + entity.getEntityNameHisRemarks());
+            remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " " + nameHisRemarks;
         }
-        entityInfoMapper.updateById(entityInfo);
+
+        String oldRemarks = entityInfo.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(oldRemarks)) {
+            oldRemarks = remarks;
+        } else {
+            oldRemarks = oldRemarks + ";" + remarks;
+        }
+        EntityInfo backInfo = new EntityInfo();
+        backInfo.setId(entityInfo.getId()).setEntityNameHisRemarks(oldRemarks).setEntityNameHis(entityInfo.getEntityNameHis());
+        entityInfoMapper.updateById(backInfo);
 
         //插入曾用名记录表
         EntityNameHis newNameHis = new EntityNameHis();
         newNameHis.setDqCode(entityInfo.getEntityCode());
         newNameHis.setOldName(entity.getEntityNameHis());
-        newNameHis.setEntityType(ENTITY_INFO_TYPE);
-        newNameHis.setHappenDate(entity.getUpdated());
+        newNameHis.setEntityType(1);
+        newNameHis.setHappenDate(new Date());
         newNameHis.setRemarks(entity.getEntityNameHisRemarks());
-        newNameHis.setSource(OLD_NAME_FROM_MAN);
+        newNameHis.setSource(1);
         nameHisMapper.insert(newNameHis);
         return R.ok();
     }
@@ -614,7 +625,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
-        if (ObjectUtils.isEmpty(newOldName)||ObjectUtils.isEmpty(oldName)) {
+        if (ObjectUtils.isEmpty(newOldName) || ObjectUtils.isEmpty(oldName)) {
             return R.fail("无效曾用名");
         }
         if (ObjectUtils.isEmpty(status)) {
@@ -629,11 +640,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //根据dqCode查询主体表
         QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
         EntityInfo entityInfo = entityInfoMapper.selectOne(infoQuery.lambda().eq(EntityInfo::getEntityCode, dqCode));
-        //根据dqCode查询曾用名列表
-        QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
-        EntityNameHis nameHis = nameHisMapper.selectOne(hisQuery.lambda()
-                .eq(EntityNameHis::getDqCode, dqCode)
-                .eq(EntityNameHis::getOldName, oldName));
 
         //找到原本曾用名
         String entityNameHis = entityInfo.getEntityNameHis();
@@ -657,15 +663,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 EntityNameHis one = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda()
                         .eq(EntityNameHis::getDqCode, dqCode)
                         .eq(EntityNameHis::getOldName, oldName).last(" limit 1"));
-                if (ObjectUtils.isEmpty(one)){
+                if (ObjectUtils.isEmpty(one)) {
                     continue;
                 }
                 // status 为空则表示替换
                 if (!ObjectUtils.isEmpty(status)) {
                     one.setRemarks(remark).setOldName(newOldName);
-                    if (!ObjectUtils.isEmpty(remark)){
+                    if (!ObjectUtils.isEmpty(remark)) {
                         one.setRemarks("系统自动生成");
                     }
+                    one.setSource(2);
                     //直接替换原本的数据
                     nameHisMapper.updateById(one);
                     continue;
@@ -673,33 +680,33 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //直接删除原本的数据
                 nameHisMapper.deleteById(one);
                 nameVo = newOldName;
-                remarkVo =TimeFormatUtil.getFormartDate(new Date()) +" "+ SecurityUtils.getUsername()+" "+remark;
-                if (ObjectUtils.isEmpty(remark)){
-                    remarkVo=remarkVo+"系统自动生成";
+                remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
+                if (ObjectUtils.isEmpty(remark)) {
+                    remarkVo = remarkVo + "系统自动生成";
                 }
-            }else {
-                nameVo=hisName;
-                if (remarkList.size()>i){
-                    remarkVo=remarkList.get(i);
-                }else {
-                    remarkVo=TimeFormatUtil.getFormartDate(new Date()) +" "+ SecurityUtils.getUsername()+" 系统自动生成";
+            } else {
+                nameVo = hisName;
+                if (remarkList.size() > i) {
+                    remarkVo = remarkList.get(i);
+                } else {
+                    remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " 系统自动生成";
                 }
             }
             // 拼接历史曾用名和备注
-            if (ObjectUtils.isEmpty(newNameResult)){
-                newNameResult=nameVo;
-            }else {
-                newNameResult=newNameResult+","+nameVo;
+            if (ObjectUtils.isEmpty(newNameResult)) {
+                newNameResult = nameVo;
+            } else {
+                newNameResult = newNameResult + "," + nameVo;
             }
-            if (ObjectUtils.isEmpty(newRemarkResult)){
-                newRemarkResult=remarkVo;
-            }else {
-                newRemarkResult=newRemarkResult+";"+remarkVo;
+            if (ObjectUtils.isEmpty(newRemarkResult)) {
+                newRemarkResult = remarkVo;
+            } else {
+                newRemarkResult = newRemarkResult + ";" + remarkVo;
             }
         }
         EntityInfo backInfo = new EntityInfo();
         //赋值新的曾用名属性
-        backInfo.setId(entityInfo.getId()).setEntityName(newNameResult).setEntityNameHisRemarks(newRemarkResult);
+        backInfo.setId(entityInfo.getId()).setEntityNameHis(newNameResult).setEntityNameHisRemarks(newRemarkResult);
         //修改主表属性
         entityInfoMapper.updateById(backInfo);
         return R.ok();

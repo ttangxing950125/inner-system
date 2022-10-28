@@ -267,8 +267,8 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "status", value = "是否停用曾用名", paramType = "query", example = "新的曾用名", dataType = "String")
     })
     @PostMapping("/updateOldName")
-    public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
-        return govInfoService.updateOldName(dqCode, oldName, newOldName, status);
+    public R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks) {
+        return govInfoService.updateOldName(dqCode, oldName, newOldName, status,remarks);
     }
 
     /**

@@ -94,7 +94,7 @@ public interface IGovInfoService  extends IService<GovInfo>
 
     void ExportEntityGov(GovAttrByDto govAttrByDto);
 
-    R updateOldName(String dqCode, String oldName, String newOldName, String status);
+    R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks);
 
 
     Map<String, Object> getOverview();
