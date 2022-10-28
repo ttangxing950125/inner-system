@@ -539,7 +539,7 @@
             >查重</el-button
           >
           <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
-          <span class="green" v-if="repalce1 === 1">无重复，可新增</span>
+          <span style="color: #13ce66" v-if="repalce1 === 1">无重复，可新增</span>
         </el-form-item>
         <el-form-item label="新增地方政府行政编码" >
           <el-input
@@ -557,7 +557,7 @@
             >查重</el-button
           >
           <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
-          <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
+          <span style="color: #13ce66" v-if="repalce2 === 1">无重复，可新增</span>
         </el-form-item>
         <el-form-item label="" prop="delivery">
           <el-radio
@@ -961,17 +961,36 @@
             v-model="ruleForm.entityName"
             @change="entityNamePass = false"
           ></el-input>
-          <el-button
+          <!--<el-button
             v-if="!entityNamePass"
             style="margin-left: 5px"
             type="text"
             @click="check(ruleForm.entityName, ruleForm.creditCode, ruleForm.notUse)"
             >{{ "查重" }}</el-button>
-            <span v-if="entityNamePass === 2" style="color:greenyellow; margin-left: 5px">无重复，可新增</span>
-            <a @click="showMoreData" v-if="entityNamePass === 1" style="color:red; margin-left: 5px">存在重复 无法新增</a>
+
+            <span v-if="entityNamePass === 2" style="color: #13ce66; margin-left: 5px">无重复，可新增</span>
+            <a @click="showMoreData" v-if="entityNamePass === 1" style="color:red; margin-left: 5px;text-decoration: underline;">存在重复 无法新增</a>-->
+
         </el-form-item>
+
+        <el-form-item>
+          <el-button
+            v-if="!entityNamePass"
+            style="margin-left: 5px"
+            type="text"
+            @click="check(ruleForm.entityName, ruleForm.creditCode, ruleForm.notUse)"
+          >{{ "查重" }}</el-button>
+          <span v-if="entityNamePass === 2" style="color: #13ce66; margin-left: 5px">无重复，可新增</span>
+          <a @click="showMoreData" v-if="entityNamePass === 1" style="color:red; margin-left: 5px;text-decoration: underline;">存在重复 无法新增</a>
+          <el-button class="ml40" type="success" plain :disabled="checkStatus !== 0" @click="submitAdd">确认新增</el-button>
+        </el-form-item>
+
       </el-form>
-      <el-button class="ml40" type="success" plain :disabled="checkStatus !== 0" @click="submitAdd">确认新增</el-button>
+
+
+
+
+
     </el-dialog>
     <el-dialog
         class="red-title"
@@ -1534,7 +1553,7 @@ export default {
       this.drawTable(flagData);
     },
     work(row) {
-      this.$router.push({ path: 'work', query: { taskCateId: row.taskCateId, taskDate: this.clickDay || this.nowTime } });
+      this.$router.push({ path: 'work', query: { taskCategory: row.taskCategory,taskCateId: row.taskCateId, taskDate: this.clickDay || this.nowTime } });
     },
     getDay(row) {
       if (!row.path[0].innerText) {
@@ -2350,7 +2369,7 @@ export default {
   }
 }
 .ml40 {
-  margin-left: 42%
+  margin-left: 20px
 }
 .width146 {
   width: 146px;
