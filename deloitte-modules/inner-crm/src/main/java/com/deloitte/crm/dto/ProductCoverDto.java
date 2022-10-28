@@ -32,6 +32,8 @@ public class ProductCoverDto {
      */
     private String entityCode;
 
+    private Integer status;
+
     /**
      *返回列数据
      */
