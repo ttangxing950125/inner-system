@@ -87,16 +87,28 @@ public class BondDelIssStrategy implements WindTaskStrategy {
                     changeType = DataChangeType.UPDATE.getId();
                 }
             }
+            /***
+             * 新债发行-推迟或取消发行债券 存储Wind行业
+             * 1.通过 所属Wind二级行业 查询crm_type_info  type=1(wind行业) 状态为正常的 {@link com.deloitte.crm.domain.CrmTypeInfo#type}  为空
+             * 2.如果不为空 看一下父parentCode 是否为空 如果为空 那么Wind行业存的就是当请二级行业
+             * 3.不为空向上查找 获取  祖宗节点 拼接wind 名称
+             * {@link com.deloitte.crm.service.impl.CrmTypeInfoServiceImpl#findCodeByParent(CrmTypeInfo, Integer)}  }
+             */
             //推迟或取消发行债券 均为二级发行
-            List<CrmTypeInfo> crmTypeInfosLists = CrmTypeInfoService.getBaseMapper().selectList(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, delIss.getWinSecondIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE));
-            if (CollectionUtil.isNotEmpty(crmTypeInfosLists)) {
-                CrmTypeInfo crmTypeInfo = crmTypeInfosLists.stream().findFirst().get();
+            CrmTypeInfo crmTypeInfo = CrmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, delIss.getWinSecondIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+            if (crmTypeInfo != null) {
                 if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
-                    List<CrmTypeInfo> treeByType = CrmTypeInfoService.findTreeByType(crmTypeInfo.getParentCode(), Integer.valueOf(crmTypeInfo.getType()));
+                    Set<CrmTypeInfo> hashSetResult = CrmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                    if (hashSetResult == null) {
+                        delIss.setWindIndustry(crmTypeInfo.getName());
+                    } else {
+                        List<CrmTypeInfo> collect = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).collect(Collectors.toList());
+                        List<String> collect1 = collect.stream().map(CrmTypeInfo::getName).collect(Collectors.toList());
+                        delIss.setWindIndustry(collect1.stream().collect(Collectors.joining("--")) + "--" + crmTypeInfo.getName());
+                    }
                 } else {
                     delIss.setWindIndustry(crmTypeInfo.getName());
                 }
-
             }
             //当债券进入 推迟或取消发行债券表 时，记为“推迟发行”
             bondInfo.setBondStatus(BondStatus.DELAY_ISSUE.getId());
