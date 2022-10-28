@@ -217,7 +217,6 @@
                     or
                 </if>
                 <if test="coll != null  and coll != ''">c.coll = #{coll}</if>
-
                 <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != ''))and (stockThk != null  and stockThk != '')">
                     or
                 </if>

@@ -13,5 +13,5 @@ import java.util.List;
  */
 public interface ProductsMasterRelMapper extends BaseMapper<ProductsMasterRel> {
 
-    List<ProCustomerDto> futureList (Integer proId);
+    List<ProCustomerDto> futureList (@Param("entityCode") String entityCode,@Param("dataYear")String dataYear,@Param("proId")Integer proId);
 }

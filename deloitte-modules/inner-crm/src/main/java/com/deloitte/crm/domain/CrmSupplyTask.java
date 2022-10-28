@@ -27,10 +27,6 @@ public class CrmSupplyTask implements Serializable
     private Integer id;
 
     /** 德勤code */
-    @Excel(name = "任务进度id")
-    private Integer speedId;
-
-    /** 德勤code */
     @Excel(name = "德勤code")
     private String entityCode;
 
@@ -67,6 +63,10 @@ public class CrmSupplyTask implements Serializable
     @Excel(name = "来源")
     @TableField("`from`")
     private String from;
+    /**
+     * 捕获ID
+     */
+    private Integer speedId;
 
     @Override
     public String toString() {

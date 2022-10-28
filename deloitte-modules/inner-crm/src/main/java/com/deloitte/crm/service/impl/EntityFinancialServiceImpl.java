@@ -30,6 +30,9 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
     private IEntityInfoService entityInfoService;
 
     @Autowired
+    private EntityCaptureSpeedService entityCaptureSpeedService;
+
+    @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
     @Autowired
@@ -37,9 +40,6 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
 
     @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
-
-    @Autowired
-    private EntityCaptureSpeedService entityCaptureSpeedService;
     /**
      * 金融机构根据entityCode补充录入副表信息
      *
@@ -55,7 +55,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         Integer taskId = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(taskId);
 
-         /*//已完成的任务，不允许重复提交
+        /*//已完成的任务，不允许重复提交
         if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
             return R.fail("已完成的任务，不能重复提交");
         }*/
@@ -74,6 +74,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
+
         //更新任务进度
         entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
         return R.ok("修改成功");

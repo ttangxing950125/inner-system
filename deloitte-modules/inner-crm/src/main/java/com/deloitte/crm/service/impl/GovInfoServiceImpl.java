@@ -14,16 +14,16 @@ import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
-import com.deloitte.crm.constants.EntityUtils;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
-import com.deloitte.crm.utils.excel.ExcelUtils;
+import com.deloitte.crm.excelUtils.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import com.deloitte.crm.vo.GovInfoDetailVo;
 import com.deloitte.crm.vo.ParentLevelVo;
@@ -148,6 +148,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * 省会城市
      */
     private static final String provincial = "省会城市";
+
     /**
      * 查询【请填写功能名称】
      *
@@ -277,20 +278,20 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R updateInfoList(GovInfo o) {
 
-            entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
-            GovInfo govInfo = govInfoMapper.selectById(o.getId());
-            String oldName = o.getGovName();
-            //修改政府主体名称时，需要先添加曾用名
-            if (!ObjectUtils.isEmpty(oldName)&&!oldName.equals(govInfo.getGovName())) {
-                GovInfo addOldName = new GovInfo();
-                addOldName.setId(o.getId());
-                addOldName.setGovNameHis(oldName);
-                addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
-                addOldName(addOldName);
-                //修改曾用名后需要将曾用名和曾用名备注置空
-                o.setGovNameHis(null).setEntityNameHisRemarks(null);
-            }
-            govInfoMapper.updateById(o);
+        entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
+        GovInfo govInfo = govInfoMapper.selectById(o.getId());
+        String oldName = o.getGovName();
+        //修改政府主体名称时，需要先添加曾用名
+        if (!ObjectUtils.isEmpty(oldName) && !oldName.equals(govInfo.getGovName())) {
+            GovInfo addOldName = new GovInfo();
+            addOldName.setId(o.getId());
+            addOldName.setGovNameHis(oldName);
+            addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
+            addOldName(addOldName);
+            //修改曾用名后需要将曾用名和曾用名备注置空
+            o.setGovNameHis(null).setEntityNameHisRemarks(null);
+        }
+        govInfoMapper.updateById(o);
         return R.ok();
     }
 
@@ -407,45 +408,54 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R addOldName(GovInfo gov) {
-        //获取操作用户
-        String remoter = SecurityUtils.getUsername();
-
+        //获取原本的主体信息
         GovInfo govInfo = govInfoMapper.selectById(gov.getId());
-
-        String govCode = govInfo.getDqGovCode();
-        String nameHis = gov.getGovNameHis();
+        //校验曾用名是否存在
+        String entityCode = govInfo.getDqGovCode();
         QueryWrapper<EntityNameHis> queryWrapper = new QueryWrapper<>();
-        Long aLong = nameHisMapper.selectCount(queryWrapper.lambda()
-                .eq(EntityNameHis::getDqCode, govCode)
+        String nameHis = gov.getGovNameHis();
+        Long count = nameHisMapper.selectCount(queryWrapper.lambda()
+                .eq(EntityNameHis::getDqCode, entityCode)
                 .eq(EntityNameHis::getOldName, nameHis));
-        if (aLong > 0) {
+        if (count > 0) {
             return R.fail("曾用名重复，请重新输入");
         }
-
+        //获取操作用户
+        String remoter = SecurityUtils.getUsername();
         //修改曾用名记录
-        String govNameHis = govInfo.getGovNameHis();
-        if (ObjectUtils.isEmpty(govNameHis)) {
-            govInfo.setGovNameHis(nameHis);
+        String entityNameHis = govInfo.getGovNameHis();
+        if (ObjectUtils.isEmpty(entityNameHis)) {
+            govInfo.setGovNameHis(gov.getGovNameHis());
         } else {
-            govInfo.setGovNameHis(govNameHis + EntityUtils.NAME_USED_SIGN + nameHis);
+            govInfo.setGovNameHis(entityNameHis + "," + gov.getGovNameHis());
         }
         String nameHisRemarks = gov.getEntityNameHisRemarks();
+        String remarks = "";
         if (ObjectUtils.isEmpty(nameHisRemarks)) {
-            govInfo.setEntityNameHisRemarks(new Date() + remoter + gov.getEntityNameHisRemarks());
+            remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " 系统自动生成";
         } else {
-            govInfo.setEntityNameHisRemarks(govNameHis + EntityUtils.NAME_USED_REMARK_SIGN + new Date() + remoter + gov.getEntityNameHisRemarks());
+            remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " " + nameHisRemarks;
         }
-        govInfoMapper.updateById(govInfo);
+
+        String oldRemarks = govInfo.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(oldRemarks)) {
+            oldRemarks = remarks;
+        } else {
+            oldRemarks = oldRemarks + ";" + remarks;
+        }
+        GovInfo backInfo = new GovInfo();
+        backInfo.setId(govInfo.getId()).setEntityNameHisRemarks(oldRemarks).setGovNameHis(govInfo.getGovNameHis());
+        govInfoMapper.updateById(backInfo);
 
         //插入曾用名记录表
-        EntityNameHis entityNameHis = new EntityNameHis();
-        entityNameHis.setDqCode(govInfo.getDqGovCode());
-        entityNameHis.setOldName(gov.getGovNameHis());
-        entityNameHis.setEntityType(2);
-        entityNameHis.setHappenDate(gov.getUpdated());
-        entityNameHis.setRemarks(gov.getEntityNameHisRemarks());
-        entityNameHis.setSource(2);
-        nameHisMapper.insert(entityNameHis);
+        EntityNameHis newNameHis = new EntityNameHis();
+        newNameHis.setDqCode(govInfo.getDqGovCode());
+        newNameHis.setOldName(govInfo.getGovNameHis());
+        newNameHis.setEntityType(2);
+        newNameHis.setHappenDate(new Date());
+        newNameHis.setRemarks(gov.getEntityNameHisRemarks());
+        newNameHis.setSource(1);
+        nameHisMapper.insert(newNameHis);
         return R.ok();
     }
 
@@ -457,14 +467,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
+        Integer pageNum = govAttrDto.getPageNum();
+        Integer pageSize = govAttrDto.getPageSize();
         //去除无效选项
         List<MoreIndex> mapList = govAttrDto.getMapList();
         if (!CollectionUtils.isEmpty(mapList)){
             List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
             govAttrDto.setMapList(newMapList);
         }
-        Integer pageNum = govAttrDto.getPageNum();
-        Integer pageSize = govAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(govAttrDto);
         } else {
@@ -655,57 +665,91 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public R updateOldName(String dqCode, String oldName, String newOldName, String status) {
+    public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
+        if (ObjectUtils.isEmpty(newOldName) || ObjectUtils.isEmpty(oldName)) {
+            return R.fail("无效曾用名");
+        }
+        if (ObjectUtils.isEmpty(status)) {
+            //校验修改后的曾用名是否已经存在
+            Long count = nameHisMapper.selectCount(new QueryWrapper<EntityNameHis>().lambda()
+                    .eq(EntityNameHis::getDqCode, dqCode)
+                    .eq(EntityNameHis::getOldName, newOldName));
+            if (count > 0) {
+                return R.ok("曾用名重复，请重新输入");
+            }
+        }
         //根据dqCode查询主体表
         QueryWrapper<GovInfo> infoQuery = new QueryWrapper<>();
         GovInfo govInfo = govInfoMapper.selectOne(infoQuery.lambda().eq(GovInfo::getDqGovCode, dqCode));
-        //根据dqCode查询曾用名列表
-        QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
-        EntityNameHis nameHis = nameHisMapper.selectOne(hisQuery.lambda()
-                .eq(EntityNameHis::getDqCode, dqCode)
-                .eq(EntityNameHis::getOldName, oldName));
 
-        if (ObjectUtils.isEmpty(status)) {
-            //校验修改后的曾用名是否已经存在
-            Long aLong = nameHisMapper.selectCount(hisQuery.lambda()
-                    .eq(EntityNameHis::getDqCode, dqCode)
-                    .eq(EntityNameHis::getOldName, newOldName));
-            if (aLong > 0) {
-                return R.ok("曾用名已经存在，请重新输入");
-            }
-            //修改主体表中的数据
-            govInfo.setGovNameHis(govInfo.getGovNameHis().replaceAll(oldName, newOldName));
-            govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks().replaceAll(oldName, newOldName));
-            govInfoMapper.updateById(govInfo);
-            //修改曾用名表中的数据
-            nameHis.setOldName(newOldName);
-            nameHisMapper.updateById(nameHis);
-            return R.ok();
+        //找到原本曾用名
+        String govNameHis = govInfo.getGovNameHis();
+        String govNameHisRemarks = govInfo.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(govNameHis)) {
+            return R.fail("无效曾用名");
         }
+        List<String> nameList = Arrays.asList(govNameHis.split(","));
+        List<String> remarkList = Arrays.asList(govNameHisRemarks.split(";"));
 
-        //修改主体表中的数据
-        govInfo.setGovNameHis(govInfo.getGovNameHis().replaceAll(oldName, ""));
-        govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks().replaceAll(oldName, newOldName));
-        String remarks = govInfo.getEntityNameHisRemarks();
-        String[] split = remarks.split(EntityUtils.NAME_USED_REMARK_SIGN);
-        String newRemarks = "";
-        //拆分曾用名
-        for (String value : split) {
-            if (value.contains(oldName)) {
-                continue;
-            }
-            if (ObjectUtils.isEmpty(newRemarks)) {
-                newRemarks = value;
+        String newNameResult = "";
+        String newRemarkResult = "";
+        for (int i = 1; i < nameList.size(); i++) {
+            String remarkVo = "";
+            String nameVo = "";
+            String hisName = nameList.get(i);
+
+            //匹配历史曾用名则替换或者删除
+            if (oldName.equals(hisName)) {
+                //匹配时，查询出原本的曾用名数据
+                EntityNameHis one = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda()
+                        .eq(EntityNameHis::getDqCode, dqCode)
+                        .eq(EntityNameHis::getOldName, oldName).last(" limit 1"));
+                if (ObjectUtils.isEmpty(one)) {
+                    continue;
+                }
+                // status 为空则表示替换
+                if (!ObjectUtils.isEmpty(status)) {
+                    one.setRemarks(remark).setOldName(newOldName);
+                    if (!ObjectUtils.isEmpty(remark)) {
+                        one.setRemarks("系统自动生成");
+                    }
+                    one.setSource(2);
+                    //直接替换原本的数据
+                    nameHisMapper.updateById(one);
+                    continue;
+                }
+                //直接删除原本的数据
+                nameHisMapper.deleteById(one);
+                nameVo = newOldName;
+                remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
+                if (ObjectUtils.isEmpty(remark)) {
+                    remarkVo = remarkVo + "系统自动生成";
+                }
             } else {
-                newRemarks = newRemarks + EntityUtils.NAME_USED_REMARK_SIGN + value;
+                nameVo = hisName;
+                if (remarkList.size() > i) {
+                    remarkVo = remarkList.get(i);
+                } else {
+                    remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " 系统自动生成";
+                }
+            }
+            // 拼接历史曾用名和备注
+            if (ObjectUtils.isEmpty(newNameResult)) {
+                newNameResult = nameVo;
+            } else {
+                newNameResult = newNameResult + "," + nameVo;
+            }
+            if (ObjectUtils.isEmpty(newRemarkResult)) {
+                newRemarkResult = remarkVo;
+            } else {
+                newRemarkResult = newRemarkResult + ";" + remarkVo;
             }
         }
-        govInfo.setEntityNameHisRemarks(newRemarks);
-        govInfoMapper.updateById(govInfo);
-
-        //修改曾用名表中的数据
-        nameHis.setStatus(EntityUtils.INVALID);
-        nameHisMapper.updateById(nameHis);
+        GovInfo backInfo = new GovInfo();
+        //赋值新的曾用名属性
+        backInfo.setId(govInfo.getId()).setGovNameHis(newNameResult).setEntityNameHisRemarks(newRemarkResult);
+        //修改主表属性
+        govInfoMapper.updateById(backInfo);
         return R.ok();
     }
 
@@ -932,7 +976,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         province.setName(hundred);
         List<ParentLevelVo> list = new ArrayList<>();
 
-        ParentLevelVo parentValue = getParentValue(hundred, 1,province.getName());
+        ParentLevelVo parentValue = getParentValue(hundred, 1, province.getName());
         list.add(parentValue);
 
         province.setValue(list);
@@ -947,7 +991,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         province.setName(provincial);
         List<ParentLevelVo> list = new ArrayList<>();
 
-        ParentLevelVo parentValue = getParentValue(provincial, 1,province.getName());
+        ParentLevelVo parentValue = getParentValue(provincial, 1, province.getName());
         list.add(parentValue);
 
         province.setValue(list);
@@ -962,7 +1006,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         province.setName(CCity);
         List<ParentLevelVo> list = new ArrayList<>();
 
-        ParentLevelVo parentValue = getParentValue(CCity, 1,province.getName());
+        ParentLevelVo parentValue = getParentValue(CCity, 1, province.getName());
         list.add(parentValue);
 
         province.setValue(list);
@@ -1068,6 +1112,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 .or().like(GovInfo::getGovCode, param)
         );
     }
+
     @Override
     public void exportEntity(HttpServletResponse response) {
         List<GovInfo> govInfoList = govInfoMapper.selectList(new QueryWrapper<GovInfo>());
@@ -1155,7 +1200,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 24));
         entityAttrIntypes.stream().forEach(o -> {
-            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(),province.getName());
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(), province.getName());
             list.add(parentValue);
         });
 
@@ -1175,7 +1220,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 23));
         entityAttrIntypes.stream().forEach(o -> {
-            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(),province.getName());
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(), province.getName());
             list.add(parentValue);
         });
 
@@ -1196,7 +1241,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 21));
         entityAttrIntypes.stream().forEach(o -> {
-            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(),province.getName());
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(), province.getName());
             list.add(parentValue);
         });
 
@@ -1216,7 +1261,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> entityAttrIntypes = intypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, 20));
         entityAttrIntypes.stream().forEach(o -> {
-            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(),province.getName());
+            ParentLevelVo parentValue = getParentValue(o.getValue(), o.getValue(), province.getName());
             list.add(parentValue);
         });
 
@@ -1240,7 +1285,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 List<ParentLevelVo> list = new ArrayList<>();
                 List<GovLevel> govLevels = levelMap.get(parentId);
                 for (GovLevel level : govLevels) {
-                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(),province.getName());
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(), province.getName());
                     list.add(parentValue);
                 }
 
@@ -1253,7 +1298,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 List<GovLevel> govLevels = levelMap.get(parentId);
                 List<ParentLevelVo> list = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(),city.getName());
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(), city.getName());
                     list.add(parentValue);
                 }
                 city.setValue(list);
@@ -1265,7 +1310,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 List<GovLevel> govLevels = levelMap.get(parentId);
                 List<ParentLevelVo> list = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(),country.getName());
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(), country.getName());
                     list.add(parentValue);
                 }
 
@@ -1279,7 +1324,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 List<GovLevel> govLevels = levelMap.get(parentId);
                 List<ParentLevelVo> list = new ArrayList<>();
                 for (GovLevel level : govLevels) {
-                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(),isJKGX.getName());
+                    ParentLevelVo parentValue = getParentValue(level.getName(), level.getId(), isJKGX.getName());
                     list.add(parentValue);
                 }
 
@@ -1290,7 +1335,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         return parentLevelVo;
     }
 
-    public ParentLevelVo getParentValue(String name, Object value,String preName) {
+    public ParentLevelVo getParentValue(String name, Object value, String preName) {
         ParentLevelVo parentLevelVo = new ParentLevelVo();
         parentLevelVo.setName(name).setSend(value).setPreName(preName);
         return parentLevelVo;

@@ -52,7 +52,7 @@
             <div class="flex1 top-left">
               <div class="title mr20">政府主体</div>
               <el-button type="text " @click="exprotGov">导出全部</el-button>
-              <div class="right-number">{{ goveSum }}</div>
+              <div class="right-number">{{ toThousands(goveSum) }}</div>
             </div>
           </div>
           <div class="title1">
@@ -128,11 +128,11 @@
               </div>
               <div>
                 <div class="text item number-font" style="width: 60px">
-                  <div>{{ goverment.govSum || "" }}</div>
-                  <div>{{ goverment.province || "" }}</div>
-                  <div>{{ goverment.city || "" }}</div>
-                  <div>{{ goverment.county || "" }}</div>
-                  <div>{{ goverment.open || "" }}</div>
+                  <div>{{ toThousands(goverment.govSum) || "" }}</div>
+                  <div>{{ toThousands(goverment.province) || "" }}</div>
+                  <div>{{ toThousands(goverment.city) || "" }}</div>
+                  <div>{{ toThousands(goverment.county) || "" }}</div>
+                  <div>{{ toThousands(goverment.open) || "" }}</div>
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@
             <div class="flex1 top-left">
               <div class="title mr20">企业主体</div>
               <el-button type="text " @click="exprotEntity">导出全部</el-button>
-              <div class="right-number">{{ entitySum }}</div>
+              <div class="right-number">{{ toThousands(entitySum) }}</div>
             </div>
           </div>
           <div class="title1">
@@ -221,11 +221,11 @@
               </div>
               <div>
                 <div class="text item number-font" style="width: 60px">
-                  <div>{{ entity.list || "0" }}</div>
-                  <div>{{ entity.issueBonds || "0" }}</div>
-                  <div>{{ entity.bondsAndList || "0" }}</div>
-                  <div>{{ entity.finance || "0" }}</div>
-                  <div>{{ entity.notBondsAndList || "0" }}</div>
+                  <div>{{ toThousands(entity.list) || "0" }}</div>
+                  <div>{{ toThousands(entity.issueBonds) || "0" }}</div>
+                  <div>{{ toThousands(entity.bondsAndList) || "0" }}</div>
+                  <div>{{ toThousands(entity.finance) || "0" }}</div>
+                  <div>{{ toThousands(entity.notBondsAndList) || "0" }}</div>
                 </div>
               </div>
             </div>
@@ -277,7 +277,7 @@
                 >
                 </el-option>
               </el-select>
-              <el-button class="mr10" type="primary" @click="select"
+              <el-button class="mr10 green-btn" type="primary" @click="select"
                 >查询</el-button
               >
             </div>
@@ -314,15 +314,23 @@
                 </el-table-column>
                 <el-table-column
                   fixed
+                  prop="status"
+                  label="是否生效"
+                  width="200"
+                >
+                 <template slot-scope="scope">
+                    <div>{{ scope.row.status && scope.row.status === 1 ? '是' : '否' }}</div>
+                 </template>
+                </el-table-column>
+                <el-table-column
+                  fixed
                   :prop="selectType === 'GV' ? 'govName' :'entityName'"
                   :label="selectType === 'GV' ? '政府名称' : '企业名称'"
                   width="300"
                   class="xxxxxxx"
                 >
                  <template slot-scope="scope">
-                    <div>
-                      {{ selectType === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName }}
-                    </div>
+                    <div v-html="replaceFun(selectType === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName)"></div>
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -405,7 +413,7 @@
 <script>
 import { govList, entityInfoList, getProduct, getCov, exportGov, exportEntity } from "@/api/subject";
 import { importExcelByEntity, getChecking  } from "@/api/common";
-import { download } from '@/utils/index'
+import { download, replaceStr } from '@/utils/index'
 import fileUpload from "../../components/FileUpload/httpUpload.vue";
 import pagination from "../../components/Pagination";
 export default {
@@ -484,6 +492,9 @@ export default {
     this.init();
   },
   methods: {
+        toThousands(num) {
+            return (num || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+        },
       getuuid() {
           const timeStr = Date.now()
         const rondStr = Math.round(Math.random()*10)
@@ -498,7 +509,7 @@ export default {
         govList({}).then((res) => {
           const { data } = res;
           this.goverment = data;
-          this.goveSum = eval(Object.values(data).join("+"));
+          this.goveSum = data.govSum
           this.govSumPercent = this.getPercent(data.govSum, this.goveSum);
           this.provincePercent = this.getPercent(data.province, this.goveSum);
           this.cityPercent = this.getPercent(data.city, this.goveSum);
@@ -535,12 +546,13 @@ export default {
             id: 9999,
             proName: "全部产品",
           });
+          this.rettHeaer = []
             this.options2.forEach((k) => {
                 if (k.id !== 9999) {
                 this.rettHeaer.push(k);
                 }
             });
-        });
+        });        
         let proId = [];
         if (this.value1.length === 1 && this.value1[0] === 9999) {
           this.options2.forEach((k) => {
@@ -623,7 +635,14 @@ export default {
     select() {
       try {
         this.loading = true;
-        this.getList();
+        this.getList();        
+        if(this.value1.length === 0) {
+            this.options2.forEach((k) => {
+                if (k.id !== 9999) {
+                this.selectHeaer.push(k);
+                }
+            });
+        }
         this.rettHeaer = this.selectHeaer
       } catch (error) {
         console.log(error);
@@ -740,16 +759,19 @@ export default {
       } finally {
         this.$modal.closeLoading()
       }
-    }
+    },
+    replaceFun(row) {
+      return replaceStr(row, this.input);
+    },
   },
   computed: {
     govePercent() {
-      const res = (this.goveSum / (this.goveSum + this.entitySum)).toFixed(4);
-      return res * 100;
+      const res = ((this.goveSum / (this.goveSum + this.entitySum))*100).toFixed(2);
+      return res;
     },
     entityPercent() {
-      const res = (this.entitySum / (this.goveSum + this.entitySum)).toFixed(4);
-      return res * 100;
+      const res = ((this.entitySum / (this.goveSum + this.entitySum))*100).toFixed(2);
+      return res;
     },
   },
 };
@@ -783,7 +805,7 @@ export default {
   .right-number {
     width: 50px;
     position: relative;
-    left: 240px;
+    right: -115%;
     top: 30%;
     color: #86bc25;
   }

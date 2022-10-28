@@ -139,9 +139,9 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
 
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
+
         //更新任务进度
         entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
-
         return R.ok("修改成功");
     }
 

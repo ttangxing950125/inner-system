@@ -147,6 +147,14 @@ public class BondDelIss implements Serializable {
     @Excel(name = "所属Wind二级行业")
     private String winSecondIndustry;
 
+    /**
+     * 所属Wind 行业
+     * @param o
+     * @return
+     */
+    private String windIndustry;
+
+
     @Override
     public boolean equals(Object o) {
         return EqualsUtil.equalsAnnoField(this, o, Excel.class);

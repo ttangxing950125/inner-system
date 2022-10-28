@@ -1,8 +1,11 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
@@ -10,6 +13,7 @@ import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.service.BondDelIssService;
+import com.deloitte.crm.service.CrmTypeInfoService;
 import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.strategy.WindTaskContext;
@@ -44,6 +48,9 @@ public class BondDelIssStrategy implements WindTaskStrategy {
     @Resource
     private IEntityAttrValueService entityAttrValueService;
 
+    @Resource
+    private CrmTypeInfoService crmTypeInfoService;
+
     /**
      * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
      *
@@ -73,11 +80,37 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             //查询有没有这条数据
             List<BondDelIss> bondDelIsses = bondDelIssService.findByBondName(shortName);
             if (CollUtil.isEmpty(bondDelIsses)) {
+
                 changeType = DataChangeType.INSERT.getId();
-            }else {
-                 BondDelIss last = bondDelIsses.stream().findFirst().get();
+            } else {
+                BondDelIss last = bondDelIsses.stream().findFirst().get();
+                last.setWindIndustry(null);
+                delIss.setWindIndustry(null);
                 if (!Objects.equals(last, delIss)) {
                     changeType = DataChangeType.UPDATE.getId();
+                }
+            }
+            /***
+             * 新债发行-推迟或取消发行债券 存储Wind行业
+             * 1.通过 所属Wind二级行业 查询crm_type_info  type=1(wind行业) 状态为正常的 {@link com.deloitte.crm.domain.CrmTypeInfo#type}  为空
+             * 2.如果不为空 看一下父parentCode 是否为空 如果为空 那么Wind行业存的就是当请二级行业
+             * 3.不为空向上查找 获取  祖宗节点 拼接wind 名称
+             * {@link com.deloitte.crm.service.impl.CrmTypeInfoServiceImpl#findCodeByParent(CrmTypeInfo, Integer)}  }
+             */
+            //推迟或取消发行债券 均为二级发行
+            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, delIss.getWinSecondIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+            if (crmTypeInfo != null) {
+                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
+                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                    if (CollectionUtil.isEmpty(hashSetResult)) {
+                        delIss.setWindIndustry(crmTypeInfo.getName());
+                    } else {
+                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel))
+                                .map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                        delIss.setWindIndustry(WindIndustryApend + "--" + crmTypeInfo.getName());
+                    }
+                } else {
+                    delIss.setWindIndustry(crmTypeInfo.getName());
                 }
             }
             //当债券进入 推迟或取消发行债券表 时，记为“推迟发行”
