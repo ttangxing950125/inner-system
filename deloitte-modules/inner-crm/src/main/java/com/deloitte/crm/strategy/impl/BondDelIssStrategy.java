@@ -49,7 +49,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
     private IEntityAttrValueService entityAttrValueService;
 
     @Resource
-    private CrmTypeInfoService CrmTypeInfoService;
+    private CrmTypeInfoService crmTypeInfoService;
 
     /**
      * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
@@ -80,9 +80,12 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             //查询有没有这条数据
             List<BondDelIss> bondDelIsses = bondDelIssService.findByBondName(shortName);
             if (CollUtil.isEmpty(bondDelIsses)) {
+
                 changeType = DataChangeType.INSERT.getId();
             } else {
                 BondDelIss last = bondDelIsses.stream().findFirst().get();
+                last.setWindIndustry(null);
+                delIss.setWindIndustry(null);
                 if (!Objects.equals(last, delIss)) {
                     changeType = DataChangeType.UPDATE.getId();
                 }
@@ -95,10 +98,10 @@ public class BondDelIssStrategy implements WindTaskStrategy {
              * {@link com.deloitte.crm.service.impl.CrmTypeInfoServiceImpl#findCodeByParent(CrmTypeInfo, Integer)}  }
              */
             //推迟或取消发行债券 均为二级发行
-            CrmTypeInfo crmTypeInfo = CrmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, delIss.getWinSecondIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, delIss.getWinSecondIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
             if (crmTypeInfo != null) {
                 if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
-                    Set<CrmTypeInfo> hashSetResult = CrmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
                     if (CollectionUtil.isEmpty(hashSetResult)) {
                         delIss.setWindIndustry(crmTypeInfo.getName());
                     } else {
