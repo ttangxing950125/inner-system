@@ -363,7 +363,7 @@
       <div class="p-top">
         <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
       </div>
-      <el-button type="text" class="p-top" @click="downFile"
+      <el-button type="text" style="text-decoration:underline" class="p-top" @click="downFile"
         >批量查询匹配模板.xlsx</el-button
       >
       <div class="p-red">
@@ -895,6 +895,7 @@ export default {
   ::v-deep .upload-file {
     background: #e7f0d9;
     text-align: center;
+    height: 50px !important;
   }
   ::v-deep .el-button--text {
     color: #86bc25;
