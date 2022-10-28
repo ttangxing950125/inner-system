@@ -88,6 +88,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
 
+    @Autowired
+    private EntityBaseBusiInfoMapper entityBaseBusiInfoMapper;
 
     private ProductsMasterRelMapper productsMasterRelMapper;
 
@@ -96,7 +98,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Autowired
     private StockThkInfoMapper stockThkMapper;
-
 
     private ProductsMasterDictMapper productsMasterDictMapper;
 
@@ -113,6 +114,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityStockThkRelMapper entityStockThkRelMapper;
 
     private GovInfoMapper govInfoMapper;
+
+    @Autowired
+    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     private BondInfoMapper bondInfoMapper;
 
@@ -136,6 +140,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private ICrmDailyTaskService crmDailyTaskService;
 
+    @Autowired
+    private EntityCaptureSpeedService entityCaptureSpeedService;
     /**
      * 主体
      */
@@ -756,21 +762,27 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     private EntityInfoDetails getCoverageDetail(EntityInfoDetails entityInfoDetails, String entityCode) {
+
+        Map<Integer, List<ProductsCover>> collect =new HashMap<>();
+
         //查询产品覆盖相关
         List<ProductsCover> productsCovers = productsCoverMapper.selectList(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getEntityCode, entityCode));
-        if (CollectionUtils.isEmpty(productsCovers)) {
-            return entityInfoDetails;
+        if (!CollectionUtils.isEmpty(productsCovers)) {
+            collect = productsCovers.stream().collect(Collectors.groupingBy(ProductsCover::getProId));
         }
-        Map<Integer, List<ProductsCover>> collect = productsCovers.stream().collect(Collectors.groupingBy(ProductsCover::getProId));
+
         //创建产品覆盖集合
         List<ProCoverVo> coverVos = new ArrayList<>();
 
         List<Products> products = productmapper.selectList(new QueryWrapper<>());
 
+        Map<Integer, List<ProductsCover>> finalCollect = collect;
         products.stream().forEach(o -> {
             String proName = o.getProName();
-            List<ProductsCover> covers = collect.get(o.getId());
-
+            List<ProductsCover> covers = new ArrayList<>();
+            if (!finalCollect.isEmpty()){
+                covers = finalCollect.get(o.getId());
+            }
             ProCoverVo proCoverVo = new ProCoverVo();
             //设置产品是否覆盖
             NameValueVo isCover = new NameValueVo();
@@ -1175,6 +1187,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public Object getListEntityByPage(EntityAttrByDto entityAttrDto) {
+        //去除无效选项
+        List<MoreIndex> mapList = entityAttrDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)){
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            entityAttrDto.setMapList(newMapList);
+        }
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
@@ -1893,33 +1911,36 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public Map<String, Object> getOverviewByGroup() {
         QueryWrapper<EntityInfo> query = new QueryWrapper<>();
         //全部主体
-        Long count = entityInfoMapper.selectCount(query);
+        Long count = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getStatus, 1));
         //上市主体
-        Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1));
+        Long list = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getStatus, 1));
         query.clear();
         //单纯上市主体
         query.and(wrapper -> wrapper.lambda().eq(EntityInfo::getList, 1))
-                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getStatus, 1));
         Long onlyList = entityInfoMapper.selectCount(query);
         query.clear();
         //发债主体
-        Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
+        Long bonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1).eq(EntityInfo::getStatus, 1));
         query.clear();
         //单纯发债主体
         query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
-                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1));
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getIssueBonds, 1))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getStatus, 1));
         Long onlyBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getIssueBonds, 1));
         query.clear();
         //既上市主体又发债主体
-        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1));
+        Long listBonds = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1).eq(EntityInfo::getStatus, 1));
         query.clear();
         //既没上市主体又不发债主体
         query.and(wrapper -> wrapper.lambda().ne(EntityInfo::getList, 1).or().isNull(EntityInfo::getList))
-                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds));
+                .and(wrapper -> wrapper.lambda().ne(EntityInfo::getIssueBonds, 1).or().isNull(EntityInfo::getIssueBonds))
+                .and(wrapper -> wrapper.lambda().eq(EntityInfo::getStatus, 1));
         Long unListBonds = entityInfoMapper.selectCount(query);
         query.clear();
         //金融
-        Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1));
+        Long finance = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getFinance, 1).eq(EntityInfo::getStatus, 1));
 
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
@@ -2278,7 +2299,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (ObjectUtil.isEmpty(ADetail)) {
             listDetail = GDetail;
         } else {
-            if (ObjectUtil.isEmpty(ADetail)) {
+            if (ObjectUtil.isEmpty(GDetail)) {
                 listDetail = ADetail;
             } else {
                 listDetail = ADetail + "," + GDetail;
@@ -2372,19 +2393,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer id = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(id);
 
+         /*//已完成的任务，不允许重复提交
         if (!ObjectUtils.isEmpty(crmSupplyTask) && !ObjectUtils.isEmpty(crmSupplyTask.getId()) && crmSupplyTask.getId() == 1) {
             return R.fail("已完成的任务，不能重复提交");
-        }
+        }*/
         crmSupplyTaskService.completeTaskById(id);
         updateEntityInfoByEntityCodeWithOutId(entityInfo);
 
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
+
+        //更新任务进度
+        entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
         return R.ok("修改成功");
     }
-
-    @Autowired
-    private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -2397,6 +2419,18 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         StockCnInfo stockCnInfo = entityInfoDetails.getStockCnInfo();
         //港股信息
         StockThkInfo stockThkInfo = entityInfoDetails.getStockThkInfo();
+
+        //修改金融机构信息
+        EntityFinancial entityFinancial = entityInfoDetails.getEntityFinancial();
+        if (!ObjectUtils.isEmpty(entityFinancial)){
+            financialMapper.updateById(entityFinancial.setUpdated(new Date()));
+        }
+        //修改主体其他一般工商信息
+        EntityBaseBusiInfo entityBaseBusiInfo = entityInfoDetails.getEntityBaseBusiInfo();
+        if (!ObjectUtils.isEmpty(entityBaseBusiInfo)){
+            entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo.setUpdated(new Date()));
+        }
+
         if (!ObjectUtil.isEmpty(entityInfo) && !ObjectUtil.isEmpty(entityInfo.getEntityCode())) {
             EntityInfo o = entityInfoMapper.selectById(entityInfo.getId());
             String entityName = o.getEntityName();
@@ -2412,19 +2446,22 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //修改基础属性，需要将曾用名置空
                 entityInfo.setEntityNameHis(null).setEntityNameHisRemarks(null);
             }
-            EntityInfo old = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+            EntityInfo old = entityInfoMapper.selectById(entityInfo.getId());
             entityInfoLogsUpdatedService.insert(old.getEntityCode(), old.getEntityName(), old, entityInfo);
-            entityInfoMapper.update(entityInfo, new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityInfo.getEntityCode()));
+            entityInfo.setUpdated(new Date()).setUpdater(SecurityUtils.getUsername());
+            entityInfoMapper.updateById(entityInfo);
         }
         if (!ObjectUtil.isEmpty(stockCnInfo) && !ObjectUtil.isEmpty(stockCnInfo.getStockDqCode())) {
-            StockCnInfo old = stockCnMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
+            StockCnInfo old = stockCnMapper.selectById(stockCnInfo.getId());
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockShortName(), old, entityInfo);
-            stockCnMapper.update(stockCnInfo, new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode()));
+            stockCnInfo.setUpdated(new Date());
+            stockCnMapper.updateById(stockCnInfo);
         }
         if (!ObjectUtil.isEmpty(stockThkInfo) && !ObjectUtil.isEmpty(stockThkInfo.getStockDqCode())) {
-            StockThkInfo old = stockThkMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
+            StockThkInfo old = stockThkMapper.selectById(stockThkInfo.getId());
             entityInfoLogsUpdatedService.insert(old.getStockDqCode(), old.getStockName(), old, entityInfo);
-            stockThkMapper.update(stockThkInfo, new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode()));
+            stockThkInfo.setUpdated(new Date());
+            stockThkMapper.updateById(stockThkInfo);
         }
     }
 

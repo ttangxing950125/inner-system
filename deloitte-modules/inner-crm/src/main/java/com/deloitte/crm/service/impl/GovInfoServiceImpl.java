@@ -469,6 +469,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
+        //去除无效选项
+        List<MoreIndex> mapList = govAttrDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)){
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            govAttrDto.setMapList(newMapList);
+        }
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(govAttrDto);
         } else {
