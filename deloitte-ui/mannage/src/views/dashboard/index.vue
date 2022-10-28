@@ -1096,6 +1096,13 @@ export default {
         judgment: "",
         shareRatio: "",
         shareRatioYear: "",
+        isFinance: "",
+        belJurisdiction: "",
+        regulators: "",
+        masterCode: "",
+        cityIb: "",
+        cityZhong: "",
+        city: "",
       },
       addGovForm: {
           govLevelBig: 1
@@ -1241,7 +1248,8 @@ export default {
       ],
       checkStatus: false,
       inputCode: '',
-      inputName: ''
+      inputName: '',
+      dnow: ''
     };
   },
   mounted() {
@@ -1577,7 +1585,7 @@ export default {
             this.list7 = data.records
             this.total = data.total
             this.queryParams.pageNum = data.current
-            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
             });
         }
         const params = {
@@ -1589,7 +1597,7 @@ export default {
           getTaskByDate(params).then((res) => {
             const { data } = res
             this.list = data
-            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
           });
         }
         if(this.roleId === 'role3'||this.roleId === 'role4'||this.roleId === 'role5') {
@@ -1598,7 +1606,7 @@ export default {
             this.list3 = data && data.records
             this.queryParams.pages = data && data.current
             this.total = data && data.total || 0
-            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
           });
         }
 
@@ -1608,7 +1616,7 @@ export default {
             this.list2 = data.records
             this.total = data.total
             this.queryParams.pages = data.pages
-            // this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
+            this.sureDate(this, false, this.year, this.monthMm, parseInt(row.path[0].innerText))
             });
         }
         getTaskCount({TaskDate: this.monthDate+ '-' +clickDay}).then(res => {

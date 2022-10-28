@@ -172,7 +172,12 @@ export default {
           this.$store
             .dispatch("Login", this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || "/" }).catch(() => {});
+                if(this.loginForm.username === 'admin') {
+                    // admin 跳转到系统管理
+                    this.$router.push({ path: 'system/user' }).catch(() => {});
+                }else {
+                    this.$router.push({ path: this.redirect || "/" }).catch(() => {});
+                }
             })
             .catch((err) => {
               this.loading = false;
