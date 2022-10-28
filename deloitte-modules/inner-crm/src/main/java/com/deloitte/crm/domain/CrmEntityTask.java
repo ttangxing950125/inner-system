@@ -30,6 +30,16 @@ public class CrmEntityTask
     private Integer id;
 
     /**
+     * 捕获时的主体名
+     */
+    private String entityName;
+
+    /**
+     * 任务进度表的id
+     */
+    private Integer speedId;
+
+    /**
      * 来源主表code
      */
     private String dataCode;

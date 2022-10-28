@@ -12,8 +12,10 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.SendEmailService;
@@ -51,6 +53,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     @Resource
     private SendEmailService sendEmailService;
+
+    @Resource
+    private EntityCaptureSpeedService entityCaptureSpeedService;
 
 
     /**
@@ -209,6 +214,14 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         Date taskDate = crmEntityTask.getTaskDate();
 
         crmEntityTaskMapper.insert(crmEntityTask);
+
+        //生成entity_capture_speed数据
+        EntityCaptureSpeed captureSpeed = new EntityCaptureSpeed();
+        captureSpeed.setSource(crmEntityTask.getTaskCategory());
+        captureSpeed.setEntityName(crmEntityTask.getEntityName());
+        captureSpeed.setCaptureTime(new Date());
+
+        entityCaptureSpeedService.save(captureSpeed);
 
 
         //修改今天角色6的任务为有任务未处理
