@@ -794,6 +794,10 @@ export default {
 <style scoped lang="scss">
 .t-input {
   width: 200px;
+  margin-top: 5px;
+  ::v-deep .el-input__inner{
+      height: 30px;
+  }
 }
 .edit-btn {
   margin-top: -3px;
