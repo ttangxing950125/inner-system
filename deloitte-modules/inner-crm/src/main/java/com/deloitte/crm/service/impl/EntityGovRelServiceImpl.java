@@ -141,6 +141,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
         //更新任务进度
         entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
+
         return R.ok("修改成功");
     }
 
