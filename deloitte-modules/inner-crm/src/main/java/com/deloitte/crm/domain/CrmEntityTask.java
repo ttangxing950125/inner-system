@@ -32,11 +32,6 @@ public class CrmEntityTask
     private String entityName;
 
     /**
-     * 任务进度表的id
-     */
-    private Integer speedId;
-
-    /**
      * 来源主表code
      */
     @ApiModelProperty(value = "来源主表code")
