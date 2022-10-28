@@ -211,26 +211,23 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "新增企业主体的曾用名")
     @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
     @PostMapping("/updateEntityName")
-    public R addOldName(@RequestBody EntityInfo entityInfo) {
+    public R updateEntityName(@RequestBody EntityInfo entityInfo) {
         return entityInfoService.addOldName(entityInfo);
     }
 
     /**
      *添加方法描述
      *
-     * @param entityCode
-     * @param hisName
-     * @param updated
-     * @param remarks
+     * @param entityInfo
      * @return R
      * @author 冉浩岑
-     * @date 2022/10/28 18:32
+     * @date 2022/10/28 18:36
     */
     @ApiOperation(value = "新增企业主体的曾用名")
     @PostMapping("/addOldName")
-    public R addOldName( String entityCode,String hisName,String updated,String remarks) {
+    public R addOldName(@RequestBody EntityInfo entityInfo) {
 
-        entityNameHisService.addEntityNameHis(entityCode,hisName,updated,remarks);
+        entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
         return R.ok();
     }
     @Autowired

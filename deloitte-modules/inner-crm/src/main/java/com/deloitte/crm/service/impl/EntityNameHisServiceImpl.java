@@ -176,7 +176,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
-    public R addEntityNameHis(String entityCode,String entityName,String updated,String remarks) {
+    public R addEntityNameHis(String entityCode,String entityName,Date updated,String remarks) {
         log.info("  =>> 角色7 新增主体曾用名:开始 <<=  ");
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
@@ -191,6 +191,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 .setOldName(entityName)
                 .setHappenDate(new Date())
                 .setRemarks(remarks)
+                .setUpdated(updated)
                 .setCreater(SecurityUtils.getUsername()));
 
         // 对主体曾用名列表进行操作
@@ -210,7 +211,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 entityInfo.setEntityNameHis(entityInfo.getEntityNameHis()+","+entityName);
             }
         }
-        entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成");
+        entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
         entityInfoMapper.updateById(entityInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
