@@ -881,28 +881,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             ArrayList<HashMap<String, String>> maps = new ArrayList<>();
             List<Integer> proId = entityOrGovByAttrVo.getProId();
             //判断空指针
-            if (CollUtil.isEmpty(proId)){
-                proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
-            }
-            for (Integer integer : proId) {
-                HashMap<String, String> Map = new HashMap<>();
-                LambdaQueryWrapper<Products> eq1 = new LambdaQueryWrapper<Products>().eq(Products::getId, integer);
-                Products products = productsMapper.selectOne(eq1);
-                LambdaQueryWrapper<ProductsCover> qw = new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, record.getDqGovCode())
-                        .eq(ProductsCover::getProId, integer)
-                        .eq(ProductsCover::getIsGov, 1);
-                ProductsCover productsCover = productsCoverMapper.selectOne(qw);
-                if(productsCover==null){
-                    Map.put("key", products.getProName());
-                    Map.put("value", "未覆盖");
-                    Map.put("color", "0");
-                }else {
-                    Map.put("key", products.getProName());
-                    Map.put("value", productsCover.getCoverDes());
-                    Map.put("color", productsCover.getIsCover());
-                }
-                maps.add(Map);
-            }
             govInfoBynameDto.setStatus(record.getStatus());
             govInfoBynameDto.setDqCode(record.getDqGovCode());
             govInfoBynameDto.setGovCode(record.getGovCode());
@@ -910,7 +888,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             LambdaQueryWrapper<GovLevel> eq1 = new LambdaQueryWrapper<GovLevel>().eq(GovLevel::getId, record.getGovLevelBig());
             GovLevel govLevel = govLevelMapper.selectOne(eq1);
             govInfoBynameDto.setLevelName(govLevel.getName());
-            govInfoBynameDto.setResult(maps);
             govInfoBynameDtos.add(govInfoBynameDto);
         }
         Page<GovInfoBynameDto> pageResult = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());

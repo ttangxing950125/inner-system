@@ -16,4 +16,14 @@ public interface ProductsCoverService extends IService<ProductsCover> {
 
 
     Page<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo);
+
+    /**
+     *组装覆盖情况
+     *
+     *
+     * @return List<ProductsCover>
+     * @author penTang
+     * @date 2022/10/28 11:41
+     */
+    void CoverRule();
 }
