@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
@@ -201,7 +202,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         updateEntityMaster(masDto);
         log.info("  =>> 修改一条数据至 entity_master <<=  ");
 
-        if (YES.equals(masDto.getCityIb())){ updateEntityGovRel(masDto); log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");}
+        updateEntityGovRel(masDto);
+        log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");
 
         //更改当条信息任务状态
         Date currentDate = iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
@@ -224,14 +226,10 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         //如果 是金融机构 那么 role_id 为6 如果 是城投政府 那么 为 7 如果都是否 那么为 5  => Y 为是
         if (YES.equals(masDto.getIsFinance())) {
             crmSupplyTask.setRoleId(5L);
-            //修改每日任务状态
-            this.editeDailyTaskByRoleTwo(5);
         } else if (YES.equals(masDto.getCityIb())) {
             crmSupplyTask.setRoleId(6L);
-            this.editeDailyTaskByRoleTwo(6);
         } else {
             crmSupplyTask.setRoleId(7L);
-            this.editeDailyTaskByRoleTwo(7);
         }
         //新增任务
         crmSupplyTaskMapper.insert(crmSupplyTask);
@@ -260,7 +258,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             Long role5 = groupingByMap.computeIfPresent(7L, (k, v) -> v != 0 ? v : 0L);
             //角色3 角色id为 5L
             if (role3 != 0 && role3 != null) {
-                sendEmailService.email(ROLE_3_ID, role3.intValue(),dateNow);
+                sendEmailService.email(ROLE_3_ID, role3.intValue());
                 //无任务为 1 有任务未完成 2
                 this.createTask(ROLE_3_ID, 2);
             } else {
@@ -268,26 +266,20 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             }
             //角色4 角色id为 6L
             if (role4 != 0 && role4 != null) {
-                sendEmailService.email(ROLE_4_ID, role4.intValue(),dateNow);
+                sendEmailService.email(ROLE_4_ID, role4.intValue());
                 this.createTask(ROLE_4_ID, 2);
             } else {
                 this.createTask(ROLE_4_ID, 1);
             }
             //角色5 角色id为 7L
             if (role5 != 0 && role5 != null) {
-                sendEmailService.email(ROLE_5_ID, role5.intValue(),dateNow);
+                sendEmailService.email(ROLE_5_ID, role5.intValue());
                 this.createTask(ROLE_5_ID, 2);
             } else {
                 this.createTask(ROLE_5_ID, 1);
             }
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
-    }
-
-    public void editeDailyTaskByRoleTwo(Integer roleId){
-        CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate,DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
-        if(ObjectUtils.isEmpty(crmDailyTask)){iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskStatus(2).setTaskDate(new Date()).setTaskRoleType(roleId.toString()));}
-        else{crmDailyTask.setTaskStatus(2);iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);}
     }
 
     /**

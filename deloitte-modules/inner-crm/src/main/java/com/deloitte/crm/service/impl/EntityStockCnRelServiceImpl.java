@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.EntityStockCnRelMapper;
-import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.EntityStockCnRelService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
@@ -19,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -40,9 +42,6 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
     @Resource
     private ObjectMapper objectMapper;
-
-    @Resource
-    private EntityCaptureSpeedService entityCaptureSpeedService;
 
     /**
      * 绑定主体和a股的关联关系，如果没有这个企业，就创建新增企业的任务
@@ -82,20 +81,16 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
             infoMap.put("公司中文名称", entityName);
 
 
-
-
             try {
                 Map<String, Object> data = AttrValueUtils.parseObj(cnCoachBack, Excel.class, "name");
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
-                entityTask.setEntityName(entityName);
-                entityTaskService.createTask(entityTask);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-
+            entityTaskService.createTask(entityTask);
 
         }
 
@@ -160,44 +155,38 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
-        //之前数据库中有该主体
-        if (CollUtil.isNotEmpty(entityInfos)) {
-            return false;
-        }
+        //之前数据库中没有该主体
+        if (CollUtil.isEmpty(entityInfos)) {
+            //创建任务
+            CrmEntityTask entityTask = new CrmEntityTask();
 
-        //创建任务
-        CrmEntityTask entityTask = new CrmEntityTask();
-        //主体名
-        entityTask.setEntityName(entityName);
+            entityTask.setTaskCategory(windTask.getTaskCategory());
+            entityTask.setDataSource(3);
 
+            entityTask.setSourceType(3);
+            entityTask.setTaskDate(windTask.getTaskDate());
+            String showData = "公司中文名称:" + entityName;
+            showData += ", 代码:" + cnCoachBack.getCode();
 
-        entityTask.setTaskCategory(windTask.getTaskCategory());
-        entityTask.setDataSource(3);
-        entityTask.setSourceType(3);
-        entityTask.setTaskDate(windTask.getTaskDate());
-        String showData = "公司中文名称:" + entityName;
-        showData += ", 代码:" + cnCoachBack.getCode();
+            entityTask.setDataShow(showData);
 
-        entityTask.setDataShow(showData);
-
-        //infoMap
-        HashMap<String, Object> infoMap = new HashMap<>();
-        infoMap.put("公司中文名称", entityName);
+            //infoMap
+            HashMap<String, Object> infoMap = new HashMap<>();
+            infoMap.put("公司中文名称", entityName);
 
 
-        try {
-            Map<String, Object> data = AttrValueUtils.parseObj(cnCoachBack, Excel.class, "name");
+            try {
+                Map<String, Object> data = AttrValueUtils.parseObj(cnCoachBack, Excel.class, "name");
 
-            entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
-            entityTask.setDetails(objectMapper.writeValueAsString(data));
-            entityTask.setEntityName(entityName);
+                entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
+                entityTask.setDetails(objectMapper.writeValueAsString(data));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             entityTaskService.createTask(entityTask);
-        } catch (Exception e) {
-            e.printStackTrace();
+
         }
-
-
-
 
         return true;
     }

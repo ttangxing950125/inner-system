@@ -1,4 +1,4 @@
-package com.deloitte.crm.utils.excel;
+package com.deloitte.crm.excelUtils;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

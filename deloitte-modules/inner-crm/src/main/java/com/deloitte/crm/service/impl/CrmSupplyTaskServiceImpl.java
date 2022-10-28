@@ -17,7 +17,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -314,7 +313,6 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         crmSupplyTask.setId(id);
         crmSupplyTask.setState(1);
         crmSupplyTask.setHandleUser(SecurityUtils.getUsername());
-        crmSupplyTask.setUpdated(new Date());
         crmSupplyTaskMapper.updateById(crmSupplyTask);
     }
 }

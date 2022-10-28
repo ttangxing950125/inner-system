@@ -20,7 +20,7 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
-import com.deloitte.crm.utils.excel.ExcelUtils;
+import com.deloitte.crm.excelUtils.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
@@ -457,12 +457,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Override
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
-        //去除无效选项
-        List<MoreIndex> mapList = govAttrDto.getMapList();
-        if (!CollectionUtils.isEmpty(mapList)){
-            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
-            govAttrDto.setMapList(newMapList);
-        }
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
@@ -865,14 +859,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         Page<GovInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
-        LambdaQueryWrapper<GovInfo> eq;
-        if (entityOrGovByAttrVo.getEntityName()==null || entityOrGovByAttrVo.getEntityName().equals("") ){
-
-            eq = new LambdaQueryWrapper<GovInfo>();
-        }else {
-            eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
-
-        }
+        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
         Page<GovInfo> page1 = govInfoMapper.selectPage(page, eq);
         List<GovInfo> records = page1.getRecords();
         ArrayList<GovInfoBynameDto> govInfoBynameDtos = new ArrayList<>();
@@ -903,7 +890,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 }
                 maps.add(Map);
             }
-            govInfoBynameDto.setStatus(record.getStatus());
             govInfoBynameDto.setDqCode(record.getDqGovCode());
             govInfoBynameDto.setGovCode(record.getGovCode());
             govInfoBynameDto.setGovName(record.getGovName());

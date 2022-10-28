@@ -146,7 +146,7 @@ public class RoleTwoController {
     @ApiOperation(value="获取子集 by正杰")
     @ApiImplicitParam(name="id",value="id",paramType = "query",dataType = "Integer")
     @Log(title = "获取子集", businessType = BusinessType.OTHER)
-        @PostMapping("/getGovLevelSmall")
+    @PostMapping("/getGovLevelSmall")
     public R<List<GovLevel>> getGovLevelSmall(Integer id){
         return iGovLevelService.getGovLevelSmall(id);
     }
