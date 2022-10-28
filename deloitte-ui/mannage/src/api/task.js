@@ -481,3 +481,14 @@ export function editeCreditCode(params) {
   });
 }
 
+// 修改库中主体的统一社会信用代码
+export function getTypeWindList(params) {
+  return request({
+    url: `/crm/crmTypeInfo/findTreeByType/${params.type}`,
+    headers: {
+      isToken: true,
+    },
+    method: "get",
+    data: { parentCode:params.parentCode },
+  });
+}

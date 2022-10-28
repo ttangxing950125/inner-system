@@ -69,6 +69,9 @@ public class CrmTypeInfo implements Serializable {
     @Excel(name = "更新时间")
     private Date updated;
 
+    /**
+     * 子级
+     */
     @TableField(exist = false)
     private List<CrmTypeInfo> children;
 

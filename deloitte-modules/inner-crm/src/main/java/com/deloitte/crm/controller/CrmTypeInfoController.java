@@ -4,6 +4,7 @@ package com.deloitte.crm.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmTypeInfo;
 import com.deloitte.crm.service.CrmTypeInfoService;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +28,8 @@ public class CrmTypeInfoController {
     @Resource
     private CrmTypeInfoService crmTypeInfoService;
 
-    
+    @GetMapping("/findTreeByType/{type}")
+    public R<List<CrmTypeInfo>> findTreeByType(String parentCode, @PathVariable Integer type){
+        return R.ok(crmTypeInfoService.findTreeByType(parentCode, type));
+    }
 }
