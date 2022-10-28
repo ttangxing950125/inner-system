@@ -7,15 +7,11 @@ import com.deloitte.crm.domain.EntityGovRel;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
-import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.service.ICrmSupplyTaskService;
-import com.deloitte.crm.service.IEntityGovRelService;
-import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -37,6 +33,8 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
     @Autowired
     private ICrmDailyTaskService crmDailyTaskService;
+    @Autowired
+    private EntityCaptureSpeedService entityCaptureSpeedService;
     /**
      * 查询【请填写功能名称】
      *
@@ -123,9 +121,10 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
         Integer taskId = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(taskId);
 
+         /*//已完成的任务，不允许重复提交
         if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
             return R.fail("已完成的任务，不能重复提交");
-        }
+        }*/
         crmSupplyTaskService.completeTaskById(taskId);
         EntityGovRel entityGovRel = entitySupplyMsgBack.newEntityGovRel();
         QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
@@ -140,6 +139,9 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
 
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
+        //更新任务进度
+        entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask);
+
         return R.ok("修改成功");
     }
 

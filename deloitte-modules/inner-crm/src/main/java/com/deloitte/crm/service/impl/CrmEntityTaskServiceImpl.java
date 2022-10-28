@@ -12,8 +12,10 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmDailyTask;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.SendEmailService;
@@ -51,6 +53,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     @Resource
     private SendEmailService sendEmailService;
+
+    @Resource
+    private EntityCaptureSpeedService entityCaptureSpeedService;
 
 
     /**
@@ -182,7 +187,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
             if (crmEntityTasks.size() != 0) {
                 //发送邮件 角色2 的 role ID 固定为 4
-                asycSendEmailService(4, crmEntityTasks.size());
+                asycSendEmailService(4, crmEntityTasks.size(),DateUtil.format(taskDate, "yyyy-MM-dd"));
             }
 
             return R.ok(SuccessInfo.SUCCESS.getInfo());
@@ -191,9 +196,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     }
 
     @Async
-    public void asycSendEmailService(Integer roleId, Integer taskCount) {
+    public void asycSendEmailService(Integer roleId, Integer taskCount,String taskDate) {
         log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}", roleId, taskCount);
-        sendEmailService.email(roleId, taskCount);
+        sendEmailService.email(roleId, taskCount,taskDate);
     }
 
     /**
@@ -208,8 +213,18 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         //当前日期
         Date taskDate = crmEntityTask.getTaskDate();
 
-        crmEntityTaskMapper.insert(crmEntityTask);
 
+
+        //生成entity_capture_speed数据
+        EntityCaptureSpeed captureSpeed = new EntityCaptureSpeed();
+        captureSpeed.setSource(crmEntityTask.getTaskCategory());
+        captureSpeed.setEntityName(crmEntityTask.getEntityName());
+        captureSpeed.setCaptureTime(new Date());
+
+        entityCaptureSpeedService.save(captureSpeed);
+        crmEntityTask.setSpeedId(captureSpeed.getId());
+
+        crmEntityTaskMapper.insert(crmEntityTask);
 
         //修改今天角色6的任务为有任务未处理
         crmDailyTaskService.updateToUnhandled(taskDate, RoleInfo.ROLE6);

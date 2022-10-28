@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.deloitte.crm.mapper.EntityMasterMapper">
-    
+
     <resultMap type="EntityMaster" id="EntityMasterResult">
-        <result property="id"    column="id"    />
-        <result property="masterCode"    column="master_code"    />
-        <result property="entityCode"    column="entity_code"    />
-        <result property="created"    column="created"    />
-        <result property="update"    column="update"    />
-        <result property="yyUrban"    column="yy_urban"    />
-        <result property="zhongxinUrban"    column="zhongxin_urban"    />
-        <result property="ibUrban"    column="ib_urban"    />
+        <result property="id" column="id"/>
+        <result property="masterCode" column="master_code"/>
+        <result property="entityCode" column="entity_code"/>
+        <result property="created" column="created"/>
+        <result property="update" column="update"/>
+        <result property="yyUrban" column="yy_urban"/>
+        <result property="zhongxinUrban" column="zhongxin_urban"/>
+        <result property="ibUrban" column="ib_urban"/>
     </resultMap>
 
     <sql id="selectEntityMasterVo">
@@ -21,19 +21,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectEntityMasterList" parameterType="EntityMaster" resultMap="EntityMasterResult">
         <include refid="selectEntityMasterVo"/>
-        <where>  
-            <if test="masterCode != null  and masterCode != ''"> and master_code = #{masterCode}</if>
-            <if test="entityCode != null  and entityCode != ''"> and entity_code = #{entityCode}</if>
-            <if test="created != null "> and created = #{created}</if>
-            <if test="update != null "> and update = #{update}</if>
+        <where>
+            <if test="masterCode != null  and masterCode != ''">and master_code = #{masterCode}</if>
+            <if test="entityCode != null  and entityCode != ''">and entity_code = #{entityCode}</if>
+            <if test="created != null ">and created = #{created}</if>
+            <if test="update != null ">and update = #{update}</if>
         </where>
     </select>
-    
+
     <select id="selectEntityMasterById" parameterType="Long" resultMap="EntityMasterResult">
         <include refid="selectEntityMasterVo"/>
         where id = #{id}
     </select>
-        
+
     <insert id="insertEntityMaster" parameterType="EntityMaster" useGeneratedKeys="true" keyProperty="id">
         insert into entity_master
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -44,7 +44,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="yyUrban != null">yy_urban,</if>
             <if test="zhongxinUrban != null">zhongxin_urban,</if>
             <if test="ibUrban != null">ib_urban</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="masterCode != null">#{masterCode},</if>
             <if test="entityCode != null">#{entityCode},</if>
@@ -53,7 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="yyUrban != null">#{yyUrban},</if>
             <if test="zhongxinUrban != null">#{zhongxinUrban},</if>
             <if test="ibUrban != null">#{ibUrban}</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateEntityMaster" parameterType="EntityMaster">
@@ -72,7 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteEntityMasterByIds" parameterType="String">
-        delete from entity_master where id in 
+        delete from entity_master where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

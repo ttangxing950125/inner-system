@@ -494,6 +494,10 @@ public class BondNewIss implements Serializable {
      */
     @Excel(name = "地方政府债置换金额（万）")
     private BigDecimal govReplaceAmount;
+    /***
+     * Wind 行业
+     */
+    private String windIndustry;
 
     @Override
     public boolean equals(Object o) {

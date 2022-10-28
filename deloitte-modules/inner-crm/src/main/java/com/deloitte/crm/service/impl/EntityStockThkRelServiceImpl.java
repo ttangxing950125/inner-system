@@ -83,11 +83,14 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
+                entityTask.setEntityName(entityName);
+
+                entityTaskService.createTask(entityTask);
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            entityTaskService.createTask(entityTask);
+
 
         }
 
