@@ -112,7 +112,7 @@ service.interceptors.response.use(
           .then(() => {
             isRelogin.show = false;
             store.dispatch("LogOut").then(() => {
-              location.href = "/index";
+              location.href = "/crm-door/index";
             });
           })
           .catch(() => {

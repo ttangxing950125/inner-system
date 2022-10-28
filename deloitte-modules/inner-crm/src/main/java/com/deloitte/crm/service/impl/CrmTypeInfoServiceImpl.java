@@ -6,12 +6,17 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.common.redis.service.RedisService;
+import com.deloitte.crm.constants.CacheName;
+import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.mapper.CrmTypeInfoMapper;
 import com.deloitte.crm.domain.CrmTypeInfo;
 import com.deloitte.crm.service.CrmTypeInfoService;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +27,8 @@ import java.util.stream.Collectors;
  */
 @Service("crmTypeInfoService")
 public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTypeInfo> implements CrmTypeInfoService {
+    @Resource
+    private RedisService redisService;
 
     /**
      * 查询树结构根据分类
@@ -42,6 +49,27 @@ public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTy
         Wrapper<CrmTypeInfo> wrapper = Wrappers.<CrmTypeInfo>lambdaQuery().eq(CrmTypeInfo::getType, type);
         List<CrmTypeInfo> categories = getBaseMapper().selectList(wrapper);
         return getDataUpList(categories, crmTypeInfo);
+    }
+
+    /**
+     * 缓存添加
+     * 拼装redis缓存为type:code:实体类
+     * @return Boolean
+     */
+    @Override
+    public Boolean cacheAll() {
+
+        final List<CrmTypeInfo> list = this.list();
+
+        redisService.deleteObject(CacheName.CRM_TYPE_INFO);
+
+        Map<String, CrmTypeInfo> attrMap = list.stream()
+                .collect(Collectors.toMap(item -> item.getType() + "::" + item.getCode(), Function.identity()));
+
+        redisService.redisTemplate.opsForHash().putAll(CacheName.CRM_TYPE_INFO, attrMap);
+
+        return true;
+
     }
 
     private Set<CrmTypeInfo> getDataUpList(List<CrmTypeInfo> categories, CrmTypeInfo crmTypeInfo) {

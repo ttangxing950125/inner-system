@@ -95,7 +95,7 @@ export default {
       })
         .then(() => {
           this.$store.dispatch("LogOut").then(() => {
-            location.href = "/crm-door/index";
+            location.href = "/crm-after/index";
           });
         })
         .catch(() => {});

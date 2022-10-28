@@ -146,7 +146,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      * 处理当日任务
      *
      * @param taskId
-     * @param state
+     * @param state 0-未处理 1-已有主体未关联 2-新增主体 3-已有主体已关联
      * @return
      */
     @Override
