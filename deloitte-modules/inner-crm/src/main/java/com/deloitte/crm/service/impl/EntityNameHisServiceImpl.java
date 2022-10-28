@@ -176,4 +176,42 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
+    public R addEntityNameHis(String entityCode,String entityName,String updated,String remarks) {
+        log.info("  =>> 角色7 新增主体曾用名:开始 <<=  ");
+        EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
+        if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
+        if(!ObjectUtils.isEmpty(entityNameHis)){return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());}
+
+        // 新增一条数据进入曾用名列表
+        baseMapper.insert(new EntityNameHis()
+                .setEntityType(1)
+                .setStatus(1)
+                .setDqCode(entityCode)
+                .setOldName(entityName)
+                .setHappenDate(new Date())
+                .setRemarks(remarks)
+                .setCreater(SecurityUtils.getUsername()));
+
+        // 对主体曾用名列表进行操作
+        String oldNames = entityInfo.getEntityNameHis();
+        if(ObjectUtils.isEmpty(oldNames)){
+            //当列表为空时 直接新增
+            entityInfo.setEntityNameHis(entityName);
+        }else{
+            //当列表不为空时 再次校验曾用名是否被使用过
+            String[] oldNameArr = oldNames.split(",");
+            if(Arrays.asList(oldNameArr).contains(entityName)){
+                //如果被使用过 证明 曾用名表中 没有存储到这个字段 但是 主表中数据已经存了 所以只需要return 不需要断言
+                log.info("  =>> 角色7 新增曾用名出现在主表中 并没有出现再历史表 <<=  ");
+                return R.ok(SuccessInfo.SUCCESS.getInfo());
+            }else{
+                //如果没被使用过 那么就再此基础上 再添加一条
+                entityInfo.setEntityNameHis(entityInfo.getEntityNameHis()+","+entityName);
+            }
+        }
+        entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成");
+        entityInfoMapper.updateById(entityInfo);
+        return R.ok(SuccessInfo.SUCCESS.getInfo());
+    }
 }

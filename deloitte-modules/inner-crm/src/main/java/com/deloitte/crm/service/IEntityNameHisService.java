@@ -82,4 +82,5 @@ public interface IEntityNameHisService
      * @return
      */
     R addEntityNameHis(String entityCode, String entityName);
+    R addEntityNameHis(String entityCode,String hisName,String updated,String remarks);
 }
