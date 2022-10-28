@@ -3,6 +3,7 @@ package com.deloitte.crm.service;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityNameHis;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -82,4 +83,5 @@ public interface IEntityNameHisService
      * @return
      */
     R addEntityNameHis(String entityCode, String entityName);
+    R addEntityNameHis(String entityCode, String hisName, Date updated, String remarks);
 }

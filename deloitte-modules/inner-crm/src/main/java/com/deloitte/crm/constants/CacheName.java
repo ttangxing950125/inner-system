@@ -14,4 +14,8 @@ public class CacheName {
 
     public static final String STOCK_CN_INFO = "stock_cn_info";
 
+    public static final String CRM_TYPE_INFO = "crm_type_info";
+
+
+
 }

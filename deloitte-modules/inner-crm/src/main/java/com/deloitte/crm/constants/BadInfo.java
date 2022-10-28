@@ -31,6 +31,7 @@ public enum BadInfo {
     EMPTY_THK_STOCK_INFO("没有找到港股信息"),
     EMPTY_CN_STOCK_INFO("没有找到A股信息"),
     ERROR_PARAM_DATE("参数日期格式格式错误"),
+    ERROR_PARAM_KEYWORD("关键参数错误"),
     PARAM_PROBABLY_BE_EMPTY("参数可能为空"),
     PARAM_PROBABLY_BE_VALIDA("参数可能无效"),
     PARAM_TABLE_COULD_NOT_BE_NULL("参数中的数据库表常量不能为空!"),

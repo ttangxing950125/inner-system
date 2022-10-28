@@ -909,7 +909,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     public R getGovEntityResult(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         Page<GovInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
-        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
+        LambdaQueryWrapper<GovInfo> eq;
+        if (entityOrGovByAttrVo.getEntityName()==null || entityOrGovByAttrVo.getEntityName().equals("") ){
+
+            eq = new LambdaQueryWrapper<GovInfo>();
+        }else {
+            eq = new LambdaQueryWrapper<GovInfo>().like(GovInfo::getGovName, entityOrGovByAttrVo.getEntityName());
+
+        }
         Page<GovInfo> page1 = govInfoMapper.selectPage(page, eq);
         List<GovInfo> records = page1.getRecords();
         ArrayList<GovInfoBynameDto> govInfoBynameDtos = new ArrayList<>();
@@ -918,35 +925,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             ArrayList<HashMap<String, String>> maps = new ArrayList<>();
             List<Integer> proId = entityOrGovByAttrVo.getProId();
             //判断空指针
-            if (CollUtil.isEmpty(proId)) {
-                proId = productsMapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
-            }
-            for (Integer integer : proId) {
-                HashMap<String, String> Map = new HashMap<>();
-                LambdaQueryWrapper<Products> eq1 = new LambdaQueryWrapper<Products>().eq(Products::getId, integer);
-                Products products = productsMapper.selectOne(eq1);
-                LambdaQueryWrapper<ProductsCover> qw = new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, record.getDqGovCode())
-                        .eq(ProductsCover::getProId, integer)
-                        .eq(ProductsCover::getIsGov, 1);
-                ProductsCover productsCover = productsCoverMapper.selectOne(qw);
-                if (productsCover == null) {
-                    Map.put("key", products.getProName());
-                    Map.put("value", "未覆盖");
-                    Map.put("color", "0");
-                } else {
-                    Map.put("key", products.getProName());
-                    Map.put("value", productsCover.getCoverDes());
-                    Map.put("color", productsCover.getIsCover());
-                }
-                maps.add(Map);
-            }
+            govInfoBynameDto.setStatus(record.getStatus());
             govInfoBynameDto.setDqCode(record.getDqGovCode());
             govInfoBynameDto.setGovCode(record.getGovCode());
             govInfoBynameDto.setGovName(record.getGovName());
             LambdaQueryWrapper<GovLevel> eq1 = new LambdaQueryWrapper<GovLevel>().eq(GovLevel::getId, record.getGovLevelBig());
             GovLevel govLevel = govLevelMapper.selectOne(eq1);
             govInfoBynameDto.setLevelName(govLevel.getName());
-            govInfoBynameDto.setResult(maps);
             govInfoBynameDtos.add(govInfoBynameDto);
         }
         Page<GovInfoBynameDto> pageResult = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
