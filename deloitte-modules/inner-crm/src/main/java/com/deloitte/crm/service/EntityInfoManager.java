@@ -1,8 +1,8 @@
 package com.deloitte.crm.service;
 
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.vo.CheckVo;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * @author 正杰
@@ -36,5 +36,15 @@ public interface EntityInfoManager {
      * @return
      */
     CheckVo matchByKeyword(String keyword, String target);
+
+    /**
+     *   *****************
+     *   *   绑定关联关系  *
+     *   *****************
+     * @param entityInfoInsertDTO
+     * @param entityCode 如果是新增主体 那么 entityInfoInsertDOT 中的 entityCode 就为空
+     * @param username
+     */
+    void bindData(EntityInfoInsertDTO entityInfoInsertDTO,String entityCode,String username);
 
 }

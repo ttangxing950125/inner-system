@@ -15,6 +15,7 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
@@ -209,11 +210,28 @@ public class EntityInfoController extends BaseController {
      */
     @ApiOperation(value = "新增企业主体的曾用名")
     @ApiImplicitParam(name = "entityInfo", value = "包含表中entity_info的所有字段", paramType = "body", example = "", dataTypeClass = EntityInfo.class)
-    @PostMapping("/addOldName")
-    public R addOldName(@RequestBody EntityInfo entityInfo) {
+    @PostMapping("/updateEntityName")
+    public R updateEntityName(@RequestBody EntityInfo entityInfo) {
         return entityInfoService.addOldName(entityInfo);
     }
 
+    /**
+     *添加方法描述
+     *
+     * @param entityInfo
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/28 18:36
+    */
+    @ApiOperation(value = "新增企业主体的曾用名")
+    @PostMapping("/addOldName")
+    public R addOldName(@RequestBody EntityInfo entityInfo) {
+
+        entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
+        return R.ok();
+    }
+    @Autowired
+    private IEntityNameHisService entityNameHisService;
     /**
      * 修改,停用企业主体的曾用名
      *
