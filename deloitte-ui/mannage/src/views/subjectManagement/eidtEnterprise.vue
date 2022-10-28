@@ -120,11 +120,11 @@
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">统一社会信用代码</div>
+                  <div class="first" :class="edit.creditCode ? 'green' : ''">统一社会信用代码</div>
                   <el-input
                     class="t-input"
                     v-model="info.entityInfo.creditCode"
-                    @change="item.edit = true"
+                    @change="edit.creditCode = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
@@ -144,21 +144,21 @@
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">年报列示类型</div>
+                  <div class="first" :class="edit.listType ? 'green' : ''">年报列示类型</div>
                   <el-input
                     class="t-input"
                     v-model="info.entityInfo.listType"
-                    @change="item.edit = true"
+                    @change="edit.listType = true"
                   ></el-input>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
-                  <div class="first">企业名称</div>
+                  <div class="first" :class="edit.entityName ? 'green' : ''">企业名称</div>
                   <el-input
                     class="t-input"
                     v-model="info.entityInfo.entityName"
-                    @change="item.edit = true"
+                    @change="edit.entityName = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
@@ -208,16 +208,18 @@
                   <div class="first">A股上市交易所</div>
                   <el-input
                     class="t-input"
+                    :class="edit.exchange ? 'green' : ''"
                     v-model="info.stockCnInfo.exchange"
-                    @change="item.edit = true"
+                    @change="edit.exchange = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
                   <div class="first">A股股票代码</div>
                   <el-input
                     class="t-input"
+                    :class="edit.stockCode ? 'green' : ''"
                     v-model="info.stockCnInfo.stockCode"
-                    @change="item.edit = true"
+                    @change="edit.stockCode = true"
                   ></el-input>
                 </div>
               </el-col>
@@ -226,16 +228,18 @@
                   <div class="first">A股上市日期</div>
                   <el-input
                     class="t-input"
+                    :class="edit.listDate ? 'green' : ''"
                     v-model="info.stockCnInfo.listDate"
-                    @change="item.edit = true"
+                    @change="edit.listDate = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
                   <div class="first">A股退市日期</div>
                   <el-input
                     class="t-input"
+                    :class="edit.delistingDate ? 'green' : ''"
                     v-model="info.stockCnInfo.delistingDate"
-                    @change="item.edit = true"
+                    @change="edit.delistingDate = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
@@ -659,7 +663,16 @@ export default {
 
       },
       activeNames: 'info',
-      clickEdit: false
+      clickEdit: false,
+      edit: {
+          creditCode: false,
+          listType: false,
+          entityName: false,
+          exchange: false,
+          stockCode: false,
+          listDate: false,
+          delistingDate: false,
+      }
     };
   },
   created() {
@@ -675,7 +688,6 @@ export default {
         this.list.forEach(e => {
             e.edit = false
         })
-        console.log(this.list)
         row.edit = true
         this.clickEdit = true
         const code = row.entityInfo.entityCode;
