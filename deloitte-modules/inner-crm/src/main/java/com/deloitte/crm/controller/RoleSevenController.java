@@ -78,8 +78,26 @@ public class RoleSevenController {
     @PostMapping("/ignoreTask")
     public R ignoreTask(Integer id){
         // 已有主体状态为 1
-        return iCrmEntityTaskService.finishTask(id,1,null);
+        //return iCrmEntityTaskService.ignoreTask(id);
+        return null;
     }
+
+    /**
+     * 删除该任务
+     * @author 正杰
+     * @date 2022/10/28
+     * @param id 传入 id
+     * @return 操作成功与否
+     */
+    @ApiOperation(value="忽略该任务 by正杰")
+    @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer")
+    @Log(title = "【删除该任务】", businessType = BusinessType.UPDATE)
+    @PostMapping("/deleteTask")
+    public R deleteTask(Integer id){
+        // 已有主体已关联 3
+        return iCrmEntityTaskService.finishTask(id,3,null);
+    }
+
 
     /**
      * 新增主体 并绑定关联债券||股票信息
@@ -117,36 +135,6 @@ public class RoleSevenController {
     public R editEntityNameHis(@NotNull(message = "德勤代码不能为空")String entityCode,@NotNull(message = "主体名称不能为空")String entityNewName){
         log.info("  =>> 角色7 修改主体名称 将其命名为{} <<=  ",entityNewName);
         return iEntityInfoService.editEntityNameHis(entityCode,entityNewName);
-    }
-
-    /**
-     * 校验统一社会信用代码是否存在 by正杰
-     * @author 正杰
-     * @date 2022/9/28
-     * @param creditCode
-     * @return R
-     */
-    @ApiOperation(value="校验统一社会信用代码是否存在 by正杰")
-    @ApiImplicitParam(name="creditCode",value="传入 企业统一社会信用代码",required = true , paramType = "query",dataType = "String")
-    @Log(title = "【 校验统一社会信用代码是否存在 】", businessType = BusinessType.OTHER)
-    @PostMapping("/checkCreditCode")
-    public R<EntityInfoVo> checkCreditCode(String creditCode){
-        return iEntityInfoService.checkCreditCode(creditCode);
-    }
-
-    /**
-     * 校验主体名称是否存在
-     * @author 正杰
-     * @date 2022/9/28
-     * @param entityName
-     * @return R
-     */
-    @ApiOperation(value="校验主体名称是否存在 by正杰")
-    @ApiImplicitParam(name="entityName",value="传入 主体名称",required = true , paramType = "query",dataType = "String")
-    @Log(title = "【 校验主体名称是否存在 】", businessType = BusinessType.OTHER)
-    @PostMapping("/checkEntityName")
-    public R<EntityInfoVo> checkEntityName(String entityName){
-        return iEntityInfoService.checkEntityName(entityName);
     }
 
     /**
@@ -198,5 +186,7 @@ public class RoleSevenController {
     public R addEntityNameHis(@NotNull(message = "德勤代码不能未空")String entityCode,@NotNull(message = "主体新名称不能为空")String entityName){
         return iEntityNameHisService.addEntityNameHis(entityCode,entityName);
     }
+
+
 
 }
