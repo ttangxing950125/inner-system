@@ -167,7 +167,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
             log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmEntityTask.getSpeedId());
         }else{
             entityCaptureSpeed.setAdded(state);
-            entityCaptureSpeedMapper.insert(entityCaptureSpeed);
+            entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
         }
 
         baseMapper.updateById(crmEntityTask);
