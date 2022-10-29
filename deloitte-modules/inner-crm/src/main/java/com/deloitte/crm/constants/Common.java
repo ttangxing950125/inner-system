@@ -150,15 +150,15 @@ public enum Common {
     public static final String CREATED = "创建时间";
 
     /** 修改名称 */
-    public static final String EDITE_NAME = "RoleSevenEditeName";
+    public static final String EDITE_NAME = "roleSevenEditeName";
     /** 新增主体 */
-    public static final String INSERT_ENTITY = "RoleSevenInsertEntity";
+    public static final String INSERT_ENTITY = "roleSevenInsertEntity";
     /** 添加曾用名 */
-    public static final String INSERT_OLD_NAME = "RoleSevenInsertOldName";
+    public static final String INSERT_OLD_NAME = "roleSevenInsertOldName";
     /** 忽略任务 */
-    public static final String IGNORE = "RoleSevenIgnore";
+    public static final String IGNORE = "roleSevenIgnore";
     /** 删除任务 */
-    public static final String DELETE_TASK = "RoleSevenDeleteTask";
+    public static final String DELETE_TASK = "roleSevenDeleteTask";
 
 
 }
