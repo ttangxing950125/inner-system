@@ -160,13 +160,13 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmEntityTask.setState(state);
-        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSourceId()));
+        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSpeedId()));
 
         // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
         if(ObjectUtils.isEmpty(entityCaptureSpeed)){
             log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmEntityTask.getSpeedId());
         }else{
-            entityCaptureSpeed.setAdded(taskId);
+            entityCaptureSpeed.setAdded(state);
             entityCaptureSpeedMapper.insert(entityCaptureSpeed);
         }
 

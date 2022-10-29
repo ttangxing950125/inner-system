@@ -1,11 +1,10 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
-
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.ModelMaster;
 import com.deloitte.crm.dto.MasDto;
-import com.deloitte.crm.vo.ModelMasterInfoVo;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -68,7 +67,7 @@ public interface IModelMasterService
      * @param id
      * @return
      */
-    R<ModelMasterInfoVo> getTable(Integer id);
+    R<MasDto> getTable(Integer id);
 
     /**
      * 获取金融细分领域多选框
@@ -88,4 +87,5 @@ public interface IModelMasterService
      * @return
      */
     R<List<ModelMaster>> getModelMaster();
+
 }
