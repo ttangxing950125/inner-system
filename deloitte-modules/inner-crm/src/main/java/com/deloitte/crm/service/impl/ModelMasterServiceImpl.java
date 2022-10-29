@@ -144,7 +144,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         //基础信息展示
         masDto.setEntityName(entityInfo.getEntityName()).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWind(entityInfo.getWindMaster()).setShenWan(entityInfo.getShenWanMaster());
         //当企业为金融机构的时候 去查entity_financial 中的数据
-        if(!ObjectUtils.isEmpty(entityInfo.getFinance())||entityInfo.getFinance()==1){
+        if(!ObjectUtils.isEmpty(entityInfo.getFinance())&&entityInfo.getFinance()==1){
             EntityFinancial entityFinancial = entityFinancialService.getBaseMapper().selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
             masDto.setFinanceSegmentation(entityFinancial.getMince());
         }
@@ -167,11 +167,12 @@ public class ModelMasterServiceImpl implements IModelMasterService {
     }
 
     public GovNode getTree(GovNode govNode,GovInfo govInfo){
-        GovInfo parent = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govInfo.getPreGovCode()));
         if(!ObjectUtils.isEmpty(govInfo.getPreGovCode())){
-            govNode.setChildren(govNode);
+            GovInfo parent = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govInfo.getPreGovCode()));
+            GovNode node = new GovNode().setGovName(govNode.getGovName());
+            govNode.setChildren(node);
             govNode.setGovName(parent.getGovName());
-            this.getTree(govNode,parent);
+            return this.getTree(govNode,parent);
         }
         return govNode;
     }
