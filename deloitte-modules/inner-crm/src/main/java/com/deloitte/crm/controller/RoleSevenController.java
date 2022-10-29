@@ -15,10 +15,7 @@ import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -73,7 +70,7 @@ public class RoleSevenController {
      * @return 操作成功与否
      */
     @ApiOperation(value="忽略该任务 by正杰")
-    @ApiImplicitParam(name="entityInfoInsertDTO",value="传入taskId,entityCode,dataSouece,dataCode",paramType = "body",dataTypeClass = EntityInfoInsertDTO.class)
+    @ApiImplicitParam(name="entityInfoInsertDTO",value="传入taskId,外部传entity_name 内部传 credit_code" , paramType = "body",dataTypeClass = EntityInfoInsertDTO.class)
     @Log(title = "【忽略该任务】", businessType = BusinessType.UPDATE)
     @PostMapping("/ignoreTask")
     public R ignoreTask(@RequestBody EntityInfoInsertDTO entityInfoInsertDTO){
@@ -162,15 +159,15 @@ public class RoleSevenController {
 
     /**
      * 删除该条任务 by正杰
-     * @param entityInfoInsertDTO 传入taskId
+     * @param id 传入taskId
      * @return
      */
     @ApiOperation(value="删除该条任务 by正杰")
-    @ApiImplicitParam(name="entityInfoInsertDTO",value="传入taskId" , paramType = "body",dataTypeClass = EntityInfoInsertDTO.class)
+    @ApiImplicitParam(name="id",value="传入taskId",paramType = "body",dataType = "Integer")
     @Log(title = "【 删除该条任务 】", businessType = BusinessType.OTHER)
-    @PostMapping("/deleteTask")
-    public R deleteTask(@RequestBody EntityInfoInsertDTO entityInfoInsertDTO) {
-        return roleSevenTaskFactory.getFactory(Common.DELETE_TASK).finishTask(entityInfoInsertDTO);
+    @PostMapping("/deleteTask/{id}")
+    public R deleteTask(@PathVariable Integer id) {
+        return roleSevenTaskFactory.getFactory(Common.DELETE_TASK).finishTask(new EntityInfoInsertDTO().setTaskId(id));
     }
 
 }

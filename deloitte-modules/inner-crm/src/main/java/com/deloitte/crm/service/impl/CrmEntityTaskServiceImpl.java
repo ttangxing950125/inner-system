@@ -142,7 +142,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getTaskDate, date));
+                .lambda().eq(CrmEntityTask::getTaskDate, date).orderBy(true,true,CrmEntityTask::getState));
         return R.ok(crmEntityTaskPage, SuccessInfo.GET_SUCCESS.getInfo());
     }
 
@@ -171,8 +171,10 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         }
 
         baseMapper.updateById(crmEntityTask);
+        //  相同主体名称情况下 && 相同任务日期 && 任务状态为 0 对该次生成任务进行忽略
+        List<CrmEntityTask> byEntityNameList = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, crmEntityTask.getTaskDate()).eq(CrmEntityTask::getState, 0).eq(CrmEntityTask::getEntityName, crmEntityTask.getEntityName()));
         //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
-        if (!ObjectUtils.isEmpty(entityCode)) {
+        if (!ObjectUtils.isEmpty(entityCode)&&byEntityNameList.size()==0) {
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType,4));
             if(ObjectUtils.isEmpty(crmDailyTask)){
