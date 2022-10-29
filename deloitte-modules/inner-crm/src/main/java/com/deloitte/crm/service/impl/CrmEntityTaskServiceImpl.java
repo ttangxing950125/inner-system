@@ -219,6 +219,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         captureSpeed.setCaptureTime(new Date());
 
         entityCaptureSpeedService.save(captureSpeed);
+
+        crmEntityTask.setSpeedId(captureSpeed.getId());
         crmEntityTaskMapper.insert(crmEntityTask);
 
         //修改今天角色6的任务为有任务未处理
