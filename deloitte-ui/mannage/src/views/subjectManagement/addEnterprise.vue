@@ -49,25 +49,35 @@
             :data="infomation.entityInfoLogs"
             style="width: 98%; margin-top: 15px"
           >
-            <el-table-column prop="createTime" label="时间"> </el-table-column>
-            <el-table-column prop="operName" label="操作人"> </el-table-column>
-            <el-table-column prop="code" label="证券代码"> </el-table-column>
-            <el-table-column prop="name" label="证券简称"> </el-table-column>
-            <el-table-column prop="entityCode" label="德勤主体代码">
+            <el-table-column prop="createTime" align="center" label="时间">
+                 <template slot-scope="scope">
+                    {{ scope.row.createTime || '-' }}
+                </template>
             </el-table-column>
-            <el-table-column prop="remarks" label="详细信息">
+            <el-table-column prop="operName" label="操作人" align="center"> </el-table-column>
+            <el-table-column prop="code" label="证券代码" align="center"> </el-table-column>
+            <el-table-column prop="name" label="证券简称" align="center">
+                <template slot-scope="scope">
+                    {{ scope.row.name || '-' }}
+                </template>
+            </el-table-column>
+            <el-table-column prop="entityCode" label="德勤主体代码" align="center">
+            </el-table-column>
+            <el-table-column prop="remarks" label="详细信息" align="center">
                 <template slot-scope="scope">
                     {{ scope.row.remarks || '-' }}
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="100">
+            <el-table-column label="操作" width="100" align="center">
               <template slot-scope="scope">
                 <el-button
+                  v-if="scope.row.operType === 1"
                   @click="handleClick(scope.row)"
                   type="text"
                   size="small"
                   >撤销停用</el-button
                 >
+                <span v-else>-</span>
               </template>
             </el-table-column>
           </el-table>
@@ -78,6 +88,7 @@
       :title="digName"
       :visible.sync="dialogVisible"
       width="50%"
+      :before-close="handleClose"
     >
       <el-form
         :model="ruleForm"
@@ -92,23 +103,24 @@
         <el-form-item label="新增操作人">
           <span>{{ currentName }}</span>
         </el-form-item>
-        <el-form-item label="IB敞口划分" prop="">
+        <el-form-item label="IB敞口划分" prop="masterCode">
           <el-select v-model="ruleForm.masterCode" placeholder="选择新增类型">
             <el-option  v-for="(item, index) in options" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="企业股票类型" prop="">
+        <el-form-item label="企业股票类型" prop="stockType">
           <el-select v-model="ruleForm.stockType" placeholder="请选择股票类型">
             <el-option label="A股" value="A"></el-option>
             <el-option label="港股" value="G"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="企业股票代码" prop="">
+        <el-form-item label="企业股票代码" prop="stockCode">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.stockCode"
               placeholder="请输入企业完整证券代码"
+              @change="repalce1 = false"
             ></el-input>
             <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce1 === 1">无重复，可新增</span>
@@ -126,12 +138,13 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="企业股票简称" prop="">
+        <el-form-item label="企业股票简称" prop="stockShortName">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.stockShortName"
               placeholder="请输入企业证券简称"
+              @change="repalce2 = false"
             ></el-input>
             <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
@@ -149,17 +162,18 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="企业全称" prop="">
+        <el-form-item label="企业全称" prop="entityName">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.entityName"
               placeholder="请输入企业完整名称"
+              @change="repalce4 = false"
             ></el-input>
             <span class="red" v-if="repalce4 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce4 === 1">无重复，可新增</span>
             <el-button
-              v-if="!repalce3"
+              v-if="!repalce4"
               style="margin-left: 5px"
               type="text"
               @click="check(ruleForm.entityName, 'ENTITY_NAME')"
@@ -167,17 +181,19 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="">
+        <el-form-item label="统一社会信用代码" prop="creditCode">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.creditCode"
+              :disabled="ruleForm.notUse"
               placeholder="请输入企业统一社会信用代码"
+              @change="repalce5 = false"
             ></el-input>
             <span class="red" v-if="repalce5 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce5 === 1">无重复，可新增</span>
             <el-button
-              v-if="!repalce4"
+              v-if="!repalce5"
               style="margin-left: 5px"
               type="text"
               @click="check(ruleForm.creditCode, 'CREDIT_CODE')"
@@ -192,7 +208,7 @@
           <span class="mr10">不适用原因</span>
           <el-select
             v-model="ruleForm.creditErrorRemark"
-            :disabled="disabeld"
+            :disabled="!ruleForm.notUse"
             placeholder="请选择"
           >
             <el-option
@@ -205,7 +221,7 @@
           </el-select>
         </div>
 
-        <el-form-item v-if="ruleForm.stockType" label="上市板块与交易所">
+        <el-form-item v-if="ruleForm.stockType" label="上市板块与交易所" prop="stockType">
             <el-select
                 v-if="ruleForm.stockType === 'A'"
                 v-model="ruleForm.exchange"
@@ -223,7 +239,7 @@
                 <el-option label="港交所" value="港交所"></el-option>
             </el-select>
         </el-form-item>
-        <el-form-item label="上市日期" prop="">
+        <el-form-item label="上市日期" prop="startXiDate">
           <el-date-picker
             v-model="ruleForm.startXiDate"
             type="date"
@@ -233,7 +249,7 @@
             value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="退市日期" prop="">
+        <el-form-item label="退市日期" prop="endDate">
           <el-date-picker
             type="date"
             class="t-input"
@@ -243,19 +259,19 @@
             v-model="ruleForm.endDate"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="是否为金融机构" prop="">
+        <el-form-item label="是否为金融机构" prop="finance">
           <el-radio-group v-model="ruleForm.finance">
             <el-radio label="1">是</el-radio>
             <el-radio label="0">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="年报列示类型" prop="">
+        <el-form-item label="年报列示类型" prop="anRportType">
           <el-radio-group v-model="ruleForm.anRportType">
             <el-radio label="1">一般企业</el-radio>
             <el-radio label="0">金融机构</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="金融机构子行业" prop="">
+        <el-form-item label="金融机构子行业" prop="financeSubIndu">
           <el-select
             v-model="ruleForm.financeSubIndu"
             placeholder="请选择金融机构子行业"
@@ -268,7 +284,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item class="position-add" label="企业曾用名或别称" prop="">
+        <el-form-item class="position-add" label="企业曾用名或别称" prop="entityNameHis">
           <el-input
             class="t-input"
             style="width: 320px"
@@ -278,7 +294,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="subForm">确认新增</el-button>
+        <el-button type="primary" class="green-btn" @click="subForm">确认新增</el-button>
       </span>
     </el-dialog>
     <!-- 债券新增主体 -->
@@ -286,6 +302,7 @@
       title="手动新增企业主体"
       :visible.sync="dialogVisible2"
       width="50%"
+      :before-close="handleClose"
     >
       <el-form
         :model="ruleForm"
@@ -300,12 +317,13 @@
         <el-form-item label="新增操作人">
           <span>{{ currentName }}</span>
         </el-form-item>
-        <el-form-item label="企业债券全称" prop="">
+        <el-form-item label="企业债券全称" prop="bondName">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.bondName"
               placeholder="请输入企业债券全称"
+              @change="repalce1 = false"
             ></el-input>
             <span class="red" v-if="repalce1 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce1 === 1">无重复，可新增</span>
@@ -318,12 +336,13 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="企业债券代码" prop="">
+        <el-form-item label="企业债券代码" prop="stockCode">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.stockCode"
               placeholder="请输入企业债券代码"
+              @change="repalce2 = false"
             ></el-input>
             <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
@@ -336,12 +355,13 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="企业债券简称" prop="">
+        <el-form-item label="企业债券简称" prop="bondShortName">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.bondShortName"
               placeholder="请输入企业债券简称"
+              @change="repalce3 = false"
             ></el-input>
             <span class="red" v-if="repalce3 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce3 === 1">无重复，可新增</span>
@@ -354,12 +374,13 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="企业全称" prop="">
+        <el-form-item label="企业全称" prop="entityName">
           <div class="flex1">
             <el-input
               class="t-input"
               v-model="ruleForm.entityName"
               placeholder="请输入企业完整名称"
+              @change="repalce4 = false"
             ></el-input>
             <span class="red" v-if="repalce4 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce4 === 1">无重复，可新增</span>
@@ -372,13 +393,14 @@
             >
           </div>
         </el-form-item>
-        <el-form-item label="统一社会信用代码" prop="">
+        <el-form-item label="统一社会信用代码" prop="creditCode">
           <div class="flex1">
             <el-input
               class="t-input"
               :disabled="!disabeld"
               v-model="ruleForm.creditCode"
               placeholder="请输入企业统一社会信用代码"
+              @change="repalce5 = false"
             ></el-input>
             <span class="red" v-if="repalce5 === 2">存在重复无法添加</span>
             <span class="green" v-if="repalce5 === 1">无重复，可新增</span>
@@ -410,7 +432,7 @@
             </el-option>
           </el-select>
         </div>
-        <el-form-item label="起息日" prop="">
+        <el-form-item label="起息日" prop="startXiDate">
           <el-date-picker
             v-model="ruleForm.startXiDate"
             type="date"
@@ -420,7 +442,7 @@
             value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="到期日" prop="">
+        <el-form-item label="到期日" prop="endDate">
           <el-date-picker
             type="date"
             class="t-input"
@@ -430,7 +452,7 @@
             v-model="ruleForm.endDate"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="债券类型" required>
+        <el-form-item label="债券类型" prop="bondType">
           <el-col :span="11">
             <el-form-item prop="">
               <el-select v-model="ruleForm.bondType" placeholder="选择债券类型">
@@ -440,19 +462,19 @@
             </el-form-item>
           </el-col>
         </el-form-item>
-        <el-form-item label="是否为金融机构" prop="">
+        <el-form-item label="是否为金融机构" prop="finance">
           <el-radio-group v-model="ruleForm.finance">
             <el-radio label="1">是</el-radio>
             <el-radio label="0">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="年报列示类型" prop="">
+        <el-form-item label="年报列示类型" prop="anRportType">
           <el-radio-group v-model="ruleForm.anRportType">
             <el-radio label="1">一般企业</el-radio>
             <el-radio label="0">金融机构</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="金融机构子行业" prop="">
+        <el-form-item label="金融机构子行业" prop="financeSubIndu">
           <el-select
             v-model="ruleForm.financeSubIndu"
             placeholder="请选择金融机构子行业"
@@ -465,7 +487,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item class="position-add" label="企业曾用名或别称" prop="">
+        <el-form-item class="position-add" label="企业曾用名或别称" prop="entityNameHis">
           <el-input
             class="t-input"
             style="width: 320px"
@@ -475,7 +497,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="subForm(2)">确认新增</el-button>
+        <el-button type="primary" class="green-btn" @click="subForm(2)">确认新增</el-button>
       </span>
     </el-dialog>
   </div>
@@ -496,45 +518,57 @@ export default {
       noUse1: "",
       list: [],
       dialogVisible: false,
-      ruleForm: {},
+      ruleForm: {
+          creditCode: ''
+      },
       rules: {
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+        masterCode: [
+          { required: true, message: "请输入IB敞口划分", trigger: "blur" },
         ],
-        region: [
-          { required: true, message: "请选择活动区域", trigger: "change" },
-        ],
-        date1: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change",
-          },
-        ],
-        date2: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择时间",
-            trigger: "change",
-          },
-        ],
-        type: [
-          {
-            type: "array",
-            required: true,
-            message: "请至少选择一个活动性质",
-            trigger: "change",
-          },
-        ],
-        resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
-        ],
-        desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
         stockType: [
           { required: true, message: "请选择企业股票类型", trigger: "blur" },
+        ],
+        stockCode: [
+          { required: true, message: "请输入企业股票代码", trigger: "blur" },
+        ],
+        stockShortName: [
+          { required: true, message: "请输入企业股票简称", trigger: "blur" },
+        ],
+        entityName: [
+          { required: true, message: "请输入企业名称", trigger: "blur" },
+        ],
+        creditCode: [
+          { required: true, message: "请输入企业统一社会信用代码", trigger: "blur" },
+        ],
+        stockType: [
+          { required: true, message: "请选择上市板块与交易所", trigger: "blur" },
+        ],
+        startXiDate: [
+          { required: true, message: "请选择日期", trigger: "blur" },
+        ],
+        endDate: [
+          { required: true, message: "请选择日期", trigger: "blur" },
+        ],
+        finance: [
+          { required: true, message: "请选择是否为金融机构", trigger: "blur" },
+        ],
+        anRportType: [
+          { required: true, message: "请选择年报列示类型", trigger: "blur" },
+        ],
+        financeSubIndu: [
+          { required: true, message: "请选择金融机构子行业", trigger: "blur" },
+        ],
+        entityNameHis: [
+          { required: true, message: "请输入企业曾用名或别称", trigger: "blur" },
+        ],
+        bondName: [
+          { required: true, message: "请输入企业债券全称", trigger: "blur" },
+        ],
+        bondShortName: [
+          { required: true, message: "请输入企业债券简称", trigger: "blur" },
+        ],
+        bondType: [
+          { required: true, message: "请选择债券类型", trigger: "blur" },
         ],
       },
       currentTime: "",
@@ -574,18 +608,6 @@ export default {
   mounted() {
     this.getCurrentTime();
     this.init();
-  },
-  watch: {
-    ruleForm: {
-      handler(newData, old) {
-        if (newData.notUse) {
-          this.ruleForm.creditCode = "";
-        }
-        this.disabeld = newData.notUse ? false : true;
-      },
-      immediate: true,
-      deep: true,
-    },
   },
   methods: {
     init() {
@@ -714,40 +736,47 @@ export default {
       myChart.setOption(option);
     },
     subForm(row) {
-      try {
-        this.$modal.loading("Loading...");
-        this.ruleForm.creditError = this.ruleForm.notUse ? 1 : 0;
-        if (row) {
-          createST(this.ruleForm).then((res) => {
-            if (data === "新增成功") {
-              this.$message({
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+                this.$modal.loading("Loading...");
+                this.ruleForm.creditError = this.ruleForm.notUse ? 1 : 0;
+                if (row) {
+                createST(this.ruleForm).then((res) => {
+                    if (data === "新增成功") {
+                    this.$message({
+                        showClose: true,
+                        message: "操作成功",
+                        type: "success",
+                    });
+                    }
+                });
+                } else {
+                createBE(this.ruleForm).then((res) => {
+                    const { data } = res;
+                    if (data === "新增成功") {
+                    this.$message({
+                        showClose: true,
+                        message: "操作成功",
+                        type: "success",
+                    });
+                    }
+                });
+                }
+            } catch (error) {
+                this.$message({
                 showClose: true,
-                message: "操作成功",
-                type: "success",
-              });
+                message: error,
+                type: "error",
+                });
+            } finally {
+                this.$modal.closeLoading();
             }
-          });
-        } else {
-          createBE(this.ruleForm).then((res) => {
-            const { data } = res;
-            if (data === "新增成功") {
-              this.$message({
-                showClose: true,
-                message: "操作成功",
-                type: "success",
-              });
-            }
-          });
-        }
-      } catch (error) {
-        this.$message({
-          showClose: true,
-          message: error,
-          type: "error",
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
         });
-      } finally {
-        this.$modal.closeLoading();
-      }
     },
     check(row, keyword) {
       try {
@@ -802,7 +831,26 @@ export default {
         this.$modal.closeLoading();
       }
     },
+    handleClose() {
+        this.dialogVisible2 = false
+        this.dialogVisible = false
+        this.ruleForm = {}
+        this.$refs['ruleForm'].clearValidate();
+    }
   },
+  watch: {
+      'ruleForm.notUse': {
+        handler(newName, oldName) {
+          if (newName) {
+            this.ruleForm.creditCode = ''
+            this.$refs['ruleForm'].clearValidate();
+          } else {
+            this.ruleForm.creditErrorRemark = ''
+          }
+        },
+        deep: true //为true，表示深度监听，这时候就能监测到a值变化
+      }
+    }
 };
 </script>
 

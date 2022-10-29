@@ -28,7 +28,7 @@
               style="width: 80%;"
               placeholder="请输入内容"
             ></el-input>
-            <el-button class="mr10" type="primary" @click="select"
+            <el-button class="mr10 green-btn" type="primary" @click="select"
               >查询</el-button
             >
           </div>
@@ -145,11 +145,10 @@
                 </div>
                 <div class="flex1">
                   <div class="first" :class="edit.listType ? 'green' : ''">年报列示类型</div>
-                  <el-input
-                    class="t-input"
-                    v-model="info.entityInfo.listType"
-                    @change="edit.listType = true"
-                  ></el-input>
+                   <el-radio-group class="mt10" v-model="info.entityInfo.listType" @change="edit.listType = true">
+                        <el-radio label=1>一般企业</el-radio>
+                        <el-radio label=0>金融机构</el-radio>
+                    </el-radio-group>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
@@ -787,6 +786,8 @@ export default {
               message: "操作成功",
               type: "success",
             });
+            this.getList()
+            this.info = {}
           }
         });
       } catch (error) {
