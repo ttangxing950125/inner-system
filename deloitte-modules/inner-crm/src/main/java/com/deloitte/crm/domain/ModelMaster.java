@@ -29,9 +29,20 @@ public class ModelMaster
     @Excel(name = "敞口code")
     private String masterCode;
 
+    /**敞口类型 1-金融机构 2-城投 3-政府敞口 4-一般敞口**/
+    private Integer masterType;
+
     /** 备注 */
     @Excel(name = "备注")
     private String remarks;
+
+    public Integer getMasterType() {
+        return masterType;
+    }
+
+    public void setMasterType(Integer masterType) {
+        this.masterType = masterType;
+    }
 
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
