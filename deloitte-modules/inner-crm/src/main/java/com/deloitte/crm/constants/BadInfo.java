@@ -39,6 +39,7 @@ public enum BadInfo {
     COULD_NOT_MATCH_TABLE("未能匹配到数据库表"),
     COULD_NOT_FIND_SOURCE("找不到该信息的来源"),
     EMPTY_ENTITY_INFO("未能查到主体表信息"),
+    CAN_NOT_IGNORE_TASK_CAUSE_EMPTY_ENTITY("不能忽略任务，因为当前主体不存在"),
     UNABLE_CREAT("查询到重复数据");
 
     public static final Boolean GET = false;

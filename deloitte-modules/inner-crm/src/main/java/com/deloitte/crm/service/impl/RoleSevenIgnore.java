@@ -40,7 +40,7 @@ public class RoleSevenIgnore implements RoleSevenTask {
         EntityInfo entityInfo;
         if(ObjectUtils.isEmpty(entityInfoInsertDTO.getCreditCode())){
             String entityName = Optional.of(entityInfoInsertDTO.getEntityName().replace(" ", "")).orElseThrow(() -> new ServiceException(BadInfo.PARAM_EMPTY.getInfo()));
-            entityInfo = Optional.ofNullable(entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_ENTITY_INFO.getInfo()));
+            entityInfo = Optional.ofNullable(entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName))).orElseThrow(() -> new ServiceException(BadInfo.CAN_NOT_IGNORE_TASK_CAUSE_EMPTY_ENTITY.getInfo()));
         }else{
             entityInfo = Optional.ofNullable(entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, entityInfoInsertDTO.getCreditCode()))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_ENTITY_INFO.getInfo()));
         }
