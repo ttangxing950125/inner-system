@@ -146,23 +146,33 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         //当企业为金融机构的时候 去查entity_financial 中的数据
         if(!ObjectUtils.isEmpty(entityInfo.getFinance())&&entityInfo.getFinance()==1){
             EntityFinancial entityFinancial = entityFinancialService.getBaseMapper().selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
-            masDto.setFinanceSegmentation(entityFinancial.getMince());
+            masDto.setIsFinance("Y").setFinanceSegmentation(entityFinancial.getMince());
+        }else{
+            masDto.setIsFinance("N");
         }
-
-        //查询是否是城投机构
-        EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
-        if(!ObjectUtils.isEmpty(entityGovRel)){
-            String dqGovCode = entityGovRel.getDqGovCode();
-            masDto.setDqGovCode(dqGovCode);
-            GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
-            if(!ObjectUtils.isEmpty(govInfo)){
-                GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
-                masDto.setGovNode(tree);
+        EntityMaster entityMaster = entityMasterMapper.selectOne(new QueryWrapper<EntityMaster>().lambda().eq(EntityMaster::getEntityCode, entityCode));
+        if(!ObjectUtils.isEmpty(entityMaster)){
+            //城投YY
+            String yyUrban = entityMaster.getYyUrban();
+            if(ObjectUtils.isEmpty(yyUrban)||"0".equals(yyUrban)){masDto.setCity("N");}else{masDto.setCity("Y");}
+            //中诚信
+            String zhongxinUrban = entityMaster.getZhongxinUrban();
+            if(ObjectUtils.isEmpty(zhongxinUrban)||"0".equals(zhongxinUrban)){masDto.setCityZhong("N");}else{masDto.setCityZhong("Y");}
+            //查询是否是城投机构
+            String ibUrban = entityMaster.getIbUrban();
+            if(!ObjectUtils.isEmpty(ibUrban)&&"1".equals(ibUrban)){
+                masDto.setCityIb("Y");
+                EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
+                String dqGovCode = entityGovRel.getDqGovCode();
+                masDto.setDqGovCode(dqGovCode);
+                GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
+                if(!ObjectUtils.isEmpty(govInfo)){
+                    GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
+                    masDto.setGovNode(tree);
+                }
             }
         }
-        //查询敞口信息
-        EntityMaster entityMaster = entityMasterMapper.selectOne(new QueryWrapper<EntityMaster>().lambda().eq(EntityMaster::getEntityCode, entityCode));
-        masDto.setMasterCode(entityMaster.getMasterCode());
+
         return R.ok(masDto,SuccessInfo.SUCCESS.getInfo());
     }
 
