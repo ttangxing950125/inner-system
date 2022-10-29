@@ -2,7 +2,7 @@
   <div class="app-container home">
     <div class="flex1">
       <el-button class="back" type="text" @click="back()">返回首页</el-button>
-      <h3 class="title">新上市-导入任务清单</h3>
+      <h3 class="title">{{this.$route.query.taskCateId.taskCategory}}-导入任务清单</h3>
     </div>
     <el-row>
       <div v-for="(item, index) in contentData" :key="index">

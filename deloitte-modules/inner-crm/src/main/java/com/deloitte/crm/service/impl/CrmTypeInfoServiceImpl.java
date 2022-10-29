@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -109,6 +110,10 @@ public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTy
                 i--;
                 //这些数据都没有儿子
             }
+        }
+
+        if (CollUtil.isEmpty(returnArr)){
+            return null;
         }
 
         return returnArr;

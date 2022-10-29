@@ -120,10 +120,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.state !== 1" @click="workRole2(scope.row)" type="text" size="small"
+            <el-button @click="workRole2(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
@@ -299,7 +298,27 @@
         <el-form-item label="来源" >
           <span>{{ ruleForm.sourceName }}</span>
         </el-form-item>
+        <!--    wind行业划分role2    -->
         <el-form-item label="wind行业划分" >
+          <el-cascader
+            v-model="ruleForm.typeWindCheck"
+            :options="typeWindList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分" >
           <span v-if="!edit1">{{ ruleForm.wind }}</span>
           <el-input
             class="t-input"
@@ -312,8 +331,8 @@
             @click="edit1 = !edit1"
             >{{ "修改" }}</el-button
           >
-        </el-form-item>
-        <el-form-item label="申万行业划分" >
+        </el-form-item>-->
+        <!--<el-form-item label="申万行业划分" >
           <span v-if="!edit2">{{ ruleForm.shenWan }}</span>
           <el-input
             class="t-input"
@@ -326,7 +345,7 @@
             @click="edit2 = !edit2"
             >{{ "修改" }}</el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="是否为金融机构" prop="isFinance">
           <el-radio-group v-model="ruleForm.isFinance">
@@ -709,14 +728,27 @@
         <el-form-item label="来源">
           <span>{{ ruleForm.source }}</span>
         </el-form-item>
+        <!--          wind行业划分role5-->
         <el-form-item label="wind行业划分" >
           <el-cascader
-            v-model="typeWindCheck"
+            v-model="ruleForm.typeWindCheck"
             :options="typeWindList"
-            :props="{ checkStrictly: true }"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
             clearable></el-cascader>
         </el-form-item>
-        <el-form-item label="wind行业划分">
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分">
           <span v-if="!edit1">{{ ruleForm.windMaster }}</span>
           <el-input
             class="t-input"
@@ -729,8 +761,8 @@
             @click="edit1 = !edit1"
             >{{ edit1 ? "" : "修改" }}</el-button
           >
-        </el-form-item>
-        <el-form-item label="申万行业划分" >
+        </el-form-item>-->
+        <!--<el-form-item label="申万行业划分" >
           <span v-if="!edit2">{{ ruleForm.shenWanMaster }}</span>
           <el-input
             class="t-input"
@@ -744,7 +776,7 @@
           >{{ edit2 ? "" : "修改" }}
           </el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="财报列示类型" prop="listType">
           <el-select :filterable="true" class="width320" v-model="ruleForm.listType" placeholder="选择类型">
@@ -769,7 +801,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button type="primary" class="green-btn" @click="subRule345(5)">保存并提交</el-button>
       </span>
     </el-dialog>
@@ -995,8 +1027,6 @@
             </el-option>
           </el-select>
         </div>
-
-
         <el-form-item>
           <el-button
             v-if="!entityNamePass"
@@ -1129,202 +1159,8 @@
         currentDay: "",
         dialogVisible: false,
         noUse: false,
-        typeWindCheck:['zhinan','shejiyuanze','yizhi'],
-        typeWindList:[{
-          value: 'zhinan',
-          label: '指南',
-          children: [{
-            value: 'shejiyuanze',
-            label: '设计原则',
-            children: [{
-              value: 'yizhi',
-              label: '一致'
-            }, {
-              value: 'fankui',
-              label: '反馈'
-            }, {
-              value: 'xiaolv',
-              label: '效率'
-            }, {
-              value: 'kekong',
-              label: '可控'
-            }]
-          }, {
-            value: 'daohang',
-            label: '导航',
-            children: [{
-              value: 'cexiangdaohang',
-              label: '侧向导航'
-            }, {
-              value: 'dingbudaohang',
-              label: '顶部导航'
-            }]
-          }]
-        }, {
-          value: 'zujian',
-          label: '组件',
-          children: [{
-            value: 'basic',
-            label: 'Basic',
-            children: [{
-              value: 'layout',
-              label: 'Layout 布局'
-            }, {
-              value: 'color',
-              label: 'Color 色彩'
-            }, {
-              value: 'typography',
-              label: 'Typography 字体'
-            }, {
-              value: 'icon',
-              label: 'Icon 图标'
-            }, {
-              value: 'button',
-              label: 'Button 按钮'
-            }]
-          }, {
-            value: 'form',
-            label: 'Form',
-            children: [{
-              value: 'radio',
-              label: 'Radio 单选框'
-            }, {
-              value: 'checkbox',
-              label: 'Checkbox 多选框'
-            }, {
-              value: 'input',
-              label: 'Input 输入框'
-            }, {
-              value: 'input-number',
-              label: 'InputNumber 计数器'
-            }, {
-              value: 'select',
-              label: 'Select 选择器'
-            }, {
-              value: 'cascader',
-              label: 'Cascader 级联选择器'
-            }, {
-              value: 'switch',
-              label: 'Switch 开关'
-            }, {
-              value: 'slider',
-              label: 'Slider 滑块'
-            }, {
-              value: 'time-picker',
-              label: 'TimePicker 时间选择器'
-            }, {
-              value: 'date-picker',
-              label: 'DatePicker 日期选择器'
-            }, {
-              value: 'datetime-picker',
-              label: 'DateTimePicker 日期时间选择器'
-            }, {
-              value: 'upload',
-              label: 'Upload 上传'
-            }, {
-              value: 'rate',
-              label: 'Rate 评分'
-            }, {
-              value: 'form',
-              label: 'Form 表单'
-            }]
-          }, {
-            value: 'data',
-            label: 'Data',
-            children: [{
-              value: 'table',
-              label: 'Table 表格'
-            }, {
-              value: 'tag',
-              label: 'Tag 标签'
-            }, {
-              value: 'progress',
-              label: 'Progress 进度条'
-            }, {
-              value: 'tree',
-              label: 'Tree 树形控件'
-            }, {
-              value: 'pagination',
-              label: 'Pagination 分页'
-            }, {
-              value: 'badge',
-              label: 'Badge 标记'
-            }]
-          }, {
-            value: 'notice',
-            label: 'Notice',
-            children: [{
-              value: 'alert',
-              label: 'Alert 警告'
-            }, {
-              value: 'loading',
-              label: 'Loading 加载'
-            }, {
-              value: 'message',
-              label: 'Message 消息提示'
-            }, {
-              value: 'message-box',
-              label: 'MessageBox 弹框'
-            }, {
-              value: 'notification',
-              label: 'Notification 通知'
-            }]
-          }, {
-            value: 'navigation',
-            label: 'Navigation',
-            children: [{
-              value: 'menu',
-              label: 'NavMenu 导航菜单'
-            }, {
-              value: 'tabs',
-              label: 'Tabs 标签页'
-            }, {
-              value: 'breadcrumb',
-              label: 'Breadcrumb 面包屑'
-            }, {
-              value: 'dropdown',
-              label: 'Dropdown 下拉菜单'
-            }, {
-              value: 'steps',
-              label: 'Steps 步骤条'
-            }]
-          }, {
-            value: 'others',
-            label: 'Others',
-            children: [{
-              value: 'dialog',
-              label: 'Dialog 对话框'
-            }, {
-              value: 'tooltip',
-              label: 'Tooltip 文字提示'
-            }, {
-              value: 'popover',
-              label: 'Popover 弹出框'
-            }, {
-              value: 'card',
-              label: 'Card 卡片'
-            }, {
-              value: 'carousel',
-              label: 'Carousel 走马灯'
-            }, {
-              value: 'collapse',
-              label: 'Collapse 折叠面板'
-            }]
-          }]
-        }, {
-          value: 'ziyuan',
-          label: '资源',
-          children: [{
-            value: 'axure',
-            label: 'Axure Components'
-          }, {
-            value: 'sketch',
-            label: 'Sketch Templates'
-          }, {
-            value: 'jiaohu',
-            label: '组件交互文档'
-          }]
-        }],
+        typeWindList:[],
+        typeShenWanList:[],
         ruleForm: {
           name: "",
           region: "",
@@ -1336,6 +1172,8 @@
           judgment: "",
           shareRatio: "",
           shareRatioYear: "",
+          typeWindCheck:[],
+          typeShenWanCheck:[]
         },
         addGovForm: {
           govLevelBig: 1
@@ -1345,10 +1183,10 @@
               { required: true, message: "请选择财报列示类型", trigger: "blur" },
         ],
         reportType: [
-            { required: true, message: "请选择关注报告类型", trigger: "change" },
+            { required: true, message: "请选择关注报告类型", trigger: "blur" },
         ],
         shareMethod: [
-            { required: true, message: "请输入政府持股方式", trigger: "change" },
+            { required: true, message: "请输入政府持股方式", trigger: "blur" },
         ],
         support: [
             { required: true, message: "请输入政府对当前城投支持力度", trigger: "blur" },
@@ -1490,6 +1328,8 @@
     this.getCurrentTime();
     this.getDaysInfo();
     this.init();
+    this.getTypeWindList();
+    this.getShenWanList();
   },
   computed: {
     disabled () {
@@ -1502,6 +1342,13 @@
           .then(res=>{
             let data = res.data;
             this.typeWindList = data;
+          })
+      },
+      getShenWanList(){
+        getTypeWindList({type:2})
+          .then(res=>{
+            let data = res.data;
+            this.typeShenWanList = data;
           })
       },
       init(page) {
@@ -1769,6 +1616,7 @@
       },
       //两个参数代表的含义分别是this对象以及判断当前的操作是不是在进行月份的修改
       sureDate(_this, other, year, month, now) {
+        console.log(_this, other, year, month, now)
         this.newDate = new Date();
         this.ynow = year || this.newDate.getFullYear();
         if (!other) {
@@ -2100,6 +1948,8 @@
       subRule2() {
         try {
           this.$modal.loading('Loading...')
+          this.ruleForm.wind = this.ruleForm.typeWindCheck.join("--")
+          this.ruleForm.shenWan = this.ruleForm.typeShenWanCheck.join("--")
           insertMas(this.ruleForm).then(res => {
             const {data} = res
             this.dialogVisible = false
@@ -2247,6 +2097,8 @@
           const region = this.ruleForm.region || this.ruleForm.city || this.ruleForm.county
           this.$set(this.ruleForm, 'belPlace', region)
           this.$set(this.ruleForm, '政府部门实际持股比例-年份', this.ruleForm.政府部门实际持股比例年份)
+          this.ruleForm.windMaster = this.ruleForm.typeWindCheck.join("--")
+          this.ruleForm.shenWanMaster = this.ruleForm.typeShenWanCheck.join("--")
           if (row === 3) {
             addFinEntitySubtableMsg(this.ruleForm).then(res => {
               if (res.code === 200) {
@@ -2348,14 +2200,21 @@
         try {
           this.$modal.loading("loading...");
           this.fsDig = true
+          this.ruleForm = {};
           const params = {
             id: row.id,
           }
           getEntityBackSupply(params).then(res => {
             const {data} = res
             this.ruleForm = data
-            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.windMaster)
+
+            if (data.windMaster){
+              this.$set(this.ruleForm, 'typeWindCheck', data.windMaster.split("--"))
+            }
+            if (data.shenWanMaster) {
+              this.$set(this.ruleForm, 'typeShenWanCheck', data.shenWanMaster.split("--"))
+            }
+
           })
           const ret = {
             organName: '财报收数'
