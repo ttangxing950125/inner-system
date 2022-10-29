@@ -30,7 +30,7 @@ import javax.annotation.Resource;
 @Service
 public class EntityBondRelServiceImpl implements IEntityBondRelService
 {
-    @Autowired
+    @Resource
     private EntityBondRelMapper entityBondRelMapper;
 
     @Resource
@@ -86,12 +86,10 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
             try {
                 Map<String, Object> data = AttrValueUtils.parseObj(newIss, Excel.class, "name");
-
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
-
+                entityTask.setWindMaster(newIss.getWindIndustry());
                 entityTask.setEntityName(issorName);
-
                 entityTaskService.createTask(entityTask);
             } catch (Exception e) {
                 e.printStackTrace();

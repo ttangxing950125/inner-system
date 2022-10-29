@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityCaptureSpeedMapper">
+    <select id="search" parameterType="java.lang.String" resultType="com.deloitte.crm.dto.EntityCaptureSpeedDto">
+        SELECT
+        speed.id as id,
+        speed.source as source,
+        speed.entity_code as entityCode,
+        ent.credit_code as creditCode,
+        capture, added, divide, supplement, push_meta
+        FROM
+        entity_capture_speed speed
+        LEFT JOIN
+        entity_info ent ON speed.entity_code = ent.entity_code
+        <where>
+            <if test="entityNameOrCode != null  and entityNameOrCode != ''">
+                AND ( speed.entity_name LIKE concat(concat("%",#{entityNameOrCode}),"%") OR speed.entity_code LIKE
+                concat(concat("%",#{entityNameOrCode}),"%" ))
+                OR ( ent.entity_code IS NULL AND speed.entity_name LIKE concat(concat("%",#{entityNameOrCode}),"%") )
+            </if>
+        </where>
+    </select>
+</mapper>

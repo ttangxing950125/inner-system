@@ -83,8 +83,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
-
-
+                entityTask.setWindMaster(secIssInfo.getWindIndustry());
                 entityTask.setEntityName(entityName);
 
                 entityTaskService.createTask(entityTask);

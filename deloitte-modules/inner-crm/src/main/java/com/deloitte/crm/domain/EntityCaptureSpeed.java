@@ -62,15 +62,22 @@ public class EntityCaptureSpeed implements Serializable {
     /**
      * 0-未推送 1-已推送 是否推送补录平台
      */
-    private Integer push_meta;
-    /**
-     * 是否初始化的数据
-     */
-    private Integer auto;
+    private Integer pushMeta;
+
     /**
      * 捕获时间
      */
     private Date captureTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updated;
+
+    /**
+     * 是否初始化的数据
+     */
+    private Integer auto;
     /**
      * 最后更新的用户，用户名
      */
@@ -79,9 +86,6 @@ public class EntityCaptureSpeed implements Serializable {
      * 创建时间
      */
     private Date created;
-    /**
-     * 更新时间
-     */
-    private Date updated;
+
 
 }

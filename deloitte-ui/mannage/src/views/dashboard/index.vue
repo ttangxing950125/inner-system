@@ -418,7 +418,7 @@
         </el-form-item>
         <el-form-item label="敞口划分" prop="masterCode">
           <el-select :filterable="true" v-model="ruleForm.masterCode" placeholder="">
-            <el-option  v-for="(item, index) in options2" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
+            <el-option  v-for="(item, index) in modelMasterList" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="备注">
@@ -1225,6 +1225,21 @@
           typeShenWanCheck:[],
           creditErrorType:''
         },
+        initRuleForm:{
+          name: "",
+          region: "",
+          county: '',
+          listType: "",
+          reportType: [],
+          shareMethod: "",
+          support: '',
+          judgment: "",
+          shareRatio: "",
+          shareRatioYear: "",
+          typeWindCheck:[],
+          typeShenWanCheck:[],
+          creditErrorType:''
+        },
         addGovForm: {
           govLevelBig: 1
       },
@@ -1384,7 +1399,24 @@
   computed: {
     disabled () {
       return this.creditCodePass !== 2 && this.entityNamePass !== 2
+    },
+    modelMasterList(){
+
+      if (this.ruleForm.isFinance==="Y" && this.ruleForm.cityIb==="Y") {
+        return this.options2;
+      }
+
+      if (this.ruleForm.isFinance==="Y") {
+        return this.options2.filter( item=>item.masterType===1 );
+      }
+
+      if (this.ruleForm.cityIb==="Y"){
+        return this.options2.filter( item=>item.masterType===2 );
+      }
+
+      return this.options2;
     }
+
   },
     methods: {
       getTypeWindList(){
@@ -1872,7 +1904,7 @@
               message: '操作成功',
               type: 'success'
             });
-            this.ruleForm = {}
+            this.ruleForm = {...this.initRuleForm};
             this.init()
           })
         } catch (error) {
@@ -1928,7 +1960,7 @@
       // 角色2流程开始
       workRole2(row) {
         try {
-          this.ruleForm = {}
+          this.ruleForm = {...this.initRuleForm};
           this.dialogVisible = true
           this.ruleForm.entityName = row.entityName
           this.ruleForm.creditCode = row.creditCode
@@ -2280,7 +2312,7 @@
         try {
           this.$modal.loading("loading...");
           this.fsDig = true
-          this.ruleForm = {};
+          this.ruleForm = {...this.initRuleForm};;
           const params = {
             id: row.id,
           }
@@ -2320,7 +2352,7 @@
       },
       // 角色345流程结束
       handleClose() {
-        this.ruleForm = {}
+        this.ruleForm = {...this.initRuleForm};
         this.addGovForm = {}
         this.creditCodePass = false
         this.entityNamePass = false
