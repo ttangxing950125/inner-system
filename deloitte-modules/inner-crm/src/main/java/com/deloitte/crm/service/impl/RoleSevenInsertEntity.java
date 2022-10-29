@@ -11,6 +11,7 @@ import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.RoleSevenTask;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import org.springframework.util.Assert;
  */
 @Component
 @Slf4j
+@AllArgsConstructor
 public class RoleSevenInsertEntity implements RoleSevenTask {
 
     private EntityInfoMapper entityInfoMapper;

@@ -11,6 +11,7 @@ import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.RoleSevenTask;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * @date 2022/10/28
  */
 @Component
+@AllArgsConstructor
 public class RoleSevenEditeName implements RoleSevenTask {
 
     private EntityInfoMapper entityInfoMapper;
