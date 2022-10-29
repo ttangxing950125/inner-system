@@ -59,6 +59,11 @@
                 {{ row.taskCategory || '-' }}
             </template>
         </el-table-column>
+        <el-table-column prop="entityName" label="主体名称">
+          <template v-slot="{row}">
+            {{ row.entityName || '-' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="dataShow" label="任务说明">
             <template v-slot="{row}">
                 {{ row.dataShow || '-' }}
@@ -71,13 +76,13 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button @click="addBody(scope.row)" type="text" size="small"
+            <el-button @click="addBody(scope.row)" type="text" size="small" :disabled="scope.row.state !== 0"
               >添加</el-button
             >
-            <el-button @click="changeAddState(scope.row.id, 1)" type="text" size="small"
+            <el-button @click="changeAddState(scope.row.id, 1)" :disabled="scope.row.state !== 0" type="text" size="small"
               >忽略</el-button
             >
-            <el-button @click="changeAddState(scope.row.id, 1)" type="text" size="small"
+            <el-button @click="deleteRole6Task(scope.row.id)" type="text" size="small"
                        :disabled="scope.row.state !== 0"
             >删除</el-button>
             <el-button @click="detaile(scope.row)" type="text" size="small"
@@ -452,7 +457,27 @@
         <el-form-item label="来源" >
           <span>{{ ruleForm.source }}</span>
         </el-form-item>
+<!--        wind行业划分role3-->
         <el-form-item label="wind行业划分" >
+          <el-cascader
+            v-model="ruleForm.typeWindCheck"
+            :options="typeWindList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分" >
           <span v-if="!edit1">{{ ruleForm.windMaster }}</span>
           <el-input
             class="t-input"
@@ -479,7 +504,7 @@
             @click="edit2 = !edit2"
             >{{ "修改" }}</el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="所属地区">
           <el-col :span="6">
@@ -631,7 +656,27 @@
         <el-form-item label="来源" >
           <span>{{ ruleForm.source }}</span>
         </el-form-item>
-        <el-form-item label="wind行业划分">
+<!--        wind行业划分role4-->
+        <el-form-item label="wind行业划分" >
+          <el-cascader
+            v-model="ruleForm.typeWindCheck"
+            :options="typeWindList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分">
           <span v-if="!edit1">{{ ruleForm.windMaster }}</span>
           <el-input
             class="t-input"
@@ -658,7 +703,7 @@
             @click="edit2 = !edit2"
             >{{ edit2 ? "" : "修改" }}</el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="政府持股方式" prop="shareMethod">
           <el-select :filterable="true" class="width320" v-model="ruleForm.shareMethod" placeholder="请选择">
@@ -700,7 +745,7 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="subRule345(4)"
           >保存并提交</el-button
         >
@@ -1038,7 +1083,7 @@
           <a @click="showMoreData" v-if="entityNamePass === 1"
              style="color:red; margin-left: 5px;text-decoration: underline;">存在重复 无法新增</a>
           <el-button class="ml40" type="success" plain :disabled="checkStatus !== 0" @click="submitAdd">确认新增</el-button>
-          <el-button class="ml40" type="warning" plain v-if="checkStatus === 3">忽略新增</el-button>
+          <el-button class="ml40" type="warning" @click="changeAddState(this.ruleForm.taskId, 1)" plain v-if="checkStatus === 3">忽略新增</el-button>
         </el-form-item>
 
       </el-form>
@@ -1128,6 +1173,7 @@
     insertGov,
     addSeven,
     ignoreTask,
+    deleteRole6Task,
     getTaskCount,
     addFinEntitySubtableMsg,
     addGovEntitySubtableMsg,
@@ -1172,7 +1218,8 @@
           shareRatio: "",
           shareRatioYear: "",
           typeWindCheck:[],
-          typeShenWanCheck:[]
+          typeShenWanCheck:[],
+          creditErrorType:''
         },
         addGovForm: {
           govLevelBig: 1
@@ -1830,6 +1877,23 @@
           this.$modal.closeLoading();
         }
       },
+      deleteRole6Task(id){
+        try {
+          this.$modal.loading("loading...");
+          deleteRole6Task(id).then(res => {
+            const {data} = res
+            this.$message({
+              message: '操作成功',
+              type: 'success'
+            });
+            this.init()
+          })
+        } catch (error) {
+          console.log(error)
+        } finally {
+          this.$modal.closeLoading();
+        }
+      },
       // 角色7修改状态 1忽略 2新增
       changeAddState(id, state) {
         try {
@@ -2037,8 +2101,15 @@
           getEntityBackSupply(params).then(res => {
             const {data} = res
             this.ruleForm = data
-            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.windMaster)
+            // this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            // this.$set(this.ruleForm, 'windMaster', data.windMaster)
+
+            if (data.windMaster){
+              this.$set(this.ruleForm, 'typeWindCheck', data.windMaster.split("--"))
+            }
+            if (data.shenWanMaster) {
+              this.$set(this.ruleForm, 'typeShenWanCheck', data.shenWanMaster.split("--"))
+            }
           })
 
           getGovLevel({preGovCode: ''}).then(res => {
@@ -2171,8 +2242,14 @@
           getEntityBackSupply(params).then(res => {
             const {data} = res
             this.ruleForm = data
-            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.windMaster)
+            // this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            // this.$set(this.ruleForm, 'windMaster', data.windMaster)
+            if (data.windMaster){
+              this.$set(this.ruleForm, 'typeWindCheck', data.windMaster.split("--"))
+            }
+            if (data.shenWanMaster) {
+              this.$set(this.ruleForm, 'typeShenWanCheck', data.shenWanMaster.split("--"))
+            }
           })
           getGovLevel({preGovCode: ''}).then(res => {
             const {data} = res

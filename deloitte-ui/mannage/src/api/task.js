@@ -492,3 +492,15 @@ export function getTypeWindList(params) {
     data: { parentCode:params.parentCode },
   });
 }
+
+
+export function deleteRole6Task(id) {
+  return request({
+    url: `/crm/roleSeven/deleteTask`,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: {taskId:id},
+  });
+}
