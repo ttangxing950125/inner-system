@@ -608,12 +608,16 @@
           <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
         </el-form-item>
         <el-form-item label="" prop="delivery">
-          <el-radio
-            style="margin-left: 5px; margin-top: 9px"
-            v-model="noUse"
-            :label="true"
-            >不适用</el-radio
-          >
+          <el-radio-group v-model="noUse">
+            <el-radio
+              style="margin-left: 5px; margin-top: 9px"
+              @click.native.prevent="changeMenopause(true)"
+              :label="true"
+            >不适用
+            </el-radio
+            >
+          </el-radio-group>
+
         </el-form-item>
         <el-form-item label="上级地方政府名称" prop="delivery">
           <span v-if="!addGovForm.preGovName">（通过下方输入官方行政编码进行查询后自动填入）</span>
@@ -1496,8 +1500,8 @@
         this.init(true)
       },
       changeMenopause(e) {
-        console.log(e)
-        e == this.noUse ? this.noUse = '' : this.noUse = e
+        e == this.noUse ? this.noUse = false : this.noUse = e
+        console.log(this.noUse)
       },
       changeMonth(row) {
         const parmas = {
