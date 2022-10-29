@@ -13,7 +13,6 @@ import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.IGovLevelService;
 import com.deloitte.crm.service.IModelMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
-import com.deloitte.crm.vo.ModelMasterInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -69,10 +68,10 @@ public class RoleTwoController {
      */
     @ApiOperation(value="敞口划分，选中单行开始工作 传入id后返回窗口 by正杰")
     @ApiImplicitParam(name="id",value="传入 id",paramType = "query",dataType = "Integer")
-    @ApiResponse(code = 200,message = "操作成功",response = ModelMasterInfoVo.class)
+    @ApiResponse(code = 200,message = "操作成功",response = MasDto.class)
     @Log(title = "敞口划分，选中单行开始工作", businessType = BusinessType.OTHER)
     @PostMapping("/getTable")
-    public R<ModelMasterInfoVo> getTable(Integer id){
+    public R<MasDto> getTable(Integer id){
         return iModelMasterService.getTable(id);
     }
 
@@ -161,10 +160,6 @@ public class RoleTwoController {
     @PostMapping("/getModelMaster")
     public R<List<ModelMaster>> getModelMaster(){
         return iModelMasterService.getModelMaster();
-    }
-
-    public R getTableBack(){
-        return null;
     }
 
 }

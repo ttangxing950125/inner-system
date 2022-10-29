@@ -202,6 +202,7 @@ public class GovInfo implements Serializable {
     @Attrs(attrId = 19,attrName = "地理分区归属")
     private String gegphZone;
 
+
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

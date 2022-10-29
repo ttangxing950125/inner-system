@@ -8,7 +8,7 @@
     </div>
     <div class="flex1" style="justify-content: space-between">
       <div class="title-2">
-        当前已添加字段 <span>x</span> 个， 其中必选字段 <span>x</span> 个
+        当前已添加字段 <span>{{ selectNum }}</span> 个， 其中必选字段 <span>x</span> 个
       </div>
       <el-button class="export" type="text" @click="back()">导出数据</el-button>
     </div>
@@ -189,6 +189,7 @@ export default {
       mapList: [],
       filterTextFirst: "",
       filterTextScend: "",
+      selectNum: 0
     };
   },
   watch: {
@@ -257,6 +258,7 @@ export default {
         };
         arrDeptId.push(item);
       });
+      this.selectNum = arrDeptId.length
       this.mapList = arrDeptId;
       try {
         this.$modal.loading("loading...");
@@ -300,8 +302,8 @@ export default {
       
       try {
           this.$modal.loading("loading...");
-          this.selected.pageNum = 1
-          this.selected.pageSize = 1
+          this.selected.pageNum = this.queryParams.pageNum
+          this.selected.pageSize = this.queryParams.pageSize
           this.selected.mapList = this.mapList
           
         getListEntityByPage(this.selected).then((res) => {
