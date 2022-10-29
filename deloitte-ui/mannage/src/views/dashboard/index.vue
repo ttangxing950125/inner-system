@@ -38,10 +38,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.complete !== scope.row.taskCount" @click="work(scope.row)" type="text" size="small"
+            <el-button @click="work(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
