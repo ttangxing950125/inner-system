@@ -15,6 +15,7 @@ import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
@@ -56,6 +57,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     @Resource
     private EntityCaptureSpeedService entityCaptureSpeedService;
+
+    @Resource
+    private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务
@@ -156,6 +160,16 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmEntityTask.setState(state);
+        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSourceId()));
+
+        // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
+        if(ObjectUtils.isEmpty(entityCaptureSpeed)){
+            log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmEntityTask.getSpeedId());
+        }else{
+            entityCaptureSpeed.setAdded(taskId);
+            entityCaptureSpeedMapper.insert(entityCaptureSpeed);
+        }
+
         baseMapper.updateById(crmEntityTask);
         //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
         if (!ObjectUtils.isEmpty(entityCode)) {
