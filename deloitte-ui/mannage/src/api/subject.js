@@ -537,3 +537,15 @@ export function addOldName(parmas) {
     data: parmas,
   });
 }
+
+// searchCapture
+export function searchCapture(parmas) {
+  return request({
+    url: `/crm/entityCaptureSpeed/search/${parmas}`,
+    headers: {
+      isToken: true,
+    },
+    method: "get",
+    data: parmas,
+  });
+}

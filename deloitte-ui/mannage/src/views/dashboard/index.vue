@@ -79,7 +79,7 @@
             <el-button @click="addBody(scope.row)" type="text" size="small" :disabled="scope.row.state !== 0"
               >添加</el-button
             >
-            <el-button @click="changeAddState(scope.row.id, 1)" :disabled="scope.row.state !== 0" type="text" size="small"
+            <el-button @click="changeAddState(scope.row, 1)" :disabled="scope.row.state !== 0" type="text" size="small"
               >忽略</el-button
             >
             <el-button @click="deleteRole6Task(scope.row.id)" type="text" size="small"
@@ -431,7 +431,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button class="green-btn" type="primary" @click="subRule2"
+        <el-button v-if="ruleForm.state === 0" class="green-btn" type="primary" @click="subRule2"
           >确认新增</el-button
         >
       </span>
@@ -1086,8 +1086,8 @@
           <span v-if="entityNamePass === 2" style="color: #13ce66; margin-left: 5px">无重复，可新增</span>
           <a @click="showMoreData" v-if="entityNamePass === 1"
              style="color:red; margin-left: 5px;text-decoration: underline;">存在重复 无法新增</a>
-          <el-button class="ml40" type="success" plain :disabled="checkStatus !== 0" @click="submitAdd">确认新增</el-button>
-          <el-button class="ml40" type="warning" @click="changeAddState(this.ruleForm.taskId, 1)" plain v-if="checkStatus === 3">忽略新增</el-button>
+          <el-button class="ml40" type="success" plain :disabled="entityNamePass !== 2" @click="submitAdd">确认新增</el-button>
+          <el-button class="ml40" type="warning" @click="changeAddState(ruleForm, 2)" plain v-if="checkStatus === 3">忽略新增</el-button>
         </el-form-item>
 
       </el-form>
@@ -1666,7 +1666,6 @@
       },
       //两个参数代表的含义分别是this对象以及判断当前的操作是不是在进行月份的修改
       sureDate(_this, other, year, month, now) {
-        console.log(_this, other, year, month, now)
         this.newDate = new Date();
         this.ynow = year || this.newDate.getFullYear();
         if (!other) {
@@ -1862,24 +1861,30 @@
         this.entityNamePass = false
       },
       submitAdd() {
-        this.$modal.loading("loading...");
-        this.ruleForm.created = ''
-        try {
-          addSeven(this.ruleForm).then(res => {
-            const {data} = res
-            this.bodyDig = false
-            this.$message({
-              message: '操作成功',
-              type: 'success'
-            });
-            this.ruleForm = {}
-            this.init()
-          })
-        } catch (error) {
-          console.log(error)
-        } finally {
-          this.$modal.closeLoading();
-        }
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            this.$modal.loading("loading...");
+            this.ruleForm.created = ''
+            try {
+            addSeven(this.ruleForm).then(res => {
+                const {data} = res
+                this.bodyDig = false
+                this.$message({
+                message: '操作成功',
+                type: 'success'
+                });
+                this.ruleForm = {}
+                this.init()
+            })
+            } catch (error) {
+            console.log(error)
+            } finally {
+            this.$modal.closeLoading();
+            }
+          } else {
+            return false;
+          }
+        });
       },
       deleteRole6Task(id){
         try {
@@ -1899,11 +1904,21 @@
         }
       },
       // 角色7修改状态 1忽略 2新增
-      changeAddState(id, state) {
+      changeAddState(row, state) {
         try {
           this.$modal.loading("loading...");
-          const params = {
-            id: id || this.addBodyId
+          let params = {}
+          if (state === 1) {
+              params = {
+                taskId: row.id || this.addBodyId,
+                entityName: row.entityName,
+              }
+          }else {
+              params = {
+                taskId: row.id,
+                entityName: row.entityName,
+                entityCode: this.replaceData.entityCode
+              }
           }
           ignoreTask(params).then(res => {
             const {data} = res
@@ -1930,11 +1945,6 @@
         try {
           this.ruleForm = {}
           this.dialogVisible = true
-          this.ruleForm.entityName = row.entityName
-          this.ruleForm.creditCode = row.creditCode
-          this.ruleForm.sourceName = row.sourceName
-          this.$set(this.ruleForm, 'entityCode', row.entityCode)
-          this.$set(this.ruleForm, 'id', row.id)
           this.$set(this.ruleForm, 'wind', '')
           this.$set(this.ruleForm, 'shenWan', '')
           this.$modal.loading("loading...");
@@ -1942,6 +1952,17 @@
             const {data} = res
             this.ruleForm.wind = data.windMaster
             this.ruleForm.sw = data.shenWanMaster
+            this.ruleForm = data
+            this.ruleForm.region = data.govNode && data.govNode.govName
+            this.ruleForm.district = data.govNode && data.govNode.children.govName
+            this.ruleForm.county = data.govNode && data.govNode.children.children.govName
+            this.ruleForm.entityName = row.entityName
+            this.ruleForm.creditCode = row.creditCode
+            this.ruleForm.sourceName = row.sourceName
+            this.$set(this.ruleForm, 'entityCode', row.entityCode)
+            this.$set(this.ruleForm, 'id', row.id)
+            this.$set(this.ruleForm, 'state', row.state)
+            console.log(this.ruleForm)
           })
           getFinances({}).then(res => {
             const {data} = res
@@ -2013,29 +2034,35 @@
         }
       },
       subRule2() {
-        try {
-          this.$modal.loading('Loading...')
-          this.ruleForm.wind = this.ruleForm.typeWindCheck.join("--")
-          this.ruleForm.shenWan = this.ruleForm.typeShenWanCheck.join("--")
-          insertMas(this.ruleForm).then(res => {
-            const {data} = res
-            this.dialogVisible = false
-            this.$message({
-              showClose: true,
-              message: '操作成功',
-              type: 'success'
-            });
-            this.init()
-          })
-        } catch (error) {
-          this.$message({
-            showClose: true,
-            message: error,
-            type: 'error'
-          });
-        } finally {
-          this.$modal.closeLoading()
-        }
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+                this.$modal.loading('Loading...')
+                this.ruleForm.wind = this.ruleForm.typeWindCheck && this.ruleForm.typeWindCheck.join("--")
+                this.ruleForm.shenWan = this.ruleForm.typeWindCheck && this.ruleForm.typeShenWanCheck.join("--")
+                insertMas(this.ruleForm).then(res => {
+                    const {data} = res
+                    this.dialogVisible = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                })
+                } catch (error) {
+                this.$message({
+                    showClose: true,
+                    message: error,
+                    type: 'error'
+                });
+                } finally {
+                this.$modal.closeLoading()
+                }
+          } else {
+            return false;
+          }
+        });
 
       },
       getGov(row) {
@@ -2166,75 +2193,81 @@
         })
       },
       subRule345(row) {
-        try {
-          this.$modal.loading("loading...");
-          const region = this.ruleForm.region || this.ruleForm.city || this.ruleForm.county
-          this.$set(this.ruleForm, 'belPlace', region)
-          this.$set(this.ruleForm, '政府部门实际持股比例-年份', this.ruleForm.政府部门实际持股比例年份)
-          this.ruleForm.windMaster = this.ruleForm.typeWindCheck.join("--")
-          this.ruleForm.shenWanMaster = this.ruleForm.typeShenWanCheck.join("--")
-          if (row === 3) {
-            addFinEntitySubtableMsg(this.ruleForm).then(res => {
-              if (res.code === 200) {
-                this.remarkDig = false
-                this.$message({
-                  showClose: true,
-                  message: '操作成功',
-                  type: 'success'
-                });
-                this.init()
-              }
-            })
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+             try {
+            this.$modal.loading("loading...");
+            const region = this.ruleForm.region || this.ruleForm.city || this.ruleForm.county
+            this.$set(this.ruleForm, 'belPlace', region)
+            this.$set(this.ruleForm, '政府部门实际持股比例-年份', this.ruleForm.政府部门实际持股比例年份)
+            this.ruleForm.windMaster = this.ruleForm.typeWindCheck.join("--")
+            this.ruleForm.shenWanMaster = this.ruleForm.typeShenWanCheck.join("--")
+            if (row === 3) {
+                addFinEntitySubtableMsg(this.ruleForm).then(res => {
+                if (res.code === 200) {
+                    this.remarkDig = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                }
+                })
+            }
+            if (row === 4) {
+                addGovEntitySubtableMsg(this.ruleForm).then(res => {
+                if (res.code === 200) {
+                    this.governmentDig = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                }
+                })
+            }
+            if (row === 5) {
+                addEntityeMsg(this.ruleForm).then(res => {
+                if (res.code === 200) {
+                    this.fsDig = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                }
+                })
+            }
+            // addEntityAttrValuesNew(this.ruleForm).then(res => {
+            //   const { data } = res
+            //   if (data.code === 200) {
+            //     this.governmentDig = false
+            //     this.$message({
+            //       showClose: true,
+            //       message: '操作成功',
+            //       type: 'success'
+            //     });
+            //   }
+            // })
+            } catch (error) {
+            this.$message({
+                showClose: true,
+                message: error,
+                type: 'error'
+            });
+            } finally {
+            this.$modal.closeLoading();
+            this.governmentDig = false
+            this.fsDig = false
+            this.remarkDig = false
+            }
+          } else {
+            return false;
           }
-          if (row === 4) {
-            addGovEntitySubtableMsg(this.ruleForm).then(res => {
-              if (res.code === 200) {
-                this.governmentDig = false
-                this.$message({
-                  showClose: true,
-                  message: '操作成功',
-                  type: 'success'
-                });
-                this.init()
-              }
-            })
-          }
-          if (row === 5) {
-            addEntityeMsg(this.ruleForm).then(res => {
-              if (res.code === 200) {
-                this.fsDig = false
-                this.$message({
-                  showClose: true,
-                  message: '操作成功',
-                  type: 'success'
-                });
-                this.init()
-              }
-            })
-          }
-          // addEntityAttrValuesNew(this.ruleForm).then(res => {
-          //   const { data } = res
-          //   if (data.code === 200) {
-          //     this.governmentDig = false
-          //     this.$message({
-          //       showClose: true,
-          //       message: '操作成功',
-          //       type: 'success'
-          //     });
-          //   }
-          // })
-        } catch (error) {
-          this.$message({
-            showClose: true,
-            message: error,
-            type: 'error'
-          });
-        } finally {
-          this.$modal.closeLoading();
-          this.governmentDig = false
-          this.fsDig = false
-          this.remarkDig = false
-        }
+        });
       },
       workRole4(row) {
         try {

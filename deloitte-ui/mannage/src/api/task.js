@@ -364,7 +364,7 @@ export function addSeven(params) {
 // 忽略任务 角色7
 export function ignoreTask(params) {
   return request({
-    url: "/crm/roleSeven/ignoreTask?id=" + params.id,
+    url: "/crm/roleSeven/ignoreTask?taskId=" + params.taskId+'&entityName='+params.entityName+'&entityCode='+params.entityCode,
     headers: {
       isToken: true,
     },
@@ -496,7 +496,7 @@ export function getTypeWindList(params) {
 
 export function deleteRole6Task(id) {
   return request({
-    url: `/crm/roleSeven/deleteTask`,
+    url: `/crm/roleSeven/deleteTask?taskId=`+id,
     headers: {
       isToken: true,
     },
