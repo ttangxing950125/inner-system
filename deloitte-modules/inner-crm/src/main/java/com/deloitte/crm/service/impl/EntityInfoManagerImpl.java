@@ -331,7 +331,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
         String dataCode = entityInfoInsertDTO.getDataCode();
         StockCnInfo stockCnInfo = Optional.ofNullable(stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockDqCode, dataCode).eq(StockCnInfo::getIsDeleted, 0))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_CN_STOCK_INFO.getInfo()));
         if (ObjectUtils.isEmpty(entityStockCnRelMapper.selectOne(new QueryWrapper<EntityStockCnRel>().lambda().eq(EntityStockCnRel::getEntityCode, entityCode).eq(EntityStockCnRel::getStockDqCode, dataCode)))) {
-            entityStockCnRelMapper.insert(new EntityStockCnRel().setEntityCode(entityCode).setStockDqCode(dataCode).setStatus(true));
+            entityStockCnRelMapper.insert(new EntityStockCnRel().setEntityCode(entityCode).setStockDqCode(dataCode));
             log.info("  =>> 成功新增一条关联信息 entity_stock_cn_rel <<== ");
         } else {
             log.info("  =>> 库中已存有一条关联数据 entity_stock_cn_rel <<== ");
@@ -349,6 +349,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     @Transactional(rollbackFor = Exception.class)
     void bindEntityInfoLogs(EntityInfoLogs entityInfoLogs) {
         log.info("  =>> 新增一条信息至 entity_info_logs <<=  ");
+        entityInfoLogs.setCreated(new Date());
         entityInfoLogsService.getBaseMapper().insert(entityInfoLogs);
     }
 
