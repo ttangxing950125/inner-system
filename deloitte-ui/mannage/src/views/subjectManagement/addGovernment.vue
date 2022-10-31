@@ -13,7 +13,7 @@
             :model="ruleForm"
             :rules="rules"
             ref="ruleForm"
-            label-width="125px"
+            label-width="135px"
             label-position="left"
             class="demo-ruleForm"
           >
@@ -23,7 +23,7 @@
             <el-form-item label="新增操作人">
               <span>admin</span>
             </el-form-item>
-            <el-form-item label="新增主体名称" prop="">
+            <el-form-item label="新增主体名称" prop="govName">
               <div class="flex1">
                 <el-input
                   class="t-input"
@@ -42,13 +42,13 @@
                 >
               </div>
             </el-form-item>
-            <el-form-item label="官方行政代码" prop="">
+            <el-form-item label="官方行政代码" prop="govCode">
               <div class="flex1">
                 <el-input
                   class="t-input"
                   v-model="ruleForm.govCode"
                   placeholder="输入官方6位行政代码"
-                  @change="repalce2 === false"
+                  @change="repalce2 = false"
                 ></el-input>
                 <span class="red" v-if="repalce2 === 2">存在重复无法添加</span>
                 <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
@@ -61,7 +61,7 @@
                 >
               </div>
             </el-form-item>
-            <el-form-item label="行政单位级别" class="max">
+            <el-form-item label="行政单位级别" class="max" prop="govLevelBig">
               <el-col :span="11">
                 <el-select
                   class="level-select"
@@ -79,7 +79,7 @@
               </el-col>
               <el-col class="line" :span="1">-</el-col>
               <el-col :span="11">
-                <el-form-item prop="">
+                <el-form-item prop="govLevelSmall">
                   <el-select
                     class="level-select"
                     v-model="ruleForm.govLevelSmall"
@@ -96,7 +96,7 @@
                 </el-form-item>
               </el-col>
             </el-form-item>
-            <el-form-item label="新增类型" prop="">
+            <el-form-item label="新增类型" prop="govType">
               <el-select v-model="ruleForm.govType" placeholder="选择新增类型">
                 <el-option label="地方政府" value="1"></el-option>
                 <el-option label="地方主管部门" value="2"></el-option>
@@ -124,13 +124,21 @@
                 placeholder="输入曾用名或别称、顿号区分"
               ></el-input>
             </el-form-item>
-            <el-form-item label="上级行政单位名称" prop="delivery">
-              <el-input
-                class="t-input"
+            <el-form-item label="上级行政单位名称"  prop="preGovName">
+                <el-select
+                class="width146"
+                :disabled="ruleForm.preGovNameDis"
                 v-model="ruleForm.preGovName"
-                placeholder="输入行政上级单位名称"
+                placeholder="选择行政上级单位名称"
                 @change="getGovCode"
-              ></el-input>
+              >
+                <el-option
+                  v-for="(item, index) in parentGovNameOptions"
+                  :key="index"
+                  :label="item.govName"
+                  :value="item"
+                ></el-option>
+              </el-select>
             </el-form-item>
             <el-form-item label="城市分级" prop="delivery">
               <el-select
@@ -147,7 +155,7 @@
               </el-select>
             </el-form-item>
             <el-form-item class="position-add" label="新增备注" prop="delivery">
-              <el-input class="t-input" v-model="ruleForm.name"></el-input>
+              <el-input class="t-input" style="width: 300px" v-model="ruleForm.name"></el-input>
             </el-form-item>
             <el-form-item
               class="position-add"
@@ -156,6 +164,7 @@
             >
               <el-input
                 class="t-input"
+                style="width: 300px"
                 v-model="ruleForm.entityNameHisRemarks"
                 placeholder="按需输入必要的曾用名或别称备注"
               ></el-input>
@@ -163,16 +172,13 @@
             <el-form-item
               class="position-add"
               label="上级行政单位代码"
-              prop="delivery"
+              prop="preGovCode"
             >
-               <el-select v-model="ruleForm.preGovCode" placeholder="请选择">
-                    <el-option
-                    v-for="item in options"
-                    :key="item.id"
-                    :label="item.govName"
-                    :value="item.dqGovCode">
-                    </el-option>
-                </el-select>
+                <el-input
+                class="t-input"
+                :disabled="true"
+                v-model="ruleForm.preGovCode"
+              ></el-input>
             </el-form-item>
             <el-form-item
               class="position-add"
@@ -188,7 +194,7 @@
               <div></div>
             </el-form-item> -->
             <el-form-item class="add-btn">
-              <el-button type="primary" @click="submitForm('ruleForm')"
+              <el-button class="green-btn" type="primary" @click="submitForm('ruleForm')"
                 >保存并添加</el-button
               >
             </el-form-item>
@@ -223,6 +229,7 @@
                   @click="handleClick(scope.row)"
                   type="text"
                   size="small"
+                  :disabled="true"
                   >撤销停用</el-button
                 >
               </template>
@@ -251,7 +258,7 @@
 </template>
 
 <script>
-import { addGovInfo, getGovByName } from "@/api/subject";
+import { addGovInfo, getGovByName, getGovInfoByLevel } from "@/api/subject";
 import { getGovLevelBig, getGovLevelSmall } from "@/api/task";
 import { checkData, getTypeByAttrId } from "@/api/common";
 export default {
@@ -259,83 +266,37 @@ export default {
   data() {
     return {
       currentTime: "",
-      list: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1517 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1519 弄",
-          zip: 200333,
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1516 弄",
-          zip: 200333,
-        },
-      ],
+      list: [],
       ruleForm: {},
       rules: {
-        name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" },
+        govName: [
+          { required: true, message: "请输入新增主体名称", trigger: "blur" },
         ],
-        region: [
-          { required: true, message: "请选择活动区域", trigger: "change" },
+        govCode: [
+          { required: true, message: "请输入官方行政代码", trigger: "change" },
         ],
-        date1: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择日期",
-            trigger: "change",
-          },
+        govLevelBig: [
+          { required: true, message: "请选择行政单位级别", trigger: "change" },
         ],
-        date2: [
-          {
-            type: "date",
-            required: true,
-            message: "请选择时间",
-            trigger: "change",
-          },
+        govLevelSmall: [
+          { required: true, message: "请选择行政单位细分级别", trigger: "change" },
         ],
-        type: [
-          {
-            type: "array",
-            required: true,
-            message: "请至少选择一个活动性质",
-            trigger: "change",
-          },
+        govType: [
+          { required: true, message: "请选择新增类型", trigger: "change" },
         ],
-        resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
+        preGovName: [
+          { required: true, message: "请选择上级行政单位名称", trigger: "change" },
         ],
-        desc: [{ required: true, message: "请填写活动形式", trigger: "blur" }],
+        preGovCode: [
+          { required: true, message: "请选择上级行政单位名称", trigger: "change" },
+        ]
       },
       dialogVisible: false,
       repalce2: false,
       repalce1: false,
       govOption1: [],
       govOption2: [],
+      parentGovNameOptions: [],
       range: [],
       level: [],
       options: []
@@ -418,46 +379,62 @@ export default {
       }
     },
     submitForm() {
-      try {
-        this.$modal.loading("Loading...");
-        addGovInfo(this.ruleForm).then((res) => {
-          if (res.code === 200) {
-            this.governmentDig = false;
-            this.$message({
-              showClose: true,
-              message: "操作成功",
-              type: "success",
-            });
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+                this.$modal.loading("Loading...");
+                addGovInfo(this.ruleForm).then((res) => {
+                if (res.code === 200) {
+                    this.governmentDig = false;
+                    this.$message({
+                    showClose: true,
+                    message: "操作成功",
+                    type: "success",
+                    });
+                    this.init()
+                }
+                });
+            } catch (error) {
+                this.$message({
+                showClose: true,
+                message: error,
+                type: "error",
+                });
+            } finally {
+                this.$modal.closeLoading();
+            }
+          } else {
+            return false;
           }
         });
-      } catch (error) {
-        this.$message({
-          showClose: true,
-          message: error,
-          type: "error",
-        });
-      } finally {
-        this.$modal.closeLoading();
-      }
     },
     getSmall(row) {
+        if (row === 1) {
+            this.ruleForm.preGovName = ''
+            this.ruleForm.preGovCode = ''
+            this.$refs['ruleForm'].clearValidate();
+            this.$set(this.ruleForm, 'preGovNameDis', true)
+            this.$set(this.ruleForm, 'preGovCodeDis', true)
+        }else {
+            this.$set(this.ruleForm, 'preGovNameDis', false)
+            this.$set(this.ruleForm, 'preGovCodeDis', false)
+        }
       getGovLevelSmall({ id: row }).then((res) => {
         const { data } = res;
         this.govOption2 = data;
       });
+      getGovInfoByLevel({ bigLevel: this.ruleForm.govLevelBig, smallLevel: row }).then((res) => {
+        const { data } = res;
+        this.parentGovNameOptions = data
+      });
     },
-    getGovCode() {
-         try {
+    getGovCode(row) {
+        try {
         this.$modal.loading("Loading...");
-        getGovByName({govName: this.ruleForm.preGovName}).then((res) => {
-          this.options = res.data
-        });
+        this.ruleForm.preGovName = row.govName
+        this.ruleForm.preGovCode = row.govCode
       } catch (error) {
-        this.$message({
-          showClose: true,
-          message: error,
-          type: "error",
-        });
+
       } finally {
         this.$modal.closeLoading();
       }

@@ -577,3 +577,15 @@ export function govExport(parmas) {
     data: parmas,
   }, {responseType:'blob'});
 }
+
+// 根据政府主体，大类小类查询政府主体
+export function getGovInfoByLevel(parmas) {
+  return request({
+    url: `/crm/govInfo/getGovInfoByLevel?bigLevel=`+parmas.bigLevel+'&smallLevel='+parmas.smallLevel,
+    headers: {
+      isToken: true,
+    },
+    method: "post",
+    data: parmas,
+  });
+}
