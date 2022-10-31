@@ -488,7 +488,7 @@
                         <div class="first">{{ item.coverReason.name }}</div>
                         <div class="scond" style="color: #a7a7a7">
                             {{
-                            item.coverReason.value
+                            item.coverReason.value === 1 ? '是' : '否'
                             }}
                         </div>
                     </div>

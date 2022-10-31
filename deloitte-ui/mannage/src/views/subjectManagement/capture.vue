@@ -19,51 +19,54 @@
             style="width: 98%; margin-top: 15px"
           >
             <el-table-column type="expand">
-                <template slot-scope="props">
+                <template slot-scope="scope">
                     <div class="flex1 space-around">
                         <div class="flex1">
-                            <div :class="capture === 1 ? 'rectangle' : 'rectangle-gary'">
-                                <span class="desc">{{ capture === 1 ? '已捕获' : '未捕获'}}</span>
+                            <div :class="scope.row.capture === 1 ? 'rectangle' : 'rectangle-gary'">
+                                <span class="desc">{{ scope.row.capture === 1 ? '已捕获 '+scope.row.captureTime : '未捕获'}}</span>
                             </div>
-                            <div :class="divide === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
+                            <div :class="scope.row.capture === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
                         </div>
                         <div class="flex1">
-                            <div :class="added === 1 ? 'rectangle' : 'rectangle-gary'">
-                                <span class="desc">{{ added === 1 ? '已确定新增' : '未确定'}}</span>
+                            <div :class="scope.row.added === 1 ? 'rectangle' : 'rectangle-gary'">
+                                <span class="desc">{{ scope.row.added === 1 ? '已确定新增' : '未确定'}}</span>
                             </div>
-                            <div :class="added === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
+                            <div :class="scope.row.added === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
                         </div>
                         <div class="flex1">
-                            <div :class="divide === 1 ? 'rectangle' : 'rectangle-gary'">
-                                <span class="desc">{{ divide === 1 ? '已划分敞口' : '未划分'}}</span>
+                            <div :class="scope.row.divide === 1 ? 'rectangle' : 'rectangle-gary'">
+                                <span class="desc">{{ scope.row.divide === 1 ? '已划分敞口' : '未划分'}}</span>
                             </div>
-                            <div :class="divide === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
+                            <div :class="scope.row.divide === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
                         </div>
                         <div class="flex1">
-                            <div :class="supplement === 1 ? 'rectangle' : 'rectangle-gary'">
-                                <span class="desc">{{ supplement === 1 ? '补充信息' : '补充信息'}}</span>
+                            <div :class="scope.row.supplement === 1 ? 'rectangle' : 'rectangle-gary'">
+                                <span class="desc">{{ scope.row.supplement === 1 ? '补充信息' : '补充信息'}}</span>
                             </div>
-                            <div :class="supplement === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
+                            <div :class="scope.row.supplement === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
                         </div>
                         <div class="flex1">
-                            <div :class="pushMeta === 1 ? 'rectangle' : 'rectangle-gary'">
-                                <span class="desc">{{ pushMeta === 1 ? '已推补录平台' : '未推送'}}</span>
+                            <div :class="scope.row.pushMeta === 1 ? 'rectangle' : 'rectangle-gary'">
+                                <span class="desc">{{ scope.row.pushMeta === 1 ? '已推补录平台' : '未推送'}}</span>
                             </div>
-                            <div :class="pushMeta === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
+                            <div :class="scope.row.pushMeta === 1 ? 'triangle-right' : 'triangle-right-gary'"></div>
                         </div>
                     </div>
                 </template>
             </el-table-column>
             <el-table-column fixed type="index" width="50"  align="center" label="序号">
             </el-table-column>
-            <el-table-column prop="entityCode" align="center" label="主体code">
+            <el-table-column prop="entityCode" align="center" label="主体Code">
             </el-table-column>
             <el-table-column prop="entityName" align="center" label="主体名">
               <template slot-scope="scope">
-                <span>{{ scope.row.stockCode && scope.row.stockCode.toString() }}</span>
+                <div v-html="replaceFun(scope.row.entityName)"></div>
               </template>
             </el-table-column>
-            <el-table-column prop="entityName" align="center" label="统一社会信用代码" width="200">
+            <el-table-column prop="creditCode" align="center" label="统一社会信用代码" width="200">
+              <template slot-scope="scope">
+                <div v-html="replaceFun(scope.row.creditCode)"></div>
+              </template>
             </el-table-column>
             <el-table-column prop="source" align="center" label="捕获渠道">
             </el-table-column>
@@ -94,14 +97,7 @@ export default {
   data() {
     return {
       nameInput: "",
-      list: [
-          {
-              entityCode: 1,
-              liveBondDetail: 1,
-              entityName: 1,
-              nameUsedNum: 1,
-          }
-      ],
+      list: [],
       loading: false,
       queryParams: {
         pageNum: 1,
@@ -135,7 +131,7 @@ export default {
     selectList() {
       try {
         this.$modal.loading("Loading...");
-        searchCapture(this.nameInput).then((res) => {
+        searchscope.row.capture(this.nameInput).then((res) => {
           const { data } = res;
           this.list = data.records;
           this.total = data.total;
