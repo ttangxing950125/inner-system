@@ -804,7 +804,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityInfoLogs.setEntityCode(sb.toString() + id);
         entityInfoLogs.setDeCode("HK" + startZeroStr);
         entityInfoLogs.setCode(entityStockInfoVo.getStockCode());
-        entityInfoLogs.setOperType(1);
+        entityInfoLogs.setOperType(2);
         entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
         entityInfoLogs.setOperName(SecurityUtils.getUsername());
         entityInfoLogs.setCreateTime(DateUtil.getNowDate());
