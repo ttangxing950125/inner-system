@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class StockCnUndoStInfoStrategy implements WindTaskStrategy {
+public class CnUndoStInfoStrategy implements WindTaskStrategy {
     @Resource
     private StockCnUndoStInfoMapper undoStInfoMapper;
     @Resource

@@ -52,21 +52,21 @@ public class StockCnInfo implements Serializable {
      * 上市日期
      */
     @ApiModelProperty(value = "上市日期")
-    @UpdateLog(fieldName = "A股上市日期",tableFieldName ="list_date")
+    @UpdateLog(fieldName = "A股上市日期", tableFieldName = "list_date")
     private String listDate;
 
     /**
      * 退市日期
      */
     @ApiModelProperty(value = "退市日期")
-    @UpdateLog(fieldName = "A股退市日期",tableFieldName ="delisting_date")
+    @UpdateLog(fieldName = "A股退市日期", tableFieldName = "delisting_date")
     private String delistingDate;
 
     /**
      * 交易所
      */
     @ApiModelProperty(value = "交易所")
-    @UpdateLog(fieldName = "A股上市交易所",tableFieldName ="exchange")
+    @UpdateLog(fieldName = "A股上市交易所", tableFieldName = "exchange")
     private String exchange;
     /**
      * 摘戴帽状态 0 摘帽状态 1 带帽状态
@@ -86,10 +86,16 @@ public class StockCnInfo implements Serializable {
      * 股票代码
      */
     @Excel(name = "股票代码")
-    @UpdateLog(fieldName = "A股股票代码",tableFieldName ="stock_code")
+    @UpdateLog(fieldName = "A股股票代码", tableFieldName = "stock_code")
     private String stockCode;
     @Excel(name = "${column.comment}")
     private Date created;
     @Excel(name = "${column.comment}")
     private Date updated;
+
+
+    /**
+     * 上市板 (拟上市板) 一个意思  张听确定
+     */
+    private String listsector;
 }

@@ -75,6 +75,8 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                 stockCnInfo = new StockCnInfo();
             }
             stockCnInfo.setStockCode(code);
+            //上市版
+            stockCnInfo.setListsector(cnCoachBack.getSimulationListed());
             //这条CnCoachBack是新增还是修改 1-新增 2-修改
             Integer changeType = null;
             //TODO 后期带上删除标识
@@ -107,11 +109,11 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
             }
 
             //有债券信息，给债券和主体绑定关联关系
-            if (StrUtil.isNotBlank(code)){
+            if (StrUtil.isNotBlank(code)) {
                 log.warn("无code创建主体任务");
                 //绑定主体关系
                 entityStockCnRelService.createTask(entityName, windTask, cnCoachBack);
-            }else {
+            } else {
                 log.info("有code创建主体任务");
                 //绑定主体关系
                 entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);

@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -19,11 +18,11 @@ import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.GovInfoBynameDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
-import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsUpdatedService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.utils.TimeFormatUtil;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import com.deloitte.crm.vo.GovInfoDetailVo;
 import com.deloitte.crm.vo.ParentLevelVo;
@@ -215,6 +214,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
+        Date now = new Date();
+        String username = SecurityUtils.getUsername();
+        govInfo.setCreater(username).setUpdater(username);
+        govInfo.setCreated(now).setUpdated(now);
         govInfoMapper.insertGovInfo(govInfo);
         return R.ok("新增政府主体成功");
     }
@@ -291,6 +294,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             //修改曾用名后需要将曾用名和曾用名备注置空
             o.setGovNameHis(null).setEntityNameHisRemarks(null);
         }
+        Date now = new Date();
+        String username = SecurityUtils.getUsername();
+        o.setUpdater(username);
+        o.setUpdated(now);
         govInfoMapper.updateById(o);
         return R.ok();
     }
@@ -627,38 +634,34 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     private GovInfoResult getGovInfoResult(GovInfo o, List<MoreIndex> mapList) {
         GovInfoResult govInfoResult = new GovInfoResult();
         govInfoResult.setGovInfo(o);
-        //表头信息
         List<String> header = new ArrayList<>();
-        //值数据
         List<String> values = new ArrayList<>();
         if (!CollectionUtils.isEmpty(mapList)) {
-            List<MoreIndex> moreList = new ArrayList<>();
+            List<MoreIndex> more = new ArrayList<>();
+            for (MoreIndex moreIndex : mapList) {
+                moreIndex.setKey(moreIndex.getName());
+                header.add(moreIndex.getName());
 
-            //遍历查询添加指标，并封装到响应数据中
-            for (MoreIndex moreValue : mapList) {
                 QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
-                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                        .eq(EntityAttrValue::getAttrId, moreValue.getId())
+                List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuer.lambda()
+                        .eq(EntityAttrValue::getAttrId, moreIndex.getId())
                         .eq(EntityAttrValue::getEntityCode, o.getDqGovCode()));
+                String value ="";
                 //新增指标栏
-                MoreIndex more = new MoreIndex();
-
-                //获取表头值和数据
-                String name = moreValue.getName();
-
-                more.setKey(name);
-                header.add(name);
-
-                if (ObjectUtils.isEmpty(attrValue)) {
-                    values.add(null);
-                } else {
-                    String value = attrValue.getValue();
-                    values.add(value);
-                    more.setValue(value);
+                if (!CollectionUtils.isEmpty(attrValueList)) {
+                    for (EntityAttrValue attrValue:attrValueList){
+                        if (ObjectUtils.isEmpty(value)){
+                            value=attrValue.getValue();
+                        }else {
+                            value=value+","+attrValue.getValue();
+                        }
+                    }
+                    moreIndex.setValue(value);
                 }
-                moreList.add(more);
+                values.add(value);
+                more.add(moreIndex);
             }
-            govInfoResult.setMore(moreList).setHeader(header).setValues(values);
+            govInfoResult.setMore(more).setHeader(header).setValues(values);
         }
         return govInfoResult;
     }
@@ -718,8 +721,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                     nameHisMapper.updateById(one);
                     continue;
                 }
+                if (!ObjectUtils.isEmpty(status)) {
+                    one.setStatus(0);
+                }
                 //直接删除原本的数据
-                nameHisMapper.deleteById(one);
+                nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
                 if (ObjectUtils.isEmpty(remark)) {
@@ -896,6 +902,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 return resultMap;
             }
         }
+        resultMap.newUpdateRecord(resultMap);
         return resultMap;
     }
 
@@ -1189,6 +1196,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             govInfo.setPreCode(preGov.getGovCode()).setPreGovName(preGov.getGovName());
             govInfoMapper.updateById(govInfo);
         }
+    }
+
+    @Override
+    public R getGovInfoByLevel(Integer bigLevel, Integer smallLevel) {
+        LambdaQueryWrapper<GovInfo> queryWrapper = new LambdaQueryWrapper<>();
+        if (!ObjectUtils.isEmpty(bigLevel)){
+            queryWrapper.eq(GovInfo::getGovLevelBig,bigLevel);
+        }
+        if (!ObjectUtils.isEmpty(smallLevel)){
+            queryWrapper.eq(GovInfo::getGovLevelSmall,smallLevel);
+        }
+        return R.ok(govInfoMapper.selectList(queryWrapper));
     }
 
     //返回筛选范围--城市分级
