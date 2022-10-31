@@ -1,17 +1,13 @@
 package com.deloitte.crm;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.crm.domain.CrmTypeInfo;
-import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
+import com.deloitte.crm.mapper.StockThkImportMapper;
 import com.deloitte.crm.service.CrmTypeInfoService;
 import com.deloitte.crm.service.EntityInfoLogsService;
 import com.deloitte.crm.service.SendEmailService;
-import com.deloitte.crm.utils.excel.ExcelUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,7 +16,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author 吴鹏鹏ppp
@@ -34,6 +29,9 @@ public class SendEmailTest {
     private CrmTypeInfoService crmTypeInfoService;
     @Resource
     private EntityInfoLogsService entityInfoLogsService;
+
+    @Resource
+    private StockThkImportMapper stockThkImportMapper;
 
     @Test
     void testSend() {
@@ -80,10 +78,5 @@ public class SendEmailTest {
         final Object type_stock = entityInfoLogsService.findAllByType("TYPE_BOND");
 
     }
-
-
-
-
-
 
 }

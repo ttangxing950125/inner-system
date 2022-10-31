@@ -35,6 +35,9 @@ public class CrmEntityTask
     @ApiModelProperty(value = "捕获时的主体名")
     private String entityName;
 
+    @ApiModelProperty(value = "wind敞口名")
+    private String windMaster;
+
     /**
      * 任务进度表的id
      */

@@ -1812,8 +1812,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityAttrValue> entityAttrs;
                 //模糊匹配全名 债券list
                 //模糊匹配短名 债券list
-                Page<BondInfo> bondInfoPage = bondInfoMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<BondInfo>().lambda()
-                        .like(BondInfo::getBondName, name).like(BondInfo::getBondShortName, name));
+                Page<BondInfo> bondInfoPage = bondInfoMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<BondInfo>()
+                        .lambda().like(BondInfo::getBondShortName,name));
                 List<BondInfo> bondInfos = bondInfoPage.getRecords();
                 if (bondInfos.size() == 0) {
                     log.info("  =>>  未查询到相关信息  <<=  ");
