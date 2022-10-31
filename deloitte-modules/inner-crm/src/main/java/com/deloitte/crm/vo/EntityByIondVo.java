@@ -85,7 +85,6 @@ public class EntityByIondVo
 
     /** 金融机构子行业*/
     @ApiModelProperty(value="金融机构子行业")
-    @NotNull(message = "金融机构子行业不能为空")
     private String  financeSubIndu;
 
     /** 主体曾用名*/
