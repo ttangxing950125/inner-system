@@ -104,10 +104,13 @@ public class BondDelIssStrategy implements WindTaskStrategy {
                     Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
                     if (CollectionUtil.isEmpty(hashSetResult)) {
                         delIss.setWindIndustry(crmTypeInfo.getName());
+                        bondInfo.setWind2(null);
                     } else {
-                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel))
-                                .map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
                         delIss.setWindIndustry(WindIndustryApend + "--" + crmTypeInfo.getName());
+                        final List<CrmTypeInfo> collect = hashSetResult.stream().filter(e -> e.getLevel() == 2).collect(Collectors.toList());
+                        //设置Wind2
+                        bondInfo.setWind2(CollUtil.isEmpty(collect) ? null : collect.get(0).getName());
                     }
                 } else {
                     delIss.setWindIndustry(crmTypeInfo.getName());
@@ -118,6 +121,13 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             if (Objects.equals(delIss.getEvent(), BondStatus.ISSUE_FAIL.getName())) {
                 bondInfo.setBondStatus(BondStatus.ISSUE_FAIL.getId());
             }
+            //上市地点
+            bondInfo.setExchange(delIss.getIpoAddr());
+            //发行总额
+            bondInfo.setIssueamount(delIss.getIssScale().toString());
+            //wind2二级
+            bondInfo.setWind2(delIss.getWinSecondIndustry());
+
             bondInfo = bondInfoService.saveOrUpdate(bondInfo);
 
             //更新债券属性

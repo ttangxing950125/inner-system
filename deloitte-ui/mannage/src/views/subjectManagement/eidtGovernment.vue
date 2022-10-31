@@ -13,9 +13,8 @@
         >逐一修改</a
       >
       <a
-        :class="currentTab === '批量修改' ? 'g-select' : ''"
-        @click="changeTab('批量修改')"
-        >地方主管部门</a
+        style="cursor: not-allowed;"
+        >批量修改</a
       >
     </div>
     <el-row>
@@ -83,7 +82,7 @@
           <span style="color: red"
             >注意：带星号字段需同故宫附表维护更新，请进入附表管理模块进行修改</span
           >
-          <el-collapse accordion class="collpase">
+          <el-collapse class="collpase">
             <el-collapse-item v-if="info.govInfo">
               <template slot="title">
                 <span style="font-size: 16px">基本信息</span>
@@ -98,11 +97,11 @@
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">政府主体名称</div>
+                  <div class="first red" :class="edit.govName ? 'green' : ''">政府主体名称</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.govName"
-                    @change="item.edit = true"
+                    v-model="info.govInfo.govName"
+                    @change="edit.govName = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
@@ -120,21 +119,21 @@
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">曾用名或别称</div>
+                  <div class="first red" :class="edit.govNameHis ? 'green' : ''">曾用名或别称</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.govNameHis"
-                    @change="item.edit = true"
+                    v-model="info.govInfo.govNameHis"
+                    @change="edit.govNameHis = true"
                   ></el-input>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
-                  <div class="first">曾用名或别称备注</div>
+                  <div class="first red" :class="edit.entityNameHisRemarks ? 'green' : ''">曾用名或别称备注</div>
                   <el-input
                     class="t-input"
-                    v-model="info.govInfo && info.govInfo.entityNameHisRemarks"
-                    @change="item.edit = true"
+                    v-model="info.govInfo.entityNameHisRemarks"
+                    @change="edit.edit = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
@@ -165,8 +164,8 @@
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">政府主体行政单位级别-大类</div>
-                   <el-select v-model="info.govInfo.govLevelBig" placeholder="请选择">
+                  <div class="first red" :class="edit.govLevelBig ? 'green' : ''">政府主体行政单位级别-大类</div>
+                   <el-select v-model="info.govInfo.govLevelBig" @change="edit.govLevelBig = true" placeholder="请选择">
                         <el-option
                         v-for="item in bigLevel"
                         :key="item.id"
@@ -176,8 +175,8 @@
                     </el-select>
                 </div>
                 <div class="flex1">
-                  <div class="first">政府主体行政单位级别-小类</div>
-                    <el-select v-model="info.govInfo.govLevelSmall" placeholder="请选择">
+                  <div class="first red" :class="edit.govLevelSmall ? 'green' : ''">政府主体行政单位级别-小类</div>
+                    <el-select v-model="info.govInfo.govLevelSmall" @change="edit.govLevelSmall = true" placeholder="请选择">
                         <el-option
                         v-for="item in smallLevel"
                         :key="item.id"
@@ -187,8 +186,8 @@
                     </el-select>
                 </div>
                 <div class="flex1">
-                  <div class="first">是否为省会城市</div>
-                  <el-select v-model="info.govInfo.provincial" placeholder="请选择">
+                   <div class="first red" :class="edit.provincial ? 'green' : ''">是否为省会城市</div>
+                  <el-select v-model="info.govInfo.provincial" @change="edit.provincial = true" placeholder="请选择">
                         <el-option
                         label="是"
                         :value="1">
@@ -200,8 +199,8 @@
                     </el-select>
                 </div>
                 <div class="flex1">
-                  <div class="first">地理分区归属</div>
-                  <el-select v-model="info.govInfo.gegphZone" placeholder="请选择">
+                  <div class="first red" :class="edit.gegphZone ? 'green' : ''">地理分区归属</div>
+                  <el-select v-model="info.govInfo.gegphZone" @change="edit.gegphZone = true" placeholder="请选择">
                         <el-option
                         v-for="item in eight"
                         :key="item.send"
@@ -211,8 +210,8 @@
                     </el-select>
                 </div>
                 <div class="flex1">
-                  <div class="first">八大经济区归属</div>
-                    <el-select v-model="info.govInfo.economyRegion" placeholder="请选择">
+                  <div class="first red" :class="edit.economyRegion ? 'green' : ''">八大经济区归属</div>
+                    <el-select v-model="info.govInfo.economyRegion" @change="edit.economyRegion = true" placeholder="请选择">
                         <el-option
                         v-for="item in eight"
                         :key="item.send"
@@ -224,8 +223,8 @@
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
-                  <div class="first">19个城市群归属</div>
-                   <el-select v-model="info.govInfo.cityGroup" placeholder="请选择">
+                  <div class="first red" :class="edit.cityGroup ? 'green' : ''">19个城市群归属</div>
+                   <el-select v-model="info.govInfo.cityGroup" @change="edit.cityGroup = true" placeholder="请选择">
                         <el-option
                         v-for="item in eight"
                         :key="item.send"
@@ -235,8 +234,8 @@
                     </el-select>
                 </div>
                 <div class="flex1">
-                  <div class="first">是否为国家中心城市</div>
-                    <el-select v-model="info.govInfo.countryCenter" placeholder="请选择">
+                  <div class="first red" :class="edit.countryCenter ? 'green' : ''">是否为国家中心城市</div>
+                    <el-select v-model="info.govInfo.countryCenter" @change="edit.countryCenter = true" placeholder="请选择">
                         <el-option
                         label="是"
                         :value="1">
@@ -260,8 +259,8 @@
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">是否为百强县</div>
-                  <el-select v-model="info.govInfo.hundred" placeholder="请选择">
+                  <div class="first red" :class="edit.hundred ? 'green' : ''">是否为百强县</div>
+                  <el-select v-model="info.govInfo.hundred" @change="edit.hundred = true" placeholder="请选择">
                         <el-option
                         label="是"
                         :value="1">
@@ -283,21 +282,22 @@
                   <div class="first">上级行政单位名称</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.govInfo.preGovName
+                      info.govInfo.preGovName || '-'
                     }}
                   </div>
                 </div>
                 <div class="flex1">
-                  <div class="first">上级行政单位官方行政代码</div>
+                  <div class="first red" :class="edit.preCode ? 'green' : ''">上级行政单位官方行政代码</div>
                   <el-input
                     class="t-input"
                     v-model="info.govInfo.preCode"
+                    @change="edit.preCode = true"
                   ></el-input>
                 </div>
                 <div class="flex1">
                   <div class="first">上级行政单位德勤代码</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo.preGovCode }}
+                    {{ info.govInfo.preGovCode || '-' }}
                   </div>
                 </div>
               </el-col>
@@ -305,19 +305,19 @@
                 <div class="flex1">
                   <div class="first">失效后关联政府主体名称</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo.newGovName }}
+                    {{ info.govInfo.newGovName || '-' }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">失效后关联政府主体官方行政代码</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo.newGovCode }}
+                    {{ info.govInfo.newGovCode || '-' }}
                   </div>
                 </div>
                 <div class="flex1">
                   <div class="first">失效后关联政府主体德勤代码</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.govInfo.newDqCode }}
+                    {{ info.govInfo.newDqCode || '-' }}
                   </div>
                 </div>
               </el-col>
@@ -331,7 +331,7 @@
                   <div class="first">关联城投企业数量</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.relationEntity
+                      info.relationEntity || '-'
                     }}
                   </div>
                 </div>
@@ -359,7 +359,7 @@ export default {
     return {
       currentTime: "",
       list: [],
-      currentTab: "",
+      currentTab: "逐一修改",
       input: '',
       info: {},
       levelStr: {
@@ -370,7 +370,13 @@ export default {
       },
       bigLevel: [],
       smallLevel: [],
-      eight: []
+      eight: [],
+      edit: {
+        govName: false,
+        govNameHis: false,
+        entityNameHisRemarks: false,
+        preCode: false,
+      }
     };
   },
   created() {
@@ -564,12 +570,17 @@ export default {
   position: relative;
   left: 50%;
 }
+.red {
+    color: red
+}
+.green {
+    color: #86bc25
+}
 .g-tab {
   margin-left: 1.5%;
   a {
     font-size: 14px;
     color: black;
-    text-decoration: underline;
     margin-right: 10px;
   }
   .g-select {

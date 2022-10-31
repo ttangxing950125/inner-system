@@ -80,6 +80,10 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
             stockThkInfo.setStockCode(code);
             stockThkInfo.setStockName(thkSecIssInfos.getName());
+            //上市版
+            stockThkInfo.setListsector(thkSecIssInfos.getIpoBoard());
+            //上市日期
+            stockThkInfo.setListDate(thkSecIssInfos.getIpoDate()==null?null:cn.hutool.core.date.DateUtil.formatDate(thkSecIssInfos.getIpoDate()));
 
             /***
              *部分代码逻辑沿用BondDelIssStrategy

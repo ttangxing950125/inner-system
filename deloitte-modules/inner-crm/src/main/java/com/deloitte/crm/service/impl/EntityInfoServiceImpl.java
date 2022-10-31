@@ -1742,13 +1742,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     .lambda().eq(EntityBondRel::getEntityCode, entityInfo.getEntityCode()));
             if (entityBondRels.size() != 0) {
                 EntityBondRel entityBondRel = entityBondRels.get(0);
-                EntityAttrValue byAttrCode = entityAttrValueMapper.findTradCode(entityBondRel.getBdCode());
+                //EntityAttrValue byAttrCode = entityAttrValueMapper.findTradCode(entityBondRel.getBdCode());
+                BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondCode, entityBondRels.get(0).getBdCode()));
                 result.setEntityVo((new EntityVo()
                                 .setId(entityInfo.getId())
                                 .setEntityName(entityInfo.getEntityName())
                                 .setEntityCode(entityInfo.getEntityCode())
                                 .setCreditCode(entityInfo.getCreditCode())
-                                .setBondCode(byAttrCode.getValue())
+                                .setBondCode(bondInfo.getOriCode())
                         )
                 );
             } else {
