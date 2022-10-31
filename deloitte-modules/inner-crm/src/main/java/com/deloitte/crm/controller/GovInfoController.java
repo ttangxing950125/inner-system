@@ -235,8 +235,7 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/addOldName")
     public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
-        entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
-        return R.ok();
+        return entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
 
     /**

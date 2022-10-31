@@ -227,9 +227,7 @@ public class EntityInfoController extends BaseController {
     @ApiOperation(value = "新增企业主体的曾用名")
     @PostMapping("/addOldName")
     public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
-
-        entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
-        return R.ok();
+        return entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
     @Autowired
     private IEntityNameHisService entityNameHisService;
