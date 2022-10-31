@@ -106,6 +106,11 @@ public class EntityBaseBusiInfo {
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
 
+    /**
+     * 主要产品及业务
+     */
+    private String entityBizProduct;
+
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

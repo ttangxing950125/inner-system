@@ -9,11 +9,14 @@ import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.EntityBaseBusiInfoMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -66,10 +69,7 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
 
             //查询a股是否存在
             String code = item.getTempCode();
-//            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
-            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code)
-                    .eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
-
+            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
             //没有就创建一个
             if (stockCnInfo == null) {
                 stockCnInfo = new StockCnInfo();
@@ -116,9 +116,14 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                     //查询状态status=1
                     List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
                     if (CollUtil.isNotEmpty(entityInfos)) {
-                       /* List<EntityInfo> mapEntityInfos = entityInfos.stream().map(e -> e.setWindMaster(windIndustry)).collect(Collectors.toList());
-                        entityInfoService.updateBatchById(mapEntityInfos);*/
                         for (EntityInfo info : entityInfos) {
+                            EntityBaseBusiInfoMapper entityBaseBusiInfoMapper = ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class);
+                            EntityBaseBusiInfo entityBaseBusiInfo = entityBaseBusiInfoMapper.selectOne(new LambdaQueryWrapper<EntityBaseBusiInfo>().eq(EntityBaseBusiInfo::getEntityCode, info.getEntityCode()));
+                            log.info("==> 根据 企业entity_code={},查询工商企业信息为>>:{}", entityBaseBusiInfo);
+                            if (entityBaseBusiInfo != null) {
+                                entityBaseBusiInfo.setEntityBizProduct(item.getProdBusiness());
+                                entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo);
+                            }
                             String entityCode = info.getEntityCode();
                             String stockDqCode = stockCnInfo.getStockDqCode();
                             //查询关联关系
@@ -132,6 +137,8 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                             cnRel.setStockDqCode(stockDqCode);
                             cnRel.setStatus(Boolean.TRUE);
                             entityStockCnRelService.getBaseMapper().insert(cnRel);
+
+
                         }
                     }
                 }
