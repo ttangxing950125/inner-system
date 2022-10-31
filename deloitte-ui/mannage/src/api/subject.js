@@ -549,3 +549,31 @@ export function searchCapture(parmas) {
     data: parmas,
   });
 }
+
+// {导出整体企业主体情况}
+export function exportEntityIndex(parmas) {
+  return request({
+    url: `/crm/entityInfo/exportEntity`,
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    method: "post",
+    responseType:'blob',
+    data: parmas,
+  }, {responseType:'blob'});
+}
+
+// 导出全部政府主体Excel表
+export function govExport(parmas) {
+  return request({
+    url: `/crm/govInfo/govExport`,
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    method: "post",
+    responseType:'blob',
+    data: parmas,
+  }, {responseType:'blob'});
+}

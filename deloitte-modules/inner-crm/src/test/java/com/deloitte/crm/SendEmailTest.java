@@ -77,7 +77,7 @@ public class SendEmailTest {
     void test05() {
 
         final Object cancel = entityInfoLogsService.cancel(75);
-
+        final Object type_stock = entityInfoLogsService.findAllByType("TYPE_BOND");
 
     }
 
