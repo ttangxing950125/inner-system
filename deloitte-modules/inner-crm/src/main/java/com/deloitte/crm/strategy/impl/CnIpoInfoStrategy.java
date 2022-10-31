@@ -126,9 +126,12 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
             List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
             if (!CollectionUtil.isEmpty(entityInfos)) {
-                entityInfos.forEach(entityInfo -> {
+                for (EntityInfo entityInfo : entityInfos) {
                     entityInfo.setWindMaster(windIndustry);
-                });
+                    //审计机构
+                    entityInfo.setEntityAuditinstitNew(item.getAuditInst());
+                }
+
             }
             //如果是成功上市，发送给敞口划分人
             if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getCode())) {
