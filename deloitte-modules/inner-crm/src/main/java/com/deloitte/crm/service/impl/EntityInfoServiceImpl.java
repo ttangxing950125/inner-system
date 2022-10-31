@@ -1483,6 +1483,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 return entityInfoList;
             }
         }
+        entityInfoList.newUpdateRecord(entityInfoList);
         return entityInfoList;
     }
 
