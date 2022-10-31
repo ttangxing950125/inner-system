@@ -8,7 +8,7 @@ import com.deloitte.crm.mapper.StockCnUndoStInfoMapper;
 import com.deloitte.crm.domain.StockCnUndoStInfo;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.service.StockCnUndoStInfoService;
-import com.deloitte.crm.strategy.impl.StockCnUndoStInfoStrategy;
+import com.deloitte.crm.strategy.impl.CnUndoStInfoStrategy;
 import com.deloitte.crm.utils.ApplicationContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +41,7 @@ public class StockCnUndoStInfoServiceImpl extends ServiceImpl<StockCnUndoStInfoM
             if (undoStInfo.getCode().contains("数据来源：Wind")) {
                 continue;
             }
-            Future<Object> future = ApplicationContextHolder.get().getBean(StockCnUndoStInfoStrategy.class).doBondImport(undoStInfo, timeNow, windTask);
+            Future<Object> future = ApplicationContextHolder.get().getBean(CnUndoStInfoStrategy.class).doBondImport(undoStInfo, timeNow, windTask);
             futureList.add(future);
         }
 
