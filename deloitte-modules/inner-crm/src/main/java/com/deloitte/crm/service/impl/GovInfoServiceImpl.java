@@ -713,8 +713,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                     nameHisMapper.updateById(one);
                     continue;
                 }
+                if (!ObjectUtils.isEmpty(status)) {
+                    one.setStatus(0);
+                }
                 //直接删除原本的数据
-                nameHisMapper.deleteById(one);
+                nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
                 if (ObjectUtils.isEmpty(remark)) {

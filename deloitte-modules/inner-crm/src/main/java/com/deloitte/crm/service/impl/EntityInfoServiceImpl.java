@@ -684,7 +684,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     continue;
                 }
                 //直接删除原本的数据
-                nameHisMapper.deleteById(one);
+                if (!ObjectUtils.isEmpty(status)) {
+                    one.setStatus(0);
+                }
+                nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
                 if (ObjectUtils.isEmpty(remark)) {
