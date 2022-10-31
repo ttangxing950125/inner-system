@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -491,5 +492,18 @@ public class EntityInfoController extends BaseController {
     @GetMapping("/exportEntity")
     public void exportEntity(HttpServletResponse response) {
         entityInfoService.exportEntity(response);
+    }
+
+    /**
+     * 根据类型导出企业主体清单
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/10/25 17:39
+     */
+    @ApiOperation(value = "根据类型导出企业主体清单")
+    @GetMapping("/exportEntityByType")
+    public void exportEntityByType(Integer type,HttpServletResponse response) {
+        entityInfoService.exportEntityByType(type,response);
     }
 }
