@@ -549,3 +549,17 @@ export function searchCapture(parmas) {
     data: parmas,
   });
 }
+
+// {导出整体企业主体情况}
+export function exportEntityIndex(parmas) {
+  return request({
+    url: `/crm/entityInfo/exportEntity`,
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    method: "post",
+    responseType:'blob',
+    data: parmas,
+  }, {responseType:'blob'});
+}

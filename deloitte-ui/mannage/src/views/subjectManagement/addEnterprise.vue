@@ -7,7 +7,7 @@
       <h3 class="title">{{ tab }}企业-新增主体</h3>
     </div>
     <el-row>
-      <el-col :sm="24" :lg="23" class="form-card">
+      <!-- <el-col :sm="24" :lg="23" class="form-card">
         <el-card>
           <div class="mt10">今日新{{ tab }}</div>
           <div v-if="tab === '上市'" class="mt10">
@@ -19,15 +19,14 @@
             <span>{{ infomation.averageDailyLatestMonth || 0 }}</span> 个
           </div>
           <div v-if="tab === '发债'" class="mt10">
-            今日新发债主体 <span>{{ infomation.addToday || 0 }}</span> 个，涉及
-            x 个发债主体。其中 x 个为未收录主体， x 给为已收录主体新发债
+            今日新发债主体 <span>{{ infomation.addToday || 0 }}</span> 个
           </div>
-          <div class="mt20" v-if="none" id="xchart" style="height: 240px; width: 100%" />
-          <div class="mt20 none" v-else  >
+          <div class="mt20" id="xchart" style="height: 240px; width: 100%" />
+          <div v-show="none" class="mt20 none">
               暂无数据
           </div>
         </el-card>
-      </el-col>
+      </el-col> -->
       <el-col
         :sm="24"
         :lg="23"
@@ -249,7 +248,7 @@
             value-format="yyyy-MM-dd"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="退市日期" prop="endDate">
+        <el-form-item label="退市日期" :prop="ruleForm.notUse1 ? '' : 'endDate'">
           <el-date-picker
             type="date"
             class="t-input"
@@ -257,7 +256,11 @@
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
             v-model="ruleForm.endDate"
+            :disabled="ruleForm.notUse1"
           ></el-date-picker>
+          <el-checkbox class="ml10" v-model="ruleForm.notUse1" label="1"
+            >不适用</el-checkbox
+          >
         </el-form-item>
         <el-form-item label="是否为金融机构" prop="finance">
           <el-radio-group v-model="ruleForm.finance">
@@ -270,19 +273,6 @@
             <el-radio label="1">一般企业</el-radio>
             <el-radio label="0">金融机构</el-radio>
           </el-radio-group>
-        </el-form-item>
-        <el-form-item label="金融机构子行业" prop="financeSubIndu">
-          <el-select
-            v-model="ruleForm.financeSubIndu"
-            placeholder="请选择金融机构子行业"
-          >
-            <el-option
-              v-for="(item, index) in financeSubIndu"
-              :key="index"
-              :label="item.value"
-              :value="item.value"
-            ></el-option>
-          </el-select>
         </el-form-item>
         <el-form-item class="position-add" label="企业曾用名或别称" prop="entityNameHis">
           <el-input
@@ -474,19 +464,6 @@
             <el-radio label="0">金融机构</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="金融机构子行业" prop="financeSubIndu">
-          <el-select
-            v-model="ruleForm.financeSubIndu"
-            placeholder="请选择金融机构子行业"
-          >
-            <el-option
-              v-for="(item, index) in financeSubIndu"
-              :key="index"
-              :label="item.value"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
         <el-form-item class="position-add" label="企业曾用名或别称" prop="entityNameHis">
           <el-input
             class="t-input"
@@ -519,7 +496,8 @@ export default {
       list: [],
       dialogVisible: false,
       ruleForm: {
-          creditCode: ''
+          creditCode: '',
+          endDate: ''
       },
       rules: {
         masterCode: [
@@ -744,12 +722,13 @@ export default {
                 if (row) {
                 createST(this.ruleForm).then((res) => {
                     if (data === "新增成功") {
-                    this.$message({
-                        showClose: true,
-                        message: "操作成功",
-                        type: "success",
-                    });
+                        this.$message({
+                            showClose: true,
+                            message: "操作成功",
+                            type: "success",
+                        });
                     }
+                    this.dialogVisible = false
                 });
                 } else {
                 createBE(this.ruleForm).then((res) => {
@@ -760,6 +739,7 @@ export default {
                         message: "操作成功",
                         type: "success",
                     });
+                    this.dialogVisible2 = false
                     }
                 });
                 }
@@ -779,6 +759,14 @@ export default {
         });
     },
     check(row, keyword) {
+        if(!row) {
+            this.$message({
+                showClose: true,
+                message: '请输入查重信息',
+                type: "error",
+            });
+            return
+        }
       try {
         this.$modal.loading("Loading...");
         const parmas = {
@@ -834,6 +822,11 @@ export default {
     handleClose() {
         this.dialogVisible2 = false
         this.dialogVisible = false
+        this.repalce1 = false
+        this.repalce2 = false
+        this.repalce3 = false
+        this.repalce4 = false
+        this.repalce5 = false
         this.ruleForm = {}
         this.$refs['ruleForm'].clearValidate();
     }
@@ -846,6 +839,15 @@ export default {
             this.$refs['ruleForm'].clearValidate();
           } else {
             this.ruleForm.creditErrorRemark = ''
+          }
+        },
+        deep: true //为true，表示深度监听，这时候就能监测到a值变化
+      },
+      'ruleForm.notUse1': {
+        handler(newName, oldName) {
+          if (newName) {
+            this.ruleForm.endDate = ''
+            this.$refs['ruleForm'].clearValidate();
           }
         },
         deep: true //为true，表示深度监听，这时候就能监测到a值变化

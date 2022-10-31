@@ -10,7 +10,7 @@
       <div class="title-2">
         当前已添加字段 <span>{{ selectNum }}</span> 个， 其中必选字段 <span>x</span> 个
       </div>
-      <el-button class="export" type="text" @click="back()">导出数据</el-button>
+      <el-button class="export" type="text" @click="downFile()">导出数据</el-button>
     </div>
     <el-row>
       <el-col
@@ -123,8 +123,9 @@
 
 <script>
 import { getAllByGroup } from "@/api/common";
-import { getListEntityByPage } from "@/api/subject";
+import { getListEntityByPage, exportEntityIndex } from "@/api/subject";
 import pagination from "../../components/Pagination";
+import { download } from '@/utils/index'
 export default {
   name: "addGovernment",
   components: {
@@ -240,8 +241,19 @@ export default {
         this.$modal.closeLoading();
       }
     },
-    back() {
-      this.$router.back();
+    downFile() {
+      try {
+        this.$modal.loading("Loading...");
+        console.log(this.selected)
+        this.selected.mapList = this.mapList
+        exportEntityIndex(this.selected).then((res) => {
+            download(res, '企业主体更多指标.xlsx')
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     filterNode(value, data) {
       if (!value) return true;
