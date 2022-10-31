@@ -12,23 +12,20 @@ import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
-import com.deloitte.crm.dto.AttrValueMapDto;
 import com.deloitte.crm.dto.MasDto;
-import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
-import com.deloitte.crm.mapper.EntityGovRelMapper;
-import com.deloitte.crm.mapper.EntityMasterMapper;
-import com.deloitte.crm.mapper.ModelMasterMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
-import com.deloitte.crm.vo.ModelMasterInfoVo;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +59,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
     private EntityFinancialService entityFinancialService;
 
     private SendEmailService sendEmailService;
+
+    private GovInfoMapper govInfoMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -137,13 +136,55 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      * @return
      */
     @Override
-    public R<ModelMasterInfoVo> getTable(Integer id) {
-        ModelMasterInfoVo modelMasterInfoVo = new ModelMasterInfoVo();
-        Map<String, AttrValueMapDto> attrs = new HashMap<>();
+    public R<MasDto> getTable(Integer id) {
+        MasDto masDto = new MasDto();
         CrmMasTask crmMasTask = Optional.ofNullable(iCrmMasTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, id))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         EntityInfo entityInfo = Optional.ofNullable(iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, crmMasTask.getEntityCode()).eq(EntityInfo::getStatus, 1))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
-        modelMasterInfoVo.setEntityName(entityInfo.getEntityName()).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWindMaster(entityInfo.getWindMaster()).setShenWanMaster(entityInfo.getShenWanMaster());
-        return R.ok(modelMasterInfoVo.setAttrs(attrs));
+        String entityCode = entityInfo.getEntityCode();
+        //基础信息展示
+        masDto.setEntityName(entityInfo.getEntityName()).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWind(entityInfo.getWindMaster()).setShenWan(entityInfo.getShenWanMaster());
+        //当企业为金融机构的时候 去查entity_financial 中的数据
+        if(!ObjectUtils.isEmpty(entityInfo.getFinance())&&entityInfo.getFinance()==1){
+            EntityFinancial entityFinancial = entityFinancialService.getBaseMapper().selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
+            masDto.setIsFinance("Y").setFinanceSegmentation(entityFinancial.getMince());
+        }else{
+            masDto.setIsFinance("N");
+        }
+        EntityMaster entityMaster = entityMasterMapper.selectOne(new QueryWrapper<EntityMaster>().lambda().eq(EntityMaster::getEntityCode, entityCode));
+        if(!ObjectUtils.isEmpty(entityMaster)){
+            //城投YY
+            String yyUrban = entityMaster.getYyUrban();
+            if(ObjectUtils.isEmpty(yyUrban)||"0".equals(yyUrban)){masDto.setCity("N");}else{masDto.setCity("Y");}
+            //中诚信
+            String zhongxinUrban = entityMaster.getZhongxinUrban();
+            if(ObjectUtils.isEmpty(zhongxinUrban)||"0".equals(zhongxinUrban)){masDto.setCityZhong("N");}else{masDto.setCityZhong("Y");}
+            //查询是否是城投机构
+            String ibUrban = entityMaster.getIbUrban();
+            if(!ObjectUtils.isEmpty(ibUrban)&&"1".equals(ibUrban)){
+                masDto.setCityIb("Y");
+                EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
+                String dqGovCode = entityGovRel.getDqGovCode();
+                masDto.setDqGovCode(dqGovCode);
+                GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
+                if(!ObjectUtils.isEmpty(govInfo)){
+                    GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
+                    masDto.setGovNode(tree);
+                }
+            }
+        }
+
+        return R.ok(masDto,SuccessInfo.SUCCESS.getInfo());
+    }
+
+    public GovNode getTree(GovNode govNode,GovInfo govInfo){
+        if(!ObjectUtils.isEmpty(govInfo.getPreGovCode())){
+            GovInfo parent = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govInfo.getPreGovCode()));
+            GovNode node = new GovNode().setGovName(govNode.getGovName());
+            govNode.setChildren(node);
+            govNode.setGovName(parent.getGovName());
+            return this.getTree(govNode,parent);
+        }
+        return govNode;
     }
 
     /**
