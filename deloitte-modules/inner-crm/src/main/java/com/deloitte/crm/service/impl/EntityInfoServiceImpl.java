@@ -1589,8 +1589,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockCnRel> cnRels = entityStockCnRels.stream().collect(Collectors.groupingBy(EntityStockCnRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(cnRels)) {
                     cnRels.stream().forEach(x -> {
-                        //德勤唯一识别代码
-                        stockDqCodeList.add(x.getStockDqCode());
+                        String stockDqCode = x.getStockDqCode().toLowerCase();
+                        String substring = stockDqCode.substring(0, 1);
+                        if (!ObjectUtils.nullSafeEquals("a", substring)){
+                            //德勤唯一识别代码
+                            stockDqCodeList.add(x.getStockDqCode());
+                        }
                     });
                 }
             }
@@ -1598,8 +1602,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockThkRel> thkRels = entityStockthkRels.stream().collect(Collectors.groupingBy(EntityStockThkRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(thkRels)) {
                     thkRels.stream().forEach(x -> {
-                        //德勤唯一识别代码
-                        stockDqCodeList.add(x.getStockDqCode());
+                        String stockDqCode = x.getStockDqCode().toLowerCase();
+                        String substring = stockDqCode.substring(0, 1);
+                        if (!ObjectUtils.nullSafeEquals("a", substring)){
+                            //德勤唯一识别代码
+                            stockDqCodeList.add(x.getStockDqCode());
+                        }
                     });
                 }
             }
@@ -1639,7 +1647,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //上市日期
                     try {
                         stockCnInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getListDate())).forEach(x -> {
-                            stockDateList.add(x.getListDate());
+                            String stockDqCode = x.getStockDqCode().toLowerCase();
+                            String substring = stockDqCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)){
+                                //德勤唯一识别代码
+                                stockDateList.add(x.getListDate());
+                            }
                         });
                     } catch (Exception e) {
                         log.error(e.getMessage());
@@ -1662,7 +1675,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //退市日期
                     try {
                         stockThkInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x -> {
-                            stockdownDateList.add(x.getDelistingDate());
+                            String stockDqCode = x.getStockDqCode().toLowerCase();
+                            String substring = stockDqCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)){
+                                //德勤唯一识别代码
+                                stockdownDateList.add(x.getDelistingDate());
+                            }
                         });
                     } catch (Exception e) {
                         log.error(e.getMessage());
@@ -1670,7 +1688,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //上市日期
                     try {
                         stockThkInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getListDate())).forEach(x -> {
-                            stockDateList.add(x.getListDate());
+                            String stockDqCode = x.getStockDqCode().toLowerCase();
+                            String substring = stockDqCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)){
+                                //德勤唯一识别代码
+                                stockDateList.add(x.getListDate());
+                            }
                         });
                     } catch (Exception e) {
                         log.error(e.getMessage());
