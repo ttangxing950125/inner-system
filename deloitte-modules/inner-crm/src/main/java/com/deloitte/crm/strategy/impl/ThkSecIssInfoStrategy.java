@@ -73,6 +73,9 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
             }
 
             stockThkInfo.setStockName(secIssInfo.getName());
+            //拟上市板块 上市板
+            stockThkInfo.setListsector(secIssInfo.getSimulationListed());
+//            stockThkInfo.setListDate(secIssInfo.getlistda);
 
 
             //主体名
