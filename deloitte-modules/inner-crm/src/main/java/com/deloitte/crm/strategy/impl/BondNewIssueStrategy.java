@@ -172,6 +172,7 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                 //修改主体的上市状态
                 entityInfos.forEach(entity -> {
                     entity.setList(1);
+                    entity.setWindMaster(issorIndustryFirst);
                 });
 
                 for (EntityInfo entityInfo : entityInfos) {
