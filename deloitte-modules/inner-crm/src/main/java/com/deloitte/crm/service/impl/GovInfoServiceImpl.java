@@ -1202,11 +1202,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public R getGovInfoByLevel(Integer bigLevel, Integer smallLevel) {
         LambdaQueryWrapper<GovInfo> queryWrapper = new LambdaQueryWrapper<>();
         if (!ObjectUtils.isEmpty(bigLevel)){
-            queryWrapper.eq(GovInfo::getGovLevelBig,bigLevel);
+            queryWrapper.eq(GovInfo::getGovLevelBig,(bigLevel-1));
         }
-        if (!ObjectUtils.isEmpty(smallLevel)){
-            queryWrapper.eq(GovInfo::getGovLevelSmall,smallLevel);
-        }
+//        if (!ObjectUtils.isEmpty(smallLevel)){
+//            queryWrapper.eq(GovInfo::getGovLevelSmall,smallLevel);
+//        }
         return R.ok(govInfoMapper.selectList(queryWrapper));
     }
 
