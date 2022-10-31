@@ -74,6 +74,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
      * 根据类型查询
      * CompletableFuture 使用线程池为ForkJoinPool
      * {@link java.util.concurrent.ForkJoinPool}
+     *
      * @param findType 查询类型
      * @return 股票 & 债券
      * @see EntityInfoLogs#operType
@@ -246,10 +247,10 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Object cancel(Integer id) {
-        int result = 0;
         LambdaQueryWrapper<EntityInfoLogs> entityInfoLogsLambdaQueryWrapper = new LambdaQueryWrapper<>();
         EntityInfoLogs entityInfoLogs = Optional.ofNullable(entityInfoLogsMapper.selectOne(entityInfoLogsLambdaQueryWrapper.eq(EntityInfoLogs::getId, id))).orElseThrow(() -> new ServiceException("id为:" + id + "的数据不存在"));
-
+        entityInfoLogs.setIsDeleted(Boolean.TRUE);
+        entityInfoLogsMapper.updateById(entityInfoLogs);
         /***
          *  债券的删除逻辑 operType=3
          * {@link EntityInfoLogs#operType}
@@ -259,11 +260,11 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
             final BondInfo bondInfo = bondInfoMapper.selectOne(bondInfoLambdaQueryWrapper.eq(BondInfo::getOriCode, entityInfoLogs.getCode()).eq(BondInfo::getBondShortName, entityInfoLogs.getName()));
             if (bondInfo != null) {
                 bondInfo.setIsDeleted(Boolean.TRUE);
-                result = bondInfoMapper.updateById(bondInfo);
+                bondInfoMapper.updateById(bondInfo);
                 LambdaQueryWrapper<EntityBondRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
                 final EntityBondRel entityBondRel = entityBondRelMapper.selectOne(lambdaQueryWrapper.eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
                 if (entityBondRel != null) {
-                    entityBondRel.setStatus(0);//TODO 0 是禁用 1是启用
+                    entityBondRel.setStatus(0);
                     entityBondRelMapper.updateEntityBondRel(entityBondRel);
                     final EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityBondRel.getEntityCode()));
                     if (entityInfo != null) {
@@ -272,8 +273,6 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                     }
                 }
             }
-            entityInfoLogs.setIsDeleted(Boolean.TRUE);
-            entityInfoLogsMapper.updateById(entityInfoLogs);
             /***
              *  A股删除逻辑 1 operType=1
              * {@link EntityInfoLogs#operType}
@@ -286,7 +285,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 LambdaQueryWrapper<EntityStockCnRel> entityStockCnRelLambdaQueryWrapper = new LambdaQueryWrapper<>();
                 final EntityStockCnRel entityStockCnRel = entityStockCnRelMapper.selectOne(entityStockCnRelLambdaQueryWrapper.eq(EntityStockCnRel::getStockDqCode, stockDqCode));
                 if (entityStockCnRel != null) {
-                    entityStockCnRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
+                    entityStockCnRel.setStatus(Boolean.FALSE);
                     entityStockCnRelMapper.updateById(entityStockCnRel);
                     final EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityStockCnRel.getEntityCode()));
                     if (entityInfo != null) {
@@ -300,12 +299,10 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                  */
                 stockCnInfo.setIsDeleted(Boolean.TRUE);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, stockCnInfo.getStockCode());
-                result = stockCnInfoMapper.updateById(stockCnInfo);
+                stockCnInfoMapper.updateById(stockCnInfo);
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, stockCnInfo.getStockCode());
             }
-            entityInfoLogs.setIsDeleted(Boolean.TRUE);
-            entityInfoLogsMapper.updateById(entityInfoLogs);
             /***
              *  港股 删除逻辑 operType=2
              * {@link EntityInfoLogs#operType}
@@ -320,24 +317,22 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                  */
                 stockThkInfo.setIsDeleted(Boolean.TRUE);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_THK_INFO, stockThkInfo.getStockCode());
-                result = stockThkInfoMapper.updateById(stockThkInfo);
+                stockThkInfoMapper.updateById(stockThkInfo);
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_THK_INFO, stockThkInfo.getStockCode());
                 String stockDqCode = stockThkInfo.getStockDqCode();
                 LambdaQueryWrapper<EntityStockThkRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();
                 EntityStockThkRel entityStockThkRel = entityStockThkRelMapper.selectOne(lambdaQueryWrapper.eq(EntityStockThkRel::getStockDqCode, stockDqCode));
                 if (entityStockThkRel != null) {
-                    entityStockThkRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
+                    entityStockThkRel.setStatus(Boolean.FALSE);
                     entityStockThkRelMapper.updateById(entityStockThkRel);
                 }
                 final EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityStockThkRel.getEntityCode()));
                 if (entityInfo != null) {
-                    entityInfo.setStatus(0);//失效
+                    entityInfo.setStatus(0);
                     entityInfoMapper.updateById(entityInfo);
                 }
             }
-            entityInfoLogs.setIsDeleted(Boolean.TRUE);
-            entityInfoLogsMapper.updateById(entityInfoLogs);
         }
         return R.ok();
     }
