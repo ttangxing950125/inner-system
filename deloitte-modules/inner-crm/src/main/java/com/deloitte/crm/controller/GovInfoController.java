@@ -221,7 +221,7 @@ public class GovInfoController extends BaseController {
     /**
      * 新增政府主体的曾用名
      *
-     * @param govInfo
+     * @param entityInfo
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:44

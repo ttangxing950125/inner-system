@@ -214,6 +214,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityNameHis.setSource(1);
             nameHisMapper.insert(entityNameHis);
         }
+        Date now = new Date();
+        String username = SecurityUtils.getUsername();
+        govInfo.setCreater(username).setUpdater(username);
+        govInfo.setCreated(now).setUpdated(now);
         govInfoMapper.insertGovInfo(govInfo);
         return R.ok("新增政府主体成功");
     }
@@ -290,6 +294,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             //修改曾用名后需要将曾用名和曾用名备注置空
             o.setGovNameHis(null).setEntityNameHisRemarks(null);
         }
+        Date now = new Date();
+        String username = SecurityUtils.getUsername();
+        o.setUpdater(username);
+        o.setUpdated(now);
         govInfoMapper.updateById(o);
         return R.ok();
     }
@@ -894,6 +902,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 return resultMap;
             }
         }
+        resultMap.newUpdateRecord(resultMap);
         return resultMap;
     }
 
