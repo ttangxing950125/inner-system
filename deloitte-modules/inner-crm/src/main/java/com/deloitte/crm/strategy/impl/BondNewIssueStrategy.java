@@ -1,6 +1,8 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -84,12 +86,18 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (bondInfo == null) {
                 bondInfo = new BondInfo();
             }
-
+            //债券简称
             bondInfo.setBondShortName(shortName);
+            //债券交易代码
             bondInfo.setOriCode(newIss.getTradeCode());
+            //债券全称
             bondInfo.setBondName(newIss.getBondName());
+            //起息日
             bondInfo.setValueDate(newIss.getValueDate());
+            //到期日
             bondInfo.setDueDate(newIss.getExpireDate());
+            //上市日期
+            bondInfo.setListdate(ObjectUtil.isEmpty(newIss.getIpoDate()) ? null : DateUtil.parseDate(newIss.getIpoDate()));
 
             //看之前有没有导入过这个数据
             BondNewIss last = bondNewIssMapper.findLastByShortName(shortName);

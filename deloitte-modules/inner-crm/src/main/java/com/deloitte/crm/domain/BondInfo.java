@@ -70,6 +70,8 @@ public class BondInfo {
     private  String dueDate ;
 
 
+
+
     /**
      * 公私募类型 0_公募 1_私募
      */
@@ -118,4 +120,20 @@ public class BondInfo {
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);
     }
+
+    /**
+     * 上市日期
+     */
+    private Date listdate;
+    /**
+     * 上市地点
+      */
+    private String exchange;
+    /**
+     *发行总额
+     * [单位] 亿元
+     */
+    private String issueamount;
+
+
 }
