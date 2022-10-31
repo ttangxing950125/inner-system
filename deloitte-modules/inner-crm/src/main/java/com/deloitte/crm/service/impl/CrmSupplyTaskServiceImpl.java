@@ -154,7 +154,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
                 .in(SysUserRole::getRoleId, ROLE_THREE, ROLE_FOUR, ROLE_FIVE)
         );
 
-//        sysUserRoles.add(new SysUserRole().setRoleId(7L));
+        sysUserRoles.add(new SysUserRole().setRoleId(6L));
 
         //不是 角色 3 4 5则不返回信息
         if (CollectionUtils.isEmpty(sysUserRoles)) {
@@ -178,7 +178,9 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         crmSupplyTasks.stream().forEach(o -> {
             //创建单个响应对象,设置角色3，4，5通用属性
             SupplyTaskVo taskVo = setNormalValue(o, roleId);
-            taskList.add(taskVo);
+            if (!ObjectUtils.isEmpty(taskVo)){
+                taskList.add(taskVo);
+            }
         });
         //响应的分页数据
         Page<SupplyTaskVo> resultPage = new Page<>(pageNum, pageSize);
@@ -189,6 +191,9 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     private SupplyTaskVo setNormalValue(CrmSupplyTask o, Long roleId) {
         SupplyTaskVo taskVo = new SupplyTaskVo();
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, o.getEntityCode()).last(" limit 1"));
+        if (ObjectUtils.isEmpty(entityInfo)){
+            return null;
+        }
         String entityCode = entityInfo.getEntityCode();
         // 唯一识别字段
         taskVo.setEntityCode(entityCode);
