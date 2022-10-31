@@ -77,13 +77,16 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
             if (stockThkInfo == null) {
                 stockThkInfo = new StockThkInfo();
             }
-
+            //股票代码
             stockThkInfo.setStockCode(code);
+            //港股简称
             stockThkInfo.setStockName(thkSecIssInfos.getName());
             //上市版
             stockThkInfo.setListsector(thkSecIssInfos.getIpoBoard());
             //上市日期
-            stockThkInfo.setListDate(thkSecIssInfos.getIpoDate()==null?null:cn.hutool.core.date.DateUtil.formatDate(thkSecIssInfos.getIpoDate()));
+            stockThkInfo.setListDate(thkSecIssInfos.getIpoDate() == null ? null : cn.hutool.core.date.DateUtil.formatDate(thkSecIssInfos.getIpoDate()));
+            //公司介绍
+            stockThkInfo.setEntityIntro(Optional.ofNullable(thkSecIssInfos.getEntityDes()).orElse(""));
 
             /***
              *部分代码逻辑沿用BondDelIssStrategy
