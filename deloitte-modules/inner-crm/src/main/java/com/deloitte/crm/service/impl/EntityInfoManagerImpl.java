@@ -297,7 +297,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
         String oriCode = bondInfo.getOriCode();
         String bondShortName = bondInfo.getBondShortName();
-        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(oriCode).setName(bondShortName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(oriCode).setName(bondShortName).setEntityCode(entityCode).setCreateTime(new Date()).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
         this.bindEntityInfoLogs(entityInfoLogs);
     }
 
@@ -318,7 +318,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
         String stockCode = stockThkInfo.getStockCode();
         String stockName = stockThkInfo.getStockName();
-        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockName).setEntityCode(entityCode).setOperType(3).setCreateTime(new Date()).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
         this.bindEntityInfoLogs(entityInfoLogs);
     }
 
@@ -339,7 +339,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
         String stockCode = stockCnInfo.getStockCode();
         String stockShortName = stockCnInfo.getStockShortName();
-        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockShortName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockShortName).setEntityCode(entityCode).setOperType(3).setCreateTime(new Date()).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
         this.bindEntityInfoLogs(entityInfoLogs);
     }
 

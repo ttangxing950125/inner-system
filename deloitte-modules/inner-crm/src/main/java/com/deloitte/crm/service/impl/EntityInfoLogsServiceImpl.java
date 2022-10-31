@@ -47,6 +47,9 @@ import java.util.stream.Collectors;
 @Service("entityInfoLogsService")
 public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper, EntityInfoLogs> implements EntityInfoLogsService {
     @Resource
+    private EntityInfoMapper entityInfoMapper;
+
+    @Resource
     private EntityInfoLogsMapper entityInfoLogsMapper;
     @Resource
     private BondInfoMapper bondInfoMapper;
@@ -74,7 +77,6 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
      * @param findType 查询类型
      * @return 股票 & 债券
      * @see EntityInfoLogs#operType
-     * TODO  后期优化
      */
     @SneakyThrows
     @Override
@@ -87,14 +89,14 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
 
             CompletableFuture<EntityInfoLogsByBondVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsByBondVo sockVo = new EntityInfoLogsByBondVo();
-                final List<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}));
+                final List<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
                 sockVo.setEntityInfoLogs(infoLogs);
                 return sockVo;
             });
 
             final CompletableFuture<Void> getAddTodayCountTask = baskTask.thenAcceptAsync(e -> {
                 String nowStrDate = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
-                final List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"})
+                final List<EntityInfoLogs> totalLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .eq(EntityInfoLogs::getCreateTime, nowStrDate));
                 e.setAddToday(totalLists.size());
             });
@@ -107,6 +109,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 // sevenTradingDayDate <= createTime <= nowDayDate  查询前7天的排除周六周天的数据 算平均数
                 List<EntityInfoLogs> sevenTradingtotalListsFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
                         .in(EntityInfoLogs::getOperType, new String[]{"3"})
+                        .eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowDayDate))
                         .stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime()))
@@ -122,6 +125,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 // latestMonthDayDate <= createTime <= nowDayDate  当前日期最近一个月的日期 算平均数
                 List<EntityInfoLogs> latestMonthDayDateFilter = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
                         .in(EntityInfoLogs::getOperType, new String[]{"3"})
+                        .eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .ge(EntityInfoLogs::getCreateTime, latestMonthDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowDayDate));
 
@@ -159,7 +163,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
 
             CompletableFuture<EntityInfoLogsBySockVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsBySockVo sockVo = new EntityInfoLogsBySockVo();
-                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().between(EntityInfoLogs::getOperType, 1, 2));
+                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().between(EntityInfoLogs::getOperType, 1, 2).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
                 sockVo.setEntityInfoLogs(entoty);
                 return sockVo;
             });
@@ -170,8 +174,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                          * TYPE_STOCK 股票分为 A股和港股 1 2 连续多个使用 between数据库中创建了索引如使用in(EntityInfoLogs::getOperType, new String[]{"1", "2"})不会走索引
                          * 详情:EXPLAIN select * from entity_info_logs WHERE oper_type BETWEEN 1 and 2 and create_time>='2022-10-17' and create_time<='2022-10-18'
                          */
-//                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
                         .between(EntityInfoLogs::getOperType, 1, 2)
+                        .eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .eq(EntityInfoLogs::getCreateTime, DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN)));
                 e.setAddToday(totalLists.size());
             });
@@ -184,6 +188,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 List<EntityInfoLogs> sevenTradingDayAveragesEntityInfoLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
 //                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
                         .between(EntityInfoLogs::getOperType, 1, 2)
+                        .eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .ge(EntityInfoLogs::getCreateTime, sevenTradingDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowStrDate))
                         .stream().filter(e -> !DateUtil.isWeekend(e.getCreateTime()))
@@ -198,7 +203,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 //当前日期最近一个月的 并求平均一个月的
                 List<EntityInfoLogs> lastMothEntityInfoLogsLists = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>()
 //                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
-                        .between(EntityInfoLogs::getOperType, 1, 2)
+                        .between(EntityInfoLogs::getOperType, 1, 2).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .ge(EntityInfoLogs::getCreateTime, latestMonthDayDate)
                         .le(EntityInfoLogs::getCreateTime, nowStrDate));
                 if (CollUtil.isNotEmpty(lastMothEntityInfoLogsLists) && lastMothEntityInfoLogsLists.size() >= 1) {
@@ -244,11 +249,12 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
         int result = 0;
         LambdaQueryWrapper<EntityInfoLogs> entityInfoLogsLambdaQueryWrapper = new LambdaQueryWrapper<>();
         EntityInfoLogs entityInfoLogs = Optional.ofNullable(entityInfoLogsMapper.selectOne(entityInfoLogsLambdaQueryWrapper.eq(EntityInfoLogs::getId, id))).orElseThrow(() -> new ServiceException("id为:" + id + "的数据不存在"));
+
         /***
          *  债券的删除逻辑 operType=3
          * {@link EntityInfoLogs#operType}
          */
-        if (entityInfoLogs.getOperType().equals("3")) {
+        if (entityInfoLogs.getOperType() == 3) {
             LambdaQueryWrapper<BondInfo> bondInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final BondInfo bondInfo = bondInfoMapper.selectOne(bondInfoLambdaQueryWrapper.eq(BondInfo::getOriCode, entityInfoLogs.getCode()).eq(BondInfo::getBondShortName, entityInfoLogs.getName()));
             if (bondInfo != null) {
@@ -259,13 +265,20 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 if (entityBondRel != null) {
                     entityBondRel.setStatus(0);//TODO 0 是禁用 1是启用
                     entityBondRelMapper.updateEntityBondRel(entityBondRel);
+                    final EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityBondRel.getEntityCode()));
+                    if (entityInfo != null) {
+                        entityInfo.setStatus(0);//失效
+                        entityInfoMapper.updateById(entityInfo);
+                    }
                 }
             }
+            entityInfoLogs.setIsDeleted(Boolean.TRUE);
+            entityInfoLogsMapper.updateById(entityInfoLogs);
             /***
              *  A股删除逻辑 1 operType=1
              * {@link EntityInfoLogs#operType}
              */
-        } else if (entityInfoLogs.getOperType().equals("1")) {
+        } else if (entityInfoLogs.getOperType() == 1) {
             LambdaQueryWrapper<StockCnInfo> stockCnInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(stockCnInfoLambdaQueryWrapper.eq(StockCnInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockCnInfo != null) {
@@ -275,6 +288,11 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 if (entityStockCnRel != null) {
                     entityStockCnRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
                     entityStockCnRelMapper.updateById(entityStockCnRel);
+                    final EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityStockCnRel.getEntityCode()));
+                    if (entityInfo != null) {
+                        entityInfo.setStatus(0);
+                        entityInfoMapper.updateById(entityInfo);
+                    }
                 }
                 /**
                  * 本次删除逻辑存在部分bug 在不考虑分布式数据实时一致性的话 延时双删不是最好的最解决方式
@@ -286,11 +304,13 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                 Thread.sleep(100);
                 redisService.redisTemplate.opsForHash().delete(CacheName.STOCK_CN_INFO, stockCnInfo.getStockCode());
             }
+            entityInfoLogs.setIsDeleted(Boolean.TRUE);
+            entityInfoLogsMapper.updateById(entityInfoLogs);
             /***
              *  港股 删除逻辑 operType=2
              * {@link EntityInfoLogs#operType}
              */
-        } else if (entityInfoLogs.getOperType().equals("2")) {
+        } else if (entityInfoLogs.getOperType() == 2) {
             LambdaQueryWrapper<StockThkInfo> stockThkInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(stockThkInfoLambdaQueryWrapper.eq(StockThkInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockThkInfo != null) {
@@ -310,7 +330,14 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                     entityStockThkRel.setStatus(Boolean.FALSE);//TODO 0 是禁用 1是启用
                     entityStockThkRelMapper.updateById(entityStockThkRel);
                 }
+                final EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, entityStockThkRel.getEntityCode()));
+                if (entityInfo != null) {
+                    entityInfo.setStatus(0);//失效
+                    entityInfoMapper.updateById(entityInfo);
+                }
             }
+            entityInfoLogs.setIsDeleted(Boolean.TRUE);
+            entityInfoLogsMapper.updateById(entityInfoLogs);
         }
         return R.ok();
     }
