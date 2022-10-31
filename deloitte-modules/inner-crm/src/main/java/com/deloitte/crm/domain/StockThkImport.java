@@ -25,7 +25,7 @@ public class StockThkImport {
     private String importTime;
 
     /** 证券代码 */
-    @ExcelProperty(value ="证券代码",index = 0)
+    @ExcelProperty(value ="证券代码")
     private String bondCode;
 
     /** 证券简称 */
