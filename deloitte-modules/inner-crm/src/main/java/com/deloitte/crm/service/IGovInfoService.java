@@ -122,4 +122,6 @@ public interface IGovInfoService  extends IService<GovInfo>
     void exportEntity(HttpServletResponse response);
 
     void updateGovInfosByPreCode();
+
+    List<GovInfo>  selectList();
 }

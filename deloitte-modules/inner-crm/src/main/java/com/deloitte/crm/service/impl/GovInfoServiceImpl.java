@@ -1,6 +1,5 @@
 package com.deloitte.crm.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -1339,6 +1338,11 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         ParentLevelVo parentLevelVo = new ParentLevelVo();
         parentLevelVo.setName(name).setSend(value).setPreName(preName);
         return parentLevelVo;
+    }
+    @Override
+    public List<GovInfo>  selectList() {
+        LambdaQueryWrapper<GovInfo> eq = new LambdaQueryWrapper<GovInfo>().eq(GovInfo::getStatus, 1);
+        return list(eq);
     }
 
 }

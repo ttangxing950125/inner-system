@@ -1,5 +1,7 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -77,6 +79,8 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
     private EntityMasterMapper entityMasterMapper;
 
     private ExecutorService singleThreadPoll;
+
+    private EntityGovRelMapper entityGovRelMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -558,6 +562,25 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         bondInfo.setValueDate(entityByIondVo.getStartXiDate());
         bondInfo.setDueDate(entityByIondVo.getEndDate());
         bondInfo.setRaiseType(entityByIondVo.getBondType());
+        if(Objects.equals(entityByIondVo.getIsDefaultOrRoll(),0)){
+            //起息日
+            DateTime StartDateTime = DateUtil.parseDate(entityByIondVo.getStartXiDate());
+            //到息日
+            DateTime endDateTime = DateUtil.parseDate(entityByIondVo.getStartXiDate());
+            Date newDate = new Date();
+            if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
+                bondInfo.setBondStatus(4);
+            } else if(StartDateTime.getTime() > newDate.getTime()) {
+                bondInfo.setBondStatus(2);
+            } else if (endDateTime.getTime() <= newDate.getTime()){
+                bondInfo.setBondStatus(9);
+
+            }
+
+        }else {
+            bondInfo.setBondStatus(7);
+        }
+
         bondInfoMapper.insertBondInfo(bondInfo);
         DecimalFormat g1 = new DecimalFormat("000000");
         String startZeroStr = g1.format(bondInfo.getId());
@@ -583,6 +606,13 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityFinancial.setEntityCode(sb.toString() + id);
         entityFinancial.setMince(entityByIondVo.getFinanceSubIndu());
         entityFinancialmapper.insert(entityFinancial);
+        if(Objects.equals(entityByIondVo.getIsInvestment(),1)){
+            EntityGovRel entityGovRel = new EntityGovRel();
+            entityGovRel.setEntityCode(entityInfo.getEntityCode());
+            entityGovRel.setDqGovCode(entityByIondVo.getDqGovCode());
+            entityGovRelMapper.insert(entityGovRel);
+
+        }
         //日志入库
         EntityInfoLogs entityInfoLogs = new EntityInfoLogs();
         entityInfoLogs.setEntityCode(sb.toString() + id);
@@ -673,6 +703,23 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         stockCnInfo.setListDate(entityStockInfoVo.getStartXiDate());
         stockCnInfo.setDelistingDate(entityStockInfoVo.getEndDate());
         stockCnInfo.setExchange(entityStockInfoVo.getExchange());
+        //上市时间
+        DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
+        //退市时间
+        DateTime endDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
+        Date newDate = new Date();
+
+        if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
+            //成功上市
+            stockCnInfo.setStockStatus(6);
+        } else if(endDateTime.getTime() <= newDate.getTime()) {
+            //退市
+            stockCnInfo.setStockStatus(9);
+
+        } else if(StartDateTime.getTime() > newDate.getTime()){
+            //发行中
+            stockCnInfo.setStockStatus(5);
+        }
         int insert = stockCnInfoMapper.insert(stockCnInfo);
         DecimalFormat g1 = new DecimalFormat("000000");
         String startZeroStr = g1.format(stockCnInfo.getId());
@@ -743,7 +790,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityInfoBystockHk.setEntityNameHis(entityStockInfoVo.getEntityNameHis());
         //创建人
         entityInfoBystockHk.setCreater(SecurityUtils.getUsername());
-
         entityInfoMapper.insert(entityInfoBystockHk);
         //根据主键id生成code
         Integer id = entityInfoBystockHk.getId();
@@ -770,6 +816,24 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         // 新增 Stock_Thk_Info
         StockThkInfo stockThkInfo = new StockThkInfo();
         stockThkInfo.setStockCode(entityStockInfoVo.getStockCode());
+
+        //上市时间
+        DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
+        //退市时间
+        DateTime endDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
+        Date newDate = new Date();
+
+        if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
+            //成功上市
+            stockThkInfo.setStockStatus(6);
+        } else if(endDateTime.getTime() <= newDate.getTime()) {
+            //退市
+            stockThkInfo.setStockStatus(9);
+
+        } else if(StartDateTime.getTime() > newDate.getTime()){
+            //发行中
+            stockThkInfo.setStockStatus(5);
+        }
         int insert = stockThkInfoMapper.insert(stockThkInfo);
         DecimalFormat g1 = new DecimalFormat("000000");
         String startZeroStr = g1.format(stockThkInfo.getId());

@@ -69,7 +69,10 @@ public class BondInfo {
     @ApiModelProperty(value="到期日")
     private  String dueDate ;
 
-
+    /** 违约日期*/
+    private  String defaultDate;
+    /** 是否城投债*/
+    private  String isInvestment;
     /**
      * 公私募类型 0_公募 1_私募
      */

@@ -221,7 +221,7 @@ public class GovInfoController extends BaseController {
     /**
      * 新增政府主体的曾用名
      *
-     * @param govInfo
+     * @param entityInfo
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:44
@@ -434,5 +434,17 @@ public class GovInfoController extends BaseController {
     @PostMapping("/updateGovInfosByPreCode")
     public void updateGovInfosByPreCode()   {
         govInfoService.updateGovInfosByPreCode();
+    }
+    /**
+     *查询全部政府主体（新增主体政府）
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/10/31 17:02
+    */
+    @ApiOperation(value = "查询所有主体")
+    @PostMapping("/selectList")
+    public R selectAll() {
+       return R.ok( govInfoService.selectList());
     }
 }
