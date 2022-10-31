@@ -91,7 +91,7 @@ public class GovInfoController extends BaseController {
 
             )
     })
-    public R importGovInfo(GovAttrByDto govAttrByDto) {
+    public R importGovInfo( @RequestBody GovAttrByDto govAttrByDto) {
         govInfoService.ExportEntityGov(govAttrByDto);
         return R.ok();
     }
