@@ -74,7 +74,7 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(paramType = "body", name = "entityAttrDto", value = "包含表中gov_info的所有字段")
     })
     @PostMapping("/exportEntity")
-    public R ImporEntityInfo(EntityAttrByDto entityAttrDto) {
+    public R ImporEntityInfo(@RequestBody EntityAttrByDto entityAttrDto) {
         entityInfoService.ExportEntityInFor(entityAttrDto);
         return R.ok();
     }
