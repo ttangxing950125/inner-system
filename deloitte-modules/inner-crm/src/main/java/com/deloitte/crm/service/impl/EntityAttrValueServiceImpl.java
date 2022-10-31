@@ -9,6 +9,7 @@ import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.exception.ServiceException;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
@@ -703,6 +704,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityInfoLogs.setOperType(1);
         entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
         entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setCreateTime(DateUtil.getNowDate());
         entityInfoLogs.setSource(2);
         entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");
@@ -802,9 +804,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityInfoLogs.setEntityCode(sb.toString() + id);
         entityInfoLogs.setDeCode("HK" + startZeroStr);
         entityInfoLogs.setCode(entityStockInfoVo.getStockCode());
-        entityInfoLogs.setOperType(1);
+        entityInfoLogs.setOperType(2);
         entityInfoLogs.setEntityName(entityStockInfoVo.getEntityName());
         entityInfoLogs.setOperName(SecurityUtils.getUsername());
+        entityInfoLogs.setCreateTime(DateUtil.getNowDate());
         entityInfoLogs.setSource(2);
         entityInfoLogsMapper.insert(entityInfoLogs);
         return R.ok("新增成功");

@@ -19,10 +19,12 @@ import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 /**
  * @author PenTang
@@ -118,16 +120,17 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
     public void CoverRule() {
         log.info("=>> "+ DateUtil.dateTimeNow()+"组装覆盖情况");
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(null);
-        List<ProductsCover> productsCovers =null;
+        List<ProductsCover> productsCovers = new ArrayList<>();
         List<ProductsCover> productsCoverData = null;
         for (int i = 0; i < entityInfos.size(); i++) {
-            log.info("进度=>"+i+0+"<=");
+            log.info("进度=>"+i+1+"<=");
             //组装ESG
             List<ProductsCover> productsCoversE = this.CoverRuleEsg(entityInfos.get(i), productsCovers);
             //组装产业链
             productsCoverData = this.CoverRuleClTE(entityInfos.get(i), productsCoversE);
         }
-        boolean b = saveBatch(productsCoverData);
+
+//        boolean b = saveBatch(productsCoverData);
         
     }
 
@@ -172,7 +175,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             productsCoverC.setCoverDes("非覆盖");
             productsCovers.add(productsCoverC);
         }else if (entityInfo.getList().equals(1)){
-            productsCoverC.setProId(CoverRule.ESG_ID);
+            productsCoverC.setProId(CoverRule.CT_LE_ID);
             productsCoverC.setIsCover("1");
             productsCoverC.setEntityCode(entityInfo.getEntityCode());
             productsCoverC.setIsGov("0");
@@ -180,6 +183,38 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             productsCovers.add(productsCoverC);
         }
         return productsCovers;
+
+    }
+
+    public static void main(String[] args) {
+
+        for (int i = 0; i < 1000000; i++) {
+            int count = 1;
+        }
+
+        for (int i = 0; i < 1000000; ++i) {
+            int count = 1;
+        }
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("for i++");
+        for (int i = 0; i < 1000000; i++) {
+            int count = 1;
+        }
+        stopWatch.stop();
+
+        stopWatch.start("for ++i");
+        for (int i = 0; i < 1000000; ++i) {
+            int count = 1;
+        }
+        stopWatch.stop();
+//
+//        AtomicInteger integer = new AtomicInteger();
+//        int num = 100000;
+//        for (int i: num) {
+//
+//        }
+        System.out.println(stopWatch);
     }
 
 

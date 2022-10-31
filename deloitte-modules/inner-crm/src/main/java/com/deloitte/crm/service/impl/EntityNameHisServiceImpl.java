@@ -9,8 +9,10 @@ import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
+import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.mapper.EntityNameHisMapper;
+import com.deloitte.crm.mapper.GovInfoMapper;
 import com.deloitte.crm.service.IEntityNameHisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,8 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     @Resource
     private EntityInfoMapper entityInfoMapper;
-
+    @Resource
+    private GovInfoMapper govInfoMapper;
     /**
      * 查询【请填写功能名称】
      *
@@ -177,7 +180,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
     }
 
     public R addEntityNameHis(String entityCode,String entityName,Date updated,String remarks) {
-        log.info("  =>> 角色7 新增主体曾用名:开始 <<=  ");
+        log.info("  =>> admin 新增主体曾用名:开始 <<=  ");
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
         EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
@@ -204,7 +207,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
             String[] oldNameArr = oldNames.split(",");
             if(Arrays.asList(oldNameArr).contains(entityName)){
                 //如果被使用过 证明 曾用名表中 没有存储到这个字段 但是 主表中数据已经存了 所以只需要return 不需要断言
-                log.info("  =>> 角色7 新增曾用名出现在主表中 并没有出现再历史表 <<=  ");
+                log.info("  =>> admin 新增曾用名出现在主表中 并没有出现再历史表 <<=  ");
                 return R.ok(SuccessInfo.SUCCESS.getInfo());
             }else{
                 //如果没被使用过 那么就再此基础上 再添加一条
@@ -213,6 +216,45 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         }
         entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
         entityInfoMapper.updateById(entityInfo);
+        return R.ok(SuccessInfo.SUCCESS.getInfo());
+    }
+    public R addGovNameHis(String dpGovCode,String govName,Date updated,String remarks) {
+        log.info("  =>> admin 新增主体曾用名:开始 <<=  ");
+        GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dpGovCode));
+        if(ObjectUtils.isEmpty(govInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
+        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, govName));
+        if(!ObjectUtils.isEmpty(entityNameHis)){return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());}
+
+        // 新增一条数据进入曾用名列表
+        baseMapper.insert(new EntityNameHis()
+                .setEntityType(1)
+                .setStatus(1)
+                .setDqCode(dpGovCode)
+                .setOldName(govName)
+                .setHappenDate(updated)
+                .setRemarks(remarks)
+                .setUpdated(updated)
+                .setCreater(SecurityUtils.getUsername()));
+
+        // 对主体曾用名列表进行操作
+        String oldNames = govInfo.getGovNameHis();
+        if(ObjectUtils.isEmpty(oldNames)){
+            //当列表为空时 直接新增
+            govInfo.setGovNameHis(govName);
+        }else{
+            //当列表不为空时 再次校验曾用名是否被使用过
+            String[] oldNameArr = oldNames.split(",");
+            if(Arrays.asList(oldNameArr).contains(govName)){
+                //如果被使用过 证明 曾用名表中 没有存储到这个字段 但是 主表中数据已经存了 所以只需要return 不需要断言
+                log.info("  =>> admin 新增曾用名出现在主表中 并没有出现再历史表 <<=  ");
+                return R.ok(SuccessInfo.SUCCESS.getInfo());
+            }else{
+                //如果没被使用过 那么就再此基础上 再添加一条
+                govInfo.setGovNameHis(govInfo.getGovNameHis()+","+govName);
+            }
+        }
+        govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
+        govInfoMapper.updateById(govInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 }

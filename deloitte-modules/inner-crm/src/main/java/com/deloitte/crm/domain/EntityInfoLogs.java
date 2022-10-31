@@ -96,5 +96,10 @@ public class EntityInfoLogs {
     @Excel(name = "更新时间")
     private Date updated;
 
+    /**
+     * 状态 1-删除 0-未删除 默认都是未删除
+     */
+    private Boolean isDeleted = Boolean.FALSE;
+
 
 }

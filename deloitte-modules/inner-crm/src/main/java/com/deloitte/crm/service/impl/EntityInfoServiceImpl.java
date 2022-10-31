@@ -26,10 +26,10 @@ import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.*;
-import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.utils.TimeFormatUtil;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
 import lombok.AllArgsConstructor;
@@ -457,7 +457,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         String stockCode = stockThkInfo.getStockCode();
         String stockName = stockThkInfo.getStockName();
-        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockName).setEntityCode(entityCode).setOperType(2).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
         this.bindEntityInfoLogs(entityInfoLogs);
     }
 
@@ -479,7 +479,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         String stockCode = stockCnInfo.getStockCode();
         String stockShortName = stockCnInfo.getStockShortName();
-        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockShortName).setEntityCode(entityCode).setOperType(3).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
+        EntityInfoLogs entityInfoLogs = new EntityInfoLogs().setDeCode(dataCode).setCode(stockCode).setName(stockShortName).setEntityCode(entityCode).setOperType(1).setEntityName(entityInfoInsertDTO.getEntityName()).setOperName(username).setSource(3);
         this.bindEntityInfoLogs(entityInfoLogs);
     }
 

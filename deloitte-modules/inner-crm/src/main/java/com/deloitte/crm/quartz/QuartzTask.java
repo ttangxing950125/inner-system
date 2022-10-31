@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
@@ -53,7 +54,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-   @Scheduled(cron = "0 0 0 * * ?" )
+//   @Scheduled(cron = "0 0 0 * * ?" )
     public void StartRuleTask() {
        //当前日期
        String date = DateUtil.getDate();
@@ -79,7 +80,7 @@ public class QuartzTask implements ApplicationContextAware {
      * {@link EntityAttrValue}
      */
     @Async
-    @Scheduled(cron = "0 0 12 * * ?" )
+//    @Scheduled(cron = "0 0 12 * * ?" )
     @Transactional(rollbackFor = Exception.class)
     public void runBatchDataToAttrValue(){
         log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");
@@ -101,6 +102,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/10/28 11:08
     */
+
     public void  CoverRulePro(){
         log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
         productsCoverService.CoverRule();
