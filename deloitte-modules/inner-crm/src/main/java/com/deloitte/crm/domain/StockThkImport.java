@@ -159,4 +159,6 @@ public class StockThkImport {
     @ExcelIgnore
     private Date updated;
 
+    @ExcelIgnore
+    private String source;
 }

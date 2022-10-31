@@ -1,10 +1,13 @@
 package com.deloitte.crm.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
+import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.mapper.EntityInfoMapper;
@@ -16,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import java.util.Optional;
 
 /**
  * @author 正杰
@@ -41,10 +46,11 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
         String entityName = entityInfoInsertDTO.getEntityName().replace(" ", "");
         Integer taskId = entityInfoInsertDTO.getTaskId();
         String username = StrUtil.isBlank(SecurityUtils.getUsername()) ? "角色7测试" : SecurityUtils.getUsername();
+        CrmEntityTask crmEntityTask = Optional.ofNullable(iCrmEntityTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, entityInfoInsertDTO.getTaskId()))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
         log.info("  =>> 角色7 新增主体 {} ：开始 <<=  ", entityName);
 
         // 插入后获取id;
-        EntityInfo entityInfo = new EntityInfo().setEntityName(entityName).setCreater(username);
+        EntityInfo entityInfo = new EntityInfo().setEntityName(entityName).setCreater(username).setWindMaster(crmEntityTask.getWindMaster());
         entityInfoMapper.insert(entityInfo);
         Integer id = entityInfo.getId();
 

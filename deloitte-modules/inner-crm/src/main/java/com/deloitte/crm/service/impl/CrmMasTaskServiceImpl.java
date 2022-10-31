@@ -13,9 +13,11 @@ import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityMaster;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.mapper.EntityMasterMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmMasTaskService;
@@ -26,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,6 +53,8 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
     private IEntityInfoService iEntityInfoService;
 
     private EntityMasterMapper entityMasterMapper;
+
+    private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
 
     /**
      * 查询【请填写功能名称】
@@ -211,6 +216,14 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
         Assert.isTrue(crmMasTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmMasTask.setState(1).setHandleUser(username);
         baseMapper.updateById(crmMasTask);
+        // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
+        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmMasTask.getSpeedId()));
+        if(ObjectUtils.isEmpty(entityCaptureSpeed)){
+            log.info("  =>> 角色2任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmMasTask.getSpeedId());
+        }else{
+            entityCaptureSpeed.setDivide(1);
+            entityCaptureSpeedMapper.insert(entityCaptureSpeed);
+        }
         return crmMasTask.getTaskDate();
     }
 }

@@ -33,6 +33,9 @@ public class CrmMasTask implements Serializable
     @Excel(name = "德勤code")
     private String entityCode;
 
+    /** speedId*/
+    private Integer speedId;
+
     @Excel(name = "来源")
     private String sourceName;
 
