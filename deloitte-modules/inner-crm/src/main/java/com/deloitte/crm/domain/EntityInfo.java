@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
 import com.deloitte.crm.annotation.UpdateLog;
@@ -23,6 +24,7 @@ import java.util.Date;
  * @author deloitte
  * @date 2022-09-21
  */
+@TableName("entity_info")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,7 +42,7 @@ public class EntityInfo implements Serializable {
      * 企业名
      */
     @Excel(name = "企业名")
-    @UpdateLog(fieldName = "企业名称",tableFieldName ="entity_name")
+    @UpdateLog(fieldName = "企业名称", tableFieldName = "entity_name")
     private String entityName;
 
     /**
@@ -53,7 +55,7 @@ public class EntityInfo implements Serializable {
      * 报告类型
      */
     @Excel(name = "报告类型")
-    @UpdateLog(fieldName = "年报列示类型",tableFieldName ="report_type")
+    @UpdateLog(fieldName = "年报列示类型", tableFieldName = "report_type")
     private String reportType;
 
 
@@ -73,14 +75,14 @@ public class EntityInfo implements Serializable {
      * entity_info的entity_code
      */
     @Excel(name = "产业链CICS行业划分明细")
-    @Attrs(attrId = 649,attrName="产业链CICS行业划分明细")
+    @Attrs(attrId = 649, attrName = "产业链CICS行业划分明细")
     private String cicsIndustryDetails;
 
     /**
      * 统一社会信用代码
      */
     @Excel(name = "统一社会信用代码")
-    @UpdateLog(fieldName = "统一社会信用代码",tableFieldName ="credit_code")
+    @UpdateLog(fieldName = "统一社会信用代码", tableFieldName = "credit_code")
     private String creditCode;
 
     /**
@@ -106,12 +108,16 @@ public class EntityInfo implements Serializable {
      * 统一社会信用代码是否异常 0-正常 1-异常
      */
 
-    /** 年报示例类型*/
-    @ApiModelProperty(value="年报示例类型")
+    /**
+     * 年报示例类型
+     */
+    @ApiModelProperty(value = "年报示例类型")
     @NotNull(message = "年报示例类型不能为空")
     private String listType;
 
-    /** 统一社会信用代码是否异常 0-正常 1-异常 */
+    /**
+     * 统一社会信用代码是否异常 0-正常 1-异常
+     */
     @Excel(name = "统一社会信用代码是否异常 0-正常 1-异常")
     private Integer creditError;
 
@@ -176,6 +182,14 @@ public class EntityInfo implements Serializable {
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date updated;
+    /**
+     * 所属证监会名称
+     */
+    private String entityIndustrySsc;
+    /**
+     * 审计机构
+     */
+    private String entityAuditinstitNew;
 
 
     @Override
