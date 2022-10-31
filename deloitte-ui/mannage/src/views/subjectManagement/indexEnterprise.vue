@@ -8,7 +8,7 @@
     </div>
     <div class="flex1" style="justify-content: space-between">
       <div class="title-2">
-        当前已添加字段 <span>{{ selectNum }}</span> 个， 其中必选字段 <span>x</span> 个
+        当前已添加字段 <span>{{ selectNum }}</span> 个， 其中必选字段 <span>5</span> 个
       </div>
       <el-button class="export" type="text" @click="downFile()">导出数据</el-button>
     </div>
@@ -64,6 +64,7 @@
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree2"
+              node-key="name"
               @check="handleCheckChange2"
             >
             </el-tree>
@@ -212,29 +213,32 @@ export default {
           const { data } = res;
           this.data1 = data;
         });
-        const params = {
-          pageNum: 1,
-          pageSize: 10,
-        };
-        getListEntityByPage(params).then((res) => {
-          const { data } = res;
-          this.total = data.total;
-          this.list = [];
-          let more = [];
-          data.records.forEach((e) => {
-              
-            this.list.push(e.entityInfo);
-            more = e.more;
-            this.header = e.header;
-          });
-          this.list.forEach((e) => {
-                if (more) {
-                    more.forEach((i) => {
-                        e[i.key] = i.value;
-                    });
-                }
-          });
-        });
+        this.$nextTick(() => {    //这个如果要默认全选就必须加，否则会报错“setCheckedNodes”未定义
+            this.$refs.tree2.setCheckedNodes(this.data2)
+            this.handleCheckChange2()
+        })
+        // const params = {
+        //   pageNum: 1,
+        //   pageSize: 10,
+        // };
+        // getListEntityByPage(params).then((res) => {
+        //   const { data } = res;
+        //   this.total = data.total;
+        //   this.list = [];
+        //   let more = [];
+        //   data.records.forEach((e) => {
+        //     this.list.push(e.entityInfo);
+        //     more = e.more;
+        //     this.header = e.header;
+        //   });
+        //   this.list.forEach((e) => {
+        //         if (more) {
+        //             more.forEach((i) => {
+        //                 e[i.key] = i.value;
+        //             });
+        //         }
+        //   });
+        // });
       } catch (error) {
         console.log(error);
       } finally {
@@ -244,7 +248,6 @@ export default {
     downFile() {
       try {
         this.$modal.loading("Loading...");
-        console.log(this.selected)
         this.selected.mapList = this.mapList
         exportEntityIndex(this.selected).then((res) => {
             download(res, '企业主体更多指标.xlsx')
@@ -270,7 +273,7 @@ export default {
         };
         arrDeptId.push(item);
       });
-      this.selectNum = arrDeptId.length
+      this.selectNum = arrDeptId.length + 5
       this.mapList = arrDeptId;
       try {
         this.$modal.loading("loading...");
@@ -287,7 +290,7 @@ export default {
           data.records.forEach((e) => {
               
             this.list.push(e.entityInfo);
-            more = e.more;
+            // more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
@@ -325,7 +328,7 @@ export default {
            let more = [];
           data.records.forEach((e) => {
             this.list.push(e.entityInfo);
-            more = e.more;
+            // more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
@@ -354,7 +357,7 @@ export default {
          let more = [];
           data.records.forEach((e) => {
             this.list.push(e.entityInfo);
-            more = e.more;
+            // more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
