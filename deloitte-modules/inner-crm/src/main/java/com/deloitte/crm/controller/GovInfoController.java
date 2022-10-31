@@ -9,7 +9,6 @@ import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
-import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
@@ -17,6 +16,7 @@ import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.vo.EntityInfoHisNameVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -234,9 +234,8 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "entityNameHisRemarks", value = "主体添加的曾用名或别称的备注", paramType = "body", example = "测试", dataType = "String")
     })
     @PostMapping("/addOldName")
-    public R addOldName(@RequestBody EntityInfo entityInfo) {
-        entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
-        return R.ok();
+    public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
+        return entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
 
     /**
