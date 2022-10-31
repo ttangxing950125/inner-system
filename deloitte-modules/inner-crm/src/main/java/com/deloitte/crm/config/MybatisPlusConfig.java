@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Configuration;
  * @date 2022/09/22 13:54
  */
 @Configuration
-public class MybatisPlusConfig {
+public class
+MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor paginationInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
