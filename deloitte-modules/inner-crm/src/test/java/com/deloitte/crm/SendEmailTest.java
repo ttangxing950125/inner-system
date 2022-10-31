@@ -1,13 +1,17 @@
 package com.deloitte.crm;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.crm.domain.CrmTypeInfo;
 import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.service.CrmTypeInfoService;
+import com.deloitte.crm.service.EntityInfoLogsService;
 import com.deloitte.crm.service.SendEmailService;
+import com.deloitte.crm.utils.excel.ExcelUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -28,6 +32,8 @@ public class SendEmailTest {
     private SendEmailService sendEmailService;
     @Resource
     private CrmTypeInfoService crmTypeInfoService;
+    @Resource
+    private EntityInfoLogsService entityInfoLogsService;
 
     @Test
     void testSend() {
@@ -56,6 +62,28 @@ public class SendEmailTest {
         System.out.println(">>>>22222" + str2);
 
     }
+
+
+    @Test
+    void test04() {
+
+        final ExcelReader reader = ExcelUtil.getReader("D:\\听姐\\10-29-灌数据-file-A\\A股-基本信息.xlsx");
+
+        final List<List<Object>> read = reader.read();
+
+
+    }
+    @Test
+    void test05() {
+
+        final Object cancel = entityInfoLogsService.cancel(75);
+
+
+    }
+
+
+
+
 
 
 }

@@ -71,6 +71,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
      * 根据类型查询
      * CompletableFuture 使用线程池为ForkJoinPool
      * {@link java.util.concurrent.ForkJoinPool}
+     *
      * @param findType 查询类型
      * @return 股票 & 债券
      * @see EntityInfoLogs#operType
@@ -248,7 +249,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
          *  债券的删除逻辑 operType=3
          * {@link EntityInfoLogs#operType}
          */
-        if (entityInfoLogs.getOperType().equals("3")) {
+        if (entityInfoLogs.getOperType() == 3) {
             LambdaQueryWrapper<BondInfo> bondInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final BondInfo bondInfo = bondInfoMapper.selectOne(bondInfoLambdaQueryWrapper.eq(BondInfo::getOriCode, entityInfoLogs.getCode()).eq(BondInfo::getBondShortName, entityInfoLogs.getName()));
             if (bondInfo != null) {
@@ -265,7 +266,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
              *  A股删除逻辑 1 operType=1
              * {@link EntityInfoLogs#operType}
              */
-        } else if (entityInfoLogs.getOperType().equals("1")) {
+        } else if (entityInfoLogs.getOperType() == 1) {
             LambdaQueryWrapper<StockCnInfo> stockCnInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(stockCnInfoLambdaQueryWrapper.eq(StockCnInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockCnInfo != null) {
@@ -290,7 +291,7 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
              *  港股 删除逻辑 operType=2
              * {@link EntityInfoLogs#operType}
              */
-        } else if (entityInfoLogs.getOperType().equals("2")) {
+        } else if (entityInfoLogs.getOperType() == 2) {
             LambdaQueryWrapper<StockThkInfo> stockThkInfoLambdaQueryWrapper = new LambdaQueryWrapper<>();
             final StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(stockThkInfoLambdaQueryWrapper.eq(StockThkInfo::getStockDqCode, entityInfoLogs.getDeCode()));
             if (stockThkInfo != null) {
