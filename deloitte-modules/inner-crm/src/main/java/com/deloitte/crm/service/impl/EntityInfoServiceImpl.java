@@ -684,7 +684,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     continue;
                 }
                 //直接删除原本的数据
-                nameHisMapper.deleteById(one);
+                if (!ObjectUtils.isEmpty(status)) {
+                    one.setStatus(0);
+                }
+                nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
                 if (ObjectUtils.isEmpty(remark)) {
@@ -1397,22 +1400,26 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (!CollectionUtils.isEmpty(mapList)) {
             List<MoreIndex> more = new ArrayList<>();
             for (MoreIndex moreIndex : mapList) {
-                QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
-                EntityAttrValue attrValue = entityAttrValueMapper.selectOne(valueQuer.lambda()
-                        .eq(EntityAttrValue::getAttrId, moreIndex.getId())
-                        .eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
-                //新增指标栏
-
                 moreIndex.setKey(moreIndex.getName());
                 header.add(moreIndex.getName());
 
-                if (ObjectUtils.isEmpty(attrValue)) {
-                    values.add(null);
-                } else {
-                    String value = attrValue.getValue();
-                    values.add(value);
+                QueryWrapper<EntityAttrValue> valueQuer = new QueryWrapper<>();
+                List<EntityAttrValue> attrValueList = entityAttrValueMapper.selectList(valueQuer.lambda()
+                        .eq(EntityAttrValue::getAttrId, moreIndex.getId())
+                        .eq(EntityAttrValue::getEntityCode, o.getEntityCode()));
+                String value ="";
+                //新增指标栏
+                if (!CollectionUtils.isEmpty(attrValueList)) {
+                    for (EntityAttrValue attrValue:attrValueList){
+                        if (ObjectUtils.isEmpty(value)){
+                            value=attrValue.getValue();
+                        }else {
+                            value=value+","+attrValue.getValue();
+                        }
+                    }
                     moreIndex.setValue(value);
                 }
+                values.add(value);
                 more.add(moreIndex);
             }
             entityInfoResult.setMore(more).setHeader(header).setValues(values);

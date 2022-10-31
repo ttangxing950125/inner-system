@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.domain.GovInfo;
+import com.deloitte.crm.utils.TimeFormatUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -18,8 +19,6 @@ import java.util.Date;
 @Data
 @Accessors(chain = true)
 public class GovInfoList {
-    private static final long serialVersionUID = 1L;
-
     /**
      * $column.columnComment
      */
@@ -162,6 +161,34 @@ public class GovInfoList {
     @Excel(name = "主体状态")
     private Integer status;
 
+    /**
+     * 关键备注提醒
+     */
+    @Excel(name = "关键备注提醒")
+    private String remark;
+
+    /**
+     * 关键备注提醒
+     */
+    @Excel(name = "更新记录")
+    private String updateRecord;
+
+    public void newUpdateRecord(GovInfoList govInfoList) {
+        try {
+            String type="创建";
+            Date updated = govInfoList.getUpdated();
+            long update = updated.getTime();
+            long create = govInfoList.getCreated().getTime();
+            if (create-update!=0l){
+                type="修改";
+            }
+            String formartDate = TimeFormatUtil.getFormartDate(updated);
+            this.updateRecord=formartDate+" "+govInfoList.getUpdater()+" "+type;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public void setGovInfo(GovInfo govInfo) {
         this.govNameHis = govInfo.getGovNameHis();
         this.govName = govInfo.getGovName();
@@ -186,6 +213,7 @@ public class GovInfoList {
         this.newGovName = govInfo.getNewGovName();
         this.provincial = govInfo.getProvincial();
         this.updater = govInfo.getUpdater();
+        this.remark = govInfo.getRemark();
     }
     //曾用名数量
     private Integer nameUsedNum;

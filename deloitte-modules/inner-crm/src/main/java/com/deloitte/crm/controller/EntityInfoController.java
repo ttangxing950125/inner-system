@@ -18,6 +18,7 @@ import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.SendEmailService;
+import com.deloitte.crm.vo.EntityInfoHisNameVo;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -225,10 +226,8 @@ public class EntityInfoController extends BaseController {
     */
     @ApiOperation(value = "新增企业主体的曾用名")
     @PostMapping("/addOldName")
-    public R addOldName(@RequestBody EntityInfo entityInfo) {
-
-        entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
-        return R.ok();
+    public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
+        return entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
     @Autowired
     private IEntityNameHisService entityNameHisService;

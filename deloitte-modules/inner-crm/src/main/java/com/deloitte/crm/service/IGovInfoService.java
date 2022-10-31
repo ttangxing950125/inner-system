@@ -122,4 +122,6 @@ public interface IGovInfoService  extends IService<GovInfo>
     void exportEntity(HttpServletResponse response);
 
     void updateGovInfosByPreCode();
+
+    R getGovInfoByLevel(Integer bigLevel, Integer smallLevel);
 }

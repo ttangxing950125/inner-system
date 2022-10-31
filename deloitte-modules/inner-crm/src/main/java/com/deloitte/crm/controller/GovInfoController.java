@@ -9,7 +9,6 @@ import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
-import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
@@ -17,6 +16,7 @@ import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
 import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.service.IGovInfoService;
+import com.deloitte.crm.vo.EntityInfoHisNameVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -91,7 +91,7 @@ public class GovInfoController extends BaseController {
 
             )
     })
-    public R importGovInfo(GovAttrByDto govAttrByDto) {
+    public R importGovInfo( @RequestBody GovAttrByDto govAttrByDto) {
         govInfoService.ExportEntityGov(govAttrByDto);
         return R.ok();
     }
@@ -221,7 +221,7 @@ public class GovInfoController extends BaseController {
     /**
      * 新增政府主体的曾用名
      *
-     * @param govInfo
+     * @param entityInfo
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:44
@@ -234,9 +234,8 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "entityNameHisRemarks", value = "主体添加的曾用名或别称的备注", paramType = "body", example = "测试", dataType = "String")
     })
     @PostMapping("/addOldName")
-    public R addOldName(@RequestBody EntityInfo entityInfo) {
-        entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
-        return R.ok();
+    public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
+        return entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
 
     /**
@@ -276,7 +275,9 @@ public class GovInfoController extends BaseController {
     public R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks) {
         return govInfoService.updateOldName(dqCode, oldName, newOldName, status,remarks);
     }
-
+//    public R updateOldName(@RequestBody OldNameVo oldNameVo) {
+//        return govInfoService.updateOldName(oldNameVo.getDqCode(), oldNameVo.getOldName(), oldNameVo.getNewOldName(), oldNameVo.getStatus(),oldNameVo.getRemarks());
+//    }
     /**
      * 根据 dqCode 查询政府主体
      *
@@ -435,5 +436,24 @@ public class GovInfoController extends BaseController {
     @PostMapping("/updateGovInfosByPreCode")
     public void updateGovInfosByPreCode()   {
         govInfoService.updateGovInfosByPreCode();
+    }
+
+    /**
+     * 根据政府主体，大类小类查询政府主体
+     *
+     * @param bigLevel 政府主体大类
+     * @param smallLevel  政府主体小类
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/31 13:12
+    */
+    @ApiOperation(value = "根据政府主体，大类小类查询政府主体")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bigLevel", value = "政府主体大类", paramType = "query", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "smallLevel", value = "政府主体小类", paramType = "query", example = "6", dataType = "Integer")
+    })
+    @PostMapping("/getGovInfoByLevel")
+    public R getGovInfoByLevel(Integer bigLevel,Integer smallLevel)   {
+        return govInfoService.getGovInfoByLevel(bigLevel,smallLevel);
     }
 }
