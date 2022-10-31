@@ -75,6 +75,11 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                 stockCnInfo = new StockCnInfo();
                 stockCnInfo.setStockCode(code);
             }
+            //上市板 (拟上市板)
+            stockCnInfo.setListsector(item.getIpoBoard());
+            //交易所
+            stockCnInfo.setExchange(item.getExchange());
+
             //这条CnCoachBack是新增还是修改 1-新增 2-修改
             Integer changeType = null;
             String entityName = item.getEntityName();
@@ -107,7 +112,7 @@ public class CnIecSmpcCheckResultStrategy implements WindTaskStrategy {
                     //更新a股属性
                     entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
                 }
-                if (changeType != null ) {
+                if (changeType != null) {
                     //查询状态status=1
                     List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
                     if (CollUtil.isNotEmpty(entityInfos)) {
