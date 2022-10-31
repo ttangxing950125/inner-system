@@ -11,7 +11,7 @@
         当前已添加字段 <span>{{ selected }}</span> 个， 其中必选字段
         <span>5</span> 个
       </div>
-      <el-button class="export" type="text" @click="back()">导出数据</el-button>
+      <el-button class="export" type="text" @click="downFile()">导出数据</el-button>
     </div>
     <el-row>
       <el-col
@@ -125,8 +125,9 @@
 
 <script>
 import { getAllByGroup, getListEntityByPage } from "@/api/common";
-import { getGovRange } from "@/api/subject";
+import { getGovRange, govExport } from "@/api/subject";
 import pagination from "../../components/Pagination";
+import { download } from '@/utils/index'
 export default {
   name: "addGovernment",
   components: {
@@ -152,6 +153,7 @@ export default {
         pageSize: 10,
       },
       total: 0,
+      ret: []
     };
   },
   watch: {
@@ -195,8 +197,21 @@ export default {
         this.$modal.closeLoading();
       }
     },
-    back() {
-      this.$router.back();
+    downFile() {
+      try {
+        this.$modal.loading("Loading...");
+        const parmas = {
+            send: this.ret,
+            mapList: this.mapList,
+        }
+        govExport(parmas).then((res) => {
+            download(res, '政府主体更多指标.xlsx')
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.$modal.closeLoading();
+      }
     },
     filterNode(value, data) {
       if (!value) return true;
@@ -258,13 +273,13 @@ export default {
               item[e.preName].push(e.send)
           }
       });
-      const ret = []
+      this.ret = []
       for (const key in item) {          
           const items = {
               key: key,
               value: item[key]
           }
-          ret.push(items)
+          this.ret.push(items)
       }
 
       try {
@@ -272,7 +287,7 @@ export default {
         const params = {
           pageNum: 1,
           pageSize: 10,
-          send: ret,
+          send: this.ret,
           mapList: this.mapList,
         };
         getListEntityByPage(params).then((res) => {
@@ -309,15 +324,26 @@ export default {
       const params = {
         pageNum: this.queryParams.pageNum,
         pageSize: 10,
+        send: this.ret,
+        mapList: this.mapList,
       };
       getListEntityByPage(params).then((res) => {
         const { data } = res;
         this.total = data.total;
         this.list = [];
         this.queryParams.pageNum = data.current;
-        data.records.forEach((e) => {
-          this.list.push(e.govInfo);
-        });
+         data.records.forEach((e) => {
+            this.list.push(e.govInfo);
+            more = e.more;
+            this.header = e.header;
+          });
+          this.list.forEach((e) => {
+            if(more) {
+                more.forEach((i) => {
+                e[i.key] = i.value;
+                });
+            }
+          });
       });
     },
   },

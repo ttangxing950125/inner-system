@@ -563,3 +563,17 @@ export function exportEntityIndex(parmas) {
     data: parmas,
   }, {responseType:'blob'});
 }
+
+// 导出全部政府主体Excel表
+export function govExport(parmas) {
+  return request({
+    url: `/crm/govInfo/govExport`,
+    headers: {
+      isToken: true,
+      responseType:'blob'
+    },
+    method: "post",
+    responseType:'blob',
+    data: parmas,
+  }, {responseType:'blob'});
+}
