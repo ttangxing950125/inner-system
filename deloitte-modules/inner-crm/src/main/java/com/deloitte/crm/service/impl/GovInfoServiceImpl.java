@@ -1186,6 +1186,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         }
     }
 
+    @Override
+    public R getGovInfoByLevel(Integer bigLevel, Integer smallLevel) {
+        LambdaQueryWrapper<GovInfo> queryWrapper = new LambdaQueryWrapper<>();
+        if (!ObjectUtils.isEmpty(bigLevel)){
+            queryWrapper.eq(GovInfo::getGovLevelBig,bigLevel);
+        }
+        if (!ObjectUtils.isEmpty(smallLevel)){
+            queryWrapper.eq(GovInfo::getGovLevelSmall,smallLevel);
+        }
+        return R.ok(govInfoMapper.selectList(queryWrapper));
+    }
+
     //返回筛选范围--城市分级
     private List<ParentLevelVo> setGovGrading(List<ParentLevelVo> parentLevelVo) {
         ParentLevelVo province = new ParentLevelVo();
