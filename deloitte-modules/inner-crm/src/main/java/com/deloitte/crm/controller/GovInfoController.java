@@ -9,11 +9,13 @@ import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
+import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.GovAttrByDto;
 import com.deloitte.crm.dto.GovInfoDto;
 import com.deloitte.crm.dto.MoreIndex;
+import com.deloitte.crm.service.IEntityNameHisService;
 import com.deloitte.crm.service.IGovInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -41,7 +43,8 @@ import java.util.List;
 public class GovInfoController extends BaseController {
     @Autowired
     private IGovInfoService govInfoService;
-
+    @Autowired
+    private IEntityNameHisService entityNameHisService;
     /**
      * 简陋搜索条件--市
      */
@@ -225,13 +228,15 @@ public class GovInfoController extends BaseController {
      */
     @ApiOperation(value = "新增政府主体的曾用名")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "gov_info主键", paramType = "body", example = "1", dataType = "Integer"),
-            @ApiImplicitParam(name = "govNameHis", value = "主体添加的曾用名或别称", paramType = "body", example = "白云区", dataType = "String"),
+            @ApiImplicitParam(name = "entityCode", value = "政府主体代码", paramType = "body", example = "dq000111", dataType = "Integer"),
+            @ApiImplicitParam(name = "entityName", value = "政府主题名称", paramType = "body", example = "白云区", dataType = "String"),
+            @ApiImplicitParam(name = "updated", value = "修改时间", paramType = "body", example = "2022-10-11", dataType = "String"),
             @ApiImplicitParam(name = "entityNameHisRemarks", value = "主体添加的曾用名或别称的备注", paramType = "body", example = "测试", dataType = "String")
     })
     @PostMapping("/addOldName")
-    public R addOldName(@RequestBody GovInfo govInfo) {
-        return govInfoService.addOldName(govInfo);
+    public R addOldName(@RequestBody EntityInfo entityInfo) {
+        entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
+        return R.ok();
     }
 
     /**
