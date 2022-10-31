@@ -119,6 +119,10 @@ public class EntityBaseBusiInfo {
      * 员工总数
      */
     private String entityStaffCount;
+    /**
+     *发行人城市
+     */
+    private String regEntityAddressCityName;
 
 
 

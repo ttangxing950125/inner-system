@@ -3,21 +3,21 @@ package com.deloitte.crm.strategy.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
 import com.deloitte.crm.constants.DataChangeType;
-import com.deloitte.crm.domain.BondInfo;
-import com.deloitte.crm.domain.BondNewIss;
-import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.mapper.BondNewIssMapper;
+import com.deloitte.crm.mapper.EntityBaseBusiInfoMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class BondNewIssueStrategy implements WindTaskStrategy {
+    @Resource
+    private EntityBaseBusiInfoService entityBaseBusiInfoService;
 
     @Resource
     private IBondNewIssService bondNewIssService;
@@ -164,24 +166,28 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                     entity.setIssueBonds(1);
                 });
             }
-
-
             if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)) {
                 newDbBond.setBondState(0);
                 newDbBond = bondInfoService.saveOrUpdate(bondInfo);
-
                 //修改主体的上市状态
                 entityInfos.forEach(entity -> {
                     entity.setList(1);
+                    entity.setWindMaster(issorIndustryFirst);
                 });
 
+                for (EntityInfo entityInfo : entityInfos) {
+                    EntityBaseBusiInfo entityBaseBusiInfo = entityBaseBusiInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityBaseBusiInfo>().eq(EntityBaseBusiInfo::getEntityCode, entityInfo.getEntityCode()));
+                    //TODO 为空的话是不是要初始化
+                    if (entityBaseBusiInfo != null) {
+                        entityBaseBusiInfo.setRegEntityAddressCityName(newIss.getIssorCity());
+                        entityBaseBusiInfoService.getBaseMapper().updateById(entityBaseBusiInfo);
+                    }
+                }
                 //更新主体数据
                 entityInfoService.updateBatchById(entityInfos);
-
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }
-
             if (resStatus != null) {
                 //更新当前债券属性
                 entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);

@@ -218,6 +218,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         entityInfoMapper.updateById(entityInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
+
     public R addGovNameHis(String dpGovCode,String govName,Date updated,String remarks) {
         log.info("  =>> admin 新增主体曾用名:开始 <<=  ");
         GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dpGovCode));
