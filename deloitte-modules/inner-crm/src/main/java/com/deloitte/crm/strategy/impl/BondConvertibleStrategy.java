@@ -2,10 +2,12 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -13,6 +15,7 @@ import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.BondConvertibleInfoService;
+import com.deloitte.crm.service.CrmTypeInfoService;
 import com.deloitte.crm.service.IEntityBondRelService;
 import com.deloitte.crm.service.StockCnInfoService;
 import com.deloitte.crm.strategy.WindTaskContext;
@@ -41,6 +44,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class BondConvertibleStrategy implements WindTaskStrategy {
+    @Resource
+    private CrmTypeInfoService crmTypeInfoService;
     @Resource
     private StockCnInfoService stockCnInfoService;
     @Resource
@@ -113,6 +118,27 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
                     if (StrUtil.isNotBlank(item.getBondThatName())) {
                         BondInfo bondInfo = bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getBondShortName, item.getBondThatName()));
                         if (bondInfo != null) {
+                            /********************************************添加Wind行业判断****************************************/
+                            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, item.getWindIndustry()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+                            if (crmTypeInfo != null) {
+                                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
+                                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                                    if (CollectionUtil.isEmpty(hashSetResult)) {
+                                        item.setWindIndustry(crmTypeInfo.getName());
+                                        bondInfo.setWind2(null);
+                                    } else {
+                                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                                        item.setWindIndustry(WindIndustryApend + "--" + crmTypeInfo.getName());
+                                        final List<CrmTypeInfo> collect = hashSetResult.stream().filter(e -> e.getLevel() == 2).collect(Collectors.toList());
+                                        //设置Wind2
+                                        bondInfo.setWind2(CollUtil.isEmpty(collect) ? null : collect.get(0).getName());
+                                    }
+                                } else {
+                                    item.setWindIndustry(crmTypeInfo.getName());
+                                }
+                            }
+                            /********************************************添加Wind行业判断****************************************/
+
                             EntityBondRel judgeEntityBondRel = Optional.ofNullable(entityBondRelMapper
                                     .selectOne(new LambdaQueryWrapper<EntityBondRel>()
                                             .eq(EntityBondRel::getBdCode, bondInfo.getBondCode())
@@ -122,6 +148,8 @@ public class BondConvertibleStrategy implements WindTaskStrategy {
                                             .conver(Boolean.TRUE)
                                             .entityCode(entityInfo.getEntityCode())
                                             .build());
+
+
                             if (judgeEntityBondRel.getId() != null) {
                                 entityBondRelMapper.updateEntityBondRel(judgeEntityBondRel);
                             } else {
