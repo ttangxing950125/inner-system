@@ -334,6 +334,28 @@
                   </template>
                 </el-table-column>
                 <el-table-column
+                    v-if="selectType === 'GV'"
+                  fixed
+                  prop="levelName"
+                  label="行政规划"
+                  class="xxxxxxx"
+                >
+                </el-table-column>
+                <el-table-column
+                    v-if="selectType === 'GV'"
+                  fixed
+                  prop="state"
+                  label="是否覆盖"
+                  class="xxxxxxx"
+                >
+                    <template slot-scope="scope">
+                        <div>
+                        {{ scope.row.state === 1 ? '是' : '否' }}
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                  v-if="selectType !== 'GV'"
                   v-for="(item, index) in rettHeaer"
                   :key="index"
                   :prop="item.proName"
@@ -363,7 +385,7 @@
       <div class="p-top">
         <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
       </div>
-      <el-button type="text" class="p-top" @click="downFile"
+      <el-button type="text" style="text-decoration:underline" class="p-top" @click="downFile"
         >批量查询匹配模板.xlsx</el-button
       >
       <div class="p-red">
@@ -554,7 +576,7 @@ export default {
             });
         });        
         let proId = [];
-        if (this.value1.length === 1 && this.value1[0] === 9999) {
+        if (this.value1[0] === 9999) {
           this.options2.forEach((k) => {
             if (k.id !== 9999) {
               proId.push(k.id);
@@ -573,7 +595,7 @@ export default {
         getCov(parmas).then((res) => {
           const { data } = res;
           data.records.forEach((e) => {
-            if (e.result) {
+            if (e.result !== null) {
               e.result.forEach((r) => {
                 e[r.key] = r.value;
               });
@@ -612,7 +634,7 @@ export default {
       getCov(parmas).then((res) => {
         const { data } = res;
         (data.records).forEach((e) => {
-          if (e.result.length > 0) {
+          if (e.result !== null) {
             e.result.forEach((r) => {
               e[r.key] = r.value;
               e.color = r.color;
@@ -643,7 +665,7 @@ export default {
                 }
             });
         }
-        this.rettHeaer = this.selectHeaer
+        // this.rettHeaer = this.selectHeaer
       } catch (error) {
         console.log(error);
       } finally {
@@ -895,6 +917,7 @@ export default {
   ::v-deep .upload-file {
     background: #e7f0d9;
     text-align: center;
+    height: 50px !important;
   }
   ::v-deep .el-button--text {
     color: #86bc25;

@@ -38,10 +38,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.complete !== scope.row.taskCount" @click="work(scope.row)" type="text" size="small"
+            <el-button @click="work(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
@@ -60,6 +59,11 @@
                 {{ row.taskCategory || '-' }}
             </template>
         </el-table-column>
+        <el-table-column prop="entityName" label="主体名称">
+          <template v-slot="{row}">
+            {{ row.entityName || '-' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="dataShow" label="任务说明">
             <template v-slot="{row}">
                 {{ row.dataShow || '-' }}
@@ -72,13 +76,13 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button @click="addBody(scope.row)" type="text" size="small"
+            <el-button @click="addBody(scope.row)" type="text" size="small" :disabled="scope.row.state !== 0"
               >添加</el-button
             >
-            <el-button @click="changeAddState(scope.row.id, 1)" type="text" size="small"
+            <el-button @click="changeAddState(scope.row, 1)" :disabled="scope.row.state !== 0" type="text" size="small"
               >忽略</el-button
             >
-            <el-button @click="changeAddState(scope.row.id, 1)" type="text" size="small"
+            <el-button @click="deleteRole6Task(scope.row.id)" type="text" size="small"
                        :disabled="scope.row.state !== 0"
             >删除</el-button>
             <el-button @click="detaile(scope.row)" type="text" size="small"
@@ -120,10 +124,9 @@
         </el-table-column>
         <el-table-column prop="province" label="任务操作">
           <template slot-scope="scope">
-            <el-button v-if="scope.row.state !== 1" @click="workRole2(scope.row)" type="text" size="small"
+            <el-button @click="workRole2(scope.row)" type="text" size="small"
               >开始工作</el-button
             >
-            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
@@ -299,7 +302,27 @@
         <el-form-item label="来源" >
           <span>{{ ruleForm.sourceName }}</span>
         </el-form-item>
+        <!--    wind行业划分role2    -->
         <el-form-item label="wind行业划分" >
+          <el-cascader
+            v-model="ruleForm.typeWindCheck"
+            :options="typeWindList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分" >
           <span v-if="!edit1">{{ ruleForm.wind }}</span>
           <el-input
             class="t-input"
@@ -312,8 +335,8 @@
             @click="edit1 = !edit1"
             >{{ "修改" }}</el-button
           >
-        </el-form-item>
-        <el-form-item label="申万行业划分" >
+        </el-form-item>-->
+        <!--<el-form-item label="申万行业划分" >
           <span v-if="!edit2">{{ ruleForm.shenWan }}</span>
           <el-input
             class="t-input"
@@ -326,7 +349,7 @@
             @click="edit2 = !edit2"
             >{{ "修改" }}</el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="是否为金融机构" prop="isFinance">
           <el-radio-group v-model="ruleForm.isFinance">
@@ -395,7 +418,7 @@
         </el-form-item>
         <el-form-item label="敞口划分" prop="masterCode">
           <el-select :filterable="true" v-model="ruleForm.masterCode" placeholder="">
-            <el-option  v-for="(item, index) in options2" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
+            <el-option  v-for="(item, index) in modelMasterList" :key="index" :label="item.masterName" :value="item.masterCode"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="备注">
@@ -408,7 +431,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button class="green-btn" type="primary" @click="subRule2"
+        <el-button v-if="ruleForm.state === 0" class="green-btn" type="primary" @click="subRule2"
           >确认新增</el-button
         >
       </span>
@@ -434,7 +457,27 @@
         <el-form-item label="来源" >
           <span>{{ ruleForm.source }}</span>
         </el-form-item>
+<!--        wind行业划分role3-->
         <el-form-item label="wind行业划分" >
+          <el-cascader
+            v-model="ruleForm.typeWindCheck"
+            :options="typeWindList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分" >
           <span v-if="!edit1">{{ ruleForm.windMaster }}</span>
           <el-input
             class="t-input"
@@ -461,7 +504,7 @@
             @click="edit2 = !edit2"
             >{{ "修改" }}</el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="所属地区">
           <el-col :span="6">
@@ -483,7 +526,7 @@
           </el-col>
         </el-form-item>
         <el-form-item label="所属辖区" prop="belJurisdiction">
-          <el-select :filterable="true" class="width146" v-model="ruleForm.belJurisdiction" :multiple="xmultiple" placeholder="选择辖区">
+          <el-select clearable :filterable="true" class="width146" v-model="ruleForm.belJurisdiction" :multiple="xmultiple" placeholder="选择辖区">
             <el-option v-for="(item, index) in jurisdiction" :key="index" :label="item.value" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
@@ -565,12 +608,16 @@
           <span class="green" v-if="repalce2 === 1">无重复，可新增</span>
         </el-form-item>
         <el-form-item label="" prop="delivery">
-          <el-radio
-            style="margin-left: 5px; margin-top: 9px"
-            v-model="noUse"
-            :label="true"
-            >不适用</el-radio
-          >
+          <el-radio-group v-model="noUse">
+            <el-radio
+              style="margin-left: 5px; margin-top: 9px"
+              @click.native.prevent="changeMenopause(true)"
+              :label="true"
+            >不适用
+            </el-radio
+            >
+          </el-radio-group>
+
         </el-form-item>
         <el-form-item label="上级地方政府名称" prop="delivery">
           <span v-if="!addGovForm.preGovName">（通过下方输入官方行政编码进行查询后自动填入）</span>
@@ -613,7 +660,27 @@
         <el-form-item label="来源" >
           <span>{{ ruleForm.source }}</span>
         </el-form-item>
-        <el-form-item label="wind行业划分">
+<!--        wind行业划分role4-->
+        <el-form-item label="wind行业划分" >
+          <el-cascader
+            v-model="ruleForm.typeWindCheck"
+            :options="typeWindList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分">
           <span v-if="!edit1">{{ ruleForm.windMaster }}</span>
           <el-input
             class="t-input"
@@ -640,7 +707,7 @@
             @click="edit2 = !edit2"
             >{{ edit2 ? "" : "修改" }}</el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="政府持股方式" prop="shareMethod">
           <el-select :filterable="true" class="width320" v-model="ruleForm.shareMethod" placeholder="请选择">
@@ -682,7 +749,7 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="subRule345(4)"
           >保存并提交</el-button
         >
@@ -709,14 +776,27 @@
         <el-form-item label="来源">
           <span>{{ ruleForm.source }}</span>
         </el-form-item>
+        <!--          wind行业划分role5-->
         <el-form-item label="wind行业划分" >
           <el-cascader
-            v-model="typeWindCheck"
+            v-model="ruleForm.typeWindCheck"
             :options="typeWindList"
-            :props="{ checkStrictly: true }"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
             clearable></el-cascader>
         </el-form-item>
-        <el-form-item label="wind行业划分">
+        <el-form-item label="申万行业划分" >
+          <!--          role5-->
+          <el-cascader
+            v-model="ruleForm.typeShenWanCheck"
+            :options="typeShenWanList"
+            filterable
+            width="300"
+            :props="{ checkStrictly: true,value:'name',label:'name' }"
+            clearable></el-cascader>
+        </el-form-item>
+        <!--<el-form-item label="wind行业划分">
           <span v-if="!edit1">{{ ruleForm.windMaster }}</span>
           <el-input
             class="t-input"
@@ -729,8 +809,8 @@
             @click="edit1 = !edit1"
             >{{ edit1 ? "" : "修改" }}</el-button
           >
-        </el-form-item>
-        <el-form-item label="申万行业划分" >
+        </el-form-item>-->
+        <!--<el-form-item label="申万行业划分" >
           <span v-if="!edit2">{{ ruleForm.shenWanMaster }}</span>
           <el-input
             class="t-input"
@@ -744,7 +824,7 @@
           >{{ edit2 ? "" : "修改" }}
           </el-button
           >
-        </el-form-item>
+        </el-form-item>-->
         <el-divider></el-divider>
         <el-form-item label="财报列示类型" prop="listType">
           <el-select :filterable="true" class="width320" v-model="ruleForm.listType" placeholder="选择类型">
@@ -769,7 +849,7 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <span v-if="ruleForm.state === 0" slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button type="primary" class="green-btn" @click="subRule345(5)">保存并提交</el-button>
       </span>
     </el-dialog>
@@ -995,8 +1075,6 @@
             </el-option>
           </el-select>
         </div>
-
-
         <el-form-item>
           <el-button
             v-if="!entityNamePass"
@@ -1008,8 +1086,8 @@
           <span v-if="entityNamePass === 2" style="color: #13ce66; margin-left: 5px">无重复，可新增</span>
           <a @click="showMoreData" v-if="entityNamePass === 1"
              style="color:red; margin-left: 5px;text-decoration: underline;">存在重复 无法新增</a>
-          <el-button class="ml40" type="success" plain :disabled="checkStatus !== 0" @click="submitAdd">确认新增</el-button>
-          <el-button class="ml40" type="warning" plain v-if="checkStatus === 3">忽略新增</el-button>
+          <el-button class="ml40" type="success" plain :disabled="entityNamePass !== 2" @click="submitAdd">确认新增</el-button>
+          <el-button class="ml40" type="warning" @click="changeAddState(ruleForm, 2)" plain v-if="checkStatus === 3">忽略新增</el-button>
         </el-form-item>
 
       </el-form>
@@ -1099,6 +1177,7 @@
     insertGov,
     addSeven,
     ignoreTask,
+    deleteRole6Task,
     getTaskCount,
     addFinEntitySubtableMsg,
     addGovEntitySubtableMsg,
@@ -1129,202 +1208,8 @@
         currentDay: "",
         dialogVisible: false,
         noUse: false,
-        typeWindCheck:['zhinan','shejiyuanze','yizhi'],
-        typeWindList:[{
-          value: 'zhinan',
-          label: '指南',
-          children: [{
-            value: 'shejiyuanze',
-            label: '设计原则',
-            children: [{
-              value: 'yizhi',
-              label: '一致'
-            }, {
-              value: 'fankui',
-              label: '反馈'
-            }, {
-              value: 'xiaolv',
-              label: '效率'
-            }, {
-              value: 'kekong',
-              label: '可控'
-            }]
-          }, {
-            value: 'daohang',
-            label: '导航',
-            children: [{
-              value: 'cexiangdaohang',
-              label: '侧向导航'
-            }, {
-              value: 'dingbudaohang',
-              label: '顶部导航'
-            }]
-          }]
-        }, {
-          value: 'zujian',
-          label: '组件',
-          children: [{
-            value: 'basic',
-            label: 'Basic',
-            children: [{
-              value: 'layout',
-              label: 'Layout 布局'
-            }, {
-              value: 'color',
-              label: 'Color 色彩'
-            }, {
-              value: 'typography',
-              label: 'Typography 字体'
-            }, {
-              value: 'icon',
-              label: 'Icon 图标'
-            }, {
-              value: 'button',
-              label: 'Button 按钮'
-            }]
-          }, {
-            value: 'form',
-            label: 'Form',
-            children: [{
-              value: 'radio',
-              label: 'Radio 单选框'
-            }, {
-              value: 'checkbox',
-              label: 'Checkbox 多选框'
-            }, {
-              value: 'input',
-              label: 'Input 输入框'
-            }, {
-              value: 'input-number',
-              label: 'InputNumber 计数器'
-            }, {
-              value: 'select',
-              label: 'Select 选择器'
-            }, {
-              value: 'cascader',
-              label: 'Cascader 级联选择器'
-            }, {
-              value: 'switch',
-              label: 'Switch 开关'
-            }, {
-              value: 'slider',
-              label: 'Slider 滑块'
-            }, {
-              value: 'time-picker',
-              label: 'TimePicker 时间选择器'
-            }, {
-              value: 'date-picker',
-              label: 'DatePicker 日期选择器'
-            }, {
-              value: 'datetime-picker',
-              label: 'DateTimePicker 日期时间选择器'
-            }, {
-              value: 'upload',
-              label: 'Upload 上传'
-            }, {
-              value: 'rate',
-              label: 'Rate 评分'
-            }, {
-              value: 'form',
-              label: 'Form 表单'
-            }]
-          }, {
-            value: 'data',
-            label: 'Data',
-            children: [{
-              value: 'table',
-              label: 'Table 表格'
-            }, {
-              value: 'tag',
-              label: 'Tag 标签'
-            }, {
-              value: 'progress',
-              label: 'Progress 进度条'
-            }, {
-              value: 'tree',
-              label: 'Tree 树形控件'
-            }, {
-              value: 'pagination',
-              label: 'Pagination 分页'
-            }, {
-              value: 'badge',
-              label: 'Badge 标记'
-            }]
-          }, {
-            value: 'notice',
-            label: 'Notice',
-            children: [{
-              value: 'alert',
-              label: 'Alert 警告'
-            }, {
-              value: 'loading',
-              label: 'Loading 加载'
-            }, {
-              value: 'message',
-              label: 'Message 消息提示'
-            }, {
-              value: 'message-box',
-              label: 'MessageBox 弹框'
-            }, {
-              value: 'notification',
-              label: 'Notification 通知'
-            }]
-          }, {
-            value: 'navigation',
-            label: 'Navigation',
-            children: [{
-              value: 'menu',
-              label: 'NavMenu 导航菜单'
-            }, {
-              value: 'tabs',
-              label: 'Tabs 标签页'
-            }, {
-              value: 'breadcrumb',
-              label: 'Breadcrumb 面包屑'
-            }, {
-              value: 'dropdown',
-              label: 'Dropdown 下拉菜单'
-            }, {
-              value: 'steps',
-              label: 'Steps 步骤条'
-            }]
-          }, {
-            value: 'others',
-            label: 'Others',
-            children: [{
-              value: 'dialog',
-              label: 'Dialog 对话框'
-            }, {
-              value: 'tooltip',
-              label: 'Tooltip 文字提示'
-            }, {
-              value: 'popover',
-              label: 'Popover 弹出框'
-            }, {
-              value: 'card',
-              label: 'Card 卡片'
-            }, {
-              value: 'carousel',
-              label: 'Carousel 走马灯'
-            }, {
-              value: 'collapse',
-              label: 'Collapse 折叠面板'
-            }]
-          }]
-        }, {
-          value: 'ziyuan',
-          label: '资源',
-          children: [{
-            value: 'axure',
-            label: 'Axure Components'
-          }, {
-            value: 'sketch',
-            label: 'Sketch Templates'
-          }, {
-            value: 'jiaohu',
-            label: '组件交互文档'
-          }]
-        }],
+        typeWindList:[],
+        typeShenWanList:[],
         ruleForm: {
           name: "",
           region: "",
@@ -1336,6 +1221,24 @@
           judgment: "",
           shareRatio: "",
           shareRatioYear: "",
+          typeWindCheck:[],
+          typeShenWanCheck:[],
+          creditErrorType:''
+        },
+        initRuleForm:{
+          name: "",
+          region: "",
+          county: '',
+          listType: "",
+          reportType: [],
+          shareMethod: "",
+          support: '',
+          judgment: "",
+          shareRatio: "",
+          shareRatioYear: "",
+          typeWindCheck:[],
+          typeShenWanCheck:[],
+          creditErrorType:''
         },
         addGovForm: {
           govLevelBig: 1
@@ -1345,10 +1248,10 @@
               { required: true, message: "请选择财报列示类型", trigger: "blur" },
         ],
         reportType: [
-            { required: true, message: "请选择关注报告类型", trigger: "change" },
+            { required: true, message: "请选择关注报告类型", trigger: "blur" },
         ],
         shareMethod: [
-            { required: true, message: "请输入政府持股方式", trigger: "change" },
+            { required: true, message: "请输入政府持股方式", trigger: "blur" },
         ],
         support: [
             { required: true, message: "请输入政府对当前城投支持力度", trigger: "blur" },
@@ -1490,11 +1393,30 @@
     this.getCurrentTime();
     this.getDaysInfo();
     this.init();
+    this.getTypeWindList();
+    this.getShenWanList();
   },
   computed: {
     disabled () {
       return this.creditCodePass !== 2 && this.entityNamePass !== 2
+    },
+    modelMasterList(){
+
+      if (this.ruleForm.isFinance==="Y" && this.ruleForm.cityIb==="Y") {
+        return this.options2;
+      }
+
+      if (this.ruleForm.isFinance==="Y") {
+        return this.options2.filter( item=>item.masterType===1 );
+      }
+
+      if (this.ruleForm.cityIb==="Y"){
+        return this.options2.filter( item=>item.masterType===2 );
+      }
+
+      return this.options2;
     }
+
   },
     methods: {
       getTypeWindList(){
@@ -1502,6 +1424,13 @@
           .then(res=>{
             let data = res.data;
             this.typeWindList = data;
+          })
+      },
+      getShenWanList(){
+        getTypeWindList({type:2})
+          .then(res=>{
+            let data = res.data;
+            this.typeShenWanList = data;
           })
       },
       init(page) {
@@ -1603,8 +1532,8 @@
         this.init(true)
       },
       changeMenopause(e) {
-        console.log(e)
-        e == this.noUse ? this.noUse = '' : this.noUse = e
+        e == this.noUse ? this.noUse = false : this.noUse = e
+        console.log(this.noUse)
       },
       changeMonth(row) {
         const parmas = {
@@ -1964,17 +1893,40 @@
         this.entityNamePass = false
       },
       submitAdd() {
-        this.$modal.loading("loading...");
-        this.ruleForm.created = ''
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            this.$modal.loading("loading...");
+            this.ruleForm.created = ''
+            try {
+            addSeven(this.ruleForm).then(res => {
+                const {data} = res
+                this.bodyDig = false
+                this.$message({
+                message: '操作成功',
+                type: 'success'
+                });
+                this.ruleForm = {}
+                this.init()
+            })
+            } catch (error) {
+            console.log(error)
+            } finally {
+            this.$modal.closeLoading();
+            }
+          } else {
+            return false;
+          }
+        });
+      },
+      deleteRole6Task(id){
         try {
-          addSeven(this.ruleForm).then(res => {
+          this.$modal.loading("loading...");
+          deleteRole6Task(id).then(res => {
             const {data} = res
-            this.bodyDig = false
             this.$message({
               message: '操作成功',
               type: 'success'
             });
-            this.ruleForm = {}
             this.init()
           })
         } catch (error) {
@@ -1984,11 +1936,21 @@
         }
       },
       // 角色7修改状态 1忽略 2新增
-      changeAddState(id, state) {
+      changeAddState(row, state) {
         try {
           this.$modal.loading("loading...");
-          const params = {
-            id: id || this.addBodyId
+          let params = {}
+          if (state === 1) {
+              params = {
+                taskId: row.id || this.addBodyId,
+                entityName: row.entityName,
+              }
+          }else {
+              params = {
+                taskId: row.id,
+                entityName: row.entityName,
+                entityCode: this.replaceData.entityCode
+              }
           }
           ignoreTask(params).then(res => {
             const {data} = res
@@ -2013,13 +1975,8 @@
       // 角色2流程开始
       workRole2(row) {
         try {
-          this.ruleForm = {}
+          this.ruleForm = {...this.initRuleForm};
           this.dialogVisible = true
-          this.ruleForm.entityName = row.entityName
-          this.ruleForm.creditCode = row.creditCode
-          this.ruleForm.sourceName = row.sourceName
-          this.$set(this.ruleForm, 'entityCode', row.entityCode)
-          this.$set(this.ruleForm, 'id', row.id)
           this.$set(this.ruleForm, 'wind', '')
           this.$set(this.ruleForm, 'shenWan', '')
           this.$modal.loading("loading...");
@@ -2027,6 +1984,17 @@
             const {data} = res
             this.ruleForm.wind = data.windMaster
             this.ruleForm.sw = data.shenWanMaster
+            this.ruleForm = data
+            this.ruleForm.region = data.govNode && data.govNode.govName
+            this.ruleForm.district = data.govNode && data.govNode.children.govName
+            this.ruleForm.county = data.govNode && data.govNode.children.children.govName
+            this.ruleForm.entityName = row.entityName
+            this.ruleForm.creditCode = row.creditCode
+            this.ruleForm.sourceName = row.sourceName
+            this.$set(this.ruleForm, 'entityCode', row.entityCode)
+            this.$set(this.ruleForm, 'id', row.id)
+            this.$set(this.ruleForm, 'state', row.state)
+            console.log(this.ruleForm)
           })
           getFinances({}).then(res => {
             const {data} = res
@@ -2098,27 +2066,35 @@
         }
       },
       subRule2() {
-        try {
-          this.$modal.loading('Loading...')
-          insertMas(this.ruleForm).then(res => {
-            const {data} = res
-            this.dialogVisible = false
-            this.$message({
-              showClose: true,
-              message: '操作成功',
-              type: 'success'
-            });
-            this.init()
-          })
-        } catch (error) {
-          this.$message({
-            showClose: true,
-            message: error,
-            type: 'error'
-          });
-        } finally {
-          this.$modal.closeLoading()
-        }
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            try {
+                this.$modal.loading('Loading...')
+                this.ruleForm.wind = this.ruleForm.typeWindCheck && this.ruleForm.typeWindCheck.join("--")
+                this.ruleForm.shenWan = this.ruleForm.typeWindCheck && this.ruleForm.typeShenWanCheck.join("--")
+                insertMas(this.ruleForm).then(res => {
+                    const {data} = res
+                    this.dialogVisible = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                })
+                } catch (error) {
+                this.$message({
+                    showClose: true,
+                    message: error,
+                    type: 'error'
+                });
+                } finally {
+                this.$modal.closeLoading()
+                }
+          } else {
+            return false;
+          }
+        });
 
       },
       getGov(row) {
@@ -2188,8 +2164,15 @@
           getEntityBackSupply(params).then(res => {
             const {data} = res
             this.ruleForm = data
-            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.windMaster)
+            // this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            // this.$set(this.ruleForm, 'windMaster', data.windMaster)
+
+            if (data.windMaster){
+              this.$set(this.ruleForm, 'typeWindCheck', data.windMaster.split("--"))
+            }
+            if (data.shenWanMaster) {
+              this.$set(this.ruleForm, 'typeShenWanCheck', data.shenWanMaster.split("--"))
+            }
           })
 
           getGovLevel({preGovCode: ''}).then(res => {
@@ -2242,73 +2225,81 @@
         })
       },
       subRule345(row) {
-        try {
-          this.$modal.loading("loading...");
-          const region = this.ruleForm.region || this.ruleForm.city || this.ruleForm.county
-          this.$set(this.ruleForm, 'belPlace', region)
-          this.$set(this.ruleForm, '政府部门实际持股比例-年份', this.ruleForm.政府部门实际持股比例年份)
-          if (row === 3) {
-            addFinEntitySubtableMsg(this.ruleForm).then(res => {
-              if (res.code === 200) {
-                this.remarkDig = false
-                this.$message({
-                  showClose: true,
-                  message: '操作成功',
-                  type: 'success'
-                });
-                this.init()
-              }
-            })
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+             try {
+            this.$modal.loading("loading...");
+            const region = this.ruleForm.region || this.ruleForm.city || this.ruleForm.county
+            this.$set(this.ruleForm, 'belPlace', region)
+            this.$set(this.ruleForm, '政府部门实际持股比例-年份', this.ruleForm.政府部门实际持股比例年份)
+            this.ruleForm.windMaster = this.ruleForm.typeWindCheck.join("--")
+            this.ruleForm.shenWanMaster = this.ruleForm.typeShenWanCheck.join("--")
+            if (row === 3) {
+                addFinEntitySubtableMsg(this.ruleForm).then(res => {
+                if (res.code === 200) {
+                    this.remarkDig = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                }
+                })
+            }
+            if (row === 4) {
+                addGovEntitySubtableMsg(this.ruleForm).then(res => {
+                if (res.code === 200) {
+                    this.governmentDig = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                }
+                })
+            }
+            if (row === 5) {
+                addEntityeMsg(this.ruleForm).then(res => {
+                if (res.code === 200) {
+                    this.fsDig = false
+                    this.$message({
+                    showClose: true,
+                    message: '操作成功',
+                    type: 'success'
+                    });
+                    this.init()
+                }
+                })
+            }
+            // addEntityAttrValuesNew(this.ruleForm).then(res => {
+            //   const { data } = res
+            //   if (data.code === 200) {
+            //     this.governmentDig = false
+            //     this.$message({
+            //       showClose: true,
+            //       message: '操作成功',
+            //       type: 'success'
+            //     });
+            //   }
+            // })
+            } catch (error) {
+            this.$message({
+                showClose: true,
+                message: error,
+                type: 'error'
+            });
+            } finally {
+            this.$modal.closeLoading();
+            this.governmentDig = false
+            this.fsDig = false
+            this.remarkDig = false
+            }
+          } else {
+            return false;
           }
-          if (row === 4) {
-            addGovEntitySubtableMsg(this.ruleForm).then(res => {
-              if (res.code === 200) {
-                this.governmentDig = false
-                this.$message({
-                  showClose: true,
-                  message: '操作成功',
-                  type: 'success'
-                });
-                this.init()
-              }
-            })
-          }
-          if (row === 5) {
-            addEntityeMsg(this.ruleForm).then(res => {
-              if (res.code === 200) {
-                this.fsDig = false
-                this.$message({
-                  showClose: true,
-                  message: '操作成功',
-                  type: 'success'
-                });
-                this.init()
-              }
-            })
-          }
-          // addEntityAttrValuesNew(this.ruleForm).then(res => {
-          //   const { data } = res
-          //   if (data.code === 200) {
-          //     this.governmentDig = false
-          //     this.$message({
-          //       showClose: true,
-          //       message: '操作成功',
-          //       type: 'success'
-          //     });
-          //   }
-          // })
-        } catch (error) {
-          this.$message({
-            showClose: true,
-            message: error,
-            type: 'error'
-          });
-        } finally {
-          this.$modal.closeLoading();
-          this.governmentDig = false
-          this.fsDig = false
-          this.remarkDig = false
-        }
+        });
       },
       workRole4(row) {
         try {
@@ -2320,8 +2311,14 @@
           getEntityBackSupply(params).then(res => {
             const {data} = res
             this.ruleForm = data
-            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.windMaster)
+            // this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
+            // this.$set(this.ruleForm, 'windMaster', data.windMaster)
+            if (data.windMaster){
+              this.$set(this.ruleForm, 'typeWindCheck', data.windMaster.split("--"))
+            }
+            if (data.shenWanMaster) {
+              this.$set(this.ruleForm, 'typeShenWanCheck', data.shenWanMaster.split("--"))
+            }
           })
           getGovLevel({preGovCode: ''}).then(res => {
             const {data} = res
@@ -2348,14 +2345,21 @@
         try {
           this.$modal.loading("loading...");
           this.fsDig = true
+          this.ruleForm = {...this.initRuleForm};;
           const params = {
             id: row.id,
           }
           getEntityBackSupply(params).then(res => {
             const {data} = res
             this.ruleForm = data
-            this.$set(this.ruleForm, 'shenWanMaster', data.shenWanMaster)
-            this.$set(this.ruleForm, 'windMaster', data.windMaster)
+
+            if (data.windMaster){
+              this.$set(this.ruleForm, 'typeWindCheck', data.windMaster.split("--"))
+            }
+            if (data.shenWanMaster) {
+              this.$set(this.ruleForm, 'typeShenWanCheck', data.shenWanMaster.split("--"))
+            }
+
           })
           const ret = {
             organName: '财报收数'
@@ -2381,7 +2385,7 @@
       },
       // 角色345流程结束
       handleClose() {
-        this.ruleForm = {}
+        this.ruleForm = {...this.initRuleForm};
         this.addGovForm = {}
         this.creditCodePass = false
         this.entityNamePass = false

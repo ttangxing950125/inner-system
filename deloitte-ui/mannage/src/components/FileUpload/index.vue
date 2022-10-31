@@ -254,7 +254,7 @@ export default {
   margin-right: 10px;
 }
 .btn {
-  margin-top: 10px;
+  margin-top: 5px;
   margin-left: 15px;
 }
 </style>

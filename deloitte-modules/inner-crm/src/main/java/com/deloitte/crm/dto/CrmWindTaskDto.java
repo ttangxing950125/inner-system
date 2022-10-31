@@ -22,6 +22,16 @@ public class CrmWindTaskDto {
     @ApiModelProperty(value = "未完成任务数(指定日期)")
     private String complete;
 
+    private String taskCategory;
+
+    public String getTaskCategory() {
+        return taskCategory;
+    }
+
+    public void setTaskCategory(String taskCategory) {
+        this.taskCategory = taskCategory;
+    }
+
     public Integer getTaskCateId() {
         return taskCateId;
     }

@@ -22,7 +22,6 @@ public class EntityInfoInsertDTO {
     private Integer taskId;
 
     /** 1-债券 bond_info、2-港股 stock_thk_info、3-股票  stock_cn_info */
-    @NotNull(message = "信息数据来源不能为空")
     @ApiModelProperty(name="dataSource",value = "信息来源表")
     private Integer dataSource;
 
@@ -37,7 +36,6 @@ public class EntityInfoInsertDTO {
 
     /** 企业名 */
     @ApiModelProperty(name="entityName",value="企业名")
-    @NotNull(message = "企业名称不能为空")
     private String entityName;
 
     /** 若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：

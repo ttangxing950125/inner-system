@@ -117,7 +117,7 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
             thkSecIssInfoService.save(secIssInfo);
 
             //如果是新增数据，并且有主体名，就要自动绑定关联关系了
-            if (Objects.equals(DataChangeType.INSERT.getId(), changeType) && StrUtil.isNotBlank(entityName)) {
+            if (StrUtil.isNotBlank(entityName)) {
                 entityStockThkRelService.bindRelOrCreateTask(stockThkInfo, entityName, windTask, secIssInfo);
             }
 

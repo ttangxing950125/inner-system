@@ -15,6 +15,7 @@ import com.deloitte.crm.domain.CrmMasTask;
 import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
+import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
@@ -56,6 +57,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     @Resource
     private EntityCaptureSpeedService entityCaptureSpeedService;
+
+    @Resource
+    private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
 
     /**
      * 查询角色7，根据导入的数据新增主体的任务
@@ -138,7 +142,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
         Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getTaskDate, date));
+                .lambda().eq(CrmEntityTask::getTaskDate, date).orderBy(true,true,CrmEntityTask::getState));
         return R.ok(crmEntityTaskPage, SuccessInfo.GET_SUCCESS.getInfo());
     }
 
@@ -156,9 +160,21 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
         crmEntityTask.setState(state);
+        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSourceId()));
+
+        // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
+        if(ObjectUtils.isEmpty(entityCaptureSpeed)){
+            log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmEntityTask.getSpeedId());
+        }else{
+            entityCaptureSpeed.setAdded(taskId);
+            entityCaptureSpeedMapper.insert(entityCaptureSpeed);
+        }
+
         baseMapper.updateById(crmEntityTask);
+        //  相同主体名称情况下 && 相同任务日期 && 任务状态为 0 对该次生成任务进行忽略
+        List<CrmEntityTask> byEntityNameList = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, crmEntityTask.getTaskDate()).eq(CrmEntityTask::getState, 0).eq(CrmEntityTask::getEntityName, crmEntityTask.getEntityName()));
         //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
-        if (!ObjectUtils.isEmpty(entityCode)) {
+        if (!ObjectUtils.isEmpty(entityCode)&&byEntityNameList.size()==0) {
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
             CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType,4));
             if(ObjectUtils.isEmpty(crmDailyTask)){
@@ -220,8 +236,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
         entityCaptureSpeedService.save(captureSpeed);
 
+        crmEntityTask.setSpeedId(captureSpeed.getId());
         crmEntityTaskMapper.insert(crmEntityTask);
-
 
         //修改今天角色6的任务为有任务未处理
         crmDailyTaskService.updateToUnhandled(taskDate, RoleInfo.ROLE6);

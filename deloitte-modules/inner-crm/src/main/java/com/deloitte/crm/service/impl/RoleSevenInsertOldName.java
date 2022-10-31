@@ -6,6 +6,7 @@ import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.RoleSevenTask;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * @date 2022/10/28
  */
 @Component
+@AllArgsConstructor
 public class RoleSevenInsertOldName implements RoleSevenTask {
 
     private EntityNameHisServiceImpl entityNameHisService;

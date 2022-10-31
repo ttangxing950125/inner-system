@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,10 +23,10 @@ public class RoleSevenTaskFactory implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        Map<String, RoleSevenTask> roleSevenTasks = applicationContext.getBeansOfType(RoleSevenTask.class);
+        this.roleSevenTasks = applicationContext.getBeansOfType(RoleSevenTask.class);
     }
 
-    public RoleSevenTask getFactory(@NotNull(message = "关键字不能为空")String keyword){
+    public RoleSevenTask getFactory(String keyword){
         return Optional.ofNullable(roleSevenTasks.get(keyword)).orElseThrow(()->new ServiceException(BadInfo.ERROR_SYSTEM_BUSY.getInfo()));
     }
 

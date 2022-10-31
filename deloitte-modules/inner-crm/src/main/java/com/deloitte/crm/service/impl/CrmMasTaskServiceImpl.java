@@ -20,7 +20,6 @@ import com.deloitte.crm.mapper.EntityMasterMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmMasTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
-import com.deloitte.crm.service.IEntityMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -175,7 +174,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
         List<CrmMasTaskVo> res = new ArrayList<>();
         Date dateDay = DateUtil.parseDate(date);
         Page<CrmMasTask> crmMasTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getTaskDate, dateDay));
+                .lambda().eq(CrmMasTask::getTaskDate, dateDay).orderBy(true,true,CrmMasTask::getState));
         List<CrmMasTask> crmMasTasks = crmMasTaskPage.getRecords();
 
         Page<CrmMasTaskVo> result = new Page<>(pageNum, pageSize, crmMasTaskPage.getTotal());
