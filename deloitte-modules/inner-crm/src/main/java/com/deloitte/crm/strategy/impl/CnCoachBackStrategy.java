@@ -11,10 +11,12 @@ import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
 import com.deloitte.crm.constants.StockThkStatus;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.EntityBaseBusiInfoMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -75,6 +77,8 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
                 stockCnInfo = new StockCnInfo();
             }
             stockCnInfo.setStockCode(code);
+            //上市版
+            stockCnInfo.setListsector(cnCoachBack.getSimulationListed());
             //这条CnCoachBack是新增还是修改 1-新增 2-修改
             Integer changeType = null;
             //TODO 后期带上删除标识
@@ -107,11 +111,11 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
             }
 
             //有债券信息，给债券和主体绑定关联关系
-            if (StrUtil.isNotBlank(code)){
+            if (StrUtil.isNotBlank(code)) {
                 log.warn("无code创建主体任务");
                 //绑定主体关系
                 entityStockCnRelService.createTask(entityName, windTask, cnCoachBack);
-            }else {
+            } else {
                 log.info("有code创建主体任务");
                 //绑定主体关系
                 entityStockCnRelService.bindRelOrCreateTask(stockCnInfo, entityName, windTask, cnCoachBack);
@@ -122,10 +126,24 @@ public class CnCoachBackStrategy implements WindTaskStrategy {
             //更新wind行业
             List<EntityInfo> dbEntities = entityInfoService.findByName(entityName);
             if (CollUtil.isNotEmpty(dbEntities)) {
-                dbEntities.forEach(item -> {
+                for (EntityInfo item : dbEntities) {
                     item.setWindMaster(windIndustry);
-                });
+                    //会计师事务所 & 审计机构
+                    item.setEntityAuditinstitNew(cnCoachBack.getAccountingFirm());
+                    //所属行业
+                    item.setEntityIndustrySsc(cnCoachBack.getCsrcBelIndustry());
+
+                    EntityBaseBusiInfoMapper entityBaseBusiInfoMapper = ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class);
+                    EntityBaseBusiInfo entityBaseBusiInfo = entityBaseBusiInfoMapper.selectOne(new LambdaQueryWrapper<EntityBaseBusiInfo>().eq(EntityBaseBusiInfo::getEntityCode, item.getEntityCode()));
+                    log.info("==> 根据 企业entity_code={},查询工商企业信息为>>:{}", entityBaseBusiInfo);
+                    if (entityBaseBusiInfo != null) {
+                        entityBaseBusiInfo.setRegAddr(cnCoachBack.getRegisterAddress());
+                        entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo);
+                    }
+                }
                 entityInfoService.updateBatchById(dbEntities);
+            } else {
+                log.warn("==> 根据企业名称={}查询不到Entity_info 主体信息！！！！！！！！！！！！！", entityName);
             }
 
             cnCoachBack.setChangeType(changeType);

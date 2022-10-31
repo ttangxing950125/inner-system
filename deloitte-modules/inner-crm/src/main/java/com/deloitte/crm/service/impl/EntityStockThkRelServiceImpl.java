@@ -3,24 +3,25 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.EntityBaseBusiInfoMapper;
 import com.deloitte.crm.mapper.EntityStockThkRelMapper;
 import com.deloitte.crm.service.EntityStockThkRelService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import com.deloitte.crm.utils.AttrValueUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +44,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
     /**
      * 绑定港股和主体的关联关系
+     *
      * @param stockThkInfo
      * @param entityName
      * @return
@@ -55,7 +57,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
 
         //之前数据库中没有该主体
-        if (CollUtil.isEmpty(entityInfos)){
+        if (CollUtil.isEmpty(entityInfos)) {
             //创建任务
             CrmEntityTask entityTask = new CrmEntityTask();
 
@@ -66,8 +68,8 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
             entityTask.setSourceType(2);
             entityTask.setSourceId(secIssInfo.getId());
             entityTask.setTaskDate(windTask.getTaskDate());
-            String showData = "公司中文名称:"+entityName;
-            showData += ", 证券代码:"+secIssInfo.getCode()+", 证券简称:"+secIssInfo.getName();
+            String showData = "公司中文名称:" + entityName;
+            showData += ", 证券代码:" + secIssInfo.getCode() + ", 证券简称:" + secIssInfo.getName();
 
             entityTask.setDataShow(showData);
 
@@ -89,32 +91,47 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
                 entityTaskService.createTask(entityTask);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("创建Task出现异常>>>>>:{}", e);
             }
 
-
-        }
-
-        //是否绑定过关联关系
-        for (EntityInfo info : entityInfos) {
-            String entityCode = info.getEntityCode();
-            String stockDqCode = stockThkInfo.getStockDqCode();
-
-            //查询关联关系
-            EntityStockThkRel dbRel = this.findByEntityStockDeCode(entityCode, stockDqCode);
-            if (dbRel!=null){
-                continue;
+        } else {
+            //是否绑定过关联关系
+            for (EntityInfo info : entityInfos) {
+                String entityCode = info.getEntityCode();
+                String stockDqCode = stockThkInfo.getStockDqCode();
+                //查询关联关系
+                EntityBaseBusiInfo entityBaseBusiInfo = finEntityBaseBusiInfoByEntityCode(entityCode);
+                if (entityBaseBusiInfo != null) {
+                    entityBaseBusiInfo.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(secIssInfo.getCreateDate()));
+                    entityBaseBusiInfo.setRegAddr(secIssInfo.getRegisterAddress());
+                    entityBaseBusiInfo.setEntityStaffCount(Optional.ofNullable(secIssInfo.getEntityEmpCount() + "").orElse(null));
+                    entityBaseBusiInfo.setBusRange(Optional.ofNullable(secIssInfo.getEntityScope()).orElse(null));
+                    ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class).updateById(entityBaseBusiInfo);
+                } else {
+                    EntityBaseBusiInfo info1 = new EntityBaseBusiInfo();
+                    info1.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(secIssInfo.getCreateDate()));
+                    info1.setRegAddr(secIssInfo.getRegisterAddress());
+                    info1.setEntityStaffCount(Optional.ofNullable(secIssInfo.getEntityEmpCount() + "").orElse(null));
+                    info1.setBusRange(Optional.ofNullable(secIssInfo.getEntityScope()).orElse(null));
+                    info1.setEntityCode(entityCode);
+                    ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class).insert(info1);
+                }
+                EntityStockThkRel dbRel = this.findByEntityStockDeCode(entityCode, stockDqCode);
+                if (dbRel != null) {
+                    continue;
+                }
+                //新增关联关系
+                EntityStockThkRel stockThkRel = new EntityStockThkRel();
+                stockThkRel.setEntityCode(entityCode);
+                stockThkRel.setStockDqCode(stockDqCode);
+                this.save(stockThkRel);
             }
-
-            //新增关联关系
-            EntityStockThkRel stockThkRel = new EntityStockThkRel();
-            stockThkRel.setEntityCode(entityCode);
-            stockThkRel.setStockDqCode(stockDqCode);
-            this.save(stockThkRel);
-
         }
-
         return true;
+    }
+
+    public EntityBaseBusiInfo finEntityBaseBusiInfoByEntityCode(String entityCode) {
+        return ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class).selectOne(new LambdaQueryWrapper<EntityBaseBusiInfo>().eq(EntityBaseBusiInfo::getEntityCode, entityCode));
     }
 
     /**
@@ -131,6 +148,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
     /**
      * 查询港股所属主体，只查询关联关系启用状态的
+     *
      * @param stockDqCode
      * @return
      */
@@ -145,7 +163,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
         List<EntityStockThkRel> thkRels = this.list(wrapper);
 
-        if (CollUtil.isEmpty(thkRels)){
+        if (CollUtil.isEmpty(thkRels)) {
             return infos;
         }
 

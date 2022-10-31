@@ -305,4 +305,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     R insertEntityInfoByDaily(EntityInfoInsertDTO entityInfoInsertDTO);
 
     void exportEntity(HttpServletResponse response);
+
+    void exportEntityByType(Integer type, HttpServletResponse response);
 }

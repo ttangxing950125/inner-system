@@ -94,8 +94,8 @@
           >
             <el-table-column label="生效状态" width="100px">
               <template slot-scope="scope">
-                <span :class="scope.row.status === '0' ? 'green' : 'red'">{{
-                  scope.row.status === "0" ? "N" : "Y"
+                <span :class="scope.row.status === 1 ? 'green' : 'red'">{{
+                  scope.row.status === 1 ? "Y" : "N"
                 }}</span>
               </template>
             </el-table-column>
@@ -125,12 +125,12 @@
             </el-table-column>
             <el-table-column prop="entityNameHisRemarks" label="备注">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.entityNameHisRemarks || '-' }}</span>
+                    <span>{{ scope.row.remark || '-' }}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="updated" label="更新记录">
               <template slot-scope="scope">
-                <span>{{ getLocalTime(scope.row.updated) }}</span>
+                <span>{{ scope.row.updateRecord || '-' }}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -166,7 +166,7 @@
             </el-table-column>
             <el-table-column prop="created" align="center" label="操作">
                 <template slot-scope="scope">
-                    <el-button @click="stopUsed" type="text" size="small"
+                    <el-button @click="stopUsed(scope.row)" type="text" size="small"
                     >停用</el-button
                     >
                 </template>
@@ -189,7 +189,10 @@
             <el-input type="textarea" v-model="form.entityNameHisRemarks"></el-input>
         </el-form-item>
         <el-form-item label="更名日期">
-            <el-date-picker type="date" placeholder="选择日期" v-model="form.updated" style="width: 100%;"></el-date-picker>
+            <el-date-picker type="date" value-format="yyyy-MM-dd" :disabled="form.notUse" placeholder="选择日期" v-model="form.updated" style="width: 84%;"></el-date-picker>
+            <el-checkbox class="ml10" v-model="form.notUse" label="1"
+            >不详</el-checkbox
+          >
         </el-form-item>
         <el-form-item>
             <el-button class="green-btn" type="primary" @click="subAddUsed">立即创建</el-button>
@@ -202,7 +205,7 @@
 
 <script>
 import { getOverview } from "@/api/common";
-import { getInfoListGov, getGovView, updateOldName, addOldName, getNameListByDqCoded } from "@/api/subject";
+import { getInfoListGov, getGovView, updateOldNameGov, addOldName, getNameListByDqCoded } from "@/api/subject";
 import { formatDate } from "@/utils/index";
 export default {
   name: "government",
@@ -410,8 +413,10 @@ export default {
         const parmas = {
           dqCode: this.selectCode,
           status: 1,
+          oldName: row.oldName,
+          newOldName: '-'
         };
-        updateOldName(parmas).then((res) => {
+        updateOldNameGov(parmas).then((res) => {
             this.dialogVisible = false
             this.$message({
               message: '操作成功',
@@ -456,6 +461,16 @@ export default {
       
     },
   },
+   watch: {
+      'form.notUse': {
+        handler(newName, oldName) {
+          if (newName) {
+            this.form.updated = ''
+          }
+        },
+        deep: true //为true，表示深度监听，这时候就能监测到a值变化
+      },
+    }
 };
 </script>
 
@@ -530,7 +545,6 @@ export default {
   a {
     font-size: 14px;
     color: black;
-    text-decoration: underline;
     margin-right: 10px;
   }
   .g-select {

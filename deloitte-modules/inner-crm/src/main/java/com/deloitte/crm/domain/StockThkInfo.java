@@ -49,20 +49,26 @@ public class StockThkInfo implements Serializable {
     @Excel(name = "德勤内部股票代码 ST_0000id 6位数字")
     private String stockDqCode;
 
-    /** 上市日期*/
-    @ApiModelProperty(value="上市日期")
-    @UpdateLog(fieldName = "港股上市时间",tableFieldName ="list_date")
-    private String  listDate ;
+    /**
+     * 上市日期
+     */
+    @ApiModelProperty(value = "上市日期")
+    @UpdateLog(fieldName = "港股上市时间", tableFieldName = "list_date")
+    private String listDate;
 
-    /** 退市日期*/
-    @ApiModelProperty(value="退市日期")
-    @UpdateLog(fieldName = "港股退市时间",tableFieldName ="delisting_date")
-    private  String  delistingDate ;
+    /**
+     * 退市日期
+     */
+    @ApiModelProperty(value = "退市日期")
+    @UpdateLog(fieldName = "港股退市时间", tableFieldName = "delisting_date")
+    private String delistingDate;
 
-    /** 交易所*/
-    @ApiModelProperty(value="交易所")
-    @UpdateLog(fieldName = "港股上市交易所",tableFieldName ="exchange")
-    private  String  exchange ;
+    /**
+     * 交易所
+     */
+    @ApiModelProperty(value = "交易所")
+    @UpdateLog(fieldName = "港股上市交易所", tableFieldName = "exchange")
+    private String exchange;
 
     /**
      * 港股简称
@@ -76,7 +82,7 @@ public class StockThkInfo implements Serializable {
      * 股票代码
      */
     @Excel(name = "股票代码")
-    @UpdateLog(fieldName = "港股股票代码",tableFieldName ="stock_code")
+    @UpdateLog(fieldName = "港股股票代码", tableFieldName = "stock_code")
     private String stockCode;
     /**
      * 创建时间
@@ -86,4 +92,14 @@ public class StockThkInfo implements Serializable {
      * 更新时间
      */
     private Date updated;
+
+    /**
+     * 上市板
+     */
+    private String listsector;
+
+    /**
+     * 公司介绍
+     */
+    private String entityIntro;
 }

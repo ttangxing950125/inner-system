@@ -1,25 +1,23 @@
 package com.deloitte.crm.service.impl;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.hutool.core.collection.CollUtil;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.EntityBondRelMapper;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
 import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.IEntityBondRelService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.utils.AttrValueUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.deloitte.crm.mapper.EntityBondRelMapper;
-import com.deloitte.crm.service.IEntityBondRelService;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -30,7 +28,7 @@ import javax.annotation.Resource;
 @Service
 public class EntityBondRelServiceImpl implements IEntityBondRelService
 {
-    @Autowired
+    @Resource
     private EntityBondRelMapper entityBondRelMapper;
 
     @Resource

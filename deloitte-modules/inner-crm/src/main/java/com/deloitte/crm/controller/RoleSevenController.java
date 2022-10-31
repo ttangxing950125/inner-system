@@ -15,7 +15,10 @@ import com.deloitte.crm.vo.EntityInfoVo;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
@@ -163,10 +166,10 @@ public class RoleSevenController {
      * @return
      */
     @ApiOperation(value="删除该条任务 by正杰")
-    @ApiImplicitParam(name="id",value="传入taskId",paramType = "body",dataType = "Integer")
+    @ApiImplicitParam(name="id",value="传入taskId",paramType = "query",dataType = "Integer")
     @Log(title = "【 删除该条任务 】", businessType = BusinessType.OTHER)
-    @PostMapping("/deleteTask/{id}")
-    public R deleteTask(@PathVariable Integer id) {
+    @PostMapping("/deleteTask")
+    public R deleteTask(Integer id) {
         return roleSevenTaskFactory.getFactory(Common.DELETE_TASK).finishTask(new EntityInfoInsertDTO().setTaskId(id));
     }
 

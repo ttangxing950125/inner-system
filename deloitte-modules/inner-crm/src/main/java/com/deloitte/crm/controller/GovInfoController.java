@@ -221,7 +221,7 @@ public class GovInfoController extends BaseController {
     /**
      * 新增政府主体的曾用名
      *
-     * @param entityInfo
+     * @param govInfo
      * @return R
      * @author 冉浩岑
      * @date 2022/9/23 8:44
@@ -446,5 +446,24 @@ public class GovInfoController extends BaseController {
     @PostMapping("/selectList")
     public R selectAll() {
        return R.ok( govInfoService.selectList());
+    }
+
+    /**
+     * 根据政府主体，大类小类查询政府主体
+     *
+     * @param bigLevel 政府主体大类
+     * @param smallLevel  政府主体小类
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/10/31 13:12
+    */
+    @ApiOperation(value = "根据政府主体，大类小类查询政府主体")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bigLevel", value = "政府主体大类", paramType = "query", example = "1", dataType = "Integer"),
+            @ApiImplicitParam(name = "smallLevel", value = "政府主体小类", paramType = "query", example = "6", dataType = "Integer")
+    })
+    @PostMapping("/getGovInfoByLevel")
+    public R getGovInfoByLevel(Integer bigLevel,Integer smallLevel)   {
+        return govInfoService.getGovInfoByLevel(bigLevel,smallLevel);
     }
 }

@@ -61,13 +61,17 @@ public class BondInfo {
     private String bondShortName;
 
 
-    /** 起息日*/
-    @ApiModelProperty(value="起息日")
-    private String valueDate ;
+    /**
+     * 起息日
+     */
+    @ApiModelProperty(value = "起息日")
+    private String valueDate;
 
-    /** 到期日*/
-    @ApiModelProperty(value="到期日")
-    private  String dueDate ;
+    /**
+     * 到期日
+     */
+    @ApiModelProperty(value = "到期日")
+    private String dueDate;
 
     /** 违约日期*/
     private  String defaultDate;
@@ -121,4 +125,28 @@ public class BondInfo {
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);
     }
+
+    /**
+     * 上市日期
+     */
+    private Date listdate;
+    /**
+     * 上市地点
+     */
+    private String exchange;
+    /**
+     * 发行总额
+     * [单位] 亿元
+     */
+    private String issueamount;
+    /**
+     * wind1一级
+     */
+    private String wind1;
+    /**
+     * wind2二级级
+     */
+    private String wind2;
+
+
 }

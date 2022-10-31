@@ -8,7 +8,7 @@ import com.deloitte.crm.mapper.StockCnImplementStInfoMapper;
 import com.deloitte.crm.domain.StockCnImplementStInfo;
 import com.deloitte.crm.service.ICrmWindTaskService;
 import com.deloitte.crm.service.StockCnImplementStInfoService;
-import com.deloitte.crm.strategy.impl.StockCnImplementStInfoStrategy;
+import com.deloitte.crm.strategy.impl.CnImplementStInfoStrategy;
 import com.deloitte.crm.utils.ApplicationContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class StockCnImplementStInfoServiceImpl extends ServiceImpl<StockCnImplem
             if (implementStInfo.getCode().contains("数据来源：Wind")) {
                 continue;
             }
-            Future<Object> future = ApplicationContextHolder.get().getBean(StockCnImplementStInfoStrategy.class).doBondImport(implementStInfo, timeNow, windTask);
+            Future<Object> future = ApplicationContextHolder.get().getBean(CnImplementStInfoStrategy.class).doBondImport(implementStInfo, timeNow, windTask);
             futureList.add(future);
         }
 

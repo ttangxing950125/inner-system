@@ -65,6 +65,7 @@
               show-checkbox
               :filter-node-method="filterNode"
               ref="tree2"
+              node-key="name"
               @check="handleCheckChange2"
             >
             </el-tree>
@@ -92,7 +93,7 @@
           </el-table-column>
           <el-table-column fixed prop="invalid" fixed label="生效状态">
             <template slot-scope="scope">
-              <span>{{ scope.row.invalid ? "Y" : "N" }}</span>
+              <span>{{ scope.row.status === 1 ? "Y" : "N" }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="created" label="创建日期">
@@ -175,21 +176,25 @@ export default {
           const { data } = res;
           this.data = data;
         });
-        const params = {
-          pageNum: 1,
-          pageSize: 10,
-        };
-        getListEntityByPage(params).then((res) => {
-          const { data } = res;
-          this.total = data.total;
-          this.list = [];
-          data.records.forEach((e) => {
-            this.list.push(e.govInfo);
-          });
-        });
+        // const params = {
+        //   pageNum: 1,
+        //   pageSize: 10,
+        // };
+        // getListEntityByPage(params).then((res) => {
+        //   const { data } = res;
+        //   this.total = data.total;
+        //   this.list = [];
+        //   data.records.forEach((e) => {
+        //     this.list.push(e.govInfo);
+        //   });
+        // });
         getGovRange({}).then((res) => {
           const { data } = res;
           this.data2 = data
+          this.$nextTick(() => {    //这个如果要默认全选就必须加，否则会报错“setCheckedNodes”未定义
+            this.$refs.tree2.setCheckedNodes(this.data2)
+            this.handleCheckChange2()
+        })
         });
       } catch (error) {
         console.log(error);
@@ -228,7 +233,7 @@ export default {
         };
         arrDeptId.push(item);
       });
-      this.selected = arrDeptId.length;
+      this.selected = arrDeptId.length + 5;
       this.mapList = arrDeptId;
       try {
         this.$modal.loading("loading...");
@@ -244,13 +249,15 @@ export default {
           let more = [];
           data.records.forEach((e) => {
             this.list.push(e.govInfo);
-            more = e.more;
+            // more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
-            more.forEach((i) => {
-              e[i.key] = i.value;
-            });
+             if(more) {
+                more.forEach((i) => {
+                e[i.key] = i.value;
+                });
+            }
           });
         });
       } catch (error) {
@@ -297,7 +304,7 @@ export default {
           let more = [];
           data.records.forEach((e) => {
             this.list.push(e.govInfo);
-            more = e.more;
+            // more = e.more;
             this.header = e.header;
           });
           this.list.forEach((e) => {
@@ -334,8 +341,11 @@ export default {
         this.queryParams.pageNum = data.current;
          data.records.forEach((e) => {
             this.list.push(e.govInfo);
-            more = e.more;
             this.header = e.header;
+            // if (e.more) {
+            //     more = e.more;
+
+            // }
           });
           this.list.forEach((e) => {
             if(more) {
@@ -344,6 +354,7 @@ export default {
                 });
             }
           });
+          console.log(this.list)
       });
     },
   },
