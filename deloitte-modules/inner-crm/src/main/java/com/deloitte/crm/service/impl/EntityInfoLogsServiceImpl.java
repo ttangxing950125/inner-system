@@ -74,11 +74,9 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
      * 根据类型查询
      * CompletableFuture 使用线程池为ForkJoinPool
      * {@link java.util.concurrent.ForkJoinPool}
-     *
      * @param findType 查询类型
      * @return 股票 & 债券
      * @see EntityInfoLogs#operType
-     * TODO  后期优化
      */
     @SneakyThrows
     @Override
@@ -176,7 +174,6 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
                          * TYPE_STOCK 股票分为 A股和港股 1 2 连续多个使用 between数据库中创建了索引如使用in(EntityInfoLogs::getOperType, new String[]{"1", "2"})不会走索引
                          * 详情:EXPLAIN select * from entity_info_logs WHERE oper_type BETWEEN 1 and 2 and create_time>='2022-10-17' and create_time<='2022-10-18'
                          */
-//                        .in(EntityInfoLogs::getOperType, new String[]{"1", "2"})
                         .between(EntityInfoLogs::getOperType, 1, 2)
                         .eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE)
                         .eq(EntityInfoLogs::getCreateTime, DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN)));
