@@ -190,8 +190,9 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
             if (row.getEntityCode() != null) {
                 EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                         .eq(EntityInfo::getEntityCode, row.getEntityCode()));
+                if(!ObjectUtils.isEmpty(entityInfo)){
                 crmMasTaskVo.setEntityName(entityInfo.getEntityName());
-                crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+                crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());}
             } else {
                 log.warn("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  !!!");
             }
