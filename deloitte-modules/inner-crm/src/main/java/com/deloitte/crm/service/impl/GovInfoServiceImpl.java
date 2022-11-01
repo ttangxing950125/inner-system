@@ -700,12 +700,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         String newNameResult = "";
         String newRemarkResult = "";
-        for (int i = 1; i < nameList.size(); i++) {
+        for (int i = 0; i < nameList.size(); i++) {
             String remarkVo = "";
             String nameVo = "";
             String hisName = nameList.get(i);
 
-            //匹配历史曾用名则替换或者删除
+            //匹配历史曾用名则停用或者替换
             if (oldName.equals(hisName)) {
                 //匹配时，查询出原本的曾用名数据
                 EntityNameHis one = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda()
@@ -714,18 +714,20 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 if (ObjectUtils.isEmpty(one)) {
                     continue;
                 }
-                // status 为空则表示替换
+                one.setSource(2);
+                // status 不为空则表示体用曾用名
                 if (!ObjectUtils.isEmpty(status)) {
-                    one.setRemarks(remark).setOldName(newOldName).setStatus(0);
-                    if (!ObjectUtils.isEmpty(remark)) {
-                        one.setRemarks("系统自动生成");
-                    }
-                    one.setSource(2);
+                    one.setStatus(0);
                     //直接替换原本的数据
                     nameHisMapper.updateById(one);
                     continue;
                 }
-                //直接删除原本的数据
+                //替换曾用名
+                if (ObjectUtils.isEmpty(remark)) {
+                    remark="系统自动生成";
+                }
+                one.setRemarks(remark).setOldName(newOldName);
+                //更新原本的数据
                 nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
