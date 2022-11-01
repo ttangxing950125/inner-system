@@ -115,7 +115,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private GovInfoMapper govInfoMapper;
 
-    @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     private BondInfoMapper bondInfoMapper;
@@ -2769,7 +2768,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 for (Integer proId : proIds) {
                     Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                     ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                            .eq(ProductsCover::getProId, proId));
+                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
                     if (productsCover != null) {
                         more.put(products.getProName(), productsCover.getCoverDes());
                     } else {
@@ -2798,7 +2797,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 for (Integer proId : proIds) {
                     Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                     ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                            .eq(ProductsCover::getProId, proId));
+                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
                     if (productsCover != null) {
                         more.put(products.getProName(), productsCover.getCoverDes());
                     } else {
@@ -2830,7 +2829,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     for (Integer proId : proIds) {
                         Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                         ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                                .eq(ProductsCover::getProId, proId));
+                                .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
                         if (productsCover != null) {
                             more.put(products.getProName(), productsCover.getCoverDes());
                         } else {

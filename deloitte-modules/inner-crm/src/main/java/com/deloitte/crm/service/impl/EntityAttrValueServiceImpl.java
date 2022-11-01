@@ -574,13 +574,10 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
                 bondInfo.setBondStatus(2);
             } else if (endDateTime.getTime() <= newDate.getTime()){
                 bondInfo.setBondStatus(9);
-
             }
-
         }else {
             bondInfo.setBondStatus(7);
         }
-
         bondInfoMapper.insertBondInfo(bondInfo);
         DecimalFormat g1 = new DecimalFormat("000000");
         String startZeroStr = g1.format(bondInfo.getId());
