@@ -182,7 +182,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         String govCodeInfo = govInfo.getGovCode();
         boolean matches = govCodeInfo.matches(Common.REGEX_GOV_CODE);
         if(!matches){
-            return R.fail("根式不匹配，请修改官方行政代码为6位数字后再提交");
+            return R.fail("格式不匹配，请修改官方行政代码为6位数字后再提交");
         }
         //校验是否重复提交
         Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govCodeInfo));
