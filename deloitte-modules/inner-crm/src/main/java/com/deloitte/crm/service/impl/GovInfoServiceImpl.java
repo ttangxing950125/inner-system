@@ -179,16 +179,20 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R insertGovInfo(GovInfo govInfo) {
-
+        String govCodeInfo = govInfo.getGovCode();
+        boolean matches = govCodeInfo.matches(Common.REGEX_GOV_CODE);
+        if(!matches){
+            return R.fail("格式不匹配，请修改官方行政代码为6位数字后再提交");
+        }
         //校验是否重复提交
-        Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govInfo.getGovCode()));
+        Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govCodeInfo));
         if (count > 0) {
             return R.fail("请勿重复提交，请修改官方行政代码后再提交");
         }
-        count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, govInfo.getGovName()));
-        if (count > 0) {
-            return R.fail("请勿重复提交，请修改主体名称后再提交");
-        }
+//        count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, govInfo.getGovName()));
+//        if (count > 0) {
+//            return R.fail("请勿重复提交，请修改主体名称后再提交");
+//        }
 
         //生成政府主体德勤主体唯一识别代码
         String dqGovCode = getDqGovCode();
