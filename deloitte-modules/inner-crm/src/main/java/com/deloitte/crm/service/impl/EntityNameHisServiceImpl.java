@@ -293,6 +293,9 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
     public void saveOldNameToInfo() {
 
         List<EntityNameHis> nameHisList = entityNameHisMapper.selectList(new QueryWrapper<>());
+        List<EntityNameHis> collect = nameHisList.stream().filter(o -> ObjectUtils.isEmpty(o.getOldName())).collect(Collectors.toList());
+        collect.forEach(o->entityNameHisMapper.deleteById(o));
+        nameHisList = nameHisList.stream().filter(o -> !ObjectUtils.isEmpty(o.getOldName())).collect(Collectors.toList());
         Map<Integer, List<EntityNameHis>> collectMap = nameHisList.stream().collect(Collectors.groupingBy(EntityNameHis::getEntityType));
 
         List<EntityNameHis> entityNameHisList = collectMap.get(1);
