@@ -293,6 +293,9 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
     public void saveOldNameToInfo() {
 
         List<EntityNameHis> nameHisList = entityNameHisMapper.selectList(new QueryWrapper<>());
+        List<EntityNameHis> collect = nameHisList.stream().filter(o -> ObjectUtils.isEmpty(o.getOldName())).collect(Collectors.toList());
+        collect.forEach(o->entityNameHisMapper.deleteById(o));
+        nameHisList = nameHisList.stream().filter(o -> !ObjectUtils.isEmpty(o.getOldName())).collect(Collectors.toList());
         Map<Integer, List<EntityNameHis>> collectMap = nameHisList.stream().collect(Collectors.groupingBy(EntityNameHis::getEntityType));
 
         List<EntityNameHis> entityNameHisList = collectMap.get(1);
@@ -302,16 +305,16 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
 
         for (String entityCode : entityCollect.keySet()) {
             List<EntityNameHis> hisList = entityCollect.get(entityCode);
+            EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
+            if (ObjectUtils.isEmpty(entityInfo)){
+                entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, entityCode));
+                continue;
+            }
             hisList.forEach(o -> {
                 String oldName = o.getOldName();
                 Date updated = o.getUpdated();
                 String remarks = o.getRemarks();
 
-                EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
-                if (ObjectUtils.isEmpty(entityInfo)){
-                    entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, entityCode));
-                    return;
-                }
                 // 对主体曾用名列表进行操作
                 String oldNames = entityInfo.getEntityNameHis();
 
@@ -325,15 +328,15 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
                         //如果没被使用过 那么就再此基础上 再添加一条
                         entityInfo.setEntityNameHis(entityInfo.getEntityNameHis() + "," + oldName);
                     }
-                    String nameHisRemarks = entityInfo.getEntityNameHisRemarks();
-                    if (ObjectUtils.isEmpty(nameHisRemarks)) {
-                        nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    } else {
-                        nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    }
-                    entityInfo.setEntityNameHisRemarks(nameHisRemarks);
-                    entityInfoMapper.updateById(entityInfo);
                 }
+                String nameHisRemarks = entityInfo.getEntityNameHisRemarks();
+                if (ObjectUtils.isEmpty(nameHisRemarks)) {
+                    nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                } else {
+                    nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                }
+                entityInfo.setEntityNameHisRemarks(nameHisRemarks);
+                entityInfoMapper.updateById(entityInfo);
             });
         }
 
@@ -342,16 +345,17 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
 
         for (String govCode : govCollect.keySet()) {
             List<EntityNameHis> hisList = govCollect.get(govCode);
+            GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govCode));
+            if (ObjectUtils.isEmpty(govInfo)){
+                entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, govCode));
+                continue;
+            }
+
             hisList.forEach(o -> {
                 String oldName = o.getOldName();
                 Date updated = o.getUpdated();
                 String remarks = o.getRemarks();
 
-                GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govCode));
-                if (ObjectUtils.isEmpty(govInfo)){
-                    entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, govCode));
-                    return;
-                }
                 // 对主体曾用名列表进行操作
                 String oldNames = govInfo.getGovNameHis();
 
@@ -365,15 +369,16 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
                         //如果没被使用过 那么就再此基础上 再添加一条
                         govInfo.setGovNameHis(govInfo.getGovNameHis() + "," + oldName);
                     }
-                    String nameHisRemarks = govInfo.getEntityNameHisRemarks();
-                    if (ObjectUtils.isEmpty(nameHisRemarks)) {
-                        nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    } else {
-                        nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    }
-                    govInfo.setEntityNameHisRemarks(nameHisRemarks);
-                    govInfoMapper.updateById(govInfo);
                 }
+                String nameHisRemarks = govInfo.getEntityNameHisRemarks();
+                if (ObjectUtils.isEmpty(nameHisRemarks)) {
+                    nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                } else {
+                    nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                }
+                govInfo.setEntityNameHisRemarks(nameHisRemarks);
+                govInfoMapper.updateById(govInfo);
+
             });
         }
     }
