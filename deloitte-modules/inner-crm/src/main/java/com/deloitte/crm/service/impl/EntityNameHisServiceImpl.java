@@ -328,15 +328,15 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
                         //如果没被使用过 那么就再此基础上 再添加一条
                         entityInfo.setEntityNameHis(entityInfo.getEntityNameHis() + "," + oldName);
                     }
-                    String nameHisRemarks = entityInfo.getEntityNameHisRemarks();
-                    if (ObjectUtils.isEmpty(nameHisRemarks)) {
-                        nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    } else {
-                        nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    }
-                    entityInfo.setEntityNameHisRemarks(nameHisRemarks);
-                    entityInfoMapper.updateById(entityInfo);
                 }
+                String nameHisRemarks = entityInfo.getEntityNameHisRemarks();
+                if (ObjectUtils.isEmpty(nameHisRemarks)) {
+                    nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                } else {
+                    nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                }
+                entityInfo.setEntityNameHisRemarks(nameHisRemarks);
+                entityInfoMapper.updateById(entityInfo);
             });
         }
 
@@ -369,15 +369,16 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
                         //如果没被使用过 那么就再此基础上 再添加一条
                         govInfo.setGovNameHis(govInfo.getGovNameHis() + "," + oldName);
                     }
-                    String nameHisRemarks = govInfo.getEntityNameHisRemarks();
-                    if (ObjectUtils.isEmpty(nameHisRemarks)) {
-                        nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    } else {
-                        nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
-                    }
-                    govInfo.setEntityNameHisRemarks(nameHisRemarks);
-                    govInfoMapper.updateById(govInfo);
                 }
+                String nameHisRemarks = govInfo.getEntityNameHisRemarks();
+                if (ObjectUtils.isEmpty(nameHisRemarks)) {
+                    nameHisRemarks = DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                } else {
+                    nameHisRemarks = nameHisRemarks + ";" + DateUtil.format(updated, "yyyy-MM-dd") + " " + o.getCreater() + " " + remarks;
+                }
+                govInfo.setEntityNameHisRemarks(nameHisRemarks);
+                govInfoMapper.updateById(govInfo);
+
             });
         }
     }
