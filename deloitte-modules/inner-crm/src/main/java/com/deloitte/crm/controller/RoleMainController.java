@@ -8,7 +8,6 @@ import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.RoleMainService;
-import com.deloitte.crm.vo.CheckVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -71,8 +70,8 @@ public class RoleMainController {
     })
     @Log(title = "【校验字段】", businessType = BusinessType.OTHER)
     @PostMapping("/checkData")
-    public R<CheckVo> checkData(@RequestParam("keyword")@NotNull(message = "关键字不能为空") String keyword,@RequestParam("target")@NotNull(message = "目标字段不能为空") String target){
-        return R.ok(entityInfoManager.matchByKeyword(keyword,target));
+    public R checkData(@RequestParam("keyword")@NotNull(message = "关键字不能为空") String keyword,@RequestParam("target")@NotNull(message = "目标字段不能为空") String target){
+        return entityInfoManager.matchByKeyword(keyword,target);
     }
 
 }
