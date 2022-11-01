@@ -51,6 +51,12 @@ public class CrmMasTask implements Serializable
     @Excel(name = "处理人，完成人")
     private String handleUser;
 
+    /** 备注 */
+    private String remarks;
+
+    /** 详情 */
+    private String details;
+
     /** $column.columnComment */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date created;

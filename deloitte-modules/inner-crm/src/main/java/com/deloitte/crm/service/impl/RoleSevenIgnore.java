@@ -48,6 +48,6 @@ public class RoleSevenIgnore implements RoleSevenTask {
         //绑定关联关系
         entityInfoManager.bindData(entityInfoInsertDTO,null, SecurityUtils.getUsername());
         //完成任务
-        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),1,null);
+        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),1,null,entityInfoInsertDTO.getRemarks());
     }
 }

@@ -103,7 +103,7 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
         entityInfoManager.bindData(entityInfoInsertDTO,entityCode,SecurityUtils.getUsername());
 
         //完成任务
-        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),2,entityCode);
+        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),2,entityCode,entityInfoInsertDTO.getRemarks());
     }
 
     /**
