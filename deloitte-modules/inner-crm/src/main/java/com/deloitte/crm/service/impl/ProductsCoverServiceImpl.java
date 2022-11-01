@@ -112,25 +112,24 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         return oageResult;
     }
 
-
-
-
-
     @Override
     public void CoverRule() {
         log.info("=>> "+ DateUtil.dateTimeNow()+"组装覆盖情况");
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(null);
         List<ProductsCover> productsCovers = new ArrayList<>();
-        List<ProductsCover> productsCoverData = null;
         for (int i = 0; i < entityInfos.size(); i++) {
             log.info("进度=>"+i+1+"<=");
             //组装ESG
             List<ProductsCover> productsCoversE = this.CoverRuleEsg(entityInfos.get(i), productsCovers);
             //组装产业链
-            productsCoverData = this.CoverRuleClTE(entityInfos.get(i), productsCoversE);
-        }
+            List<ProductsCover> productsCoversC = this.CoverRuleClTE(entityInfos.get(i), productsCoversE);
+            //组装股票
+           this.CoverRuleSTOCK(entityInfos.get(i), productsCoversC);
 
-//        boolean b = saveBatch(productsCoverData);
+        }
+        System.out.println(productsCovers);
+//        boolean b = saveBatch(productsCovers);
+//        productsCovers.clear();
         
     }
 
@@ -181,6 +180,29 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             productsCoverC.setIsGov("0");
             productsCoverC.setCoverDes("覆盖");
             productsCovers.add(productsCoverC);
+        }
+        return productsCovers;
+
+    }
+
+
+    public List<ProductsCover> CoverRuleSTOCK(EntityInfo entityInfo,List<ProductsCover> productsCovers){
+        log.info("组装股票");
+        ProductsCover productsCoverS = new ProductsCover();
+        if (entityInfo.getList()==null || entityInfo.getList().equals(0)) {
+            productsCoverS.setProId(CoverRule.STOCK_ID);
+            productsCoverS.setIsCover("0");
+            productsCoverS.setEntityCode(entityInfo.getEntityCode());
+            productsCoverS.setIsGov("0");
+            productsCoverS.setCoverDes("非覆盖");
+            productsCovers.add(productsCoverS);
+        }else if (entityInfo.getList().equals(1)){
+            productsCoverS.setProId(CoverRule.STOCK_ID);
+            productsCoverS.setIsCover("1");
+            productsCoverS.setEntityCode(entityInfo.getEntityCode());
+            productsCoverS.setIsGov("0");
+            productsCoverS.setCoverDes("覆盖");
+            productsCovers.add(productsCoverS);
         }
         return productsCovers;
 

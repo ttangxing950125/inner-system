@@ -54,7 +54,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-//   @Scheduled(cron = "0 0 0 * * ?" )
+   @Scheduled(cron = "0 0 0 * * ?" )
     public void StartRuleTask() {
        //当前日期
        String date = DateUtil.getDate();
@@ -102,7 +102,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/10/28 11:08
     */
-
+    @PostConstruct
     public void  CoverRulePro(){
         log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
         productsCoverService.CoverRule();
