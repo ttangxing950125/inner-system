@@ -1919,13 +1919,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfoValueResult> resultList = new ArrayList<>();
         Page<EntityInfoValueResult> pageResult = new Page<>(pageNum, pageSize);
 
-        queryWrapper.and(wrapper->wrapper.lambda()
+        queryWrapper.lambda()
                     .like(EntityInfo::getEntityCode, param)
                     .or().like(EntityInfo::getEntityName, param)
-                    .or().like(EntityInfo::getCreditCode, param))
-                .and(wrapper->wrapper.lambda()
-                     .eq(EntityInfo::getList, 1).or().eq(EntityInfo::getIssueBonds, 1));
-        queryWrapper.lambda().orderByAsc(EntityInfo::getId);
+                    .or().like(EntityInfo::getCreditCode, param)
+                    .orderByAsc(EntityInfo::getId);
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper);
 
         //新的分页结果赋值

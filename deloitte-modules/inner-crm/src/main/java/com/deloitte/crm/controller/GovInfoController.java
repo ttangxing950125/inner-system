@@ -483,7 +483,7 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 将曾用名存入主体
+     * 初始化曾用名存入主体
      *
      * @return R
      * @author 冉浩岑
