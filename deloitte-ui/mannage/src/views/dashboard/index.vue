@@ -2354,7 +2354,7 @@ export default {
         }
         checkData(parmas).then((res) => {
           const { data } = res
-          const ret = data.data === null ? 1 : 2
+          const ret = data === null ? 1 : 2
           if (num === 1) {
             this.repalce1 = ret
           }
@@ -2362,9 +2362,9 @@ export default {
             this.repalce2 = ret
           }
         })
+        this.$modal.closeLoading()
       } catch (error) {
         console.log(error)
-      } finally {
         this.$modal.closeLoading()
       }
     },

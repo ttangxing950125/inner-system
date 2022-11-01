@@ -250,7 +250,7 @@
             >
               <a href="">更新记录</a>
             </router-link>
-            <a href="">导出上市主体清单</a>
+            <a style="text-decoration:underline;" @click="exportEntity">导出上市主体清单</a>
             <el-input
               v-model="codeInput"
               class="select-x"
@@ -379,9 +379,10 @@ import {
   getListView,
   getNameListByDqCoded,
   updateOldName,
-  addOldName
+  addOldName,
+  exportEntityByType
 } from '@/api/subject'
-import { replaceStr } from '@/utils/index'
+import { replaceStr, download } from '@/utils/index'
 import pagination from '../../components/Pagination'
 export default {
   name: 'Government',
@@ -440,21 +441,21 @@ export default {
     },
     unListBonds() {
       const res = (
-        (this.overviewData.unListBonds / this.sumCount) *
+        (this.overviewData.unListBonds / this.overviewData.count) *
         100
       ).toFixed(2)
       return res
     },
     bonds() {
-      const res = ((this.overviewData.onlyList / this.sumCount) * 100).toFixed(2)
+      const res = ((this.overviewData.onlyList / this.overviewData.count) * 100).toFixed(2)
       return res
     },
     bondsList() {
-      const res = ((this.overviewData.onlyBonds / this.sumCount) * 100).toFixed(2)
+      const res = ((this.overviewData.onlyBonds / this.overviewData.count) * 100).toFixed(2)
       return res
     },
     listBonds() {
-      const res = ((this.overviewData.listBonds / this.sumCount) * 100).toFixed(
+      const res = ((this.overviewData.listBonds / this.overviewData.count) * 100).toFixed(
         2
       )
       return res
@@ -677,6 +678,18 @@ export default {
       } catch (error) {
         console.log(error)
       } finally {
+        this.$modal.closeLoading()
+      }
+    },
+    exportEntity() {
+      try {
+        this.$modal.loading('Loading...')
+        exportEntityByType({ type: this.currentTab }).then((res) => {
+          download(res, '企业主体清单.xlsx')
+          this.$modal.closeLoading()
+        })
+      } catch (error) {
+        console.log(error)
         this.$modal.closeLoading()
       }
     }

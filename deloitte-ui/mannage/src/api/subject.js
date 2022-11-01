@@ -295,7 +295,7 @@ export function updateOldNameGov(parmas) {
 // 企业主体清单-查询上市概览
 export function getListView(parmas) {
   return request({
-    url: "/crm/entityInfo/getListView?type="+parmas.type,
+    url: "/crm/entityInfo/getListView?type=" + parmas.type,
     headers: {
       isToken: true,
     },
@@ -319,7 +319,13 @@ export function getGovView(parmas) {
 // 上市企业-地方政府-更新记录 by正杰
 export function getInfoUpdate(parmas) {
   return request({
-    url: "/crm/updateRecords/getInfo?pageNum=" + parmas.pageNum + '&pageSize=' + parmas.pageSize + '&tableType='+parmas.tableType,
+    url:
+      "/crm/updateRecords/getInfo?pageNum=" +
+      parmas.pageNum +
+      "&pageSize=" +
+      parmas.pageSize +
+      "&tableType=" +
+      parmas.tableType,
     headers: {
       isToken: true,
     },
@@ -331,7 +337,7 @@ export function getInfoUpdate(parmas) {
 // 根据政府名称查询政府主体
 export function getGovByName(parmas) {
   return request({
-    url: "/crm/govInfo/getGovByName?govName=" + parmas.govName ,
+    url: "/crm/govInfo/getGovByName?govName=" + parmas.govName,
     headers: {
       isToken: true,
     },
@@ -343,7 +349,7 @@ export function getGovByName(parmas) {
 // 根据 dqCode 查询政府主体
 export function getInfoDetailGov(parmas) {
   return request({
-    url: "/crm/govInfo/getInfoDetail?dqGovCode=" + parmas.dqGovCode ,
+    url: "/crm/govInfo/getInfoDetail?dqGovCode=" + parmas.dqGovCode,
     headers: {
       isToken: true,
     },
@@ -415,7 +421,13 @@ export function getDataYear(parmas) {
 // 查询产品客户敞口信息
 export function getProDucCom(parmas) {
   return request({
-    url: "/crm/ProMaRel/getProDucCom?dataYear="+parmas.dataYear+'&entityCode='+parmas.entityCode+'&proId='+parmas.proId,
+    url:
+      "/crm/ProMaRel/getProDucCom?dataYear=" +
+      parmas.dataYear +
+      "&entityCode=" +
+      parmas.entityCode +
+      "&proId=" +
+      parmas.proId,
     headers: {
       isToken: true,
     },
@@ -439,7 +451,7 @@ export function updateRel(parmas) {
 // 查询敞口信息
 export function ProMaDir(parmas) {
   return request({
-    url: "/crm/ProMaDir/ProMaDir?proCustId="+parmas.proCustId,
+    url: "/crm/ProMaDir/ProMaDir?proCustId=" + parmas.proCustId,
     headers: {
       isToken: true,
     },
@@ -451,7 +463,7 @@ export function ProMaDir(parmas) {
 // 下载查询产品
 export function getProductsOne(parmas) {
   return request({
-    url: "/crm/Products/getProductsOne?id="+parmas.id,
+    url: "/crm/Products/getProductsOne?id=" + parmas.id,
     headers: {
       isToken: true,
     },
@@ -462,16 +474,20 @@ export function getProductsOne(parmas) {
 
 // 下载查询产品 导出
 export function getProductsExcel(parmas) {
-  return request({
-    url: "/crm/Products/getProductsExcel?id="+parmas.id,
-    headers: {
-      isToken: true,
-      responseType:'blob'
+  return request(
+    {
+      url: "/crm/Products/getProductsExcel?id=" + parmas.id,
+      headers: {
+        isToken: true,
+        responseType: "blob",
+      },
+      responseType: "blob",
+      method: "post",
+      data: parmas,
     },
-    responseType:'blob',
-    method: "post",
-    data: parmas,
-  },{responseType:'blob'}, {responseType:'blob'});
+    { responseType: "blob" },
+    { responseType: "blob" }
+  );
 }
 
 // 政府级别
@@ -488,36 +504,44 @@ export function getGovLevel(parmas) {
 
 // 总览政府导出
 export function exportGov(parmas) {
-  return request({
-    url: "/crm/govInfo/exportGov",
-    headers: {
-      isToken: true,
-      responseType:'blob'
+  return request(
+    {
+      url: "/crm/govInfo/exportGov",
+      headers: {
+        isToken: true,
+        responseType: "blob",
+      },
+      responseType: "blob",
+      method: "get",
+      data: parmas,
     },
-    responseType:'blob',
-    method: "get",
-    data: parmas,
-  },{responseType:'blob'}, {responseType:'blob'});
+    { responseType: "blob" },
+    { responseType: "blob" }
+  );
 }
 
 // 总览企业导出
 export function exportEntity(parmas) {
-  return request({
-    url: "/crm/entityInfo/exportEntity",
-    headers: {
-      isToken: true,
-      responseType:'blob'
+  return request(
+    {
+      url: "/crm/entityInfo/exportEntity",
+      headers: {
+        isToken: true,
+        responseType: "blob",
+      },
+      responseType: "blob",
+      method: "get",
+      data: parmas,
     },
-    responseType:'blob',
-    method: "get",
-    data: parmas,
-  },{responseType:'blob'}, {responseType:'blob'});
+    { responseType: "blob" },
+    { responseType: "blob" }
+  );
 }
 
 // 根据德勤code查询曾用名列表
 export function getNameListByDqCoded(parmas) {
   return request({
-    url: "/crm/his/getNameListByDqCoded?dqCode="+parmas.dqCode,
+    url: "/crm/his/getNameListByDqCoded?dqCode=" + parmas.dqCode,
     headers: {
       isToken: true,
     },
@@ -529,7 +553,15 @@ export function getNameListByDqCoded(parmas) {
 // 新增曾用名
 export function addOldName(parmas) {
   return request({
-    url: "/crm/entityInfo/addOldName?entityCode="+parmas.entityCode+'&entityName='+parmas.entityName+'&entityNameHisRemarks='+parmas.entityNameHisRemarks+'&updated='+parmas.updated,
+    url:
+      "/crm/entityInfo/addOldName?entityCode=" +
+      parmas.entityCode +
+      "&entityName=" +
+      parmas.entityName +
+      "&entityNameHisRemarks=" +
+      parmas.entityNameHisRemarks +
+      "&updated=" +
+      parmas.updated,
     headers: {
       isToken: true,
     },
@@ -552,40 +584,64 @@ export function searchCapture(parmas) {
 
 // {导出整体企业主体情况}
 export function exportEntityIndex(parmas) {
-  return request({
-    url: `/crm/entityInfo/exportEntity`,
-    headers: {
-      isToken: true,
-      responseType:'blob'
+  return request(
+    {
+      url: `/crm/entityInfo/exportEntity`,
+      headers: {
+        isToken: true,
+        responseType: "blob",
+      },
+      method: "post",
+      responseType: "blob",
+      data: parmas,
     },
-    method: "post",
-    responseType:'blob',
-    data: parmas,
-  }, {responseType:'blob'});
+    { responseType: "blob" }
+  );
 }
 
 // 导出全部政府主体Excel表
 export function govExport(parmas) {
-  return request({
-    url: `/crm/govInfo/govExport`,
-    headers: {
-      isToken: true,
-      responseType:'blob'
+  return request(
+    {
+      url: `/crm/govInfo/govExport`,
+      headers: {
+        isToken: true,
+        responseType: "blob",
+      },
+      method: "post",
+      responseType: "blob",
+      data: parmas,
     },
-    method: "post",
-    responseType:'blob',
-    data: parmas,
-  }, {responseType:'blob'});
+    { responseType: "blob" }
+  );
 }
 
 // 根据政府主体，大类小类查询政府主体
 export function getGovInfoByLevel(parmas) {
   return request({
-    url: `/crm/govInfo/getGovInfoByLevel?bigLevel=`+parmas.bigLevel+'&smallLevel='+parmas.smallLevel,
+    url:
+      `/crm/govInfo/getGovInfoByLevel?bigLevel=` +
+      parmas.bigLevel +
+      "&smallLevel=" +
+      parmas.smallLevel,
     headers: {
       isToken: true,
     },
     method: "post",
     data: parmas,
+  });
+}
+
+// 根据类型导出企业主体清单
+export function exportEntityByType(parmas) {
+  return request({
+    url: `/crm/entityInfo/exportEntityByType?type=` + parmas.type,
+    headers: {
+      isToken: true,
+      responseType: "blob",
+    },
+    method: "get",
+    data: parmas,
+    responseType: "blob",
   });
 }
