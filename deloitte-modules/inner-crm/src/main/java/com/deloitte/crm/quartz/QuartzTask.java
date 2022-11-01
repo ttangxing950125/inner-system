@@ -1,10 +1,14 @@
 package com.deloitte.crm.quartz;
-
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.nacos.shaded.com.google.common.base.Objects;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.ProductsCover;
+import com.deloitte.crm.dto.EntityCoverDto;
+import com.deloitte.crm.mapper.ProductsCoverMapper;
+import com.deloitte.crm.quartz.service.CoverRuleProService;
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.service.ProductsCoverService;
@@ -19,8 +23,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,17 +58,24 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+   @Scheduled(cron = "0 0 0 * * ?" )
     public void startRuleTask() {
-        //当前日期
-        String date = DateUtil.getDate();
-        //节假日 0=工作日, 1=假日, 2=节日
-        try {
-            HttpResponse response = HttpRequest.get("https://tool.bitefu.net/jiari/?d=".concat(date)).execute();
-            if (Objects.equal("1", response.body()) || Objects.equal("2", response.body())) {
-                return;
-            }
-        } catch (Exception e) {
+       //当前日期
+       String date = DateUtil.getDate();
+       //节假日 0=工作日, 1=假日, 2=节日
+       try {
+           HttpResponse response = HttpRequest.get("https://tool.bitefu.net/jiari/?d=".concat(date)).execute();
+           if (Objects.equal("1",response.body()) || Objects.equal("2",response.body())) {
+               return;
+           }
+       }catch (Exception e){
+           ArrayList<String> EamilArrayList = new ArrayList<>();
+           EamilArrayList.add("1033166542@qq.com");
+           EamilArrayList.add("2471485070@qq.com");
+           String errorInfoFromException = getErrorInfoFromException(e);
+           for (String s : EamilArrayList) {
+               EmailUtil.sendTemplateEmail("每日定时任务跑批异常", errorInfoFromException,s);
+           }
 
             log.error("e");
 
@@ -96,12 +112,32 @@ public class QuartzTask implements ApplicationContextAware {
      * @return void
      * @author penTang
      * @date 2022/10/28 11:08
-     */
-
-    public void CoverRulePro() {
-        log.info("=>> " + DateUtil.dateTimeNow() + "覆盖跑批开始");
+    */
+    public void  CoverRulePro(){
+        log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
         productsCoverService.CoverRule();
-        log.info("=>> " + DateUtil.dateTimeNow() + "覆盖跑批结束");
+        log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批结束");
     }
+
+    //转换方法
+    /**
+     * 异常信息转String
+     * @param e
+     * @return
+     */
+    public String getErrorInfoFromException(Exception e) {
+        try {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            sw.close();
+            pw.close();
+            return "\r\n" + sw.toString() + "\r\n";
+        } catch (Exception e2) {
+            return "ErrorInfoFromException";
+        }
+    }
+
+
 
 }

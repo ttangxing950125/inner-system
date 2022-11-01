@@ -98,8 +98,11 @@ public class ExportEntityCheckDto implements Serializable {
     @ApiModelProperty(name="entityNameByResult",value="最终统一社会信用代码结果")
     private String  creditCodeByResult;
 
-
     private Map<String, String> more = new HashMap<String, String>();
+    /**主体状态*/
+    @Excel(name = "主体状态")
+    @ApiModelProperty(name="entityNameByResult",value="主体状态")
+    private String isStatus ;
 
 
 
