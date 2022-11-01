@@ -279,7 +279,6 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/updateOldName")
     public R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks) {
-        log.info("  >>>>  修改,停用政府主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ",dqCode,oldName,newOldName,status,remarks);
         return govInfoService.updateOldName(dqCode, oldName, newOldName, status,remarks);
     }
 

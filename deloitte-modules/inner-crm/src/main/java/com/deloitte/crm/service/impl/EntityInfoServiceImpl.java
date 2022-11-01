@@ -634,17 +634,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
-        log.info("  >>>> 修改,停用企业主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remark=[{}] <<<<  ",dqCode,oldName,newOldName,status,remark);
-        if (ObjectUtils.isEmpty(newOldName) || ObjectUtils.isEmpty(oldName)) {
-            return R.fail("无效曾用名");
+        log.info("  >>>> 修改,停用企业主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ",dqCode,oldName,newOldName,status,remark);
+        if (ObjectUtils.isEmpty(oldName)) {
+            return R.fail("无效的原始曾用名");
         }
         if (ObjectUtils.isEmpty(status)) {
+            if (ObjectUtils.isEmpty(newOldName)) {
+                return R.fail("无效的新曾用名");
+            }
             //校验修改后的曾用名是否已经存在
             Long count = nameHisMapper.selectCount(new QueryWrapper<EntityNameHis>().lambda()
                     .eq(EntityNameHis::getDqCode, dqCode)
                     .eq(EntityNameHis::getOldName, newOldName));
             if (count > 0) {
-                return R.ok(REPET_OLD_NAME);
+                return R.ok("曾用名重复，请重新输入");
             }
         }
         //根据dqCode查询主体表
@@ -662,12 +665,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         String newNameResult = "";
         String newRemarkResult = "";
-        for (int i = 1; i < nameList.size(); i++) {
+        for (int i = 0; i < nameList.size(); i++) {
             String remarkVo = "";
             String nameVo = "";
             String hisName = nameList.get(i);
 
-            //匹配历史曾用名则替换或者删除
+            //匹配历史曾用名则停用或者替换
             if (oldName.equals(hisName)) {
                 //匹配时，查询出原本的曾用名数据
                 EntityNameHis one = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda()
@@ -676,21 +679,20 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (ObjectUtils.isEmpty(one)) {
                     continue;
                 }
-                // status 为空则表示替换
+                one.setSource(2);
+                // status 不为空则表示体用曾用名
                 if (!ObjectUtils.isEmpty(status)) {
-                    one.setRemarks(remark).setOldName(newOldName).setStatus(0);
-                    if (!ObjectUtils.isEmpty(remark)) {
-                        one.setRemarks("系统自动生成");
-                    }
-                    one.setSource(2);
+                    one.setStatus(0);
                     //直接替换原本的数据
                     nameHisMapper.updateById(one);
                     continue;
                 }
-                //直接删除原本的数据
-                if (!ObjectUtils.isEmpty(status)) {
-                    one.setStatus(0);
+                //替换曾用名
+                if (ObjectUtils.isEmpty(remark)) {
+                    remark="系统自动生成";
                 }
+                one.setRemarks(remark).setOldName(newOldName);
+                //更新原本的数据
                 nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
