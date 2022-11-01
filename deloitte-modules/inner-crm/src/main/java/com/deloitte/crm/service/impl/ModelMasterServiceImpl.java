@@ -176,6 +176,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         return R.ok(masDto,SuccessInfo.SUCCESS.getInfo());
     }
 
+    /** 组装 树形结构菜单 */
     public GovNode getTree(GovNode govNode,GovInfo govInfo){
         if(!ObjectUtils.isEmpty(govInfo.getPreGovCode())){
             GovInfo parent = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govInfo.getPreGovCode()));
@@ -199,20 +200,9 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         return R.ok(collect);
     }
 
-    private final Integer FINISH_STATE = 1;
 
-    private final Integer UN_FINISH_STATE = 0;
-
-    private final Integer FINISH_DAILY_STATE = 3;
+    /** 前端展示中 Y 表示 1*/
     private final String YES = "Y";
-
-    private final Integer ROLE_2_ID = 4;
-
-    private final Integer ROLE_3_ID = 5;
-
-    private final Integer ROLE_4_ID = 6;
-
-    private final Integer ROLE_5_ID = 7;
 
     /**
      * 敞口划分 保存并提交
@@ -243,14 +233,14 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         updateEntityMaster(masDto);
         log.info("  =>> 修改一条数据至 entity_master <<=  ");
 
-        updateEntityGovRel(masDto);
-        log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");
+        if (YES.equals(masDto.getCityIb())){ updateEntityGovRel(masDto); log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");}
 
         //更改当条信息任务状态
         Date currentDate = iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
         log.info("  =>> 完成任务 taskId = " + masDto.getId() + " <<=  ");
 
         // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
+        Integer UN_FINISH_STATE = 0;
         List<CrmMasTask> crmMasTasks = iCrmMasTaskService.getBaseMapper().selectList(new QueryWrapper<CrmMasTask>()
                 .lambda().eq(CrmMasTask::getTaskDate, currentDate)
                 .eq(CrmMasTask::getState, UN_FINISH_STATE));
@@ -267,16 +257,23 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         //如果 是金融机构 那么 role_id 为6 如果 是城投政府 那么 为 7 如果都是否 那么为 5  => Y 为是
         if (YES.equals(masDto.getIsFinance())) {
             crmSupplyTask.setRoleId(5L);
+            //修改每日任务状态
+            this.editeDailyTaskByRoleTwo(5);
         } else if (YES.equals(masDto.getCityIb())) {
             crmSupplyTask.setRoleId(6L);
+            this.editeDailyTaskByRoleTwo(6);
         } else {
             crmSupplyTask.setRoleId(7L);
+            this.editeDailyTaskByRoleTwo(7);
         }
         //新增任务
         crmSupplyTaskMapper.insert(crmSupplyTask);
 
         // 查询到所有任务已经完成 修改当日单表
         if (crmMasTasks.size() == 0) {
+            Integer ROLE_2_ID = 4;
+            // 任务完成状态为 3
+            Integer FINISH_DAILY_STATE = 3;
             iCrmDailyTaskService.saveTask(ROLE_2_ID, FINISH_DAILY_STATE, DateUtil.format(currentDate, "yyyy-MM-dd"));
 
             // 发送邮件
@@ -298,29 +295,35 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             Long role4 = groupingByMap.computeIfPresent(6L, (k, v) -> v != 0 ? v : 0L);
             Long role5 = groupingByMap.computeIfPresent(7L, (k, v) -> v != 0 ? v : 0L);
             //角色3 角色id为 5L
-            if (role3 != 0 && role3 != null) {
-                sendEmailService.email(ROLE_3_ID, role3.intValue());
+            if (!ObjectUtils.isEmpty(role3)&&role3!=0) {
+                sendEmailService.email(5, role3.intValue(),dateNow);
                 //无任务为 1 有任务未完成 2
-                this.createTask(ROLE_3_ID, 2);
+                this.createTask(5, 2);
             } else {
-                this.createTask(ROLE_3_ID, 1);
+                this.createTask(5, 1);
             }
             //角色4 角色id为 6L
-            if (role4 != 0 && role4 != null) {
-                sendEmailService.email(ROLE_4_ID, role4.intValue());
-                this.createTask(ROLE_4_ID, 2);
+            if (!ObjectUtils.isEmpty(role4)&&role4!=0) {
+                sendEmailService.email(6, role4.intValue(),dateNow);
+                this.createTask(6, 2);
             } else {
-                this.createTask(ROLE_4_ID, 1);
+                this.createTask(6, 1);
             }
             //角色5 角色id为 7L
-            if (role5 != 0 && role5 != null) {
-                sendEmailService.email(ROLE_5_ID, role5.intValue());
-                this.createTask(ROLE_5_ID, 2);
+            if (!ObjectUtils.isEmpty(role5)&&role5!=0) {
+                sendEmailService.email(7, role5.intValue(),dateNow);
+                this.createTask(7, 2);
             } else {
-                this.createTask(ROLE_5_ID, 1);
+                this.createTask(7, 1);
             }
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
+    }
+    /** 修改每日任务表 角色2 */
+    public void editeDailyTaskByRoleTwo(Integer roleId){
+        CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate,DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
+        if(ObjectUtils.isEmpty(crmDailyTask)){iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskStatus(2).setTaskDate(new Date()).setTaskRoleType(roleId.toString()));}
+        else{crmDailyTask.setTaskStatus(2);iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);}
     }
 
     /**
@@ -361,6 +364,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
 
     /**
      * 角色2 生成任务
+     * @param roleId 5-角色3 6-角色4 7-角色5
+     * @param taskState 1- 没有任务  2-有任务未完成
      */
     public void createTask(Integer roleId, Integer taskState) {
         BaseMapper<CrmDailyTask> baseMapper = iCrmDailyTaskService.getBaseMapper();
