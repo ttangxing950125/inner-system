@@ -2144,11 +2144,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityInfoValueResult> resultList = new ArrayList<>();
         Page<EntityInfoValueResult> pageResult = new Page<>(pageNum, pageSize);
 
-        Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper.lambda()
+        queryWrapper.and(wrapper->wrapper.lambda()
                 .like(EntityInfo::getEntityCode, param)
                 .or().like(EntityInfo::getEntityName, param)
-                .or().like(EntityInfo::getCreditCode, param).orderByAsc(EntityInfo::getEntityCode)
-        );
+                .or().like(EntityInfo::getCreditCode, param))
+                .and(wrapper->wrapper.lambda()
+                        .eq(EntityInfo::getList, 1).eq(EntityInfo::getIssueBonds, 1).orderByAsc(EntityInfo::getEntityCode));
+
+        Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper);
+
         //新的分页结果赋值
         pageResult.setTotal(page.getTotal());
 
