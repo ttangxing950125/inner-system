@@ -673,10 +673,13 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
-        if (ObjectUtils.isEmpty(newOldName) || ObjectUtils.isEmpty(oldName)) {
-            return R.fail("无效曾用名");
+        if (ObjectUtils.isEmpty(oldName)) {
+            return R.fail("无效的原始曾用名");
         }
         if (ObjectUtils.isEmpty(status)) {
+            if (ObjectUtils.isEmpty(newOldName)) {
+                return R.fail("无效的新曾用名");
+            }
             //校验修改后的曾用名是否已经存在
             Long count = nameHisMapper.selectCount(new QueryWrapper<EntityNameHis>().lambda()
                     .eq(EntityNameHis::getDqCode, dqCode)
