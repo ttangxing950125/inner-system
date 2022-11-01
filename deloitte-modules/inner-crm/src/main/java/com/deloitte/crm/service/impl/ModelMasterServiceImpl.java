@@ -181,6 +181,10 @@ public class ModelMasterServiceImpl implements IModelMasterService {
                         }
                 }else{log.warn("  =>> 角色 2 发现主体数据 {} 的 敞口关联数据表值为空 <<=  ", entityName);}
             }
+            //敞口划分信息
+            String masterCode = entityMaster.getMasterCode();
+            ModelMaster modelMaster = Optional.ofNullable(modelMasterMapper.selectOne(new QueryWrapper<ModelMaster>().lambda().eq(ModelMaster::getMasterCode, masterCode))).orElse(new ModelMaster());
+            masDto.setMasterCode(modelMaster.getMasterName());
         }
 
         return R.ok(masDto,SuccessInfo.SUCCESS.getInfo());
