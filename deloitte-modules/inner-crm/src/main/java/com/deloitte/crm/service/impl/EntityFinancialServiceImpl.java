@@ -72,6 +72,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
         }
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         entityInfoService.updateEntityInfoByEntityCodeWithOutId(entityInfo);
+
         //检验是否更新每日任务表
         crmDailyTaskService.checkDailyTask(crmSupplyTask);
 

@@ -1589,12 +1589,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockCnRel> cnRels = entityStockCnRels.stream().collect(Collectors.groupingBy(EntityStockCnRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(cnRels)) {
                     cnRels.stream().forEach(x -> {
-                        String stockDqCode = x.getStockDqCode().toLowerCase();
-                        String substring = stockDqCode.substring(0, 1);
-                        if (!ObjectUtils.nullSafeEquals("a", substring)){
-                            //德勤唯一识别代码
-                            stockDqCodeList.add(x.getStockDqCode());
-                        }
+
+                        //德勤唯一识别代码
+                        stockDqCodeList.add(x.getStockDqCode());
+
                     });
                 }
             }
@@ -1602,12 +1600,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockThkRel> thkRels = entityStockthkRels.stream().collect(Collectors.groupingBy(EntityStockThkRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(thkRels)) {
                     thkRels.stream().forEach(x -> {
-                        String stockDqCode = x.getStockDqCode().toLowerCase();
-                        String substring = stockDqCode.substring(0, 1);
-                        if (!ObjectUtils.nullSafeEquals("a", substring)){
-                            //德勤唯一识别代码
-                            stockDqCodeList.add(x.getStockDqCode());
-                        }
+
+                        //德勤唯一识别代码
+                        stockDqCodeList.add(x.getStockDqCode());
+
                     });
                 }
             }
@@ -1627,7 +1623,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
                     //上市状态  6-成功上市
                     stockCnInfos.forEach(x -> {
-                        stockCodeList.add(x.getStockCode());
+                        String stockCode = x.getStockCode();
+                        String substring = stockCode.substring(0, 1);
+                        if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                            //德勤唯一识别代码
+                            stockCodeList.add(stockCode);
+                        }
                         if (LIVE_STATE.equals(listState[0])) {
                             return;
                         }
@@ -1639,7 +1640,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //退市日期
                     try {
                         stockCnInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x -> {
-                            stockdownDateList.add(x.getDelistingDate());
+                            String stockCode = x.getStockCode();
+                            String substring = stockCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                                //德勤唯一识别代码
+                                stockdownDateList.add(x.getDelistingDate());
+                            }
                         });
                     } catch (Exception e) {
                         log.error(e.getMessage());
@@ -1647,9 +1653,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //上市日期
                     try {
                         stockCnInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getListDate())).forEach(x -> {
-                            String stockDqCode = x.getStockDqCode().toLowerCase();
-                            String substring = stockDqCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)){
+                            String stockCode = x.getStockCode();
+                            String substring = stockCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
                                 //德勤唯一识别代码
                                 stockDateList.add(x.getListDate());
                             }
@@ -1663,7 +1669,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (!CollectionUtils.isEmpty(stockThkInfos)) {
                     //上市状态  4-成功上市
                     stockThkInfos.forEach(x -> {
-                        stockCodeList.add(x.getStockCode());
+                        String stockCode = x.getStockCode();
+                        String substring = stockCode.substring(0, 1);
+                        if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                            //德勤唯一识别代码
+                            stockCodeList.add(stockCode);
+                        }
                         if (LIVE_STATE.equals(listState[0])) {
                             return;
                         }
@@ -1675,9 +1686,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //退市日期
                     try {
                         stockThkInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x -> {
-                            String stockDqCode = x.getStockDqCode().toLowerCase();
-                            String substring = stockDqCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)){
+                            String stockCode = x.getStockCode();
+                            String substring = stockCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
                                 //德勤唯一识别代码
                                 stockdownDateList.add(x.getDelistingDate());
                             }
@@ -1688,9 +1699,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     //上市日期
                     try {
                         stockThkInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getListDate())).forEach(x -> {
-                            String stockDqCode = x.getStockDqCode().toLowerCase();
-                            String substring = stockDqCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)){
+                            String stockCode = x.getStockCode();
+                            String substring = stockCode.substring(0, 1);
+                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
                                 //德勤唯一识别代码
                                 stockDateList.add(x.getListDate());
                             }
@@ -1836,7 +1847,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //模糊匹配全名 债券list
                 //模糊匹配短名 债券list
                 Page<BondInfo> bondInfoPage = bondInfoMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<BondInfo>()
-                        .lambda().like(BondInfo::getBondShortName,name));
+                        .lambda().like(BondInfo::getBondShortName, name));
                 List<BondInfo> bondInfos = bondInfoPage.getRecords();
                 if (bondInfos.size() == 0) {
                     log.info("  =>>  未查询到相关信息  <<=  ");
@@ -3225,13 +3236,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (ObjectUtils.isEmpty(type)) {
             type = 1;
         }
-        if (type==1) {
+        if (type == 1) {
             infoQuery.eq(EntityInfo::getList, 1);
-        } else if (type==2) {
+        } else if (type == 2) {
             infoQuery.eq(EntityInfo::getIssueBonds, 1);
-        } else if (type==3) {
+        } else if (type == 3) {
             infoQuery.eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0);
-        } else if (type==4) {
+        } else if (type == 4) {
             infoQuery.eq(EntityInfo::getFinance, 1);
         }
 
@@ -3259,11 +3270,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         });
         records = finalRecords;
 
-        if (type==1) {
+        if (type == 1) {
             records = getListSpecial(records, codeList);
-        } else if (type==2) {
+        } else if (type == 2) {
             records = getListSpecial(records, codeList);
-        } else if (type==4) {
+        } else if (type == 4) {
             records = getListSpecial(records, codeList);
         }
         if (CollectionUtils.isEmpty(entityInfoList)) {
@@ -3272,7 +3283,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         // 将数据汇总
         List<List<Object>> sheetDataList = new ArrayList<>();
         //设置表头
-        List<Object> head=Arrays.asList("存续状态", "德勤主体代码", "主体名称", "证券代码",
+        List<Object> head = Arrays.asList("存续状态", "德勤主体代码", "主体名称", "证券代码",
                 "曾用名和别称", "上市日期", "退市日期", "更新记录");
         sheetDataList.add(head);
 
@@ -3280,25 +3291,25 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //添加行数据
             List<Object> sheetData = new ArrayList<>();
 
-            String liveType="Y";
+            String liveType = "Y";
 
             record.getList();
-            if (type==1) {
+            if (type == 1) {
                 Integer list = record.getList();
-                if (ObjectUtils.isEmpty(list)||1!=list){
-                    liveType="N";
+                if (ObjectUtils.isEmpty(list) || 1 != list) {
+                    liveType = "N";
                 }
-            } else if (type==2) {
+            } else if (type == 2) {
                 Integer iss = record.getIssueBonds();
-                if (ObjectUtils.isEmpty(iss)||1!=iss){
-                    liveType="N";
+                if (ObjectUtils.isEmpty(iss) || 1 != iss) {
+                    liveType = "N";
                 }
-            }else if (type==3) {
-                liveType="N";
-            } else if (type==4) {
+            } else if (type == 3) {
+                liveType = "N";
+            } else if (type == 4) {
                 Integer finance = record.getFinance();
-                if (ObjectUtils.isEmpty(finance)||1!=finance){
-                    liveType="N";
+                if (ObjectUtils.isEmpty(finance) || 1 != finance) {
+                    liveType = "N";
                 }
             }
             sheetData.add(liveType);
@@ -3318,16 +3329,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             //添加总数据
             sheetDataList.add(sheetData);
         }
-        String name="上市主体清单";
-        if (2==type){
-            name="发债主体清单";
-        }else if (3==type){
-            name="既非上市也非发债主体清单";
-        }else if (4==type){
-            name="金融机构主体清单";
+        String name = "上市主体清单";
+        if (2 == type) {
+            name = "发债主体清单";
+        } else if (3 == type) {
+            name = "既非上市也非发债主体清单";
+        } else if (4 == type) {
+            name = "金融机构主体清单";
         }
         // 导出数据
         ExcelUtils.export(response, name, sheetDataList);
-        log.info("导出"+name+"完毕");
+        log.info("导出" + name + "完毕");
     }
 }
