@@ -1,7 +1,8 @@
 package com.deloitte.crm.service;
 
+
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.deloitte.crm.entity.ThkSecRetiredInfo;
+import com.deloitte.crm.domain.ThkSecRetiredInfo;
 
 /**
  * 证券发行-港股-已退市证券一览(ThkSecRetiredInfo)表服务接口
