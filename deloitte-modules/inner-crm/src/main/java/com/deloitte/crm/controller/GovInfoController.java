@@ -483,15 +483,14 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 将政府曾用名存入政府主体
+     * 将曾用名存入主体
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/11/1 15:29
     */
-    @ApiOperation(value = "将曾用名存入政府主体")
-    @PostMapping("/saveOldNameToGovInfo")
-    public R saveOldNameToGovInfo(){
+    @PostMapping("/saveOldNameToInfo")
+    public R saveOldNameToInfo(){
         entityNameHisService.saveOldNameToInfo();
         return R.ok();
     }
