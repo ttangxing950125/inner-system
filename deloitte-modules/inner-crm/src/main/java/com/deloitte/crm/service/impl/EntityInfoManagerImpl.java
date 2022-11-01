@@ -188,7 +188,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else{return R.fail(byCode,BadInfo.EXITS_ENTITY_CODE.getInfo());}
                 //主体的统一社会信用代码
             case CREDIT_CODE:
-                if(!keyword.matches(Common.REGEX_CREDIT_CODE)){return R.ok(BadInfo.VALID_PARAM.getInfo());}
+                if(!keyword.matches(Common.REGEX_CREDIT_CODE)){return R.fail(BadInfo.VALID_PARAM.getInfo());}
                 EntityInfo byCreditCode = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, target));
                 if(byCreditCode==null){return R.ok(SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
                 }else{return R.fail(byCreditCode,BadInfo.EXITS_ENTITY_CODE.getInfo());}
@@ -217,7 +217,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else{return R.fail(govByName,BadInfo.EXITS_BOND_CODE.getInfo());}
             //新地方政府行政编码
             case GOV_CODE:
-                if(!target.matches(Common.REGEX_GOV_CODE)){return R.ok(BadInfo.PARAM_GOV_VALIDA.getInfo());}
+                if(!target.matches(Common.REGEX_GOV_CODE)){return R.fail(BadInfo.PARAM_GOV_VALIDA.getInfo());}
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
                 if(govByCode==null){return R.ok(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return R.fail(govByCode,BadInfo.EXITS_BOND_CODE.getInfo());}
