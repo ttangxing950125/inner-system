@@ -7,6 +7,7 @@ package com.deloitte.crm.constants;
  */
 public enum BadInfo {
 
+    /** 错误结果信息返回结果 */
     PARAM_EMPTY("参数不能为空"),
     RESULT_NULL("结果为空"),
     ERROR_SYSTEM_BUSY("系统繁忙，请稍后再操作"),
@@ -15,6 +16,10 @@ public enum BadInfo {
     EXITS_ENTITY_CODE("该主体已存在，无法新增"),
     EXITS_CREDIT_CODE("该统一社会信用代码已存在"),
     EXITS_BOND_CODE("该债券已存在"),
+    EXITS_BOND_SHORT_NAME("该债券简称已经存在"),
+    EXITS_BOND_FULL_NAME("该债券全称已经存在"),
+    EXITS_GOV_NAME("地方政府名称已存在"),
+    EXITS_GOV_CODE("地方政府行政编码已存在"),
     EXITS_STOCK_CODE("该股票代码重复"),
     EXITS_STOCK_SHO_NAME("该股票简称重复"),
     VALID_EMPTY_TARGET("未查询到有效数据"),
@@ -45,6 +50,7 @@ public enum BadInfo {
 
     public static final Boolean GET = false;
 
+    /**  获取信息结果 */
     private final String info;
 
     BadInfo(String info) {
