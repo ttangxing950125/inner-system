@@ -54,8 +54,8 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-//   @Scheduled(cron = "0 0 0 * * ?" )
-    public void StartRuleTask() {
+   @Scheduled(cron = "0 0 0 * * ?" )
+    public void startRuleTask() {
        //当前日期
        String date = DateUtil.getDate();
        //节假日 0=工作日, 1=假日, 2=节日
@@ -80,7 +80,7 @@ public class QuartzTask implements ApplicationContextAware {
      * {@link EntityAttrValue}
      */
     @Async
-//    @Scheduled(cron = "0 0 12 * * ?" )
+    @Scheduled(cron = "0 0 12 * * ?" )
     @Transactional(rollbackFor = Exception.class)
     public void runBatchDataToAttrValue(){
         log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");

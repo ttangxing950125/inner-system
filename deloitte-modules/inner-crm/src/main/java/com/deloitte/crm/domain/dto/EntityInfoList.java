@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.utils.TimeFormatUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -223,6 +224,26 @@ public class EntityInfoList {
      */
     private String liveState;
 
+    /**
+     * 关键备注提醒
+     */
+    @Excel(name = "更新记录")
+    private String updateRecord;
+    public void newUpdateRecord(EntityInfoList entityInfoList) {
+        try {
+            String type="创建";
+            Date updated = entityInfoList.getUpdated();
+            long update = updated.getTime();
+            long create = entityInfoList.getCreated().getTime();
+            if (create-update!=0l){
+                type="修改";
+            }
+            String formartDate = TimeFormatUtil.getFormartDate(updated);
+            this.updateRecord=formartDate+" "+type;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

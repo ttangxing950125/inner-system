@@ -124,4 +124,6 @@ public interface IGovInfoService  extends IService<GovInfo>
     void updateGovInfosByPreCode();
 
     R getGovInfoByLevel(Integer bigLevel, Integer smallLevel);
+
+    List<GovInfo>  selectList();
 }

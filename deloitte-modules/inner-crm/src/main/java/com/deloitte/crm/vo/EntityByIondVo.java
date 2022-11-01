@@ -27,6 +27,11 @@ public class EntityByIondVo
     @ApiModelProperty(value="债券名称")
     @NotNull(message = "债券名称不能为空")
     private String  bondName;
+  /**
+  * 德勤code
+  */
+   @ApiModelProperty(value="德勤code")
+    private String  dqGovCode;
 
 
     /**
@@ -67,6 +72,17 @@ public class EntityByIondVo
     @ApiModelProperty(value="到期日")
     @NotNull(message = "到期日或者退市日期不能为空")
     private  String  endDate ;
+
+     /** 违约日期*/
+     @ApiModelProperty(value="违约日期")
+      private  String defaultDate;
+     /** 是否城投债* 1-是 0-否*/
+     @ApiModelProperty(value="是否城投债")
+     private  String isInvestment;
+
+      /** 是否违约或展期*/
+      @ApiModelProperty(value="是否违约或展期")
+      private  Integer isDefaultOrRoll;
 
     /** 债券类型*/
     @ApiModelProperty(value="债券类型")
