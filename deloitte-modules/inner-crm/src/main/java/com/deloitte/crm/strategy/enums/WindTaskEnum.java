@@ -26,7 +26,7 @@ public enum WindTaskEnum {
 
     THK_SEC_ISS_INFO(22, 3, "港股发行", "证券发行-股票发行-聆讯信息一览"),
     THK_SEC_ISS_DETAIL(23, 3, "港股发行", "证券发行-股票发行-首次发行明细"),
-    THK_SEC_RETIRED_INFO(24, 3, "港股发行", "证券发行-港股-已退市证券一览"),
+    THK_SEC_RETIRED_INFO(26, 3, "港股发行", "证券发行-港股-已退市证券一览"),
 
     BREAK_CONTRACT_FIRST_NUMBER_COUNT(24, 4, "违约", "企业首次违约报表"),
     BREAK_CONTRACT_DEFAULT_MONEY_TOTAL(25, 4, "违约", "历年违约发生金额统计");
