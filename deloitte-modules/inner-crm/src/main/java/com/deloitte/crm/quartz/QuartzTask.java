@@ -55,7 +55,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @date 2022/9/22 14:22
      */
    @Scheduled(cron = "0 0 0 * * ?" )
-    public void StartRuleTask() {
+    public void startRuleTask() {
        //当前日期
        String date = DateUtil.getDate();
        //节假日 0=工作日, 1=假日, 2=节日
