@@ -137,11 +137,11 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 if (CollUtil.isNotEmpty(entityInfos)) {
                     //更新 主体基本信息表
                     entityInfos.stream().map(e -> e.setWindMaster(thkSecRetiredInfos.getBelWind())).forEach(e -> entityInfoService.getBaseMapper().updateById(e));
+                    initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
                 } else {
-                    this.initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
+                    log.warn("==> 根据企业名称：{} 查询主体信息 为空 不做任何绑定关系", thkSecRetiredInfos.getCompanyCn());
                 }
             }
-
             thkSecRetiredInfos.setChangeType(changeType);
             thkSecRetiredInfoService.save(thkSecRetiredInfos);
 
@@ -203,8 +203,8 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo);
             } else {
                 EntityBaseBusiInfo info1 = new EntityBaseBusiInfo();
-                entityBaseBusiInfo.setRegAddr(thkSecRetiredInfo.getDetailedAddress());
-                entityBaseBusiInfo.setBusRange(Optional.ofNullable(thkSecRetiredInfo.getMainBusiness()).orElse(null));
+                info1.setRegAddr(Optional.ofNullable(thkSecRetiredInfo.getDetailedAddress()).orElse(null));
+                info1.setBusRange(Optional.ofNullable(thkSecRetiredInfo.getMainBusiness()).orElse(null));
                 info1.setEntityCode(entityCode);
                 entityBaseBusiInfoMapper.insert(info1);
             }
