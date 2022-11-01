@@ -674,7 +674,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
                 // status 为空则表示替换
                 if (!ObjectUtils.isEmpty(status)) {
-                    one.setRemarks(remark).setOldName(newOldName);
+                    one.setRemarks(remark).setOldName(newOldName).setStatus(0);
                     if (!ObjectUtils.isEmpty(remark)) {
                         one.setRemarks("系统自动生成");
                     }

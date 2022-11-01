@@ -275,6 +275,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
         //前发行人名称 此处用的发行人全称
         result.add(getDataFromEntityAttrValue(59, bondCode));
         EntityAttrValue issuerName = entityAttrValueMapper.findValueByCodeAndAttrId(59, bondCode);
+        if(ObjectUtils.isEmpty(issuerName)){ issuerName = new EntityAttrValue(); }
 
         /**
          * 通过发行人全称 查找到 发行人
