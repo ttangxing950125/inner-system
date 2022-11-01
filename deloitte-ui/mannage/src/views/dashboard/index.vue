@@ -2318,7 +2318,6 @@ export default {
           this.$set(this.ruleForm, 'entityCode', row.entityCode)
           this.$set(this.ruleForm, 'id', row.id)
           this.$set(this.ruleForm, 'state', row.state)
-          console.log(this.ruleForm)
         })
         getFinances({}).then((res) => {
           const { data } = res
@@ -2355,7 +2354,7 @@ export default {
         }
         checkData(parmas).then((res) => {
           const { data } = res
-          const ret = data.data === null ? 1 : 2
+          const ret = data === null ? 1 : 2
           if (num === 1) {
             this.repalce1 = ret
           }
@@ -2363,9 +2362,9 @@ export default {
             this.repalce2 = ret
           }
         })
+        this.$modal.closeLoading()
       } catch (error) {
         console.log(error)
-      } finally {
         this.$modal.closeLoading()
       }
     },

@@ -1,5 +1,6 @@
 package com.deloitte.crm.domain;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.io.Serializable;
 
@@ -84,14 +85,11 @@ public class StockThkInfo implements Serializable {
     @Excel(name = "股票代码")
     @UpdateLog(fieldName = "港股股票代码", tableFieldName = "stock_code")
     private String stockCode;
-    /**
-     * 创建时间
+    /*****************************************
+     /**
+     * 公司英文名称
      */
-    private Date created;
-    /**
-     * 更新时间
-     */
-    private Date updated;
+    private String companyEnglish;
 
     /**
      * 上市板
@@ -102,4 +100,71 @@ public class StockThkInfo implements Serializable {
      * 公司介绍
      */
     private String entityIntro;
+
+    /**
+     * 发行股本(百万元)
+     */
+    private BigDecimal ssuingEquity;
+
+    /**
+     * 法定股本(百万元)
+     */
+    private BigDecimal statutoryCapital;
+    /**
+     * 币种
+     */
+    private String currency;
+    /**
+     * 集团主席
+     */
+    private String chairmanGroup;
+    /**
+     * 公司秘书
+     */
+    private String companySecretary;
+    /**
+     * 办公地址
+     */
+    private String officeAddress;
+    /**
+     * 公司网址
+     */
+    private String companyWebSite;
+    /**
+     * 电邮地址
+     */
+    private String emailAddress;
+    /**
+     * 电话
+     */
+    private String phone;
+    /**
+     * 传真
+     */
+    private String fax;
+    /**
+     * 年结日
+     */
+    private String junction;
+    /**
+     * 所属Wind行业
+     */
+    private String belWind;
+    /**
+     * 所属行业(HS)
+     */
+    private String hsLndustry;
+    /**
+     * 终止上市类型
+     */
+    private String terminationType;
+    /*****************************************
+     /**
+     * 创建时间
+     */
+    private Date created;
+    /**
+     * 更新时间
+     */
+    private Date updated;
 }

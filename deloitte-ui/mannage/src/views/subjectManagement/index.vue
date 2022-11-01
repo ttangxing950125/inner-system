@@ -51,7 +51,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">政府主体</div>
-              <el-button type="text "  style="text-decoration:underline" @click="exprotGov">导出全部</el-button>
+              <el-button type="text " style="text-decoration:underline" @click="exprotGov">导出全部</el-button>
               <div class="right-number">{{ toThousands(goveSum) }}</div>
             </div>
           </div>
@@ -144,7 +144,7 @@
           <div class="box-card1 box-card">
             <div class="flex1 top-left">
               <div class="title mr20">企业主体</div>
-              <el-button type="text "  style="text-decoration:underline" @click="exprotEntity">导出全部</el-button>
+              <el-button type="text " style="text-decoration:underline" @click="exprotEntity">导出全部</el-button>
               <div class="right-number">{{ toThousands(entitySum) }}</div>
             </div>
           </div>
@@ -243,8 +243,8 @@
           <div class="select-body">
             <div class="flex1">
               <el-select
-                class="mr5 select-only"
                 v-model="value"
+                class="mr5 select-only"
                 placeholder="选择主体类型"
                 @change="changeType"
               >
@@ -253,17 +253,16 @@
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
-                >
-                </el-option>
+                />
               </el-select>
               <el-input
-                class="mr10"
                 v-model="input"
+                class="mr10"
                 placeholder="请输入主体名称/行政区划/企业统一社会信用代码"
-              ></el-input>
+              />
               <el-select
-                class="mr10 selects"
                 v-model="value1"
+                class="mr10 selects"
                 :disabled="value === 'GV'"
                 multiple
                 placeholder="选择查询产品范围（可多选）"
@@ -274,21 +273,22 @@
                   :key="item.id"
                   :label="item.proName"
                   :value="item.id"
-                >
-                </el-option>
+                />
               </el-select>
-              <el-button class="mr10 green-btn" type="primary" @click="select"
-                >查询</el-button
-              >
+              <el-button
+                class="mr10 green-btn"
+                type="primary"
+                @click="select"
+              >查询</el-button>
             </div>
           </div>
           <div class="select-table">
-            <div class="table-title flex1" v-if="list.length === 0">
+            <div v-if="list.length === 0" class="table-title flex1">
               <div class="table-desc">查询结果</div>
               <el-divider
                 direction="vertical"
                 style="height：60px"
-              ></el-divider>
+              />
               <div class="table-desc">
                 {{
                   loading ? "查询中..." : list.length === 0 ? "查无此结果" : ""
@@ -303,24 +303,22 @@
                 </div>
               </div>
               <el-table class="table-content" :data="list" style="width: 98%">
-                <el-table-column fixed type="index" width="50" label="序号">
-                </el-table-column>
+                <el-table-column fixed type="index" width="50" label="序号" />
                 <el-table-column
                   fixed
                   :prop="selectType === 'GV' ? 'dqCode' :'entityCode'"
                   label="德勤主体代码"
                   width="200"
-                >
-                </el-table-column>
+                />
                 <el-table-column
                   fixed
                   prop="status"
                   label="是否生效"
                   width="200"
                 >
-                 <template slot-scope="scope">
+                  <template slot-scope="scope">
                     <div>{{ scope.row.status && scope.row.status === 1 ? '是' : '否' }}</div>
-                 </template>
+                  </template>
                 </el-table-column>
                 <el-table-column
                   fixed
@@ -329,34 +327,33 @@
                   width="300"
                   class="xxxxxxx"
                 >
-                 <template slot-scope="scope">
-                    <div v-html="replaceFun(selectType === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName)"></div>
+                  <template slot-scope="scope">
+                    <div v-html="replaceFun(selectType === 'GV' ? scope.row.govName+scope.row.govCode : scope.row.entityName)" />
                   </template>
                 </el-table-column>
                 <el-table-column
-                    v-if="selectType === 'GV'"
+                  v-if="selectType === 'GV'"
                   fixed
                   prop="levelName"
                   label="行政规划"
                   class="xxxxxxx"
-                >
-                </el-table-column>
+                />
                 <el-table-column
-                    v-if="selectType === 'GV'"
+                  v-if="selectType === 'GV'"
                   fixed
                   prop="state"
                   label="是否覆盖"
                   class="xxxxxxx"
                 >
-                    <template slot-scope="scope">
-                        <div>
-                        {{ scope.row.state === 1 ? '是' : '否' }}
-                        </div>
-                    </template>
+                  <template slot-scope="scope">
+                    <div>
+                      {{ scope.row.state === 1 ? '是' : '否' }}
+                    </div>
+                  </template>
                 </el-table-column>
                 <el-table-column
-                  v-if="selectType !== 'GV'"
                   v-for="(item, index) in rettHeaer"
+                  v-if="selectType !== 'GV'"
                   :key="index"
                   :prop="item.proName"
                   :label="item.proName"
@@ -371,13 +368,13 @@
               </el-table>
             </div>
           </div>
-            <pagination
-              v-show="total > 0"
-              :total="total"
-              :page.sync="queryParams.pageNum"
-              :limit.sync="queryParams.pageSize"
-              @pagination="getList"
-            />
+          <pagination
+            v-show="total > 0"
+            :total="total"
+            :page.sync="queryParams.pageNum"
+            :limit.sync="queryParams.pageSize"
+            @pagination="getList"
+          />
         </el-card>
       </el-col>
     </el-row>
@@ -385,9 +382,12 @@
       <div class="p-top">
         <span>请按照模板准备输入文件， 并通过以下界面导入文件进行匹配。</span>
       </div>
-      <el-button type="text" style="text-decoration:underline" class="p-top" @click="downFile"
-        >批量查询匹配模板.xlsx</el-button
-      >
+      <el-button
+        type="text"
+        style="text-decoration:underline"
+        class="p-top"
+        @click="downFile"
+      >批量查询匹配模板.xlsx</el-button>
       <div class="p-red">
         <div>特别注意：</div>
         <div>请不要修改列名！</div>
@@ -398,16 +398,16 @@
         <div class="upload-font">请选择文件</div>
         <fileUpload
           v-if="!uploadStatus && !uploadLoading"
-          :uploadUrl="'#'"
-          :uploadStr="'+ 点击上传文件'"
           ref="fileUpload"
+          :upload-url="'#'"
+          :upload-str="'+ 点击上传文件'"
+          :http-fun="uploadFun"
           @loading="loadingFun"
           @uploadFail="uploadFail"
           @uploadPass="uploadPass"
-          :httpFun="uploadFun"
-        /> 
-        <div class="upload-complete" v-else>
-            <span class="upload-c-s">{{ uploadLoading ? '上传中' : '已完成' }}</span>
+        />
+        <div v-else class="upload-complete">
+          <span class="upload-c-s">{{ uploadLoading ? '上传中' : '已完成' }}</span>
         </div>
       </div>
       <div>
@@ -421,44 +421,45 @@
           color="#86BC25"
           :text-inside="true"
           :stroke-width="15"
-        ></el-progress>
+        />
       </div>
       <div slot="footer" class="dialog-footer center">
-        <el-button type="primary" @click="dialogVisible = false"
-          >确 定</el-button
-        >
+        <el-button
+          type="primary"
+          @click="dialogVisible = false"
+        >确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { govList, entityInfoList, getProduct, getCov, exportGov, exportEntity } from "@/api/subject";
-import { importExcelByEntity, getChecking  } from "@/api/common";
+import { govList, entityInfoList, getProduct, getCov, exportGov, exportEntity } from '@/api/subject'
+import { importExcelByEntity, getChecking } from '@/api/common'
 import { download, replaceStr } from '@/utils/index'
-import fileUpload from "../../components/FileUpload/httpUpload.vue";
-import pagination from "../../components/Pagination";
+import fileUpload from '../../components/FileUpload/httpUpload.vue'
+import pagination from '../../components/Pagination'
 export default {
-  name: "Index",
+  name: 'Index',
   components: {
     fileUpload,
-    pagination,
+    pagination
   },
   data() {
     return {
       list: [],
-      input: "",
+      input: '',
       options: [
         {
-          value: "GV",
-          label: "政府主体",
+          value: 'GV',
+          label: '政府主体'
         },
         {
-          value: "Q",
-          label: "企业主体",
-        },
+          value: 'Q',
+          label: '企业主体'
+        }
       ],
-      value: "Q",
+      value: 'Q',
       options2: [],
       value1: [],
       loading: false,
@@ -483,24 +484,24 @@ export default {
       selectHeaer: [],
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       total: 0,
       queryParams2: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       total2: 0,
       rettHeaer: [
-          {
-              proName: ''
-          },
-          {
-              proName: ''
-          },
-          {
-              proName: ''
-          }
+        {
+          proName: ''
+        },
+        {
+          proName: ''
+        },
+        {
+          proName: ''
+        }
       ],
       uuid: '',
       timer: null,
@@ -508,181 +509,191 @@ export default {
       fileName: '批量检查结果.xlsx',
       uploadLoading: false,
       selectType: false
-    };
+    }
+  },
+  computed: {
+    govePercent() {
+      const res = ((this.goveSum / (this.goveSum + this.entitySum)) * 100).toFixed(2)
+      return res
+    },
+    entityPercent() {
+      const res = ((this.entitySum / (this.goveSum + this.entitySum)) * 100).toFixed(2)
+      return res
+    }
   },
   mounted() {
-    this.init();
+    this.init()
   },
   methods: {
-        toThousands(num) {
-            return (num || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
-        },
-      getuuid() {
-          const timeStr = Date.now()
-        const rondStr = Math.round(Math.random()*10)
-        const parmasStr = timeStr+rondStr
-        localStorage.setItem('uuid', parmasStr)
-        this.uuid = parmasStr
-      },
+    toThousands(num) {
+      return (num || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+    },
+    getuuid() {
+      const timeStr = Date.now()
+      const rondStr = Math.round(Math.random() * 10)
+      const parmasStr = timeStr + rondStr
+      localStorage.setItem('uuid', parmasStr)
+      this.uuid = parmasStr
+    },
     init() {
       try {
-        this.$modal.loading("loading...");
-        this.loadingData = true;
+        this.$modal.loading('loading...')
+        this.loadingData = true
         govList({}).then((res) => {
-          const { data } = res;
-          this.goverment = data;
+          const { data } = res
+          this.goverment = data
           this.goveSum = data.govSum
-          this.govSumPercent = this.getPercent(data.govSum, this.goveSum);
-          this.provincePercent = this.getPercent(data.province, this.goveSum);
-          this.cityPercent = this.getPercent(data.city, this.goveSum);
-          this.countyPercent = this.getPercent(data.county, this.goveSum);
-          this.openPercent = this.getPercent(data.open, this.goveSum);
-        });
+          this.govSumPercent = this.getPercent(data.govSum, this.goveSum)
+          this.provincePercent = this.getPercent(data.province, this.goveSum)
+          this.cityPercent = this.getPercent(data.city, this.goveSum)
+          this.countyPercent = this.getPercent(data.county, this.goveSum)
+          this.openPercent = this.getPercent(data.open, this.goveSum)
+        })
         entityInfoList({}).then((res) => {
-          const { data } = res;
-          this.entity = data;
+          const { data } = res
+          this.entity = data
           this.entitySum = data.entitySum
           this.entitySumPercent = this.getPercent(
             data.entitySum,
             this.entitySum
-          );
-          this.listPercent = this.getPercent(data.list, this.entitySum);
+          )
+          this.listPercent = this.getPercent(data.list, this.entitySum)
           this.issueBondsPercent = this.getPercent(
             data.issueBonds,
             this.entitySum
-          );
-          this.financePercent = this.getPercent(data.finance, this.entitySum);
+          )
+          this.financePercent = this.getPercent(data.finance, this.entitySum)
           this.bondsAndListPercent = this.getPercent(
             data.bondsAndList,
             this.entitySum
-          );
+          )
           this.notBondsAndListPercent = this.getPercent(
             data.notBondsAndList,
             this.entitySum
-          );
-        });
+          )
+        })
         getProduct({}).then((res) => {
-          const { data } = res;
-          this.options2 = data;
+          const { data } = res
+          this.options2 = data
           this.options2.push({
             id: 9999,
-            proName: "全部产品",
-          });
+            proName: '全部产品'
+          })
           this.rettHeaer = []
-            this.options2.forEach((k) => {
-                if (k.id !== 9999) {
-                this.rettHeaer.push(k);
-                }
-            });
-        });        
-        let proId = [];
+          this.options2.forEach((k) => {
+            if (k.id !== 9999) {
+              this.rettHeaer.push(k)
+            }
+          })
+        })
+        let proId = []
         if (this.value1[0] === 9999) {
           this.options2.forEach((k) => {
             if (k.id !== 9999) {
-              proId.push(k.id);
+              proId.push(k.id)
             }
-          });
+          })
         } else {
-          proId = this.value1;
+          proId = this.value1
         }
         const parmas = {
           entityName: this.input,
           entityType: this.value,
           proId: proId,
           pageNum: this.queryParams.pageNum,
-          pageSize: this.queryParams.pageSize,
-        };
+          pageSize: this.queryParams.pageSize
+        }
         getCov(parmas).then((res) => {
-          const { data } = res;
+          const { data } = res
           data.records.forEach((e) => {
             if (e.result !== null) {
               e.result.forEach((r) => {
-                e[r.key] = r.value;
-              });
+                e[r.key] = r.value
+              })
             }
-          });
-          this.list = data.records;
-          this.total = data.total;
-          this.queryParams.pageNum = data.current;
-        });
+          })
+          this.list = data.records
+          this.total = data.total
+          this.queryParams.pageNum = data.current
+        })
         this.getuuid()
       } catch (error) {
-        console.log(error);
+        console.log(error)
       } finally {
-        this.loadingData = false;
-        this.$modal.closeLoading();
+        this.loadingData = false
+        this.$modal.closeLoading()
       }
     },
     getList() {
-      let proId = [];
+      let proId = []
       if (this.value1.length === 1 && this.value1[0] === 9999) {
         this.options2.forEach((k) => {
           if (k.id !== 9999) {
-            proId.push(k.id);
+            proId.push(k.id)
           }
-        });
+        })
       } else {
-        proId = this.value1;
+        proId = this.value1
       }
       const parmas = {
         entityName: this.input,
         entityType: this.value,
         proId: proId,
         pageNum: this.queryParams.pageNum,
-        pageSize: this.queryParams.pageSize,
-      };
+        pageSize: this.queryParams.pageSize
+      }
       getCov(parmas).then((res) => {
         const { data } = res;
         (data.records).forEach((e) => {
           if (e.result !== null) {
             e.result.forEach((r) => {
-              e[r.key] = r.value;
-              e.color = r.color;
-            });
+              e[r.key] = r.value
+              e.color = r.color
+            })
           }
-        });
-        this.list = data.records;
+        })
+        this.list = data.records
         this.selectType = this.value
-        this.total = data.total;
-        this.queryParams.pageNum = data.current;
-      });
+        this.total = data.total
+        this.queryParams.pageNum = data.current
+      })
     },
     getPercent(newObj, sum) {
-      const res = ((newObj / sum) * 100).toFixed(2);
-      return res;
+      const res = ((newObj / sum) * 100).toFixed(2)
+      return res
     },
     goTarget(href) {
-      window.open(href, "_blank");
+      window.open(href, '_blank')
     },
     select() {
       try {
-        this.loading = true;
-        this.getList();        
-        if(this.value1.length === 0) {
-            this.options2.forEach((k) => {
-                if (k.id !== 9999) {
-                this.selectHeaer.push(k);
-                }
-            });
+        this.loading = true
+        this.getList()
+        if (this.value1.length === 0) {
+          this.options2.forEach((k) => {
+            if (k.id !== 9999) {
+              this.selectHeaer.push(k)
+            }
+          })
         }
         // this.rettHeaer = this.selectHeaer
       } catch (error) {
-        console.log(error);
+        console.log(error)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     selectAll() {
-      this.dialogVisible = true;
+      this.dialogVisible = true
     },
     downFile() {
-      var a = document.createElement("a"); // 创建一个<a></a>标签
-      a.href = "/批量查询匹配模板.xlsx";
-      a.download = "批量查询匹配模板.xlsx"; // 设置下载文件文件名
-      a.style.display = "none"; // 隐藏a标签
-      document.body.appendChild(a); // 将a标签追加到文档对象中
-      a.click(); // 模拟点击了a标签，会触发a标签的href的读取，浏览器就会自动下载了
-      a.remove(); // 一次性的，用完就删除a标签
+      var a = document.createElement('a') // 创建一个<a></a>标签
+      a.href = '/批量查询匹配模板.xlsx'
+      a.download = '批量查询匹配模板.xlsx' // 设置下载文件文件名
+      a.style.display = 'none' // 隐藏a标签
+      document.body.appendChild(a) // 将a标签追加到文档对象中
+      a.click() // 模拟点击了a标签，会触发a标签的href的读取，浏览器就会自动下载了
+      a.remove() // 一次性的，用完就删除a标签
     },
     loadingFun(index) {
       this.$modal.loading('Loading...')
@@ -697,106 +708,96 @@ export default {
       this.uploadLoading = false
     },
     selectChange(row) {
-      this.selectHeaer = [];
+      this.selectHeaer = []
       const all = row.indexOf(9999)
       if ((row.length === 1 && row[0] === 9999) || all >= 0) {
         this.options2.forEach((k) => {
-            if (k.id !== 9999) {
-              this.selectHeaer.push(k);
-            }
-        });
+          if (k.id !== 9999) {
+            this.selectHeaer.push(k)
+          }
+        })
       } else {
         row.forEach((e) => {
           this.options2.forEach((k) => {
             if (e === k.id && e !== 9999) {
-              this.selectHeaer.push(k);
+              this.selectHeaer.push(k)
             }
-          });
-        });
+          })
+        })
       }
     },
     uploadFun(params) {
     // 获取文件 通过FormData将文件转化为二进制流的形式传给后端
-        let form = new FormData()
-        form.append('file', params.file)
-        form.uuid = this.uuid
-        form.proIds = this.value1
-        importExcelByEntity(form).then((res) => {
-            clearTimeout(this.timer);
-            this.uploadStatus = true
-            this.uploadLoading = false
-            this.percentage = 0
-            download(res, this.fileName)
-        })
-        this.timer = setInterval(this.getProgress, 1000)
-        this.$modal.closeLoading()
+      const form = new FormData()
+      form.append('file', params.file)
+      form.uuid = this.uuid
+      form.proIds = this.value1
+      importExcelByEntity(form).then((res) => {
+        clearTimeout(this.timer)
+        this.uploadStatus = true
+        this.uploadLoading = false
+        this.percentage = 0
+        download(res, this.fileName)
+      })
+      this.timer = setInterval(this.getProgress, 1000)
+      this.$modal.closeLoading()
     },
     getProgress() {
-        let uuid = localStorage.getItem('uuid')
-        getChecking({uuid: uuid}).then(res => {
-            const { data } = res
-            if (data) { 
-                const ret = parseFloat(data)
-                const percent = data && (ret.toFixed(2))*100
-                this.percentage = percent
-            }
-        })
+      const uuid = localStorage.getItem('uuid')
+      getChecking({ uuid: uuid }).then(res => {
+        const { data } = res
+        if (data) {
+          const ret = parseFloat(data)
+          const percent = data && (ret.toFixed(2)) * 100
+          this.percentage = percent
+        }
+      })
     },
     changeType(row) {
-        this.selectHeaer = []
-        this.value1 = this.value === 'GV' ? [] : this.value1
-        if (row === 'GV') {
-            this.options2.forEach(e => {
-                if (e.id !== 9999) {
-                    this.selectHeaer.push(e);
-                }
-            })
-        }
+      this.selectHeaer = []
+      this.value1 = this.value === 'GV' ? [] : this.value1
+      if (row === 'GV') {
+        this.options2.forEach(e => {
+          if (e.id !== 9999) {
+            this.selectHeaer.push(e)
+          }
+        })
+      }
     },
     handleClose() {
-        this.uploadStatus = false
-        this.percentage = 0
-        this.dialogVisible = false
+      this.uploadStatus = false
+      this.percentage = 0
+      this.dialogVisible = false
     },
     exprotGov() {
-        try {
+      try {
         this.$modal.loading('Loading...')
         exportGov({}).then(res => {
-            download(res, '政府总览.xlsx')
+          download(res, '政府总览.xlsx')
+          this.$modal.closeLoading()
         })
       } catch (error) {
-        console.log(error);
-      } finally {
+        console.log(error)
         this.$modal.closeLoading()
       }
     },
     exprotEntity() {
-        try {
+      try {
         this.$modal.loading('Loading...')
         exportEntity({}).then(res => {
-            download(res, '企业总览.xlsx')
+          download(res, '企业总览.xlsx')
+          this.$modal.closeLoading()
         })
       } catch (error) {
-        console.log(error);
-      } finally {
+        console.log(error)
         this.$modal.closeLoading()
       }
     },
     replaceFun(row) {
-      return replaceStr(row, this.input);
-    },
-  },
-  computed: {
-    govePercent() {
-      const res = ((this.goveSum / (this.goveSum + this.entitySum))*100).toFixed(2);
-      return res;
-    },
-    entityPercent() {
-      const res = ((this.entitySum / (this.goveSum + this.entitySum))*100).toFixed(2);
-      return res;
-    },
-  },
-};
+      return replaceStr(row, this.input)
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">
