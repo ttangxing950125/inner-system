@@ -83,11 +83,13 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
 
     /**
      * 处理当日任务
-     * @param taskId
+     * @param taskId 任务id
      * @param state 0-未处理 1-已有主体未关联 2-新增主体 3-已有主体已关联
-     * @return
+     * @param entityCode 主体 code
+     * @param remarks 备注信息
+     * @return 操作成功与否
      */
-    R finishTask(Integer taskId,Integer state,String entityCode);
+    R finishTask(Integer taskId,Integer state,String entityCode,String remarks);
 
 
 }
