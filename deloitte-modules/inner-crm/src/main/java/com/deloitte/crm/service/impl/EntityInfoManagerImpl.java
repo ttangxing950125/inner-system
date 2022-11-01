@@ -170,7 +170,6 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     public CheckVo matchByKeyword(String keyword, String target) {
         if(keyword==null){return new CheckVo().setMsg(BadInfo.PARAM_EMPTY.getInfo());}
         if(target==null||target.trim().length()==0){return new CheckVo().setMsg(BadInfo.PARAM_EMPTY.getInfo());}
-        target = target.trim();
 
         switch (keyword){
             //主体的Code
