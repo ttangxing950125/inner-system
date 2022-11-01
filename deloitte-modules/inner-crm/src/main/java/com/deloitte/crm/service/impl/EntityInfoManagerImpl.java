@@ -209,7 +209,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else{return new CheckVo().setData(govByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             //新地方政府行政编码
             case GOV_CODE:
-                if(target.matches(Common.REGEX_GOV_CODE)){return new CheckVo().setMsg(BadInfo.PARAM_GOV_VALIDA.getInfo());}
+                if(!target.matches(Common.REGEX_GOV_CODE)){return new CheckVo().setMsg(BadInfo.PARAM_GOV_VALIDA.getInfo());}
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
                 if(govByCode==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(govByCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
