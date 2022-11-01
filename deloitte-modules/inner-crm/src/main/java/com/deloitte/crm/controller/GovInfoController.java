@@ -481,4 +481,18 @@ public class GovInfoController extends BaseController {
         log.info("  >>>>  根据政府主体，大类小类查询政府主体,bigLevel=[{}],smallLevel=[{}] <<<<  ",bigLevel,smallLevel);
         return govInfoService.getGovInfoByLevel(bigLevel,smallLevel);
     }
+
+    /**
+     * 将政府曾用名存入政府主体
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/1 15:29
+    */
+    @ApiOperation(value = "将曾用名存入政府主体")
+    @PostMapping("/saveOldNameToGovInfo")
+    public R saveOldNameToGovInfo(){
+        entityNameHisService.saveOldNameToInfo();
+        return R.ok();
+    }
 }
