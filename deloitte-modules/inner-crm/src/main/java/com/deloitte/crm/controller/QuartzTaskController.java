@@ -28,7 +28,7 @@ public class QuartzTaskController {
     @GetMapping("/manual")
     public R manualQuartzTask(HttpServletResponse response, HttpServletRequest request) {
         log.info(">>>>>自动生成定时任务开始..................");
-        quartzTask.StartRuleTask();
+        quartzTask.startRuleTask();
         log.info(">>>>>自动生成定时任务结束..................");
         return R.ok();
     }
