@@ -1,6 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -242,7 +243,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
         Integer UN_FINISH_STATE = 0;
         List<CrmMasTask> crmMasTasks = iCrmMasTaskService.getBaseMapper().selectList(new QueryWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getTaskDate, currentDate)
+                .lambda().eq(CrmMasTask::getTaskDate, DateUtils.format(currentDate,"yyyy-MM-dd"))
                 .eq(CrmMasTask::getState, UN_FINISH_STATE));
 
         //完成当条任务后 向 crm_supply 添加任务
