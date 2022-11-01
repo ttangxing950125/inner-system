@@ -384,6 +384,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public void exportEntity(HttpServletResponse response) {
+        log.info("  >>>>  导出企业主体基本信息 <<<<  ");
         List<EntityInfo> entityInfoList = entityInfoMapper.selectList(new QueryWrapper<EntityInfo>());
         if (CollectionUtils.isEmpty(entityInfoList)) {
             return;
@@ -513,6 +514,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public long updateEntityInfoByEntityCodeWithOutId(EntityInfo entityInfo) {
+        log.info("  >>>> 企业主体根据entityCode修改信息,id置为空,entityCode=[{}] <<<<  ",entityInfo.getEntityCode());
         //设置主键为空，防止修改主键
         entityInfo.setId(null);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
@@ -577,6 +579,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R addOldName(EntityInfo entity) {
+        log.info("  >>>> 新增企业主体的曾用名,entity=[{}] <<<<  ",entity);
         //获取原本的主体信息
         EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
         //校验曾用名是否存在
@@ -631,6 +634,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
+        log.info("  >>>> 修改,停用企业主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remark=[{}] <<<<  ",dqCode,oldName,newOldName,status,remark);
         if (ObjectUtils.isEmpty(newOldName) || ObjectUtils.isEmpty(oldName)) {
             return R.fail("无效曾用名");
         }
@@ -724,6 +728,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getInfoDetailByEntityCode(String entityCode) {
+        log.info("  >>>> 上市企业-修改信息-根据 entityCode 查询主体详细信息,entityCode=[{}] <<<<  ",entityCode);
+
         EntityInfoDetails entityInfoDetails = new EntityInfoDetails();
 
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
@@ -1069,6 +1075,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     }
 
     public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+        log.info("  >>>> 企业主体分类查询,type=[{}] <<<<  ",type);
         return R.ok(getInfoListByType(type, param, pageNum, pageSize));
     }
 
@@ -1161,6 +1168,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer updateInfoList(List<EntityInfo> list) {
+        log.info("  >>>> 企业主体批量修改，list=[{}] <<<<  ",list);
         list.stream().forEach(o -> {
             EntityInfo entityInfo = entityInfoMapper.selectById(o.getId());
             entityInfoMapper.updateById(o);
@@ -1185,12 +1193,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public List<EntityInfo> checkEntity(EntityInfo entityInfo) {
+        log.info("  >>>> 查询企业名称，或者编码，是否重复,entityInfo=[{}] <<<<  ",entityInfo);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper(entityInfo);
         return entityInfoMapper.selectList(queryWrapper);
     }
 
     @Override
     public Object getListEntityByPage(EntityAttrByDto entityAttrDto) {
+
         //去除无效选项
         List<MoreIndex> mapList = entityAttrDto.getMapList();
         if (!CollectionUtils.isEmpty(mapList)) {
@@ -1199,6 +1209,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
+        log.info("  >>>>  企业主体-更多指标,添加指标列表,mapList=[{}] <<<<  ", mapList);
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(entityAttrDto);
         } else {
@@ -1953,6 +1964,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public Map<String, Object> getOverviewByGroup() {
+        log.info("  >>>>  企业主体分类概览 <<<<  ");
         QueryWrapper<EntityInfo> query = new QueryWrapper<>();
         //全部主体
         Long count = entityInfoMapper.selectCount(query.lambda().eq(EntityInfo::getStatus, 1));
@@ -2000,6 +2012,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public Map<String, Object> getOverviewByAll() {
+        log.info("  >>>>  主体整体概览 <<<<  ");
         //查询整体概览
         Long entityCount = entityInfoMapper.selectCount(new QueryWrapper<>());
         Long govCount = govInfoMapper.selectCount(new QueryWrapper<>());
@@ -2129,6 +2142,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R getQuickOfCoverage(String param, Integer pageNum, Integer pageSize) {
+        log.info("  >>>>  快速查询企业上市或发债情况 <<<<  ");
         if (ObjectUtil.isEmpty(pageNum)) {
             return R.fail(NO_PAGENUM_ERROR);
         }
@@ -2437,6 +2451,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+        log.info("  >>>>  财报收数根据entityCode补充录入信息--主表,entityCode=[{}] <<<<  ",entitySupplyMsgBack.getEntityCode());
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         Integer id = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(id);
@@ -2470,6 +2485,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         //修改金融机构信息
         EntityFinancial entityFinancial = entityInfoDetails.getEntityFinancial();
+
+        log.info("  >>>> 上市企业-修改信息,基础属性 entityInfo=[{}],A股信息 stockCnInfo=[{}],港股信息 stockThkInfo=[{}],金融机构信息 entityFinancial=[{}] <<<<  ", entityInfo,stockCnInfo,stockThkInfo,entityFinancial);
+
         if (!ObjectUtils.isEmpty(entityFinancial)) {
             financialMapper.updateById(entityFinancial.setUpdated(new Date()));
         }
@@ -2515,6 +2533,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public EntityListView getListView(Integer type) {
+        log.info("  >>>>  企业主体清单-查询概览 <<<<  ");
         EntityListView entityListView = new EntityListView();
         switch (type) {
             //查询上市概览
@@ -3130,6 +3149,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R<EntitySupplyMsgBack> getEntityBackSupply(Integer id) {
+        log.info("  >>>>  企业主体清单-查询概览角色3，4，5补充录入查询和回显,id=[{}] <<<<  ",id);
         if (ObjectUtils.isEmpty(id)) {
             return R.fail("请传入任务id");
         }
@@ -3236,6 +3256,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public void exportEntityByType(Integer type, HttpServletResponse response) {
+        log.info("  >>>>  根据类型导出企业主体清单 <<<<  ");
         LambdaQueryWrapper<EntityInfo> infoQuery = new LambdaQueryWrapper<>();
         if (ObjectUtils.isEmpty(type)) {
             type = 1;

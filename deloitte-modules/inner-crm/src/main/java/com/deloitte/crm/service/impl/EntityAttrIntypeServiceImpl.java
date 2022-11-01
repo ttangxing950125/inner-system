@@ -6,6 +6,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityAttrIntype;
 import com.deloitte.crm.mapper.EntityAttrIntypeMapper;
 import com.deloitte.crm.service.EntityAttrIntypeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
  * @date 2022/09/29 17:51
  */
 @Service
+@Slf4j
 public class EntityAttrIntypeServiceImpl extends ServiceImpl<EntityAttrIntypeMapper, EntityAttrIntype> implements EntityAttrIntypeService {
 
     @Autowired
@@ -23,6 +25,7 @@ public class EntityAttrIntypeServiceImpl extends ServiceImpl<EntityAttrIntypeMap
 
     @Override
     public List<EntityAttrIntype> getTypeByAttrId(Integer attrId) {
+        log.info("  >>>> 根据attrId查询选项,attrId=[{}] <<<<  ",attrId);
         QueryWrapper<EntityAttrIntype> intypeQuery = new QueryWrapper<>();
         List<EntityAttrIntype> attrIntypes = entityAttrIntypeMapper.selectList(intypeQuery.lambda().eq(EntityAttrIntype::getAttrId, attrId));
         return attrIntypes;

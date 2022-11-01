@@ -116,6 +116,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     @Override
     public List<EntityNameHis> getNameListByDqCoded(String dqCode) {
+        log.info("  >>>>  根据德勤code查询曾用名列表,dqCode=[{}] <<<<  ",dqCode);
         QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
         return entityNameHisMapper.selectList(
                 queryWrapper.lambda()
@@ -124,11 +125,13 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     @Override
     public List<Map<String, Object>> getGovHisNameList(String param) {
+        log.info("  >>>>  查询政府主体曾用名列表,govName=[{}] <<<<  ",param);
         return entityNameHisMapper.getGovHisNameList(param);
     }
 
     @Override
     public List<Map<String, Object>> getEntityHisNameList(String param) {
+        log.info("  >>>>  查询企业主体曾用名列表,param=[{}] <<<<  ",param);
         return entityNameHisMapper.getEntityHisNameList(param);
     }
 

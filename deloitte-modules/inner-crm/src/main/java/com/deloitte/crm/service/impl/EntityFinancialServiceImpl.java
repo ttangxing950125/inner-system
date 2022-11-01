@@ -10,6 +10,7 @@ import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityFinancialMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @since 2022-10-11 17:11:57
  */
 @Service("entityFinancialService")
+@Slf4j
 public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMapper, EntityFinancial> implements EntityFinancialService {
 
     @Autowired
@@ -50,7 +52,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R addFinEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
-
+        log.info("  >>>> 金融机构根据entityCode补充录入副表信息,entityCode=[{}] <<<<  ",entitySupplyMsgBack.getEntityCode());
 
         Integer taskId = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(taskId);

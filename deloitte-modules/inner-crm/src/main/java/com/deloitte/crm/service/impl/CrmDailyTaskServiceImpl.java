@@ -186,7 +186,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
     public void checkDailyTask(CrmSupplyTask crmSupplyTask) {
         Long roleId = crmSupplyTask.getRoleId();
         Date taskDate = crmSupplyTask.getTaskDate();
-
+        log.info("  >>>> 完成任务后根据roleId检查并修改每日任务状态,roleId=[{}],taskDate=[{}] <<<<  ",roleId,taskDate);
         List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new QueryWrapper<CrmSupplyTask>().lambda()
                 .eq(CrmSupplyTask::getRoleId, roleId).eq(CrmSupplyTask::getTaskDate, taskDate));
         if (CollectionUtils.isEmpty(crmSupplyTasks)) {

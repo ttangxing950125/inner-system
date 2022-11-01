@@ -9,6 +9,7 @@ import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.mapper.EntityGovRelMapper;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.List;
  * @date 2022-09-21
  */
 @Service
+@Slf4j
 public class EntityGovRelServiceImpl implements IEntityGovRelService {
     @Autowired
     private EntityGovRelMapper entityGovRelMapper;
@@ -103,6 +105,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
 
     @Override
     public Long getEntityGovCount(String dqCode) {
+        log.info("  >>>> 根据 dqCode 查询城投主体数量,dqCode=[{}] <<<<  ",dqCode);
         QueryWrapper<EntityGovRel> govRelQuery = new QueryWrapper<>();
         return entityGovRelMapper.selectCount(govRelQuery.lambda().eq(EntityGovRel::getDqGovCode, dqCode));
     }
@@ -118,6 +121,7 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R addGovEntitySubtableMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
+        log.info("  >>>> 城投机构根据entityCode补充录入副表信息,dqCode=[{}] <<<<  ",entitySupplyMsgBack.getEntityCode());
         Integer taskId = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(taskId);
 

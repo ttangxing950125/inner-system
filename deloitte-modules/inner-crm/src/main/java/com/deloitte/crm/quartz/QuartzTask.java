@@ -1,13 +1,10 @@
 package com.deloitte.crm.quartz;
+
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.nacos.shaded.com.google.common.base.Objects;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.ProductsCover;
-import com.deloitte.crm.dto.EntityCoverDto;
-import com.deloitte.crm.mapper.ProductsCoverMapper;
-import com.deloitte.crm.quartz.service.CoverRuleProService;
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.service.ProductsCoverService;
@@ -22,10 +19,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,21 +49,21 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/9/22 14:22
      */
-   @Scheduled(cron = "0 0 0 * * ?" )
+    @Scheduled(cron = "0 0 0 * * ?")
     public void startRuleTask() {
-       //当前日期
-       String date = DateUtil.getDate();
-       //节假日 0=工作日, 1=假日, 2=节日
-       try {
-           HttpResponse response = HttpRequest.get("https://tool.bitefu.net/jiari/?d=".concat(date)).execute();
-           if (Objects.equal("1",response.body()) || Objects.equal("2",response.body())) {
-               return;
-           }
-       }catch (Exception e){
+        //当前日期
+        String date = DateUtil.getDate();
+        //节假日 0=工作日, 1=假日, 2=节日
+        try {
+            HttpResponse response = HttpRequest.get("https://tool.bitefu.net/jiari/?d=".concat(date)).execute();
+            if (Objects.equal("1", response.body()) || Objects.equal("2", response.body())) {
+                return;
+            }
+        } catch (Exception e) {
 
-        log.error("e");
+            log.error("e");
 
-       }
+        }
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();
         log.info("同步任务结束 =============");
@@ -80,12 +75,12 @@ public class QuartzTask implements ApplicationContextAware {
      * {@link EntityAttrValue}
      */
     @Async
-    @Scheduled(cron = "0 0 12 * * ?" )
+    @Scheduled(cron = "0 0 12 * * ?")
     @Transactional(rollbackFor = Exception.class)
-    public void runBatchDataToAttrValue(){
-        log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");
+    public void runBatchDataToAttrValue() {
+        log.info("=>>  " + DateUtil.dateTimeNow() + " Attr数据导入开始  <<=");
         entityAttrValueRunBatchTasks.forEach(EntityAttrValueRunBatchTask::runBatchData);
-        log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入完成  <<=");
+        log.info("=>>  " + DateUtil.dateTimeNow() + " Attr数据导入完成  <<=");
     }
 
     @Override
@@ -96,17 +91,17 @@ public class QuartzTask implements ApplicationContextAware {
 
 
     /**
-     *覆盖规则
+     * 覆盖规则
      *
      * @return void
      * @author penTang
      * @date 2022/10/28 11:08
-    */
+     */
 
-    public void  CoverRulePro(){
-        log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
+    public void CoverRulePro() {
+        log.info("=>> " + DateUtil.dateTimeNow() + "覆盖跑批开始");
         productsCoverService.CoverRule();
-        log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批结束");
+        log.info("=>> " + DateUtil.dateTimeNow() + "覆盖跑批结束");
     }
 
 }

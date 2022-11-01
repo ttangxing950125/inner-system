@@ -156,10 +156,11 @@ public class GovInfoController extends BaseController {
      * @author 冉浩岑
      * @date 2022/9/22 15:24
      */
-    @ApiOperation(value = "政府主体批量修改")
+    @ApiOperation(value = "政府主体修改")
     @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
     public R updateInfoList(@RequestBody GovInfo govInfoList) {
+        log.info("  >>>>  政府主体修改,govInfo=[{}] <<<<  ",govInfoList);
         return R.ok(govInfoService.updateInfoList(govInfoList));
     }
 
@@ -175,6 +176,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParam(name = "govName", value = "政府主体名称", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getGovByName")
     public R getGovByName(String govName) {
+        log.info("  >>>>  根据政府名称查询政府主体,govName=[{}] <<<<  ",govName);
         if (ObjectUtils.isEmpty(govName)) {
             return R.fail("请输入需要查询的条件");
         }
@@ -202,6 +204,7 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/getInfoList")
     public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+        log.info("  >>>>  政府主体分类查询,type=[{}] <<<<  ",type);
         return govInfoService.getInfoList(type, param, pageNum, pageSize);
     }
 
@@ -215,6 +218,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "政府主体分类概览")
     @PostMapping("/getOverviewByGroup")
     public R getOverviewByGroup() {
+        log.info("  >>>>  getOverviewByGroup <<<<  ");
         return R.ok(govInfoService.getOverviewByGroup());
     }
 
@@ -235,6 +239,7 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/addOldName")
     public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
+        log.info("  >>>>  新增政府主体的曾用名 <<<<  ");
         return entityNameHisService.addGovNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
 
@@ -249,6 +254,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParam(name = "govInfo", value = "全数据", paramType = "body", example = "", dataTypeClass = GovInfo.class)
     @PostMapping("/addGovInfo")
     public R addGovInfo(@RequestBody GovInfo govInfo) {
+        log.info("  >>>>  新增地方政府,govInfo=[{}] <<<<  ",govInfo);
         return govInfoService.insertGovInfo(govInfo);
     }
 
@@ -273,6 +279,7 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/updateOldName")
     public R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks) {
+        log.info("  >>>>  修改,停用政府主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ",dqCode,oldName,newOldName,status,remarks);
         return govInfoService.updateOldName(dqCode, oldName, newOldName, status,remarks);
     }
 
@@ -288,6 +295,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParam(name = "dqGovCode", value = "政府主体德勤唯一识别码", paramType = "query", dataType = "String")
     @PostMapping("/getInfoDetail")
     public R getInfoDetail(String dqGovCode) {
+        log.info("  >>>>  根据 dqCode 查询政府主体,dqGovCode=[{}] <<<<  ",dqGovCode);
         return govInfoService.getInfoDetail(dqGovCode);
     }
 
@@ -333,6 +341,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "地方政府-更多指标-主体范围")
     @PostMapping("/getGovRange")
     public R getGovRange() {
+        log.info("  >>>>  地方政府-更多指标-主体范围 <<<<  ");
         return R.ok(govInfoService.getGovRange());
     }
 
@@ -346,6 +355,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "政府主体总概览")
     @PostMapping("/getOverview")
     public R getOverview() {
+        log.info("  >>>>  政府主体总概览 <<<<  ");
         return R.ok(govInfoService.getOverview());
     }
 
@@ -376,6 +386,7 @@ public class GovInfoController extends BaseController {
     @ApiImplicitParam(name = "preGovCode", value = "父级Code", paramType = "query", example = "GV10110", dataType = "Integer")
     @PostMapping("/getGovLevel")
     public R getGovLevel(String preGovCode) {
+        log.info("  >>>>  获取省市级数据,preGovCode=[{}] <<<<  ",preGovCode);
         return R.ok(govInfoService.getGovLevel(preGovCode));
     }
 
@@ -391,6 +402,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "政府主体清单-地方政府概览")
     @PostMapping("/getGovView")
     public R getGovView() {
+        log.info("  >>>>  政府主体清单-地方政府概览 <<<<  ");
         return R.ok(govInfoService.getGovView());
     }
 
@@ -405,6 +417,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "根据政府名称或者政府code查询政府主体")
     @PostMapping("/getGovByParam")
     public R getGovByParam(String param) {
+        log.info("  >>>>  根据政府名称或者政府code查询政府主体,code=[{}] <<<<  ",param);
         return R.ok(govInfoService.getGovByParam(param));
     }
 
@@ -419,6 +432,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "导出政府主体基本信息")
     @GetMapping("/exportGov")
     public void exportGov(HttpServletResponse response) throws Exception {
+        log.info("  >>>>  导出政府主体基本信息 <<<<  ");
         govInfoService.exportEntity(response);
     }
 
@@ -433,6 +447,7 @@ public class GovInfoController extends BaseController {
     @ApiOperation(value = "根据父级 code 更新政府主体父子级对应关系")
     @PostMapping("/updateGovInfosByPreCode")
     public void updateGovInfosByPreCode()   {
+        log.info("  >>>>  根据父级 code 更新政府主体父子级对应关系 <<<<  ");
         govInfoService.updateGovInfosByPreCode();
     }
     /**
@@ -464,6 +479,7 @@ public class GovInfoController extends BaseController {
     })
     @PostMapping("/getGovInfoByLevel")
     public R getGovInfoByLevel(Integer bigLevel,Integer smallLevel)   {
+        log.info("  >>>>  根据政府主体，大类小类查询政府主体,bigLevel=[{}],smallLevel=[{}] <<<<  ",bigLevel,smallLevel);
         return govInfoService.getGovInfoByLevel(bigLevel,smallLevel);
     }
 }
