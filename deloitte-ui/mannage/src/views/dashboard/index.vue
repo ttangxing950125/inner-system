@@ -414,7 +414,7 @@
             <el-radio label="N">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="ruleForm.isFinance === 'Y'" label="金融细分领域">
+        <!-- <el-form-item v-if="ruleForm.isFinance === 'Y'" label="金融细分领域">
           <el-select
             v-model="ruleForm.financeSegmentation"
             :filterable="true"
@@ -427,7 +427,7 @@
               :value="item"
             />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="YY-是否为城投机构" prop="city">
           <el-radio-group v-model="ruleForm.city">
             <el-radio label="Y">是</el-radio>
@@ -621,7 +621,7 @@
           >
         </el-form-item>-->
         <el-divider />
-        <el-form-item label="所属地区">
+        <el-form-item label="所属地区" prop="region">
           <el-col :span="6">
             <el-select
               v-model="ruleForm.region"
@@ -659,12 +659,13 @@
               v-model="ruleForm.county"
               :filterable="true"
               placeholder="选择县"
+              @change="getGov"
             >
               <el-option
                 v-for="(item, index) in county"
                 :key="index"
                 :label="item.govName"
-                :value="item.govName"
+                :value="item"
               />
             </el-select>
           </el-col>
@@ -1535,6 +1536,9 @@ export default {
         ],
         regulators: [
           { required: true, message: '请选择对口监管机构', trigger: 'blur' }
+        ],
+        region: [
+          { required: true, message: '请至少选择省级区域', trigger: 'blur' }
         ]
       },
       edit2: false,
@@ -2420,15 +2424,6 @@ export default {
         }
       })
     },
-    getGov(row) {
-      this.ruleForm.county = row.govName
-      this.county.forEach((e) => {
-        if (e.govName === row.govName) {
-          this.ruleForm.govCode = e.govCode
-          this.ruleForm.dqGovCode = e.dqGovCode
-        }
-      })
-    },
     addGovernment() {
       this.addGovernmentDig = true
       getGovLevelBig({}).then((res) => {
@@ -2441,15 +2436,14 @@ export default {
       })
     },
     getSmall(row) {
-      this.ruleForm.govLevelSmall = ''
+      this.addGovForm.govLevelSmall = ''
+      this.$set(this.addGovForm, 'govLevelSmall', '')
       getGovLevelSmall({ id: row }).then((res) => {
         const { data } = res
         this.govOption2 = data
       })
-      console.log(row)
       if (row === 4) {
         this.noUse = true
-        console.log(1111)
       }
     },
     subGov() {
@@ -2540,6 +2534,8 @@ export default {
       this.ruleForm.region = row.govName
       this.ruleForm.dqGovCode = row.dqGovCode
       this.ruleForm.govCode = row.govCode
+      this.ruleForm.district = ''
+      this.ruleForm.county = ''
       getGovLevel({ preGovCode: row.dqGovCode }).then((res) => {
         const { data } = res
         this.city = data
@@ -2549,10 +2545,21 @@ export default {
       this.ruleForm.district = row.govName
       this.ruleForm.dqGovCode = row.dqGovCode
       this.ruleForm.govCode = row.govCode
-      this.$set(this.ruleForm, 'district', row.govName)
+      this.$set(this.ruleForm, 'city', row.govName)
+      this.$set(this.ruleForm, 'county', '')
       getGovLevel({ preGovCode: row.dqGovCode }).then((res) => {
         const { data } = res
         this.county = data
+      })
+    },
+    getGov(row) {
+      this.ruleForm.county = row.govName
+      this.$set(this.ruleForm, 'county', row.govName)
+      this.county.forEach((e) => {
+        if (e.govName === row.govName) {
+          this.ruleForm.govCode = e.govCode
+          this.ruleForm.dqGovCode = e.dqGovCode
+        }
       })
     },
     subRule345(row) {
@@ -2561,9 +2568,9 @@ export default {
           try {
             this.$modal.loading('loading...')
             const region =
-              this.ruleForm.region ||
+              this.ruleForm.county ||
               this.ruleForm.city ||
-              this.ruleForm.county
+              this.ruleForm.region
             this.$set(this.ruleForm, 'belPlace', region)
             this.$set(
               this.ruleForm,
