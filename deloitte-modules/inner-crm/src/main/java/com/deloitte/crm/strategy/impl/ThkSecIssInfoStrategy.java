@@ -87,13 +87,13 @@ public class ThkSecIssInfoStrategy implements WindTaskStrategy {
                 if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
                     Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
                     if (CollectionUtil.isEmpty(hashSetResult)) {
-                        secIssInfo.setBelWind(crmTypeInfo.getName());
+                        secIssInfo.setWindIndustry(crmTypeInfo.getName());
                     } else {
                         String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
-                        secIssInfo.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
+                        secIssInfo.setWindIndustry(WindIndustryApend + "--" + crmTypeInfo.getName());
                     }
                 } else {
-                    secIssInfo.setBelWind(crmTypeInfo.getName());
+                    secIssInfo.setWindIndustry(crmTypeInfo.getName());
                 }
             }
 

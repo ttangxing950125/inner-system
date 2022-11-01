@@ -233,7 +233,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         captureSpeed.setSource(crmEntityTask.getTaskCategory());
         captureSpeed.setEntityName(crmEntityTask.getEntityName());
         captureSpeed.setCaptureTime(new Date());
-
+        captureSpeed.setCapture(1);
         entityCaptureSpeedService.save(captureSpeed);
 
         crmEntityTask.setSpeedId(captureSpeed.getId());
