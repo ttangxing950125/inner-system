@@ -147,7 +147,9 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         //当企业为金融机构的时候 去查entity_financial 中的数据
         if(!ObjectUtils.isEmpty(entityInfo.getFinance())&&entityInfo.getFinance()==1){
             EntityFinancial entityFinancial = entityFinancialService.getBaseMapper().selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
-            masDto.setIsFinance("Y").setFinanceSegmentation(entityFinancial.getMince());
+            if(!ObjectUtils.isEmpty(entityFinancial)){
+                masDto.setIsFinance("Y").setFinanceSegmentation(entityFinancial.getMince());
+            }else{ log.info("  =>> 角色 2 发现主体数据 {} 的 金融机构关联数据表值为空 <<=  ",entityInfo.getEntityName());}
         }else{
             masDto.setIsFinance("N");
         }
@@ -164,13 +166,15 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             if(!ObjectUtils.isEmpty(ibUrban)&&"1".equals(ibUrban)){
                 masDto.setCityIb("Y");
                 EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
-                String dqGovCode = entityGovRel.getDqGovCode();
-                masDto.setDqGovCode(dqGovCode);
-                GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
-                if(!ObjectUtils.isEmpty(govInfo)){
-                    GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
-                    masDto.setGovNode(tree);
-                }
+                if(!ObjectUtils.isEmpty(entityGovRel)){
+                    String dqGovCode = entityGovRel.getDqGovCode();
+                    masDto.setDqGovCode(dqGovCode);
+                    GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
+                        if(!ObjectUtils.isEmpty(govInfo)){
+                            GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
+                            masDto.setGovNode(tree);
+                        }
+                }else{log.info("  =>> 角色 2 发现主体数据 {} 的 敞口关联数据表值为空 <<=  ",entityInfo.getEntityName());}
             }
         }
 
