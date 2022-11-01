@@ -15,12 +15,12 @@ import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsService;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.vo.CheckVo;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,29 +38,38 @@ import java.util.stream.Collectors;
  * @date 2022/9/29
  */
 @Component
-@AllArgsConstructor
 @Slf4j
 public class EntityInfoManagerImpl implements EntityInfoManager {
 
-    private final EntityInfoMapper entityInfoMapper;
+    @Resource
+    private EntityInfoMapper entityInfoMapper;
 
-    private final EntityNameHisMapper entityNameHisMapper;
+    @Resource
+    private EntityNameHisMapper entityNameHisMapper;
 
-    private final BondInfoMapper bondInfoMapper;
+    @Resource
+    private BondInfoMapper bondInfoMapper;
 
-    private final EntityBondRelMapper entityBondRelMapper;
+    @Resource
+    private EntityBondRelMapper entityBondRelMapper;
 
-    private final GovInfoMapper govInfoMapper;
+    @Resource
+    private GovInfoMapper govInfoMapper;
 
-    private final StockCnInfoMapper stockCnInfoMapper;
+    @Resource
+    private StockCnInfoMapper stockCnInfoMapper;
 
-    private final EntityStockCnRelMapper entityStockCnRelMapper;
+    @Resource
+    private EntityStockCnRelMapper entityStockCnRelMapper;
 
-    private final StockThkInfoMapper stockThkInfoMapper;
+    @Resource
+    private StockThkInfoMapper stockThkInfoMapper;
 
-    private final EntityStockThkRelMapper entityStockThkRelMapper;
+    @Resource
+    private EntityStockThkRelMapper entityStockThkRelMapper;
 
-    private final EntityInfoLogsService entityInfoLogsService;
+    @Resource
+    private EntityInfoLogsService entityInfoLogsService;
 
 
     private final String SEPARATE ="，";
