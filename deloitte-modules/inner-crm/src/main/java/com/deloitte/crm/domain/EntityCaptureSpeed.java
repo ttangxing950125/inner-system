@@ -62,7 +62,7 @@ public class EntityCaptureSpeed implements Serializable {
     /**
      * 0-未推送 1-已推送 是否推送补录平台
      */
-    private Integer push_meta;
+    private Integer pushMeta;
     /**
      * 是否初始化的数据
      */

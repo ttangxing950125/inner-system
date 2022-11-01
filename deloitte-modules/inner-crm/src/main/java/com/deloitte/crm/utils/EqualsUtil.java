@@ -57,7 +57,7 @@ public class EqualsUtil {
      */
     public static boolean equalsObj(Object o1, Object o2){
         if (o1 == o2) return true;
-        if (o1 == null || o1.getClass() != o2.getClass()) return false;
+        if (o1 == null || o2==null|| o1.getClass() != o2.getClass()) return false;
 
         Class<?> aClass = o1.getClass();
 
