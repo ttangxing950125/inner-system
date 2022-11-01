@@ -143,6 +143,9 @@ public enum Common {
 
     public static final String REGEX_ENTITY_CODE = "\\S{8}";
 
+    /** 地方行政编码 */
+    public static final String REGEX_GOV_CODE = "\\d{6}";
+
     public static final String ENTITY_CODE = "主体code";
 
     public static final String UPDATED = "修改时间";

@@ -179,16 +179,20 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R insertGovInfo(GovInfo govInfo) {
-
+        String govCodeInfo = govInfo.getGovCode();
+        boolean matches = govCodeInfo.matches(Common.REGEX_GOV_CODE);
+        if(!matches){
+            return R.fail("格式不匹配，请修改官方行政代码为6位数字后再提交");
+        }
         //校验是否重复提交
-        Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govInfo.getGovCode()));
+        Long count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, govCodeInfo));
         if (count > 0) {
             return R.fail("请勿重复提交，请修改官方行政代码后再提交");
         }
-        count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, govInfo.getGovName()));
-        if (count > 0) {
-            return R.fail("请勿重复提交，请修改主体名称后再提交");
-        }
+//        count = govInfoMapper.selectCount(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, govInfo.getGovName()));
+//        if (count > 0) {
+//            return R.fail("请勿重复提交，请修改主体名称后再提交");
+//        }
 
         //生成政府主体德勤主体唯一识别代码
         String dqGovCode = getDqGovCode();
@@ -669,10 +673,14 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
-        if (ObjectUtils.isEmpty(newOldName) || ObjectUtils.isEmpty(oldName)) {
-            return R.fail("无效曾用名");
+        log.info("  >>>>  修改,停用政府主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ",dqCode,oldName,newOldName,status,remark);
+        if (ObjectUtils.isEmpty(oldName)) {
+            return R.fail("无效的原始曾用名");
         }
         if (ObjectUtils.isEmpty(status)) {
+            if (ObjectUtils.isEmpty(newOldName)) {
+                return R.fail("无效的新曾用名");
+            }
             //校验修改后的曾用名是否已经存在
             Long count = nameHisMapper.selectCount(new QueryWrapper<EntityNameHis>().lambda()
                     .eq(EntityNameHis::getDqCode, dqCode)
@@ -696,12 +704,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
         String newNameResult = "";
         String newRemarkResult = "";
-        for (int i = 1; i < nameList.size(); i++) {
+        for (int i = 0; i < nameList.size(); i++) {
             String remarkVo = "";
             String nameVo = "";
             String hisName = nameList.get(i);
 
-            //匹配历史曾用名则替换或者删除
+            //匹配历史曾用名则停用或者替换
             if (oldName.equals(hisName)) {
                 //匹配时，查询出原本的曾用名数据
                 EntityNameHis one = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda()
@@ -710,18 +718,20 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
                 if (ObjectUtils.isEmpty(one)) {
                     continue;
                 }
-                // status 为空则表示替换
+                one.setSource(2);
+                // status 不为空则表示体用曾用名
                 if (!ObjectUtils.isEmpty(status)) {
-                    one.setRemarks(remark).setOldName(newOldName).setStatus(0);
-                    if (!ObjectUtils.isEmpty(remark)) {
-                        one.setRemarks("系统自动生成");
-                    }
-                    one.setSource(2);
+                    one.setStatus(0);
                     //直接替换原本的数据
                     nameHisMapper.updateById(one);
                     continue;
                 }
-                //直接删除原本的数据
+                //替换曾用名
+                if (ObjectUtils.isEmpty(remark)) {
+                    remark="系统自动生成";
+                }
+                one.setRemarks(remark).setOldName(newOldName);
+                //更新原本的数据
                 nameHisMapper.updateById(one);
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;

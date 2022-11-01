@@ -1,36 +1,37 @@
 <template>
   <div class="app-container home">
     <div class="flex1">
-      <el-button class="back" type="text" @click="back()"
-        >返回企业主体首页</el-button
-      >
+      <el-button
+        class="back"
+        type="text"
+        @click="back()"
+      >返回企业主体首页</el-button>
       <h3 class="title">上市企业-修改信息</h3>
     </div>
     <div class="g-tab flex1">
       <a
         :class="currentTab === '逐一修改' ? 'g-select' : ''"
         @click="changeTab('逐一修改')"
-        >逐一修改</a
-      >
+      >逐一修改</a>
       <a
-        :class="currentTab === '批量修改' ? 'g-select' : ''"
-        @click="changeTab('批量修改')"
-        >地方主管部门</a
-      >
+        style="cursor: not-allowed"
+      >批量修改</a>
     </div>
     <el-row>
       <el-col :sm="24" :lg="24" class="form-card">
         <el-card class="box-card">
           <div class="select-body mt20">
             <el-input
-              class="mr10"
               v-model="input"
+              class="mr10"
               style="width: 80%;"
               placeholder="请输入内容"
-            ></el-input>
-            <el-button class="mr10 green-btn" type="primary" @click="select"
-              >查询</el-button
-            >
+            />
+            <el-button
+              class="mr10 green-btn"
+              type="primary"
+              @click="select"
+            >查询</el-button>
           </div>
           <h3 class="g-title">查询结果</h3>
           <el-table
@@ -38,8 +39,7 @@
             :data="list"
             style="width: 98%; margin-top: 20px"
           >
-            <el-table-column type="index" label="序号" width="50">
-            </el-table-column>
+            <el-table-column type="index" label="序号" width="50" />
             <el-table-column prop="date" label="德勤主体代码">
               <template slot-scope="scope">
                 <span>{{
@@ -49,7 +49,7 @@
             </el-table-column>
             <el-table-column prop="name" label="企业名称">
               <template slot-scope="scope">
-                <div v-html="replaceFun(scope.row.entityInfo.entityName)"></div>
+                <div v-html="replaceFun(scope.row.entityInfo.entityName)" />
               </template>
             </el-table-column>
             <el-table-column prop="province" label="统一社会信用代码">
@@ -70,11 +70,10 @@
               <template slot-scope="scope">
                 <el-button
                   v-if="!scope.row.edit"
-                  @click="handleClick(scope.row)"
                   type="text"
                   size="small"
-                  >进入修改</el-button
-                >
+                  @click="handleClick(scope.row)"
+                >进入修改</el-button>
                 <span v-else class="green">修改中</span>
               </template>
             </el-table-column>
@@ -102,11 +101,11 @@
         style="padding-left: 20px"
       >
         <el-card>
-          <span style="color: red"
-            >注意：带星号字段需同故宫附表维护更新，请进入附表管理模块进行修改</span
-          >
-          <el-collapse accordion class="collpase" v-model="activeNames" >
-            <el-collapse-item name="info" v-if="info.entityInfo">
+          <span
+            style="color: red"
+          >注意：带星号字段需同故宫附表维护更新，请进入附表管理模块进行修改</span>
+          <el-collapse v-model="activeNames" accordion class="collpase">
+            <el-collapse-item v-if="info.entityInfo" name="info">
               <template slot="title">
                 <span style="font-size: 16px">基本信息</span>
               </template>
@@ -122,10 +121,10 @@
                 <div class="flex1">
                   <div class="first" :class="edit.creditCode ? 'green' : ''">统一社会信用代码</div>
                   <el-input
-                    class="t-input"
                     v-model="info.entityInfo.creditCode"
+                    class="t-input"
                     @change="edit.creditCode = true"
-                  ></el-input>
+                  />
                 </div>
                 <div class="flex1">
                   <div class="first">统一社会信用代码是否异常</div>
@@ -145,20 +144,20 @@
                 </div>
                 <div class="flex1">
                   <div class="first" :class="edit.listType ? 'green' : ''">年报列示类型</div>
-                   <el-radio-group class="mt10" v-model="info.entityInfo.listType" @change="edit.listType = true">
-                        <el-radio label=1>一般企业</el-radio>
-                        <el-radio label=0>金融机构</el-radio>
-                    </el-radio-group>
+                  <el-radio-group v-model="info.entityInfo.listType" class="mt10" @change="edit.listType = true">
+                    <el-radio label="1">一般企业</el-radio>
+                    <el-radio label="0">金融机构</el-radio>
+                  </el-radio-group>
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first" :class="edit.entityName ? 'green' : ''">企业名称</div>
                   <el-input
-                    class="t-input"
                     v-model="info.entityInfo.entityName"
+                    class="t-input"
                     @change="edit.entityName = true"
-                  ></el-input>
+                  />
                 </div>
                 <div class="flex1">
                   <div class="first">企业曾用名</div>
@@ -174,7 +173,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item name="stockCnInfo" v-if="info.stockCnInfo">
+            <el-collapse-item v-if="info.stockCnInfo" name="stockCnInfo">
               <template slot="title">
                 <span style="font-size: 16px">上市情况</span>
               </template>
@@ -183,7 +182,7 @@
                   <div class="first">是否上市</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -191,7 +190,7 @@
                   <div class="first">上市类型汇总</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.listType || '-' 
+                      info.listType || '-'
                     }}
                   </div>
                 </div>
@@ -206,40 +205,40 @@
                 <div class="flex1">
                   <div class="first">A股上市交易所</div>
                   <el-input
+                    v-model="info.stockCnInfo.exchange"
                     class="t-input"
                     :class="edit.exchange ? 'green' : ''"
-                    v-model="info.stockCnInfo.exchange"
                     @change="edit.exchange = true"
-                  ></el-input>
+                  />
                 </div>
                 <div class="flex1">
                   <div class="first">A股股票代码</div>
                   <el-input
+                    v-model="info.stockCnInfo.stockCode"
                     class="t-input"
                     :class="edit.stockCode ? 'green' : ''"
-                    v-model="info.stockCnInfo.stockCode"
                     @change="edit.stockCode = true"
-                  ></el-input>
+                  />
                 </div>
               </el-col>
               <el-col :sm="24" :lg="12" class="form-card">
                 <div class="flex1">
                   <div class="first">A股上市日期</div>
                   <el-input
+                    v-model="info.stockCnInfo.listDate"
                     class="t-input"
                     :class="edit.listDate ? 'green' : ''"
-                    v-model="info.stockCnInfo.listDate"
                     @change="edit.listDate = true"
-                  ></el-input>
+                  />
                 </div>
                 <div class="flex1">
                   <div class="first">A股退市日期</div>
                   <el-input
+                    v-model="info.stockCnInfo.delistingDate"
                     class="t-input"
                     :class="edit.delistingDate ? 'green' : ''"
-                    v-model="info.stockCnInfo.delistingDate"
                     @change="edit.delistingDate = true"
-                  ></el-input>
+                  />
                 </div>
                 <div class="flex1">
                   <div class="first">A股证券简称</div>
@@ -261,7 +260,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item name="bondInfoDetail" v-if="info.bondInfoDetail">
+            <el-collapse-item v-if="info.bondInfoDetail" name="bondInfoDetail">
               <template slot="title">
                 <span style="font-size: 16px">发债情况</span>
               </template>
@@ -278,7 +277,7 @@
                   <div class="first">是否可以收数</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.bondInfoDetail && info.bondInfoDetail.isCollection === '1' ? 'Y' : 'N' 
+                      info.bondInfoDetail && info.bondInfoDetail.isCollection === '1' ? 'Y' : 'N'
                     }}
                   </div>
                 </div>
@@ -321,7 +320,7 @@
                 <div class="flex1">
                   <div class="first">发行ABS 数量</div>
                   <div class="scond" style="color: #updated">
-                    {{ info.bondInfoDetail.absBondsNum}}
+                    {{ info.bondInfoDetail.absBondsNum }}
                   </div>
                 </div>
                 <div class="flex1">
@@ -382,7 +381,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item name="entityInfo" v-if="info.entityInfo">
+            <el-collapse-item v-if="info.entityInfo" name="entityInfo">
               <template slot="title">
                 <span style="font-size: 16px">金融机构</span>
               </template>
@@ -391,7 +390,7 @@
                   <div class="first">是否为金融机构</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.entityInfo.finance === 1 ? 'Y' : 'N' 
+                      info.entityInfo.finance === 1 ? 'Y' : 'N'
                     }}
                   </div>
                 </div>
@@ -399,7 +398,7 @@
                   <div class="first">所处细分行业</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.entityFinancial && info.entityFinancial.mince 
+                      info.entityFinancial && info.entityFinancial.mince
                     }}
                   </div>
                 </div>
@@ -421,7 +420,7 @@
                 </div>
               </el-col>
             </el-collapse-item>
-            <el-collapse-item name="ck" v-if="info.entityInfo">
+            <el-collapse-item v-if="info.entityInfo" name="ck">
               <template slot="title">
                 <span style="font-size: 16px">敞口划分</span>
               </template>
@@ -446,7 +445,7 @@
                   <div class="first">旧辖口行业划分</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -475,23 +474,23 @@
                 <span style="font-size: 16px">产品覆盖情况</span>
               </template>
               <el-col :sm="24" :lg="12" class="form-card">
-                <div v-for="(item, index) in info.coverageDetail" :key="index" >
-                    <div class="flex1">
-                        <div class="first">{{ item.isCover.name }}</div>
-                        <div class="scond" style="color: #a7a7a7">
-                            {{
-                            item.isCover.value === '1' || !item.isCover.value ? '-' : item.isCover.value
-                            }}
-                        </div>
+                <div v-for="(item, index) in info.coverageDetail" :key="index">
+                  <div class="flex1">
+                    <div class="first">{{ item.isCover.name }}</div>
+                    <div class="scond" style="color: #a7a7a7">
+                      {{
+                        item.isCover.value === 1 ? '是' : '否'
+                      }}
                     </div>
-                    <div class="flex1">
-                        <div class="first">{{ item.coverReason.name }}</div>
-                        <div class="scond" style="color: #a7a7a7">
-                            {{
-                            item.coverReason.value === 1 ? '是' : '否'
-                            }}
-                        </div>
+                  </div>
+                  <div class="flex1">
+                    <div class="first">{{ item.coverReason.name }}</div>
+                    <div class="scond" style="color: #a7a7a7">
+                      {{
+                        item.coverReason.value === 1 ? '是' : '否'
+                      }}
                     </div>
+                  </div>
                 </div>
               </el-col>
               <!-- <el-col :sm="24" :lg="12" class="form-card">
@@ -499,7 +498,7 @@
                   <div class="first">客户敞口行业划分汇集</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -507,7 +506,7 @@
                   <div class="first">产业链CICS行业划分明细</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -515,7 +514,7 @@
                   <div class="first">产业链是否覆盖</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -523,7 +522,7 @@
                   <div class="first">产业链未覆盖原因</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -531,7 +530,7 @@
                   <div class="first">ESC是否覆盖</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
@@ -539,13 +538,13 @@
                   <div class="first">ESC未覆盖原因</div>
                   <div class="scond" style="color: #a7a7a7">
                     {{
-                      info.stockCnInfo && levelStr[info.stockCnInfo.govType] 
+                      info.stockCnInfo && levelStr[info.stockCnInfo.govType]
                     }}
                   </div>
                 </div>
               </el-col> -->
             </el-collapse-item>
-            <el-collapse-item name="entityBaseBusiInfo" v-if="info.entityBaseBusiInfo">
+            <el-collapse-item v-if="info.entityBaseBusiInfo" name="entityBaseBusiInfo">
               <template slot="title">
                 <span style="font-size: 16px">其他一般工商信息</span>
               </template>
@@ -635,28 +634,28 @@
 import {
   getQuickOfCoverage,
   getInfoDetail,
-  updateInfoDetail,
-} from "@/api/subject";
-import pagination from "../../components/Pagination";
-import { replaceStr } from "@/utils/index";
+  updateInfoDetail
+} from '@/api/subject'
+import pagination from '../../components/Pagination'
+import { replaceStr } from '@/utils/index'
 export default {
-  name: "eidtGovernment",
+  name: 'EidtGovernment',
   components: {
-    pagination,
+    pagination
   },
   data() {
     return {
-      input: "",
+      input: '',
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 10
       },
       total: 0,
-      currentTime: "",
+      currentTime: '',
       list: [],
-      currentTab: "",
+      currentTab: '逐一修改',
       info: {
-          stockCnInfo: {}
+        stockCnInfo: {}
       },
       levelStr: {
 
@@ -664,112 +663,112 @@ export default {
       activeNames: 'info',
       clickEdit: false,
       edit: {
-          creditCode: false,
-          listType: false,
-          entityName: false,
-          exchange: false,
-          stockCode: false,
-          listDate: false,
-          delistingDate: false,
+        creditCode: false,
+        listType: false,
+        entityName: false,
+        exchange: false,
+        stockCode: false,
+        listDate: false,
+        delistingDate: false
       }
-    };
+    }
   },
   created() {
-    this.getCurrentTime();
+    this.getCurrentTime()
   },
   methods: {
     replaceFun(row) {
-      return replaceStr(row, this.input);
+      return replaceStr(row, this.input)
     },
     handleClick(row) {
       try {
-        this.$modal.loading("Loading...");
+        this.$modal.loading('Loading...')
         this.list.forEach(e => {
-            e.edit = false
+          e.edit = false
         })
         row.edit = true
         this.clickEdit = true
-        const code = row.entityInfo.entityCode;
+        const code = row.entityInfo.entityCode
         getInfoDetail({ entityCode: code }).then((res) => {
-          const { data } = res;
-          this.info = data;
-        });
+          const { data } = res
+          this.info = data
+        })
       } catch (error) {
-        console.log(error);
+        console.log(error)
       } finally {
-        this.$modal.closeLoading();
+        this.$modal.closeLoading()
       }
     },
     getCurrentTime() {
-      //获取当前时间并打印
-      let yy = new Date().getFullYear();
-      let mm = new Date().getMonth() + 1;
-      let dd = new Date().getDate();
-      let hh = new Date().getHours();
-      let mf =
+      // 获取当前时间并打印
+      const yy = new Date().getFullYear()
+      const mm = new Date().getMonth() + 1
+      const dd = new Date().getDate()
+      const hh = new Date().getHours()
+      const mf =
         new Date().getMinutes() < 10
-          ? "0" + new Date().getMinutes()
-          : new Date().getMinutes();
-      let ss =
+          ? '0' + new Date().getMinutes()
+          : new Date().getMinutes()
+      const ss =
         new Date().getSeconds() < 10
-          ? "0" + new Date().getSeconds()
-          : new Date().getSeconds();
+          ? '0' + new Date().getSeconds()
+          : new Date().getSeconds()
       // eslint-disable-next-line no-unused-vars
       this.currentTime =
-        yy + "-" + mm + "-" + dd + " " + hh + ":" + mf + ":" + ss;
+        yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf + ':' + ss
     },
     check(name) {
-      this.dialogVisible = true;
+      this.dialogVisible = true
     },
     changeTab(tab) {
-      this.currentTab = tab;
+      this.currentTab = tab
     },
     back() {
-      this.$router.back();
+      this.$router.back()
     },
     select() {
       try {
-        this.$modal.loading("Loading...");
+        this.$modal.loading('Loading...')
         const parmas = {
           param: this.input,
           pageNum: 1,
-          pageSize: this.queryParams.pageSize,
-        };
+          pageSize: this.queryParams.pageSize
+        }
         getQuickOfCoverage(parmas).then((res) => {
-          const { data } = res;
-          this.list = data.records;
-          this.total = data.total;
-          this.queryParams.pageNum = data.current;
-        });
+          const { data } = res
+          this.list = data.records
+          this.total = data.total
+          this.queryParams.pageNum = data.current
+        })
       } catch (error) {
-        console.log(error);
+        console.log(error)
       } finally {
-        this.$modal.closeLoading();
+        this.$modal.closeLoading()
       }
     },
     getList() {
       try {
-        this.$modal.loading("Loading...");
+        this.$modal.loading('Loading...')
         const parmas = {
           param: this.input,
           pageNum: this.queryParams.pageNum,
-          pageSize: this.queryParams.pageSize,
-        };
+          pageSize: this.queryParams.pageSize
+        }
         getQuickOfCoverage(parmas).then((res) => {
-          const { data } = res;
-          this.list = data.records;
-          this.total = data.total;
-          this.queryParams.pageNum = data.current;
-        });
+          const { data } = res
+          this.list = data.records
+          this.total = data.total
+          this.queryParams.pageNum = data.current
+        })
       } catch (error) {
-        console.log(error);
+        console.log(error)
       } finally {
-        this.$modal.closeLoading();
+        this.$modal.closeLoading()
       }
     },
     submit() {
       try {
-        this.$modal.loading("Loading...");
+        this.$modal.loading('Loading...')
         // const entityInfoDetails = {
         //   entityInfo: this.info.entityInfo,
         //   stockCnInfo: {
@@ -783,25 +782,25 @@ export default {
           if (res.code === 200) {
             this.$message({
               showClose: true,
-              message: "操作成功",
-              type: "success",
-            });
+              message: '操作成功',
+              type: 'success'
+            })
             this.getList()
             this.info = {}
           }
-        });
+        })
       } catch (error) {
         this.$message({
           showClose: true,
           message: error,
           type: 'error'
-        });
+        })
       } finally {
-        this.$modal.closeLoading();
+        this.$modal.closeLoading()
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">

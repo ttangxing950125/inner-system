@@ -11,6 +11,7 @@ import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.GovLevel;
 import com.deloitte.crm.service.IGovLevelService;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.List;
  * @date 2022-09-21
  */
 @RestController
+@Slf4j
 @RequestMapping("/level")
 public class GovLevelController extends BaseController {
     @Autowired
@@ -101,6 +103,7 @@ public class GovLevelController extends BaseController {
     @ApiOperation(value = "政府级别")
     @PostMapping("/getGovLevel")
     public R getGovLevel(){
+        log.info("  >>>>  政府级别 <<<<  ");
         return govLevelService.getGovLevel();
     }
 }

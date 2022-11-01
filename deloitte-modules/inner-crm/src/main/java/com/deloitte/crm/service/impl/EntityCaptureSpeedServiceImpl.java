@@ -36,6 +36,7 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
      */
     @Override
     public void sendTFFSpeed(CrmSupplyTask crmSupplyTask, EntityInfo entityInfo) {
+        log.info("  >>>> 更新记录角色3.4.5的任务进度,roleId=[{}],entityCode=[{}] <<<<  ",crmSupplyTask.getRoleId(),entityInfo.getEntityCode());
         Integer speedId = crmSupplyTask.getSpeedId();
 
         if (ObjectUtils.isEmpty(speedId)) {

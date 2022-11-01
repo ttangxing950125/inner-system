@@ -116,6 +116,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     @Override
     public List<EntityNameHis> getNameListByDqCoded(String dqCode) {
+        log.info("  >>>>  根据德勤code查询曾用名列表,dqCode=[{}] <<<<  ",dqCode);
         QueryWrapper<EntityNameHis>queryWrapper=new QueryWrapper<>();
         return entityNameHisMapper.selectList(
                 queryWrapper.lambda()
@@ -124,11 +125,13 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
 
     @Override
     public List<Map<String, Object>> getGovHisNameList(String param) {
+        log.info("  >>>>  查询政府主体曾用名列表,govName=[{}] <<<<  ",param);
         return entityNameHisMapper.getGovHisNameList(param);
     }
 
     @Override
     public List<Map<String, Object>> getEntityHisNameList(String param) {
+        log.info("  >>>>  查询企业主体曾用名列表,param=[{}] <<<<  ",param);
         return entityNameHisMapper.getEntityHisNameList(param);
     }
 
@@ -144,7 +147,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         log.info("  =>> 角色7 新增主体曾用名:开始 <<=  ");
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
+        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName).eq(EntityNameHis::getDqCode,entityCode));
         if(!ObjectUtils.isEmpty(entityNameHis)){return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());}
 
         // 新增一条数据进入曾用名列表
@@ -174,7 +177,13 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 entityInfo.setEntityNameHis(entityInfo.getEntityNameHis()+","+entityName);
             }
         }
-        entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成");
+        String nameHisRemarks = entityInfo.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(nameHisRemarks)){
+            nameHisRemarks="";
+        }else {
+            nameHisRemarks=nameHisRemarks+";";
+        }
+        entityInfo.setEntityNameHisRemarks(nameHisRemarks+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成");
         entityInfoMapper.updateById(entityInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
@@ -183,7 +192,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         log.info("  =>> admin 新增主体曾用名:开始 <<=  ");
         EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
         if(ObjectUtils.isEmpty(entityInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName));
+        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, entityName).eq(EntityNameHis::getDqCode,entityCode));
         if(!ObjectUtils.isEmpty(entityNameHis)){return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());}
 
         // 新增一条数据进入曾用名列表
@@ -214,7 +223,13 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 entityInfo.setEntityNameHis(entityInfo.getEntityNameHis()+","+entityName);
             }
         }
-        entityInfo.setEntityNameHisRemarks(entityInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
+        String nameHisRemarks = entityInfo.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(nameHisRemarks)){
+            nameHisRemarks="";
+        }else {
+            nameHisRemarks=nameHisRemarks+";";
+        }
+        entityInfo.setEntityNameHisRemarks(nameHisRemarks+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
         entityInfoMapper.updateById(entityInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
@@ -223,7 +238,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
         log.info("  =>> admin 新增主体曾用名:开始 <<=  ");
         GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dpGovCode));
         if(ObjectUtils.isEmpty(govInfo)){return R.fail(BadInfo.VALID_EMPTY_TARGET.getInfo());}
-        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, govName));
+        EntityNameHis entityNameHis = baseMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getOldName, govName).eq(EntityNameHis::getDqCode,dpGovCode));
         if(!ObjectUtils.isEmpty(entityNameHis)){return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());}
 
         // 新增一条数据进入曾用名列表
@@ -254,7 +269,13 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper,En
                 govInfo.setGovNameHis(govInfo.getGovNameHis()+","+govName);
             }
         }
-        govInfo.setEntityNameHisRemarks(govInfo.getEntityNameHisRemarks()+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
+        String nameHisRemarks = govInfo.getEntityNameHisRemarks();
+        if (ObjectUtils.isEmpty(nameHisRemarks)){
+            nameHisRemarks="";
+        }else {
+            nameHisRemarks=nameHisRemarks+";";
+        }
+        govInfo.setEntityNameHisRemarks(nameHisRemarks+ DateUtil.format(new Date(),"yyyy-MM-dd")+ " "+ SecurityUtils.getUsername()+ " " + "系统自动生成").setUpdated(updated);
         govInfoMapper.updateById(govInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }

@@ -21,6 +21,7 @@ public interface SendEmailService {
      * 角色2 角色7 邮件模板
      * @param roleId
      * @param taskCount
+     * @param taskDate
      */
-    void email(Integer roleId,Integer taskCount);
+    void email(Integer roleId,Integer taskCount,String taskDate);
 }

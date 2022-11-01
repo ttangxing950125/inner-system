@@ -11,8 +11,10 @@ import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.SupplyTaskVo;
 import com.deloitte.system.api.domain.SysUserRole;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -28,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @date 2022-09-21
  */
 @Service
+@Slf4j
 public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, CrmSupplyTask> implements ICrmSupplyTaskService {
     @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
@@ -265,6 +268,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
     @Override
     public TaskStatistics getTaskStatistics() {
+        log.info("  >>>> 匹配登录用户角色 <<<<  ");
         Long userId = SecurityUtils.getUserId();
         TaskStatistics taskStatistics = new TaskStatistics();
 
@@ -280,6 +284,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
         SysUserRole sysUserRole = sysUserRoles.get(0);
 
         Long roleId = sysUserRole.getRoleId();
+        log.info("  >>>> 角色 "+(roleId-2)+" 任务列表查询  <<<<  ");
         String currentTime = TimeFormatUtil.getDayTime("yyyy-MM-dd", 0);
         //设置日期
         taskStatistics.setTodayDate(currentTime);
@@ -314,7 +319,9 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void completeTaskById(Integer id) {
+        log.info("  >>>> 修改任务，任务ID:  "+id+" ,为完成状态  <<<<  ");
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
         crmSupplyTask.setId(id);
         crmSupplyTask.setState(1);

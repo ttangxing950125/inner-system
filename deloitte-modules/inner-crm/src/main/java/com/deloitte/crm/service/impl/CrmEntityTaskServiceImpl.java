@@ -1,11 +1,12 @@
 package com.deloitte.crm.service.impl;
 
+import com.alibaba.excel.util.DateUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
-import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
@@ -29,6 +30,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -156,53 +158,55 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R finishTask(Integer taskId, Integer state, String entityCode) {
-        log.info(">>>>>>处理当日任务开始 taskId={}>>entityCode>>>:{}", taskId, entityCode);
+        log.info("  =>> 角色7处理当日任务开始 taskId={}>>entityCode>>>:{} <<=  ", taskId, entityCode);
         CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
-        crmEntityTask.setState(state);
-        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSpeedId()));
 
         // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
+        EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSpeedId()));
         if(ObjectUtils.isEmpty(entityCaptureSpeed)){
-            log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmEntityTask.getSpeedId());
+            log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据 <<=  ",taskId,crmEntityTask.getSpeedId());
         }else{
             entityCaptureSpeed.setAdded(state);
             entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
         }
 
+        log.info("  =>> 角色7任务 将任务 {} 的状态更改至 {} <<=  ",taskId,state);
+        crmEntityTask.setState(state);
         baseMapper.updateById(crmEntityTask);
-        //  相同主体名称情况下 && 相同任务日期 && 任务状态为 0 对该次生成任务进行忽略
-        List<CrmEntityTask> byEntityNameList = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, crmEntityTask.getTaskDate()).eq(CrmEntityTask::getState, 0).eq(CrmEntityTask::getEntityName, crmEntityTask.getEntityName()));
-        //如果 entity_code 不为 null 那么就是新增，便给角色 2 新增一条任务
-        if (!ObjectUtils.isEmpty(entityCode)&&byEntityNameList.size()==0) {
-            crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
-            CrmDailyTask crmDailyTask = crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType,4));
-            if(ObjectUtils.isEmpty(crmDailyTask)){
-                crmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskRoleType("4").setTaskStatus(2).setTaskDate(new Date()));
-            }else{
-                crmDailyTask.setTaskStatus(2);
-                crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
-            }
-        }
+
+        //获取当条任务日期 以及 格式化后的日期
         Date taskDate = crmEntityTask.getTaskDate();
-        List<CrmEntityTask> unFinish = baseMapper
-                .selectList(new QueryWrapper<CrmEntityTask>().lambda()
-                        .like(CrmEntityTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd"))
-                        .eq(CrmEntityTask::getState, 0));
+        String date = DateUtils.format(taskDate, "yyyy-MM-dd");
+        BaseMapper<CrmDailyTask> crmDailyTaskMapper = crmDailyTaskService.getBaseMapper();
+
+        //  相同主体名称情况下 && 相同任务日期 && 任务状态为 0 对该次生成任务进行忽略
+        List<CrmEntityTask> byEntityNameList = Optional.ofNullable(baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, date).eq(CrmEntityTask::getState, 0).eq(CrmEntityTask::getEntityName, crmEntityTask.getEntityName()))).orElse(new ArrayList<>());
+        //如果 entity_code 不为 null ，并且 任务中并未出现相同主体名称的任务，那么就是新增，便给角色 2 新增一条任务
+        if (!ObjectUtils.isEmpty(entityCode)&&byEntityNameList.size()==0) {
+            //向 crm_mas_task中添加任务
+            crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
+            CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType,4));
+            //向每日任务列表添加任务 角色4 crm_daily_task 中 task_role_type = 4 , task_status = 2
+            if(ObjectUtils.isEmpty(crmDailyTask)){
+                crmDailyTaskMapper.insert(new CrmDailyTask().setTaskRoleType("4").setTaskStatus(2).setTaskDate(new Date()));}
+            else { crmDailyTaskMapper.updateById(crmDailyTask.setTaskStatus(2));}
+        }
+
+        List<CrmEntityTask> unFinish = Optional.ofNullable(baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, date).eq(CrmEntityTask::getState, 0))).orElse(new ArrayList<>());
         if (unFinish.size() == 0) {
+            log.info("  =>> 角色7任务 {} 的任务已经完成，进行发送邮件以及更改任务状态操作  <<=  ",date);
             //查询日任务 角色7对应的 task_role_type 为 8
-            CrmDailyTask crmDailyTask = Optional.ofNullable(crmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().like(CrmDailyTask::getTaskDate, DateUtil.format(taskDate, "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, 8))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+            CrmDailyTask crmDailyTask = Optional.ofNullable(crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, 8))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
             // 当日任务处理完毕 状态码为 3
-            crmDailyTask.setTaskStatus(3);
-            crmDailyTaskService.getBaseMapper().updateById(crmDailyTask);
+            crmDailyTaskMapper.updateById(crmDailyTask.setTaskStatus(3));
 
             // 当日是新增主体的数量 状态码为2 代表是新增主体
-            List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2));
-            CrmDailyTask role2DailyTask = new CrmDailyTask().setTaskRoleType("4").setTaskDate(new Date());
+            List<CrmEntityTask> crmEntityTasks = baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getState, 2).eq(CrmEntityTask::getTaskDate, date));
 
             if (crmEntityTasks.size() != 0) {
                 //发送邮件 角色2 的 role ID 固定为 4
-                asycSendEmailService(4, crmEntityTasks.size());
+                asyncSendEmailService(4, crmEntityTasks.size(), date);
             }
 
             return R.ok(SuccessInfo.SUCCESS.getInfo());
@@ -211,9 +215,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     }
 
     @Async
-    public void asycSendEmailService(Integer roleId, Integer taskCount) {
+    public void asyncSendEmailService(Integer roleId, Integer taskCount, String date) {
         log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}", roleId, taskCount);
-        sendEmailService.email(roleId, taskCount);
+        sendEmailService.email(roleId, taskCount,date);
     }
 
     /**

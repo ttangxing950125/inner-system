@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/roletff")
 @AllArgsConstructor
 @Api(tags = "角色345控制层")
+@Slf4j
 public class RoleTFFController {
 
     private final ICrmSupplyTaskService iCrmSupplyTaskService;
@@ -41,6 +43,7 @@ public class RoleTFFController {
 
     @PostMapping("/getRoleSupplyTask")
     public R getRoleSupplyTask(String taskDate, Integer pageNum, Integer pageSize) {
+        log.info("  >>>>  获取登录用户角色的信息补充任务,taskDate=[{}] <<<<  ",taskDate);
         return iCrmSupplyTaskService.getRoleSupplyTask(taskDate, pageNum, pageSize);
     }
 }

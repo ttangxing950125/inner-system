@@ -3,12 +3,14 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.nacos.shaded.com.google.common.base.Objects;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
+import com.deloitte.crm.domain.ProductsCover;
+import com.deloitte.crm.dto.EntityCoverDto;
+import com.deloitte.crm.mapper.ProductsCoverMapper;
+import com.deloitte.crm.quartz.service.CoverRuleProService;
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.service.ProductsCoverService;
-import com.deloitte.crm.service.SendEmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +73,9 @@ public class QuartzTask implements ApplicationContextAware {
                EmailUtil.sendTemplateEmail("每日定时任务跑批异常", errorInfoFromException,s);
            }
 
-        log.error("e");
+            log.error("e");
 
-       }
+        }
         log.info("同步任务开始 =============");
         quarzRoleTaskService.executeQuarzRoleTask();
         log.info("同步任务结束 =============");
@@ -88,12 +87,12 @@ public class QuartzTask implements ApplicationContextAware {
      * {@link EntityAttrValue}
      */
     @Async
-    @Scheduled(cron = "0 0 12 * * ?" )
+    @Scheduled(cron = "0 0 12 * * ?")
     @Transactional(rollbackFor = Exception.class)
-    public void runBatchDataToAttrValue(){
-        log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");
+    public void runBatchDataToAttrValue() {
+        log.info("=>>  " + DateUtil.dateTimeNow() + " Attr数据导入开始  <<=");
         entityAttrValueRunBatchTasks.forEach(EntityAttrValueRunBatchTask::runBatchData);
-        log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入完成  <<=");
+        log.info("=>>  " + DateUtil.dateTimeNow() + " Attr数据导入完成  <<=");
     }
 
     @Override
@@ -104,7 +103,7 @@ public class QuartzTask implements ApplicationContextAware {
 
 
     /**
-     *覆盖规则
+     * 覆盖规则
      *
      * @return void
      * @author penTang

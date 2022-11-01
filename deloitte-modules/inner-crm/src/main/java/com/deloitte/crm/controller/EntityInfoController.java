@@ -16,8 +16,6 @@ import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
-import com.deloitte.crm.service.IGovInfoService;
-import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EntityInfoHisNameVo;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import io.swagger.annotations.Api;
@@ -28,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -44,11 +41,6 @@ import java.util.List;
 public class EntityInfoController extends BaseController {
     @Autowired
     private IEntityInfoService entityInfoService;
-    @Autowired
-    private SendEmailService service;
-    @Autowired
-    private IGovInfoService iGovInfoService;
-
 
     /**
      * 统计整体企业主体情况
@@ -268,6 +260,7 @@ public class EntityInfoController extends BaseController {
     @ApiImplicitParam(name = "entityCode", value = "主体德勤唯一识别码", paramType = "query", example = "", dataType = "String")
     @PostMapping("/getInfoDetail")
     public R getInfoDetailByEntityCode(String entityCode) {
+
         return entityInfoService.getInfoDetailByEntityCode(entityCode);
     }
 

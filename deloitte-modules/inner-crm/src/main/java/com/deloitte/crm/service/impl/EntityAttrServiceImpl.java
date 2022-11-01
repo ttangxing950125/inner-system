@@ -13,10 +13,12 @@ import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.IEntityAttrService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
  * @date 2022-09-21
  */
 @Service
+@Slf4j
 public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityAttr> implements IEntityAttrService {
     @Autowired
     private EntityAttrMapper entityAttrMapper;
@@ -133,6 +136,11 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
     @Override
     public R getAllByGroup(Integer type) {
+        String name="企业";
+        if (!ObjectUtils.isEmpty(type)&&2==type){
+            name="政府";
+        }
+        log.info("  >>>> 获取 "+name+" 主体父子级指标清单  <<<<  ");
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList((query.lambda().eq(EntityAttr::getAttrType, type)));
 
@@ -167,7 +175,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
     @Override
     public List<EntityAttr> getAttrByDqCode(String dqCode) {
-
+        log.info("  >>>> 根据主体dqCode查询详细信息,dqCode=[{}]  <<<<  ",dqCode);
         QueryWrapper<EntityAttrValue> valueQuery = new QueryWrapper<>();
         List<EntityAttrValue> attrValues = valueMapper.selectList(valueQuery.lambda().eq(EntityAttrValue::getEntityCode, dqCode));
         if (CollectionUtils.isEmpty(attrValues)) {
@@ -196,6 +204,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getTaskByEntityCode(String entityCode, Integer roleId) {
+        log.info("  >>>> 根据任务id查询补充信息,entityCode=[{}],roleId=[{}] <<<<  ",entityCode,roleId);
         //封装企业返回信息
         EntitySupplyBack entitySupplyBack = new EntitySupplyBack();
 
@@ -219,6 +228,7 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, List<EntityAttr>> getAttrByOrganName(String organName) {
+        log.info("  >>>> 根据机构类型查询需要补充录入的信息,organName=[{}] <<<<  ",organName);
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));
         if (CollectionUtils.isEmpty(entityAttrs)) {
