@@ -202,25 +202,25 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 BondInfo bondName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondShortName, target)
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE));
                 if(bondName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(bondName,BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else{return R.fail(bondName,BadInfo.EXITS_BOND_SHORT_NAME.getInfo());}
             //债券全称
             case BOND_FULL_NAME:
                 BondInfo bondFName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE));
                 if(bondFName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(bondFName,BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else{return R.fail(bondFName,BadInfo.EXITS_BOND_FULL_NAME.getInfo());}
 
             //新地方政府地方名称
             case GOV_NAME:
                 GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
                 if(govByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(govByName,BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else{return R.fail(govByName,BadInfo.EXITS_GOV_NAME.getInfo());}
             //新地方政府行政编码
             case GOV_CODE:
                 if(!target.matches(Common.REGEX_GOV_CODE)){return R.fail(BadInfo.PARAM_GOV_VALIDA.getInfo());}
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
                 if(govByCode==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(govByCode,BadInfo.EXITS_BOND_CODE.getInfo());}
+                }else{return R.fail(govByCode,BadInfo.EXITS_GOV_CODE.getInfo());}
                 //债券代码查重
             case BOND_CODE:
                 BondInfo bondOriCode = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getOriCode, target)

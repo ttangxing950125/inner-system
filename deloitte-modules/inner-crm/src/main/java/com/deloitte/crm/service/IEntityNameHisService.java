@@ -86,4 +86,6 @@ public interface IEntityNameHisService
     R addEntityNameHis(String entityCode, String hisName, Date updated, String remarks);
 
     R addGovNameHis(String entityCode, String entityName, Date updated, String entityNameHisRemarks);
+
+    void saveOldNameToInfo();
 }

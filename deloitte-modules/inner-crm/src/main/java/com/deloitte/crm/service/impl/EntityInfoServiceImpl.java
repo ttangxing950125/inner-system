@@ -115,7 +115,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private GovInfoMapper govInfoMapper;
 
-    @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     private BondInfoMapper bondInfoMapper;
@@ -1076,6 +1075,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return this.list(wrapper);
     }
 
+    @Override
     public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
         log.info("  >>>> 企业主体分类查询,type=[{}] <<<<  ",type);
         return R.ok(getInfoListByType(type, param, pageNum, pageSize));
@@ -2674,6 +2674,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     exportEntityCheckDto.setCreditCodeByEntityName(entityInfo.getEntityName());
                     exportEntityCheckDto.setCreditCodeByEntityCode(entityInfo.getEntityCode());
                     exportEntityCheckDto.setCreditCodeByCreditCode(entityInfo.getCreditCode());
+                    exportEntityCheckDto.setIsStatus(entityInfo.getStatus()==1 ? "是" : "否");
                 } else {
                     exportEntityCheckDto.setCreditCodeByRecord("识别成功,未覆盖主体");
                 }
@@ -2691,6 +2692,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 exportEntityCheckDto.setEntityNameByEntityName(entityInfos.get(0).getEntityName());
                 exportEntityCheckDto.setEntityNameByEntityCode(entityInfos.get(0).getEntityCode());
                 exportEntityCheckDto.setEntityNameByCreditCode(entityInfos.get(0).getCreditCode());
+                exportEntityCheckDto.setIsStatus(entityInfos.get(0).getStatus()==1 ? "是" : "否");
             } else {
                 exportEntityCheckDto.setEntityNameByRecord("识别成功,未覆盖主体");
             }
@@ -2790,7 +2792,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 for (Integer proId : proIds) {
                     Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                     ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                            .eq(ProductsCover::getProId, proId));
+                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
                     if (productsCover != null) {
                         more.put(products.getProName(), productsCover.getCoverDes());
                     } else {
@@ -2819,7 +2821,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 for (Integer proId : proIds) {
                     Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                     ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                            .eq(ProductsCover::getProId, proId));
+                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
                     if (productsCover != null) {
                         more.put(products.getProName(), productsCover.getCoverDes());
                     } else {
@@ -2851,7 +2853,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     for (Integer proId : proIds) {
                         Products products = productmapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                         ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                                .eq(ProductsCover::getProId, proId));
+                                .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
                         if (productsCover != null) {
                             more.put(products.getProName(), productsCover.getCoverDes());
                         } else {
@@ -3001,11 +3003,15 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (CollUtil.isEmpty(proIds)) {
             proIds = productmapper.selectList(null).stream().map(Products::getId).collect(Collectors.toList());
         }
-        if (proIds.size() != 0) {
-            merge.merge(0, 0, 15, 15 + proIds.size() - 1, "产品覆盖情况", true);
+        int size = proIds.size();
+        if (size != 0) {
+            merge.merge(0, 0, 15, 15 + size - 1, "产品覆盖情况", true);
+
         }
         writer.passCurrentRow();// 跳过当前行
         CellUtil.setCellValue(writer.getOrCreateCell(10, 0), "冲突检查", writer.getStyleSet(), true);
+        CellUtil.setCellValue(writer.getOrCreateCell(15 + size, 0), "生效情况", writer.getStyleSet(), true);
+
 
         ArrayList<Map<String, Object>> rows = new ArrayList<>();
         entityByBatchList.forEach(o -> {
@@ -3030,7 +3036,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     map.put(s, o.getMore().get(s));
                 }
             }
-
+            map.put("是否生效", o.getIsStatus());
             rows.add(map);
         });
         //一次性写出内容，强制输出标题

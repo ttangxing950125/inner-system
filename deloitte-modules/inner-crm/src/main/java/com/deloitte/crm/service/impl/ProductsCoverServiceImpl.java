@@ -2,6 +2,7 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.injector.methods.UpdateById;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
@@ -84,7 +85,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             for (Integer integer : proIds) {
                 HashMap<String, String> stringStringHashMap = new HashMap<>();
                 //当前主体关联的产品覆盖情况
-                ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()));
+                ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()).eq(ProductsCover::getIsGov,0));
                 if (productsCover == null) {
                     Products products = productsMapper.selectById(integer);
                     stringStringHashMap.put("key", products.getProName());
@@ -113,6 +114,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
     }
 
     @Override
+
     public void CoverRule() {
         log.info("=>> "+ DateUtil.dateTimeNow()+"组装覆盖情况");
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(null);
@@ -128,9 +130,36 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
 
         }
         System.out.println(productsCovers);
-        boolean b = saveBatch(productsCovers);
+         //入库
+         int updateSum = 0;
+         int saveSum = 0;
+        for (ProductsCover productsCover : productsCovers) {
+            LambdaQueryWrapper<ProductsCover> qw = new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, productsCover.getEntityCode())
+                    .eq(ProductsCover::getProId, productsCover.getProId())
+                    .eq(ProductsCover::getIsGov,0);
+            ProductsCover one = getOne(qw);
+            if (one != null) {
+                one.setIsCover(productsCover.getIsCover());
+                one.setCoverDes(productsCover.getCoverDes());
+                boolean b = updateById(one);
+                if (b){
+                    // 统计更新了多少条
+                  updateSum ++;
+                }
+            }else {
+                boolean save = save(productsCover);
+                if (save){
+                    //统计新增了多少条
+                    saveSum ++;
+                }
+
+            }
+
+        }
+        log.info("总数：{}",productsCovers.size());
+        log.info("更新：{}",updateSum);
+        log.info("新增：{}",saveSum);
         productsCovers.clear();
-        
     }
 
     /**
