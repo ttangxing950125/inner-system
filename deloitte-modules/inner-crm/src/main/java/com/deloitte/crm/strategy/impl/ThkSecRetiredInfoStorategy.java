@@ -113,6 +113,7 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                     stockThkInfo.setBelWind(crmTypeInfo.getName());
                 }
             }
+//            thkSecRetiredInfos.setNumber(null);
             //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
             Integer changeType = null;
             //查询这条数据有没有
@@ -124,6 +125,7 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 changeType = DataChangeType.INSERT.getId();
                 stockThkInfo.setStockStatus(StockThkStatus.DELISTING.getId());
                 stockThkInfo.setStatusDesc(StockThkStatus.DELISTING.getName());
+
             } else if (!Objects.equals(thkSecRetiredInfoLast, thkSecRetiredInfos)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
