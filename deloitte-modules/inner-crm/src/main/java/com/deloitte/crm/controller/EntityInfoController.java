@@ -41,7 +41,8 @@ import java.util.List;
 public class EntityInfoController extends BaseController {
     @Autowired
     private IEntityInfoService entityInfoService;
-
+    @Autowired
+    private IEntityNameHisService entityNameHisService;
     /**
      * 统计整体企业主体情况
      *
@@ -218,12 +219,16 @@ public class EntityInfoController extends BaseController {
      * @date 2022/10/28 18:36
     */
     @ApiOperation(value = "新增企业主体的曾用名")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "entityCode", value = "对应的主体code，必传", paramType = "body", example = "IB000001", dataType = "String"),
+            @ApiImplicitParam(name = "entityName", value = "对应的主体名称，必传", paramType = "body", example = "哈尔滨哈投投资股份有限公司", dataType = "String"),
+            @ApiImplicitParam(name = "updated", value = "修改的时间，没选传空，必传", paramType = "body", example = "2022-10-11", dataType = "String"),
+            @ApiImplicitParam(name = "entityNameHisRemarks", value = "新增的备注，没有传空，必传", paramType = "body", example = "新的备注", dataType = "String")
+    })
     @PostMapping("/addOldName")
     public R addOldName(@RequestBody EntityInfoHisNameVo entityInfo) {
         return entityNameHisService.addEntityNameHis(entityInfo.getEntityCode(),entityInfo.getEntityName(),entityInfo.getUpdated(),entityInfo.getEntityNameHisRemarks());
     }
-    @Autowired
-    private IEntityNameHisService entityNameHisService;
     /**
      * 修改,停用企业主体的曾用名
      *
@@ -232,16 +237,16 @@ public class EntityInfoController extends BaseController {
      * @param newOldName
      * @param status
      * @return R
-     * @author 冉浩岑
+     * @author 冉浩岑a
      * @date 2022/9/25 13:22
      */
     @ApiOperation(value = "修改,停用企业主体的曾用名")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "dqCode", value = "德勤统一识别码", paramType = "query", example = "1", dataType = "String"),
-            @ApiImplicitParam(name = "oldName", value = "原本的曾用名", paramType = "query", example = "原始曾用名", dataType = "String"),
-            @ApiImplicitParam(name = "newOldName", value = "修改后的曾用名", paramType = "query", example = "新的曾用名", dataType = "String"),
-            @ApiImplicitParam(name = "remarks", value = "修改后的曾用名备注", paramType = "query", example = "修改后的曾用名备注", dataType = "String"),
-            @ApiImplicitParam(name = "status", value = "是否停用曾用名", paramType = "query", example = "是否停用曾用名", dataType = "String")
+            @ApiImplicitParam(name = "dqCode", value = "德勤统一识别码,必传", paramType = "query", example = "1", dataType = "String"),
+            @ApiImplicitParam(name = "oldName", value = "原本的曾用名,必传", paramType = "query", example = "原始曾用名", dataType = "String"),
+            @ApiImplicitParam(name = "newOldName", value = "修改后的曾用名,必传，停用串-", paramType = "query", example = "新的曾用名", dataType = "String"),
+            @ApiImplicitParam(name = "remarks", value = "修改后的曾用名备注,必传", paramType = "query", example = "修改后的曾用名备注", dataType = "String"),
+            @ApiImplicitParam(name = "status", value = "是否停用曾用名,必传，停用传1，修改传空串", paramType = "query", example = "是否停用曾用名", dataType = "String")
     })
     @PostMapping("/updateOldName")
     public R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks) {
