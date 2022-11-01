@@ -1461,7 +1461,8 @@ export default {
         shareRatioYear: '',
         typeWindCheck: [],
         typeShenWanCheck: [],
-        creditErrorType: ''
+        creditErrorType: '',
+        notUse: false
       },
       addGovForm: {
         govLevelBig: 1
@@ -1549,7 +1550,6 @@ export default {
         2: '新增主体'
       },
       options: [],
-      month: '',
       monthMm: '',
       notUseoptions: [
         {
