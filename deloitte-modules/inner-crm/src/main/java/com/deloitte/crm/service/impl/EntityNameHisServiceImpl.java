@@ -305,16 +305,16 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
 
         for (String entityCode : entityCollect.keySet()) {
             List<EntityNameHis> hisList = entityCollect.get(entityCode);
+            EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
+            if (ObjectUtils.isEmpty(entityInfo)){
+                entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, entityCode));
+                continue;
+            }
             hisList.forEach(o -> {
                 String oldName = o.getOldName();
                 Date updated = o.getUpdated();
                 String remarks = o.getRemarks();
 
-                EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, entityCode));
-                if (ObjectUtils.isEmpty(entityInfo)){
-                    entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, entityCode));
-                    return;
-                }
                 // 对主体曾用名列表进行操作
                 String oldNames = entityInfo.getEntityNameHis();
 
@@ -345,16 +345,17 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
 
         for (String govCode : govCollect.keySet()) {
             List<EntityNameHis> hisList = govCollect.get(govCode);
+            GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govCode));
+            if (ObjectUtils.isEmpty(govInfo)){
+                entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, govCode));
+                continue;
+            }
+
             hisList.forEach(o -> {
                 String oldName = o.getOldName();
                 Date updated = o.getUpdated();
                 String remarks = o.getRemarks();
 
-                GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, govCode));
-                if (ObjectUtils.isEmpty(govInfo)){
-                    entityNameHisMapper.delete(new QueryWrapper<EntityNameHis>().lambda().eq(EntityNameHis::getDqCode, govCode));
-                    return;
-                }
                 // 对主体曾用名列表进行操作
                 String oldNames = govInfo.getGovNameHis();
 
