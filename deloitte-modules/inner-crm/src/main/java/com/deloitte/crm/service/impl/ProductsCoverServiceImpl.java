@@ -128,8 +128,8 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
 
         }
         System.out.println(productsCovers);
-//        boolean b = saveBatch(productsCovers);
-//        productsCovers.clear();
+        boolean b = saveBatch(productsCovers);
+        productsCovers.clear();
         
     }
 
