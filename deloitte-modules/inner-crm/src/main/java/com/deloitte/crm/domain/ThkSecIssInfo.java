@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.crm.utils.EqualsUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -154,6 +155,12 @@ public class ThkSecIssInfo implements Serializable {
      */
     @Excel(name = "全球协调人")
     private String coordinator;
+
+    /**
+     * 设置windIndustry
+     */
+    @TableField(exist = false)
+    private String windIndustry;
 
 
     @Override

@@ -90,7 +90,7 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
-
+                entityTask.setWindMaster(cnCoachBack.getWindIndustry());
 
                 entityTask.setEntityName(entityName);
                 entityTaskService.createTask(entityTask);
