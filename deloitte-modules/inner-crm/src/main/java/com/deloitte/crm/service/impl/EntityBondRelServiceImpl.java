@@ -87,7 +87,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
-
+                entityTask.setWindMaster(newIss.getWindIndustry());
                 entityTask.setEntityName(issorName);
 
                 entityTaskService.createTask(entityTask);

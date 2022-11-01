@@ -82,7 +82,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
             try {
                 Map<String, Object> data = AttrValueUtils.parseObj(secIssInfo, Excel.class, "name");
-
+                entityTask.setWindMaster(secIssInfo.getWindIndustry());
                 entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
                 entityTask.setDetails(objectMapper.writeValueAsString(data));
 

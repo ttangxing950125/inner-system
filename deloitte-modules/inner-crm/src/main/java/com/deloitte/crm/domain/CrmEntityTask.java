@@ -28,7 +28,6 @@ public class CrmEntityTask
 
     @TableId(type = IdType.AUTO)
     private Integer id;
-
     /**
      * 捕获时的主体名
      */
