@@ -80,7 +80,7 @@ public class QuartzTask implements ApplicationContextAware {
      * {@link EntityAttrValue}
      */
     @Async
-//    @Scheduled(cron = "0 0 12 * * ?" )
+    @Scheduled(cron = "0 0 12 * * ?" )
     @Transactional(rollbackFor = Exception.class)
     public void runBatchDataToAttrValue(){
         log.info("=>>  "+ DateUtil.dateTimeNow() +" Attr数据导入开始  <<=");
@@ -102,7 +102,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/10/28 11:08
     */
-    @PostConstruct
+
     public void  CoverRulePro(){
         log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
         productsCoverService.CoverRule();
