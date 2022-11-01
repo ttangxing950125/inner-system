@@ -2318,7 +2318,6 @@ export default {
           this.$set(this.ruleForm, 'entityCode', row.entityCode)
           this.$set(this.ruleForm, 'id', row.id)
           this.$set(this.ruleForm, 'state', row.state)
-          console.log(this.ruleForm)
         })
         getFinances({}).then((res) => {
           const { data } = res

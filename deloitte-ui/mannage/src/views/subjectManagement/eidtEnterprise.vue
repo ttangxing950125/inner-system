@@ -14,9 +14,8 @@
         @click="changeTab('逐一修改')"
       >逐一修改</a>
       <a
-        :class="currentTab === '批量修改' ? 'g-select' : ''"
-        @click="changeTab('批量修改')"
-      >地方主管部门</a>
+        style="cursor: not-allowed"
+      >批量修改</a>
     </div>
     <el-row>
       <el-col :sm="24" :lg="24" class="form-card">
@@ -654,7 +653,7 @@ export default {
       total: 0,
       currentTime: '',
       list: [],
-      currentTab: '',
+      currentTab: '逐一修改',
       info: {
         stockCnInfo: {}
       },
