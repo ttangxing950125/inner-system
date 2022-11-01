@@ -119,7 +119,7 @@ public class EntityInfoController extends BaseController {
     @PostMapping("/add")
     public AjaxResult addEntity(@RequestBody EntityDto entityDto) {
         //新增主体
-        entityInfoService.insertEntityInfo(entityDto);
+        //entityInfoService.insertEntityInfo(entityDto);
         return toAjax(true);
     }
 
