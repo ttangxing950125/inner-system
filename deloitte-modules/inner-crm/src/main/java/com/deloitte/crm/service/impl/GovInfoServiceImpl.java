@@ -673,6 +673,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
+        log.info("  >>>>  修改,停用政府主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ",dqCode,oldName,newOldName,status,remark);
         if (ObjectUtils.isEmpty(oldName)) {
             return R.fail("无效的原始曾用名");
         }
