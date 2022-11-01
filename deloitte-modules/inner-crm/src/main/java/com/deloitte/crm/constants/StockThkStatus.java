@@ -4,11 +4,12 @@ package com.deloitte.crm.constants;
  * @author 吴鹏鹏ppp
  * @date 2022/9/26
  */
-public enum  StockThkStatus {
+public enum StockThkStatus {
 
     LISTEN(1, "聆听中"),
-    ISSUE(2,"发行中"),
-    LIST(3,"成功上市");
+    ISSUE(2, "发行中"),
+    DELISTING(4, "退市"),
+    LIST(3, "成功上市");
 
     private final Integer id;
 

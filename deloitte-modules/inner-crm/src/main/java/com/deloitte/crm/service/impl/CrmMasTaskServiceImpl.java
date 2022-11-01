@@ -173,7 +173,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
      */
     @Override
     public R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
-        log.info("  =>> 角色2 " + date + " 查询 <<=  ");
+        log.info("  =>> 角色2 {} 查询 <<=  ",date);
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
         List<CrmMasTaskVo> res = new ArrayList<>();
@@ -194,7 +194,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
                 crmMasTaskVo.setEntityName(entityInfo.getEntityName());
                 crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());}
             } else {
-                log.warn("  =>> 角色2 出现无效信息 taskId = " + row.getId() + " entity_code 为空  <<=  !!!");
+                log.warn("  =>> 角色2 出现无效信息 taskId {} entity_code 为空  <<=  !!!",row.getId());
             }
             crmMasTaskVos.add(crmMasTaskVo);
         });

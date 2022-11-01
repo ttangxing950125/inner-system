@@ -138,21 +138,27 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      */
     @Override
     public R<MasDto> getTable(Integer id) {
+        log.info("  =>> 角色 2 开始查询 {} 任务的相关信息 <<=  ",id);
         MasDto masDto = new MasDto();
         CrmMasTask crmMasTask = Optional.ofNullable(iCrmMasTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, id))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         EntityInfo entityInfo = Optional.ofNullable(iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, crmMasTask.getEntityCode()).eq(EntityInfo::getStatus, 1))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         String entityCode = entityInfo.getEntityCode();
+        String entityName = entityInfo.getEntityName();
         //基础信息展示
-        masDto.setEntityName(entityInfo.getEntityName()).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWind(entityInfo.getWindMaster()).setShenWan(entityInfo.getShenWanMaster());
+        masDto.setEntityName(entityName).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWind(entityInfo.getWindMaster()).setShenWan(entityInfo.getShenWanMaster());
         //当企业为金融机构的时候 去查entity_financial 中的数据
         if(!ObjectUtils.isEmpty(entityInfo.getFinance())&&entityInfo.getFinance()==1){
+            log.info("  =>> 查询到主体信息 {} 鉴定为金融机构 <<=  ", entityName);
             EntityFinancial entityFinancial = entityFinancialService.getBaseMapper().selectOne(new QueryWrapper<EntityFinancial>().lambda().eq(EntityFinancial::getEntityCode, entityCode));
-            masDto.setIsFinance("Y").setFinanceSegmentation(entityFinancial.getMince());
+            if(!ObjectUtils.isEmpty(entityFinancial)){
+                masDto.setIsFinance("Y").setFinanceSegmentation(entityFinancial.getMince());
+            }else{ log.warn("  =>> 角色 2 发现主体数据 {} 的 金融机构关联数据表值为空 <<=  ", entityName);}
         }else{
             masDto.setIsFinance("N");
         }
         EntityMaster entityMaster = entityMasterMapper.selectOne(new QueryWrapper<EntityMaster>().lambda().eq(EntityMaster::getEntityCode, entityCode));
         if(!ObjectUtils.isEmpty(entityMaster)){
+            log.info("  =>> 查询到主体信息 {} 已经被划过敞口，拥有敞口信息 <<=  ", entityName);
             //城投YY
             String yyUrban = entityMaster.getYyUrban();
             if(ObjectUtils.isEmpty(yyUrban)||"0".equals(yyUrban)){masDto.setCity("N");}else{masDto.setCity("Y");}
@@ -162,15 +168,18 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             //查询是否是城投机构
             String ibUrban = entityMaster.getIbUrban();
             if(!ObjectUtils.isEmpty(ibUrban)&&"1".equals(ibUrban)){
+                log.info("  =>> 查询到主体信息 {} 鉴定为城投机构(IB) <<=  ", entityName);
                 masDto.setCityIb("Y");
                 EntityGovRel entityGovRel = entityGovRelMapper.selectOne(new QueryWrapper<EntityGovRel>().lambda().eq(EntityGovRel::getEntityCode, entityCode));
-                String dqGovCode = entityGovRel.getDqGovCode();
-                masDto.setDqGovCode(dqGovCode);
-                GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
-                if(!ObjectUtils.isEmpty(govInfo)){
-                    GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
-                    masDto.setGovNode(tree);
-                }
+                if(!ObjectUtils.isEmpty(entityGovRel)){
+                    String dqGovCode = entityGovRel.getDqGovCode();
+                    masDto.setDqGovCode(dqGovCode);
+                    GovInfo govInfo = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getDqGovCode, dqGovCode));
+                        if(!ObjectUtils.isEmpty(govInfo)){
+                            GovNode tree = this.getTree(new GovNode().setGovName(govInfo.getGovName()), govInfo);
+                            masDto.setGovNode(tree);
+                        }
+                }else{log.warn("  =>> 角色 2 发现主体数据 {} 的 敞口关联数据表值为空 <<=  ", entityName);}
             }
         }
 

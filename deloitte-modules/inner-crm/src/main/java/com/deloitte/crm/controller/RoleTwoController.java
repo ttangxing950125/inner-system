@@ -57,7 +57,6 @@ public class RoleTwoController {
     @PostMapping("/getTaskInfo")
     @Log(title = "【 查询当日任务 】", businessType = BusinessType.OTHER)
     public R<Page<CrmMasTaskVo>> getTaskInfo(String date,Integer pageNum, Integer pageSize){
-        //单表查询 角色2当月任务完成情况
         return iCrmMasTaskService.getTaskInfo(date,pageNum,pageSize);
     }
 
@@ -77,7 +76,7 @@ public class RoleTwoController {
 
     /**
      * 确定新增 by正杰
-     *
+     * 此处调用 浩辰方法
      * @param govInfo
      * @return
      */

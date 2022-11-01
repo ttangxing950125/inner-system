@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -17,6 +18,7 @@ import java.util.Date;
  * @author 冉浩岑
  * @date 2022/10/13 15:10
  */
+@Builder
 @Data
 @Accessors(chain = true)
 @AllArgsConstructor

@@ -18,17 +18,15 @@ public enum WindTaskEnum {
     CN_ST_UNDO(10, 2, "A股发行", "撤消ST"),//摘帽
 
 
-
-
     BOND_NEW_ISS(15, 2, "债券发行", "新债发行-新发行债券"),
     BOND_DEL_ISS(14, 2, "债券发行", "新债发行-推迟或取消发行债券"),
     BOND_CONVERTIBLE(17, 2, "债券发行", "可转债发行预案"),
     BOND_CONVERTIBLE_CHANGE(18, 2, "债券发行", "可交换转债发行预案"),
 
 
-
     THK_SEC_ISS_INFO(22, 3, "港股发行", "证券发行-股票发行-聆讯信息一览"),
     THK_SEC_ISS_DETAIL(23, 3, "港股发行", "证券发行-股票发行-首次发行明细"),
+    THK_SEC_RETIRED_INFO(26, 3, "港股发行", "证券发行-港股-已退市证券一览"),
 
     BREAK_CONTRACT_FIRST_NUMBER_COUNT(24, 4, "违约", "企业首次违约报表"),
     BREAK_CONTRACT_DEFAULT_MONEY_TOTAL(25, 4, "违约", "历年违约发生金额统计");
