@@ -42,9 +42,6 @@ public class BondInfoServiceImpl implements IBondInfoService {
     private IEntityAttrService entityAttrService;
 
     @Resource
-    private IEntityAttrValueService entityAttrValueService;
-
-    @Resource
     private RedisService redisService;
 
     @Resource

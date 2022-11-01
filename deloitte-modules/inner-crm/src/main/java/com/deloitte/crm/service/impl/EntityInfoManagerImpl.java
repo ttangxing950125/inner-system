@@ -72,29 +72,27 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     private EntityInfoLogsService entityInfoLogsService;
 
 
-    private final String SEPARATE ="，";
-
     /**
      *   ******************
      *   *    修改主体名称  *
      *   ******************
-     * @param entity
-     * @param entityNewName
-     * @param remarks
+     * @param entity 主体
+     * @param entityNewName 主体新名称
+     * @param remarks 备注信息
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String updateEntityName(EntityInfo entity,String entityNewName,String remarks) {
-        //如果备注为空 自动改为  系统自动生成
+        //如果备注为空 自动改为  remarks = 系统自动生成
         if (StrUtil.isBlank(remarks)) {remarks = "系统自动生成";}
         String username = SecurityUtils.getUsername();
         if (ObjectUtils.isEmpty(entity)) {throw new ServiceException(BadInfo.EMPTY_ENTITY_INFO.getInfo()); }
 
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
         String oldName = entity.getEntityName();
-        if (!Arrays.stream(oldName.split(SEPARATE)).collect(Collectors.toMap(row -> row, row -> row)).containsKey(entityNewName)) {
-            entity.setEntityNameHis(entity.getEntityNameHis() + "，" + oldName);
+        if (!Arrays.stream(oldName.split(",")).collect(Collectors.toMap(row -> row, row -> row)).containsKey(entityNewName)) {
+            entity.setEntityNameHis(entity.getEntityNameHis() + "," + oldName);
             //修改主体曾用名 entity_name_his_remarks 时 需要用 日期+更新人+备注;
             entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
                     + "\r\n"
@@ -138,30 +136,30 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
         return null;
     }
 
-
+    /** 主体code */
     private final String ENTITY_CODE = "ENTITY_CODE";
-
+    /** 统一社会信用代码 */
     private final String CREDIT_CODE = "CREDIT_CODE";
-
+    /** 主体名称 */
     private final String ENTITY_NAME = "ENTITY_NAME";
-
+    /** 债券全称 */
     private final String BOND_FULL_NAME = "BOND_FULL_NAME";
-
+    /** 债券简称 */
     private final String BOND_SHORT_NAME = "BOND_SHORT_NAME";
-
+    /** 政府名称 */
     private final String GOV_NAME = "GOV_NAME";
-
+    /** 政府行政编码 */
     private final String GOV_CODE = "GOV_CODE";
 
-    //债券简称
+    /** 债券代码 */
     private final String BOND_CODE = "BOND_CODE";
-    //A股代码
+    /** A股代码 */
     private final String STOCK_CN_CODE = "STOCK_CN_CODE";
-    //港股代码
+    /** 港股代码 */
     private final String STOCK_HK_CODE = "STOCK_HK_CODE";
-    //A股简称
+    /** A股简称 */
     private final String STOCK_A_NAME = "STOCK_A_NAME";
-    //港股简称
+    /** 港股简称 */
     private final String STOCK_HK_NAME = "STOCK_HK_NAME";
 
 
@@ -171,9 +169,9 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
      *   *****************
      *   *    匹配关键字   *
      *   *****************
-     * @param keyword
-     * @param target
-     * @return
+     * @param keyword 需要校验的字段类型
+     * @param target 校验的字段
+     * @return 匹配是否有效
      */
     @Override
     public R matchByKeyword(String keyword, String target) {
@@ -205,10 +203,10 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else{return R.fail(bondName,BadInfo.EXITS_BOND_SHORT_NAME.getInfo());}
             //债券全称
             case BOND_FULL_NAME:
-                BondInfo bondFName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
+                BondInfo bondFullName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
                         .eq(BondInfo::getIsDeleted,Boolean.FALSE));
-                if(bondFName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(bondFName,BadInfo.EXITS_BOND_FULL_NAME.getInfo());}
+                if(bondFullName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else{return R.fail(bondFullName,BadInfo.EXITS_BOND_FULL_NAME.getInfo());}
 
             //新地方政府地方名称
             case GOV_NAME:
@@ -237,11 +235,11 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else {return R.fail(stockCnInfo,BadInfo.EXITS_STOCK_CODE.getInfo());}
                 //港股查重
             case STOCK_HK_CODE:
-                StockThkInfo stockTHKInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target)
+                StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target)
                         .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (stockTHKInfo==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else {return R.fail(stockTHKInfo,BadInfo.EXITS_STOCK_CODE.getInfo());}
+                if (stockThkInfo==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else {return R.fail(stockThkInfo,BadInfo.EXITS_STOCK_CODE.getInfo());}
             case STOCK_A_NAME:
                 StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target)
                         .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
@@ -249,11 +247,11 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 if (stockCnInfoByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else {return R.fail(stockCnInfoByName,BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
             case STOCK_HK_NAME:
-                StockThkInfo stockTHKInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target)
+                StockThkInfo stockThkInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target)
                         .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
                 );
-                if (stockTHKInfoByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else {return R.fail(stockTHKInfoByName,BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
+                if (stockThkInfoByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                }else {return R.fail(stockThkInfoByName,BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
             default:
                 return R.ok(null,BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }

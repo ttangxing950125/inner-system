@@ -2,8 +2,10 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -137,11 +139,11 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 if (CollUtil.isNotEmpty(entityInfos)) {
                     //更新 主体基本信息表
                     entityInfos.stream().map(e -> e.setWindMaster(thkSecRetiredInfos.getBelWind())).forEach(e -> entityInfoService.getBaseMapper().updateById(e));
+                    initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
                 } else {
-                    this.initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
+                    log.warn("<<<<<<根据企业名称：{} 查询主体信息 为空 不做任何绑定关系!!!<<<<<<<", thkSecRetiredInfos.getCompanyCn());
                 }
             }
-
             thkSecRetiredInfos.setChangeType(changeType);
             thkSecRetiredInfoService.save(thkSecRetiredInfos);
 
@@ -185,7 +187,23 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
 
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        Integer taskId = windTask.getId();
+        Wrapper<ThkSecRetiredInfo> wrapper = Wrappers.<ThkSecRetiredInfo>lambdaQuery()
+                .eq(ThkSecRetiredInfo::getTaskId, taskId)
+                .in(ThkSecRetiredInfo::getChangeType, 1, 2);
+        return thkSecRetiredInfoService.list(wrapper).stream().map(item -> {
+            HashMap<String, Object> dataMap = new HashMap<>();
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("证券代码", item.getCode());
+            dataMap.put("证券简称", item.getName());
+            dataMap.put("公司中文名称", item.getCompanyCn());
+
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
     private void initEntityRel(List<EntityInfo> entityInfos, StockThkInfo stockThkInfo, ThkSecRetiredInfo thkSecRetiredInfo) {
@@ -203,8 +221,8 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo);
             } else {
                 EntityBaseBusiInfo info1 = new EntityBaseBusiInfo();
-                entityBaseBusiInfo.setRegAddr(thkSecRetiredInfo.getDetailedAddress());
-                entityBaseBusiInfo.setBusRange(Optional.ofNullable(thkSecRetiredInfo.getMainBusiness()).orElse(null));
+                info1.setRegAddr(Optional.ofNullable(thkSecRetiredInfo.getDetailedAddress()).orElse(null));
+                info1.setBusRange(Optional.ofNullable(thkSecRetiredInfo.getMainBusiness()).orElse(null));
                 info1.setEntityCode(entityCode);
                 entityBaseBusiInfoMapper.insert(info1);
             }

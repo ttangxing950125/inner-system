@@ -8,7 +8,10 @@ import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
 import com.deloitte.crm.domain.dto.EntityInfoResult;
 import com.deloitte.crm.domain.dto.EntityListView;
-import com.deloitte.crm.dto.*;
+import com.deloitte.crm.dto.EntityInfoCodeDto;
+import com.deloitte.crm.dto.EntityInfoDto;
+import com.deloitte.crm.dto.ExportEntityCheckDto;
+import com.deloitte.crm.dto.ImportDto;
 import com.deloitte.crm.vo.EntityInfoVo;
 import com.deloitte.crm.vo.EntitySupplyMsgBack;
 import com.deloitte.crm.vo.TargetEntityBondsVo;
@@ -51,15 +54,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     public List<EntityInfo> selectEntityInfoList(EntityInfo entityInfo);
 
     /**
-     * @param entityDto
-     * @return
-     * @author 正杰
-     * @date 2022/9/22
-     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
-     */
-    public R insertEntityInfo(EntityDto entityDto);
-
-    /**
      * 修改【请填写功能名称】
      *
      * @param entityInfo 【请填写功能名称】
@@ -98,18 +92,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return
      */
     EntityInfo getEntityInfoByCreditCode(String creditCode);
-
-
-    /**
-     * => 修改主体信息中的主体名称 & 汇总曾用名
-     * => 新增主体曾用名
-     * @author 正杰
-     * @date 2022/9/22
-     * @param entityCode 德勤code
-     * @param entityNewName 主体新名称
-     * @return 修改返回信息
-     */
-    R editEntityNameHis(String entityCode, String entityNewName);
 
     /**
      * 根据名称查询主体
@@ -174,23 +156,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
 
     Map<String, Object> getOverviewByAll();
 
-    /**
-     * 校验统一社会信用代码是否存在 by正杰
-     * @author 正杰
-     * @date 2022/9/28
-     * @param creditCode
-     * @return
-     */
-    R<EntityInfoVo> checkCreditCode(String creditCode);
-
-    /**
-     * 校验主体名称是否存在
-     * @author 正杰
-     * @date 2022/9/28
-     * @param entityName
-     * @return R
-     */
-    R<EntityInfoVo> checkEntityName(String entityName);
     /**
      * 覆盖情况快速查询
      *
@@ -293,16 +258,6 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * @return
      */
     R editeCreditCode(String entityCode, String creditCode);
-
-    /**
-     * 新增主体 并绑定关联债券||股票信息
-     * @param entityInfoInsertDTO
-     * @return
-     * @author 正杰
-     * @date 2022/9/22
-     * 新增【确定该主体是新增后,填写具体要新增主体的信息】
-     */
-    R insertEntityInfoByDaily(EntityInfoInsertDTO entityInfoInsertDTO);
 
     void exportEntity(HttpServletResponse response);
 
