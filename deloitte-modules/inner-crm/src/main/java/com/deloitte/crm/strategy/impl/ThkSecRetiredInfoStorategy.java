@@ -139,7 +139,7 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                     entityInfos.stream().map(e -> e.setWindMaster(thkSecRetiredInfos.getBelWind())).forEach(e -> entityInfoService.getBaseMapper().updateById(e));
                     initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
                 } else {
-                    log.warn("==> 根据企业名称：{} 查询主体信息 为空 不做任何绑定关系", thkSecRetiredInfos.getCompanyCn());
+                    log.warn("<<<<<<根据企业名称：{} 查询主体信息 为空 不做任何绑定关系!!!<<<<<<<", thkSecRetiredInfos.getCompanyCn());
                 }
             }
             thkSecRetiredInfos.setChangeType(changeType);
