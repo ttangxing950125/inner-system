@@ -98,7 +98,7 @@ public class ThkSecRetiredInfo implements Serializable {
     /**
      * 注册地址
      */
-    @Excel(name = "注册地址")
+    @Excel(name = "注册地")
     private String registered;
     /**
      * 注册地详细地址
@@ -158,6 +158,6 @@ public class ThkSecRetiredInfo implements Serializable {
     /**
      * 序号
      */
-    @Excel(name = "序号")
-    private String number;
+//    @Excel(name = "序号")
+//    private String number;
 }

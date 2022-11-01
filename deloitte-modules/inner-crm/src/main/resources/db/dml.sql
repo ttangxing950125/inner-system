@@ -14,5 +14,7 @@ alter table stock_thk_info add column `junction` varchar(50) DEFAULT NULL COMMEN
 alter table stock_thk_info add column `bel_wind` varchar(50) DEFAULT NULL COMMENT '所属Wind行业';
 alter table stock_thk_info add column  `delisting_date` date DEFAULT NULL COMMENT '摘牌日期';
 alter table stock_thk_info add column  `termination_type` varchar(20) DEFAULT NULL COMMENT '终止上市类型';
+alter table stock_thk_info add column  `hs_lndustry` varchar(20) DEFAULT NULL COMMENT '所属行业(HS)';
+
 
 
