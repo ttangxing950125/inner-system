@@ -2,8 +2,10 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -185,7 +187,23 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
 
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        Integer taskId = windTask.getId();
+        Wrapper<ThkSecRetiredInfo> wrapper = Wrappers.<ThkSecRetiredInfo>lambdaQuery()
+                .eq(ThkSecRetiredInfo::getTaskId, taskId)
+                .in(ThkSecRetiredInfo::getChangeType, 1, 2);
+        return thkSecRetiredInfoService.list(wrapper).stream().map(item -> {
+            HashMap<String, Object> dataMap = new HashMap<>();
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("证券代码", item.getCode());
+            dataMap.put("证券简称", item.getName());
+            dataMap.put("公司中文名称", item.getCompanyCn());
+
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
     private void initEntityRel(List<EntityInfo> entityInfos, StockThkInfo stockThkInfo, ThkSecRetiredInfo thkSecRetiredInfo) {
