@@ -1,8 +1,8 @@
 package com.deloitte.crm.service;
 
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.dto.EntityInfoInsertDTO;
-import com.deloitte.crm.vo.CheckVo;
 
 /**
  * @author 正杰
@@ -35,7 +35,7 @@ public interface EntityInfoManager {
      * @param target
      * @return
      */
-    CheckVo matchByKeyword(String keyword, String target);
+    R matchByKeyword(String keyword, String target);
 
     /**
      *   *****************
