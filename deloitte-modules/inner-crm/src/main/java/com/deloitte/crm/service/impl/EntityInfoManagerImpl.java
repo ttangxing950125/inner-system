@@ -15,12 +15,12 @@ import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsService;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.vo.CheckVo;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,29 +38,38 @@ import java.util.stream.Collectors;
  * @date 2022/9/29
  */
 @Component
-@AllArgsConstructor
 @Slf4j
 public class EntityInfoManagerImpl implements EntityInfoManager {
 
-    private final EntityInfoMapper entityInfoMapper;
+    @Resource
+    private EntityInfoMapper entityInfoMapper;
 
-    private final EntityNameHisMapper entityNameHisMapper;
+    @Resource
+    private EntityNameHisMapper entityNameHisMapper;
 
-    private final BondInfoMapper bondInfoMapper;
+    @Resource
+    private BondInfoMapper bondInfoMapper;
 
-    private final EntityBondRelMapper entityBondRelMapper;
+    @Resource
+    private EntityBondRelMapper entityBondRelMapper;
 
-    private final GovInfoMapper govInfoMapper;
+    @Resource
+    private GovInfoMapper govInfoMapper;
 
-    private final StockCnInfoMapper stockCnInfoMapper;
+    @Resource
+    private StockCnInfoMapper stockCnInfoMapper;
 
-    private final EntityStockCnRelMapper entityStockCnRelMapper;
+    @Resource
+    private EntityStockCnRelMapper entityStockCnRelMapper;
 
-    private final StockThkInfoMapper stockThkInfoMapper;
+    @Resource
+    private StockThkInfoMapper stockThkInfoMapper;
 
-    private final EntityStockThkRelMapper entityStockThkRelMapper;
+    @Resource
+    private EntityStockThkRelMapper entityStockThkRelMapper;
 
-    private final EntityInfoLogsService entityInfoLogsService;
+    @Resource
+    private EntityInfoLogsService entityInfoLogsService;
 
 
     private final String SEPARATE ="，";
@@ -170,7 +179,6 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     public CheckVo matchByKeyword(String keyword, String target) {
         if(keyword==null){return new CheckVo().setMsg(BadInfo.PARAM_EMPTY.getInfo());}
         if(target==null||target.trim().length()==0){return new CheckVo().setMsg(BadInfo.PARAM_EMPTY.getInfo());}
-        target = target.trim();
 
         switch (keyword){
             //主体的Code
@@ -209,6 +217,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
                 }else{return new CheckVo().setData(govByName).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}
             //新地方政府行政编码
             case GOV_CODE:
+                if(!target.matches(Common.REGEX_GOV_CODE)){return new CheckVo().setMsg(BadInfo.PARAM_GOV_VALIDA.getInfo());}
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
                 if(govByCode==null){return new CheckVo().setMsg(SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
                 }else{return new CheckVo().setData(govByCode).setMsg(BadInfo.EXITS_BOND_CODE.getInfo());}

@@ -34,6 +34,7 @@ public enum BadInfo {
     ERROR_PARAM_KEYWORD("关键参数错误"),
     PARAM_PROBABLY_BE_EMPTY("参数可能为空"),
     PARAM_PROBABLY_BE_VALIDA("参数可能无效"),
+    PARAM_GOV_VALIDA("行政编码无效"),
     PARAM_TABLE_COULD_NOT_BE_NULL("参数中的数据库表常量不能为空!"),
     PARAM_ID_COULD_NOT_BE_NULL("参数中的id不能为空!"),
     COULD_NOT_MATCH_TABLE("未能匹配到数据库表"),
