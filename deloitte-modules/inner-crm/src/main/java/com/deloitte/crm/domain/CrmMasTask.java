@@ -53,11 +53,11 @@ public class CrmMasTask implements Serializable
     private String handleUser;
 
     /** 备注 */
-    @TableField("remarks")
+    @TableField("`remarks`")
     private String remarks;
 
     /** 详情 */
-    @TableField("details")
+    @TableField("`details`")
     private String details;
 
     /** $column.columnComment */

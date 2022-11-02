@@ -29,6 +29,8 @@ public class GovAttrByDto implements Serializable
     private List<String> govScale;
     /** 城市分级 */
     private List<String> govGrading;
+    /** 地理分区归属 */
+    private List<String> gegphZone;
 
 
     /** 省级行政区 */
@@ -47,15 +49,16 @@ public class GovAttrByDto implements Serializable
     private List<String> nineteenCity;
 
     /** 百强县 */
-    private Integer hundred;
+    private List<String> hundred;
     /** 国家中心城市 *///    国家中心城市 ——> 是否为国家中心城市
-    private Integer CCity;
+    private List<String> CCity;
     /** 省会城市 *///    省会城市 ——> 是否为省会城市
-    private Integer provincial;
+    private List<String> provincial;
 
     private GovAttrByDto govAttrByDto;
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);
     }
+
 }
