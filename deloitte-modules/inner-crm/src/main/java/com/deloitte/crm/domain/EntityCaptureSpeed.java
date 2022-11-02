@@ -68,6 +68,24 @@ public class EntityCaptureSpeed implements Serializable {
      */
     private Date captureTime;
     /**
+     * 新增时间
+     */
+    private Date addedTime;
+    /**
+     * 敞口划分时间
+     */
+    private Date divideTime;
+    /**
+     * 补充时间
+     */
+    private Date supplementTime;
+    /**
+     * 推送时间
+     */
+    private Date pushMetaTime;
+
+
+    /**
      * 最后更新的用户，用户名
      */
     private String updater;
