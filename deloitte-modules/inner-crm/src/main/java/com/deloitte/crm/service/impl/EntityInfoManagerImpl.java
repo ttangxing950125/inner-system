@@ -15,6 +15,7 @@ import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.EntityInfoLogsService;
 import com.deloitte.crm.service.EntityInfoManager;
+import io.seata.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -202,127 +203,65 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
      */
     @Override
     public R matchByKeyword(String keyword, String target) {
-        if (keyword == null) {
+        if (StringUtils.isEmpty(keyword)) {
             return R.fail(BadInfo.PARAM_EMPTY.getInfo());
         }
         if (target == null || target.trim().length() == 0) {
             return R.ok(null, BadInfo.PARAM_EMPTY.getInfo());
         }
-
         switch (keyword) {
             //主体的Code
             case ENTITY_CODE:
-                EntityInfo byCode = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, target));
-                if (byCode == null) {
-                    return R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
-                } else {
-                    return R.fail(byCode, BadInfo.EXITS_ENTITY_CODE.getInfo());
-                }
-                //主体的统一社会信用代码
+                EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, target));
+                return Optional.ofNullable(entityInfo).map(r -> (R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()))).orElseGet(() -> R.fail(entityInfo, BadInfo.EXITS_ENTITY_CODE.getInfo()));
+            //主体的统一社会信用代码
             case CREDIT_CODE:
                 if (!target.matches(Common.REGEX_CREDIT_CODE)) {
                     return R.fail(BadInfo.VALID_PARAM.getInfo());
                 }
                 EntityInfo byCreditCode = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, target));
-                if (byCreditCode == null) {
-                    return R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
-                } else {
-                    return R.fail(byCreditCode, BadInfo.EXITS_ENTITY_CODE.getInfo());
-                }
-                //主体名称
+                return Optional.ofNullable(byCreditCode).map(e -> (R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()))).orElseGet(() -> R.fail(byCreditCode, BadInfo.EXITS_ENTITY_CODE.getInfo()));
+            //主体名称
             case ENTITY_NAME:
-                EntityInfo byName = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, target));
-                if (byName == null) {
-                    return R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
-                } else {
-                    return R.fail(byName, BadInfo.EXITS_ENTITY_CODE.getInfo());
-                }
-                //债券简称
+                EntityInfo info = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, target));
+                return Optional.ofNullable(info).map(e -> (R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo()))).orElseGet(() -> R.fail(info, BadInfo.EXITS_ENTITY_CODE.getInfo()));
+            //债券简称
             case BOND_SHORT_NAME:
-                BondInfo bondName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondShortName, target)
-                        .eq(BondInfo::getIsDeleted, Boolean.FALSE));
-                if (bondName == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(bondName, BadInfo.EXITS_BOND_SHORT_NAME.getInfo());
-                }
-                //债券全称
+                BondInfo bondName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondShortName, target).eq(BondInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(bondName).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(bondName, BadInfo.EXITS_BOND_SHORT_NAME.getInfo()));
+            //债券全称
             case BOND_FULL_NAME:
-                BondInfo bondFullName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
-                        .eq(BondInfo::getIsDeleted, Boolean.FALSE));
-                if (bondFullName == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(bondFullName, BadInfo.EXITS_BOND_FULL_NAME.getInfo());
-                }
-
-                //新地方政府地方名称
+                BondInfo bondFullName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target).eq(BondInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(bondFullName).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(bondFullName, BadInfo.EXITS_BOND_SHORT_NAME.getInfo()));
+            //新地方政府地方名称
             case GOV_NAME:
                 GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
-                if (govByName == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(govByName, BadInfo.EXITS_GOV_NAME.getInfo());
-                }
-                //新地方政府行政编码
+                return Optional.ofNullable(govByName).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(govByName, BadInfo.EXITS_GOV_NAME.getInfo()));
+            //新地方政府行政编码
             case GOV_CODE:
                 if (!target.matches(Common.REGEX_GOV_CODE)) {
                     return R.fail(BadInfo.PARAM_GOV_VALIDA.getInfo());
                 }
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
-                if (govByCode == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(govByCode, BadInfo.EXITS_GOV_CODE.getInfo());
-                }
-                //债券代码查重
+                return Optional.ofNullable(govByCode).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(govByCode, BadInfo.EXITS_GOV_CODE.getInfo()));
+            //债券代码查重
             case BOND_CODE:
-                BondInfo bondOriCode = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getOriCode, target)
-                        .eq(BondInfo::getIsDeleted, Boolean.FALSE)
-                );
-                if (bondOriCode == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(bondOriCode, BadInfo.EXITS_BOND_CODE.getInfo());
-                }
-                //A股查重
+                BondInfo bondOriCode = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getOriCode, target).eq(BondInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(bondOriCode).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(bondOriCode, BadInfo.EXITS_BOND_CODE.getInfo()));
+            //A股查重
             case STOCK_CN_CODE:
-                StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockCode, target)
-                        .eq(StockCnInfo::getIsDeleted, Boolean.FALSE)
-                );
-                if (stockCnInfo == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(stockCnInfo, BadInfo.EXITS_STOCK_CODE.getInfo());
-                }
-                //港股查重
+                StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockCode, target).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(stockCnInfo).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(stockCnInfo, BadInfo.EXITS_STOCK_CODE.getInfo()));
+            //港股查重
             case STOCK_HK_CODE:
-                StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target)
-                        .eq(StockThkInfo::getIsDeleted, Boolean.FALSE)
-                );
-                if (stockThkInfo == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(stockThkInfo, BadInfo.EXITS_STOCK_CODE.getInfo());
-                }
+                StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target).eq(StockThkInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(stockThkInfo).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(stockThkInfo, BadInfo.EXITS_STOCK_CODE.getInfo()));
             case STOCK_A_NAME:
-                StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target)
-                        .eq(StockCnInfo::getIsDeleted, Boolean.FALSE)
-                );
-                if (stockCnInfoByName == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(stockCnInfoByName, BadInfo.EXITS_STOCK_SHO_NAME.getInfo());
-                }
+                StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(stockCnInfoByName).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(stockCnInfoByName, BadInfo.EXITS_STOCK_SHO_NAME.getInfo()));
             case STOCK_HK_NAME:
-                StockThkInfo stockThkInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target)
-                        .eq(StockThkInfo::getIsDeleted, Boolean.FALSE)
-                );
-                if (stockThkInfoByName == null) {
-                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                } else {
-                    return R.fail(stockThkInfoByName, BadInfo.EXITS_STOCK_SHO_NAME.getInfo());
-                }
+                StockThkInfo stockThkInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target).eq(StockThkInfo::getIsDeleted, Boolean.FALSE));
+                return Optional.ofNullable(stockThkInfoByName).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(stockThkInfoByName, BadInfo.EXITS_STOCK_SHO_NAME.getInfo()));
             default:
                 return R.ok(null, BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }
