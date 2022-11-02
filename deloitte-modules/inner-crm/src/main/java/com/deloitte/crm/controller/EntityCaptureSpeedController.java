@@ -1,6 +1,8 @@
 package com.deloitte.crm.controller;
 
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.web.controller.BaseController;
+import com.deloitte.crm.dto.EntityCaptureSpeedDto;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +13,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.List;
+
+import static com.deloitte.common.core.utils.PageUtils.startPage;
+
 /**
  * Created with IntelliJ IDEA.
  *
@@ -20,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RestController
 @RequestMapping("/entityCaptureSpeed")
-public class EntityCaptureSpeedController {
+public class EntityCaptureSpeedController extends BaseController {
     @Resource
     private EntityCaptureSpeedService entityCaptureSpeedService;
 
@@ -46,12 +52,12 @@ public class EntityCaptureSpeedController {
 
         String[] split = str.split("\n");
         for (int i = 0; i < split.length; i++) {
-            System.out.println(split[i]+" text comment '"+i+"' ,");
+            System.out.println(split[i] + " text comment '" + i + "' ,");
 
         }
         System.out.println(split.length);
     }
-    
+
     /**
      * @param entityNameOrCode
      * @param request
@@ -59,8 +65,9 @@ public class EntityCaptureSpeedController {
      * @return
      */
     @GetMapping(value = "/search/{entityNameOrCode}")
-    public R search(@PathVariable("entityNameOrCode") String entityNameOrCode, HttpServletRequest request, HttpServletResponse response) {
-        return entityCaptureSpeedService.search(entityNameOrCode);
+    public Object search(@PathVariable("entityNameOrCode") String entityNameOrCode, HttpServletRequest request, HttpServletResponse response) {
+        startPage();
+        List<EntityCaptureSpeedDto> search = entityCaptureSpeedService.search(entityNameOrCode);
+        return getDataTable(search);
     }
-
 }
