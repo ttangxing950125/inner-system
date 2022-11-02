@@ -3,7 +3,6 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
 import com.deloitte.crm.annotation.UpdateLog;
@@ -21,7 +20,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-@TableName("gov_info_copy")
+//@TableName("gov_info_copy")
 public class GovInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
