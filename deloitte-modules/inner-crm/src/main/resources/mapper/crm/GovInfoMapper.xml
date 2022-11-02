@@ -424,7 +424,7 @@
             resultType="java.lang.Integer">
         SELECT count(0) FROM gov_info
         <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
-                or (provincial != null  and provincial != '')">
+                or (provincial != null  and provincial != '')or (gegphZones != null  and gegphZones != '')">
             <where>
                 <if test="isProvince != null  and isProvince != ''">
                     gov_level_small in
@@ -464,7 +464,12 @@
                 <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != ''))and (hundred != null  and hundred != '')">
                     or
                 </if>
-                <if test="hundred != null  and hundred !=''">hundred =#{hundred}</if>
+                <if test="hundred != null  and hundred !=''">
+                    hundred  IN
+                    <foreach item="item" collection="hundred" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
 
                 <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != ''))and (govScale != null  and govScale != '')">
                     or
@@ -510,14 +515,30 @@
                     or
                 </if>
                 <if test="CCity != null  and CCity !=''">
-                    country_center = #{CCity}
+                    country_center in
+                    <foreach item="item" collection="CCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
                 </if>
 
                 <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != ''))and (provincial != null  and provincial != '')">
                     or
                 </if>
                 <if test="provincial != null  and provincial !=''">
-                    provincial =#{provincial}
+                    provincial in
+                    <foreach item="item" collection="provincial" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')or (provincial != null  and provincial != ''))and (gegphZone != null  and gegphZone != '')">
+                    or
+                </if>
+                <if test="gegphZone != null  and gegphZone !=''">
+                    gegph_zone in
+                    <foreach item="item" collection="gegphZone" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
                 </if>
             </where>
         </if>

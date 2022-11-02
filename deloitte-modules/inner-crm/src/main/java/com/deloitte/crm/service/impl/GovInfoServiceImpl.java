@@ -142,15 +142,15 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     /**
      * 百强县
      */
-    private static final String hundred = "百强县";
+    private static final String hundred = "是否百强县";
     /**
      * 国家中心城市
      */
-    private static final String CCity = "国家中心城市";
+    private static final String CCity = "是否国家中心城市";
     /**
      * 省会城市
      */
-    private static final String provincial = "省会城市";
+    private static final String provincial = "是否省会城市";
     /**
      * 是
      */
