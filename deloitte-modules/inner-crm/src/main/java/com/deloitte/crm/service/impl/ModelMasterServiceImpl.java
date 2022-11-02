@@ -181,6 +181,10 @@ public class ModelMasterServiceImpl implements IModelMasterService {
                         }
                 }else{log.warn("  =>> 角色 2 发现主体数据 {} 的 敞口关联数据表值为空 <<=  ", entityName);}
             }
+            //敞口划分信息
+            String masterCode = entityMaster.getMasterCode();
+            ModelMaster modelMaster = Optional.ofNullable(modelMasterMapper.selectOne(new QueryWrapper<ModelMaster>().lambda().eq(ModelMaster::getMasterCode, masterCode))).orElse(new ModelMaster());
+            masDto.setMasterCode(modelMaster.getMasterName());
         }
 
         return R.ok(masDto,SuccessInfo.SUCCESS.getInfo());
@@ -240,7 +244,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         iEntityInfoService.updateById(entityInfo);
         log.info("  =>> 修改一条数据至 entity_info <<=  ");
 
-        updateEntityMaster(masDto);
+        CrmMasTask crmMasTask = Optional.ofNullable(iCrmMasTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, masDto.getId()))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+        updateEntityMaster(masDto.setRemarks(crmMasTask.getRemarks()));
         log.info("  =>> 修改一条数据至 entity_master <<=  ");
 
         if (YES.equals(masDto.getCityIb())){ updateEntityGovRel(masDto); log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");}
@@ -250,10 +255,9 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         log.info("  =>> 完成任务 taskId = " + masDto.getId() + " <<=  ");
 
         // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
-        Integer UN_FINISH_STATE = 0;
         List<CrmMasTask> crmMasTasks = iCrmMasTaskService.getBaseMapper().selectList(new QueryWrapper<CrmMasTask>()
                 .lambda().eq(CrmMasTask::getTaskDate, DateUtils.format(currentDate,"yyyy-MM-dd"))
-                .eq(CrmMasTask::getState, UN_FINISH_STATE));
+                .eq(CrmMasTask::getState, 0));
 
         //完成当条任务后 向 crm_supply 添加任务
         CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
@@ -281,10 +285,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
 
         // 查询到所有任务已经完成 修改当日单表
         if (crmMasTasks.size() == 0) {
-            Integer ROLE_2_ID = 4;
             // 任务完成状态为 3
-            Integer FINISH_DAILY_STATE = 3;
-            iCrmDailyTaskService.saveTask(ROLE_2_ID, FINISH_DAILY_STATE, DateUtil.format(currentDate, "yyyy-MM-dd"));
+            iCrmDailyTaskService.saveTask(4, 3, DateUtil.format(currentDate, "yyyy-MM-dd"));
 
             // 发送邮件
             String dateNow = DateUtil.format(currentDate, "yyyy-MM-dd");
@@ -428,6 +430,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
         //新增 敞口的code
         entityMaster.setMasterCode(masDto.getMasterCode());
+        entityMaster.setRemarks(masDto.getRemarks());
         if (ObjectUtils.isEmpty(entityMaster.getId())) {
             entityMasterMapper.insert(entityMaster);
         } else {

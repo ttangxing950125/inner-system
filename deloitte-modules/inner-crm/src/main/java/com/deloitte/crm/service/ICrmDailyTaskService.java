@@ -80,9 +80,9 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
     /**
      * 传入对应参数 当月任务列表进行新增或修改
      * @author 正杰
-     * @param taskRoleType
-     * @param taskStatus
-     * @param date
+     * @param taskRoleType  3=角色1,4=角色2,5=角色3,6=角色4,7=角色5,8=角色6
+     * @param taskStatus 任务状态 1-无任务 2-有任务 3-任务完成
+     * @param date 日期 yyyy-MM-dd
      */
     void saveTask(Integer taskRoleType,Integer taskStatus,String date);
 }

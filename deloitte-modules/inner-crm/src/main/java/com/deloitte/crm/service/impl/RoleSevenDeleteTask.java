@@ -20,6 +20,6 @@ public class RoleSevenDeleteTask implements RoleSevenTask {
 
     @Override
     public R finishTask(EntityInfoInsertDTO entityInfoInsertDTO) {
-        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),3,null);
+        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),3,null,null);
     }
 }
