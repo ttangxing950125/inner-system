@@ -173,7 +173,7 @@
             resultType="com.deloitte.crm.domain.GovInfo">
         SELECT DISTINCT * FROM gov_info
         <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
-                or (provincial != null  and provincial != '')or (gegphZones != null  and gegphZones != '')">
+                or (provincial != null  and provincial != '')or (gegphZone != null  and gegphZone != '')">
             <where>
                 <if test="isProvince != null  and isProvince != ''">
                     gov_level_small in
@@ -298,7 +298,7 @@
             resultType="com.deloitte.crm.domain.GovInfo">
         SELECT DISTINCT * FROM gov_info
         <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
-                or (provincial != null  and provincial != '')or (gegphZones != null  and gegphZones != '')">
+                or (provincial != null  and provincial != '')or (gegphZone != null  and gegphZone != '')">
             <where>
                 <if test="isProvince != null  and isProvince != ''">
                     gov_level_small in
@@ -424,7 +424,7 @@
             resultType="java.lang.Integer">
         SELECT count(0) FROM gov_info
         <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
-                or (provincial != null  and provincial != '')or (gegphZones != null  and gegphZones != '')">
+                or (provincial != null  and provincial != '')or (gegphZone != null  and gegphZone != '')">
             <where>
                 <if test="isProvince != null  and isProvince != ''">
                     gov_level_small in
