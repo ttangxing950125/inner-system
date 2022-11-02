@@ -283,26 +283,38 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public R updateInfoList(GovInfo o) {
-
-        entityInfoLogsUpdatedService.insert(o.getDqGovCode(), o.getGovName(), o, o);
-        GovInfo govInfo = govInfoMapper.selectById(o.getId());
-        String oldName = o.getGovName();
+    public R updateInfoList(GovInfo info) {
+        Integer updateStatus = info.getStatus();
+        GovInfo govInfo = govInfoMapper.selectById(info.getId());
+        Integer organStatus = govInfo.getStatus();
+        if (!ObjectUtils.isEmpty(updateStatus)&&!ObjectUtils.isEmpty(organStatus)&&updateStatus==0&&organStatus==1){
+            String newGovCode = info.getNewGovCode();
+            String newGovName = info.getNewGovName();
+            if (ObjectUtils.isEmpty(newGovCode)){
+                return R.fail("请填写失效后的政府代码");
+            }
+            if (ObjectUtils.isEmpty(newGovName)){
+                return R.fail("请填写失效后的政府名称");
+            }
+            info.setNewDqCode(info.getDqGovCode());
+        }
+        entityInfoLogsUpdatedService.insert(info.getDqGovCode(), info.getGovName(), govInfo, info);
+        String oldName = info.getGovName();
         //修改政府主体名称时，需要先添加曾用名
         if (!ObjectUtils.isEmpty(oldName) && !oldName.equals(govInfo.getGovName())) {
             GovInfo addOldName = new GovInfo();
-            addOldName.setId(o.getId());
+            addOldName.setId(info.getId());
             addOldName.setGovNameHis(oldName);
-            addOldName.setEntityNameHisRemarks(o.getEntityNameHisRemarks());
+            addOldName.setEntityNameHisRemarks(info.getEntityNameHisRemarks());
             addOldName(addOldName);
             //修改曾用名后需要将曾用名和曾用名备注置空
-            o.setGovNameHis(null).setEntityNameHisRemarks(null);
+            info.setGovNameHis(null).setEntityNameHisRemarks(null);
         }
         Date now = new Date();
         String username = SecurityUtils.getUsername();
-        o.setUpdater(username);
-        o.setUpdated(now);
-        govInfoMapper.updateById(o);
+        info.setUpdater(username);
+        info.setUpdated(now);
+        govInfoMapper.updateById(info);
         return R.ok();
     }
 

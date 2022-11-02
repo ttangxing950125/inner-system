@@ -191,6 +191,14 @@ public class EntityInfo implements Serializable {
      */
     private String entityAuditinstitNew;
 
+    /**
+     * 历史是否上市 0 否 1 是
+     */
+    private String entityStockTag;
+    /**
+     * 历史是否发债 0 否 1 是
+     */
+    private String entityBondTag;
 
     @Override
     public String toString() {

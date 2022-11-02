@@ -896,30 +896,30 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         Page<EntityInfo> pageInfo = new Page<>(pageNum, pageSize);
 
-        LambdaQueryWrapper<EntityInfo> infoQuery = new LambdaQueryWrapper<>();
+        QueryWrapper<EntityInfo> infoQuery = new QueryWrapper<>();
         if (ObjectUtils.isEmpty(type)) {
             type = 1;
         }
         if (type == 1) {
-            infoQuery.eq(EntityInfo::getList, 1);
+            infoQuery.lambda().eq(EntityInfo::getEntityStockTag, 1);
         } else if (type == 2) {
-            infoQuery.eq(EntityInfo::getIssueBonds, 1);
+            infoQuery.lambda().eq(EntityInfo::getEntityBondTag, 1);
         } else if (type == 3) {
-            infoQuery.eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0);
+            infoQuery.lambda().eq(EntityInfo::getEntityStockTag, 0).eq(EntityInfo::getEntityBondTag, 0);
         } else if (type == 4) {
-            infoQuery.eq(EntityInfo::getFinance, 1);
+            infoQuery.lambda().eq(EntityInfo::getFinance, 1);
         }
         if (!ObjectUtils.isEmpty(param)) {
-            infoQuery.like(EntityInfo::getEntityCode, param);
-            infoQuery.or().like(EntityInfo::getEntityName, param);
+            infoQuery.lambda().like(EntityInfo::getEntityCode, param);
+            infoQuery.lambda().or().like(EntityInfo::getEntityName, param);
             if (type == 1) {
-                infoQuery.eq(EntityInfo::getList, 1);
+                infoQuery.lambda().eq(EntityInfo::getEntityStockTag, 1);
             } else if (type == 2) {
-                infoQuery.eq(EntityInfo::getIssueBonds, 1);
+                infoQuery.lambda().eq(EntityInfo::getEntityBondTag, 1);
             } else if (type == 3) {
-                infoQuery.eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0);
+//                infoQuery.and(query->query().eq(EntityInfo::getEntityStockTag, 0).eq(EntityInfo::getEntityBondTag, 0));
             } else if (type == 4) {
-                infoQuery.eq(EntityInfo::getFinance, 1);
+                infoQuery.lambda().eq(EntityInfo::getFinance, 1);
             }
         }
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, infoQuery);

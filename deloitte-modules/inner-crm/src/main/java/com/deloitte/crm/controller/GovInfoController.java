@@ -149,19 +149,19 @@ public class GovInfoController extends BaseController {
     }
 
     /**
-     * 政府主体批量修改
+     * 修改政府主体
      *
      * @param govInfoList
      * @return R
      * @author 冉浩岑
      * @date 2022/9/22 15:24
      */
-    @ApiOperation(value = "政府主体修改")
+    @ApiOperation(value = "修改政府主体")
     @ApiImplicitParam(name = "govInfoList", value = "可包含表 gov_info 的所有字段", paramType = "body", dataTypeClass = GovInfo.class)
     @PostMapping("/updateInfoList")
     public R updateInfoList(@RequestBody GovInfo govInfoList) {
         log.info("  >>>>  政府主体修改,govInfo=[{}] <<<<  ",govInfoList);
-        return R.ok(govInfoService.updateInfoList(govInfoList));
+        return govInfoService.updateInfoList(govInfoList);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.deloitte.crm.domain;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.Attrs;
 import com.deloitte.crm.annotation.UpdateLog;
@@ -20,6 +21,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
+@TableName("gov_info_copy")
 public class GovInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -184,13 +186,13 @@ public class GovInfo implements Serializable {
     private Integer status;
 
     /**
-     * 主体状态 是否生效 0-失效 1-生效
+     * 城市规模
      */
     @Excel(name = "城市规模")
     private String govScale;
 
     /**
-     * 主体状态 是否生效 0-失效 1-生效
+     * 城市分级
      */
     @Excel(name = "城市分级")
     private String govGrading;
