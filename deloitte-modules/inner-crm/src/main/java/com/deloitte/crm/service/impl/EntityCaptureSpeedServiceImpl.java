@@ -48,8 +48,7 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
             return;
         }
         EntityCaptureSpeed updateSpeed = new EntityCaptureSpeed();
-        updateSpeed.setId(speedId).setSupplement(1).setUpdated(new Date()).setUpdater(SecurityUtils.getUsername());
-        updateSpeed.setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode()).setCreditCode(entityInfo.getCreditCode());
+        updateSpeed.setId(speedId).setSupplement(1).setUpdated(new Date()).setUpdater(SecurityUtils.getUsername()).setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode()).setCreditCode(entityInfo.getCreditCode());
         entityCaptureSpeedMapper.updateById(updateSpeed);
     }
 
