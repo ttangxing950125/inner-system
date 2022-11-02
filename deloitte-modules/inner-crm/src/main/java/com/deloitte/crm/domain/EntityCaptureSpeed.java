@@ -3,16 +3,13 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.UpdateLog;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -83,4 +80,10 @@ public class EntityCaptureSpeed implements Serializable {
      */
     private Date updated;
 
+    /**
+     * 统一社会信用代码
+     */
+    @Excel(name = "统一社会信用代码")
+    @UpdateLog(fieldName = "统一社会信用代码", tableFieldName = "credit_code")
+    private String creditCode;
 }
