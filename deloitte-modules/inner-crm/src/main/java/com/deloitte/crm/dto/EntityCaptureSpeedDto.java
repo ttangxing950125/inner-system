@@ -64,5 +64,9 @@ public class EntityCaptureSpeedDto implements Serializable {
      * 更新时间
      */
     private Date updated;
+    /**
+     * 最后
+     */
+    private String updater;
 
 }
