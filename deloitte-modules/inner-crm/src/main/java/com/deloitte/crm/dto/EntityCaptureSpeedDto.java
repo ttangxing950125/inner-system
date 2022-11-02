@@ -1,9 +1,7 @@
 package com.deloitte.crm.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,6 +15,9 @@ import java.util.Date;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
+@Builder
+@Accessors(chain = true)
 public class EntityCaptureSpeedDto implements Serializable {
     //id
     private Integer id;
@@ -63,5 +64,9 @@ public class EntityCaptureSpeedDto implements Serializable {
      * 更新时间
      */
     private Date updated;
+    /**
+     * 最后
+     */
+    private String updater;
 
 }
