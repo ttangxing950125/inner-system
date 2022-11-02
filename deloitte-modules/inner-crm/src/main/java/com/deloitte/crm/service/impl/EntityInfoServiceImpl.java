@@ -917,7 +917,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             } else if (type == 2) {
                 infoQuery.lambda().eq(EntityInfo::getEntityBondTag, 1);
             } else if (type == 3) {
-                infoQuery.and(query->query.lambda().eq(EntityInfo::getEntityStockTag, 0).eq(EntityInfo::getEntityBondTag, 0));
+                infoQuery.and(query->query.lambda().eq(EntityInfo::getEntityStockTag, 0).or().isNull(EntityInfo::getEntityStockTag));
+                infoQuery.and(query->query.lambda().eq(EntityInfo::getEntityBondTag, 0).or().isNull(EntityInfo::getEntityBondTag));
             } else if (type == 4) {
                 infoQuery.lambda().eq(EntityInfo::getFinance, 1);
             }
