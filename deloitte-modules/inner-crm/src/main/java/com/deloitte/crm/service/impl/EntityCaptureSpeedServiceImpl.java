@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author 冉浩岑
@@ -54,7 +56,7 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
     }
 
     @Override
-    public  IPage<EntityCaptureSpeedDto> search(String entityNameOrCode, Integer pageNum, Integer pageSize) {
+    public IPage<EntityCaptureSpeedDto> search(String entityNameOrCode, Integer pageNum, Integer pageSize) {
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 10 : pageSize;
         Page<EntityInfoList> page = new Page<>(pageNum, pageSize);

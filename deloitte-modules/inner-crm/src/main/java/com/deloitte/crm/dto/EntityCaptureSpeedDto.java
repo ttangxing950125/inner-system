@@ -36,6 +36,8 @@ public class EntityCaptureSpeedDto implements Serializable {
      * capture 为1绿色，其余灰色 已捕获
      */
     private Integer capture;
+    private Date captureDate;
+
     /**
      * 0-未处理 1-已有主体 2-新增主体 角色6是否新增,不为0就是已处理
      * added 为0灰色，其余绿色 已确定新增
@@ -70,5 +72,22 @@ public class EntityCaptureSpeedDto implements Serializable {
      * 最后
      */
     private String updater;
+
+    /**
+     * 新增时间
+     */
+    private Date addedTime;
+    /**
+     * 敞口划分时间
+     */
+    private Date divideTime;
+    /**
+     * 补充时间
+     */
+    private Date supplementTime;
+    /**
+     * 推送时间
+     */
+    private Date pushMetaTime;
 
 }
