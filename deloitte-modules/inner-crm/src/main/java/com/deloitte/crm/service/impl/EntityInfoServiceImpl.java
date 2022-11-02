@@ -910,14 +910,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             infoQuery.lambda().eq(EntityInfo::getFinance, 1);
         }
         if (!ObjectUtils.isEmpty(param)) {
-            infoQuery.lambda().like(EntityInfo::getEntityCode, param);
-            infoQuery.lambda().or().like(EntityInfo::getEntityName, param);
+            String finalParam = param;
+            infoQuery.and(query->query.lambda().like(EntityInfo::getEntityCode, finalParam).or().like(EntityInfo::getEntityName, finalParam));
             if (type == 1) {
                 infoQuery.lambda().eq(EntityInfo::getEntityStockTag, 1);
             } else if (type == 2) {
                 infoQuery.lambda().eq(EntityInfo::getEntityBondTag, 1);
             } else if (type == 3) {
-//                infoQuery.and(query->query().eq(EntityInfo::getEntityStockTag, 0).eq(EntityInfo::getEntityBondTag, 0));
+                infoQuery.and(query->query.lambda().eq(EntityInfo::getEntityStockTag, 0).eq(EntityInfo::getEntityBondTag, 0));
             } else if (type == 4) {
                 infoQuery.lambda().eq(EntityInfo::getFinance, 1);
             }
