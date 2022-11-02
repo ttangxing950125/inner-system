@@ -3,7 +3,6 @@ package com.deloitte.crm.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.domain.EntityCaptureSpeed;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author 冉浩岑
@@ -51,7 +49,7 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
         }
         EntityCaptureSpeed updateSpeed = new EntityCaptureSpeed();
         updateSpeed.setId(speedId).setSupplement(1).setUpdated(new Date()).setUpdater(SecurityUtils.getUsername());
-        updateSpeed.setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode());
+        updateSpeed.setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode()).setCreditCode(entityInfo.getCreditCode());
         entityCaptureSpeedMapper.updateById(updateSpeed);
     }
 
