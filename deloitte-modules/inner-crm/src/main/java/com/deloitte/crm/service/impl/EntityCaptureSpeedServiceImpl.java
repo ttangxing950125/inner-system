@@ -1,11 +1,14 @@
 package com.deloitte.crm.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.domain.EntityInfo;
+import com.deloitte.crm.domain.dto.EntityInfoList;
 import com.deloitte.crm.dto.EntityCaptureSpeedDto;
 import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
@@ -53,8 +56,11 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
     }
 
     @Override
-    public  List<EntityCaptureSpeedDto> search(String entityNameOrCode) {
-        List<EntityCaptureSpeedDto> searchLists = entityCaptureSpeedMapper.search(entityNameOrCode);
-        return searchLists;
+    public  IPage<EntityCaptureSpeedDto> search(String entityNameOrCode, Integer pageNum, Integer pageSize) {
+        pageNum = pageNum == null ? 1 : pageNum;
+        pageSize = pageSize == null ? 10 : pageSize;
+        Page<EntityInfoList> page = new Page<>(pageNum, pageSize);
+        IPage<EntityCaptureSpeedDto> searchBypage = entityCaptureSpeedMapper.search(page, entityNameOrCode);
+        return searchBypage;
     }
 }

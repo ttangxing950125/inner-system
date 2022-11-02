@@ -1,6 +1,8 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.dto.EntityCaptureSpeedDto;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,5 +17,5 @@ import java.util.List;
 @Mapper
 public interface EntityCaptureSpeedMapper extends BaseMapper<EntityCaptureSpeed> {
 
-    List<EntityCaptureSpeedDto> search(@Param("entityNameOrCode") String entityNameOrCode);
+    IPage<EntityCaptureSpeedDto> search(@Param("page") Page page, @Param("entityNameOrCode") String entityNameOrCode);
 }

@@ -1,7 +1,9 @@
 package com.deloitte.crm.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.web.controller.BaseController;
+import com.deloitte.crm.domain.EntityInfoLogsUpdated;
 import com.deloitte.crm.dto.EntityCaptureSpeedDto;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,9 +67,7 @@ public class EntityCaptureSpeedController extends BaseController {
      * @return
      */
     @GetMapping(value = "/search/{entityNameOrCode}")
-    public Object search(@PathVariable("entityNameOrCode") String entityNameOrCode, HttpServletRequest request, HttpServletResponse response) {
-        startPage();
-        List<EntityCaptureSpeedDto> search = entityCaptureSpeedService.search(entityNameOrCode);
-        return getDataTable(search);
+    public R search(@PathVariable("entityNameOrCode") String entityNameOrCode, Integer pageNum, Integer pageSize, HttpServletRequest request, HttpServletResponse response) {
+        return R.ok(entityCaptureSpeedService.search(entityNameOrCode, pageNum, pageSize));
     }
 }

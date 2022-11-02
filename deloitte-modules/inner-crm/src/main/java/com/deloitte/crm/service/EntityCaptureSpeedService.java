@@ -1,5 +1,6 @@
 package com.deloitte.crm.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmSupplyTask;
@@ -17,5 +18,5 @@ public interface EntityCaptureSpeedService extends IService<EntityCaptureSpeed> 
 
     void sendTFFSpeed(CrmSupplyTask crmSupplyTask, EntityInfo entityInfo);
 
-    List<EntityCaptureSpeedDto> search(String entityNameOrCode);
+    Object search(String entityNameOrCode, Integer pageNum, Integer pageSize);
 }
