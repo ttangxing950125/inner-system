@@ -9,10 +9,15 @@
         speed.source as source,
         speed.entity_code as entityCode,
         speed.entity_name as entityName,
-        ent.credit_code as creditCode,
-        speed.capture as capture, speed.added as speed, speed.divide as divide, speed.supplement as supplement,
+        speed.credit_code as creditCode,
+        speed.capture as capture,
+        speed.added as speed,
+        speed.divide as divide,
+        speed.supplement as supplement,
         speed.push_meta as pushMeta,
-        speed.capture_time as captureTime,speed.updated as updated,speed.updater as updater
+        speed.capture_time as captureTime,
+        speed.updated as updated,
+        speed.updater as updater
         FROM
         entity_capture_speed speed
         LEFT JOIN

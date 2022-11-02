@@ -25,8 +25,10 @@ public class EntityCaptureSpeedDto implements Serializable {
     private String source;
     //主体名称
     private String entityName;
-    //社会统一信用代码
+    //主体Code
     private String entityCode;
+    //统一社会信用代码
+    private String creditCode;
 
     /**
      * 0.未捕获 1.已捕获
