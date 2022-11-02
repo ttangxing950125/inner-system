@@ -115,8 +115,6 @@ public class CnUndoStInfoStrategy implements WindTaskStrategy {
             changeType = DataChangeType.INSERT.getId();
         } else {
             final StockCnUndoStInfo stockCnUndoStInfo = undoStInfoResultLists.stream().findFirst().get();
-            stockCnUndoStInfo.setNumber(null);
-            undoStInfo.setNumber(null);
             if (!Objects.equals(stockCnUndoStInfo, undoStInfo)) {
                 changeType = DataChangeType.UPDATE.getId();
             }
