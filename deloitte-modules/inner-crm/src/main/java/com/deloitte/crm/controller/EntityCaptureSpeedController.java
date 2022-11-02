@@ -66,8 +66,8 @@ public class EntityCaptureSpeedController extends BaseController {
      * @param response
      * @return
      */
-    @GetMapping(value = "/search/{entityNameOrCode}")
-    public R search(@PathVariable("entityNameOrCode") String entityNameOrCode, Integer pageNum, Integer pageSize, HttpServletRequest request, HttpServletResponse response) {
+    @GetMapping(value = "/search")
+    public R search(String entityNameOrCode, Integer pageNum, Integer pageSize, HttpServletRequest request, HttpServletResponse response) {
         return R.ok(entityCaptureSpeedService.search(entityNameOrCode, pageNum, pageSize));
     }
 }
