@@ -60,6 +60,7 @@
             a.dq_code LIKE  concat('%', #{param}, '%')
             OR b.gov_name LIKE  concat('%', #{param}, '%')
             OR b.gov_code LIKE  concat('%', #{param}, '%')
+            OR a.old_name LIKE  concat('%', #{param}, '%')
         )
     </select>
 
@@ -81,6 +82,7 @@
 	        a.dq_code LIKE  concat('%', #{param}, '%')
 	        OR b.entity_name LIKE  concat('%', #{param}, '%')
 	        OR b.credit_code LIKE  concat('%', #{param}, '%')
+	        OR a.old_name LIKE  concat('%', #{param}, '%')
         )
     </select>
 
