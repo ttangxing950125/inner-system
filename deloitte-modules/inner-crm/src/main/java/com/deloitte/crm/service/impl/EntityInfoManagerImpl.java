@@ -28,10 +28,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- *
- *   ****************
- *   *    通用方法   *
- *   ****************
+ * ****************
+ * *    通用方法   *
+ * ****************
  *
  * @author 正杰
  * @description: EntityInfoManager
@@ -73,21 +72,26 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
 
 
     /**
-     *   ******************
-     *   *    修改主体名称  *
-     *   ******************
-     * @param entity 主体
+     * ******************
+     * *    修改主体名称  *
+     * ******************
+     *
+     * @param entity        主体
      * @param entityNewName 主体新名称
-     * @param remarks 备注信息
+     * @param remarks       备注信息
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String updateEntityName(EntityInfo entity,String entityNewName,String remarks) {
+    public String updateEntityName(EntityInfo entity, String entityNewName, String remarks) {
         //如果备注为空 自动改为  remarks = 系统自动生成
-        if (StrUtil.isBlank(remarks)) {remarks = "系统自动生成";}
+        if (StrUtil.isBlank(remarks)) {
+            remarks = "系统自动生成";
+        }
         String username = SecurityUtils.getUsername();
-        if (ObjectUtils.isEmpty(entity)) {throw new ServiceException(BadInfo.EMPTY_ENTITY_INFO.getInfo()); }
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new ServiceException(BadInfo.EMPTY_ENTITY_INFO.getInfo());
+        }
 
         //修改主体曾用名 entity_name_his 时 需要用 ， 拼接
         String oldName = entity.getEntityName();
@@ -97,7 +101,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             entity.setEntityNameHisRemarks(entity.getEntityNameHisRemarks()
                     + "\r\n"
                     + "；"
-                    + DateUtil.format(new Date(),"yyyy-MM-dd")
+                    + DateUtil.format(new Date(), "yyyy-MM-dd")
                     + " "
                     + SecurityUtils.getUsername()
                     + " "
@@ -136,139 +140,209 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
         return null;
     }
 
-    /** 主体code */
+    /**
+     * 主体code
+     */
     private final String ENTITY_CODE = "ENTITY_CODE";
-    /** 统一社会信用代码 */
+    /**
+     * 统一社会信用代码
+     */
     private final String CREDIT_CODE = "CREDIT_CODE";
-    /** 主体名称 */
+    /**
+     * 主体名称
+     */
     private final String ENTITY_NAME = "ENTITY_NAME";
-    /** 债券全称 */
+    /**
+     * 债券全称
+     */
     private final String BOND_FULL_NAME = "BOND_FULL_NAME";
-    /** 债券简称 */
+    /**
+     * 债券简称
+     */
     private final String BOND_SHORT_NAME = "BOND_SHORT_NAME";
-    /** 政府名称 */
+    /**
+     * 政府名称
+     */
     private final String GOV_NAME = "GOV_NAME";
-    /** 政府行政编码 */
+    /**
+     * 政府行政编码
+     */
     private final String GOV_CODE = "GOV_CODE";
 
-    /** 债券代码 */
+    /**
+     * 债券代码
+     */
     private final String BOND_CODE = "BOND_CODE";
-    /** A股代码 */
+    /**
+     * A股代码
+     */
     private final String STOCK_CN_CODE = "STOCK_CN_CODE";
-    /** 港股代码 */
+    /**
+     * 港股代码
+     */
     private final String STOCK_HK_CODE = "STOCK_HK_CODE";
-    /** A股简称 */
+    /**
+     * A股简称
+     */
     private final String STOCK_A_NAME = "STOCK_A_NAME";
-    /** 港股简称 */
+    /**
+     * 港股简称
+     */
     private final String STOCK_HK_NAME = "STOCK_HK_NAME";
 
 
-
-
     /**
-     *   *****************
-     *   *    匹配关键字   *
-     *   *****************
+     * *****************
+     * *    匹配关键字   *
+     * *****************
+     *
      * @param keyword 需要校验的字段类型
-     * @param target 校验的字段
+     * @param target  校验的字段
      * @return 匹配是否有效
      */
     @Override
     public R matchByKeyword(String keyword, String target) {
-        if(keyword==null){return R.fail(BadInfo.PARAM_EMPTY.getInfo());}
-        if(target==null||target.trim().length()==0){return R.ok(null,BadInfo.PARAM_EMPTY.getInfo());}
+        if (keyword == null) {
+            return R.fail(BadInfo.PARAM_EMPTY.getInfo());
+        }
+        if (target == null || target.trim().length() == 0) {
+            return R.ok(null, BadInfo.PARAM_EMPTY.getInfo());
+        }
 
-        switch (keyword){
+        switch (keyword) {
             //主体的Code
             case ENTITY_CODE:
                 EntityInfo byCode = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, target));
-                if(byCode==null){return R.ok(null,SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
-                }else{return R.fail(byCode,BadInfo.EXITS_ENTITY_CODE.getInfo());}
+                if (byCode == null) {
+                    return R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+                } else {
+                    return R.fail(byCode, BadInfo.EXITS_ENTITY_CODE.getInfo());
+                }
                 //主体的统一社会信用代码
             case CREDIT_CODE:
-                if(!keyword.matches(Common.REGEX_CREDIT_CODE)){return R.fail(BadInfo.VALID_PARAM.getInfo());}
+                if (!target.matches(Common.REGEX_CREDIT_CODE)) {
+                    return R.fail(BadInfo.VALID_PARAM.getInfo());
+                }
                 EntityInfo byCreditCode = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getCreditCode, target));
-                if(byCreditCode==null){return R.ok(null,SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
-                }else{return R.fail(byCreditCode,BadInfo.EXITS_ENTITY_CODE.getInfo());}
-            //主体名称
+                if (byCreditCode == null) {
+                    return R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+                } else {
+                    return R.fail(byCreditCode, BadInfo.EXITS_ENTITY_CODE.getInfo());
+                }
+                //主体名称
             case ENTITY_NAME:
                 EntityInfo byName = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, target));
-                if(byName==null){return R.ok(null,SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
-                }else{return R.fail(byName,BadInfo.EXITS_ENTITY_CODE.getInfo());}
-            //债券简称
+                if (byName == null) {
+                    return R.ok(null, SuccessInfo.ENABLE_CREAT_ENTITY.getInfo());
+                } else {
+                    return R.fail(byName, BadInfo.EXITS_ENTITY_CODE.getInfo());
+                }
+                //债券简称
             case BOND_SHORT_NAME:
                 BondInfo bondName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondShortName, target)
-                        .eq(BondInfo::getIsDeleted,Boolean.FALSE));
-                if(bondName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(bondName,BadInfo.EXITS_BOND_SHORT_NAME.getInfo());}
-            //债券全称
+                        .eq(BondInfo::getIsDeleted, Boolean.FALSE));
+                if (bondName == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(bondName, BadInfo.EXITS_BOND_SHORT_NAME.getInfo());
+                }
+                //债券全称
             case BOND_FULL_NAME:
                 BondInfo bondFullName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target)
-                        .eq(BondInfo::getIsDeleted,Boolean.FALSE));
-                if(bondFullName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(bondFullName,BadInfo.EXITS_BOND_FULL_NAME.getInfo());}
+                        .eq(BondInfo::getIsDeleted, Boolean.FALSE));
+                if (bondFullName == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(bondFullName, BadInfo.EXITS_BOND_FULL_NAME.getInfo());
+                }
 
-            //新地方政府地方名称
+                //新地方政府地方名称
             case GOV_NAME:
                 GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
-                if(govByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(govByName,BadInfo.EXITS_GOV_NAME.getInfo());}
-            //新地方政府行政编码
+                if (govByName == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(govByName, BadInfo.EXITS_GOV_NAME.getInfo());
+                }
+                //新地方政府行政编码
             case GOV_CODE:
-                if(!target.matches(Common.REGEX_GOV_CODE)){return R.fail(BadInfo.PARAM_GOV_VALIDA.getInfo());}
+                if (!target.matches(Common.REGEX_GOV_CODE)) {
+                    return R.fail(BadInfo.PARAM_GOV_VALIDA.getInfo());
+                }
                 GovInfo govByCode = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovCode, target));
-                if(govByCode==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(govByCode,BadInfo.EXITS_GOV_CODE.getInfo());}
+                if (govByCode == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(govByCode, BadInfo.EXITS_GOV_CODE.getInfo());
+                }
                 //债券代码查重
             case BOND_CODE:
                 BondInfo bondOriCode = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getOriCode, target)
-                        .eq(BondInfo::getIsDeleted,Boolean.FALSE)
+                        .eq(BondInfo::getIsDeleted, Boolean.FALSE)
                 );
-                if (bondOriCode==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else{return R.fail(bondOriCode,BadInfo.EXITS_BOND_CODE.getInfo());}
+                if (bondOriCode == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(bondOriCode, BadInfo.EXITS_BOND_CODE.getInfo());
+                }
                 //A股查重
             case STOCK_CN_CODE:
                 StockCnInfo stockCnInfo = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockCode, target)
-                        .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
+                        .eq(StockCnInfo::getIsDeleted, Boolean.FALSE)
                 );
-                if (stockCnInfo==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else {return R.fail(stockCnInfo,BadInfo.EXITS_STOCK_CODE.getInfo());}
+                if (stockCnInfo == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(stockCnInfo, BadInfo.EXITS_STOCK_CODE.getInfo());
+                }
                 //港股查重
             case STOCK_HK_CODE:
                 StockThkInfo stockThkInfo = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockCode, target)
-                        .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
+                        .eq(StockThkInfo::getIsDeleted, Boolean.FALSE)
                 );
-                if (stockThkInfo==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else {return R.fail(stockThkInfo,BadInfo.EXITS_STOCK_CODE.getInfo());}
+                if (stockThkInfo == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(stockThkInfo, BadInfo.EXITS_STOCK_CODE.getInfo());
+                }
             case STOCK_A_NAME:
                 StockCnInfo stockCnInfoByName = stockCnInfoMapper.selectOne(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockShortName, target)
-                        .eq(StockCnInfo::getIsDeleted,Boolean.FALSE)
+                        .eq(StockCnInfo::getIsDeleted, Boolean.FALSE)
                 );
-                if (stockCnInfoByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else {return R.fail(stockCnInfoByName,BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
+                if (stockCnInfoByName == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(stockCnInfoByName, BadInfo.EXITS_STOCK_SHO_NAME.getInfo());
+                }
             case STOCK_HK_NAME:
                 StockThkInfo stockThkInfoByName = stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockName, target)
-                        .eq(StockThkInfo::getIsDeleted,Boolean.FALSE)
+                        .eq(StockThkInfo::getIsDeleted, Boolean.FALSE)
                 );
-                if (stockThkInfoByName==null){return R.ok(null,SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
-                }else {return R.fail(stockThkInfoByName,BadInfo.EXITS_STOCK_SHO_NAME.getInfo());}
+                if (stockThkInfoByName == null) {
+                    return R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo());
+                } else {
+                    return R.fail(stockThkInfoByName, BadInfo.EXITS_STOCK_SHO_NAME.getInfo());
+                }
             default:
-                return R.ok(null,BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
+                return R.ok(null, BadInfo.PARAM_PROBABLY_BE_VALIDA.getInfo());
         }
 
     }
 
     /**
-     *   *****************
-     *   *   绑定关联关系  *
-     *   *****************
+     * *****************
+     * *   绑定关联关系  *
+     * *****************
+     *
      * @param entityInfoInsertDTO
-     * @param entityCode 如果是新增主体 那么 entityInfoInsertDOT 中的 entityCode 就为空
+     * @param entityCode          如果是新增主体 那么 entityInfoInsertDOT 中的 entityCode 就为空
      * @param username
      */
     @Override
     public void bindData(EntityInfoInsertDTO entityInfoInsertDTO, String entityCode, String username) {
-        if(!ObjectUtils.isEmpty(entityInfoInsertDTO.getEntityCode())){ entityCode = entityInfoInsertDTO.getEntityCode();}
+        if (!ObjectUtils.isEmpty(entityInfoInsertDTO.getEntityCode())) {
+            entityCode = entityInfoInsertDTO.getEntityCode();
+        }
         log.info("  =>> 角色7 主体 {} 主体其余信息导入 <<=  ", entityInfoInsertDTO.getEntityName());
         if (StrUtil.isNotBlank(entityInfoInsertDTO.getDataCode())) {
             switch (entityInfoInsertDTO.getDataSource()) {
@@ -294,7 +368,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     void bindBondInfo(EntityInfoInsertDTO entityInfoInsertDTO, String entityCode, String username) {
         log.info("  =>> 关联信息导入 bond_info 与 entity_bond_rel <<=  ");
         String dataCode = entityInfoInsertDTO.getDataCode();
-        BondInfo bondInfo = Optional.ofNullable(bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondCode, dataCode).eq(BondInfo::getIsDeleted, 0))).orElseThrow(()->new ServiceException(BadInfo.EMPTY_BOND_INFO.getInfo()));
+        BondInfo bondInfo = Optional.ofNullable(bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondCode, dataCode).eq(BondInfo::getIsDeleted, 0))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_BOND_INFO.getInfo()));
         if (ObjectUtils.isEmpty(entityBondRelMapper.selectOne(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getEntityCode, entityCode).eq(EntityBondRel::getBdCode, dataCode)))) {
             entityBondRelMapper.insert(new EntityBondRel().setEntityCode(entityCode).setBdCode(dataCode).setStatus(1));
             log.info("  =>> 成功新增一条关联信息 至entity_bond_rel <<== ");
@@ -315,7 +389,7 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
     void bindStockThkInfo(EntityInfoInsertDTO entityInfoInsertDTO, String entityCode, String username) {
         log.info("  =>> 主体导入 stock_thk_info 与 entity_stock_thk_rel <<=  ");
         String dataCode = entityInfoInsertDTO.getDataCode();
-        StockThkInfo stockThkInfo = Optional.ofNullable(stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, dataCode).eq(StockThkInfo::getIsDeleted, 0))).orElseThrow(()->new ServiceException(BadInfo.EMPTY_CN_STOCK_INFO.getInfo()));
+        StockThkInfo stockThkInfo = Optional.ofNullable(stockThkInfoMapper.selectOne(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockDqCode, dataCode).eq(StockThkInfo::getIsDeleted, 0))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_CN_STOCK_INFO.getInfo()));
         if (ObjectUtils.isEmpty(entityStockThkRelMapper.selectOne(new QueryWrapper<EntityStockThkRel>().lambda().eq(EntityStockThkRel::getEntityCode, entityCode).eq(EntityStockThkRel::getStockDqCode, dataCode)))) {
             entityStockThkRelMapper.insert(new EntityStockThkRel().setEntityCode(entityCode).setStockDqCode(dataCode).setStatus(true));
             log.info("  =>> 成功新增一条关联信息 entity_stock_thk_rel <<== ");
