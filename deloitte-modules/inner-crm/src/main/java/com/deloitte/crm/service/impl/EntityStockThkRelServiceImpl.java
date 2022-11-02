@@ -102,14 +102,14 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
                 //查询关联关系
                 EntityBaseBusiInfo entityBaseBusiInfo = finEntityBaseBusiInfoByEntityCode(entityCode);
                 if (entityBaseBusiInfo != null) {
-                    entityBaseBusiInfo.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(secIssInfo.getCreateDate()));
+                    entityBaseBusiInfo.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(DateUtil.formatDateByString(secIssInfo.getCreateDate())));
                     entityBaseBusiInfo.setRegAddr(secIssInfo.getRegisterAddress());
                     entityBaseBusiInfo.setEntityStaffCount(Optional.ofNullable(secIssInfo.getEntityEmpCount() + "").orElse(null));
                     entityBaseBusiInfo.setBusRange(Optional.ofNullable(secIssInfo.getEntityScope()).orElse(null));
                     ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class).updateById(entityBaseBusiInfo);
                 } else {
                     EntityBaseBusiInfo info1 = new EntityBaseBusiInfo();
-                    info1.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(secIssInfo.getCreateDate()));
+                    info1.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(DateUtil.formatDateByString(secIssInfo.getCreateDate())));
                     info1.setRegAddr(secIssInfo.getRegisterAddress());
                     info1.setEntityStaffCount(Optional.ofNullable(secIssInfo.getEntityEmpCount() + "").orElse(null));
                     info1.setBusRange(Optional.ofNullable(secIssInfo.getEntityScope()).orElse(null));
