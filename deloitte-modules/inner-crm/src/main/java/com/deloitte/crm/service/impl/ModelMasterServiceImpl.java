@@ -430,7 +430,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
         //新增 敞口的code
         entityMaster.setMasterCode(masDto.getMasterCode());
-        entityMaster.setRemarks(masDto.getRemarks());
+        entityMaster.setRemark(masDto.getRemarks());
         if (ObjectUtils.isEmpty(entityMaster.getId())) {
             entityMasterMapper.insert(entityMaster);
         } else {
