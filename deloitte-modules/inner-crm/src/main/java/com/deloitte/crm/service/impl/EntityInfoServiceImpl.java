@@ -2295,18 +2295,17 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityListView getFinViews() {
         EntityListView entityListView = new EntityListView();
-
         Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getFinance, 1));
         entityListView.setTotle(listTotle);
-
         return entityListView;
-
     }
 
     private EntityListView getUnBondsListViews() {
         EntityListView entityListView = new EntityListView();
-
-        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 0).eq(EntityInfo::getIssueBonds, 0));
+        QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(query->query.lambda().ne(EntityInfo::getEntityStockTag, 1).or().isNull(EntityInfo::getEntityStockTag));
+        queryWrapper.and(query->query.lambda().ne(EntityInfo::getEntityBondTag, 1).or().isNull(EntityInfo::getEntityBondTag));
+        Long listTotle = entityInfoMapper.selectCount(queryWrapper);
         entityListView.setTotle(listTotle);
         return entityListView;
 
@@ -2314,35 +2313,24 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private EntityListView getBondsViews() {
         EntityListView entityListView = new EntityListView();
-
-        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getIssueBonds, 1));
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityBondTag, 1));
         entityListView.setTotle(listTotle);
         if (listTotle < 1) {
             return entityListView.setLive(0L).setDead(0L);
         }
         //根据时间查询发债存续企业
-        Long bondLive = bondInfoMapper.selectCount(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondState, 0));
+        Long bondLive = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getIssueBonds, 1));
         return entityListView.setLive(bondLive).setDead(listTotle - bondLive);
     }
 
     private EntityListView getListViews() {
         EntityListView entityListView = new EntityListView();
-
-        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 1));
+        Long listTotle = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityStockTag, 1));
         entityListView.setTotle(listTotle);
         if (listTotle < 1) {
             return entityListView.setLive(0L).setDead(0L);
         }
-        Date now = new Date();
-        //根据时间查询A股上市存续企业
-        List<String> listCnLive = entityInfoMapper.selectListCnLive(TimeFormatUtil.getFormartDate(now));
-        //根据时间查询港股上市存续企业
-        List<String> listThkLive = entityInfoMapper.selectListThkLive(TimeFormatUtil.getFormartDate(now));
-        if (!CollectionUtils.isEmpty(listThkLive)) {
-            List<String> newThkList = listThkLive.stream().filter(o -> !listCnLive.contains(o)).collect(Collectors.toList());
-            listCnLive.addAll(newThkList);
-        }
-        Long listLive = (long) listCnLive.size();
+        Long listLive = entityInfoMapper.selectCount(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getList, 1));
         return entityListView.setLive(listLive).setDead(listTotle - listLive);
 
     }
