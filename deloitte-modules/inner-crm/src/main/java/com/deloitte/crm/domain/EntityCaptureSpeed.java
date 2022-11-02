@@ -24,7 +24,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
 @Accessors(chain = true)
 public class EntityCaptureSpeed implements Serializable {
 
