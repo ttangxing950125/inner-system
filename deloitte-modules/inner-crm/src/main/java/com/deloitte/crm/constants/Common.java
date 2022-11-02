@@ -142,6 +142,12 @@ public enum Common {
      */
     public static final String REGEX_CREDIT_CODE = "\\S{18}";
 
+    public static void main(String[] args) {
+        if (!"91330521MABMK0YE7A".matches(Common.REGEX_CREDIT_CODE)) {
+
+        }
+    }
+
     public static final String REGEX_ENTITY_CODE = "\\S{8}";
 
     /** 地方行政编码 */
