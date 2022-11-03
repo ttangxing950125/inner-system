@@ -90,4 +90,5 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
     R finishTask(Integer taskId,Integer state,String entityCode);
 
 
+    String sendEmail();
 }
