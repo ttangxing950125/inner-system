@@ -73,5 +73,4 @@ public class RoleMainController {
     public R checkData(@RequestParam("keyword")@NotNull(message = "关键字不能为空") String keyword,@RequestParam("target")@NotNull(message = "目标字段不能为空") String target){
         return entityInfoManager.matchByKeyword(keyword,target);
     }
-
 }
