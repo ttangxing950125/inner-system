@@ -35,9 +35,6 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
     private EntityCaptureSpeedService entityCaptureSpeedService;
 
     @Autowired
-    private ICrmSupplyTaskService crmSupplyTaskService;
-
-    @Autowired
     private CrmSupplyTaskMapper crmSupplyTaskMapper;
 
     @Autowired
@@ -62,7 +59,6 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
             return R.fail("已完成的任务，不能重复提交");
         }*/
 
-        crmSupplyTaskService.completeTaskById(taskId);
         //保存
         EntityFinancial entityFinancial = entitySupplyMsgBack.newEntityFinancial();
         QueryWrapper<EntityFinancial> financialQuery = new QueryWrapper<>();

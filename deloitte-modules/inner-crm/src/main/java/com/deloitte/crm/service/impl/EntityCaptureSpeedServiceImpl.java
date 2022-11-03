@@ -11,7 +11,6 @@ import com.deloitte.crm.domain.dto.EntityInfoList;
 import com.deloitte.crm.dto.EntityCaptureSpeedDto;
 import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
 import com.deloitte.crm.service.EntityCaptureSpeedService;
-import com.deloitte.crm.service.ICrmEntityTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,6 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
 
     @Autowired
     private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
-    @Autowired
-    private ICrmEntityTaskService crmEntityTaskService;
     /**
      * 更新记录角色3.4.5的任务进度
      *
@@ -52,8 +49,6 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
         EntityCaptureSpeed updateSpeed = new EntityCaptureSpeed();
         updateSpeed.setSupplementTime(new Date()).setId(speedId).setSupplement(1).setUpdater(SecurityUtils.getUsername()).setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode()).setCreditCode(entityInfo.getCreditCode());
         entityCaptureSpeedMapper.updateById(updateSpeed);
-        //发送邮件
-        crmEntityTaskService.sendEmail();
     }
 
     @Override

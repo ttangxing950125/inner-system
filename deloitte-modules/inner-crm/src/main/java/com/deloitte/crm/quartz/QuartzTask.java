@@ -168,7 +168,4 @@ public class QuartzTask implements ApplicationContextAware {
             return "ErrorInfoFromException";
         }
     }
-
-
-
 }
