@@ -10,5 +10,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from stock_thk_info
         where stock_code = #{secIssInfoCode}
     </select>
-
+    <select id="selectListByEntityCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(0) FROM stock_thk_info a
+        LEFT JOIN entity_stock_thk_rel b ON a.stock_dq_code = b.stock_dq_code
+        WHERE a.stock_status = 6 and
+	    b.entity_code = #{entityCode}
+    </select>
 </mapper>

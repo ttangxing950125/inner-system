@@ -2,7 +2,7 @@ package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
@@ -43,6 +43,9 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
 
     @Resource
     private ObjectMapper objectMapper;
+
+    @Resource
+    private EntityStockCnRelMapper stockCnRelMapper;
 
     @Resource
     private EntityCaptureSpeedService entityCaptureSpeedService;
@@ -196,5 +199,10 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
         }
 
         return true;
+    }
+
+    @Override
+    public List<EntityStockCnRel> selectEntityStockCnRelListByBondCodes(List<String> stockCnCodes) {
+        return stockCnRelMapper.selectList(new QueryWrapper<EntityStockCnRel>().lambda().in(EntityStockCnRel::getStockDqCode,stockCnCodes));
     }
 }

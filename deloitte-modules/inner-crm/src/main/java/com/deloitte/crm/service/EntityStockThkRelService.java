@@ -35,4 +35,6 @@ public interface EntityStockThkRelService extends IService<EntityStockThkRel> {
      * @return
      */
     List<EntityInfo> findEntityByStockDqCode(String stockDqCode);
+
+    List<EntityStockThkRel> selectEntityStockThkRelListByBondCodes(List<String> stockThkCodes);
 }
