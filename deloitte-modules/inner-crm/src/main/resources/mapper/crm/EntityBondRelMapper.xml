@@ -44,7 +44,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
 
-    <select id="searchEntity" parameterType="java.lang.String" resultType="com.deloitte.crm.vo.BondVo">
+    <select id="searchEntity" parameterType="java.lang.Integer" resultType="com.deloitte.crm.vo.BondVo">
         SELECT
             b.id as id,
             b.bond_code as bondCode,
@@ -57,14 +57,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM
             entity_bond_rel a
             LEFT JOIN bond_info b ON a.bd_code = b.bond_code
-        WHERE
-            a.entity_code =(
-            SELECT
-                entity_code
-            FROM
-                entity_info
-        WHERE
-            id = #{id} AND `status`=1)
+            <where>
+                <if test="id!=null and id!=''">
+                    a.entity_code =(SELECT entity_code  FROM entity_info WHERE id = #{id} AND `status`=1)
+                </if>
+            </where>
     </select>
 
         

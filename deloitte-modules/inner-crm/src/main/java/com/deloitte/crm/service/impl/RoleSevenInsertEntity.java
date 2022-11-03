@@ -43,7 +43,7 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
     @Transactional(rollbackFor = Exception.class)
     public R finishTask(EntityInfoInsertDTO entityInfoInsertDTO) {
         String creditCode = entityInfoInsertDTO.getCreditCode();
-        String entityName = entityInfoInsertDTO.getEntityName().trim();
+        String entityName = entityInfoInsertDTO.getEntityName().trim().replace("（","(").replace("）",")");
         entityInfoInsertDTO.setEntityName(entityName);
         Integer taskId = entityInfoInsertDTO.getTaskId();
         String username = StrUtil.isBlank(SecurityUtils.getUsername()) ? "角色7测试" : SecurityUtils.getUsername();
@@ -61,6 +61,8 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
 
         // 判断社会信用代码是否适用 => 适用为 空 并为其赋值 5 否则有数字
         Integer creditErrorType = entityInfoInsertDTO.getCreditErrorType();
+        entityInfo.setCreditError(0);
+        entityInfo.setCreditErrorType(creditErrorType);
         if (creditErrorType == null) {
             creditErrorType = 5;
             entityInfo.setCreditError(1);
