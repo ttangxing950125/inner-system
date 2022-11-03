@@ -16,7 +16,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
-import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.redis.service.RedisService;
@@ -35,7 +34,6 @@ import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -2984,7 +2982,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         if (StrUtil.isBlank(entityName)) {
             return R.fail(BadInfo.PARAM_EMPTY.getInfo());
         }
-        entityName = entityName.replace(" ", "");
+        entityName = entityName.trim().replace("（","(").replace("）",")");
         log.info("  =>> 校验新增主体字段 社会信用代码:{}，主体名称{} <<=  ", creditCode, entityName);
         if (StrUtil.isBlank(creditCode)) {
             EntityInfo byName = this.checkName(entityName);

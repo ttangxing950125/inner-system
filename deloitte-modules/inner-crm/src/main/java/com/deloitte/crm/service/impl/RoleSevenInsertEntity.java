@@ -43,7 +43,7 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
     @Transactional(rollbackFor = Exception.class)
     public R finishTask(EntityInfoInsertDTO entityInfoInsertDTO) {
         String creditCode = entityInfoInsertDTO.getCreditCode();
-        String entityName = entityInfoInsertDTO.getEntityName().trim();
+        String entityName = entityInfoInsertDTO.getEntityName().trim().replace("（","(").replace("）",")");
         entityInfoInsertDTO.setEntityName(entityName);
         Integer taskId = entityInfoInsertDTO.getTaskId();
         String username = StrUtil.isBlank(SecurityUtils.getUsername()) ? "角色7测试" : SecurityUtils.getUsername();
