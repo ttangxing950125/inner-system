@@ -47,11 +47,11 @@ public class BondsListingLog implements Serializable {
     /**
      * 上市日期
      */
-    private LocalDateTime ipoDate;
+    private Date ipoDate;
     /**
      * 发债日期
      */
-    private LocalDateTime issueDate;
+    private Date issueDate;
     /**
      * 发行人
      */

@@ -79,10 +79,13 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      * 角色2今日运维模块
      * @author 正杰
      * @date 2022/9/27
-     * @param date 请传入参数 yyyy-MM
      * @return R<Page<CrmMasTaskVo>> 当日任务
+     * @param date 请传入参数 yyyy-MM-dd
+     * @param sourceName 来源
+     * @param pageNum 页码
+     * @param pageSize 页数
      */
-    R<Page<CrmMasTaskVo>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
+    R<Page<CrmMasTaskVo>> getTaskInfo(String date,String sourceName, Integer pageNum, Integer pageSize);
 
     /**
      * 角色2 完成任务

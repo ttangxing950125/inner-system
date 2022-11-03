@@ -3,6 +3,7 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -41,7 +42,8 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
     @Resource
     private ObjectMapper objectMapper;
-
+    @Resource
+    private EntityStockThkRelMapper stockThkRelMapper;
     /**
      * 绑定港股和主体的关联关系
      *
@@ -53,6 +55,9 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
     @Transactional(rollbackFor = Exception.class)
     public boolean bindRelOrCreateTask(StockThkInfo stockThkInfo, String entityName,
                                        CrmWindTask windTask, ThkSecIssInfo secIssInfo) {
+
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
 
@@ -172,6 +177,11 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
         //查询主体
         return entityInfoService.findListByEntityCodes(entityCodes);
+    }
+
+    @Override
+    public List<EntityStockThkRel> selectEntityStockThkRelListByBondCodes(List<String> stockThkCodes) {
+        return stockThkRelMapper.selectList(new QueryWrapper<EntityStockThkRel>().lambda().in(EntityStockThkRel::getStockDqCode,stockThkCodes));
     }
 
     private String formatDateByString(String value) {

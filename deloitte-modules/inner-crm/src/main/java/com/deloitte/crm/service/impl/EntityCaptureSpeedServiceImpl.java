@@ -28,7 +28,6 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
 
     @Autowired
     private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
-
     /**
      * 更新记录角色3.4.5的任务进度
      *

@@ -61,6 +61,9 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
     @Resource
     private IEntityInfoService entityInfoService;
 
+    @Resource
+    private BondsListingLogService bondsListingLogService;
+
 
     /**
      * 根据导入的BondNewIss信息，处理bondinfo表和entityattrvalue
@@ -166,6 +169,24 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                     entity.setIssueBonds(1);
                 });
             }
+
+
+            //发债记录
+            if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())){
+                //创建log
+                BondsListingLog log = new BondsListingLog();
+                log.setCode(newIss.getTradeCode());
+                log.setName(newIss.getBondName());
+                log.setShortName(newIss.getBondShortName());
+                log.setIssueDate(DateUtil.dateTime(newIss.getIssStartDate(),"yyyy-MM-dd"));
+                log.setPublisher(newIss.getIssorName());
+                log.setRecordTime(timeNow);
+                log.setSourceType(1);
+
+
+                bondsListingLogService.save(log);
+            }
+
             if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)) {
                 newDbBond.setBondState(0);
                 newDbBond = bondInfoService.saveOrUpdate(bondInfo);
@@ -185,6 +206,9 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                 }
                 //更新主体数据
                 entityInfoService.updateBatchById(entityInfos);
+
+
+
                 //新敞口划分任务
                 crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
             }

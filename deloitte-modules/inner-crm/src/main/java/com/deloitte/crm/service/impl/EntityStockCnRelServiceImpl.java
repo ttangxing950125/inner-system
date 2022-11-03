@@ -2,7 +2,7 @@ package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.annotation.Excel;
@@ -45,6 +45,9 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
     private ObjectMapper objectMapper;
 
     @Resource
+    private EntityStockCnRelMapper stockCnRelMapper;
+
+    @Resource
     private EntityCaptureSpeedService entityCaptureSpeedService;
 
     /**
@@ -59,6 +62,9 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean bindRelOrCreateTask(StockCnInfo stockCnInfo, String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack) {
+
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
         //之前数据库中没有该主体
@@ -160,6 +166,8 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
     @Override
     public boolean createTask(String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack) {
 
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
         //之前数据库中没有该主体
@@ -196,5 +204,10 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
         }
 
         return true;
+    }
+
+    @Override
+    public List<EntityStockCnRel> selectEntityStockCnRelListByBondCodes(List<String> stockCnCodes) {
+        return stockCnRelMapper.selectList(new QueryWrapper<EntityStockCnRel>().lambda().in(EntityStockCnRel::getStockDqCode,stockCnCodes));
     }
 }

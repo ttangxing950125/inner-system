@@ -18,7 +18,10 @@ import com.deloitte.crm.mapper.BondsListingLogMapper;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
-import com.deloitte.crm.service.*;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
+import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EmailVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,20 +139,25 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     /**
      * 角色7今日运维模块
-     *
-     * @param date     请传入参数 yyyy-mm-dd
-     * @param pageNum
-     * @param pageSize
-     * @return R<List < CrmEntityTask>> 当日任务情况
      * @author 正杰
+     * @param taskCategory 捕获渠道
+     * @param date 请传入参数 yyyy-mm-dd
+     * @param pageNum 页码
+     * @param pageSize 每页条数
      * @date 2022/9/22
+     * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @Override
-    public R<Page<CrmEntityTask>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
+    public R<Page<CrmEntityTask>> getTaskInfo(String taskCategory,String date, Integer pageNum, Integer pageSize) {
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
-        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getTaskDate, date).orderBy(true, true, CrmEntityTask::getState));
+        QueryWrapper<CrmEntityTask> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(CrmEntityTask::getTaskDate, date);
+
+        //添加一条 关于捕获信息的 查询条件
+        if(!ObjectUtils.isEmpty(taskCategory)){wrapper.lambda().eq(CrmEntityTask::getTaskCategory,taskCategory);}
+
+        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), wrapper.lambda().orderBy(true, true, CrmEntityTask::getState));
         return R.ok(crmEntityTaskPage, SuccessInfo.GET_SUCCESS.getInfo());
     }
 
@@ -167,14 +178,14 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     public R finishTask(Integer taskId, Integer state, String entityCode,String remarks) {
         log.info("  =>> 角色7处理当日任务开始 taskId={}>>entityCode>>>:{} <<=  ", taskId, entityCode);
         CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
-        Assert.isTrue(Objects.equals(crmEntityTask.getState(), 0), BadInfo.EXITS_TASK_FINISH.getInfo());
+        Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
 
         // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
         EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSpeedId()));
         if (ObjectUtils.isEmpty(entityCaptureSpeed)) {
             log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据 <<=  ", taskId, crmEntityTask.getSpeedId());
         } else {
-            entityCaptureSpeed.setAdded(state);
+            entityCaptureSpeed.setAdded(state).setEntityCode(entityCode);
             entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
         }
 

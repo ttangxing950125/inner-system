@@ -38,4 +38,6 @@ public interface EntityStockCnRelService extends IService<EntityStockCnRel> {
      * @return
      */
     boolean createTask(String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack);
+
+    List<EntityStockCnRel> selectEntityStockCnRelListByBondCodes(List<String> stockCnCodes);
 }

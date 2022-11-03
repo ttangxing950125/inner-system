@@ -3,10 +3,12 @@ package com.deloitte.crm;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.CrmTypeInfo;
 import com.deloitte.crm.mapper.StockThkImportMapper;
 import com.deloitte.crm.service.CrmTypeInfoService;
 import com.deloitte.crm.service.EntityInfoLogsService;
+import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.SendEmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +34,8 @@ public class SendEmailTest {
 
     @Resource
     private StockThkImportMapper stockThkImportMapper;
+    @Resource
+    private IEntityInfoService entityInfoService;
 
     @Test
     void testSend() {
@@ -71,12 +75,19 @@ public class SendEmailTest {
 
 
     }
+
     @Test
     void test05() {
 
         final Object cancel = entityInfoLogsService.cancel(75);
         final Object type_stock = entityInfoLogsService.findAllByType("TYPE_BOND");
 
+    }
+
+    @Test
+    void test06() {
+        final R entity = entityInfoService.findRelationEntityOrBond(4761, "ENTITY", 1, 10);
+        System.out.println(JSON.toJSONString(entity));
     }
 
 

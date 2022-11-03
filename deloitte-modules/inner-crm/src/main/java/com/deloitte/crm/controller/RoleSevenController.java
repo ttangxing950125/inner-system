@@ -49,20 +49,26 @@ public class RoleSevenController {
     /**
      * 角色7今日运维模块
      * @author 正杰
+     * @param taskCategory 捕获渠道
      * @param date 请传入参数 yyyy-mm-dd
-     * @param pageNum
-     * @param pageSize
+     * @param pageNum 页码
+     * @param pageSize 每页条数
      * @date 2022/9/22
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @ApiOperation(value="查询当日任务 by正杰")
     @ApiResponse(code = 200,message = "操作成功",response = CrmEntityTaskVo.class)
-    @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String",example = "2022-10-12")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="taskCategory",value="捕获渠道",paramType = "query",dataType = "String",example = "港股发行"),
+            @ApiImplicitParam(name="date",value="请传入参数 yyyy-mm-dd",paramType = "query",dataType = "String",example = "2022-10-12"),
+            @ApiImplicitParam(name="pageNum",value="页码",paramType = "query",dataType = "Integer",example = "1"),
+            @ApiImplicitParam(name="pageSize",value="每页条数",paramType = "query",dataType = "Integer",example = "10")
+    })
     @PostMapping("/getDayTaskInfo")
     @Log(title = "【 查询当日任务情况 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmEntityTask>> getDayTaskInfo(String date, Integer pageNum, Integer pageSize){
+    public R<Page<CrmEntityTask>> getDayTaskInfo(String taskCategory, String date, Integer pageNum, Integer pageSize){
         log.info("==> 角色7当日查询 <==");
-        return iCrmEntityTaskService.getTaskInfo(date,pageNum,pageSize);
+        return iCrmEntityTaskService.getTaskInfo(taskCategory,date,pageNum,pageSize);
     }
 
     /**

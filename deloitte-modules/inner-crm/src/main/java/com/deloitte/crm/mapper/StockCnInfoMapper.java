@@ -3,6 +3,7 @@ package com.deloitte.crm.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.StockCnInfo;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * a股信息表，大陆股票(StockCnInfo)表数据库访问层
@@ -19,4 +20,6 @@ public interface StockCnInfoMapper extends BaseMapper<StockCnInfo> {
      * @return
      */
     StockCnInfo findByCode(String code);
+
+    Integer selectListByEntityCode(@Param("entityCode") String entityCode);
 }
