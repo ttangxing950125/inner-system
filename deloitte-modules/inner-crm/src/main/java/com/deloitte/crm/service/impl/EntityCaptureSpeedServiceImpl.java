@@ -1,5 +1,6 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,7 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 冉浩岑
@@ -31,6 +36,7 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
     private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
     @Autowired
     private ICrmEntityTaskService crmEntityTaskService;
+
     /**
      * 更新记录角色3.4.5的任务进度
      *
@@ -62,6 +68,13 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
         pageSize = pageSize == null ? 10 : pageSize;
         Page<EntityInfoList> page = new Page<>(pageNum, pageSize);
         IPage<EntityCaptureSpeedDto> searchBypage = entityCaptureSpeedMapper.search(page, entityNameOrCode);
+        List<EntityCaptureSpeedDto> records = searchBypage.getRecords();
+        if (CollUtil.isEmpty(records)) {
+            return searchBypage;
+        }
+//        Collections.reverse(records);
+        List<EntityCaptureSpeedDto> collect = records.stream().sorted(Comparator.comparing(EntityCaptureSpeedDto::getId).reversed()).collect(Collectors.toList());
+        searchBypage.setRecords(collect);
         return searchBypage;
     }
 }
