@@ -22,6 +22,7 @@ import com.deloitte.crm.mapper.CrmDailyTaskMapper;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.EmailVo;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysRole;
@@ -250,7 +251,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             if (allCount < 0) {
                 try {
                     log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],开始发送邮件 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
-                    sendEmail();
+                    sendEmail(TimeFormatUtil.getFormartDate(crmSupplyTask.getTaskDate()));
                     log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],邮件发送完成 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
                 } catch (Exception e) {
                     log.error("角色3.4.5完成任务发送邮件异常，异常信息：[{}]", e.getMessage());
@@ -277,7 +278,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @date 2022/11/2 11:37
      */
     @Override
-    public String sendEmail() {
+    public String sendEmail(String date) {
         String result ="";
         try {
             List<CrmEntityTask> list = crmEntityTaskMapper.selectList(new QueryWrapper<>());
@@ -291,7 +292,6 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             List<CrmEntityTask> collectZ = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 1).collect(Collectors.toList());
             //标题
             String title = "今日平台新增主体" + addEntity.size() + "个，其中a股检测到" + collectA.size() + "个，港股检测到" + collectG.size() + "个，债券检测到" + collectZ.size() + "个";
-            String date = com.deloitte.common.core.utils.DateUtil.getDate();
             LambdaQueryWrapper<BondsListingLog> qw = new LambdaQueryWrapper<BondsListingLog>().eq(BondsListingLog::getRecordTime, date);
             List<BondsListingLog> bondsListingLogs = bondsListingLogMapper.selectList(qw);
             List<BondsListingLog> bonds = bondsListingLogs.stream().filter(row -> row.getSourceType() == 1).collect(Collectors.toList());

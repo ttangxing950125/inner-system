@@ -86,5 +86,5 @@ public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
      */
     void saveTask(Integer taskRoleType,Integer taskStatus,String date);
 
-    String sendEmail();
+    String sendEmail(String date);
 }
