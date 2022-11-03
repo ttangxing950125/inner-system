@@ -108,7 +108,7 @@ public class BondDelIssStrategy implements WindTaskStrategy {
                     } else {
                         String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
                         delIss.setWindIndustry(WindIndustryApend + "--" + crmTypeInfo.getName());
-                        final List<CrmTypeInfo> collect = hashSetResult.stream().filter(e -> e.getLevel() == 2).collect(Collectors.toList());
+                        final List<CrmTypeInfo> collect = hashSetResult.stream().filter(e -> e.getLevel() != null && e.getLevel() == 2).collect(Collectors.toList());
                         //设置Wind2
                         bondInfo.setWind2(CollUtil.isEmpty(collect) ? null : collect.get(0).getName());
                     }
