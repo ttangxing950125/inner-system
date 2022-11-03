@@ -16,7 +16,6 @@ import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysRole;
@@ -54,11 +53,12 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
     @Resource
     private CrmDailyTaskMapper crmDailyTaskMapper;
 
-    @Autowired
-    private ICrmEntityTaskService crmEntityTaskService;
+//    @Autowired
+//    private ICrmEntityTaskService crmEntityTaskService;
 
     @Autowired
     private ICrmSupplyTaskService crmSupplyTaskService;
+
     /**
      * 更新状态为 2-有任务未全部处理完
      *
@@ -197,26 +197,26 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @return void
      * @author 冉浩岑
      * @date 2022/11/3 16:58
-    */
+     */
     @Override
     public void checkDailyTask(CrmSupplyTask crmSupplyTask) {
 
         //完成任务前先检查一下角色3任务是否全部完成，如果都完成，则不需要修改每日任务状态
         QueryWrapper<CrmSupplyTask> query = new QueryWrapper<>();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId,crmSupplyTask.getRoleId()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId, crmSupplyTask.getRoleId()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
         Long count = crmSupplyTaskMapper.selectCount(query);
         //完成任务前先检查一下角色3.4.5任务是否全部完成，如果都完成，则不需要发送邮件
         query.clear();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
         Long allCount = crmSupplyTaskMapper.selectCount(query);
 
         crmSupplyTaskService.completeTaskById(crmSupplyTask.getId());
 
         //如果当前角色已经完成过一次所有任务，则更新每日任务表
-        if (count<1){
+        if (count < 1) {
             Long roleId = crmSupplyTask.getRoleId();
             Date taskDate = crmSupplyTask.getTaskDate();
-            log.info("  >>>> 完成任务后根据roleId检查并修改每日任务状态,roleId=[{}],taskDate=[{}] <<<<  ",roleId,taskDate);
+            log.info("  >>>> 完成任务后根据roleId检查并修改每日任务状态,roleId=[{}],taskDate=[{}] <<<<  ", roleId, taskDate);
             query.clear();
             query.lambda().eq(CrmSupplyTask::getRoleId, roleId).eq(CrmSupplyTask::getTaskDate, taskDate);
             List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(query);
@@ -235,17 +235,18 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         }
 
         //发送邮件
-        if (allCount<0){
+        if (allCount < 0) {
             query.clear();
-            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
             allCount = crmSupplyTaskMapper.selectCount(query);
-            if (allCount<0){
+            if (allCount < 0) {
                 try {
-                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],开始发送邮件 <<<<  ",crmSupplyTask.getTaskDate(),crmSupplyTask.getRoleId());
+                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],开始发送邮件 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
+                    CrmEntityTaskServiceImpl crmEntityTaskService = new CrmEntityTaskServiceImpl();
                     crmEntityTaskService.sendEmail();
-                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],邮件发送完成 <<<<  ",crmSupplyTask.getTaskDate(),crmSupplyTask.getRoleId());
-                }catch (Exception e){
-                    log.error("角色3.4.5完成任务发送邮件异常，异常信息：[{}]",e.getMessage());
+                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],邮件发送完成 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
+                } catch (Exception e) {
+                    log.error("角色3.4.5完成任务发送邮件异常，异常信息：[{}]", e.getMessage());
                 }
             }
         }

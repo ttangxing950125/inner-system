@@ -24,6 +24,7 @@ import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EmailVo;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
+@NoArgsConstructor
 public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, CrmEntityTask> implements ICrmEntityTaskService {
     @Resource
     private CrmEntityTaskMapper crmEntityTaskMapper;
@@ -69,6 +71,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     private BondsListingLogMapper bondsListingLogMapper;
     @Resource
     private  EmailVo emailVo;
+
     /**
      * 查询角色7，根据导入的e数据新增主体的任务
      *
@@ -361,5 +364,4 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         }
         return result;
     }
-
 }
