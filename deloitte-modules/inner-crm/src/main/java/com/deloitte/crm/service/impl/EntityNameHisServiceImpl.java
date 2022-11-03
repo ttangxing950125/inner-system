@@ -223,6 +223,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
                 .setHappenDate(new Date())
                 .setRemarks(remarks)
                 .setUpdated(updated)
+                .setCreated(updated)
                 .setCreater(SecurityUtils.getUsername()));
 
         // 对主体曾用名列表进行操作
@@ -273,6 +274,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
                 .setHappenDate(updated)
                 .setRemarks(remarks)
                 .setUpdated(updated)
+                .setCreated(updated)
                 .setCreater(SecurityUtils.getUsername()));
 
         // 对主体曾用名列表进行操作
