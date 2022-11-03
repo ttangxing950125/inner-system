@@ -183,9 +183,9 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
         EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmEntityTask.getSpeedId()));
         if (ObjectUtils.isEmpty(entityCaptureSpeed)) {
-            log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据 <<=  ", taskId, crmEntityTask.getSpeedId());
+            log.warn("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据 <<=  ", taskId, crmEntityTask.getSpeedId());
         } else {
-            entityCaptureSpeed.setAdded(state).setEntityCode(entityCode);
+            entityCaptureSpeed.setAdded(state).setAddedTime(new Date()).setEntityCode(entityCode);
             entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
         }
 

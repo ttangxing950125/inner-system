@@ -51,10 +51,9 @@ public class EntityCaptureSpeedServiceImpl extends ServiceImpl<EntityCaptureSpee
         }
         EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectById(speedId);
         if (ObjectUtils.isEmpty(entityCaptureSpeed)) {
+            log.warn("==>>>更新记录角色3.4.5的任务进度 通过speedId={}查询entityCaptureSpeed为空不做处理!!!!", speedId);
             return;
         }
-
-        EntityCaptureSpeed updateSpeed = new EntityCaptureSpeed();
         entityCaptureSpeed.setSupplementTime(new Date()).setSupplement(1).setUpdater(SecurityUtils.getUsername()).setEntityName(entityInfo.getEntityName()).setEntityCode(entityInfo.getEntityCode()).setCreditCode(entityInfo.getCreditCode());
         entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
     }
