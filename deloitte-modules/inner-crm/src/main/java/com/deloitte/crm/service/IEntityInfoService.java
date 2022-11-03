@@ -143,11 +143,13 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      * 查询债券或是主体下相关的主体或是债券信息 by正杰
      * @param id
      * @param keyword
+     * @param pageNum
+     * @param pageSize
      * @return
      * @author 正杰
      * @date 2022/9/25
      */
-    R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id, String keyword);
+    R findRelationEntityOrBond(Integer id, String keyword, Integer pageNum, Integer pageSize);
 
 
     Map<String, Object> getOverview();
