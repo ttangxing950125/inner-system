@@ -24,6 +24,7 @@ import com.deloitte.crm.service.ICrmEntityTaskService;
 import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EmailVo;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 @Slf4j
+@NoArgsConstructor
 public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, CrmEntityTask> implements ICrmEntityTaskService {
     @Resource
     private CrmEntityTaskMapper crmEntityTaskMapper;
@@ -71,6 +73,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
     private BondsListingLogMapper bondsListingLogMapper;
     @Resource
     private  EmailVo emailVo;
+
     /**
      * 查询角色7，根据导入的e数据新增主体的任务
      *
@@ -269,99 +272,4 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
         return crmEntityTask;
     }
-
-    /**
-     * 发送邮件(今日新发债和股票情况)
-     *
-     * @return String
-     * @author penTang
-     * @date 2022/11/2 11:37
-     */
-    @Override
-    public String sendEmail() {
-        String result ="";
-        try {
-            List<CrmEntityTask> list = list();
-            //新增主体
-            List<CrmEntityTask> addEntity = list.stream().filter(row -> row.getState() == 2).collect(Collectors.toList());
-            //a股检测
-            List<CrmEntityTask> collectA = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 3).collect(Collectors.toList());
-            //港股券
-            List<CrmEntityTask> collectG = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 2).collect(Collectors.toList());
-            //债券
-            List<CrmEntityTask> collectZ = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 1).collect(Collectors.toList());
-            //标题
-            String title = "今日平台新增主体" + addEntity.size() + "个，其中a股检测到" + collectA.size() + "个，港股检测到" + collectG.size() + "个，债券检测到" + collectZ.size() + "个";
-            String date = DateUtil.getDate();
-            LambdaQueryWrapper<BondsListingLog> qw = new LambdaQueryWrapper<BondsListingLog>().eq(BondsListingLog::getRecordTime, date);
-            List<BondsListingLog> bondsListingLogs = bondsListingLogMapper.selectList(qw);
-            List<BondsListingLog> bonds = bondsListingLogs.stream().filter(row -> row.getSourceType() == 1).collect(Collectors.toList());
-            List<BondsListingLog> stocks = bondsListingLogs.stream().filter(row -> row.getSourceType() != 1).collect(Collectors.toList());
-            //画表格
-            StringBuffer content= new StringBuffer();
-            if (bonds.size() != 0) {
-                content.append("<h2>今日新发债情况如下:</h2>");
-                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=12px;;font-size:18px;\">");
-                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>债券简称</th><th>债券全称</th><th>债券code</th><th>发行日期</th><th>发行人</th></tr>");
-                for (BondsListingLog row : bonds) {
-                    content.append("<tr>");
-                    //债券简称
-                    content.append("<td align=\"center\">" + row.getName() + "</td>");
-                    //债券全称
-                    content.append("<td align=\"center\">" + row.getShortName() + "</td>");
-                    //债券code
-                    content.append("<td align=\"center\">" + row.getCode() + "</td>");
-                    //发行日期
-                    content.append("<td align=\"center\">" + row.getIssueDate() + "</td>");
-                    //发行人
-                    content.append("<td align=\"center\">" + row.getPublisher() + "</td>");
-                    content.append("</tr>");
-                }
-                content.append("</table>");
-            } else {
-                content.append("<h2 style=\" font-size: 14px;\">今日新发债情况如下:暂无数据</h2>");
-            }
-
-            if (stocks.size() != 0) {
-                content.append("<h2>今日股票情况如下:</h2>");
-                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=12px;;font-size:18px;\">");
-                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>股票简称</th><th>股票全称</th><th>股票code</th><th>发行日期</th><th>发行人</th><th>股票类型</th></tr>");
-                for (BondsListingLog stock : stocks) {
-                    content.append("<tr>");
-                    //股票简称
-                    content.append("<td align=\"center\">" + stock.getName() + "</td>");
-                    //股票全称
-                    content.append("<td align=\"center\">" + stock.getShortName() + "</td>");
-                    //股票code
-                    content.append("<td align=\"center\">" + stock.getCode() + "</td>");
-                    //发行日期
-                    content.append("<td align=\"center\">" + stock.getIpoDate() + "</td>");
-                    //发行人
-                    content.append("<td align=\"center\">" + stock.getPublisher() + "</td>");
-                    //股票类型
-                   String s =  stock.getSourceType()==2 ? "港股":"A股";
-                    content.append("<td align=\"center\">" + s + "</td>");
-                    content.append("</tr>");
-                }
-                content.append("</table>");
-            } else {
-                content.append("<h2 style=\" font-size: 14px;\">今日股票情况如下:暂无数据</h2>");
-
-            }
-
-            List<String> passwords = emailVo.getPasswords();
-
-            for (String s : passwords) {
-                EmailUtil.sendTemplateEmail(title, content.toString(), s);
-            }
-            result ="邮件发送成功";
-
-        }catch(Exception e){
-
-            result="邮件发送失败";
-
-        }
-        return result;
-    }
-
 }

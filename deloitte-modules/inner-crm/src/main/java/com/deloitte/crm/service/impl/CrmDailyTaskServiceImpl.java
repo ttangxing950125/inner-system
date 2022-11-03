@@ -1,6 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -8,22 +9,25 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
+import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
+import com.deloitte.crm.domain.BondsListingLog;
 import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.domain.CrmSupplyTask;
+import com.deloitte.crm.mapper.BondsListingLogMapper;
 import com.deloitte.crm.mapper.CrmDailyTaskMapper;
+import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.service.ICrmEntityTaskService;
-import com.deloitte.crm.service.ICrmSupplyTaskService;
+import com.deloitte.crm.vo.EmailVo;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -54,11 +58,15 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
     @Resource
     private CrmDailyTaskMapper crmDailyTaskMapper;
 
-    @Autowired
-    private ICrmEntityTaskService crmEntityTaskService;
+    @Resource
+    private CrmEntityTaskMapper crmEntityTaskMapper;
 
-    @Autowired
-    private ICrmSupplyTaskService crmSupplyTaskService;
+    @Resource
+    private BondsListingLogMapper bondsListingLogMapper;
+
+    @Resource
+    private EmailVo emailVo;
+
     /**
      * 更新状态为 2-有任务未全部处理完
      *
@@ -197,26 +205,26 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      * @return void
      * @author 冉浩岑
      * @date 2022/11/3 16:58
-    */
+     */
     @Override
     public void checkDailyTask(CrmSupplyTask crmSupplyTask) {
 
         //完成任务前先检查一下角色3任务是否全部完成，如果都完成，则不需要修改每日任务状态
         QueryWrapper<CrmSupplyTask> query = new QueryWrapper<>();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId,crmSupplyTask.getRoleId()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId, crmSupplyTask.getRoleId()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
         Long count = crmSupplyTaskMapper.selectCount(query);
         //完成任务前先检查一下角色3.4.5任务是否全部完成，如果都完成，则不需要发送邮件
         query.clear();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
         Long allCount = crmSupplyTaskMapper.selectCount(query);
 
-        crmSupplyTaskService.completeTaskById(crmSupplyTask.getId());
+        completeTaskById(crmSupplyTask.getId());
 
         //如果当前角色已经完成过一次所有任务，则更新每日任务表
-        if (count<1){
+        if (count < 1) {
             Long roleId = crmSupplyTask.getRoleId();
             Date taskDate = crmSupplyTask.getTaskDate();
-            log.info("  >>>> 完成任务后根据roleId检查并修改每日任务状态,roleId=[{}],taskDate=[{}] <<<<  ",roleId,taskDate);
+            log.info("  >>>> 完成任务后根据roleId检查并修改每日任务状态,roleId=[{}],taskDate=[{}] <<<<  ", roleId, taskDate);
             query.clear();
             query.lambda().eq(CrmSupplyTask::getRoleId, roleId).eq(CrmSupplyTask::getTaskDate, taskDate);
             List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(query);
@@ -235,22 +243,124 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         }
 
         //发送邮件
-        if (allCount<0){
+        if (allCount < 0) {
             query.clear();
-            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
             allCount = crmSupplyTaskMapper.selectCount(query);
-            if (allCount<0){
+            if (allCount < 0) {
                 try {
-                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],开始发送邮件 <<<<  ",crmSupplyTask.getTaskDate(),crmSupplyTask.getRoleId());
-                    crmEntityTaskService.sendEmail();
-                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],邮件发送完成 <<<<  ",crmSupplyTask.getTaskDate(),crmSupplyTask.getRoleId());
-                }catch (Exception e){
-                    log.error("角色3.4.5完成任务发送邮件异常，异常信息：[{}]",e.getMessage());
+                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],开始发送邮件 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
+                    sendEmail();
+                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],邮件发送完成 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
+                } catch (Exception e) {
+                    log.error("角色3.4.5完成任务发送邮件异常，异常信息：[{}]", e.getMessage());
                 }
             }
         }
-
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void completeTaskById(Integer id) {
+        log.info("  >>>> 修改任务，任务ID:  "+id+" ,为完成状态  <<<<  ");
+        CrmSupplyTask crmSupplyTask = new CrmSupplyTask();
+        crmSupplyTask.setId(id);
+        crmSupplyTask.setState(1);
+        crmSupplyTask.setHandleUser(SecurityUtils.getUsername());
+        crmSupplyTask.setUpdated(new Date());
+        crmSupplyTaskMapper.updateById(crmSupplyTask);
     }
 
+    /**
+     * 发送邮件(今日新发债和股票情况)
+     *
+     * @return String
+     * @author penTang
+     * @date 2022/11/2 11:37
+     */
+    @Override
+    public String sendEmail() {
+        String result ="";
+        try {
+            List<CrmEntityTask> list = crmEntityTaskMapper.selectList(new QueryWrapper<>());
+            //新增主体
+            List<CrmEntityTask> addEntity = list.stream().filter(row -> row.getState() == 2).collect(Collectors.toList());
+            //a股检测
+            List<CrmEntityTask> collectA = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 3).collect(Collectors.toList());
+            //港股券
+            List<CrmEntityTask> collectG = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 2).collect(Collectors.toList());
+            //债券
+            List<CrmEntityTask> collectZ = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 1).collect(Collectors.toList());
+            //标题
+            String title = "今日平台新增主体" + addEntity.size() + "个，其中a股检测到" + collectA.size() + "个，港股检测到" + collectG.size() + "个，债券检测到" + collectZ.size() + "个";
+            String date = com.deloitte.common.core.utils.DateUtil.getDate();
+            LambdaQueryWrapper<BondsListingLog> qw = new LambdaQueryWrapper<BondsListingLog>().eq(BondsListingLog::getRecordTime, date);
+            List<BondsListingLog> bondsListingLogs = bondsListingLogMapper.selectList(qw);
+            List<BondsListingLog> bonds = bondsListingLogs.stream().filter(row -> row.getSourceType() == 1).collect(Collectors.toList());
+            List<BondsListingLog> stocks = bondsListingLogs.stream().filter(row -> row.getSourceType() != 1).collect(Collectors.toList());
+            //画表格
+            StringBuffer content= new StringBuffer();
+            if (bonds.size() != 0) {
+                content.append("<h2>今日新发债情况如下:</h2>");
+                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=12px;;font-size:18px;\">");
+                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>债券简称</th><th>债券全称</th><th>债券code</th><th>发行日期</th><th>发行人</th></tr>");
+                for (BondsListingLog row : bonds) {
+                    content.append("<tr>");
+                    //债券简称
+                    content.append("<td align=\"center\">" + row.getName() + "</td>");
+                    //债券全称
+                    content.append("<td align=\"center\">" + row.getShortName() + "</td>");
+                    //债券code
+                    content.append("<td align=\"center\">" + row.getCode() + "</td>");
+                    //发行日期
+                    content.append("<td align=\"center\">" + row.getIssueDate() + "</td>");
+                    //发行人
+                    content.append("<td align=\"center\">" + row.getPublisher() + "</td>");
+                    content.append("</tr>");
+                }
+                content.append("</table>");
+            } else {
+                content.append("<h2 style=\" font-size: 14px;\">今日新发债情况如下:暂无数据</h2>");
+            }
+
+            if (stocks.size() != 0) {
+                content.append("<h2>今日股票情况如下:</h2>");
+                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=12px;;font-size:18px;\">");
+                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>股票简称</th><th>股票全称</th><th>股票code</th><th>发行日期</th><th>发行人</th><th>股票类型</th></tr>");
+                for (BondsListingLog stock : stocks) {
+                    content.append("<tr>");
+                    //股票简称
+                    content.append("<td align=\"center\">" + stock.getName() + "</td>");
+                    //股票全称
+                    content.append("<td align=\"center\">" + stock.getShortName() + "</td>");
+                    //股票code
+                    content.append("<td align=\"center\">" + stock.getCode() + "</td>");
+                    //发行日期
+                    content.append("<td align=\"center\">" + stock.getIpoDate() + "</td>");
+                    //发行人
+                    content.append("<td align=\"center\">" + stock.getPublisher() + "</td>");
+                    //股票类型
+                    String s =  stock.getSourceType()==2 ? "港股":"A股";
+                    content.append("<td align=\"center\">" + s + "</td>");
+                    content.append("</tr>");
+                }
+                content.append("</table>");
+            } else {
+                content.append("<h2 style=\" font-size: 14px;\">今日股票情况如下:暂无数据</h2>");
+
+            }
+
+            List<String> passwords = emailVo.getPasswords();
+
+            for (String s : passwords) {
+                EmailUtil.sendTemplateEmail(title, content.toString(), s);
+            }
+            result ="邮件发送成功";
+
+        }catch(Exception e){
+            e.printStackTrace();
+            result="邮件发送失败";
+
+        }
+        return result;
+    }
 
 }
