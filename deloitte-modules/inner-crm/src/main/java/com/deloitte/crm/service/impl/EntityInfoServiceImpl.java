@@ -1740,46 +1740,44 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public R findRelationEntityOrBond(Integer id, String keyword, Integer pageNum, Integer pageSize) {
         List<TargetEntityBondsVo> result = new ArrayList<>();
         switch (keyword) {
+            /**
+             * {@link com.deloitte.crm.mapper.EntityBondRelMapper#searchEntity} 该sql优化走索引 详情
+             * <code>
+             *     EXPAND
+             *     SELECT
+             *             b.id as id,
+             *             b.bond_code as bondCode,
+             *             b.ori_code as transactionCode,
+             *             b.bond_name as fullName,
+             *             b.bond_short_name as bondShortName,
+             *             b.bond_state as debtRaisingType,
+             *             b.raise_type as raiseType,
+             *             b.bond_state as bondState
+             *         FROM
+             *             entity_bond_rel a
+             *             LEFT JOIN bond_info b ON a.bd_code = b.bond_code
+             *         WHERE
+             *             a.entity_code =(
+             *             SELECT
+             *                 entity_code
+             *             FROM
+             *                 entity_info
+             *         WHERE
+             *             id = #{id} AND `status`=1)
+             * </code>
+             */
             case ENTITY:
                 pageNum = pageNum == null ? 1 : pageNum;
                 pageSize = pageSize == null ? 10 : pageSize;
-                Page<EntityBondRel> page = new Page<>(pageNum, pageSize);
-                /**
-                 * {@link com.deloitte.crm.mapper.EntityBondRelMapper#searchEntity} 该sql优化走索引 详情
-                 * <code>
-                 *     EXPAND
-                 *     SELECT
-                 *             b.id as id,
-                 *             b.bond_code as bondCode,
-                 *             b.ori_code as transactionCode,
-                 *             b.bond_name as fullName,
-                 *             b.bond_short_name as bondShortName,
-                 *             b.bond_state as debtRaisingType,
-                 *             b.raise_type as raiseType,
-                 *             b.bond_state as bondState
-                 *         FROM
-                 *             entity_bond_rel a
-                 *             LEFT JOIN bond_info b ON a.bd_code = b.bond_code
-                 *         WHERE
-                 *             a.entity_code =(
-                 *             SELECT
-                 *                 entity_code
-                 *             FROM
-                 *                 entity_info
-                 *         WHERE
-                 *             id = #{id} AND `status`=1)
-                 * </code>
-                 */
+                Page<BondVo> page = new Page<>(pageNum, pageSize);
                 IPage<BondVo> entityBondRelIPage = this.entityBondRelMapper.searchEntity(page, id);
                 return R.ok(entityBondRelIPage);
             case BOND:
                 log.info("  =>> 开始查询 id 为 " + id + " 的 " + ENTITY + " 信息 <<=  ");
                 BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getId, id));
-                List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda()
-                        .eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
+                List<EntityBondRel> entityBondRels1 = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getBdCode, bondInfo.getBondCode()));
                 entityBondRels1.forEach(item -> {
-                    EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda()
-                            .eq(EntityInfo::getEntityCode, item.getEntityCode()));
+                    EntityInfo entityInfo = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, item.getEntityCode()));
                     result.add(this.matchingEntityInfo(entityInfo));
                     log.info("  =>>  查询到信息并返回 " + result.size() + " 条 <<=  ");
                     log.info("  >>>>  债券信息管理 - 结束  <<<<");
