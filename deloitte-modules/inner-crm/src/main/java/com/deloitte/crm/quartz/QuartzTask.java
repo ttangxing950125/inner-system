@@ -10,6 +10,7 @@ import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
 import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.ProductsCoverService;
 import com.deloitte.crm.service.StockCnInfoService;
+import com.deloitte.crm.utils.TimeFormatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -126,12 +128,12 @@ public class QuartzTask implements ApplicationContextAware {
      * @author 冉浩岑
      * @date 2022/11/3 10:35
     */
-//    @Scheduled(cron = "30 0 0 * * ?")
-    @Scheduled(cron = "0 1 14 * * ?")
+    @Scheduled(cron = "10 0 0 * * ?")
     public void checkBondStatus(){
-        log.info("=>> "+ DateUtil.dateTimeNow()+"债券退市检测跑批开始");
+        String today = TimeFormatUtil.getFormartDate(new Date());
+        log.info("=>> "+ today +"债券退市检测跑批开始");
         bondInfoService.checkBondStatus();
-        log.info("=>> "+ DateUtil.dateTimeNow()+"债券退市检测跑批结束");
+        log.info("=>> "+ today+"债券退市检测跑批结束");
     }
     /**
      * 股票退市检测跑批
@@ -142,9 +144,10 @@ public class QuartzTask implements ApplicationContextAware {
      */
     @Scheduled(cron = "30 0 0 * * ?")
     public void checkStockStatus(){
-        log.info("=>> "+ DateUtil.dateTimeNow()+"股票退市检测跑批开始");
+        String today = TimeFormatUtil.getFormartDate(new Date());
+        log.info("=>> "+ today+" 股票退市检测跑批开始");
         stockCnInfoService.checkStockStatus();
-        log.info("=>> "+ DateUtil.dateTimeNow()+"股票退市检测跑批结束");
+        log.info("=>> "+ today+" 股票退市检测跑批结束");
     }
 
     //转换方法

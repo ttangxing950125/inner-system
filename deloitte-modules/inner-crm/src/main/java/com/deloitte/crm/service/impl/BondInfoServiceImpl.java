@@ -574,9 +574,10 @@ public class BondInfoServiceImpl implements IBondInfoService {
         //需要修改的所有债券的code
         List<String>bondCodes=new ArrayList<>();
         bondInfos.forEach(o->{
-            o.setBondStatus(9).setBondState(2);
+            BondInfo bondInfo=new BondInfo();
+            bondInfo.setBondStatus(9).setBondState(2).setId(o.getId());
             bondCodes.add(o.getBondCode());
-            bondInfoMapper.updateById(o);
+            bondInfoMapper.updateById(bondInfo);
         });
         log.info(" ===> 当日正常兑付债券数量为 count=[{}]个,债券代码 codes=[{}]",count,bondCodes);
         //查询所有被修改状态对应的主体
@@ -602,9 +603,6 @@ public class BondInfoServiceImpl implements IBondInfoService {
                 entityInfoMapper.update(entityInfo,new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,o));
             }
         });
-        log.info(" ===> 当日债券退市数量 count=[{}]个,主体代码 codes=[{}]",downEntityCodes.size(),downEntityCodes);
-
-        int i=1/0;
-        System.out.println(i);
+        log.info(" ===> 当日债券主体退市数量 count=[{}]个,主体代码 codes=[{}]",downEntityCodes.size(),downEntityCodes);
     }
 }

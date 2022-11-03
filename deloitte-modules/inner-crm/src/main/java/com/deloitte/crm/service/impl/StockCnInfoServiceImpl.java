@@ -138,10 +138,10 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
     public void checkStockStatus() {
         //修改所有退市日期小于当前日期的正在上市的股票状态
         Date now = new Date();
-        //查询A股的退市股票
+        //查询A股需要退市的股票
         List<StockCnInfo> stockCnInfos = cnMapper.selectList(new QueryWrapper<StockCnInfo>().lambda().eq(StockCnInfo::getStockStatus, 6).le(StockCnInfo::getDelistingDate, now));
-        //查询港股的退市股票
-        List<StockThkInfo> stockThkInfos = thkMapper.selectList(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockStatus, 6).le(StockThkInfo::getDelistingDate, now));
+        //查询港股需要退市的股票
+        List<StockThkInfo> stockThkInfos = thkMapper.selectList(new QueryWrapper<StockThkInfo>().lambda().eq(StockThkInfo::getStockStatus, 3).le(StockThkInfo::getDelistingDate, now));
 
         Integer count = stockCnInfos.size();
         //修改条数为0则不执行后续操作
@@ -154,9 +154,10 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
         List<String>stockCnCodes=new ArrayList<>();
         if (CollectionUtils.isNotEmpty(stockCnInfos)){
             stockCnInfos.forEach(o->{
-                o.setStockStatus(9);
+                StockCnInfo stockCnInfo = new StockCnInfo();
+                stockCnInfo.setStockStatus(9).setId(o.getId());
                 stockCnCodes.add(o.getStockDqCode());
-                cnMapper.updateById(o);
+                cnMapper.updateById(stockCnInfo);
             });
             log.info(" ===> 当日退市A股数量为 count=[{}]个,股票德勤唯一识别码 codes=[{}]",stockCnCodes.size(),stockCnCodes);
         }
@@ -165,9 +166,10 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
         List<String>stockThkCodes=new ArrayList<>();
         if (CollectionUtils.isNotEmpty(stockThkInfos)){
             stockThkInfos.forEach(o->{
-                o.setStockStatus(9);
+                StockThkInfo stockThkInfo = new StockThkInfo();
+                stockThkInfo.setStockStatus(4).setId(o.getId());
                 stockThkCodes.add(o.getStockDqCode());
-                thkMapper.updateById(o);
+                thkMapper.updateById(stockThkInfo);
             });
             log.info(" ===> 当日退市A股数量为 count=[{}]个,股票德勤唯一识别码 codes=[{}]",stockThkCodes.size(),stockThkCodes);
         }
@@ -183,7 +185,7 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
             });
         }
         //查询港股所有被修改状态对应的主体
-        if (CollectionUtils.isNotEmpty(stockCnCodes)){
+        if (CollectionUtils.isNotEmpty(stockThkCodes)){
             List<EntityStockThkRel>stockThkRels=stockThkRelService.selectEntityStockThkRelListByBondCodes(stockThkCodes);
             stockThkRels.forEach(o->{
                 if (!entityCodes.contains(o.getEntityCode())){
@@ -209,9 +211,5 @@ public class StockCnInfoServiceImpl extends ServiceImpl<StockCnInfoMapper, Stock
             }
         });
         log.info(" ===> 当日股票退市数量 count=[{}]个,主体代码 codes=[{}]",downEntityCodes.size(),downEntityCodes);
-
-
-        int i=1/0;
-        System.out.println(i);
     }
 }
