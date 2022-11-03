@@ -76,11 +76,11 @@ public class BondInfoManagerController {
             @ApiImplicitParam(name="keyword",value="请传入常量 ENTITY || BOND",paramType="query",dataType = "String")
     })
         @PostMapping("/findRelationEntityOrBond")
-    public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id,String keyword){
+    public R findRelationEntityOrBond(Integer id,String keyword,Integer pageNum,Integer pageSize){
         // 查询主体||债券信息
         log.info("  >>>> 债券信息管理 - 开始  <<<<  ");
         log.info("  =>> 二级匹配查询  <<=");
-        return iEntityInfoService.findRelationEntityOrBond(id,keyword);
+        return iEntityInfoService.findRelationEntityOrBond(id,keyword,pageNum,pageSize);
     }
 
     /**

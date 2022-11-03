@@ -42,6 +42,31 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectEntityBondRelVo"/>
         where id = #{id}
     </select>
+
+
+    <select id="searchEntity" parameterType="java.lang.String" resultType="com.deloitte.crm.vo.BondVo">
+        SELECT
+            b.id as id,
+            b.bond_code as bondCode,
+            b.ori_code as transactionCode,
+            b.bond_name as fullName,
+            b.bond_short_name as bondShortName,
+            b.bond_state as debtRaisingType,
+            b.raise_type as raiseType,
+            b.bond_state as bondState
+        FROM
+            entity_bond_rel a
+            LEFT JOIN bond_info b ON a.bd_code = b.bond_code
+        WHERE
+            a.entity_code =(
+            SELECT
+                entity_code
+            FROM
+                entity_info
+        WHERE
+            id = #{id} AND `status`=1)
+    </select>
+
         
     <insert id="insertEntityBondRel" parameterType="EntityBondRel" useGeneratedKeys="true" keyProperty="id">
         insert into entity_bond_rel
