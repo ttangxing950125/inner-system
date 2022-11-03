@@ -1,4 +1,5 @@
 package com.deloitte.crm.service.impl;
+
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -8,13 +9,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.CoverRule;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.Products;
-import com.deloitte.crm.domain.ProductsCover;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.ProductCoverDto;
-import com.deloitte.crm.mapper.EntityInfoMapper;
-import com.deloitte.crm.mapper.ProductsCoverMapper;
-import com.deloitte.crm.mapper.ProductsMapper;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ProductsCoverService;
 import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
@@ -22,11 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import javax.swing.text.html.Option;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
 /**
  * @author PenTang
  * @date 2022/10/12 16:51
@@ -43,6 +40,10 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
 
     private ProductsMapper productsMapper;
 
+    private EntityStockCnRelMapper entityStockCnRelmapper;
+
+    private StockCnInfoMapper stockCnInfomapper;
+
 
     /**
      * 查询覆盖情况
@@ -52,7 +53,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      * @date 2022/10/12 18:58
      */
     @Override
-    public Page <ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
+    public Page<ProductCoverDto> getProducts(EntityOrGovByAttrVo entityOrGovByAttrVo) {
         // 获取 需要查询的产品
         List<Integer> proId = entityOrGovByAttrVo.getProId();
         //参数进行校验
@@ -66,11 +67,12 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         Page<EntityInfo> page = new Page<>(entityOrGovByAttrVo.getPageNum(), entityOrGovByAttrVo.getPageSize());
         QueryWrapper<EntityInfo> like = new QueryWrapper<EntityInfo>();
         LambdaQueryWrapper<EntityInfo> like1;
-        if (entityOrGovByAttrVo.getEntityName()==null || entityOrGovByAttrVo.getEntityName().equals("") ){
+        if (entityOrGovByAttrVo.getEntityName() == null || entityOrGovByAttrVo.getEntityName().equals("")) {
             like1 = like.lambda();
-        }else {
+        } else {
             like1 = like.lambda().like(EntityInfo::getEntityName, entityOrGovByAttrVo.getEntityName());
-        }        Page<EntityInfo> page1 = entityInfoMapper.selectPage(page, like1);
+        }
+        Page<EntityInfo> page1 = entityInfoMapper.selectPage(page, like1);
         List<EntityInfo> records = page1.getRecords();
         if (CollUtil.isEmpty(records)) {
             R.fail("未查询到该主体");
@@ -85,7 +87,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             for (Integer integer : proIds) {
                 HashMap<String, String> stringStringHashMap = new HashMap<>();
                 //当前主体关联的产品覆盖情况
-                ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()).eq(ProductsCover::getIsGov,0));
+                ProductsCover productsCover = productCoverMapper.selectOne(new QueryWrapper<ProductsCover>().lambda().eq(ProductsCover::getProId, integer).eq(ProductsCover::getEntityCode, o.getEntityCode()).eq(ProductsCover::getIsGov, 0));
                 if (productsCover == null) {
                     Products products = productsMapper.selectById(integer);
                     stringStringHashMap.put("key", products.getProName());
@@ -114,56 +116,55 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
     }
 
     @Override
-
     public void CoverRule() {
-        log.info("=>> "+ DateUtil.dateTimeNow()+"组装覆盖情况");
+        log.info("=>> " + DateUtil.dateTimeNow() + "组装覆盖情况");
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(null);
         List<ProductsCover> productsCovers = new ArrayList<>();
         for (int i = 0; i < entityInfos.size(); i++) {
-            log.info("进度=>"+i+1+"<=");
+            log.info("进度=>" + i + 1 + "<=");
             //组装ESG
             List<ProductsCover> productsCoversE = this.CoverRuleEsg(entityInfos.get(i), productsCovers);
             //组装产业链
             List<ProductsCover> productsCoversC = this.CoverRuleClTE(entityInfos.get(i), productsCoversE);
             //组装股票
-           this.CoverRuleSTOCK(entityInfos.get(i), productsCoversC);
+            this.CoverRuleSTOCK(entityInfos.get(i), productsCoversC);
 
         }
         System.out.println(productsCovers);
-         //入库
-         int updateSum = 0;
-         int saveSum = 0;
+        //入库
+        int updateSum = 0;
+        int saveSum = 0;
         for (ProductsCover productsCover : productsCovers) {
             LambdaQueryWrapper<ProductsCover> qw = new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, productsCover.getEntityCode())
                     .eq(ProductsCover::getProId, productsCover.getProId())
-                    .eq(ProductsCover::getIsGov,0);
+                    .eq(ProductsCover::getIsGov, 0);
             ProductsCover one = getOne(qw);
             if (one != null) {
                 one.setIsCover(productsCover.getIsCover());
                 one.setCoverDes(productsCover.getCoverDes());
                 boolean b = updateById(one);
-                if (b){
+                if (b) {
                     // 统计更新了多少条
-                  updateSum ++;
+                    updateSum++;
                 }
-            }else {
+            } else {
                 boolean save = save(productsCover);
-                if (save){
+                if (save) {
                     //统计新增了多少条
-                    saveSum ++;
+                    saveSum++;
                 }
 
             }
 
         }
-        log.info("总数：{}",productsCovers.size());
-        log.info("更新：{}",updateSum);
-        log.info("新增：{}",saveSum);
+        log.info("总数：{}", productsCovers.size());
+        log.info("更新：{}", updateSum);
+        log.info("新增：{}", saveSum);
         productsCovers.clear();
     }
 
     /**
-     *组装
+     * 组装
      *
      * @param entityInfo
      * @param productsCovers
@@ -171,101 +172,165 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      * @author penTang
      * @date 2022/10/28 15:11
      */
-    public List<ProductsCover> CoverRuleEsg(EntityInfo entityInfo,List<ProductsCover> productsCovers){
+    public List<ProductsCover> CoverRuleEsg(EntityInfo entityInfo, List<ProductsCover> productsCovers) {
         log.info("组装ESG");
-        ProductsCover productsCoverE = new ProductsCover();
-        if (entityInfo.getList()==null || entityInfo.getList().equals(0)) {
-            productsCoverE.setProId(CoverRule.ESG_ID);
-            productsCoverE.setIsCover("0");
-            productsCoverE.setEntityCode(entityInfo.getEntityCode());
-            productsCoverE.setIsGov("0");
-            productsCoverE.setCoverDes("非覆盖");
-            productsCovers.add(productsCoverE);
-        }else if (entityInfo.getList().equals(1)){
-            productsCoverE.setProId(CoverRule.ESG_ID);
-            productsCoverE.setIsCover("1");
-            productsCoverE.setEntityCode(entityInfo.getEntityCode());
-            productsCoverE.setIsGov("0");
-            productsCoverE.setCoverDes("覆盖");
-            productsCovers.add(productsCoverE);
-        }
-        return productsCovers;
-    }
+        LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfo.getEntityCode());
+        List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
 
-    public List<ProductsCover> CoverRuleClTE(EntityInfo entityInfo,List<ProductsCover> productsCovers){
-        log.info("组装CLTE");
+        ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
         ProductsCover productsCoverC = new ProductsCover();
-        if (entityInfo.getList()==null || entityInfo.getList().equals(0)) {
-            productsCoverC.setProId(CoverRule.CT_LE_ID);
+        if (CollUtil.isNotEmpty(entityStockCnRels)) {
+            for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
+                LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
+                StockCnInfo stockCnInfo = Optional.ofNullable(stockCnInfomapper.selectOne(eq1)).orElse(null);
+                if (stockCnInfo != null) {
+                    stockCnInfos.add(stockCnInfo);
+                }
+
+            }
+        }
+        if (CollUtil.isNotEmpty(stockCnInfos)) {
+            for (StockCnInfo stockCnInfo : stockCnInfos) {
+                if (Objects.equals(stockCnInfo.getStockStatus(), 6) || stockCnInfo.getListDate() != null) {
+                    productsCoverC.setProId(CoverRule.ESG_ID);
+                    productsCoverC.setIsCover("1");
+                    productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                    productsCoverC.setIsGov("0");
+                    productsCoverC.setCoverDes("应覆盖（A股上市）");
+                    productsCovers.add(productsCoverC);
+                    break;
+                } else if (stockCnInfo.getDelistingDate() == null || !Objects.equals(stockCnInfo.getStockStatus(), 9)) {
+                    productsCoverC.setProId(CoverRule.ESG_ID);
+                    productsCoverC.setIsCover("0");
+                    productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                    productsCoverC.setIsGov("0");
+                    productsCoverC.setCoverDes("未覆盖（未A股上市）");
+                    productsCovers.add(productsCoverC);
+                    break;
+                }
+            }
+            if (CollUtil.isEmpty(productsCovers)) {
+                productsCoverC.setProId(CoverRule.ESG_ID);
+                productsCoverC.setIsCover("0");
+                productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                productsCoverC.setIsGov("0");
+                productsCoverC.setCoverDes("不再覆盖（A股退市）");
+                productsCovers.add(productsCoverC);
+            }
+
+
+        } else {
+
+            productsCoverC.setProId(CoverRule.ESG_ID);
             productsCoverC.setIsCover("0");
             productsCoverC.setEntityCode(entityInfo.getEntityCode());
             productsCoverC.setIsGov("0");
-            productsCoverC.setCoverDes("非覆盖");
-            productsCovers.add(productsCoverC);
-        }else if (entityInfo.getList().equals(1)){
-            productsCoverC.setProId(CoverRule.CT_LE_ID);
-            productsCoverC.setIsCover("1");
-            productsCoverC.setEntityCode(entityInfo.getEntityCode());
-            productsCoverC.setIsGov("0");
-            productsCoverC.setCoverDes("覆盖");
+            productsCoverC.setCoverDes("未覆盖（未A股上市）");
             productsCovers.add(productsCoverC);
         }
+        return productsCovers;
+    }
+
+    public List<ProductsCover> CoverRuleClTE(EntityInfo entityInfo, List<ProductsCover> productsCovers) {
+        log.info("组装CLTE");
+        LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfo.getEntityCode());
+        List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
+        ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
+        ProductsCover productsCoverC = new ProductsCover();
+        if (!entityStockCnRels.isEmpty()) {
+            for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
+                LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().
+                        eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
+                StockCnInfo stockCnInfo = stockCnInfomapper.selectOne(eq1);
+                if (stockCnInfo != null) {
+                    stockCnInfos.add(stockCnInfo);
+                }
+            }
+        }
+        if (!stockCnInfos.isEmpty()) {
+            for (StockCnInfo stockCnInfo : stockCnInfos) {
+                if (Objects.equals(stockCnInfo.getStockStatus(), 6) || stockCnInfo.getListDate() != null) {
+                    productsCoverC.setProId(CoverRule.CT_LE_ID);
+                    productsCoverC.setIsCover("1");
+                    productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                    productsCoverC.setIsGov("0");
+                    productsCoverC.setCoverDes("应覆盖（A股上市）");
+                    productsCovers.add(productsCoverC);
+                    break;
+                } else if (stockCnInfo.getDelistingDate() == null || !Objects.equals(stockCnInfo.getStockStatus(), 9)) {
+                    productsCoverC.setProId(CoverRule.CT_LE_ID);
+                    productsCoverC.setIsCover("0");
+                    productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                    productsCoverC.setIsGov("0");
+                    productsCoverC.setCoverDes("未覆盖（未A股上市）");
+                    productsCovers.add(productsCoverC);
+                    break;
+                }
+            }
+            if (productsCovers.isEmpty()) {
+                productsCoverC.setProId(CoverRule.CT_LE_ID);
+                productsCoverC.setIsCover("0");
+                productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                productsCoverC.setIsGov("0");
+                productsCoverC.setCoverDes("不再覆盖（A股退市）");
+                productsCovers.add(productsCoverC);
+            }
+
+        }
+
         return productsCovers;
 
     }
 
 
-    public List<ProductsCover> CoverRuleSTOCK(EntityInfo entityInfo,List<ProductsCover> productsCovers){
+    public List<ProductsCover> CoverRuleSTOCK(EntityInfo entityInfo, List<ProductsCover> productsCovers) {
         log.info("组装股票");
-        ProductsCover productsCoverS = new ProductsCover();
-        if (entityInfo.getList()==null || entityInfo.getList().equals(0)) {
-            productsCoverS.setProId(CoverRule.STOCK_ID);
-            productsCoverS.setIsCover("0");
-            productsCoverS.setEntityCode(entityInfo.getEntityCode());
-            productsCoverS.setIsGov("0");
-            productsCoverS.setCoverDes("非覆盖");
-            productsCovers.add(productsCoverS);
-        }else if (entityInfo.getList().equals(1)){
-            productsCoverS.setProId(CoverRule.STOCK_ID);
-            productsCoverS.setIsCover("1");
-            productsCoverS.setEntityCode(entityInfo.getEntityCode());
-            productsCoverS.setIsGov("0");
-            productsCoverS.setCoverDes("覆盖");
-            productsCovers.add(productsCoverS);
+        LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfo.getEntityCode());
+        List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
+        ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
+        ProductsCover productsCoverC = new ProductsCover();
+        if (!entityStockCnRels.isEmpty()) {
+            for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
+                LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().
+                        eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
+                StockCnInfo stockCnInfo = stockCnInfomapper.selectOne(eq1);
+                if (stockCnInfo != null) {
+                    stockCnInfos.add(stockCnInfo);
+                }
+
+            }
+        }
+        if (!stockCnInfos.isEmpty()) {
+            for (StockCnInfo stockCnInfo : stockCnInfos) {
+                if (Objects.equals(stockCnInfo.getStockStatus(), 6) || stockCnInfo.getListDate() != null) {
+                    productsCoverC.setProId(CoverRule.STOCK_ID);
+                    productsCoverC.setIsCover("1");
+                    productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                    productsCoverC.setIsGov("0");
+                    productsCoverC.setCoverDes("应覆盖（A股上市）");
+                    productsCovers.add(productsCoverC);
+                    break;
+                } else if (stockCnInfo.getDelistingDate() == null || !Objects.equals(stockCnInfo.getStockStatus(), 9)) {
+                    productsCoverC.setProId(CoverRule.STOCK_ID);
+                    productsCoverC.setIsCover("0");
+                    productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                    productsCoverC.setIsGov("0");
+                    productsCoverC.setCoverDes("未覆盖（未A股上市）");
+                    productsCovers.add(productsCoverC);
+                    break;
+                }
+            }
+            if (productsCovers.isEmpty()) {
+                productsCoverC.setProId(CoverRule.STOCK_ID);
+                productsCoverC.setIsCover("0");
+                productsCoverC.setEntityCode(entityInfo.getEntityCode());
+                productsCoverC.setIsGov("0");
+                productsCoverC.setCoverDes("不再覆盖（A股退市）");
+                productsCovers.add(productsCoverC);
+            }
+
         }
         return productsCovers;
-
-    }
-
-    public static void main(String[] args) {
-
-        for (int i = 0; i < 1000000; i++) {
-            int count = 1;
-        }
-
-        for (int i = 0; i < 1000000; ++i) {
-            int count = 1;
-        }
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("for i++");
-        for (int i = 0; i < 1000000; i++) {
-            int count = 1;
-        }
-        stopWatch.stop();
-
-        stopWatch.start("for ++i");
-        for (int i = 0; i < 1000000; ++i) {
-            int count = 1;
-        }
-        stopWatch.stop();
-//
-//        AtomicInteger integer = new AtomicInteger();
-//        int num = 100000;
-//        for (int i: num) {
-//
-//        }
-        System.out.println(stopWatch);
     }
 
 

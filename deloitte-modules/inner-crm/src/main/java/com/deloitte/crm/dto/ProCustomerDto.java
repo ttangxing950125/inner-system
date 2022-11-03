@@ -41,5 +41,10 @@ public class ProCustomerDto {
      */
     private String dictId;
 
+    /**
+     * 映射情况
+     */
+    private String updateMark;
+
 
 }
