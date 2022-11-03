@@ -231,7 +231,7 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
             log.info("  =>> 角色2任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmMasTask.getSpeedId());
         }else{
             entityCaptureSpeed.setDivide(1);
-            entityCaptureSpeedMapper.insert(entityCaptureSpeed);
+            entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
         }
         return crmMasTask.getTaskDate();
     }

@@ -66,6 +66,7 @@ public class ProductsMasterRelImpl extends ServiceImpl<ProductsMasterRelMapper,P
                                 ProductsMasterDict productsMasterDict = productsMasterDictmapper.selectOne(eq);
                                 proCustomerDto.setDictId(productsMasterRel.getProMasDictId().toString());
                                 proCustomerDto.setMasterName(productsMasterDict.getMasterName());
+                                proCustomerDto.setUpdateMark(productsMasterDict.getUpdateMark());
                         }
                 }
 
