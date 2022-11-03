@@ -374,8 +374,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public List<EntityInfo> findByName(String entityName) {
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         return baseMapper.findByName(entityName);
     }
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override

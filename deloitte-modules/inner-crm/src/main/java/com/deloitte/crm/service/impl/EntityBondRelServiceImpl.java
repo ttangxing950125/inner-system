@@ -58,6 +58,8 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
             return false;
         }
 
+        issorName = issorName.trim().replace("（","(").replace("）",")");
+
         //查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(issorName);
         //没有主体就创建任务

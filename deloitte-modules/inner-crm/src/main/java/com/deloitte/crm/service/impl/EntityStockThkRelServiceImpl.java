@@ -53,6 +53,9 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
     @Transactional(rollbackFor = Exception.class)
     public boolean bindRelOrCreateTask(StockThkInfo stockThkInfo, String entityName,
                                        CrmWindTask windTask, ThkSecIssInfo secIssInfo) {
+
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
 

@@ -59,6 +59,9 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean bindRelOrCreateTask(StockCnInfo stockCnInfo, String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack) {
+
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
         //之前数据库中没有该主体
@@ -159,6 +162,8 @@ public class EntityStockCnRelServiceImpl extends ServiceImpl<EntityStockCnRelMap
      */
     @Override
     public boolean createTask(String entityName, CrmWindTask windTask, CnCoachBack cnCoachBack) {
+
+        entityName = entityName.trim().replace("（","(").replace("）",")");
 
         //根据名称查询主体
         List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
