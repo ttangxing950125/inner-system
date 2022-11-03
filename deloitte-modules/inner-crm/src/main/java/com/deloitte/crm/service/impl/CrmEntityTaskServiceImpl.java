@@ -18,7 +18,10 @@ import com.deloitte.crm.mapper.BondsListingLogMapper;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
 import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
-import com.deloitte.crm.service.*;
+import com.deloitte.crm.service.EntityCaptureSpeedService;
+import com.deloitte.crm.service.ICrmDailyTaskService;
+import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.SendEmailService;
 import com.deloitte.crm.vo.EmailVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -136,20 +137,25 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     /**
      * 角色7今日运维模块
-     *
-     * @param date     请传入参数 yyyy-mm-dd
-     * @param pageNum
-     * @param pageSize
-     * @return R<List < CrmEntityTask>> 当日任务情况
      * @author 正杰
+     * @param taskCategory 捕获渠道
+     * @param date 请传入参数 yyyy-mm-dd
+     * @param pageNum 页码
+     * @param pageSize 每页条数
      * @date 2022/9/22
+     * @return R<List<CrmEntityTask>> 当日任务情况
      */
     @Override
-    public R<Page<CrmEntityTask>> getTaskInfo(String date, Integer pageNum, Integer pageSize) {
+    public R<Page<CrmEntityTask>> getTaskInfo(String taskCategory,String date, Integer pageNum, Integer pageSize) {
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
-        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<CrmEntityTask>()
-                .lambda().eq(CrmEntityTask::getTaskDate, date).orderBy(true, true, CrmEntityTask::getState));
+        QueryWrapper<CrmEntityTask> wrapper = new QueryWrapper<>();
+        wrapper.lambda().eq(CrmEntityTask::getTaskDate, date);
+
+        //添加一条 关于捕获信息的 查询条件
+        if(!ObjectUtils.isEmpty(taskCategory)){wrapper.lambda().eq(CrmEntityTask::getTaskCategory,taskCategory);}
+
+        Page<CrmEntityTask> crmEntityTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), wrapper.lambda().orderBy(true, true, CrmEntityTask::getState));
         return R.ok(crmEntityTaskPage, SuccessInfo.GET_SUCCESS.getInfo());
     }
 

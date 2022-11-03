@@ -54,6 +54,9 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
     @Resource
     private IEntityInfoService entityInfoService;
 
+    @Resource
+    private BondsListingLogService bondsListingLogService;
+
     /**
      * 处理文件中的每一行
      *
@@ -144,6 +147,21 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
                 entityInfos.forEach(entity -> {
                     entity.setList(1);
                 });
+
+
+                //上市记录
+                String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
+                //创建log
+                BondsListingLog log = new BondsListingLog();
+                log.setCode(thkSecIssInfos.getCode());
+                log.setName(thkSecIssInfos.getName());
+                log.setIpoDate(DateUtil.parseDate(thkSecIssInfos.getIpoDate()));
+                log.setPublisher(names);
+                log.setRecordTime(timeNow);
+                log.setSourceType(3);
+
+
+                bondsListingLogService.save(log);
 
                 entityInfoService.updateBatchById(entityInfos);
 

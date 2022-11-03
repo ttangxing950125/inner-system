@@ -66,13 +66,14 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
     /**
      * 角色7今日运维模块
      * @author 正杰
+     * @param taskCategory 捕获渠道
      * @param date 请传入参数 yyyy-mm-dd
-     * @param pageNum
-     * @param pageSize
+     * @param pageNum 页码
+     * @param pageSize 每页条数
      * @date 2022/9/22
      * @return R<List<CrmEntityTask>> 当日任务情况
      */
-    R<Page<CrmEntityTask>> getTaskInfo(String date, Integer pageNum, Integer pageSize);
+    R<Page<CrmEntityTask>> getTaskInfo(String taskCategory,String date, Integer pageNum, Integer pageSize);
 
     /**
      * 创建任务

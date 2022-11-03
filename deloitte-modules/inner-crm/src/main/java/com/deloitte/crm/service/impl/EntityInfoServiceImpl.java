@@ -409,8 +409,11 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public List<EntityInfo> findByName(String entityName) {
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
         return baseMapper.findByName(entityName);
     }
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -1623,8 +1626,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         TargetEntityBondsVo result = new TargetEntityBondsVo();
         if (entityInfo.getEntityCode() != null) {
             //取任意一个 bd_code都相等
-            List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
-                    .lambda().eq(EntityBondRel::getEntityCode, entityInfo.getEntityCode()));
+            List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda().eq(EntityBondRel::getEntityCode, entityInfo.getEntityCode()));
             if (entityBondRels.size() != 0) {
                 EntityBondRel entityBondRel = entityBondRels.get(0);
                 //EntityAttrValue byAttrCode = entityAttrValueMapper.findTradCode(entityBondRel.getBdCode());
@@ -1669,8 +1671,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             case ENTITY:
                 List<TargetEntityBondsVo> res = new ArrayList<>();
                 //模糊匹配后的主体list
-                Page<EntityInfo> entityInfoPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<EntityInfo>()
-                        .lambda().like(EntityInfo::getEntityName, name));
+                Page<EntityInfo> entityInfoPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<EntityInfo>().lambda().like(EntityInfo::getEntityName, name));
                 List<EntityInfo> entityInfos = entityInfoPage.getRecords();
                 if (entityInfos.size() == 0) {
                     log.info("  =>>  未查询到相关信息  <<=  ");
@@ -1696,8 +1697,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityAttrValue> entityAttrs;
                 //模糊匹配全名 债券list
                 //模糊匹配短名 债券list
-                Page<BondInfo> bondInfoPage = bondInfoMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<BondInfo>()
-                        .lambda().like(BondInfo::getBondShortName, name));
+                Page<BondInfo> bondInfoPage = bondInfoMapper.selectPage(new Page<>(pageNum, pageSize), new QueryWrapper<BondInfo>().lambda().like(BondInfo::getBondShortName, name));
                 List<BondInfo> bondInfos = bondInfoPage.getRecords();
                 if (bondInfos.size() == 0) {
                     log.info("  =>>  未查询到相关信息  <<=  ");

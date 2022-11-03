@@ -55,6 +55,7 @@ public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTy
     /**
      * 缓存添加
      * 拼装redis缓存为type:code:实体类
+     *
      * @return Boolean
      */
     @Override
@@ -64,8 +65,7 @@ public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTy
 
         redisService.deleteObject(CacheName.CRM_TYPE_INFO);
 
-        Map<String, CrmTypeInfo> attrMap = list.stream()
-                .collect(Collectors.toMap(item -> item.getType() + "::" + item.getCode(), Function.identity()));
+        Map<String, CrmTypeInfo> attrMap = list.stream().collect(Collectors.toMap(item -> item.getType() + "::" + item.getCode(), Function.identity()));
 
         redisService.redisTemplate.opsForHash().putAll(CacheName.CRM_TYPE_INFO, attrMap);
 
@@ -112,7 +112,7 @@ public class CrmTypeInfoServiceImpl extends ServiceImpl<CrmTypeInfoMapper, CrmTy
             }
         }
 
-        if (CollUtil.isEmpty(returnArr)){
+        if (CollUtil.isEmpty(returnArr)) {
             return null;
         }
 

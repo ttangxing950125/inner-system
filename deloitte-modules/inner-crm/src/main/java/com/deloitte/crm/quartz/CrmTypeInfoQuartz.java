@@ -24,4 +24,5 @@ public class CrmTypeInfoQuartz {
     public void initCache() {
         crmTypeInfoService.cacheAll();
     }
+
 }

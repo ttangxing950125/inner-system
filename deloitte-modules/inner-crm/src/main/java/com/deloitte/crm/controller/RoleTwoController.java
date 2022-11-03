@@ -13,10 +13,7 @@ import com.deloitte.crm.service.IGovInfoService;
 import com.deloitte.crm.service.IGovLevelService;
 import com.deloitte.crm.service.IModelMasterService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,16 +45,24 @@ public class RoleTwoController {
      * 角色2今日运维模块
      * @author 正杰
      * @date 2022/9/27
-     * @param date 请传入参数 yyyy-MM
      * @return R<Page<CrmMasTaskVo>> 当日任务
+     * @param date 请传入参数 yyyy-MM-dd
+     * @param sourceName 来源
+     * @param pageNum 页码
+     * @param pageSize 页数
      */
     @ApiOperation(value="查询当日任务 by正杰")
     @ApiResponse(code=200,message = "操作成功",response = CrmMasTaskVo.class)
-    @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="date",value="请传入参数 yyyy-MM-dd",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="sourceName",value="来源",paramType = "query",dataType = "String"),
+            @ApiImplicitParam(name="pageNum",value="页码",paramType = "query",dataType = "Integer"),
+            @ApiImplicitParam(name="pageSize",value="页数",paramType = "query",dataType = "Integer")
+    })
     @PostMapping("/getTaskInfo")
     @Log(title = "【 查询当日任务 】", businessType = BusinessType.OTHER)
-    public R<Page<CrmMasTaskVo>> getTaskInfo(String date,Integer pageNum, Integer pageSize){
-        return iCrmMasTaskService.getTaskInfo(date,pageNum,pageSize);
+    public R<Page<CrmMasTaskVo>> getTaskInfo(String date,String sourceName, Integer pageNum, Integer pageSize){
+        return iCrmMasTaskService.getTaskInfo(date,sourceName,pageNum,pageSize);
     }
 
     /**

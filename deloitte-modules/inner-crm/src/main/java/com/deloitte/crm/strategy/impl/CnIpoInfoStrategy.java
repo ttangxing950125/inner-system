@@ -1,17 +1,16 @@
 package com.deloitte.crm.strategy.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.crm.constants.BondStatus;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.constants.StockCnStatus;
-import com.deloitte.crm.domain.CnIpoInfo;
-import com.deloitte.crm.domain.CrmWindTask;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.StockCnInfo;
+import com.deloitte.crm.domain.*;
 import com.deloitte.crm.service.*;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
@@ -54,6 +53,10 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
 
     @Resource
     private IEntityInfoService entityInfoService;
+
+
+    @Resource
+    private BondsListingLogService bondsListingLogService;
 
     /**
      * 处理文件中的每一行
@@ -142,6 +145,20 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
                 if (ipoNow) {
                     //新敞口划分任务
                     crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
+
+                    //上市记录
+                    String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
+                    //创建log
+                    BondsListingLog log = new BondsListingLog();
+                    log.setCode(item.getCode());
+                    log.setName(item.getStockName());
+                    log.setIpoDate(DateUtil.parseDate(item.getIpoDate()));
+                    log.setPublisher(names);
+                    log.setRecordTime(timeNow);
+                    log.setSourceType(3);
+
+
+                    bondsListingLogService.save(log);
                 }
             }
             entityInfoService.updateBatchById(entityInfos);

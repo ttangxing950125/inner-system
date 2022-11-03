@@ -19,4 +19,5 @@ public class InnerCrmApplication {
         SpringApplication.run(InnerCrmApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  德勤内部系统crm模块启动成功   ლ(´ڡ`ლ)ﾞ  ");
     }
+
 }
