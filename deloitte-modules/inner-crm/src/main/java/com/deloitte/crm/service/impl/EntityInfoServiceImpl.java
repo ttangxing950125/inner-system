@@ -10,11 +10,13 @@ import cn.hutool.poi.excel.cell.CellUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.GlobalException;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.redis.service.RedisService;
@@ -33,6 +35,7 @@ import com.deloitte.crm.utils.excel.ExcelUtils;
 import com.deloitte.crm.vo.*;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -147,55 +150,89 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Resource
     private EntityInfoLogsService entityInfoLogsService;
 
-    /** 主体 */
+    /**
+     * 主体
+     */
     public static final String ENTITY = "ENTITY";
 
-    /** 债券 */
+    /**
+     * 债券
+     */
     public static final String BOND = "BOND";
 
-    /** 未输入页码 */
+    /**
+     * 未输入页码
+     */
     private static final String NO_PAGENUM_ERROR = "未输入页码";
 
-    /** 默认页面size */
+    /**
+     * 默认页面size
+     */
     private static final Integer DEFAULT_PAGESIZE = 9;
 
-    /** 默认页码 */
+    /**
+     * 默认页码
+     */
     private static final Integer DEFAULT_PAGENUM = 1;
 
-    /** 曾用名重复 */
+    /**
+     * 曾用名重复
+     */
     private static final String REPET_OLD_NAME = "曾用名重复，请重新输入";
 
-    /** 记录新增来源  2-政府 */
+    /**
+     * 记录新增来源  2-政府
+     */
     private static final Integer ENTITY_INFO_TYPE = 2;
 
-    /** 记录新增来源  2-曾用名管理中操作 */
+    /**
+     * 记录新增来源  2-曾用名管理中操作
+     */
     private static final Integer OLD_NAME_FROM_MAN = 2;
 
-    /** 债券类型 ABS */
+    /**
+     * 债券类型 ABS
+     */
     public static final String BOND_TYPE_ABS = "ABS";
 
-    /** 债券类型 COLL */
+    /**
+     * 债券类型 COLL
+     */
     public static final String BOND_TYPE_COLL = "集合债";
 
-    /** 债券类型 public */
+    /**
+     * 债券类型 public
+     */
     public static final String BOND_TYPE_PUBLIC = "公募债";
 
-    /** 债券类型 private */
+    /**
+     * 债券类型 private
+     */
     public static final String BOND_TYPE_PRIVATE = "私募债";
 
-    /** 债券状态 存续 */
+    /**
+     * 债券状态 存续
+     */
     public static final String BOND_STATE_LIVE = "(存续)";
 
-    /** 债券状态 已退市 */
+    /**
+     * 债券状态 已退市
+     */
     public static final String BOND_STATE_BACK = "(已退市)";
 
-    /** 债券状态 违约 */
+    /**
+     * 债券状态 违约
+     */
     public static final String BOND_STATE_DEAD = "(违约)";
 
-    /** 存续状态 */
+    /**
+     * 存续状态
+     */
     public static final String LIVE_STATE = "Y";
 
-    /** 未存续 */
+    /**
+     * 未存续
+     */
     public static final String DEAD_STATE = "N";
 
     /**
@@ -336,7 +373,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public long updateEntityInfoByEntityCodeWithOutId(EntityInfo entityInfo) {
-        log.info("  >>>> 企业主体根据entityCode修改信息,id置为空,entityCode=[{}] <<<<  ",entityInfo.getEntityCode());
+        log.info("  >>>> 企业主体根据entityCode修改信息,id置为空,entityCode=[{}] <<<<  ", entityInfo.getEntityCode());
         //设置主键为空，防止修改主键
         entityInfo.setId(null);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
@@ -380,7 +417,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Transactional(rollbackFor = Exception.class)
     @Override
     public R addOldName(EntityInfo entity) {
-        log.info("  >>>> 新增企业主体的曾用名,entity=[{}] <<<<  ",entity);
+        log.info("  >>>> 新增企业主体的曾用名,entity=[{}] <<<<  ", entity);
         //获取原本的主体信息
         EntityInfo entityInfo = entityInfoMapper.selectById(entity.getId());
         //校验曾用名是否存在
@@ -435,7 +472,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R updateOldName(String dqCode, String oldName, String newOldName, String status, String remark) {
-        log.info("  >>>> 修改,停用企业主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ",dqCode,oldName,newOldName,status,remark);
+        log.info("  >>>> 修改,停用企业主体的曾用名,dqCode=[{}],oldName=[{}],newOldName=[{}],status=[{}],remarks=[{}] <<<<  ", dqCode, oldName, newOldName, status, remark);
         if (ObjectUtils.isEmpty(oldName)) {
             return R.fail("无效的原始曾用名");
         }
@@ -490,7 +527,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
                 //替换曾用名
                 if (ObjectUtils.isEmpty(remark)) {
-                    remark="系统自动生成";
+                    remark = "系统自动生成";
                 }
                 one.setRemarks(remark).setOldName(newOldName);
                 //更新原本的数据
@@ -531,7 +568,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R getInfoDetailByEntityCode(String entityCode) {
-        log.info("  >>>> 上市企业-修改信息-根据 entityCode 查询主体详细信息,entityCode=[{}] <<<<  ",entityCode);
+        log.info("  >>>> 上市企业-修改信息-根据 entityCode 查询主体详细信息,entityCode=[{}] <<<<  ", entityCode);
 
         EntityInfoDetails entityInfoDetails = new EntityInfoDetails();
 
@@ -878,7 +915,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
-        log.info("  >>>> 企业主体分类查询,type=[{}] <<<<  ",type);
+        log.info("  >>>> 企业主体分类查询,type=[{}] <<<<  ", type);
         return R.ok(getInfoListByType(type, param, pageNum, pageSize));
     }
 
@@ -911,14 +948,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         if (!ObjectUtils.isEmpty(param)) {
             String finalParam = param;
-            infoQuery.and(query->query.lambda().like(EntityInfo::getEntityCode, finalParam).or().like(EntityInfo::getEntityName, finalParam));
+            infoQuery.and(query -> query.lambda().like(EntityInfo::getEntityCode, finalParam).or().like(EntityInfo::getEntityName, finalParam));
             if (type == 1) {
                 infoQuery.lambda().eq(EntityInfo::getEntityStockTag, 1);
             } else if (type == 2) {
                 infoQuery.lambda().eq(EntityInfo::getEntityBondTag, 1);
             } else if (type == 3) {
-                infoQuery.and(query->query.lambda().eq(EntityInfo::getEntityStockTag, 0).or().isNull(EntityInfo::getEntityStockTag));
-                infoQuery.and(query->query.lambda().eq(EntityInfo::getEntityBondTag, 0).or().isNull(EntityInfo::getEntityBondTag));
+                infoQuery.and(query -> query.lambda().eq(EntityInfo::getEntityStockTag, 0).or().isNull(EntityInfo::getEntityStockTag));
+                infoQuery.and(query -> query.lambda().eq(EntityInfo::getEntityBondTag, 0).or().isNull(EntityInfo::getEntityBondTag));
             } else if (type == 4) {
                 infoQuery.lambda().eq(EntityInfo::getFinance, 1);
             }
@@ -972,7 +1009,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer updateInfoList(List<EntityInfo> list) {
-        log.info("  >>>> 企业主体批量修改，list=[{}] <<<<  ",list);
+        log.info("  >>>> 企业主体批量修改，list=[{}] <<<<  ", list);
         list.stream().forEach(o -> {
             EntityInfo entityInfo = entityInfoMapper.selectById(o.getId());
             entityInfoMapper.updateById(o);
@@ -997,7 +1034,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public List<EntityInfo> checkEntity(EntityInfo entityInfo) {
-        log.info("  >>>> 查询企业名称，或者编码，是否重复,entityInfo=[{}] <<<<  ",entityInfo);
+        log.info("  >>>> 查询企业名称，或者编码，是否重复,entityInfo=[{}] <<<<  ", entityInfo);
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper(entityInfo);
         return entityInfoMapper.selectList(queryWrapper);
     }
@@ -1693,27 +1730,48 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      *
      * @param id
      * @param keyword
+     * @param pageNum
+     * @param pageSize
      * @return
      * @author 正杰
      * @date 2022/9/25
      */
     @Override
-    public R<List<TargetEntityBondsVo>> findRelationEntityOrBond(Integer id, String keyword) {
+    public R findRelationEntityOrBond(Integer id, String keyword, Integer pageNum, Integer pageSize) {
         List<TargetEntityBondsVo> result = new ArrayList<>();
         switch (keyword) {
             case ENTITY:
-                log.info("  =>> 开始查询 id 为 " + id + " 的 " + BOND + " 信息 <<=  ");
-                EntityInfo entity = entityInfoMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getId, id));
-                List<EntityBondRel> entityBondRels = entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>()
-                        .lambda().eq(EntityBondRel::getEntityCode, entity.getEntityCode()));
-                entityBondRels.forEach(row -> {
-                    BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda()
-                            .eq(BondInfo::getBondCode, row.getBdCode()));
-                    result.add(this.matchingBondInfo(bondInfo));
-                    log.info("  =>>  查询到信息并返回 " + result.size() + " 条 <<=  ");
-                    log.info("  >>>>  债券信息管理 - 结束  <<<<");
-                });
-                return R.ok(result);
+                pageNum = pageNum == null ? 1 : pageNum;
+                pageSize = pageSize == null ? 10 : pageSize;
+                Page<EntityBondRel> page = new Page<>(pageNum, pageSize);
+                /**
+                 * {@link com.deloitte.crm.mapper.EntityBondRelMapper#searchEntity} 该sql优化走索引 详情
+                 * <code>
+                 *     EXPAND
+                 *     SELECT
+                 *             b.id as id,
+                 *             b.bond_code as bondCode,
+                 *             b.ori_code as transactionCode,
+                 *             b.bond_name as fullName,
+                 *             b.bond_short_name as bondShortName,
+                 *             b.bond_state as debtRaisingType,
+                 *             b.raise_type as raiseType,
+                 *             b.bond_state as bondState
+                 *         FROM
+                 *             entity_bond_rel a
+                 *             LEFT JOIN bond_info b ON a.bd_code = b.bond_code
+                 *         WHERE
+                 *             a.entity_code =(
+                 *             SELECT
+                 *                 entity_code
+                 *             FROM
+                 *                 entity_info
+                 *         WHERE
+                 *             id = #{id} AND `status`=1)
+                 * </code>
+                 */
+                IPage<BondVo> entityBondRelIPage = this.entityBondRelMapper.searchEntity(page, id);
+                return R.ok(entityBondRelIPage);
             case BOND:
                 log.info("  =>> 开始查询 id 为 " + id + " 的 " + ENTITY + " 信息 <<=  ");
                 BondInfo bondInfo = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getId, id));
@@ -1921,10 +1979,10 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Page<EntityInfoValueResult> pageResult = new Page<>(pageNum, pageSize);
 
         queryWrapper.lambda()
-                    .like(EntityInfo::getEntityCode, param)
-                    .or().like(EntityInfo::getEntityName, param)
-                    .or().like(EntityInfo::getCreditCode, param)
-                    .orderByAsc(EntityInfo::getId);
+                .like(EntityInfo::getEntityCode, param)
+                .or().like(EntityInfo::getEntityName, param)
+                .or().like(EntityInfo::getCreditCode, param)
+                .orderByAsc(EntityInfo::getId);
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, queryWrapper);
 
         //新的分页结果赋值
@@ -2190,7 +2248,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R addEntityeMsg(EntitySupplyMsgBack entitySupplyMsgBack) {
-        log.info("  >>>>  财报收数根据entityCode补充录入信息--主表,entityCode=[{}] <<<<  ",entitySupplyMsgBack.getEntityCode());
+        log.info("  >>>>  财报收数根据entityCode补充录入信息--主表,entityCode=[{}] <<<<  ", entitySupplyMsgBack.getEntityCode());
         EntityInfo entityInfo = entitySupplyMsgBack.newEntityInfo();
         Integer id = entitySupplyMsgBack.getTaskId();
         CrmSupplyTask crmSupplyTask = crmSupplyTaskMapper.selectById(id);
@@ -2225,7 +2283,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         //修改金融机构信息
         EntityFinancial entityFinancial = entityInfoDetails.getEntityFinancial();
 
-        log.info("  >>>> 上市企业-修改信息,基础属性 entityInfo=[{}],A股信息 stockCnInfo=[{}],港股信息 stockThkInfo=[{}],金融机构信息 entityFinancial=[{}] <<<<  ", entityInfo,stockCnInfo,stockThkInfo,entityFinancial);
+        log.info("  >>>> 上市企业-修改信息,基础属性 entityInfo=[{}],A股信息 stockCnInfo=[{}],港股信息 stockThkInfo=[{}],金融机构信息 entityFinancial=[{}] <<<<  ", entityInfo, stockCnInfo, stockThkInfo, entityFinancial);
 
         if (!ObjectUtils.isEmpty(entityFinancial)) {
             financialMapper.updateById(entityFinancial.setUpdated(new Date()));
@@ -2304,8 +2362,8 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     private EntityListView getUnBondsListViews() {
         EntityListView entityListView = new EntityListView();
         QueryWrapper<EntityInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.and(query->query.lambda().ne(EntityInfo::getEntityStockTag, 1).or().isNull(EntityInfo::getEntityStockTag));
-        queryWrapper.and(query->query.lambda().ne(EntityInfo::getEntityBondTag, 1).or().isNull(EntityInfo::getEntityBondTag));
+        queryWrapper.and(query -> query.lambda().ne(EntityInfo::getEntityStockTag, 1).or().isNull(EntityInfo::getEntityStockTag));
+        queryWrapper.and(query -> query.lambda().ne(EntityInfo::getEntityBondTag, 1).or().isNull(EntityInfo::getEntityBondTag));
         Long listTotle = entityInfoMapper.selectCount(queryWrapper);
         entityListView.setTotle(listTotle);
         return entityListView;
@@ -2399,7 +2457,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     exportEntityCheckDto.setCreditCodeByEntityName(entityInfo.getEntityName());
                     exportEntityCheckDto.setCreditCodeByEntityCode(entityInfo.getEntityCode());
                     exportEntityCheckDto.setCreditCodeByCreditCode(entityInfo.getCreditCode());
-                    exportEntityCheckDto.setIsStatus(entityInfo.getStatus()==1 ? "是" : "否");
+                    exportEntityCheckDto.setIsStatus(entityInfo.getStatus() == 1 ? "是" : "否");
                 } else {
                     exportEntityCheckDto.setCreditCodeByRecord("识别成功,未覆盖主体");
                 }
@@ -2417,7 +2475,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 exportEntityCheckDto.setEntityNameByEntityName(entityInfos.get(0).getEntityName());
                 exportEntityCheckDto.setEntityNameByEntityCode(entityInfos.get(0).getEntityCode());
                 exportEntityCheckDto.setEntityNameByCreditCode(entityInfos.get(0).getCreditCode());
-                exportEntityCheckDto.setIsStatus(entityInfos.get(0).getStatus()==1 ? "是" : "否");
+                exportEntityCheckDto.setIsStatus(entityInfos.get(0).getStatus() == 1 ? "是" : "否");
             } else {
                 exportEntityCheckDto.setEntityNameByRecord("识别成功,未覆盖主体");
             }
@@ -2517,7 +2575,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 for (Integer proId : proIds) {
                     Products products = productsMapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                     ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
+                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov, 0));
                     if (productsCover != null) {
                         more.put(products.getProName(), productsCover.getCoverDes());
                     } else {
@@ -2546,7 +2604,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 for (Integer proId : proIds) {
                     Products products = productsMapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                     ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
+                            .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov, 0));
                     if (productsCover != null) {
                         more.put(products.getProName(), productsCover.getCoverDes());
                     } else {
@@ -2578,7 +2636,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     for (Integer proId : proIds) {
                         Products products = productsMapper.selectOne(new LambdaQueryWrapper<Products>().eq(Products::getId, proId));
                         ProductsCover productsCover = productsCoverMapper.selectOne(new LambdaQueryWrapper<ProductsCover>().eq(ProductsCover::getEntityCode, exportEntityCheckDto.getEntityCodeByResult())
-                                .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov,0));
+                                .eq(ProductsCover::getProId, proId).eq(ProductsCover::getIsGov, 0));
                         if (productsCover != null) {
                             more.put(products.getProName(), productsCover.getCoverDes());
                         } else {
@@ -2882,7 +2940,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     @Override
     public R<EntitySupplyMsgBack> getEntityBackSupply(Integer id) {
-        log.info("  >>>>  企业主体清单-查询概览角色3，4，5补充录入查询和回显,id=[{}] <<<<  ",id);
+        log.info("  >>>>  企业主体清单-查询概览角色3，4，5补充录入查询和回显,id=[{}] <<<<  ", id);
         if (ObjectUtils.isEmpty(id)) {
             return R.fail("请传入任务id");
         }
