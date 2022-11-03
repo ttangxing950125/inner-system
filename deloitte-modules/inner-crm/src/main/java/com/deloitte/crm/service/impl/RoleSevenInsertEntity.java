@@ -61,6 +61,7 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
 
         // 判断社会信用代码是否适用 => 适用为 空 并为其赋值 5 否则有数字
         Integer creditErrorType = entityInfoInsertDTO.getCreditErrorType();
+        entityInfo.setCreditErrorType(creditErrorType);
         if (creditErrorType == null) {
             creditErrorType = 5;
             entityInfo.setCreditError(1);
