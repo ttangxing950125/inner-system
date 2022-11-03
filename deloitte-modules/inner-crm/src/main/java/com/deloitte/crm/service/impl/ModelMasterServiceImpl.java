@@ -144,6 +144,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         EntityInfo entityInfo = Optional.ofNullable(iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, crmMasTask.getEntityCode()).eq(EntityInfo::getStatus, 1))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         String entityCode = entityInfo.getEntityCode();
         String entityName = entityInfo.getEntityName();
+        masDto.setRemarks(crmMasTask.getRemarks());
+        masDto.setDetails(crmMasTask.getDetails());
         //基础信息展示
         masDto.setEntityName(entityName).setCreditCode(entityInfo.getCreditCode()).setSource(crmMasTask.getSourceName()).setWind(entityInfo.getWindMaster()).setShenWan(entityInfo.getShenWanMaster());
         //当企业为金融机构的时候 去查entity_financial 中的数据
@@ -430,7 +432,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         entityMaster.setIbUrban(YES.equals(masDto.getCityIb()) ? "1" : "0");
         //新增 敞口的code
         entityMaster.setMasterCode(masDto.getMasterCode());
-        entityMaster.setRemarks(masDto.getRemarks());
+        entityMaster.setRemark(masDto.getRemarks());
         if (ObjectUtils.isEmpty(entityMaster.getId())) {
             entityMasterMapper.insert(entityMaster);
         } else {

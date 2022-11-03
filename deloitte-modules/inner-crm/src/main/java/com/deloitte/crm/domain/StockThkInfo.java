@@ -1,20 +1,19 @@
 package com.deloitte.crm.domain;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.crm.annotation.UpdateLog;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
+import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 股票信息表(StockThkInfo)表实体类
@@ -26,6 +25,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class StockThkInfo implements Serializable {
     private static final long serialVersionUID = 422225653182126009L;
 

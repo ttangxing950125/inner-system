@@ -133,4 +133,9 @@ public class MasDto {
      */
     @ApiModelProperty(value = "备注")
     private String remarks;
+
+    /** 详情 */
+    @ApiModelProperty("详情展示")
+    private String details;
+
 }

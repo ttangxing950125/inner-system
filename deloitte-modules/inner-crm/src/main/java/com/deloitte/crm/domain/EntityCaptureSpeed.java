@@ -3,16 +3,13 @@ package com.deloitte.crm.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.UpdateLog;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -24,7 +21,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
 @Accessors(chain = true)
 public class EntityCaptureSpeed implements Serializable {
 
@@ -72,6 +68,24 @@ public class EntityCaptureSpeed implements Serializable {
      */
     private Date captureTime;
     /**
+     * 新增时间
+     */
+    private Date addedTime;
+    /**
+     * 敞口划分时间
+     */
+    private Date divideTime;
+    /**
+     * 补充时间
+     */
+    private Date supplementTime;
+    /**
+     * 推送时间
+     */
+    private Date pushMetaTime;
+
+
+    /**
      * 最后更新的用户，用户名
      */
     private String updater;
@@ -84,4 +98,10 @@ public class EntityCaptureSpeed implements Serializable {
      */
     private Date updated;
 
+    /**
+     * 统一社会信用代码
+     */
+    @Excel(name = "统一社会信用代码")
+    @UpdateLog(fieldName = "统一社会信用代码", tableFieldName = "credit_code")
+    private String creditCode;
 }

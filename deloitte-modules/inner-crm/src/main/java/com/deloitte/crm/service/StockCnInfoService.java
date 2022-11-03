@@ -28,4 +28,12 @@ public interface StockCnInfoService extends IService<StockCnInfo> {
      * @return
      */
     StockCnInfo saveOrUpdateNew(StockCnInfo stockCnInfo);
+    /**
+     * 股票退市检测跑批
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/11/3 10:35
+     */
+    void checkStockStatus();
 }

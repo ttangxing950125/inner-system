@@ -1,11 +1,11 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
-
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.domain.BondNewIss;
 import com.deloitte.crm.domain.CrmWindTask;
 import com.deloitte.crm.domain.EntityBondRel;
+
+import java.util.List;
 
 /**
  * 【请填写功能名称】Service接口
@@ -72,4 +72,11 @@ public interface IEntityBondRelService
      * @return
      */
     boolean bindRelOrCreateTask(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
+    /**
+     * 查询所有被修改状态对应的主体
+     *
+     * @author 冉浩岑
+     * @date 2022/11/3 11:12
+    */
+    List<EntityBondRel> selectEntityBondRelListByBondCodes(List<String> bondCodes);
 }

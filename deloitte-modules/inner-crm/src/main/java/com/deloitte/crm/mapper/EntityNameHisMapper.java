@@ -1,6 +1,7 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.EntityNameHis;
 import org.apache.ibatis.annotations.Param;
 
@@ -63,7 +64,7 @@ public interface EntityNameHisMapper extends BaseMapper<EntityNameHis>
      */
     public int deleteEntityNameHisByIds(Long[] ids);
 
-    List<Map<String, Object>> getGovHisNameList(@Param("param") String param);
+    Page<Map<String, Object>> getGovHisNameList(Page<Map<String, Object>>page, @Param("param") String param);
 
-    List<Map<String, Object>> getEntityHisNameList(@Param("param")String param);
+    Page<Map<String, Object>> getEntityHisNameList(Page<Map<String, Object>>page, @Param("param") String param);
 }

@@ -1,6 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.crm.domain.*;
@@ -120,6 +121,11 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
 
         return true;
+    }
+
+    @Override
+    public List<EntityBondRel> selectEntityBondRelListByBondCodes(List<String> bondCodes) {
+        return entityBondRelMapper.selectList(new QueryWrapper<EntityBondRel>().lambda().in(EntityBondRel::getBdCode,bondCodes));
     }
 
     /**

@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
@@ -22,6 +23,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class BondInfo {
     private static final long serialVersionUID = 1L;
 
@@ -120,6 +122,12 @@ public class BondInfo {
      */
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date updated;
+
+    /**
+     * 摘牌日期，退市日期
+     */
+    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+    private Date delistdate;
 
     @Override
     public String toString() {

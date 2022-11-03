@@ -1,12 +1,12 @@
 package com.deloitte.crm.mapper;
 
-import java.util.Date;
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.dto.EntityAttrDetailDto;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 【请填写功能名称】Mapper接口
@@ -90,4 +90,6 @@ public interface BondInfoMapper extends BaseMapper<BondInfo>
     void editByBondInfoManager(@Param("id") Integer id, @Param("filedName") String filedName, @Param("value") String value);
 
     void editByBondInfoManagerDate(@Param("id") Integer id, @Param("filedName") String filedName, @Param("date") Date date);
+
+    Integer selectListByEntityCode(@Param("entityCode")String entityCode);
 }

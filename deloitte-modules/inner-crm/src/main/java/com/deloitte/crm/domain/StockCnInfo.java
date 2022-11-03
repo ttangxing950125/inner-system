@@ -1,19 +1,18 @@
 package com.deloitte.crm.domain;
 
-import java.util.Date;
-import java.io.Serializable;
-
-import com.deloitte.crm.annotation.UpdateLog;
-import io.swagger.annotations.ApiModelProperty;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
+import com.deloitte.crm.annotation.UpdateLog;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
+import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * a股信息表，大陆股票(StockCnInfo)表实体类
@@ -25,6 +24,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class StockCnInfo implements Serializable {
     private static final long serialVersionUID = -67604867285400904L;
     @TableId(type = IdType.AUTO)

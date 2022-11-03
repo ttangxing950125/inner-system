@@ -1,8 +1,5 @@
 package com.deloitte.crm.service;
 
-import java.util.List;
-
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.BondInfo;
 import com.deloitte.crm.dto.BondInfoManualDto;
@@ -120,4 +117,12 @@ public interface IBondInfoService
      * @return 操作成功与否信息
      */
     R insertBondInfoManual(BondInfoManualDto bondInfoManualDto);
+    /**
+     * 债券退市检测跑批
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/11/3 10:35
+     */
+    void checkBondStatus();
 }

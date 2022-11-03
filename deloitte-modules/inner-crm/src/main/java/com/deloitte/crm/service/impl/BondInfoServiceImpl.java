@@ -552,5 +552,57 @@ public class BondInfoServiceImpl implements IBondInfoService {
                 break;
         }
     }
-
+    /**
+     * 债券退市检测跑批
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/11/3 10:35
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void checkBondStatus() {
+        //修改所有退市日期小于当前日期的正在上市的债券状态
+        Date now = new Date();
+        List<BondInfo> bondInfos = bondInfoMapper.selectList(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondStatus, 4).le(BondInfo::getDelistdate, now));
+        Integer count = bondInfos.size();
+        //修改条数为0则不执行后续操作
+        if (count<1){
+            log.info(" ===> 当日正常兑付债券数量为 "+count+" 个");
+            return;
+        }
+        //需要修改的所有债券的code
+        List<String>bondCodes=new ArrayList<>();
+        bondInfos.forEach(o->{
+            BondInfo bondInfo=new BondInfo();
+            bondInfo.setBondStatus(9).setBondState(2).setId(o.getId());
+            bondCodes.add(o.getBondCode());
+            bondInfoMapper.updateById(bondInfo);
+        });
+        log.info(" ===> 当日正常兑付债券数量为 count=[{}]个,债券代码 codes=[{}]",count,bondCodes);
+        //查询所有被修改状态对应的主体
+        List<EntityBondRel>bondRels=iEntityBondRelService.selectEntityBondRelListByBondCodes(bondCodes);
+        //所有被修改的所有债券对应的主体Code
+        List<String>entityCodes=new ArrayList<>();
+        bondRels.forEach(o->{
+            if (!entityCodes.contains(o.getEntityCode())){
+                entityCodes.add(o.getEntityCode());
+            }
+        });
+        //根据主体code查询并修改债券发行状态
+        //当前退市主体code
+        List<String>downEntityCodes=new ArrayList<>();
+        entityCodes.forEach(o->{
+            //查询主体上市中的债券信息
+            Integer bondUpCount=bondInfoMapper.selectListByEntityCode(o);
+            //没有债券还在上市的主体，则修改主体状态
+            if (bondUpCount<1){
+                downEntityCodes.add(o);
+                EntityInfo entityInfo = new EntityInfo();
+                entityInfo.setEntityCode(o).setIssueBonds(0);
+                entityInfoMapper.update(entityInfo,new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode,o));
+            }
+        });
+        log.info(" ===> 当日债券主体退市数量 count=[{}]个,主体代码 codes=[{}]",downEntityCodes.size(),downEntityCodes);
+    }
 }

@@ -76,7 +76,8 @@ public class EntityMaster implements Serializable {
     private String ibUrban;
 
     /** 备注 */
-    private String remarks;
+    @TableField("`remark`")
+    private String remark;
 
 
     @Override

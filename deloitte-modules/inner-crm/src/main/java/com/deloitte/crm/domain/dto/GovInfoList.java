@@ -8,6 +8,7 @@ import com.deloitte.crm.domain.GovInfo;
 import com.deloitte.crm.utils.TimeFormatUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
 
@@ -183,7 +184,11 @@ public class GovInfoList {
                 type="修改";
             }
             String formartDate = TimeFormatUtil.getFormartDate(updated);
-            this.updateRecord=formartDate+" "+govInfoList.getUpdater()+" "+type;
+            String updater = govInfoList.getUpdater();
+            if (ObjectUtils.isEmpty(updater)){
+                updater="-";
+            }
+            this.updateRecord=formartDate+" "+updater+" "+type;
         }catch (Exception e){
             e.printStackTrace();
         }

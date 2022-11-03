@@ -5,13 +5,12 @@ import com.alibaba.nacos.shaded.com.google.common.base.Objects;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.domain.EntityAttrValue;
-import com.deloitte.crm.domain.ProductsCover;
-import com.deloitte.crm.dto.EntityCoverDto;
-import com.deloitte.crm.mapper.ProductsCoverMapper;
-import com.deloitte.crm.quartz.service.CoverRuleProService;
 import com.deloitte.crm.quartz.service.QuarzRoleTaskService;
 import com.deloitte.crm.service.EntityAttrValueRunBatchTask;
+import com.deloitte.crm.service.IBondInfoService;
 import com.deloitte.crm.service.ProductsCoverService;
+import com.deloitte.crm.service.StockCnInfoService;
+import com.deloitte.crm.utils.TimeFormatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +22,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -48,7 +46,11 @@ public class QuartzTask implements ApplicationContextAware {
     @Resource
     private ProductsCoverService productsCoverService;
 
+    @Resource
+    private IBondInfoService bondInfoService;
 
+    @Resource
+    private StockCnInfoService stockCnInfoService;
     /**
      * 1.每天创建全部角色的任务，默认状态 无任务（1）
      * 2.创建角色1的详细任务 crm_wind_task
@@ -113,11 +115,39 @@ public class QuartzTask implements ApplicationContextAware {
      * @author penTang
      * @date 2022/10/28 11:08
     */
-    @Scheduled(cron = "0 00 1 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void  CoverRulePro(){
         log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
         productsCoverService.CoverRule();
         log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批结束");
+    }
+    /**
+     * 债券退市检测跑批
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/11/3 10:35
+    */
+    @Scheduled(cron = "10 0 0 * * ?")
+    public void checkBondStatus(){
+        String today = TimeFormatUtil.getFormartDate(new Date());
+        log.info("=>> "+ today +"债券退市检测跑批开始");
+        bondInfoService.checkBondStatus();
+        log.info("=>> "+ today+"债券退市检测跑批结束");
+    }
+    /**
+     * 股票退市检测跑批
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/11/3 10:35
+     */
+    @Scheduled(cron = "30 0 0 * * ?")
+    public void checkStockStatus(){
+        String today = TimeFormatUtil.getFormartDate(new Date());
+        log.info("=>> "+ today+" 股票退市检测跑批开始");
+        stockCnInfoService.checkStockStatus();
+        log.info("=>> "+ today+" 股票退市检测跑批结束");
     }
 
     //转换方法

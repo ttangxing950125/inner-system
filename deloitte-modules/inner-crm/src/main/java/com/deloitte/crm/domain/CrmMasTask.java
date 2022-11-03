@@ -1,6 +1,7 @@
 package com.deloitte.crm.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.Getter;
@@ -52,9 +53,11 @@ public class CrmMasTask implements Serializable
     private String handleUser;
 
     /** 备注 */
+    @TableField("`remarks`")
     private String remarks;
 
     /** 详情 */
+    @TableField("`details`")
     private String details;
 
     /** $column.columnComment */

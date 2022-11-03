@@ -3,6 +3,7 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -41,7 +42,8 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
     @Resource
     private ObjectMapper objectMapper;
-
+    @Resource
+    private EntityStockThkRelMapper stockThkRelMapper;
     /**
      * 绑定港股和主体的关联关系
      *
@@ -105,14 +107,14 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
                 //查询关联关系
                 EntityBaseBusiInfo entityBaseBusiInfo = finEntityBaseBusiInfoByEntityCode(entityCode);
                 if (entityBaseBusiInfo != null) {
-                    entityBaseBusiInfo.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(DateUtil.formatDateByString(secIssInfo.getCreateDate())));
+                    entityBaseBusiInfo.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(formatDateByString(secIssInfo.getCreateDate())));
                     entityBaseBusiInfo.setRegAddr(secIssInfo.getRegisterAddress());
                     entityBaseBusiInfo.setEntityStaffCount(Optional.ofNullable(secIssInfo.getEntityEmpCount() + "").orElse(null));
                     entityBaseBusiInfo.setBusRange(Optional.ofNullable(secIssInfo.getEntityScope()).orElse(null));
                     ApplicationContextHolder.get().getBean(EntityBaseBusiInfoMapper.class).updateById(entityBaseBusiInfo);
                 } else {
                     EntityBaseBusiInfo info1 = new EntityBaseBusiInfo();
-                    info1.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(DateUtil.formatDateByString(secIssInfo.getCreateDate())));
+                    info1.setEstablishDate(StringUtils.isEmpty(secIssInfo.getCreateDate()) ? null : DateUtil.parseDate(formatDateByString(secIssInfo.getCreateDate())));
                     info1.setRegAddr(secIssInfo.getRegisterAddress());
                     info1.setEntityStaffCount(Optional.ofNullable(secIssInfo.getEntityEmpCount() + "").orElse(null));
                     info1.setBusRange(Optional.ofNullable(secIssInfo.getEntityScope()).orElse(null));
@@ -175,5 +177,20 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
 
         //查询主体
         return entityInfoService.findListByEntityCodes(entityCodes);
+    }
+
+    @Override
+    public List<EntityStockThkRel> selectEntityStockThkRelListByBondCodes(List<String> stockThkCodes) {
+        return stockThkRelMapper.selectList(new QueryWrapper<EntityStockThkRel>().lambda().in(EntityStockThkRel::getStockDqCode,stockThkCodes));
+    }
+
+    private String formatDateByString(String value) {
+        if (value.length() == 8) {
+            return value.substring(0, 4) + "-" + value.substring(4, 6) + "-" + value.substring(6, 8);
+        } else if (value.length() == 6) {
+            return value.substring(0, 4) + "-" + value.substring(4, 6);
+        } else {
+            return value;
+        }
     }
 }

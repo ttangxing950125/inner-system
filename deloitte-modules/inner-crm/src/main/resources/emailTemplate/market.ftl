@@ -22,7 +22,6 @@ padding:15px 15px 20px;">
 		<p style="list-style: '160%'; margin:10px 0;font-weight: 600;">&nbsp;&nbsp;邮件正文：</p>
 		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{1}</p>
 
-
 	</div>
 	<div class="time"style="text-align:right;color:#999;padding:0 15px 15px;">{2}</div><br>
 </div>

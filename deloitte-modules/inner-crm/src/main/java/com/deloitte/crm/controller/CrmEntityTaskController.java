@@ -3,6 +3,7 @@ package com.deloitte.crm.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
+import com.deloitte.common.core.domain.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -102,5 +103,20 @@ public class CrmEntityTaskController extends BaseController
     {
         return toAjax(crmEntityTaskService.deleteCrmEntityTaskByIds(ids));
     }
+
+    /**
+     *发送邮件（统计新发债和股票情况）
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/11/2 16:50
+    */
+    @PostMapping("/sendEmail")
+    public R sendByEmail(){
+
+        String s = crmEntityTaskService.sendEmail();
+        return R.ok(s);
+    }
+
 
 }
