@@ -17,12 +17,12 @@ import java.util.List;
 public interface ICrmDailyTaskService extends IService<CrmDailyTask> {
 
     /**
-     * 检验是否完成每日 supply 任务，更新 dailyTask
+     * 检验是否更新每日任务表以及是否发送邮件
      *
      * @param crmSupplyTask
      * @return void
      * @author 冉浩岑
-     * @date 2022/10/25 21:32
+     * @date 2022/11/3 16:58
      */
     void checkDailyTask(CrmSupplyTask crmSupplyTask);
 

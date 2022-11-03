@@ -129,7 +129,6 @@ public class EntityGovRelServiceImpl implements IEntityGovRelService {
         if (!ObjectUtils.isEmpty(crmSupplyTask)&&!ObjectUtils.isEmpty(crmSupplyTask.getId())&&crmSupplyTask.getId()==1){
             return R.fail("已完成的任务，不能重复提交");
         }*/
-        crmSupplyTaskService.completeTaskById(taskId);
         EntityGovRel entityGovRel = entitySupplyMsgBack.newEntityGovRel();
         QueryWrapper<EntityGovRel> govQuery = new QueryWrapper<>();
         long count = entityGovRelMapper.selectCount(govQuery.lambda().eq(EntityGovRel::getEntityCode, entityGovRel.getEntityCode()));

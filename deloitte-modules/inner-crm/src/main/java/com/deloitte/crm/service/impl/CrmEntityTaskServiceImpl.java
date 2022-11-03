@@ -183,7 +183,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         if (ObjectUtils.isEmpty(entityCaptureSpeed)) {
             log.info("  =>> 角色7任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据 <<=  ", taskId, crmEntityTask.getSpeedId());
         } else {
-            entityCaptureSpeed.setAdded(state);
+            entityCaptureSpeed.setAdded(state).setEntityCode(entityCode);
             entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
         }
 
