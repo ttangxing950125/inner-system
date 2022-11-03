@@ -152,4 +152,24 @@ public class DateUtil extends cn.hutool.core.date.DateUtil {
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }
+    public static String formatDateByString(String value){
+        if(value.length() == 8){
+            return value.substring(0, 4) + "-" + value.substring(4, 6) + "-" + value.substring(6, 8);
+        } else if(value.length() == 6){
+            return value.substring(0, 4) + "-" + value.substring(4, 6);
+        } else {
+            return value;
+        }
+    }
+
+    public static void main(String[] args) {
+
+        String str="20121010";
+        final String replace = DateUtil.formatDateByString(str);
+        final DateTime yyyMMdd = cn.hutool.core.date.DateUtil.parse(replace);
+
+
+
+        System.out.println(yyyMMdd);
+    }
 }

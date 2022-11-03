@@ -127,11 +127,11 @@ public class EntityNameHisController extends BaseController
     @ApiOperation(value = "查询政府曾用名列表")
     @ApiImplicitParam(name="param", value="模糊查询得条件，匹配政府主体名称，政府主体代码，政府主体行政编码", paramType = "query", example = "Gv", dataType = "String")
     @PostMapping("/getGovHisNameList")
-    public R getGovHisNameList(String param){
+    public R getGovHisNameList(String param, Integer pageNum, Integer pageSize){
         if (ObjectUtils.isEmpty(param)){
             return R.fail("参数不能为空");
         }
-        return R.ok(entityNameHisService.getGovHisNameList(param));
+        return R.ok(entityNameHisService.getGovHisNameList(param,pageNum,pageSize));
     }
     /**
      * 查询企业主体曾用名列表
@@ -149,10 +149,10 @@ public class EntityNameHisController extends BaseController
             example = "te",
             dataType = "String")
     @PostMapping("/getEntityHisNameList")
-    public R getEntityHisNameList(String param){
+    public R getEntityHisNameList(String param, Integer pageNum, Integer pageSize){
         if (ObjectUtils.isEmpty(param)){
             return R.fail("参数不能为空");
         }
-        return R.ok(entityNameHisService.getEntityHisNameList(param));
+        return R.ok(entityNameHisService.getEntityHisNameList(param,pageNum,pageSize));
     }
 }

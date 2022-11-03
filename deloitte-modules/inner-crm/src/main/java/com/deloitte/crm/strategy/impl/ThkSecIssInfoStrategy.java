@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 /**
  * @author 吴鹏鹏ppp
  * @date 2022/9/25
+ * <b>证券发行-股票发行-聆讯信息一览</b>
  */
 @Component
 public class ThkSecIssInfoStrategy implements WindTaskStrategy {

@@ -1,5 +1,6 @@
 package com.deloitte.crm.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityNameHis;
 
@@ -72,9 +73,9 @@ public interface IEntityNameHisService
      */
     List<EntityNameHis> getNameListByDqCoded(String dqCode);
 
-    List<Map<String,Object>> getGovHisNameList(String param);
+    Page<Map<String, Object>> getGovHisNameList(String param, Integer pageNum, Integer pageSize);
 
-    List<Map<String,Object>> getEntityHisNameList(String param);
+    Page<Map<String, Object>> getEntityHisNameList(String param, Integer pageNum, Integer pageSize);
 
     /**
      * 新增库中主体的曾用名 by正杰

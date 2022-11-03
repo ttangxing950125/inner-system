@@ -75,6 +75,10 @@ public class EntityMaster implements Serializable {
     @Attrs(attrId = 642,attrName = "是否为城投机构（IB）")
     private String ibUrban;
 
+    /** 备注 */
+    @TableField("`remark`")
+    private String remark;
+
 
     @Override
     public String toString() {

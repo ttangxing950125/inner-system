@@ -52,8 +52,8 @@ public class StockCnUndoStInfo implements Serializable {
     /**
      * 序号
      */
-    @Excel(name = "序号")
-    private Integer number;
+//    @Excel(name = "序号")
+//    private Integer number;
     /**
      * 代码
      */

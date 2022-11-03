@@ -43,7 +43,8 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
     @Transactional(rollbackFor = Exception.class)
     public R finishTask(EntityInfoInsertDTO entityInfoInsertDTO) {
         String creditCode = entityInfoInsertDTO.getCreditCode();
-        String entityName = entityInfoInsertDTO.getEntityName().replace(" ", "");
+        String entityName = entityInfoInsertDTO.getEntityName().trim();
+        entityInfoInsertDTO.setEntityName(entityName);
         Integer taskId = entityInfoInsertDTO.getTaskId();
         String username = StrUtil.isBlank(SecurityUtils.getUsername()) ? "角色7测试" : SecurityUtils.getUsername();
         CrmEntityTask crmEntityTask = Optional.ofNullable(iCrmEntityTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, entityInfoInsertDTO.getTaskId()))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
@@ -103,7 +104,7 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
         entityInfoManager.bindData(entityInfoInsertDTO,entityCode,SecurityUtils.getUsername());
 
         //完成任务
-        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),2,entityCode);
+        return iCrmEntityTaskService.finishTask(entityInfoInsertDTO.getTaskId(),2,entityCode,entityInfoInsertDTO.getRemarks());
     }
 
     /**

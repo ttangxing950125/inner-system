@@ -51,4 +51,8 @@ public class EntityInfoInsertDTO {
     @ApiModelProperty(name ="entityCode",value = "如果不是新增 那么entityCode 应该有值")
     private String entityCode;
 
+    /** 备注 */
+    @ApiModelProperty("备注信息")
+    private String remarks;
+
 }

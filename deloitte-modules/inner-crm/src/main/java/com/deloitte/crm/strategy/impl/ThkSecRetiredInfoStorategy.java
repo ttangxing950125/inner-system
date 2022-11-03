@@ -2,8 +2,11 @@ package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
@@ -25,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -66,66 +70,63 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
         try {
             //设置属性
             thkSecRetiredInfos.setTaskId(windTask.getId());
-            //查询证券代码是否存在
             String secIssInfoCode = thkSecRetiredInfos.getCode();
-
-            StockThkInfo stockThkInfo = stockThkInfoService.findByCode(secIssInfoCode);
-            if (stockThkInfo == null) {
-                stockThkInfo = new StockThkInfo();
-            }
-
-            stockThkInfo.setDelistingDate(Optional.ofNullable(thkSecRetiredInfos.getDelistingDate()).map(e -> DateUtil.format(e, YYYY_MM_DD)).orElse(null));
-            stockThkInfo.setStockCode(secIssInfoCode);
-            stockThkInfo.setStockName(thkSecRetiredInfos.getName());
-            stockThkInfo.setCompanyEnglish(thkSecRetiredInfos.getCompanyEnglish());
-            stockThkInfo.setStatutoryCapital(thkSecRetiredInfos.getStatutoryCapital());
-            stockThkInfo.setSsuingEquity(thkSecRetiredInfos.getSsuingEquity());
-            stockThkInfo.setCurrency(thkSecRetiredInfos.getCurrency());
-            stockThkInfo.setChairmanGroup(thkSecRetiredInfos.getChairmanGroup());
-            stockThkInfo.setCompanySecretary(thkSecRetiredInfos.getCompanySecretary());
-            stockThkInfo.setCompanyWebSite(thkSecRetiredInfos.getCompanyWebSite());
-            stockThkInfo.setEmailAddress(thkSecRetiredInfos.getEmailAddress());
-            stockThkInfo.setPhone(thkSecRetiredInfos.getPhone());
-            stockThkInfo.setFax(thkSecRetiredInfos.getFax());
-            stockThkInfo.setJunction(thkSecRetiredInfos.getJunction());
-            stockThkInfo.setHsLndustry(thkSecRetiredInfos.getHsLndustry());
-            stockThkInfo.setTerminationType(thkSecRetiredInfos.getTerminationType());
-
-            /***
-             *部分代码逻辑沿用BondDelIssStrategy
+            CompletableFuture<StockThkInfo> findStockThkInfoTask = CompletableFuture.supplyAsync(() -> {
+                StockThkInfo stockThkInfo = stockThkInfoService.findByCode(secIssInfoCode);
+                if (stockThkInfo == null) {
+                    stockThkInfo = new StockThkInfo();
+                }
+                stockThkInfo.setDelistingDate(Optional.ofNullable(thkSecRetiredInfos.getDelistingDate()).map(e -> DateUtil.format(e, YYYY_MM_DD)).orElse(null));
+                stockThkInfo.setStockCode(secIssInfoCode);
+                stockThkInfo.setStockName(thkSecRetiredInfos.getName());
+                stockThkInfo.setCompanyEnglish(thkSecRetiredInfos.getCompanyEnglish());
+                stockThkInfo.setStatutoryCapital(thkSecRetiredInfos.getStatutoryCapital());
+                stockThkInfo.setSsuingEquity(thkSecRetiredInfos.getSsuingEquity());
+                stockThkInfo.setCurrency(thkSecRetiredInfos.getCurrency());
+                stockThkInfo.setChairmanGroup(thkSecRetiredInfos.getChairmanGroup());
+                stockThkInfo.setCompanySecretary(thkSecRetiredInfos.getCompanySecretary());
+                stockThkInfo.setCompanyWebSite(thkSecRetiredInfos.getCompanyWebSite());
+                stockThkInfo.setEmailAddress(thkSecRetiredInfos.getEmailAddress());
+                stockThkInfo.setPhone(thkSecRetiredInfos.getPhone());
+                stockThkInfo.setFax(thkSecRetiredInfos.getFax());
+                stockThkInfo.setJunction(thkSecRetiredInfos.getJunction());
+                stockThkInfo.setHsLndustry(thkSecRetiredInfos.getHsLndustry());
+                stockThkInfo.setTerminationType(thkSecRetiredInfos.getTerminationType());
+                return stockThkInfo;
+            });
+            /**
+             * 部分代码逻辑沿用BondDelIssStrategy
              * {@link com.deloitte.crm.strategy.impl.BondDelIssStrategy#doBondImport(BondDelIss, Date, CrmWindTask)}
              */
-            //推迟或取消发行债券 均为二级发行
-            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, thkSecRetiredInfos.getBelWind()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
-            if (crmTypeInfo != null) {
-                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
-                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
-                    if (CollectionUtil.isEmpty(hashSetResult)) {
-                        thkSecRetiredInfos.setBelWind(crmTypeInfo.getName());
-                        stockThkInfo.setBelWind(crmTypeInfo.getName());
-                    } else {
-                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
-                        thkSecRetiredInfos.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
-                        stockThkInfo.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
-                    }
-                } else {
-                    thkSecRetiredInfos.setBelWind(crmTypeInfo.getName());
-                    stockThkInfo.setBelWind(crmTypeInfo.getName());
+            CompletableFuture<String> findCrmTypeInfoByBelWindTask = CompletableFuture.supplyAsync(() -> {
+                String wind = thkSecRetiredInfos.getBelWind();
+                CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, thkSecRetiredInfos.getBelWind()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+                if (crmTypeInfo == null || StringUtils.isEmpty(crmTypeInfo.getParentCode())) {
+                    return wind;
                 }
-            }
-//            thkSecRetiredInfos.setNumber(null);
+                Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                if (CollectionUtil.isEmpty(hashSetResult)) {
+                    return wind = crmTypeInfo.getName();
+                }
+                wind = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                return wind;
+            });
+            final StockThkInfo stockThkInfo = findStockThkInfoTask.thenCombine(findCrmTypeInfoByBelWindTask, (e1, e2) -> {
+                e1.setBelWind(e2);
+                return e1;
+            }).exceptionally((ex) -> {
+                log.info("证券发行-港股-已退市证券一览 出现异常:[{}]", ex);
+                throw new ServiceException("证券发行-港股-已退市证券一览出现为止异常");
+            }).join();
+            thkSecRetiredInfos.setBelWind(findCrmTypeInfoByBelWindTask.get());
             //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
             Integer changeType = null;
             //查询这条数据有没有
-            ThkSecRetiredInfo thkSecRetiredInfoLast = thkSecRetiredInfoService.getBaseMapper().selectOne(
-                    new LambdaQueryWrapper<ThkSecRetiredInfo>().eq(ThkSecRetiredInfo::getCode, thkSecRetiredInfos.getCode())
-                            .orderBy(true, false, ThkSecRetiredInfo::getId)
-                            .last("LIMIT 1"));
+            ThkSecRetiredInfo thkSecRetiredInfoLast = thkSecRetiredInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<ThkSecRetiredInfo>().eq(ThkSecRetiredInfo::getCode, thkSecRetiredInfos.getCode()).orderBy(true, false, ThkSecRetiredInfo::getId).last("LIMIT 1"));
             if (thkSecRetiredInfoLast == null) {
                 changeType = DataChangeType.INSERT.getId();
                 stockThkInfo.setStockStatus(StockThkStatus.DELISTING.getId());
                 stockThkInfo.setStatusDesc(StockThkStatus.DELISTING.getName());
-
             } else if (!Objects.equals(thkSecRetiredInfoLast, thkSecRetiredInfos)) {
                 //如果他们两个不相同，代表有属性修改了
                 changeType = DataChangeType.UPDATE.getId();
@@ -137,11 +138,11 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 if (CollUtil.isNotEmpty(entityInfos)) {
                     //更新 主体基本信息表
                     entityInfos.stream().map(e -> e.setWindMaster(thkSecRetiredInfos.getBelWind())).forEach(e -> entityInfoService.getBaseMapper().updateById(e));
+                    initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
                 } else {
-                    this.initEntityRel(entityInfos, stockThkInfo, thkSecRetiredInfos);
+                    log.warn("<<<<<<根据企业名称：{} 查询主体信息 为空 不做任何绑定关系!!!<<<<<<<", thkSecRetiredInfos.getCompanyCn());
                 }
             }
-
             thkSecRetiredInfos.setChangeType(changeType);
             thkSecRetiredInfoService.save(thkSecRetiredInfos);
 
@@ -185,7 +186,23 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
 
     @Override
     public List<Map<String, Object>> getDetail(CrmWindTask windTask) {
-        return null;
+        Integer taskId = windTask.getId();
+        Wrapper<ThkSecRetiredInfo> wrapper = Wrappers.<ThkSecRetiredInfo>lambdaQuery()
+                .eq(ThkSecRetiredInfo::getTaskId, taskId)
+                .in(ThkSecRetiredInfo::getChangeType, 1, 2);
+        return thkSecRetiredInfoService.list(wrapper).stream().map(item -> {
+            HashMap<String, Object> dataMap = new HashMap<>();
+            dataMap.put("导入日期", item.getImportTime());
+            dataMap.put("ID", item.getId());
+            dataMap.put("变化状态", item.getChangeType());
+
+            dataMap.put("证券代码", item.getCode());
+            dataMap.put("证券简称", item.getName());
+            dataMap.put("公司中文名称", item.getCompanyCn());
+
+
+            return dataMap;
+        }).collect(Collectors.toList());
     }
 
     private void initEntityRel(List<EntityInfo> entityInfos, StockThkInfo stockThkInfo, ThkSecRetiredInfo thkSecRetiredInfo) {
@@ -203,8 +220,8 @@ public class ThkSecRetiredInfoStorategy implements WindTaskStrategy {
                 entityBaseBusiInfoMapper.updateById(entityBaseBusiInfo);
             } else {
                 EntityBaseBusiInfo info1 = new EntityBaseBusiInfo();
-                entityBaseBusiInfo.setRegAddr(thkSecRetiredInfo.getDetailedAddress());
-                entityBaseBusiInfo.setBusRange(Optional.ofNullable(thkSecRetiredInfo.getMainBusiness()).orElse(null));
+                info1.setRegAddr(Optional.ofNullable(thkSecRetiredInfo.getDetailedAddress()).orElse(null));
+                info1.setBusRange(Optional.ofNullable(thkSecRetiredInfo.getMainBusiness()).orElse(null));
                 info1.setEntityCode(entityCode);
                 entityBaseBusiInfoMapper.insert(info1);
             }

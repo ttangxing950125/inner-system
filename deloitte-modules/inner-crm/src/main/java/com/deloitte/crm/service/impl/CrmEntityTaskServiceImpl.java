@@ -155,6 +155,11 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
 
     /**
      * 处理当日任务
+     * @param taskId 任务id
+     * @param state 0-未处理 1-已有主体未关联 2-新增主体 3-已有主体已关联
+     * @param entityCode 主体 code
+     * @param remarks 备注信息
+     * @return 操作成功与否
      *
      * @param taskId
      * @param state  0-未处理 1-已有主体未关联 2-新增主体 3-已有主体已关联
@@ -162,7 +167,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R finishTask(Integer taskId, Integer state, String entityCode) {
+    public R finishTask(Integer taskId, Integer state, String entityCode,String remarks) {
         log.info("  =>> 角色7处理当日任务开始 taskId={}>>entityCode>>>:{} <<=  ", taskId, entityCode);
         CrmEntityTask crmEntityTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.VALID_EMPTY_TARGET.getInfo()));
         Assert.isTrue(crmEntityTask.getState() == 0, BadInfo.EXITS_TASK_FINISH.getInfo());
@@ -190,6 +195,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         //如果 entity_code 不为 null ，并且 任务中并未出现相同主体名称的任务，那么就是新增，便给角色 2 新增一条任务
         if (!ObjectUtils.isEmpty(entityCode) && byEntityNameList.size() == 0) {
             //向 crm_mas_task中添加任务
+            crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setSpeedId(crmEntityTask.getSpeedId()).setDetails(crmEntityTask.getDetails()).setRemarks(remarks).setTaskDate(new Date()));
+            CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType,4));
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setTaskDate(new Date()));
             CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, 4));
             //向每日任务列表添加任务 角色4 crm_daily_task 中 task_role_type = 4 , task_status = 2
