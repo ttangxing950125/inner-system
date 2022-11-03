@@ -53,6 +53,7 @@ public class StockCnInfo implements Serializable {
      */
     @ApiModelProperty(value = "上市日期")
     @UpdateLog(fieldName = "A股上市日期", tableFieldName = "list_date")
+
     private String listDate;
 
     /**
