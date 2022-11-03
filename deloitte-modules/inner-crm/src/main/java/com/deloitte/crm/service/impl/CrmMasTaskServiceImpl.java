@@ -165,17 +165,18 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
     /**
      * 角色2今日运维模块
+     *
+     * @param date       请传入参数 yyyy-MM-dd
+     * @param sourceName 来源
+     * @param pageNum    页码
+     * @param pageSize   页数
+     * @return R<Page < CrmMasTaskVo>> 当日任务
      * @author 正杰
      * @date 2022/9/27
-     * @return R<Page<CrmMasTaskVo>> 当日任务
-     * @param date 请传入参数 yyyy-MM-dd
-     * @param sourceName 来源
-     * @param pageNum 页码
-     * @param pageSize 页数
      */
     @Override
-    public R<Page<CrmMasTaskVo>> getTaskInfo(String date,String sourceName, Integer pageNum, Integer pageSize) {
-        log.info("  =>> 角色2 {} 查询 <<=  ",date);
+    public R<Page<CrmMasTaskVo>> getTaskInfo(String date, String sourceName, Integer pageNum, Integer pageSize) {
+        log.info("  =>> 角色2 {} 查询 <<=  ", date);
         pageNum = pageNum == null ? 1 : pageNum;
         pageSize = pageSize == null ? 5 : pageSize;
         Date dateDay = DateUtil.parseDate(date);
@@ -183,11 +184,11 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
         crmMasTaskQueryWrapper.lambda().eq(CrmMasTask::getTaskDate, dateDay);
 
         // 如果 来源信息不为空 那么就为其添加来源数据查询条件
-        if(!ObjectUtils.isEmpty(sourceName)){
-            crmMasTaskQueryWrapper.lambda().eq(CrmMasTask::getSourceName,sourceName);
+        if (!ObjectUtils.isEmpty(sourceName)) {
+            crmMasTaskQueryWrapper.lambda().eq(CrmMasTask::getSourceName, sourceName);
         }
 
-        Page<CrmMasTask> crmMasTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize),crmMasTaskQueryWrapper.lambda().orderBy(true, true, CrmMasTask::getState));
+        Page<CrmMasTask> crmMasTaskPage = baseMapper.selectPage(new Page<>(pageNum, pageSize), crmMasTaskQueryWrapper.lambda().orderBy(true, true, CrmMasTask::getState));
         List<CrmMasTask> crmMasTasks = crmMasTaskPage.getRecords();
 
         Page<CrmMasTaskVo> result = new Page<>(pageNum, pageSize, crmMasTaskPage.getTotal());
@@ -198,11 +199,12 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
             if (row.getEntityCode() != null) {
                 EntityInfo entityInfo = iEntityInfoService.getBaseMapper().selectOne(new QueryWrapper<EntityInfo>().lambda()
                         .eq(EntityInfo::getEntityCode, row.getEntityCode()));
-                if(!ObjectUtils.isEmpty(entityInfo)){
-                crmMasTaskVo.setEntityName(entityInfo.getEntityName());
-                crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());}
+                if (!ObjectUtils.isEmpty(entityInfo)) {
+                    crmMasTaskVo.setEntityName(entityInfo.getEntityName());
+                    crmMasTaskVo.setCreditCode(entityInfo.getCreditCode());
+                }
             } else {
-                log.warn("  =>> 角色2 出现无效信息 taskId {} entity_code 为空  <<=  !!!",row.getId());
+                log.warn("  =>> 角色2 出现无效信息 taskId {} entity_code 为空  <<=  !!!", row.getId());
             }
             crmMasTaskVos.add(crmMasTaskVo);
         });
@@ -227,11 +229,13 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
         baseMapper.updateById(crmMasTask);
         // 为状态表中 修改当前状态表数据中的 状态 entity_capture_speed
         EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmMasTask.getSpeedId()));
-        if(ObjectUtils.isEmpty(entityCaptureSpeed)){
-            log.info("  =>> 角色2任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据",taskId,crmMasTask.getSpeedId());
-        }else{
+        if (ObjectUtils.isEmpty(entityCaptureSpeed)) {
+            log.warn("  =>> 角色2任务 {} 未查询到关联 entity_capture_speed 表 id为 {} 的数据", taskId, crmMasTask.getSpeedId());
+        } else {
             entityCaptureSpeed.setDivide(1);
+            entityCaptureSpeed.setDivideTime(new Date());
             entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
+
         }
         return crmMasTask.getTaskDate();
     }
