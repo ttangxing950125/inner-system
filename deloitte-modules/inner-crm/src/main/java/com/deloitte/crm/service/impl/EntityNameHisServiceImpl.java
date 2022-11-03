@@ -266,7 +266,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
 
         // 新增一条数据进入曾用名列表
         baseMapper.insert(new EntityNameHis()
-                .setEntityType(1)
+                .setEntityType(2)
                 .setStatus(1)
                 .setDqCode(dpGovCode)
                 .setOldName(govName)
