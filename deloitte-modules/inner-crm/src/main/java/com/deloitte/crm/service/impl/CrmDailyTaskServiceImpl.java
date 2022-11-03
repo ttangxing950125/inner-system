@@ -189,9 +189,9 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             baseMapper.updateById(crmDailyTask.setTaskStatus(taskStatus));
         }
     }
-    //
+
     /**
-     * 检验是否更新每日任务表以及发送邮件
+     * 检验是否更新每日任务表以及是否发送邮件
      *
      * @param crmSupplyTask
      * @return void
@@ -203,15 +203,12 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
 
         //完成任务前先检查一下角色3任务是否全部完成，如果都完成，则不需要修改每日任务状态
         QueryWrapper<CrmSupplyTask> query = new QueryWrapper<>();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId,crmSupplyTask.getRoleId());
-        query.and(wrapper->wrapper.lambda().eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId,crmSupplyTask.getRoleId()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
         Long count = crmSupplyTaskMapper.selectCount(query);
         //完成任务前先检查一下角色3.4.5任务是否全部完成，如果都完成，则不需要发送邮件
         query.clear();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate());
-        query.and(wrapper->wrapper.lambda().eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
         Long allCount = crmSupplyTaskMapper.selectCount(query);
-
 
         crmSupplyTaskService.completeTaskById(crmSupplyTask.getId());
 
@@ -240,8 +237,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
         //发送邮件
         if (allCount<0){
             query.clear();
-            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate());
-            query.and(wrapper->wrapper.lambda().eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
+            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper->wrapper.eq(CrmSupplyTask::getState,0 ).or().isNull(CrmSupplyTask::getState));
             allCount = crmSupplyTaskMapper.selectCount(query);
             if (allCount<0){
                 try {
