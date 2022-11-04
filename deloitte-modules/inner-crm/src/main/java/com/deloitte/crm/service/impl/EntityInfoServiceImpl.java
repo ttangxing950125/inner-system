@@ -963,18 +963,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
         Page<EntityInfo> page = entityInfoMapper.selectPage(pageInfo, infoQuery);
         List<EntityInfo> entityInfoList = page.getRecords();
-
+        Page<EntityInfoList> resultPage = new Page<>(pageNum, pageSize);
         if (CollectionUtils.isEmpty(entityInfoList)) {
-            return null;
+            return resultPage;
         }
         //封装结果集
         List<EntityInfoList> records = new ArrayList<>();
         //相响分页结果
-//        Page<Map<String, Object>> resultPage = new Page<>(pageNum, pageSize);
-        Page<EntityInfoList> resultPage = new Page<>(pageNum, pageSize);
-
         resultPage.setTotal(page.getTotal()).setCurrent(page.getCurrent());
-
         List<EntityInfoList> finalRecords = records;
         //查出所有的曾用名
         QueryWrapper<EntityNameHis> hisQuery = new QueryWrapper<>();
