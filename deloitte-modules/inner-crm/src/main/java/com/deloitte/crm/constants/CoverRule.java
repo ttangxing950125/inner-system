@@ -33,4 +33,15 @@ public enum CoverRule {
     public static final String  IB = "IB";
     public static final Integer IB_ID = 1;
 
+    public static final String  BANK = "银行";
+    public static final String FIN  = "金融";
+    public static final String  DY_FIN  = "多元金融";
+    public static final String  IN_SII  = "保险II";
+    public static final String  FIN_NOT  = "非银金融";
+
+
+
+
+
+
 }

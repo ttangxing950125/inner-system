@@ -91,6 +91,8 @@ public class StockThkInfo implements Serializable {
      */
     private String companyEnglish;
 
+
+
     /**
      * 上市板
      */
@@ -158,6 +160,8 @@ public class StockThkInfo implements Serializable {
      * 终止上市类型
      */
     private String terminationType;
+
+
     /*****************************************
      /**
      * 创建时间

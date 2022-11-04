@@ -129,6 +129,16 @@ public class BondInfo {
     @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
     private Date delistdate;
 
+
+    /**
+     * 城投债(wind)
+     */
+    private Integer citiinvestWindTag;
+    /**
+     * 城投债(YY)
+     */
+    private Integer citiinvestYyTag;
+
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

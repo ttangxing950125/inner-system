@@ -1,6 +1,7 @@
 package com.deloitte.crm.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.injector.methods.UpdateById;
@@ -10,6 +11,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.crm.constants.CoverRule;
 import com.deloitte.crm.domain.*;
+import com.deloitte.crm.dto.CoverStatus;
 import com.deloitte.crm.dto.ProductCoverDto;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ProductsCoverService;
@@ -23,6 +25,8 @@ import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static cn.hutool.poi.excel.sax.ElementName.row;
 
 /**
  * @author PenTang
@@ -120,14 +124,30 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         log.info("=>> " + DateUtil.dateTimeNow() + "组装覆盖情况");
         List<EntityInfo> entityInfos = entityInfoMapper.selectList(null);
         List<ProductsCover> productsCovers = new ArrayList<>();
+
         for (int i = 0; i < entityInfos.size(); i++) {
             log.info("进度=>" + i + 1 + "<=");
+
+            LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfos.get(i).getEntityCode());
+            List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
+            ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
+            if (!entityStockCnRels.isEmpty()) {
+                for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
+                    LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().
+                            eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
+                    StockCnInfo stockCnInfo = stockCnInfomapper.selectOne(eq1);
+                    if (stockCnInfo != null) {
+                        stockCnInfos.add(stockCnInfo);
+                    }
+
+                }
+            }
             //组装ESG
-            List<ProductsCover> productsCoversE = this.CoverRuleEsg(entityInfos.get(i), productsCovers);
+            List<ProductsCover> productsCoversE = this.CoverRuleEsg(entityInfos.get(i), productsCovers, stockCnInfos);
             //组装产业链
-            List<ProductsCover> productsCoversC = this.CoverRuleClTE(entityInfos.get(i), productsCoversE);
+            List<ProductsCover> productsCoversC = this.CoverRuleClTE(entityInfos.get(i), productsCoversE, stockCnInfos);
             //组装股票
-            this.CoverRuleSTOCK(entityInfos.get(i), productsCoversC);
+            this.CoverRuleSTOCK(entityInfos.get(i), productsCoversC, stockCnInfos);
 
         }
         System.out.println(productsCovers);
@@ -164,7 +184,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
     }
 
     /**
-     * 组装
+     * ESG判断规则
      *
      * @param entityInfo
      * @param productsCovers
@@ -172,23 +192,10 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
      * @author penTang
      * @date 2022/10/28 15:11
      */
-    public List<ProductsCover> CoverRuleEsg(EntityInfo entityInfo, List<ProductsCover> productsCovers) {
+    public List<ProductsCover> CoverRuleEsg(EntityInfo entityInfo, List<ProductsCover> productsCovers, ArrayList<StockCnInfo> stockCnInfos) {
         log.info("组装ESG");
-        LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfo.getEntityCode());
-        List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
-
-        ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
         ProductsCover productsCoverC = new ProductsCover();
-        if (CollUtil.isNotEmpty(entityStockCnRels)) {
-            for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
-                LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
-                StockCnInfo stockCnInfo = Optional.ofNullable(stockCnInfomapper.selectOne(eq1)).orElse(null);
-                if (stockCnInfo != null) {
-                    stockCnInfos.add(stockCnInfo);
-                }
 
-            }
-        }
         if (CollUtil.isNotEmpty(stockCnInfos)) {
             for (StockCnInfo stockCnInfo : stockCnInfos) {
                 if (Objects.equals(stockCnInfo.getStockStatus(), 6) || stockCnInfo.getListDate() != null) {
@@ -231,22 +238,19 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         return productsCovers;
     }
 
-    public List<ProductsCover> CoverRuleClTE(EntityInfo entityInfo, List<ProductsCover> productsCovers) {
+    /**
+     * 产业链的判断规则
+     *
+     * @param entityInfo
+     * @param productsCovers
+     * @param stockCnInfos
+     * @return List<ProductsCover>
+     * @author penTang
+     * @date 2022/11/3 18:38
+     */
+    public List<ProductsCover> CoverRuleClTE(EntityInfo entityInfo, List<ProductsCover> productsCovers, ArrayList<StockCnInfo> stockCnInfos) {
         log.info("组装CLTE");
-        LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfo.getEntityCode());
-        List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
-        ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
         ProductsCover productsCoverC = new ProductsCover();
-        if (!entityStockCnRels.isEmpty()) {
-            for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
-                LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().
-                        eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
-                StockCnInfo stockCnInfo = stockCnInfomapper.selectOne(eq1);
-                if (stockCnInfo != null) {
-                    stockCnInfos.add(stockCnInfo);
-                }
-            }
-        }
         if (!stockCnInfos.isEmpty()) {
             for (StockCnInfo stockCnInfo : stockCnInfos) {
                 if (Objects.equals(stockCnInfo.getStockStatus(), 6) || stockCnInfo.getListDate() != null) {
@@ -282,24 +286,19 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
 
     }
 
-
-    public List<ProductsCover> CoverRuleSTOCK(EntityInfo entityInfo, List<ProductsCover> productsCovers) {
+    /**
+     * 股票的判断规则
+     *
+     * @param entityInfo
+     * @param productsCovers
+     * @param stockCnInfos
+     * @return List<ProductsCover>
+     * @author penTang
+     * @date 2022/11/3 18:38
+     */
+    public List<ProductsCover> CoverRuleSTOCK(EntityInfo entityInfo, List<ProductsCover> productsCovers, ArrayList<StockCnInfo> stockCnInfos) {
         log.info("组装股票");
-        LambdaQueryWrapper<EntityStockCnRel> eq = new LambdaQueryWrapper<EntityStockCnRel>().eq(EntityStockCnRel::getEntityCode, entityInfo.getEntityCode());
-        List<EntityStockCnRel> entityStockCnRels = entityStockCnRelmapper.selectList(eq);
-        ArrayList<StockCnInfo> stockCnInfos = new ArrayList<>();
         ProductsCover productsCoverC = new ProductsCover();
-        if (!entityStockCnRels.isEmpty()) {
-            for (EntityStockCnRel entityStockCnRel : entityStockCnRels) {
-                LambdaQueryWrapper<StockCnInfo> eq1 = new LambdaQueryWrapper<StockCnInfo>().
-                        eq(StockCnInfo::getStockDqCode, entityStockCnRel.getStockDqCode());
-                StockCnInfo stockCnInfo = stockCnInfomapper.selectOne(eq1);
-                if (stockCnInfo != null) {
-                    stockCnInfos.add(stockCnInfo);
-                }
-
-            }
-        }
         if (!stockCnInfos.isEmpty()) {
             for (StockCnInfo stockCnInfo : stockCnInfos) {
                 if (Objects.equals(stockCnInfo.getStockStatus(), 6) || stockCnInfo.getListDate() != null) {
@@ -331,6 +330,118 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
 
         }
         return productsCovers;
+    }
+
+    /**
+     * 财报智评-判断规则
+     *
+     * @param entityInfo     主体
+     * @param productsCovers 入库的规则
+     * @param stockCnInfos   股票
+     * @return List<ProductsCover>
+     * @author penTang
+     * @date 2022/11/3 18:38
+     */
+    public List<ProductsCover> CoverRuleIDOU(EntityInfo entityInfo, List<ProductsCover> productsCovers, ArrayList<StockCnInfo> stockCnInfos, ArrayList<StockThkInfo> stockThkInfos, ArrayList<BondInfo> BondInfoList) {
+        log.info("组装财报智评");
+        //A股的初始覆盖状态
+        CoverStatus coverStatusA = new CoverStatus();
+        //港股的初始覆盖状态
+        CoverStatus coverStatusG = new CoverStatus();
+        //债券的初始覆盖状态
+        CoverStatus coverStatusB = new CoverStatus();
+        //入库的对象
+        ProductsCover productsCover = new ProductsCover();
+        productsCover.setProId(CoverRule.CA_ZP_ID);
+        productsCover.setEntityCode(entityInfo.getEntityCode());
+        productsCover.setIsGov("0");
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("银行");
+        strings.add("金融");
+        strings.add("多元金融");
+        strings.add("保险II");
+        strings.add("非银金融");
+        ArrayList<String> ArrayList = new ArrayList<>();
+        ArrayList.add("银行");
+        ArrayList.add("非银金融");
+
+        //ShenWan的触发规则
+        String[] splitS = entityInfo.getShenWanMaster().split("--");
+        List<String> collectByS = Arrays.stream(splitS).collect(Collectors.toList());
+        //取一级
+        String s1 = collectByS.get(0);
+        //wind触发规则
+        String[] splitW = entityInfo.getWindMaster().split("--");
+        List<String> collectByW = Arrays.stream(splitW).collect(Collectors.toList());
+        String s2 = collectByW.get(1);
+
+        //根据ShenWan判断是否金融机构
+        boolean containsW = ArrayList.contains(s1);
+        //根据Wand判断是否金融机构
+        boolean containsS = strings.contains(s2);
+
+        boolean fins = containsW || containsS;
+        //A股
+        if (CollUtil.isNotEmpty(stockCnInfos)) {
+            boolean A = stockCnInfos.stream().anyMatch(row -> Objects.equals(row.getStockStatus(), 6) || row.getListDate() != null);
+            if (A) {
+                if (A && fins) {
+                    coverStatusA.setStatus("覆盖");
+                    coverStatusA.setCoverDes("应覆盖(A股上市非金融)");
+                } else {
+                    coverStatusA.setStatus("未覆盖");
+                    coverStatusA.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                }
+
+            } else {
+                boolean b = stockCnInfos.stream().allMatch(row -> row.getDelistingDate() != null || Objects.equals(row.getStockStatus(), 9));
+                if (b) {
+                    coverStatusA.setStatus("不再覆盖");
+                    coverStatusA.setCoverDes("不再覆盖(A股退市)");
+                } else {
+                    coverStatusA.setStatus("未覆盖");
+                    coverStatusA.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融）");
+                }
+            }
+        }
+        //港股
+        if (CollUtil.isNotEmpty(stockThkInfos)) {
+            boolean G = stockThkInfos.stream().anyMatch(row -> Objects.equals(row.getStockStatus(), 3) || row.getListDate() != null);
+            if (G) {
+                    if (G && fins) {
+                        coverStatusG.setStatus("覆盖");
+                        coverStatusG.setCoverDes("应覆盖(A股上市非金融)");
+                    }else{
+                        coverStatusG.setStatus("未覆盖");
+                        coverStatusG.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                    }
+
+            } else {
+                boolean b = stockCnInfos.stream().allMatch(row -> row.getDelistingDate() != null || Objects.equals(row.getStockStatus(), 4));
+                if (b) {
+                    coverStatusG.setStatus("不再覆盖");
+                    coverStatusG.setCoverDes("不再覆盖(A股退市)");
+                } else {
+                    coverStatusG.setStatus("未覆盖");
+                    coverStatusG.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融）");
+                }
+
+            }
+        }
+        //债券
+        if (CollUtil.isNotEmpty(BondInfoList)) {
+            BondInfoList.stream().anyMatch(row -> Objects.equals(row.getRaiseType(), 0)
+                    && Objects.equals(row.getColl(), 0)
+                    && Objects.equals(row.getAbs(), 0)
+                    && Objects.equals(row.getCitiinvestWindTag(),"0")
+                    && Objects.equals(row.getCitiinvestYyTag(),"0")
+                    && Objects.equals(row.getBondState(),0)
+            );
+
+        }
+
+
+        return null;
     }
 
 
