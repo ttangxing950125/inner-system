@@ -1,27 +1,19 @@
 package com.deloitte.crm.controller;
 
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-
-import com.deloitte.common.core.domain.R;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
+import com.deloitte.common.core.web.controller.BaseController;
+import com.deloitte.common.core.web.domain.AjaxResult;
+import com.deloitte.common.core.web.page.TableDataInfo;
 import com.deloitte.common.log.annotation.Log;
 import com.deloitte.common.log.enums.BusinessType;
 import com.deloitte.common.security.annotation.RequiresPermissions;
 import com.deloitte.crm.domain.CrmEntityTask;
 import com.deloitte.crm.service.ICrmEntityTaskService;
-import com.deloitte.common.core.web.controller.BaseController;
-import com.deloitte.common.core.web.domain.AjaxResult;
-import com.deloitte.common.core.utils.poi.ExcelUtil;
-import com.deloitte.common.core.web.page.TableDataInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 角色7，根据导入的数据新增主体的任务Controller
@@ -103,20 +95,4 @@ public class CrmEntityTaskController extends BaseController
     {
         return toAjax(crmEntityTaskService.deleteCrmEntityTaskByIds(ids));
     }
-
-    /**
-     *发送邮件（统计新发债和股票情况）
-     *
-     * @return R
-     * @author penTang
-     * @date 2022/11/2 16:50
-    */
-    @PostMapping("/sendEmail")
-    public R sendByEmail(){
-
-        String s = crmEntityTaskService.sendEmail();
-        return R.ok(s);
-    }
-
-
 }
