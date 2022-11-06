@@ -1,8 +1,3 @@
-# Tomcat
-server:
-  port: 9204
-
-
 # Spring
 spring:
   mvc:
@@ -11,17 +6,13 @@ spring:
   main:
     allow-circular-references: true
     allow-bean-definition-overriding: true
-  application:
-    # 应用名称
-    name: inner-crm
   cloud:
     nacos:
       discovery:
         # 服务注册地址
         server-addr: 10.173.43.11:8848
         # 配置所在分组
-        namespace: 2c34a3b6-3f61-47c9-b992-a9b28e418b32
-        group: DEV
+        namespace: e8602d04-0831-48d9-a258-59f8574e4d9d
       config:
         # 配置中心地址
         server-addr: 10.173.43.11:8848
@@ -29,11 +20,9 @@ spring:
         file-extension: yml
         # 共享配置
         shared-configs:
-          - ${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
         # 配置所在分组
-        namespace: 2c34a3b6-3f61-47c9-b992-a9b28e418b32
-        group: DEV
-
+        namespace: e8602d04-0831-48d9-a258-59f8574e4d9d
 logging:
   level:
     com.deloitte.crm: debug

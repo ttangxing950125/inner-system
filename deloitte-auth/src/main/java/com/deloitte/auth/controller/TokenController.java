@@ -44,8 +44,6 @@ public class TokenController
         LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
         // 获取登录token
         Map<String, Object> token = tokenService.createToken(userInfo);
-//        SysRole roleInfo = iSysRoleService.getRoleInfo(userId);
-//        SecurityUtils.getUserId()
         token.put("roleInfo", userInfo.getRoleInfo());
 
         return R.ok(token);

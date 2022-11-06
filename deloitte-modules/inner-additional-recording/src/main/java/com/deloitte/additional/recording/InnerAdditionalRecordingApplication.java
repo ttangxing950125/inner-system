@@ -17,6 +17,7 @@ import com.deloitte.common.swagger.annotation.EnableCustomSwagger2;
 @SpringBootApplication
 public class InnerAdditionalRecordingApplication
 {
+
     public static void main(String[] args)
     {
         SpringApplication.run(InnerAdditionalRecordingApplication.class, args);
