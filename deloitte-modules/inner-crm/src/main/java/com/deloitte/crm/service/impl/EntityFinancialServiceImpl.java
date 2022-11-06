@@ -3,6 +3,7 @@ package com.deloitte.crm.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.CrmSupplyTask;
 import com.deloitte.crm.domain.EntityFinancial;
 import com.deloitte.crm.domain.EntityInfo;
@@ -76,7 +77,7 @@ public class EntityFinancialServiceImpl extends ServiceImpl<EntityFinancialMappe
 
         //更新任务进度
         entityCaptureSpeedService.sendTFFSpeed(crmSupplyTask,entityInfo);
-        return R.ok("修改成功");
+        return R.ok(Common.UPDATE_SUCCESS);
     }
 
 }

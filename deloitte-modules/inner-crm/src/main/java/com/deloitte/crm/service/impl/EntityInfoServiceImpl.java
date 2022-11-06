@@ -224,11 +224,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     public static final String BOND_STATE_DEAD = "(违约)";
 
     /**
-     * 存续状态
-     */
-    public static final String LIVE_STATE = "Y";
-
-    /**
      * 未存续
      */
     public static final String DEAD_STATE = "N";
@@ -1401,7 +1396,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
             });
             if (liveBond[0] > 0) {
-                result.setLiveState(LIVE_STATE);
+                result.setLiveState(Common.LIVE_STATE);
             }
             //债券存续数量
             result.setLiveBond(liveBond[0]);
@@ -1438,7 +1433,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockCnRel> cnRels = entityStockCnRels.stream().collect(Collectors.groupingBy(EntityStockCnRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(cnRels)) {
                     cnRels.stream().forEach(x -> {
-
                         //德勤唯一识别代码
                         stockDqCodeList.add(x.getStockDqCode());
 
@@ -1449,7 +1443,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 List<EntityStockThkRel> thkRels = entityStockthkRels.stream().collect(Collectors.groupingBy(EntityStockThkRel::getEntityCode)).get(o);
                 if (!CollectionUtils.isEmpty(thkRels)) {
                     thkRels.stream().forEach(x -> {
-
                         //德勤唯一识别代码
                         stockDqCodeList.add(x.getStockDqCode());
 
@@ -1457,11 +1450,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
             }
             //最晚退市日期
-            final String[] listState = {DEAD_STATE};
-
-//            List<String> stockDateList = new ArrayList<>();
-            //退市日期
-//            List<String> stockdownDateList = new ArrayList<>();
+            final String[] listState = {Common.DEAD_STATE};
             //A股上市日期
             //A股退市日期
             if (!CollectionUtils.isEmpty(stockDqCodeList)) {
@@ -1474,16 +1463,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     stockCnInfos.forEach(x -> {
                         String stockCode = x.getStockCode();
                         String substring = stockCode.substring(0, 1);
-                        if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                        if (!ObjectUtils.nullSafeEquals(Common.STOCK_BEGIN_WITH_A, substring)) {
                             //德勤唯一识别代码
                             stockCodeList.add(stockCode);
                         }
-                        if (LIVE_STATE.equals(listState[0])) {
+                        if (Common.LIVE_STATE.equals(listState[0])) {
                             return;
                         }
                         Integer stockStatus = x.getStockStatus();
                         if (!ObjectUtils.isEmpty(stockStatus) && 6 == stockStatus) {
-                            listState[0] = LIVE_STATE;
+                            listState[0] = Common.LIVE_STATE;
                         }
                     });
                     //退市日期
@@ -1491,7 +1480,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         stockCnInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x -> {
                             String stockCode = x.getStockCode();
                             String substring = stockCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                            if (!ObjectUtils.nullSafeEquals(Common.STOCK_BEGIN_WITH_A, substring)) {
                                 //德勤唯一识别代码
                                 stockdownDateList.add(x.getDelistingDate());
                             }
@@ -1504,7 +1493,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         stockCnInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getListDate())).forEach(x -> {
                             String stockCode = x.getStockCode();
                             String substring = stockCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                            if (!ObjectUtils.nullSafeEquals(Common.STOCK_BEGIN_WITH_A, substring)) {
                                 //德勤唯一识别代码
                                 stockDateList.add(x.getListDate());
                             }
@@ -1520,16 +1509,16 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                     stockThkInfos.forEach(x -> {
                         String stockCode = x.getStockCode();
                         String substring = stockCode.substring(0, 1);
-                        if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                        if (!ObjectUtils.nullSafeEquals(Common.STOCK_BEGIN_WITH_A, substring)) {
                             //德勤唯一识别代码
                             stockCodeList.add(stockCode);
                         }
-                        if (LIVE_STATE.equals(listState[0])) {
+                        if (Common.LIVE_STATE.equals(listState[0])) {
                             return;
                         }
                         Integer stockStatus = x.getStockStatus();
                         if (!ObjectUtils.isEmpty(stockStatus) && 4 == stockStatus) {
-                            listState[0] = LIVE_STATE;
+                            listState[0] = Common.LIVE_STATE;
                         }
                     });
                     //退市日期
@@ -1537,7 +1526,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         stockThkInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getDelistingDate())).forEach(x -> {
                             String stockCode = x.getStockCode();
                             String substring = stockCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                            if (!ObjectUtils.nullSafeEquals(Common.STOCK_BEGIN_WITH_A, substring)) {
                                 //德勤唯一识别代码
                                 stockdownDateList.add(x.getDelistingDate());
                             }
@@ -1550,7 +1539,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                         stockThkInfos.stream().filter(x -> !ObjectUtils.isEmpty(x.getListDate())).forEach(x -> {
                             String stockCode = x.getStockCode();
                             String substring = stockCode.substring(0, 1);
-                            if (!ObjectUtils.nullSafeEquals("a", substring)) {
+                            if (!ObjectUtils.nullSafeEquals(Common.STOCK_BEGIN_WITH_A, substring)) {
                                 //德勤唯一识别代码
                                 stockDateList.add(x.getListDate());
                             }

@@ -19,5 +19,5 @@ public class NameValueVo {
     /** 展示名称 */
     private String name;
     /** 展示值 */
-    private String value;
+    private Object value;
 }
