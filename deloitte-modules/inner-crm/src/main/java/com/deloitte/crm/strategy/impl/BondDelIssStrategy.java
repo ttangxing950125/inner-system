@@ -12,6 +12,7 @@ import com.deloitte.crm.constants.BondStatus;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
+import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.service.BondDelIssService;
 import com.deloitte.crm.service.CrmTypeInfoService;
 import com.deloitte.crm.service.IBondInfoService;
@@ -19,6 +20,7 @@ import com.deloitte.crm.service.IEntityAttrValueService;
 import com.deloitte.crm.strategy.WindTaskContext;
 import com.deloitte.crm.strategy.WindTaskStrategy;
 import com.deloitte.crm.strategy.enums.WindTaskEnum;
+import com.deloitte.crm.utils.ApplicationContextHolder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
@@ -66,13 +68,22 @@ public class BondDelIssStrategy implements WindTaskStrategy {
             //查询债券是否存在
             String shortName = delIss.getBondShortName();
 
+
             Integer changeType = null;
 
             //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(shortName, Boolean.FALSE);
+            /*BondInfo bondInfo = bondInfoService.findByShortName(shortName, Boolean.FALSE);
             if (bondInfo == null) {
                 bondInfo = new BondInfo();
-            }
+            }*/
+            //TODO 通过债券代码查询BondInfo 查询一条数据  这个地方可能存在多个 目前 按照业务来讲BondInfo 是债券全程作为唯一索引
+            BondInfoMapper bondInfoMapper = ApplicationContextHolder.get().getBean(BondInfoMapper.class);
+            BondInfo bondInfo1 =bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>()
+                    .eq(BondInfo::getBondCode,delIss.getBondCode())
+                    .eq(BondInfo::getIsDeleted,Boolean.FALSE));
+
+            BondInfo bondInfo = Optional.ofNullable(bondInfo1).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+
 
             bondInfo.setBondShortName(shortName);
             bondInfo.setOriCode(delIss.getBondCode());

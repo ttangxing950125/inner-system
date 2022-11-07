@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
@@ -11,6 +12,7 @@ import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.BondInfoDto;
 import com.deloitte.crm.dto.DefaultFirstNumberCountDto;
+import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.DefaultFirstNumberCountMapper;
 import com.deloitte.crm.mapper.DefaultMoneyTotalMapper;
 import com.deloitte.crm.mapper.EntityBondRelMapper;
@@ -151,7 +153,12 @@ public class DefaultFirstNumberCountStrategy implements WindTaskStrategy {
         defaultFirstNumberCount.setTaskId(windTask.getId());
 
         String shortName = defaultFirstNumberCount.getDefaultBondsDesc();
-        BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName, Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+        //TODO 通过债券代码查询BondInfo 查询一条数据  这个地方可能存在多个 目前 按照业务来讲BondInfo 是债券全程作为唯一索引
+        BondInfoMapper bondInfoMapper = ApplicationContextHolder.get().getBean(BondInfoMapper.class);
+        BondInfo bondInfo1 =bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getBondCode,defaultFirstNumberCount.getDefaultBondsCode())
+                .eq(BondInfo::getIsDeleted,Boolean.FALSE));
+         BondInfo bondInfo = Optional.ofNullable(bondInfo1).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+
         bondInfo.setBondStatus(7);
         bondInfo.setBondState(1);
 
