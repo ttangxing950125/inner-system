@@ -577,6 +577,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             }
         }else {
             bondInfo.setBondStatus(7);
+            bondInfo.setDefaultDate(entityByIondVo.getDefaultDate());
         }
         bondInfoMapper.insertBondInfo(bondInfo);
         DecimalFormat g1 = new DecimalFormat("000000");

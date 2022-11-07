@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -116,6 +117,7 @@ public class QuartzTask implements ApplicationContextAware {
      * @date 2022/10/28 11:08
     */
     @Scheduled(cron = "0 0 1 * * ?")
+//    @PostConstruct
     public void  CoverRulePro(){
         log.info("=>> "+ DateUtil.dateTimeNow()+"覆盖跑批开始");
         productsCoverService.CoverRule();

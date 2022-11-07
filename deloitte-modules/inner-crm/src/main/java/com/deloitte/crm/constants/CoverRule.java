@@ -30,7 +30,22 @@ public enum CoverRule {
     public static final String  CH_TO = "城投";
     public static final Integer CH_TO_ID = 2;
 
-    public static final String  IB = "IB";
+    public static final String  IB = "IB评级";
     public static final Integer IB_ID = 1;
+
+    public static final String  COVER_IB_A = "应覆盖(A股上市)";
+    public static final String COVER_IB_E  = "已覆盖";
+    public static final String  COVER_IB_Bond  = "应覆盖(存续公募债)";
+    public static final String  COVER_IB_FIN  = "应覆盖(金融机构)";
+    public static final String  COVER_NOT_A  = "不再覆盖(A股退市)";
+    public static final String  COVER_NOT_Bond  = "不在覆盖(无存续公募债)";
+    public static final String  COVER_NOT = "未覆盖(未A股上市且未发公募债)";
+
+
+
+
+
+
+
 
 }

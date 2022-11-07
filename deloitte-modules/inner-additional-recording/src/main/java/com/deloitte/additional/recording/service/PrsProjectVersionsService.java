@@ -23,4 +23,6 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      * @date 2022/11/7 16:32
      */
     Object getPrsProjectVersions(String year, String status, String param,Integer pageNum,Integer pageSize);
+
+    List<String> findAllPrsProjectVersions();
 }

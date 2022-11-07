@@ -22,6 +22,7 @@ import java.util.Date;
 public class PrsProjectVersions implements Serializable {
     private static final long serialVersionUID = 361705244178024930L;
     @Excel(name = "${column.comment}")
+
     private Integer id;
     /**
      * 版本名称

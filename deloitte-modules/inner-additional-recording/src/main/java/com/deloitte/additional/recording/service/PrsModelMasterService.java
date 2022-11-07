@@ -3,6 +3,8 @@ package com.deloitte.additional.recording.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsModelMaster;
 
+import java.util.List;
+
 /**
  * (PrsModelMaster)表服务接口
  *
@@ -11,4 +13,5 @@ import com.deloitte.additional.recording.domain.PrsModelMaster;
  */
 public interface PrsModelMasterService extends IService<PrsModelMaster> {
 
+    List<String> finAllPrsModelMaster();
 }

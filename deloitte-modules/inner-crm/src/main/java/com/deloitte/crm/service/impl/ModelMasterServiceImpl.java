@@ -253,7 +253,8 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         if (YES.equals(masDto.getCityIb())){ updateEntityGovRel(masDto); log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");}
 
         //更改当条信息任务状态
-        Date currentDate = iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
+        iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
+        Date currentDate = new Date();
         log.info("  =>> 完成任务 taskId = " + masDto.getId() + " <<=  ");
 
         // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
