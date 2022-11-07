@@ -1095,15 +1095,72 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Integer stockThk = entityAttrDto.getStockThk();
         //获取是否是A股
         Integer stockCn = entityAttrDto.getStockCn();
-
-        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll, stockThk, stockCn);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
 
-        entityInfos.stream().forEach(o -> {
-            EntityInfoResult entityInfoResult = getEntityInfoResult(o, mapList);
+        List<String>idList=new ArrayList<>();
+        List<String>header=new ArrayList<>();
+        List<String>codeList=new ArrayList<>();
+        if (!CollectionUtils.isEmpty(mapList)){
+            mapList.forEach(o->{
+                header.add(o.getName());
+                idList.add(o.getId());
+            });
+        }
+        List<EntityInfo> entityInfos = entityInfoMapper.getEntityByBondType(raiseType, abs, coll, stockThk, stockCn);
+        if (CollectionUtils.isEmpty(entityInfos)){
+            return resultRecords;
+        }
+        entityInfos.forEach(o->codeList.add(o.getEntityCode()));
+        QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
+        //所有符合条件的指标值
+        List<EntityAttrValue> attrValueList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(codeList)){
+            query.lambda().in(EntityAttrValue::getEntityCode,codeList );
+
+        }
+        //需要查询额外指标时再指标数据
+        if (!CollectionUtils.isEmpty(idList)){
+            query.lambda().in(EntityAttrValue::getAttrId,idList );
+            attrValueList = entityAttrValueMapper.selectList(query);
+        }
+        Map<String, List<EntityAttrValue>> entityCodeMap =new HashMap<>();
+        if (!CollectionUtils.isEmpty(attrValueList)){
+            entityCodeMap = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode));
+        }
+        Map<String, List<EntityAttrValue>> finalEntityCodeMap = entityCodeMap;
+        entityInfos.forEach(info->{
+            List<MoreIndex> more=new ArrayList<>();
+            List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
+            if (!CollectionUtils.isEmpty(mapList)){
+                mapList.forEach(o->{
+                    MoreIndex moreIndex = new MoreIndex();
+                    moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
+                    if (!ObjectUtils.isEmpty(finalEntityCodeMap)){
+                        List<EntityAttrValue> valueList = finalEntityCodeMap.get(info.getEntityCode());
+                        if (!ObjectUtils.isEmpty(valueList)){
+                            Map<Long, List<EntityAttrValue>> attrValuesById = valueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getAttrId));
+                            List<EntityAttrValue> attrValuesByAttrId = attrValuesById.get(Long.valueOf(o.getId()));
+                            String value="";
+                            if (!ObjectUtils.isEmpty(attrValuesByAttrId)){
+                                value = attrValuesByAttrId.get(0).getValue();
+                            }
+                            moreIndex.setValue(value);
+                            values.add(value);
+                            more.add(moreIndex);
+                        }
+                    }
+                });
+            }
+            EntityInfoResult entityInfoResult =new EntityInfoResult();
+            entityInfoResult.setEntityInfo(info).setHeader(header).setValues(values).setMore(more);
             resultRecords.add(entityInfoResult);
         });
+
+//        entityInfos.stream().forEach(o -> {
+//            EntityInfoResult entityInfoResult = getEntityInfoResult(o, mapList);
+//            resultRecords.add(entityInfoResult);
+//        });
         return resultRecords;
     }
 
