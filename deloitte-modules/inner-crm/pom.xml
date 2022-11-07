@@ -94,7 +94,11 @@
             <artifactId>deloitte-common-swagger</artifactId>
         </dependency>
 
-
+<!--        &lt;!&ndash; deloitte Common Core &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.deloitte</groupId>-->
+<!--            <artifactId>deloitte-common-core</artifactId>-->
+<!--        </dependency>-->
 
 
     </dependencies>
