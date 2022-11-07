@@ -3,6 +3,8 @@ package com.deloitte.additional.recording.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsProjectVersions;
 
+import java.util.List;
+
 /**
  * (PrsProjectVersions)表服务接口
  *
@@ -11,4 +13,5 @@ import com.deloitte.additional.recording.domain.PrsProjectVersions;
  */
 public interface PrsProjectVersionsService extends IService<PrsProjectVersions> {
 
+    List<String> findAllPrsProjectVersions();
 }
