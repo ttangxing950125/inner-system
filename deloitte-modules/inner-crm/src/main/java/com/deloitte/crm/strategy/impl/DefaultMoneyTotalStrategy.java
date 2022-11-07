@@ -12,6 +12,7 @@ import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.DefaultFirstNumberCountDto;
+import com.deloitte.crm.mapper.BondInfoMapper;
 import com.deloitte.crm.mapper.DefaultMoneyTotalMapper;
 import com.deloitte.crm.mapper.EntityBondRelMapper;
 import com.deloitte.crm.service.*;
@@ -78,7 +79,13 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
             moneyTotal.setTaskId(windTask.getId());
 
             String shortName = moneyTotal.getBondAbstract();
-            BondInfo bondInfo = Optional.ofNullable(bondInfoService.findByShortName(shortName, Boolean.FALSE)).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+
+            //TODO 通过债券代码查询BondInfo 查询一条数据  这个地方可能存在多个 目前 按照业务来讲BondInfo 是债券全程作为唯一索引
+            BondInfoMapper bondInfoMapper = ApplicationContextHolder.get().getBean(BondInfoMapper.class);
+            BondInfo bondInfo1 =bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getBondCode,moneyTotal.getBondCode())
+                    .eq(BondInfo::getIsDeleted,Boolean.FALSE));
+            BondInfo bondInfo = Optional.ofNullable(bondInfo1).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
+
             if (moneyTotal.getLatestStatus().equals("实质违约")) {
                 bondInfo.setBondStatus(7);
                 bondInfo.setBondState(1);
