@@ -144,15 +144,13 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (StringUtils.isNotEmpty(issorIndustryFirst)) {
                 if (StringUtils.isNotEmpty(issorIndustrySecond)) {
                     windIndustry = issorIndustryFirst + "--" + issorIndustrySecond;
-
                 } else {
                     windIndustry = issorIndustryFirst;
                 }
             }
-
             bondInfo.setWind1(issorIndustryFirst);
-            bondInfo.setWind2(windIndustry);
-
+            bondInfo.setWind2(issorIndustrySecond);
+            //Wind行业
             newIss.setWindIndustry(windIndustry);
 
             bondNewIssMapper.insert(newIss);
