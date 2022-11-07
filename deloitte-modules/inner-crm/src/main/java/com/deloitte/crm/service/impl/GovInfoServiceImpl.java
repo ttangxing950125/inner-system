@@ -508,12 +508,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
-        //去除无效选项
-        List<MoreIndex> mapList = govAttrDto.getMapList();
-        if (!CollectionUtils.isEmpty(mapList)) {
-            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
-            govAttrDto.setMapList(newMapList);
-        }
+
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(govAttrDto);
         } else {
@@ -530,21 +525,90 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/26 00:35
      */
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
+        //去除无效选项
+        List<MoreIndex> mapList = govAttrByDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            govAttrByDto.setMapList(newMapList);
+        }
         //设置参数信息
         govAttrByDto = getSend(govAttrByDto);
 
         //获取基础参数信息
-        List<MoreIndex> mapList = govAttrByDto.getMapList();
+        mapList = govAttrByDto.getMapList();
 
         List<GovInfo> govInfos = govInfoMapper.getGovByAttrValue(govAttrByDto);
-
-        //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
+        if (CollectionUtils.isEmpty(govInfos)){
+            return resultRecords;
+        }
+        //封装新的结果集
+        resultRecords=getGovInfoResultNew(govInfos,mapList,resultRecords);
 
-        govInfos.stream().forEach(o -> {
-            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
+//        //封装新的结果集
+//        List<GovInfoResult> resultRecords = new ArrayList<>();
+//
+//        govInfos.stream().forEach(o -> {
+//            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
+//            resultRecords.add(govInfoResult);
+//        });
+
+        return resultRecords;
+    }
+
+    private List<GovInfoResult> getGovInfoResultNew(List<GovInfo> govInfos, List<MoreIndex> mapList, List<GovInfoResult> resultRecords) {
+        List<String>idList=new ArrayList<>();
+        List<String>codeList=new ArrayList<>();
+        govInfos.forEach(o->codeList.add(o.getDqGovCode()));
+        QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
+        //所有符合条件的指标值
+        List<EntityAttrValue> attrValueList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(codeList)){
+            query.lambda().in(EntityAttrValue::getEntityCode,codeList );
+
+        }
+        //需要查询额外指标时再指标数据
+        if (!CollectionUtils.isEmpty(idList)){
+            query.lambda().in(EntityAttrValue::getAttrId,idList );
+            //查询指标选项值
+            attrValueList = entityAttrValueMapper.selectList(query);
+        }
+        Map<String, List<EntityAttrValue>> entityCodeMap =new HashMap<>();
+        if (!CollectionUtils.isEmpty(attrValueList)){
+            entityCodeMap = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode));
+        }
+        Map<String, List<EntityAttrValue>> finalEntityCodeMap = entityCodeMap;
+        govInfos.forEach(info->{
+            List<MoreIndex> more=new ArrayList<>();
+            List<String>header=new ArrayList<>();
+            List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
+            if (!CollectionUtils.isEmpty(mapList)){
+                //遍历更多指标
+                mapList.forEach(o->{
+                    header.add(o.getName());
+                    MoreIndex moreIndex = new MoreIndex();
+                    moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
+                    String value="";
+                    if (!ObjectUtils.isEmpty(finalEntityCodeMap)){
+                        List<EntityAttrValue> valueList = finalEntityCodeMap.get(info.getDqGovCode());
+                        if (!ObjectUtils.isEmpty(valueList)){
+                            Map<Long, List<EntityAttrValue>> attrValuesById = valueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getAttrId));
+                            List<EntityAttrValue> attrValuesByAttrId = attrValuesById.get(Long.valueOf(o.getId()));
+                            if (!ObjectUtils.isEmpty(attrValuesByAttrId)){
+                                value = attrValuesByAttrId.get(0).getValue();
+                            }
+                        }
+                    }
+                    moreIndex.setValue(value);
+                    values.add(value);
+                    more.add(moreIndex);
+                });
+            }
+            GovInfoResult govInfoResult =new GovInfoResult();
+            govInfoResult.setGovInfo(info).setHeader(header).setValues(values).setMore(more);
             resultRecords.add(govInfoResult);
         });
+
         return resultRecords;
     }
 
@@ -634,30 +698,40 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/25 17:05
      */
     public Page<GovInfoResult> getListEntityPage(GovAttrByDto govAttrDto) {
+        //去除无效选项
+        List<MoreIndex> mapList = govAttrDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            govAttrDto.setMapList(newMapList);
+        }
         //设置参数信息
         govAttrDto = getSend(govAttrDto);
 
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
         Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
-        List<MoreIndex> mapList = govAttrDto.getMapList();
+        mapList = govAttrDto.getMapList();
 
         pageNum = (pageNum - 1) * pageSize;
         govAttrDto.setPageNum(pageNum);
         //查询页面数据
-        List<GovInfo> records = govInfoMapper.getGovByAttrValueByPage(govAttrDto);
+        List<GovInfo> govInfos = govInfoMapper.getGovByAttrValueByPage(govAttrDto);
         //查询条数
         Integer count = govInfoMapper.getGovCountByAttrValue(govAttrDto);
-
         pageResult.setTotal(count);
-
-        //封装新的结果集
+        /** =================================================================== */
+        //        //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
-
-        records.stream().forEach(o -> {
-            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
-            resultRecords.add(govInfoResult);
-        });
+        if (CollectionUtils.isEmpty(govInfos)){
+            return pageResult;
+        }
+        //封装新的结果集
+        resultRecords=getGovInfoResultNew(govInfos,mapList,resultRecords);
+        /** =================================================================== */
+//        govInfos.stream().forEach(o -> {
+//            GovInfoResult govInfoResult = getGovInfoResult(o, finalMapList);
+//            resultRecords.add(govInfoResult);
+//        });
         pageResult.setRecords(resultRecords);
         return pageResult;
     }
