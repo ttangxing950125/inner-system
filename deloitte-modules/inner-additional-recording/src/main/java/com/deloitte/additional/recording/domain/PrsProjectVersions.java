@@ -1,14 +1,13 @@
 package com.deloitte.additional.recording.domain;
 
-import java.util.Date;
-import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * (PrsProjectVersions)表实体类
