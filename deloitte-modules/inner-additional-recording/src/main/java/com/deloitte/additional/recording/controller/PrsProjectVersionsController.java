@@ -19,7 +19,7 @@ import java.util.List;
  * @since 2022-11-07 02:00:39
  */
 @RestController
-@RequestMapping("prsProjectVersions")
+@RequestMapping("/prsProjectVersions")
 public class PrsProjectVersionsController {
     /**
      * 服务对象
