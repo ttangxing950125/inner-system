@@ -88,7 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="findLastByShortName" resultType="bondNewIss">
         <include refid="selectBondNewIssVo"/>
-        where bond_short_name = #{shortName}
+        where bond_name = #{shortName}
         order by id desc
         limit 1
     </select>
