@@ -508,12 +508,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public Object getListEntityByPage(GovAttrByDto govAttrDto) {
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
-        //去除无效选项
-        List<MoreIndex> mapList = govAttrDto.getMapList();
-        if (!CollectionUtils.isEmpty(mapList)) {
-            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
-            govAttrDto.setMapList(newMapList);
-        }
+
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(govAttrDto);
         } else {
@@ -530,11 +525,17 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/26 00:35
      */
     public List<GovInfoResult> getListEntityAll(GovAttrByDto govAttrByDto) {
+        //去除无效选项
+        List<MoreIndex> mapList = govAttrByDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            govAttrByDto.setMapList(newMapList);
+        }
         //设置参数信息
         govAttrByDto = getSend(govAttrByDto);
 
         //获取基础参数信息
-        List<MoreIndex> mapList = govAttrByDto.getMapList();
+        mapList = govAttrByDto.getMapList();
 
         List<GovInfo> govInfos = govInfoMapper.getGovByAttrValue(govAttrByDto);
 
@@ -566,11 +567,12 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityCodeMap = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode));
         }
         Map<String, List<EntityAttrValue>> finalEntityCodeMap = entityCodeMap;
+        List<MoreIndex> finalMapList = mapList;
         govInfos.forEach(info->{
             List<MoreIndex> more=new ArrayList<>();
             List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
-            if (!CollectionUtils.isEmpty(mapList)){
-                mapList.forEach(o->{
+            if (!CollectionUtils.isEmpty(finalMapList)){
+                finalMapList.forEach(o->{
                     MoreIndex moreIndex = new MoreIndex();
                     moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
                     if (!ObjectUtils.isEmpty(finalEntityCodeMap)){
@@ -690,13 +692,19 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
      * @date 2022/9/25 17:05
      */
     public Page<GovInfoResult> getListEntityPage(GovAttrByDto govAttrDto) {
+        //去除无效选项
+        List<MoreIndex> mapList = govAttrDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            govAttrDto.setMapList(newMapList);
+        }
         //设置参数信息
         govAttrDto = getSend(govAttrDto);
 
         Integer pageNum = govAttrDto.getPageNum();
         Integer pageSize = govAttrDto.getPageSize();
         Page<GovInfoResult> pageResult = new Page<>(pageNum, pageSize);
-        List<MoreIndex> mapList = govAttrDto.getMapList();
+        mapList = govAttrDto.getMapList();
 
         pageNum = (pageNum - 1) * pageSize;
         govAttrDto.setPageNum(pageNum);
@@ -710,8 +718,9 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
 
+        List<MoreIndex> finalMapList = mapList;
         records.stream().forEach(o -> {
-            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
+            GovInfoResult govInfoResult = getGovInfoResult(o, finalMapList);
             resultRecords.add(govInfoResult);
         });
         pageResult.setRecords(resultRecords);

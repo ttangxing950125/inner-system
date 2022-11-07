@@ -1034,15 +1034,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Override
     public Object getListEntityByPage(EntityAttrByDto entityAttrDto) {
 
-        //去除无效选项
-        List<MoreIndex> mapList = entityAttrDto.getMapList();
-        if (!CollectionUtils.isEmpty(mapList)) {
-            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
-            entityAttrDto.setMapList(newMapList);
-        }
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
-        log.info("  >>>>  企业主体-更多指标,添加指标列表,mapList=[{}] <<<<  ", mapList);
+        log.info("  >>>>  企业主体-更多指标,添加指标列表,mapList=[{}] <<<<  ", entityAttrDto.getMapList());
         if (ObjectUtils.isEmpty(pageNum) && ObjectUtils.isEmpty(pageSize)) {
             return getListEntityAll(entityAttrDto);
         } else {
@@ -1071,8 +1065,13 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      */
     @Override
     public List<EntityInfoResult> getListEntityAll(EntityAttrByDto entityAttrDto) {
-        //获取参数信息
+        //去除无效选项
         List<MoreIndex> mapList = entityAttrDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            entityAttrDto.setMapList(newMapList);
+        }
+        mapList = entityAttrDto.getMapList();
         //0.公募债券 1.私募债券
         Integer raiseType = null;
 
@@ -1129,18 +1128,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             entityCodeMap = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode));
         }
         Map<String, List<EntityAttrValue>> finalEntityCodeMap = entityCodeMap;
+        List<MoreIndex> finalMapList = mapList;
         entityInfos.forEach(info->{
             List<MoreIndex> more=new ArrayList<>();
             List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
-            if (!CollectionUtils.isEmpty(mapList)){
-                mapList.forEach(o->{
+            if (!CollectionUtils.isEmpty(finalMapList)){
+                finalMapList.forEach(o->{
                     MoreIndex moreIndex = new MoreIndex();
                     moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
                     if (!ObjectUtils.isEmpty(finalEntityCodeMap)){
                         List<EntityAttrValue> valueList = finalEntityCodeMap.get(info.getEntityCode());
                         if (!ObjectUtils.isEmpty(valueList)){
                             Map<Long, List<EntityAttrValue>> attrValuesById = valueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getAttrId));
-                            List<EntityAttrValue> attrValuesByAttrId = attrValuesById.get(Long.valueOf(o.getId()));
+                            List<EntityAttrValue> attrValuesByAttrId = attrValuesById.get((o.getId()));
                             String value="";
                             if (!ObjectUtils.isEmpty(attrValuesByAttrId)){
                                 value = attrValuesByAttrId.get(0).getValue();
@@ -1249,6 +1249,12 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
      * @date 2022/9/25 17:04
      */
     public Page<EntityInfoResult> getListEntityPage(EntityAttrByDto entityAttrDto) {
+        //去除无效选项
+        List<MoreIndex> mapList = entityAttrDto.getMapList();
+        if (!CollectionUtils.isEmpty(mapList)) {
+            List<MoreIndex> newMapList = mapList.stream().filter(o -> !ObjectUtils.isEmpty(o.getId())).collect(Collectors.toList());
+            entityAttrDto.setMapList(newMapList);
+        }
         Integer pageNum = entityAttrDto.getPageNum();
         Integer pageSize = entityAttrDto.getPageSize();
         Integer raiseType = null;
@@ -1278,7 +1284,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         Page<EntityInfoResult> pageResult = new Page<>(pageNum, pageSize);
         //封装新的结果集
         List<EntityInfoResult> resultRecords = new ArrayList<>();
-        List<MoreIndex> mapList = entityAttrDto.getMapList();
+        mapList = entityAttrDto.getMapList();
 
         Integer count = entityInfoMapper.getEntityCountByBondType(raiseType, abs, coll, stockThk, stockCn);
         pageNum = (pageNum - 1) * pageSize;
@@ -1286,8 +1292,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
         pageResult.setTotal(count);
 
+        List<MoreIndex> finalMapList = mapList;
         records.stream().forEach(o -> {
-            EntityInfoResult entityInfoResult = getEntityInfoResult(o, mapList);
+            EntityInfoResult entityInfoResult = getEntityInfoResult(o, finalMapList);
             resultRecords.add(entityInfoResult);
         });
         pageResult.setRecords(resultRecords);
