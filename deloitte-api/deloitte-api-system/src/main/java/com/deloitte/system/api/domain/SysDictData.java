@@ -4,21 +4,26 @@ import com.alibaba.fastjson2.JSON;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.annotation.Excel.ColumnType;
 import com.deloitte.common.core.constant.UserConstants;
-import com.deloitte.common.core.web.domain.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 字典数据表 sys_dict_data
  *
  * @author lipeng
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class SysDictData implements Serializable {
 
     private static final long serialVersionUID = 1L;

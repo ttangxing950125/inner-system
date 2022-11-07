@@ -1,16 +1,13 @@
 package com.deloitte.additional.recording.controller;
 
 
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
-import org.springframework.web.bind.annotation.*;
+import com.deloitte.common.core.domain.R;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * (PrsProjectVersions)表控制层
@@ -27,5 +24,21 @@ public class PrsProjectVersionsController {
     @Resource
     private PrsProjectVersionsService prsProjectVersionsService;
 
-    
+    /**
+     * 查询版本配置列表
+     *
+     * @param year   年份
+     * @param status 状态
+     * @param param  搜索内容
+     * @param pageNum  页码
+     * @param pageSize  页面size
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/7 16:32
+     */
+    @PostMapping("/getPrsProjectVersions")
+    public R getPrsProjectVersions(String year, String status, String param,Integer pageNum,Integer pageSize) {
+
+        return R.ok(prsProjectVersionsService.getPrsProjectVersions(year, status, param,pageNum,pageSize));
+    }
 }
