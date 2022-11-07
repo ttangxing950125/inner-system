@@ -538,17 +538,28 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         mapList = govAttrByDto.getMapList();
 
         List<GovInfo> govInfos = govInfoMapper.getGovByAttrValue(govAttrByDto);
-
-        /** =================================================================== */
-        //        //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
-        List<String>idList=new ArrayList<>();
-        List<String>header=new ArrayList<>();
-        List<String>codeList=new ArrayList<>();
-
         if (CollectionUtils.isEmpty(govInfos)){
             return resultRecords;
         }
+        //封装新的结果集
+        resultRecords=getGovInfoResultNew(govInfos,mapList,resultRecords);
+
+//        //封装新的结果集
+//        List<GovInfoResult> resultRecords = new ArrayList<>();
+//
+//        govInfos.stream().forEach(o -> {
+//            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
+//            resultRecords.add(govInfoResult);
+//        });
+
+        return resultRecords;
+    }
+
+    private List<GovInfoResult> getGovInfoResultNew(List<GovInfo> govInfos, List<MoreIndex> mapList, List<GovInfoResult> resultRecords) {
+        List<String>idList=new ArrayList<>();
+        List<String>header=new ArrayList<>();
+        List<String>codeList=new ArrayList<>();
         govInfos.forEach(o->codeList.add(o.getDqGovCode()));
         QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
         //所有符合条件的指标值
@@ -595,14 +606,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             govInfoResult.setGovInfo(info).setHeader(header).setValues(values).setMore(more);
             resultRecords.add(govInfoResult);
         });
-        /** =================================================================== */
-//        //封装新的结果集
-//        List<GovInfoResult> resultRecords = new ArrayList<>();
-//
-//        govInfos.stream().forEach(o -> {
-//            GovInfoResult govInfoResult = getGovInfoResult(o, mapList);
-//            resultRecords.add(govInfoResult);
-//        });
+
         return resultRecords;
     }
 
@@ -709,20 +713,23 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         pageNum = (pageNum - 1) * pageSize;
         govAttrDto.setPageNum(pageNum);
         //查询页面数据
-        List<GovInfo> records = govInfoMapper.getGovByAttrValueByPage(govAttrDto);
+        List<GovInfo> govInfos = govInfoMapper.getGovByAttrValueByPage(govAttrDto);
         //查询条数
         Integer count = govInfoMapper.getGovCountByAttrValue(govAttrDto);
-
         pageResult.setTotal(count);
-
-        //封装新的结果集
+        /** =================================================================== */
+        //        //封装新的结果集
         List<GovInfoResult> resultRecords = new ArrayList<>();
-
-        List<MoreIndex> finalMapList = mapList;
-        records.stream().forEach(o -> {
-            GovInfoResult govInfoResult = getGovInfoResult(o, finalMapList);
-            resultRecords.add(govInfoResult);
-        });
+        if (CollectionUtils.isEmpty(govInfos)){
+            return pageResult;
+        }
+        //封装新的结果集
+        resultRecords=getGovInfoResultNew(govInfos,mapList,resultRecords);
+        /** =================================================================== */
+//        govInfos.stream().forEach(o -> {
+//            GovInfoResult govInfoResult = getGovInfoResult(o, finalMapList);
+//            resultRecords.add(govInfoResult);
+//        });
         pageResult.setRecords(resultRecords);
         return pageResult;
     }
