@@ -559,14 +559,18 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     private List<GovInfoResult> getGovInfoResultNew(List<GovInfo> govInfos, List<MoreIndex> mapList, List<GovInfoResult> resultRecords) {
         List<String>idList=new ArrayList<>();
         List<String>codeList=new ArrayList<>();
+        List<String>header=new ArrayList<>();
         govInfos.forEach(o->codeList.add(o.getDqGovCode()));
         QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
         //所有符合条件的指标值
         List<EntityAttrValue> attrValueList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(codeList)){
             query.lambda().in(EntityAttrValue::getEntityCode,codeList );
-
         }
+        mapList.forEach(o->{
+            header.add(o.getName());
+            idList.add(o.getId());
+        });
         //需要查询额外指标时再指标数据
         if (!CollectionUtils.isEmpty(idList)){
             query.lambda().in(EntityAttrValue::getAttrId,idList );
@@ -580,12 +584,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         Map<String, List<EntityAttrValue>> finalEntityCodeMap = entityCodeMap;
         govInfos.forEach(info->{
             List<MoreIndex> more=new ArrayList<>();
-            List<String>header=new ArrayList<>();
             List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
             if (!CollectionUtils.isEmpty(mapList)){
                 //遍历更多指标
                 mapList.forEach(o->{
-                    header.add(o.getName());
                     MoreIndex moreIndex = new MoreIndex();
                     moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
                     String value="";
