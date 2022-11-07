@@ -9,6 +9,7 @@ import com.deloitte.additional.recording.constants.Common;
 import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.mapper.PrsProjectVersionsMapper;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
+import com.deloitte.common.core.domain.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -34,7 +35,7 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
      *
      * @param year   年份
      * @param status 状态
-     * @param param  搜索内容
+     * @param name  版本名称
      * @param pageNum  页码
      * @param pageSize  页面size
      * @return R
@@ -42,7 +43,7 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
      * @date 2022/11/7 16:32
      */
     @Override
-    public Object getPrsProjectVersions(String year, String status, String param,Integer pageNum,Integer pageSize) {
+    public Page<PrsProjectVersions> getPrsProjectVersions(String year, String status, String name, Integer pageNum, Integer pageSize) {
         if (ObjectUtils.isEmpty(pageNum)){
             pageNum= Common.DEFAUT_PAGE_NUM;
         }
@@ -57,9 +58,10 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
         if (!ObjectUtils.isEmpty(status)){
             query.lambda().eq(PrsProjectVersions::getStatus,year);
         }
-        if (!ObjectUtils.isEmpty(param)){
-            query.lambda().eq(PrsProjectVersions::getName,param);
+        if (!ObjectUtils.isEmpty(name)){
+            query.lambda().like(PrsProjectVersions::getName,name);
         }
+        query.lambda().orderByAsc(PrsProjectVersions::getId);
         return prsProjectVersionsMapper.selectPage(pageInfo,query);
     }
     @Override
@@ -68,4 +70,58 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
         List<String> collect = prsProjectVersions.parallelStream().filter(e -> StringUtils.isNotEmpty(e.getName())).map(PrsProjectVersions::getName).distinct().collect(Collectors.toList());
         return collect;
     }
+    /**
+     * 一键禁用
+     *
+     * @param ids  版本id列表
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/7 17:51
+     */
+    @Override
+    public Integer updateStatusToDownByIds(List<Integer> ids) {
+        return updateStatusByIds(ids,Common.DELETE);
+    }
+    /**
+     * 一键启用
+     *
+     * @param ids  版本id列表
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/7 17:51
+     */
+    @Override
+    public Integer updateStatusToUpByIds(List<Integer> ids) {
+        return updateStatusByIds(ids,Common.NORMAL);
+    }
+
+    /**
+     * 新增版本
+     *
+     * @param prsProjectVersions
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/7 18:00
+     */
+    @Override
+    public R insertPrsProjectVersions(PrsProjectVersions prsProjectVersions) {
+        prsProjectVersionsMapper.insert(prsProjectVersions);
+        return R.ok(Common.INSERT_SUCCESS);
+    }
+
+    /**
+     * 批量修改版本状态
+     *
+     * @param ids
+     * @param status
+     * @return Integer
+     * @author 冉浩岑
+     * @date 2022/11/7 17:58
+    */
+    private Integer updateStatusByIds(List<Integer> ids ,Integer status){
+        PrsProjectVersions prsProjectVersions = new PrsProjectVersions();
+        prsProjectVersions.setStatus(status);
+        return prsProjectVersionsMapper.update(prsProjectVersions,new QueryWrapper<PrsProjectVersions>().lambda().in(PrsProjectVersions::getId,ids));
+    }
+
 }

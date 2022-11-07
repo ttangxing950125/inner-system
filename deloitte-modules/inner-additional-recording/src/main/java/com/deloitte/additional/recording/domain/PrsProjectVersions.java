@@ -1,5 +1,7 @@
 package com.deloitte.additional.recording.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +25,7 @@ public class PrsProjectVersions implements Serializable {
     private static final long serialVersionUID = 361705244178024930L;
     @Excel(name = "${column.comment}")
 
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 版本名称

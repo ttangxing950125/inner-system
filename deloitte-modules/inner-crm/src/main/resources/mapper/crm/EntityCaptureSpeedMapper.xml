@@ -9,7 +9,7 @@
         speed.source as source,
         speed.entity_code as entityCode,
         speed.entity_name as entityName,
-        speed.credit_code as creditCode,
+        ent.credit_code as creditCode,
         speed.capture as capture,
         speed.capture_time as captureTime,
         speed.added as added,
