@@ -150,7 +150,7 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             }
             bondInfo.setWind1(issorIndustryFirst);
             bondInfo.setWind2(issorIndustrySecond);
-
+            //Wind行业
             newIss.setWindIndustry(windIndustry);
 
             bondNewIssMapper.insert(newIss);
