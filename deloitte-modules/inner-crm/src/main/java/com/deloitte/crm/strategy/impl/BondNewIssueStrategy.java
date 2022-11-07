@@ -84,19 +84,22 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             Integer resStatus = null;
 
             //查询债券是否存在
-            String shortName = newIss.getBondShortName();
+//            String shortName = newIss.getBondShortName();
+            //债券全称
+
+            String bondName = newIss.getBondName().trim().replace("（", "(").replace("）", ")");
 
             //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(shortName, Boolean.FALSE);
+            BondInfo bondInfo = bondInfoService.findByShortName(bondName, Boolean.FALSE);
             if (bondInfo == null) {
                 bondInfo = new BondInfo();
             }
             //债券简称
-            bondInfo.setBondShortName(shortName);
+            bondInfo.setBondShortName(newIss.getBondShortName());
             //债券交易代码
             bondInfo.setOriCode(newIss.getTradeCode());
             //债券全称
-            bondInfo.setBondName(newIss.getBondName());
+            bondInfo.setBondName(bondName);
             //起息日
             bondInfo.setValueDate(newIss.getValueDate());
             //到期日
@@ -105,7 +108,7 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             bondInfo.setListdate(ObjectUtil.isEmpty(newIss.getIpoDate()) ? null : DateUtil.parseDate(newIss.getIpoDate()));
 
             //看之前有没有导入过这个数据
-            BondNewIss last = bondNewIssMapper.findLastByShortName(shortName);
+            BondNewIss last = bondNewIssMapper.findLastByShortName(bondName);
             if (last == null) {
                 resStatus = DataChangeType.INSERT.getId();
             } else {
@@ -141,15 +144,13 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
             if (StringUtils.isNotEmpty(issorIndustryFirst)) {
                 if (StringUtils.isNotEmpty(issorIndustrySecond)) {
                     windIndustry = issorIndustryFirst + "--" + issorIndustrySecond;
-
                 } else {
                     windIndustry = issorIndustryFirst;
                 }
             }
-
             bondInfo.setWind1(issorIndustryFirst);
-            bondInfo.setWind2(windIndustry);
-
+            bondInfo.setWind2(issorIndustrySecond);
+            //Wind行业
             newIss.setWindIndustry(windIndustry);
 
             bondNewIssMapper.insert(newIss);
@@ -172,13 +173,13 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
 
 
             //发债记录
-            if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())){
+            if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())) {
                 //创建log
                 BondsListingLog log = new BondsListingLog();
                 log.setCode(newIss.getTradeCode());
                 log.setName(newIss.getBondName());
                 log.setShortName(newIss.getBondShortName());
-                log.setIssueDate(DateUtil.dateTime(newIss.getIssStartDate(),"yyyy-MM-dd"));
+                log.setIssueDate(DateUtil.dateTime("yyyy-MM-dd", newIss.getIssStartDate()));
                 log.setPublisher(newIss.getIssorName());
                 log.setRecordTime(timeNow);
                 log.setSourceType(1);
@@ -206,7 +207,6 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
                 }
                 //更新主体数据
                 entityInfoService.updateBatchById(entityInfos);
-
 
 
                 //新敞口划分任务

@@ -30,10 +30,6 @@ public enum Common {
 
     public static final String DAY = "DAY";
 
-    public static final String ATTR_FIN = "金融机构表";
-    public static final String ATTR_CITY = "城投机构表";
-    public static final String ATTR_ISS = "财报收数";
-
     public static final String MOUTH = "MOUTH";
 
     public static final Integer FIRST_NUMBER = 0;
@@ -47,35 +43,6 @@ public enum Common {
     public static final String TABLE_BOND_INFO = "BOND_INFO";
 
     public static final String ENTITY_ATTR_VALUE = "ENTITY_ATTR_VALUE";
-
-    public static final String TRANSACTION_CODE_NAME = "交易代码";
-    public static final Integer TRANSACTION_CODE_ID = 804;
-
-
-    public static final String WHETHER_COLLECTIVE_BONDS = "是否发行集合债";
-    public static final Integer WHETHER_COLLECTIVE_BONDS_ID = 58;
-
-
-    public static final String BOND_NAME = "债券全称";
-    public static final Integer BOND_NAME_ID = 48;
-
-
-    public static final String WHETHER_VIOLATION = "是否违约";
-    public static final Integer WHETHER_VIOLATION_ID = 108;
-
-
-    public static final String WHETHER_ATTR_NAME_SW = "申万(2021)行业划分明细";
-    public static final Integer WHETHER_ATTR_NAME_SW_ID = 650;
-    public static final Integer WHETHER_ATTR_NAME_SW_ATTR_CATE_ID = 97;
-
-
-    public static final String WHETHER_ATTR_NAME_WIND = "wind行业划分明细";
-    public static final Integer WWHETHER_ATTR_NAME_WIND_ID = 652;
-    public static final Integer WWHETHER_ATTR_NAME_WIND_ATTR_CATE_ID = 99;
-
-    public static final String TABLE_CRM_MAS_TASK = "TABLE_CRM_MAS_TASK";
-    public static final String STOCK_CODE = "债券代码";
-    public static final Integer STOCK_CODE_ID = 49;
 
     public static final String  STOCK_TYPE_A= "A";
 
@@ -91,51 +58,10 @@ public enum Common {
     public static final String  CHECK_TYPE8="匹配冲突,需人工介入";
     public static final String  CHECK_TYPE9="识别失败";
 
-
-
-    //上市日期对应的att_id
-    public static final Integer SHANSI_DATE_ID = 583;
-
-    //退市日期对应的att_id
-    public static final Integer TUISI_DATE_ID = 584;
-
-    //上市板块
-    public static final Integer STOCK_SHANXI = 893;
-
-    //交易所
-    public static final Integer EXCHANGE_ID = 903;
-
-    //港股上市日期
-    public static final Integer STOCK_SHANXI_DATE_HK_ID = 827;
-
-    //港股退市日期
-    public static final Integer TUISI_DATE_HK_ID = 602;
-
-    //港股上市版
-    public static final Integer STOCK_SHANXI_HK_ID = 828;
-
-    //港股交易所
-    public static final Integer EXCHANGE_HK_ID = 980;
-
-    public static final String START_XI_DATE = "起息日";
-    public static final Integer START_XI_DATE_ID = 52;
-
-    public static final String STRING_END_DATE = "到期日";
-    public static final Integer STRING_END_DATE_ID = 53;
-
     //股票
     public static final String TYPE_STOCK = "TYPE_STOCK";
     //债券
     public static final String TYPE_BOND = "TYPE_BOND";
-
-    public static final Integer BOND_TYPE_ID = 85;
-    public static final String BOND_TYPE = "债券类型";
-
-    public static final String anRportType = "年报列示类型";
-    public static final Integer AN_RPORT_TYPE = 680;
-
-    public static final String FINANCE_SUB_INDU = "金融机构细分行业";
-    public static final Integer FINANCE_SUB_INDU_ID = 656;
 
     /**
      *  匹配社会信用代码的正则表达式
@@ -154,7 +80,20 @@ public enum Common {
     public static final String UPDATED = "修改时间";
 
     public static final String CREATED = "创建时间";
-
+    /** 时间 yyyy-MM-dd 格式 */
+    public static final String TIME_FORMART_YYYY_MM_DD = "yyyy-MM-dd";
+    /** 政府 */
+    public static final String GOV = "政府";
+    /** 企业 */
+    public static final String ENTITY = "企业";
+    /** 修改成功 */
+    public static final String UPDATE_SUCCESS = "修改成功";
+    /** 排除股票证券以 a 开头 */
+    public static final String STOCK_BEGIN_WITH_A = "a";
+    /** 存续状态 Y */
+    public static final String LIVE_STATE = "Y";
+    /** 存续状态 N */
+    public static final String DEAD_STATE = "N";
     /** 修改名称 */
     public static final String EDITE_NAME = "roleSevenEditeName";
     /** 新增主体 */
@@ -165,6 +104,14 @@ public enum Common {
     public static final String IGNORE = "roleSevenIgnore";
     /** 删除任务 */
     public static final String DELETE_TASK = "roleSevenDeleteTask";
-
-
+    /** 系统自动生成 */
+    public static final String CREATE_AUTO = "系统自动生成";
+    /** SQL_LIMIT_1 */
+    public static final String SQL_LIMIT_1 = " limit 1";
+    /** 存续 */
+    public static final String LIVE = "存续";
+    /** 未上市 */
+    public static final String NOT_ISS = "未上市";
+    /** 已退市 */
+    public static final String DOWN = "已退市";
 }

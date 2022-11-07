@@ -91,13 +91,13 @@ public class CrmSupplyTaskController extends BaseController {
         return toAjax(crmSupplyTaskService.deleteCrmSupplyTaskByIds(ids));
     }
     /**
-     *添加方法描述
+     * 查询角色3.4.5任务完成情况统计
      *
      * @return R
      * @author 冉浩岑
      * @date 2022/10/9 18:06
     */
-    @ApiOperation(value = "查询任务完成情况统计")
+    @ApiOperation(value = "查询角色3.4.5任务完成情况统计")
     @PostMapping("/getTaskStatistics")
     public R getTaskStatistics() {
         return R.ok(crmSupplyTaskService.getTaskStatistics());

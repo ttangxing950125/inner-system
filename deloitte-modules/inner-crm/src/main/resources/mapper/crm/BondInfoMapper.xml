@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="findByShortName" resultType="bondInfo">
         <include refid="selectBondInfoVo" />
-        where bond_short_name = #{shortName} And is_deleted= #{isDeleted}
+        where bond_name = #{shortName} And is_deleted= #{isDeleted}
     </select>
 
 

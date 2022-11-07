@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.security.utils.SecurityUtils;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ICrmSupplyTaskService;
@@ -285,7 +286,7 @@ public class CrmSupplyTaskServiceImpl extends ServiceImpl<CrmSupplyTaskMapper, C
 
         Long roleId = sysUserRole.getRoleId();
         log.info("  >>>> 角色 "+(roleId-2)+" 任务列表查询  <<<<  ");
-        String currentTime = TimeFormatUtil.getDayTime("yyyy-MM-dd", 0);
+        String currentTime = TimeFormatUtil.getDayTime(Common.TIME_FORMART_YYYY_MM_DD, 0);
         //设置日期
         taskStatistics.setTodayDate(currentTime);
         //设置周几

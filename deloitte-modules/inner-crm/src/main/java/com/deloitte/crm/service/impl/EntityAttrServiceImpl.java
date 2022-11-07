@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.redis.service.RedisService;
 import com.deloitte.crm.constants.CacheName;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.domain.EntityAttr;
 import com.deloitte.crm.domain.EntityAttrValue;
 import com.deloitte.crm.domain.EntityInfo;
@@ -13,6 +14,7 @@ import com.deloitte.crm.mapper.EntityAttrMapper;
 import com.deloitte.crm.mapper.EntityAttrValueMapper;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.IEntityAttrService;
+import com.deloitte.crm.vo.NameValueVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,21 +138,21 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
 
     @Override
     public R getAllByGroup(Integer type) {
-        String name="企业";
+        String name= Common.ENTITY;
         if (!ObjectUtils.isEmpty(type)&&2==type){
-            name="政府";
+            name= Common.GOV;
         }
         log.info("  >>>> 获取 "+name+" 主体父子级指标清单  <<<<  ");
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList((query.lambda().eq(EntityAttr::getAttrType, type)));
 
         Map<String, List<EntityAttr>> listMap = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getAttrCateName));
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<NameValueVo> result = new ArrayList<>();
         for (String key : listMap.keySet()) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", key);
-            map.put("value", listMap.get(key));
-            result.add(map);
+            NameValueVo nameValueVo = new NameValueVo();
+            nameValueVo.setName(key);
+            nameValueVo.setValue(listMap.get(key));
+            result.add(nameValueVo);
         }
         return R.ok(result);
     }
@@ -231,11 +233,12 @@ public class EntityAttrServiceImpl extends ServiceImpl<EntityAttrMapper, EntityA
         log.info("  >>>> 根据机构类型查询需要补充录入的信息,organName=[{}] <<<<  ",organName);
         QueryWrapper<EntityAttr> query = new QueryWrapper<>();
         List<EntityAttr> entityAttrs = entityAttrMapper.selectList(query.lambda().eq(EntityAttr::getAttrCateName, organName));
+        Map<String, List<EntityAttr>> collectMap=new HashMap<>();
         if (CollectionUtils.isEmpty(entityAttrs)) {
-            return null;
+            return collectMap;
         }
-        Map<String, List<EntityAttr>> collect = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getName));
+        collectMap = entityAttrs.stream().collect(Collectors.groupingBy(EntityAttr::getName));
 
-        return collect;
+        return collectMap;
     }
 }

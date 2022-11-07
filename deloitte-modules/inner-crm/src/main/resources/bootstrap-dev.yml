@@ -21,6 +21,7 @@ spring:
         server-addr: 10.173.43.11:8848
         # 配置所在分组
         namespace: 2c34a3b6-3f61-47c9-b992-a9b28e418b32
+        group: DEV
       config:
         # 配置中心地址
         server-addr: 10.173.43.11:8848
@@ -31,6 +32,7 @@ spring:
           - ${spring.application.name}-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
         # 配置所在分组
         namespace: 2c34a3b6-3f61-47c9-b992-a9b28e418b32
+        group: DEV
 
 logging:
   level:

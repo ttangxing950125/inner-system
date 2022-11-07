@@ -168,10 +168,16 @@
         a.*
         FROM
         entity_info a
-        LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
-        LEFT JOIN bond_info c ON b.bd_code = c.bond_code
-        left JOIN entity_stock_thk_rel d on a.entity_code=d.entity_code
-        left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
+        <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')">
+            LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
+            LEFT JOIN bond_info c ON b.bd_code = c.bond_code
+        </if>
+        <if test="stockThk != null  and stockThk != ''">
+            left JOIN entity_stock_thk_rel d on a.entity_code=d.entity_code
+        </if>
+        <if test="stockCn != null  and stockCn != ''">
+            left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
+        </if>
         <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != '')or (stockCn != null  and stockCn != '')">
             <where>
                 <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
