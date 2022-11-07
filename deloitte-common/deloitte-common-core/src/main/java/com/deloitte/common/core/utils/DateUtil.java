@@ -164,12 +164,14 @@ public class DateUtil extends cn.hutool.core.date.DateUtil {
 
     public static void main(String[] args) {
 
-        String str="20121010";
-        final String replace = DateUtil.formatDateByString(str);
-        final DateTime yyyMMdd = cn.hutool.core.date.DateUtil.parse(replace);
+        String str="2012-10-10";
+//        final String replace = DateUtil.formatDateByString(str);
+//        final DateTime yyyMMdd = cn.hutool.core.date.DateUtil.parse(replace);
+        final Date date = dateTime("yyyy-MM-dd", str);
+        String s=null;
+        String str2=s.trim().replace("（", "(").replace("）", ")");
 
 
-
-        System.out.println(yyyMMdd);
+        System.out.println(str2);
     }
 }

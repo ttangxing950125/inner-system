@@ -88,7 +88,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
 
         //入历史记录库
         for (BondNewIss newIss : isses) {
-            if (StrUtil.isBlank(newIss.getBondShortName())){
+            if (StrUtil.isBlank(newIss.getBondName())){
                 continue;
             }
             //Wind债券类型(二级) 国债和地方政府债不考虑
