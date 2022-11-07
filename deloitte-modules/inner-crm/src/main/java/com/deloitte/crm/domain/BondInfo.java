@@ -133,11 +133,11 @@ public class BondInfo {
     /**
      * 城投债(wind)
      */
-    private Integer citiinvestWindTag;
+    private String citiinvestWindTag;
     /**
      * 城投债(YY)
      */
-    private Integer citiinvestYyTag;
+    private String citiinvestYyTag;
 
     @Override
     public String toString() {

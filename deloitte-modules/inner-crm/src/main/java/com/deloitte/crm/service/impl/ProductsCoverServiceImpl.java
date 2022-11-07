@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.CoverRule;
 import com.deloitte.crm.domain.*;
 import com.deloitte.crm.dto.CoverStatus;
@@ -19,15 +20,8 @@ import com.deloitte.crm.vo.EntityOrGovByAttrVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
-
-import javax.swing.text.html.Option;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static cn.hutool.poi.excel.sax.ElementName.row;
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 
 /**
  * @author PenTang
@@ -405,23 +399,36 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         ArrayList<String> ArrayList = new ArrayList<>();
         ArrayList.add("银行");
         ArrayList.add("非银金融");
-
-        //ShenWan的触发规则
-        String[] splitS = entityInfo.getShenWanMaster().split("--");
-        List<String> collectByS = Arrays.stream(splitS).collect(Collectors.toList());
-        //取一级
-        String s1 = collectByS.get(0);
-        //wind触发规则
-        String[] splitW = entityInfo.getWindMaster().split("--");
-        List<String> collectByW = Arrays.stream(splitW).collect(Collectors.toList());
-        String s2 = collectByW.get(1);
-
-        //根据ShenWan判断是否金融机构
-        boolean containsW = ArrayList.contains(s1);
-        //根据Wand判断是否金融机构
-        boolean containsS = strings.contains(s2);
-
-        boolean fins = containsW || containsS;
+        //Wan的触发规则
+        boolean containsW;
+        if (!Objects.equals(entityInfo.getWindMaster(), null)) {
+            //wind触发规则
+            String[] splitW = entityInfo.getWindMaster().split("--");
+            List<String> collectByW = Arrays.stream(splitW).collect(Collectors.toList());
+            String s2 = "";
+            if (collectByW.size() != 1) {
+                s2 = collectByW.get(1);
+            } else {
+                //此时该主体没有wind没有二级
+                containsW = false;
+            }
+            //根据Wand判断是否金融机构
+            containsW = strings.contains(s2);
+        } else {
+            containsW = false;
+        }
+        boolean containsS;
+        if (!Objects.equals(entityInfo.getShenWanMaster(), null)) {
+            String[] splitS = entityInfo.getShenWanMaster().split("--");
+            List<String> collectByS = Arrays.stream(splitS).collect(Collectors.toList());
+            //取一级
+            String s1 = collectByS.get(0);
+            //根据ShenWan判断是否金融机构
+            containsS = ArrayList.contains(s1);
+        } else {
+            containsS = false;
+        }
+        boolean fins = !(containsW || containsS);
         //A股
         if (CollUtil.isNotEmpty(stockCnInfos)) {
             boolean A = stockCnInfos.stream().anyMatch(row -> Objects.equals(row.getStockStatus(), 6) || row.getListDate() != null);
@@ -432,7 +439,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
                     coverStatuses.add(coverStatusA);
                 } else {
                     coverStatusA.setStatus("未覆盖");
-                    coverStatusA.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                    coverStatusA.setCoverDes("未覆盖(不是A/港股上市或发公募债的非金融)");
                     coverStatuses.add(coverStatusA);
                 }
 
@@ -459,11 +466,11 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
             if (G) {
                 if (G && fins) {
                     coverStatusG.setStatus("覆盖");
-                    coverStatusG.setCoverDes("应覆盖(A股上市非金融)");
+                    coverStatusG.setCoverDes("应覆盖(港股上市非金融)");
                     coverStatuses.add(coverStatusG);
                 } else {
                     coverStatusG.setStatus("未覆盖");
-                    coverStatusG.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                    coverStatusG.setCoverDes("未覆盖(不是A/港股上市或发公募债的非金融)");
                     coverStatuses.add(coverStatusG);
                 }
 
@@ -488,32 +495,32 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         //债券
         if (CollUtil.isNotEmpty(BondInfoList)) {
             boolean b = BondInfoList.stream().anyMatch(row -> Objects.equals(row.getRaiseType(), 0)
-                    && Objects.equals(row.getColl(), 0)
-                    && Objects.equals(row.getAbs(), 0)
+                    && Objects.equals(row.getColl(), false)
+                    && Objects.equals(row.getAbs(), false)
                     && Objects.equals(row.getCitiinvestWindTag(), "否")
                     && Objects.equals(row.getCitiinvestYyTag(), "否")
                     && Objects.equals(row.getBondState(), 0)
             );
-            if (b) {
+            if (fins) {
                 if (b && fins) {
                     coverStatusB.setStatus("覆盖");
                     coverStatusB.setCoverDes("应覆盖(存续债券非金融)");
                     coverStatuses.add(coverStatusB);
                 } else {
                     coverStatusB.setStatus("未覆盖");
-                    coverStatusB.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                    coverStatusB.setCoverDes("未覆盖(不是A/港股上市或发公募债的非金融)");
                     coverStatuses.add(coverStatusB);
                 }
             } else {
                 List<BondInfo> collect = BondInfoList.stream().filter(o -> Objects.equals(o.getRaiseType(), 0)).collect(Collectors.toList());
                 boolean b1 = collect.stream().anyMatch(row -> Objects.equals(row.getBondStatus(), 7) || Objects.equals(row.getBondStatus(), 8) || Objects.equals(row.getBondStatus(), 9));
                 if (b1) {
-                    coverStatusB.setStatus("不在覆盖");
-                    coverStatusG.setCoverDes("不在覆盖(无存续公募债)");
+                    coverStatusB.setStatus("不再覆盖");
+                    coverStatusB.setCoverDes("不再覆盖(无存续公募债)");
                     coverStatuses.add(coverStatusB);
                 } else {
                     coverStatusB.setStatus("未覆盖");
-                    coverStatusB.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                    coverStatusB.setCoverDes("未覆盖(不是A/港股上市或发公募债的非金融)");
                     coverStatuses.add(coverStatusB);
                 }
 
@@ -521,7 +528,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
 
         } else {
             coverStatusB.setStatus("未覆盖");
-            coverStatusB.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+            coverStatusB.setCoverDes("未覆盖(不是A/港股上市或发公募债的非金融)");
             coverStatuses.add(coverStatusB);
         }
         //最终组装结果
@@ -555,7 +562,7 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
                 productsCover.setCoverDes(string.toString());
             } else {
                 productsCover.setIsCover("0");
-                productsCover.setCoverDes("未覆盖（不是A/港股上市或发公募债的非金融");
+                productsCover.setCoverDes("未覆盖(不是A/港股上市或发公募债的非金融)");
             }
         }
 
@@ -564,5 +571,145 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
         return productsCovers;
     }
 
+    /**
+     * IB-评级
+     *
+     * @param entityInfo
+     * @param BondInfoList
+     * @param stockCnInfos
+     * @return List<ProductsCover>
+     * @author penTang
+     * @date 2022/11/4 16:51
+     */
+    public List<ProductsCover> CoverRuleIB(EntityInfo entityInfo, ArrayList<BondInfo> BondInfoList, ArrayList<StockCnInfo> stockCnInfos,List<ProductsCover> productsCovers) {
+        log.info("IB-评级");
+        ArrayList<CoverStatus> coverStatuses = new ArrayList<>();
+        //A股的初始覆盖状态
+        CoverStatus coverStatusByA = new CoverStatus();
+        //债券的初始覆盖状态
+        CoverStatus coverStatusByBond = new CoverStatus();
+        //金融机构的初始覆盖情况
+        CoverStatus coverStatusByFin = new CoverStatus();
+        //入库的对象
+        ProductsCover productsCover = new ProductsCover();
+        productsCover.setProId(CoverRule.IB_ID);
+        productsCover.setEntityCode(entityInfo.getEntityCode());
+        productsCover.setIsGov("0");
+        //A股
+        if (CollUtil.isNotEmpty(stockCnInfos)) {
+            boolean b = stockCnInfos.stream().anyMatch(i -> Objects.equals(i.getStockStatus(), 6) || i.getListDate().equals(null));
+            if (b) {
+                coverStatusByA.setCoverDes(CoverRule.COVER_IB_A);
+                coverStatusByA.setStatus("覆盖");
+            } else {
+                boolean a = stockCnInfos.stream().allMatch(row -> row.getDelistingDate() != null || Objects.equals(row.getStockStatus(), 9));
+                if (a) {
+                    coverStatusByA.setCoverDes(CoverRule.COVER_NOT_A);
+                    coverStatusByA.setStatus("不再覆盖");
+                } else {
+                    coverStatusByA.setCoverDes(CoverRule.COVER_NOT);
+                    coverStatusByA.setStatus("未覆盖");
+                }
+            }
+        } else {
+            coverStatusByA.setCoverDes(CoverRule.COVER_NOT);
+            coverStatusByA.setStatus("未覆盖");
+            coverStatuses.add(coverStatusByA);
+        }
+        //债券
+        if (CollUtil.isNotEmpty(BondInfoList)) {
+            boolean b = BondInfoList.stream().anyMatch(row -> Objects.equals(row.getBondStatus(), 4) && Objects.equals(row.getRaiseType(), 0) && Objects.equals(row.getBondState(), 0));
+            if (b) {
+                coverStatusByBond.setCoverDes(CoverRule.COVER_IB_Bond);
+                coverStatusByBond.setStatus("覆盖");
+                coverStatuses.add(coverStatusByBond);
+            } else {
+                List<BondInfo> collect = BondInfoList.stream().filter(o -> Objects.equals(o.getRaiseType(), 0)).collect(Collectors.toList());
+                boolean b1 = collect.stream().allMatch(row -> Objects.equals(row.getBondStatus(), 7) || Objects.equals(row.getBondStatus(), 8) || Objects.equals(row.getBondStatus(), 9));
+                if (b1) {
+                    coverStatusByBond.setCoverDes(CoverRule.COVER_NOT_Bond);
+                    coverStatusByBond.setStatus("不再覆盖");
+                    coverStatuses.add(coverStatusByBond);
+                } else {
+                    coverStatusByBond.setCoverDes(CoverRule.COVER_NOT);
+                    coverStatusByBond.setStatus("未覆盖");
+                    coverStatuses.add(coverStatusByBond);
+                }
+            }
+        } else {
+            coverStatusByBond.setCoverDes(CoverRule.COVER_NOT);
+            coverStatusByBond.setStatus("未覆盖");
+            coverStatuses.add(coverStatusByBond);
+        }
+        //金融机构
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("银行");
+        strings.add("金融");
+        strings.add("多元金融");
+        strings.add("保险II");
+        strings.add("非银金融");
+        ArrayList<String> ArrayList = new ArrayList<>();
+        ArrayList.add("银行");
+        ArrayList.add("非银金融");
+        //Wan的触发规则
+        boolean containsW;
+        if (!Objects.equals(entityInfo.getWindMaster(), null)) {
+            //wind触发规则
+            String[] splitW = entityInfo.getWindMaster().split("--");
+            List<String> collectByW = Arrays.stream(splitW).collect(Collectors.toList());
+            String s2 = "";
+            if (collectByW.size() != 1) {
+                s2 = collectByW.get(1);
+            } else {
+                //此时该主体没有wind没有二级
+                containsW = false;
+            }
+            //根据Wand判断是否金融机构
+            containsW = strings.contains(s2);
+        } else {
+            containsW = false;
+        }
+        boolean containsS;
+        if (!Objects.equals(entityInfo.getShenWanMaster(), null)) {
+            String[] splitS = entityInfo.getShenWanMaster().split("--");
+            List<String> collectByS = Arrays.stream(splitS).collect(Collectors.toList());
+            //取一级
+            String s1 = collectByS.get(0);
+            //根据ShenWan判断是否金融机构
+            containsS = ArrayList.contains(s1);
+        } else {
+            containsS = false;
+        }
+        boolean fins = containsW || containsS;
+        if (fins){
+            coverStatusByFin.setCoverDes(CoverRule.COVER_IB_FIN);
+            coverStatusByFin.setStatus("覆盖");
+            coverStatuses.add(coverStatusByFin);
+        }else{
+            coverStatusByFin.setCoverDes(CoverRule.COVER_NOT);
+            coverStatusByFin.setStatus("未覆盖");
+            coverStatuses.add(coverStatusByFin);
+        }
 
+        productsCovers.add(productsCover);
+        return productsCovers;
+    }
+
+
+    /**
+     *IB-预警
+     *
+     * @param entityInfo
+     * @param BondInfoList
+     * @param stockCnInfos
+     * @param productsCovers
+     * @return List<ProductsCover>
+     * @author penTang
+     * @date 2022/11/7 10:14
+    */
+    public List<ProductsCover> CoverRuleIBY(EntityInfo entityInfo, ArrayList<BondInfo> BondInfoList, ArrayList<StockCnInfo> stockCnInfos,List<ProductsCover> productsCovers){
+
+        return null;
+
+    }
 }

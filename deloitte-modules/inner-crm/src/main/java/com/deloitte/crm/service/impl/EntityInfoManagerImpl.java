@@ -232,7 +232,12 @@ public class EntityInfoManagerImpl implements EntityInfoManager {
             //债券全称
             case BOND_FULL_NAME:
                 BondInfo bondFullName = bondInfoMapper.selectOne(new QueryWrapper<BondInfo>().lambda().eq(BondInfo::getBondName, target).eq(BondInfo::getIsDeleted, Boolean.FALSE));
-                return Optional.ofNullable(bondFullName).map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo()))).orElseGet(() -> R.fail(bondFullName, BadInfo.EXITS_BOND_FULL_NAME.getInfo()));
+                Optional<BondInfo> bondFullName1 = Optional.ofNullable(bondFullName);
+
+                Optional<R<Object>> objectR = bondFullName1.map(e -> (R.ok(null, SuccessInfo.EMPTY_ENTITY_CODE.getInfo())));
+
+                R<Object> objectR1 = objectR.orElseGet(() -> R.fail(bondFullName, BadInfo.EXITS_BOND_FULL_NAME.getInfo()));
+                return objectR1;
             //新地方政府地方名称
             case GOV_NAME:
                 GovInfo govByName = govInfoMapper.selectOne(new QueryWrapper<GovInfo>().lambda().eq(GovInfo::getGovName, target));
