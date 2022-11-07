@@ -30,9 +30,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     @Resource
     private SysDictDataMapper mapper;
 
-    @Resource
-    private SysDictDataMapper sysDictDataMapper;
-
     /**
      * 查询可查询年份
      *
@@ -42,7 +39,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public R getYear() {
-        return R.ok(sysDictDataMapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.SEARCH_YEAR)));
+        return R.ok(mapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.SEARCH_YEAR)));
     }
     /**
      * 查询可查询数据源
@@ -53,7 +50,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public R getDataSource() {
-        return R.ok(sysDictDataMapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.DATA_SOURCE)));
+        return R.ok(mapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.DATA_SOURCE)));
     }
     /**
      * 查询可显示类型
@@ -64,7 +61,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public R getShowType() {
-        return R.ok(sysDictDataMapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.SHOW_TYPE)));
+        return R.ok(mapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.SHOW_TYPE)));
     }
     @Override
     public List<Map<String, Object>> finAllsysDictData() {
