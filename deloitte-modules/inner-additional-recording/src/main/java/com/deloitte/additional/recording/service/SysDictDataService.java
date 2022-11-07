@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.system.api.domain.SysDictData;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 字典表接口
  *
@@ -35,4 +38,6 @@ public interface SysDictDataService extends IService<SysDictData> {
      * @date 2022/11/7 17:28
      */
     R getShowType();
+
+    List<Map<String, Object>> finAllsysDictData();
 }
