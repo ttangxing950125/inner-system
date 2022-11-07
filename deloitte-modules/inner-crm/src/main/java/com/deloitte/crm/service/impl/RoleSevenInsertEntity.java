@@ -1,6 +1,10 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.StrUtil;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -44,6 +49,29 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
     public R finishTask(EntityInfoInsertDTO entityInfoInsertDTO) {
         String creditCode = entityInfoInsertDTO.getCreditCode();
         String entityName = entityInfoInsertDTO.getEntityName().trim().replace("（","(").replace("）",")");
+
+
+        //根据企业名或社会信用代码查询
+        Wrapper<EntityInfo> wrapperName = Wrappers.<EntityInfo>lambdaQuery()
+                .eq(EntityInfo::getEntityName, entityName);
+
+        List<EntityInfo> selectByName = entityInfoMapper.selectList(wrapperName);
+        if (CollUtil.isNotEmpty(selectByName)){
+            log.info("根据名称查询主体 selectByName {},{}",entityName,selectByName.size());
+            throw new ServiceException("已有同名主体："+entityName);
+        }
+
+        Wrapper<EntityInfo> wrapperCreditCode = Wrappers.<EntityInfo>lambdaQuery()
+                .eq(EntityInfo::getCreditCode, creditCode);
+
+        List<EntityInfo> selectByCode = entityInfoMapper.selectList(wrapperCreditCode);
+        if (CollUtil.isNotEmpty(selectByCode)){
+            log.info("根据社会信用代码查询主体 selectByCode {},{}",entityName,selectByName.size());
+            throw new ServiceException("已有相同社会信用代码："+creditCode);
+        }
+
+
+
         entityInfoInsertDTO.setEntityName(entityName);
         Integer taskId = entityInfoInsertDTO.getTaskId();
         String username = StrUtil.isBlank(SecurityUtils.getUsername()) ? "角色7测试" : SecurityUtils.getUsername();
