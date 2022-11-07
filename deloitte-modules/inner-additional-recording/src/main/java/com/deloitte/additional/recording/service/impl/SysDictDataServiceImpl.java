@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.additional.recording.mapper.SysDictDataMapper;
+import com.deloitte.additional.recording.service.SysDictDataService;
 import com.deloitte.system.api.domain.SysDictData;
 import org.springframework.stereotype.Service;
 

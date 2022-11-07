@@ -1,14 +1,14 @@
-package com.deloitte.additional.recording.service.impl;
+package com.deloitte.additional.recording.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.system.api.domain.SysDictData;
 
 /**
- * (BasEvdDataDict)表服务接口
+ * 字典表接口
  *
- * @author 吴鹏鹏ppp
- * @since 2022-11-07 02:00:38
- */
+ * @author 冉浩岑
+ * @date 2022/11/7 17:17
+*/
 public interface SysDictDataService extends IService<SysDictData> {
 
 }
