@@ -104,6 +104,14 @@ public enum Common {
     public static final String IGNORE = "roleSevenIgnore";
     /** 删除任务 */
     public static final String DELETE_TASK = "roleSevenDeleteTask";
-
-
+    /** 系统自动生成 */
+    public static final String CREATE_AUTO = "系统自动生成";
+    /** SQL_LIMIT_1 */
+    public static final String SQL_LIMIT_1 = " limit 1";
+    /** 存续 */
+    public static final String LIVE = "存续";
+    /** 未上市 */
+    public static final String NOT_ISS = "未上市";
+    /** 已退市 */
+    public static final String DOWN = "已退市";
 }

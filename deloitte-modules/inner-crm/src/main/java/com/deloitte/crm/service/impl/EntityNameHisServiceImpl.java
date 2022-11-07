@@ -7,6 +7,7 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
+import com.deloitte.crm.constants.Common;
 import com.deloitte.crm.constants.SuccessInfo;
 import com.deloitte.crm.domain.EntityInfo;
 import com.deloitte.crm.domain.EntityNameHis;
@@ -249,7 +250,7 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
         } else {
             nameHisRemarks = nameHisRemarks + ";";
         }
-        entityInfo.setEntityNameHisRemarks(nameHisRemarks + DateUtil.format(new Date(), "yyyy-MM-dd") + " " + SecurityUtils.getUsername() + " " + "系统自动生成").setUpdated(updated);
+        entityInfo.setEntityNameHisRemarks(nameHisRemarks + DateUtil.format(new Date(), Common.TIME_FORMART_YYYY_MM_DD) + " " + SecurityUtils.getUsername() + " " + Common.CREATE_AUTO).setUpdated(updated);
         entityInfoMapper.updateById(entityInfo);
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }

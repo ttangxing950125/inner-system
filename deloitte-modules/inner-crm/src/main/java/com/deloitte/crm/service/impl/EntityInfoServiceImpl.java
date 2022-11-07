@@ -438,7 +438,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         String nameHisRemarks = entity.getEntityNameHisRemarks();
         String remarks = "";
         if (ObjectUtils.isEmpty(nameHisRemarks)) {
-            remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " 系统自动生成";
+            remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " "+Common.CREATE_AUTO;
         } else {
             remarks = TimeFormatUtil.getFormartDate(new Date()) + " " + remoter + " " + nameHisRemarks;
         }
@@ -509,7 +509,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //匹配时，查询出原本的曾用名数据
                 EntityNameHis one = nameHisMapper.selectOne(new QueryWrapper<EntityNameHis>().lambda()
                         .eq(EntityNameHis::getDqCode, dqCode)
-                        .eq(EntityNameHis::getOldName, oldName).last(" limit 1"));
+                        .eq(EntityNameHis::getOldName, oldName).last(Common.SQL_LIMIT_1));
                 if (ObjectUtils.isEmpty(one)) {
                     continue;
                 }
@@ -523,7 +523,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 }
                 //替换曾用名
                 if (ObjectUtils.isEmpty(remark)) {
-                    remark = "系统自动生成";
+                    remark = Common.CREATE_AUTO;
                 }
                 one.setRemarks(remark).setOldName(newOldName);
                 //更新原本的数据
@@ -531,14 +531,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 nameVo = newOldName;
                 remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " " + remark;
                 if (ObjectUtils.isEmpty(remark)) {
-                    remarkVo = remarkVo + "系统自动生成";
+                    remarkVo = remarkVo + Common.CREATE_AUTO;
                 }
             } else {
                 nameVo = hisName;
                 if (remarkList.size() > i) {
                     remarkVo = remarkList.get(i);
                 } else {
-                    remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " 系统自动生成";
+                    remarkVo = TimeFormatUtil.getFormartDate(new Date()) + " " + SecurityUtils.getUsername() + " "+Common.CREATE_AUTO;
                 }
             }
             // 拼接历史曾用名和备注
@@ -791,7 +791,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
             bondInfoDetail.setIsCollection("0");
             EntityAttrValue attrValue = entityAttrValueMapper.selectOne(new QueryWrapper<EntityAttrValue>().lambda()
                     .eq(EntityAttrValue::getEntityCode, entityCode)
-                    .eq(EntityAttrValue::getAttrId, 686).last(" limit 1"));
+                    .eq(EntityAttrValue::getAttrId, 686).last(Common.SQL_LIMIT_1));
             if (!ObjectUtils.isEmpty(attrValue)) {
                 bondInfoDetail.setIsCollection(attrValue.getValue());
             }
@@ -837,9 +837,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 //港股状态 3-成功上市
                 Integer stockStatus = stockThkInfo.getStockStatus();
                 if (stockStatus == 3) {
-                    entityInfoDetails.setListTypeG("存续");
+                    entityInfoDetails.setListTypeG(Common.LIVE);
                 } else {
-                    entityInfoDetails.setListTypeG("已退市");
+                    entityInfoDetails.setListTypeG(Common.DOWN);
                 }
                 //设置港股信息
                 entityInfoDetails.setStockThkInfo(stockThkInfo);
@@ -879,9 +879,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 Integer status = stockCnInfo.getStockStatus();
                 //A股状态 6-成功上市
                 if (status == 6) {
-                    entityInfoDetails.setListTypeA("存续");
+                    entityInfoDetails.setListTypeA(Common.LIVE);
                 } else {
-                    entityInfoDetails.setListTypeA("未上市");
+                    entityInfoDetails.setListTypeA(Common.NOT_ISS);
                 }
                 //设置A股信息
                 entityInfoDetails.setStockCnInfo(stockCnInfo);
