@@ -1252,7 +1252,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
 
     private  List<EntityInfoResult> getEntityInfoResultNew(List<EntityInfo> entityInfos,List<MoreIndex> mapList, List<EntityInfoResult> resultRecords) {
         List<String>idList=new ArrayList<>();
-        List<String>header=new ArrayList<>();
         List<String>codeList=new ArrayList<>();
         entityInfos.forEach(o->codeList.add(o.getEntityCode()));
         QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
@@ -1260,7 +1259,6 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         List<EntityAttrValue> attrValueList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(codeList)){
             query.lambda().in(EntityAttrValue::getEntityCode,codeList );
-
         }
         //需要查询额外指标时再指标数据
         if (!CollectionUtils.isEmpty(idList)){
@@ -1276,24 +1274,27 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityInfos.forEach(info->{
             List<MoreIndex> more=new ArrayList<>();
             List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
+            List<String>header=new ArrayList<>();
             if (!CollectionUtils.isEmpty(mapList)){
                 mapList.forEach(o->{
+                    header.add(o.getName());
                     MoreIndex moreIndex = new MoreIndex();
                     moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
+                    String value="";
+                    //如果查出来的值不为空则去取值
                     if (!ObjectUtils.isEmpty(finalEntityCodeMap)){
                         List<EntityAttrValue> valueList = finalEntityCodeMap.get(info.getEntityCode());
                         if (!ObjectUtils.isEmpty(valueList)){
                             Map<Long, List<EntityAttrValue>> attrValuesById = valueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getAttrId));
                             List<EntityAttrValue> attrValuesByAttrId = attrValuesById.get((o.getId()));
-                            String value="";
                             if (!ObjectUtils.isEmpty(attrValuesByAttrId)){
                                 value = attrValuesByAttrId.get(0).getValue();
                             }
-                            moreIndex.setValue(value);
-                            values.add(value);
-                            more.add(moreIndex);
                         }
                     }
+                    moreIndex.setValue(value);
+                    values.add(value);
+                    more.add(moreIndex);
                 });
             }
             EntityInfoResult entityInfoResult =new EntityInfoResult();

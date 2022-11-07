@@ -558,7 +558,6 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
 
     private List<GovInfoResult> getGovInfoResultNew(List<GovInfo> govInfos, List<MoreIndex> mapList, List<GovInfoResult> resultRecords) {
         List<String>idList=new ArrayList<>();
-        List<String>header=new ArrayList<>();
         List<String>codeList=new ArrayList<>();
         govInfos.forEach(o->codeList.add(o.getDqGovCode()));
         QueryWrapper<EntityAttrValue> query = new QueryWrapper<>();
@@ -571,6 +570,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
         //需要查询额外指标时再指标数据
         if (!CollectionUtils.isEmpty(idList)){
             query.lambda().in(EntityAttrValue::getAttrId,idList );
+            //查询指标选项值
             attrValueList = entityAttrValueMapper.selectList(query);
         }
         Map<String, List<EntityAttrValue>> entityCodeMap =new HashMap<>();
@@ -578,28 +578,30 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             entityCodeMap = attrValueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getEntityCode));
         }
         Map<String, List<EntityAttrValue>> finalEntityCodeMap = entityCodeMap;
-        List<MoreIndex> finalMapList = mapList;
         govInfos.forEach(info->{
             List<MoreIndex> more=new ArrayList<>();
+            List<String>header=new ArrayList<>();
             List<String> values=new ArrayList<>();//传入指标列表不为空时录入指标数据
-            if (!CollectionUtils.isEmpty(finalMapList)){
-                finalMapList.forEach(o->{
+            if (!CollectionUtils.isEmpty(mapList)){
+                //遍历更多指标
+                mapList.forEach(o->{
+                    header.add(o.getName());
                     MoreIndex moreIndex = new MoreIndex();
                     moreIndex.setName(o.getName()).setId(o.getId()).setKey(o.getName());
+                    String value="";
                     if (!ObjectUtils.isEmpty(finalEntityCodeMap)){
                         List<EntityAttrValue> valueList = finalEntityCodeMap.get(info.getDqGovCode());
                         if (!ObjectUtils.isEmpty(valueList)){
                             Map<Long, List<EntityAttrValue>> attrValuesById = valueList.stream().collect(Collectors.groupingBy(EntityAttrValue::getAttrId));
                             List<EntityAttrValue> attrValuesByAttrId = attrValuesById.get(Long.valueOf(o.getId()));
-                            String value="";
                             if (!ObjectUtils.isEmpty(attrValuesByAttrId)){
                                 value = attrValuesByAttrId.get(0).getValue();
                             }
-                            moreIndex.setValue(value);
-                            values.add(value);
-                            more.add(moreIndex);
                         }
                     }
+                    moreIndex.setValue(value);
+                    values.add(value);
+                    more.add(moreIndex);
                 });
             }
             GovInfoResult govInfoResult =new GovInfoResult();
