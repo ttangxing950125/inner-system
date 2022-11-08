@@ -24,7 +24,7 @@ public class SpringBootTests {
 
     @Test
     public void test() {
-        final List<DataListPageTataiVo> dataListPageTataiVos = prsModelQualService.queryByPageStatsdetail("第一创业", "2021", "M_029");
+        final List<DataListPageTataiVo> dataListPageTataiVos = prsModelQualService.queryByPageStatsdetail("M_029", "2021", "第一创业");
         System.out.println(JSON.toJSONString(dataListPageTataiVos));
     }
 }

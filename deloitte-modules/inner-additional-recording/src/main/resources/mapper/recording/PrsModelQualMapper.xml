@@ -32,10 +32,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                        prs.`name`= #{name}
                    </if>
                    <if test="timeValue!=null and timeValue!=''">
-                       prs.`time_value`= #{timeValue}
+                       AND prs.`time_value`= #{timeValue}
                    </if>
                    <if test="modelCode!=null and modelCode!=''">
-                       prs.`model_code`= #{modelCode}
+                       AND  m.`model_code`= #{modelCode}
                    </if>
                </where>
 
