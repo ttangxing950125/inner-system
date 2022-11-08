@@ -24,7 +24,7 @@ public class DataListGetDropDownBoxVo implements Serializable {
     //   版本
     private List<String> prsProjectVersionList;
     //敞口:
-    private List<String> prsModelMasterLists;
+    private  List<Map<String, Object>> prsModelMasterLists;
     //月份
-    private List<Map<String,String>> sysDitMonthLists;
+    private List<Map<String,Object>> sysDitMonthLists;
 }
