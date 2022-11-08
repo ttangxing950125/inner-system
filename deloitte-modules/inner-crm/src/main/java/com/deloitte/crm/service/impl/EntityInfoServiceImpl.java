@@ -1432,7 +1432,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                 if (!map.isEmpty()) {
                     List<EntityNameHis> nameHisList = map.get(entityInfo.getEntityCode());
                     if (!CollectionUtils.isEmpty(nameHisList)) {
-                        count = nameHisList.size();
+                        count = nameHisList.stream().filter(o->Objects.equals(o.getStatus(),1)).collect(Collectors.toList()).size();
                     }
                 }
                 entityInfoList.setNameUsedNum(count);
