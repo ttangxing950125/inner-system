@@ -699,15 +699,43 @@ public class ProductsCoverServiceImpl extends ServiceImpl<ProductsCoverMapper, P
     /**
      *IB-预警
      *
-     * @param entityInfo
+
      * @param BondInfoList
-     * @param stockCnInfos
+
      * @param productsCovers
      * @return List<ProductsCover>
      * @author penTang
      * @date 2022/11/7 10:14
     */
-    public List<ProductsCover> CoverRuleIBY(EntityInfo entityInfo, ArrayList<BondInfo> BondInfoList, ArrayList<StockCnInfo> stockCnInfos,List<ProductsCover> productsCovers){
+    public List<ProductsCover> CoverRuleIBY(ArrayList<BondInfo> BondInfoList,List<ProductsCover> productsCovers){
+        log.info("IB-评级");
+        ArrayList<CoverStatus> coverStatuses = new ArrayList<>();
+        //债券的初始覆盖状态
+        CoverStatus coverStatusByBond = new CoverStatus();
+        boolean b = BondInfoList.stream().anyMatch(i -> Objects.equals(i.getWind2(), CoverRule.COVER_IBY_DR)
+                || Objects.equals(i.getWind2(), CoverRule.COVER_IBY_DRS)
+                || Objects.equals(i.getWind2(), CoverRule.COVER_IBY_DX)
+                || Objects.equals(i.getWind2(), CoverRule.COVER_IBY_GS)
+                || Objects.equals(i.getWind2(), CoverRule.COVER_IBY_QY) || Objects.equals(i.getWind2(), CoverRule.COVER_IBY_SM)
+                || Objects.equals(i.getWind2(), CoverRule.COVER_IBY_ZQ)
+        );
+        if (b) {
+            coverStatusByBond.setCoverDes("应覆盖");
+            coverStatusByBond.setStatus("覆盖");
+        }else {
+            List<BondInfo> collect = BondInfoList.stream().filter(o -> Objects.equals(o.getRaiseType(), 0)).collect(Collectors.toList());
+            boolean b1 = collect.stream().allMatch(row -> Objects.equals(row.getBondStatus(), 7) || Objects.equals(row.getBondStatus(), 8) || Objects.equals(row.getBondStatus(), 9));
+            if (b1) {
+                coverStatusByBond.setCoverDes(CoverRule.COVER_NOT_Bond);
+                coverStatusByBond.setStatus("不再覆盖");
+                coverStatuses.add(coverStatusByBond);
+            } else {
+                coverStatusByBond.setCoverDes(CoverRule.COVER_NOT);
+                coverStatusByBond.setStatus("未覆盖");
+                coverStatuses.add(coverStatusByBond);
+            }
+
+        }
 
         return null;
 

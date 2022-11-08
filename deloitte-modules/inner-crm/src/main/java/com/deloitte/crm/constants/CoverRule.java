@@ -42,6 +42,16 @@ public enum CoverRule {
     public static final String  COVER_NOT = "未覆盖(未A股上市且未发公募债)";
 
 
+    public  static final String COVER_IBY_QY="一般企业债";
+    public  static final String COVER_IBY_GS="一般公司债";
+    public  static final String COVER_IBY_DR="一般短期融资券";
+    public  static final String COVER_IBY_DRS="超短期融资债券";
+    public  static final String COVER_IBY_ZQ="一般中期票据";
+    public  static final String COVER_IBY_DX="定向工具";
+    public  static final String COVER_IBY_SM="私募债";
+
+
+
 
 
 

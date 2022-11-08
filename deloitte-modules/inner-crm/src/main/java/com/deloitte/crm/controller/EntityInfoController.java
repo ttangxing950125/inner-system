@@ -191,7 +191,7 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+    public R getInfoList(Integer type, String param, Integer pageNum,  Integer pageSize) {
         return entityInfoService.getInfoList(type, param, pageNum, pageSize);
     }
 

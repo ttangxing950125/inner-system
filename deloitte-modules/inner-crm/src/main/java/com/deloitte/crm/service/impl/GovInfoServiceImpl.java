@@ -874,7 +874,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     public Map<String, Object> getOverview() {
         QueryWrapper<GovInfo> query = new QueryWrapper<>();
         Long count = govInfoMapper.selectCount(query);
-        Long aLong = govInfoMapper.selectCount(query.lambda().eq(GovInfo::getInvalid, 0));
+        Long aLong = govInfoMapper.selectCount(query.lambda().eq(GovInfo::getStatus, 1));
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
         result.put("invalid", aLong);
