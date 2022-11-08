@@ -102,6 +102,15 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     List<EntityInfo> findByName(String entityName);
 
+    /**
+     * 根据名称查询主体(会将 中文括号换成英文括号，会查询曾用名 )
+     *
+     * @author 吴鹏鹏ppp
+     * @param entityName
+     * @return
+     */
+    List<EntityInfo> findByNameOrOldName(String entityName);
+
     List<EntityInfo> findByNames(List<String> entityNames);
 
     R addOldName(EntityInfo entityInfo);

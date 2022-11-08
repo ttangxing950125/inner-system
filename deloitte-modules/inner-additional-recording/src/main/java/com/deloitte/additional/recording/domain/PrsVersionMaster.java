@@ -1,13 +1,15 @@
 package com.deloitte.additional.recording.domain;
 
-import java.util.Date;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deloitte.common.core.annotation.Excel;
-import lombok.Builder;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * (PrsVersionMaster)表实体类
@@ -22,6 +24,7 @@ import lombok.Builder;
 public class PrsVersionMaster implements Serializable {
     private static final long serialVersionUID = -57806542470018572L;
     @Excel(name = "${column.comment}")
+    @TableId(type = IdType.AUTO)
     private Integer id;
     /**
      * 版本表，prs_project_version_id
