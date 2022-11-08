@@ -62,7 +62,7 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
 
         issorNames.forEach(issorName->{
             //查询主体
-            List<EntityInfo> entityInfos = entityInfoService.findByName(issorName);
+            List<EntityInfo> entityInfos = entityInfoService.findByNameOrOldName(issorName);
             //没有主体就创建任务
             if (CollUtil.isEmpty(entityInfos)){
                 CrmEntityTask entityTask = new CrmEntityTask();

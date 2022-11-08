@@ -148,6 +148,9 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
     @Resource
     private EntityInfoLogsService entityInfoLogsService;
 
+    @Resource
+    private EntityNameHisMapper entityNameHisMapper;
+
     /**
      * 主体
      */
@@ -407,6 +410,38 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         entityName = entityName.trim().replace("（","(").replace("）",")");
 
         return baseMapper.findByName(entityName);
+    }
+
+    /**
+     * 根据名称查询主体(会将 中文括号换成英文括号，会查询曾用名 )
+     *
+     * @param entityName
+     * @return
+     * @author 吴鹏鹏ppp
+     */
+    @Override
+    public List<EntityInfo> findByNameOrOldName(String entityName) {
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+
+        //根据name查询
+        List<EntityInfo> byName = this.findByName(entityName);
+        if(CollUtil.isNotEmpty(byName)){
+            return byName;
+        }
+
+        //查询曾用名
+        LambdaQueryWrapper<EntityNameHis> wrapper = Wrappers.<EntityNameHis>lambdaQuery()
+                .eq(EntityNameHis::getOldName, entityName);
+        List<EntityNameHis> entityNameHis = entityNameHisMapper.selectList(wrapper);
+
+        List<String> entityCodes = entityNameHis.stream().map(EntityNameHis::getDqCode).collect(Collectors.toList());
+
+        LambdaQueryWrapper<EntityInfo> codeWrapper = Wrappers.<EntityInfo>lambdaQuery()
+                .in(EntityInfo::getEntityCode, entityCodes);
+
+
+
+        return this.list(codeWrapper);
     }
 
     @Override

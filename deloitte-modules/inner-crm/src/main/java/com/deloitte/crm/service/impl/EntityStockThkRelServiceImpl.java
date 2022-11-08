@@ -59,7 +59,7 @@ public class EntityStockThkRelServiceImpl extends ServiceImpl<EntityStockThkRelM
         entityName = entityName.trim().replace("（","(").replace("）",")");
 
         //根据名称查询主体
-        List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
+        List<EntityInfo> entityInfos = entityInfoService.findByNameOrOldName(entityName);
 
         //之前数据库中没有该主体
         if (CollUtil.isEmpty(entityInfos)) {
