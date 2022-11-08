@@ -50,7 +50,7 @@ public class PrsProjectVersions implements Serializable {
     /**
      * 是否允许一个主体出现在多个敞口下 0-不允许 1-允许
      */
-    @Excel(name = "是否允许一个主体出现在多个敞口下 0-不允许 1-允许")
+    @Excel(name = "是否允许一个主体出现在多个敞口下updateOldName 0-不允许 1-允许")
     private Boolean entMultiMas;
     /**
      * 数据时间维度，选择项（与项目的时间粒度相关）

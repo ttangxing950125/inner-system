@@ -214,14 +214,16 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
         if (!ObjectUtils.isEmpty(entityNameHis)) {
             return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());
         }
-
+        if(ObjectUtils.isEmpty(updated)){
+            updated=new Date();
+        }
         // 新增一条数据进入曾用名列表
         baseMapper.insert(new EntityNameHis()
                 .setEntityType(1)
                 .setStatus(1)
                 .setDqCode(entityCode)
                 .setOldName(entityName)
-                .setHappenDate(new Date())
+                .setHappenDate(updated)
                 .setRemarks(remarks)
                 .setUpdated(updated)
                 .setCreated(updated)
@@ -265,7 +267,9 @@ public class EntityNameHisServiceImpl extends ServiceImpl<EntityNameHisMapper, E
         if (!ObjectUtils.isEmpty(entityNameHis)) {
             return R.fail(BadInfo.EXITS_ENTITY_OLD_NAME.getInfo());
         }
-
+        if(ObjectUtils.isEmpty(updated)){
+            updated=new Date();
+        }
         // 新增一条数据进入曾用名列表
         baseMapper.insert(new EntityNameHis()
                 .setEntityType(2)
