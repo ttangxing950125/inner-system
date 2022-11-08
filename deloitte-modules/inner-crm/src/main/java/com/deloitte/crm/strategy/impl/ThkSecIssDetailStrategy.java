@@ -68,126 +68,121 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doThkStockImport(ThkSecIssDetail thkSecIssInfos, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置属性
-            thkSecIssInfos.setTaskId(windTask.getId());
+        //设置属性
+        thkSecIssInfos.setTaskId(windTask.getId());
 
-            //查询港股是否存在
-            String code = thkSecIssInfos.getCode();
-            StockThkInfo stockThkInfo = stockThkInfoService.findByCode(code);
+        //查询港股是否存在
+        String code = thkSecIssInfos.getCode();
+        StockThkInfo stockThkInfo = stockThkInfoService.findByCode(code);
 
-            //没有就创建一个
-            if (stockThkInfo == null) {
-                stockThkInfo = new StockThkInfo();
-            }
-            //股票代码
-            stockThkInfo.setStockCode(code);
-            //港股简称
-            stockThkInfo.setStockName(thkSecIssInfos.getName());
-            //上市版
-            stockThkInfo.setListsector(thkSecIssInfos.getIpoBoard());
-            //上市日期
-            stockThkInfo.setListDate(thkSecIssInfos.getIpoDate() == null ? null : cn.hutool.core.date.DateUtil.formatDate(thkSecIssInfos.getIpoDate()));
-            //公司介绍
-            stockThkInfo.setEntityIntro(Optional.ofNullable(thkSecIssInfos.getEntityDes()).orElse(""));
-
-            /***
-             *部分代码逻辑沿用BondDelIssStrategy
-             * {@link com.deloitte.crm.strategy.impl.BondDelIssStrategy#doBondImport(BondDelIss, Date, CrmWindTask)}
-             */
-            //推迟或取消发行债券 均为二级发行
-            CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, thkSecIssInfos.getBelWind()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
-            if (crmTypeInfo != null) {
-                if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
-                    Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
-                    if (CollectionUtil.isEmpty(hashSetResult)) {
-                        thkSecIssInfos.setBelWind(crmTypeInfo.getName());
-                    } else {
-                        String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
-                        thkSecIssInfos.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
-                    }
-                } else {
-                    thkSecIssInfos.setBelWind(crmTypeInfo.getName());
-                }
-            }
-
-            //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-
-            //查询这条数据有没有
-            ThkSecIssDetail lastThkSecIssInfo = thkSecIssDetailService.findLastByCode(code);
-
-            if (lastThkSecIssInfo == null) {
-
-                changeType = DataChangeType.INSERT.getId();
-
-                //当股票首次出现在  首次发行明细 中时，记为“发行中”
-                stockThkInfo.setStockStatus(StockThkStatus.ISSUE.getId());
-                stockThkInfo.setStatusDesc(StockThkStatus.ISSUE.getName());
-            } else if (!Objects.equals(lastThkSecIssInfo, thkSecIssInfos)) {
-                //如果他们两个不相同，代表有属性修改了
-                changeType = DataChangeType.UPDATE.getId();
-            }
-
-            thkSecIssInfos.setChangeType(changeType);
-
-
-            Date ipoDate = thkSecIssInfos.getIpoDate();
-
-            boolean ipoNow = DateUtil.compare(ipoDate, timeNow) == 0;
-
-            //当股票状态已经是“发行中”时，当【上市日期】 = 今天 时，状态改为“成功上市”
-            if (Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus()) && DateUtil.compare(ipoDate, timeNow) == 0) {
-                stockThkInfo.setStockStatus(StockThkStatus.LIST.getId());
-                stockThkInfo.setStatusDesc(StockThkStatus.LIST.getName());
-
-                //查询当前港股绑定的主体
-                List<EntityInfo> entityInfos = entityStockThkRelService.findEntityByStockDqCode(stockThkInfo.getStockDqCode());
-
-                entityInfos.forEach(entity -> {
-                    entity.setList(1);
-                });
-
-
-                //上市记录
-                String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
-                //创建log
-                BondsListingLog log = new BondsListingLog();
-                log.setCode(thkSecIssInfos.getCode());
-                log.setName(thkSecIssInfos.getName());
-                log.setIpoDate(DateUtil.parseDate(thkSecIssInfos.getIpoDate()));
-                log.setPublisher(names);
-                log.setRecordTime(timeNow);
-                log.setSourceType(3);
-
-
-                bondsListingLogService.save(log);
-
-                entityInfoService.updateBatchById(entityInfos);
-
-                //敞口划分任务
-                crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), timeNow);
-
-            }
-
-            //新增港股
-            stockThkInfo = stockThkInfoService.saveOrUpdateNew(stockThkInfo);
-
-            if (changeType == null) {
-                //保存attr
-                //更新港股属性
-                entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);
-            }
-
-            //保存thkSecIssInfo
-            thkSecIssDetailService.save(thkSecIssInfos);
-
-
-            return new AsyncResult(new Object());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AsyncResult(e);
+        //没有就创建一个
+        if (stockThkInfo == null) {
+            stockThkInfo = new StockThkInfo();
         }
+        //股票代码
+        stockThkInfo.setStockCode(code);
+        //港股简称
+        stockThkInfo.setStockName(thkSecIssInfos.getName());
+        //上市版
+        stockThkInfo.setListsector(thkSecIssInfos.getIpoBoard());
+        //上市日期
+        stockThkInfo.setListDate(thkSecIssInfos.getIpoDate() == null ? null : cn.hutool.core.date.DateUtil.formatDate(thkSecIssInfos.getIpoDate()));
+        //公司介绍
+        stockThkInfo.setEntityIntro(Optional.ofNullable(thkSecIssInfos.getEntityDes()).orElse(""));
+
+        /***
+         *部分代码逻辑沿用BondDelIssStrategy
+         * {@link com.deloitte.crm.strategy.impl.BondDelIssStrategy#doBondImport(BondDelIss, Date, CrmWindTask)}
+         */
+        //推迟或取消发行债券 均为二级发行
+        CrmTypeInfo crmTypeInfo = crmTypeInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<CrmTypeInfo>().eq(CrmTypeInfo::getName, thkSecIssInfos.getBelWind()).eq(CrmTypeInfo::getIsDeleted, Boolean.FALSE).eq(CrmTypeInfo::getType, 1));
+        if (crmTypeInfo != null) {
+            if (StringUtils.isNotEmpty(crmTypeInfo.getParentCode())) {
+                Set<CrmTypeInfo> hashSetResult = crmTypeInfoService.findCodeByParent(crmTypeInfo, Integer.valueOf(crmTypeInfo.getType()));
+                if (CollectionUtil.isEmpty(hashSetResult)) {
+                    thkSecIssInfos.setBelWind(crmTypeInfo.getName());
+                } else {
+                    String WindIndustryApend = hashSetResult.stream().sorted(Comparator.comparing(CrmTypeInfo::getLevel)).map(CrmTypeInfo::getName).collect(Collectors.joining("--"));
+                    thkSecIssInfos.setBelWind(WindIndustryApend + "--" + crmTypeInfo.getName());
+                }
+            } else {
+                thkSecIssInfos.setBelWind(crmTypeInfo.getName());
+            }
+        }
+
+        //这条ThkSecIssDetail是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+
+        //查询这条数据有没有
+        ThkSecIssDetail lastThkSecIssInfo = thkSecIssDetailService.findLastByCode(code);
+
+        if (lastThkSecIssInfo == null) {
+
+            changeType = DataChangeType.INSERT.getId();
+
+            //当股票首次出现在  首次发行明细 中时，记为“发行中”
+            stockThkInfo.setStockStatus(StockThkStatus.ISSUE.getId());
+            stockThkInfo.setStatusDesc(StockThkStatus.ISSUE.getName());
+        } else if (!Objects.equals(lastThkSecIssInfo, thkSecIssInfos)) {
+            //如果他们两个不相同，代表有属性修改了
+            changeType = DataChangeType.UPDATE.getId();
+        }
+
+        thkSecIssInfos.setChangeType(changeType);
+
+
+        Date ipoDate = thkSecIssInfos.getIpoDate();
+
+        boolean ipoNow = DateUtil.compare(ipoDate, timeNow) == 0;
+
+        //当股票状态已经是“发行中”时，当【上市日期】 = 今天 时，状态改为“成功上市”
+        if (Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus()) && DateUtil.compare(ipoDate, timeNow) == 0) {
+            stockThkInfo.setStockStatus(StockThkStatus.LIST.getId());
+            stockThkInfo.setStatusDesc(StockThkStatus.LIST.getName());
+
+            //查询当前港股绑定的主体
+            List<EntityInfo> entityInfos = entityStockThkRelService.findEntityByStockDqCode(stockThkInfo.getStockDqCode());
+
+            entityInfos.forEach(entity -> {
+                entity.setList(1);
+            });
+
+
+            //上市记录
+            String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
+            //创建log
+            BondsListingLog log = new BondsListingLog();
+            log.setCode(thkSecIssInfos.getCode());
+            log.setName(thkSecIssInfos.getName());
+            log.setIpoDate(DateUtil.parseDate(thkSecIssInfos.getIpoDate()));
+            log.setPublisher(names);
+            log.setRecordTime(timeNow);
+            log.setSourceType(2);
+
+
+            bondsListingLogService.save(log);
+
+            entityInfoService.updateBatchById(entityInfos);
+
+            //敞口划分任务
+            crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), timeNow);
+
+        }
+
+        //新增港股
+        stockThkInfo = stockThkInfoService.saveOrUpdateNew(stockThkInfo);
+
+        if (changeType == null) {
+            //保存attr
+            //更新港股属性
+            entityAttrValueService.updateStockThkAttr(stockThkInfo.getStockDqCode(), thkSecIssInfos);
+        }
+
+        //保存thkSecIssInfo
+        thkSecIssDetailService.save(thkSecIssInfos);
+
+
+        return new AsyncResult(new Object());
     }
 
     /**

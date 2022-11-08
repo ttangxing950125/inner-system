@@ -248,15 +248,6 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             query.clear();
             query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
             allCount = crmSupplyTaskMapper.selectCount(query);
-            if (allCount < 0) {
-                try {
-                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],开始发送邮件 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
-                    sendEmail(TimeFormatUtil.getFormartDate(crmSupplyTask.getTaskDate()));
-                    log.info("  >>>> 角色3.4.5，date=[{}] 日期任务完成，最后完成人角色ID = [{}],邮件发送完成 <<<<  ", crmSupplyTask.getTaskDate(), crmSupplyTask.getRoleId());
-                } catch (Exception e) {
-                    log.error("角色3.4.5完成任务发送邮件异常，异常信息：[{}]", e.getMessage());
-                }
-            }
         }
     }
     @Transactional(rollbackFor = Exception.class)

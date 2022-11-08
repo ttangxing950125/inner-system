@@ -47,6 +47,7 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
 
     /**
      * 处理文件中的每一行
+     *
      * @param item
      * @param timeNow
      * @param windTask
@@ -55,63 +56,57 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doThkStockImport(CnIpoPause item, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置属性
-            item.setTaskId(windTask.getId());
+        //设置属性
+        item.setTaskId(windTask.getId());
 
-            //查询a股是否存在
-            String code = item.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
+        //查询a股是否存在
+        String code = item.getCode();
+        StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
-            //没有就创建一个
-            if (stockCnInfo==null){
-                stockCnInfo = new StockCnInfo();
-                stockCnInfo.setStockCode(code);
-            }
-
-
-
-            //这条CnIpoPause是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            CnIpoPause last = cnIpoPauseService.findLastByCode(code);
-
-            if (last==null){
-                //查询不到之前的数据，代表是新增的
-                changeType = DataChangeType.INSERT.getId();
-                if(stockCnInfo.getStockStatus()==null){
-                    //当股票首次出现在  IPO审核申报表 中时，
-                    // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getMessage());
-                }else if(stockCnInfo.getStockStatus()!=null && stockCnInfo.getStockStatus()==StockCnStatus.IEC_SMPC_CHECK.getCode()){
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getMessage());
-                }
-
-
-            }else if (!Objects.equals(last, item)){
-                //如果他们两个不相同，代表有属性修改了
-                changeType = DataChangeType.UPDATE.getId();
-            }
-
-            if (StrUtil.isNotBlank(code)){
-                //保存a股信息
-                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-
-                //更新a股属性
-                entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
-            }
-
-
-            item.setChangeType(changeType);
-
-            cnIpoPauseService.save(item);
-
-            return new AsyncResult(new Object());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AsyncResult<>(e);
+        //没有就创建一个
+        if (stockCnInfo == null) {
+            stockCnInfo = new StockCnInfo();
+            stockCnInfo.setStockCode(code);
         }
+
+
+        //这条CnIpoPause是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        CnIpoPause last = cnIpoPauseService.findLastByCode(code);
+
+        if (last == null) {
+            //查询不到之前的数据，代表是新增的
+            changeType = DataChangeType.INSERT.getId();
+            if (stockCnInfo.getStockStatus() == null) {
+                //当股票首次出现在  IPO审核申报表 中时，
+                // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
+                stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getMessage());
+            } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
+                stockCnInfo.setStockStatus(StockCnStatus.IPO_PAUSE.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.IPO_PAUSE.getMessage());
+            }
+
+
+        } else if (!Objects.equals(last, item)) {
+            //如果他们两个不相同，代表有属性修改了
+            changeType = DataChangeType.UPDATE.getId();
+        }
+
+        if (StrUtil.isNotBlank(code)) {
+            //保存a股信息
+            stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+
+            //更新a股属性
+            entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
+        }
+
+
+        item.setChangeType(changeType);
+
+        cnIpoPauseService.save(item);
+
+        return new AsyncResult(new Object());
     }
 
     /**
@@ -127,6 +122,7 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
 
     /**
      * 开始执行任务
+     *
      * @param windTaskContext wind文件上下文对象，包含各种需要的对象
      * @return
      */
@@ -136,7 +132,8 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
         CrmWindTask windTask = windTaskContext.getWindTask();
 //        读取文件
         ExcelUtil<CnIpoPause> util = new ExcelUtil<CnIpoPause>(CnIpoPause.class);
-        List<CnIpoPause> list = util.importExcel(windTaskContext.getFileStream(), true);;
+        List<CnIpoPause> list = util.importExcel(windTaskContext.getFileStream(), true);
+        ;
         Collections.reverse(list);
         return cnIpoPauseService.doTask(windTask, list);
     }
@@ -183,7 +180,7 @@ public class CnIpoPauseStrategy implements WindTaskStrategy {
                 .in(CnIpoPause::getChangeType, changeStatusArr);
 
 
-        return cnIpoPauseService.list(wrapper).stream().map(item->{
+        return cnIpoPauseService.list(wrapper).stream().map(item -> {
             HashMap<String, Object> dataMap = new HashMap<>();
             dataMap.put("导入日期", item.getImportTime());
             dataMap.put("ID", item.getId());
