@@ -7,7 +7,6 @@ import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import java.util.List;
  * @Date: 2022/11/08/15:44
  * @Description:
  */
-
 @SpringBootTest(classes = InnerAdditionalRecordingApplication.class)
 public class SpringBootTests {
     @Resource
