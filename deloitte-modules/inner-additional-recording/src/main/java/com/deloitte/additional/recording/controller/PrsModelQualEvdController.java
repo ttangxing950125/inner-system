@@ -2,15 +2,12 @@ package com.deloitte.additional.recording.controller;
 
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.deloitte.additional.recording.domain.PrsModelQualEvd;
 import com.deloitte.additional.recording.service.PrsModelQualEvdService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * (PrsModelQualEvd)表控制层
@@ -27,5 +24,16 @@ public class PrsModelQualEvdController {
     @Resource
     private PrsModelQualEvdService prsModelQualEvdService;
 
+    /**
+     * 映射 prs_model_qual_factor，prs_model_qual_evd 外部链接 CODE
+     *
+     * @return void
+     * @author 冉浩岑
+     * @date 2022/11/8 14:47
+    */
+    @PostMapping("/set")
+    public void setValue(){
+        prsModelQualEvdService.setValue();
+    }
     
 }

@@ -11,4 +11,5 @@ import com.deloitte.additional.recording.domain.PrsModelQualEvd;
  */
 public interface PrsModelQualEvdService extends IService<PrsModelQualEvd> {
 
+    void setValue();
 }

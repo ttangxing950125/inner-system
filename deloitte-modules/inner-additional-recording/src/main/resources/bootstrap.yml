@@ -37,3 +37,6 @@ spring:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
         # 配置所在分组
         group: INNER_SYSTEM_GROUP
+logging:
+  level:
+    com.deloitte.additional.recording: debug
