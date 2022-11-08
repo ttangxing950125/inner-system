@@ -200,6 +200,7 @@ public class EntityInfo implements Serializable {
      */
     private String entityBondTag;
 
+
     @Override
     public String toString() {
         return this.getClass().getName() + JSON.toJSONString(this);

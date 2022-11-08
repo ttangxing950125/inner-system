@@ -58,10 +58,31 @@ public class DataListController extends BaseController {
         return R.ok(dataListGetDropDownBoxVo);
     }
 
+    /**
+     * 获取分页数据
+     * @param dto
+     * @param request
+     * @param response
+     * @return
+     */
     @PostMapping("/dataListPage")
     public R queryByPage(@RequestBody GetTaskTargetvalPageListDto dto, HttpServletRequest request, HttpServletResponse response) {
         return R.ok(dataListBizService.queryByPage(dto));
     }
+
+    /**
+     * 获取指标头
+     * @param modelCode 敞口Code
+     * @param timeValue 年份
+     * @param name 版本
+     * @return
+     */
+    @RequestMapping("/queryByPageStatsdetail")
+    public R queryByPageStatsdetail(String modelCode,String timeValue,String name){
+        return R.ok(dataListBizService.queryByPageStatsdetail(modelCode,timeValue,name));
+
+    }
+
 
 
 }
