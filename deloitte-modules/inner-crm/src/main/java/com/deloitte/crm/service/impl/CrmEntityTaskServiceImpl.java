@@ -232,6 +232,8 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
                 asyncSendEmailService(4, crmEntityTasks.size(), date);
             }
 
+            crmDailyTaskService.sendEmail(date);
+
             return R.ok(SuccessInfo.SUCCESS.getInfo());
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());

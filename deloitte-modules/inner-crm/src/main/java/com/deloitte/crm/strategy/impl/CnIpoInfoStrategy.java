@@ -69,114 +69,109 @@ public class CnIpoInfoStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doThkStockImport(CnIpoInfo item, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置属性
-            item.setTaskId(windTask.getId());
+        //设置属性
+        item.setTaskId(windTask.getId());
 
-            //查询a股是否存在
-            String code = item.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
+        //查询a股是否存在
+        String code = item.getCode();
+        StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
-            //没有就创建一个
-            if (stockCnInfo == null) {
-                stockCnInfo = new StockCnInfo();
-            }
+        //没有就创建一个
+        if (stockCnInfo == null) {
+            stockCnInfo = new StockCnInfo();
+        }
 
-            stockCnInfo.setStockCode(code);
-            stockCnInfo.setStockShortName(item.getStockName());
+        stockCnInfo.setStockCode(code);
+        stockCnInfo.setStockShortName(item.getStockName());
 
-            //这条CnCoachBack是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            CnIpoInfo last = cnIpoInfoService.findLastByCode(code);
+        //这条CnCoachBack是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        CnIpoInfo last = cnIpoInfoService.findLastByCode(code);
 
-            if (last == null) {
-                //查询不到之前的数据，代表是新增的
-                changeType = DataChangeType.INSERT.getId();
-                //当股票首次出现在  新股发行 中时，记为“发行中”
-                if (stockCnInfo.getStockStatus() == null) {
-                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
-                    stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
-                } else {
-                    log.warn("==> 新股发行 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
-                }
-
-            } else if (!Objects.equals(last, item)) {
-                //如果他们两个不相同，代表有属性修改了
-                changeType = DataChangeType.UPDATE.getId();
-            }
-
-            if (last != null && !StrUtil.equals(last.getIpoDate(), item.getIpoDate())) {
-                //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
-                // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
+        if (last == null) {
+            //查询不到之前的数据，代表是新增的
+            changeType = DataChangeType.INSERT.getId();
+            //当股票首次出现在  新股发行 中时，记为“发行中”
+            if (stockCnInfo.getStockStatus() == null) {
                 stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
                 stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
+            } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
+                stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
+            } else {
+                log.warn("==> 新股发行 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
             }
 
-
-            //上市日期是否是今天
-            boolean ipoNow = DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate());
-
-            //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
-            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getCode()) && DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate())) {
-                stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getCode());
-                stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getMessage());
-            }
-
-            String windIndustry = item.getWindIndustry();
-
-            List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
-            if (!CollectionUtil.isEmpty(entityInfos)) {
-                for (EntityInfo entityInfo : entityInfos) {
-                    entityInfo.setWindMaster(windIndustry);
-                    //审计机构
-                    entityInfo.setEntityAuditinstitNew(item.getAuditInst());
-                }
-
-            }
-            //如果是成功上市，发送给敞口划分人
-            if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getCode())) {
-                //查询和当前a股绑定关联关系的主体
-                entityInfos.forEach(entity -> {
-                    entity.setList(1);
-                });
-                if (ipoNow) {
-                    //新敞口划分任务
-                    crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
-
-                    //上市记录
-                    String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
-                    //创建log
-                    BondsListingLog log = new BondsListingLog();
-                    log.setCode(item.getCode());
-                    log.setName(item.getStockName());
-                    log.setIpoDate(DateUtil.parseDate(item.getIpoDate()));
-                    log.setPublisher(names);
-                    log.setRecordTime(timeNow);
-                    log.setSourceType(3);
-
-
-                    bondsListingLogService.save(log);
-                }
-            }
-            entityInfoService.updateBatchById(entityInfos);
-            if (StrUtil.isNotBlank(code)) {
-                //保存a股信息
-                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-                //更新a股属性
-                entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
-            }
-            item.setChangeType(changeType);
-
-            cnIpoInfoService.save(item);
-
-            return new AsyncResult(new Object());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AsyncResult<>(e);
+        } else if (!Objects.equals(last, item)) {
+            //如果他们两个不相同，代表有属性修改了
+            changeType = DataChangeType.UPDATE.getId();
         }
+
+        if (last != null && !StrUtil.equals(last.getIpoDate(), item.getIpoDate())) {
+            //*后续如果该股票信息再次更新有出现新的【上市日期】时，状态变回为“发行中”，
+            // 并当【上市日期】 = 今天 时， 状态改为“成功上市”
+            stockCnInfo.setStockStatus(StockCnStatus.ISSUE.getCode());
+            stockCnInfo.setStatusDesc(StockCnStatus.ISSUE.getMessage());
+        }
+
+
+        //上市日期是否是今天
+        boolean ipoNow = DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate());
+
+        //当股票状态已经是“发行中”时，且【上市日期】 = 今天 时，状态改为“成功上市”
+        if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.ISSUE.getCode()) && DateUtil.format(timeNow, "yyyy-MM-dd").equals(item.getIpoDate())) {
+            stockCnInfo.setStockStatus(StockCnStatus.IPO_INFO.getCode());
+            stockCnInfo.setStatusDesc(StockCnStatus.IPO_INFO.getMessage());
+        }
+
+        String windIndustry = item.getWindIndustry();
+
+        List<EntityInfo> entityInfos = entityStockCnRelService.findByStockCode(stockCnInfo.getStockDqCode());
+        if (!CollectionUtil.isEmpty(entityInfos)) {
+            for (EntityInfo entityInfo : entityInfos) {
+                entityInfo.setWindMaster(windIndustry);
+                //审计机构
+                entityInfo.setEntityAuditinstitNew(item.getAuditInst());
+            }
+
+        }
+        //如果是成功上市，发送给敞口划分人
+        if (Objects.equals(stockCnInfo.getStockStatus(), StockCnStatus.IPO_INFO.getCode())) {
+            //查询和当前a股绑定关联关系的主体
+            entityInfos.forEach(entity -> {
+                entity.setList(1);
+            });
+            if (ipoNow) {
+                //新敞口划分任务
+                crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
+
+                //上市记录
+                String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
+                //创建log
+                BondsListingLog log = new BondsListingLog();
+                log.setCode(item.getCode());
+                log.setName(item.getStockName());
+                log.setIpoDate(DateUtil.parseDate(item.getIpoDate()));
+                log.setPublisher(names);
+                log.setRecordTime(timeNow);
+                log.setSourceType(3);
+
+
+                bondsListingLogService.save(log);
+            }
+        }
+        entityInfoService.updateBatchById(entityInfos);
+        if (StrUtil.isNotBlank(code)) {
+            //保存a股信息
+            stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+            //更新a股属性
+            entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
+        }
+        item.setChangeType(changeType);
+
+        cnIpoInfoService.save(item);
+
+        return new AsyncResult(new Object());
     }
 
     /**

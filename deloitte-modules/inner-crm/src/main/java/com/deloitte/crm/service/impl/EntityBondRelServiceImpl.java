@@ -47,78 +47,79 @@ public class EntityBondRelServiceImpl implements IEntityBondRelService
     /**
      * 绑定指定主体和债券的关系
      * 如果没有这个主体，就生成今天的任务
-     * @param issorName 发行人全称
+     * @param issorNames 发行人全称
      * @param bondInfo
      * @param newIss
      * @return
      */
     @Override
-    public boolean bindRelOrCreateTask(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask) {
+    public boolean bindRelOrCreateTask(List<String> issorNames, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask) {
         //没有发行人名称不处理
-        if (StrUtil.isBlank(issorName)){
+        if (CollUtil.isEmpty(issorNames)){
             return false;
         }
 
-        issorName = issorName.trim().replace("（","(").replace("）",")");
 
-        //查询主体
-        List<EntityInfo> entityInfos = entityInfoService.findByName(issorName);
-        //没有主体就创建任务
-        if (CollUtil.isEmpty(entityInfos)){
-            CrmEntityTask entityTask = new CrmEntityTask();
-            entityTask.setTaskCategory(windTask.getTaskCategory());
-            entityTask.setDataSource(1);
-            entityTask.setDataCode(bondInfo.getBondCode());
-            entityTask.setSourceType(1);
-            entityTask.setSourceId(newIss.getId());
-            entityTask.setTaskDate(windTask.getTaskDate());
-            String showData = "发行人全称:"+issorName;
-            showData += ", 交易代码:"+newIss.getTradeCode()+", 债券简称:"+newIss.getBondShortName();
+        issorNames.forEach(issorName->{
+            //查询主体
+            List<EntityInfo> entityInfos = entityInfoService.findByName(issorName);
+            //没有主体就创建任务
+            if (CollUtil.isEmpty(entityInfos)){
+                CrmEntityTask entityTask = new CrmEntityTask();
+                entityTask.setTaskCategory(windTask.getTaskCategory());
+                entityTask.setDataSource(1);
+                entityTask.setDataCode(bondInfo.getBondCode());
+                entityTask.setSourceType(1);
+                entityTask.setSourceId(newIss.getId());
+                entityTask.setTaskDate(windTask.getTaskDate());
+                String showData = "发行人全称:"+issorName;
+                showData += ", 交易代码:"+newIss.getTradeCode()+", 债券简称:"+newIss.getBondShortName();
 
-            entityTask.setDataShow(showData);
+                entityTask.setDataShow(showData);
 
-            //infoMap
-            HashMap<String, Object> infoMap = new LinkedHashMap<>();
-            infoMap.put("发行人全称", issorName);
-            infoMap.put("债券简称", bondInfo.getBondShortName());
-            infoMap.put("债券全称", bondInfo.getBondName());
-            infoMap.put("交易代码", bondInfo.getOriCode());
+                //infoMap
+                HashMap<String, Object> infoMap = new LinkedHashMap<>();
+                infoMap.put("发行人全称", issorName);
+                infoMap.put("债券简称", bondInfo.getBondShortName());
+                infoMap.put("债券全称", bondInfo.getBondName());
+                infoMap.put("交易代码", bondInfo.getOriCode());
 
 
-            try {
-                Map<String, Object> data = AttrValueUtils.parseObj(newIss, Excel.class, "name");
+                try {
+                    Map<String, Object> data = AttrValueUtils.parseObj(newIss, Excel.class, "name");
 
-                entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
-                entityTask.setDetails(objectMapper.writeValueAsString(data));
-                entityTask.setWindMaster(newIss.getWindIndustry());
-                entityTask.setEntityName(issorName);
+                    entityTask.setInfos(objectMapper.writeValueAsString(infoMap));
+                    entityTask.setDetails(objectMapper.writeValueAsString(data));
+                    entityTask.setWindMaster(newIss.getWindIndustry());
+                    entityTask.setEntityName(issorName);
 
-                entityTaskService.createTask(entityTask);
-            } catch (Exception e) {
-                e.printStackTrace();
+                    entityTaskService.createTask(entityTask);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
 
-        }
+            //是否绑定过关联关系
+            for (EntityInfo info : entityInfos) {
+                String entityCode = info.getEntityCode();
+                String bondCode = bondInfo.getBondCode();
 
-        //是否绑定过关联关系
-        for (EntityInfo info : entityInfos) {
-            String entityCode = info.getEntityCode();
-            String bondCode = bondInfo.getBondCode();
+                //查询关联关系
+                EntityBondRel dbRel = entityBondRelMapper.findByEntityBondCode(entityCode, bondCode);
+                if (dbRel!=null){
+                    continue;
+                }
 
-            //查询关联关系
-            EntityBondRel dbRel = entityBondRelMapper.findByEntityBondCode(entityCode, bondCode);
-            if (dbRel!=null){
-                continue;
+                //新增关联关系
+                EntityBondRel saveRel = new EntityBondRel();
+                saveRel.setBdCode(bondCode);
+                saveRel.setEntityCode(entityCode);
+                entityBondRelMapper.insertEntityBondRel(saveRel);
+
             }
 
-            //新增关联关系
-            EntityBondRel saveRel = new EntityBondRel();
-            saveRel.setBdCode(bondCode);
-            saveRel.setEntityCode(entityCode);
-            entityBondRelMapper.insertEntityBondRel(saveRel);
-
-        }
-
+        });
 
         return true;
     }

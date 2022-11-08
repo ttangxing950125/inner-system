@@ -409,6 +409,14 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         return baseMapper.findByName(entityName);
     }
 
+    @Override
+    public List<EntityInfo> findByNames(List<String> entityNames) {
+        Wrapper<EntityInfo> wapper = Wrappers.<EntityInfo>lambdaQuery()
+                .eq(EntityInfo::getEntityName, entityNames);
+
+        return baseMapper.selectList(wapper);
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     @Override

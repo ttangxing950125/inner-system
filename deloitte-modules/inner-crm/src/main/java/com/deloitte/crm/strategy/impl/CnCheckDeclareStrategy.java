@@ -63,93 +63,88 @@ public class CnCheckDeclareStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doThkStockImport(CnCheckDeclare item, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置属性
-            item.setTaskId(windTask.getId());
-            //查询a股是否存在
-            String code = item.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
-            //没有就创建一个
-            if (stockCnInfo == null) {
-                log.warn("==> IPO-审核申报 查询A股不存在 创建A股信息!");
-                stockCnInfo = new StockCnInfo();
+        //设置属性
+        item.setTaskId(windTask.getId());
+        //查询a股是否存在
+        String code = item.getCode();
+        StockCnInfo stockCnInfo = stockCnInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<StockCnInfo>().eq(StockCnInfo::getStockCode, code).eq(StockCnInfo::getIsDeleted, Boolean.FALSE));
+        //没有就创建一个
+        if (stockCnInfo == null) {
+            log.warn("==> IPO-审核申报 查询A股不存在 创建A股信息!");
+            stockCnInfo = new StockCnInfo();
+        }
+        stockCnInfo.setStockCode(code);
+        //这条CnCoachBack是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        String entityName = item.getEntityName();
+        CnCheckDeclare last = cnCheckDeclareService.findLastByEntityName(entityName);
+
+        String windIndustry = item.getWindIndustry();
+
+
+        if (last == null) {
+            //查询不到之前的数据，代表是新增的
+            changeType = DataChangeType.INSERT.getId();
+            /**
+             * IPO审核申报中 只能介于IPO辅导备案中之后才能修改
+             */
+            if (stockCnInfo.getStockStatus() == null) {
+                log.info("==> IPO审核申报中 修改A股状态为 《IPO审核申报中》2！！！");
+                //当股票首次出现在  IPO审核申报表 中时，
+                // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
+                stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
+            } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.COACH_BACK.getCode()) {
+                log.info("==> IPO审核申报中 原【股票代码】={} A股状态为:{} 修改A股状态为 《IPO审核申报中》2 ！！", stockCnInfo.getStockCode(), stockCnInfo.getStockStatus());
+                stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
+            } else {
+                log.warn("==> IPO审核申报中 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
             }
-            stockCnInfo.setStockCode(code);
-            //这条CnCoachBack是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            String entityName = item.getEntityName();
-            CnCheckDeclare last = cnCheckDeclareService.findLastByEntityName(entityName);
-
-            String windIndustry = item.getWindIndustry();
-
-
-            if (last == null) {
-                //查询不到之前的数据，代表是新增的
-                changeType = DataChangeType.INSERT.getId();
-                /**
-                 * IPO审核申报中 只能介于IPO辅导备案中之后才能修改
-                 */
-                if (stockCnInfo.getStockStatus() == null) {
-                    log.info("==> IPO审核申报中 修改A股状态为 《IPO审核申报中》2！！！");
-                    //当股票首次出现在  IPO审核申报表 中时，
-                    // 记为“IPO审核申报中(XXXX)”，其中XXXX为【审核状态】中的字段内容
-                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.COACH_BACK.getCode()) {
-                    log.info("==> IPO审核申报中 原【股票代码】={} A股状态为:{} 修改A股状态为 《IPO审核申报中》2 ！！", stockCnInfo.getStockCode(), stockCnInfo.getStockStatus());
-                    stockCnInfo.setStockStatus(StockCnStatus.CHECK_DECLARE.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.CHECK_DECLARE.getMessage() + "(" + item.getAuditStatus() + ")");
-                } else {
-                    log.warn("==> IPO审核申报中 跳过修改A股状态逻辑目前【股票代码】:{},A股状态为:{}", code, stockCnInfo.getStockStatus());
-                }
-            } else if (!Objects.equals(last, item)) {
-                //如果他们两个不相同，代表有属性修改了
-                changeType = DataChangeType.UPDATE.getId();
+        } else if (!Objects.equals(last, item)) {
+            //如果他们两个不相同，代表有属性修改了
+            changeType = DataChangeType.UPDATE.getId();
+        }
+        if (StrUtil.isNotBlank(code)) {
+            //保存a股信息
+            stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+            if (changeType != null) {
+                //更新a股属性
+                entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
             }
-            if (StrUtil.isNotBlank(code)) {
-                //保存a股信息
-                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-                if (changeType != null) {
-                    //更新a股属性
-                    entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
-                }
 
 
-                //有债券信息，给债券和主体绑定关联关系
-                if (changeType != null) {
-                    List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
-                    if (CollUtil.isNotEmpty(entityInfos)) {
-                        List<EntityInfo> mapEntityInfos = entityInfos.stream().map(e -> e.setWindMaster(windIndustry)).collect(Collectors.toList());
-                        entityInfoService.updateBatchById(mapEntityInfos);
-                        for (EntityInfo info : entityInfos) {
-                            String entityCode = info.getEntityCode();
-                            String stockDqCode = stockCnInfo.getStockDqCode();
-                            //查询关联关系
-                            EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(
-                                    new LambdaQueryWrapper<EntityStockCnRel>()
-                                            .eq(EntityStockCnRel::getEntityCode, entityCode)
-                                            .eq(EntityStockCnRel::getStockDqCode, stockDqCode)
-                                            .eq(EntityStockCnRel::getStatus, Boolean.TRUE));
-                            if (dbRel != null) {
-                                continue;
-                            }
-                            //新增关联关系
-                            EntityStockCnRel cnRel = new EntityStockCnRel();
-                            cnRel.setEntityCode(entityCode);
-                            cnRel.setStockDqCode(stockDqCode);
-                            cnRel.setStatus(Boolean.TRUE);
-                            entityStockCnRelService.getBaseMapper().insert(cnRel);
+            //有债券信息，给债券和主体绑定关联关系
+            if (changeType != null) {
+                List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
+                if (CollUtil.isNotEmpty(entityInfos)) {
+                    List<EntityInfo> mapEntityInfos = entityInfos.stream().map(e -> e.setWindMaster(windIndustry)).collect(Collectors.toList());
+                    entityInfoService.updateBatchById(mapEntityInfos);
+                    for (EntityInfo info : entityInfos) {
+                        String entityCode = info.getEntityCode();
+                        String stockDqCode = stockCnInfo.getStockDqCode();
+                        //查询关联关系
+                        EntityStockCnRel dbRel = entityStockCnRelService.getBaseMapper().selectOne(
+                                new LambdaQueryWrapper<EntityStockCnRel>()
+                                        .eq(EntityStockCnRel::getEntityCode, entityCode)
+                                        .eq(EntityStockCnRel::getStockDqCode, stockDqCode)
+                                        .eq(EntityStockCnRel::getStatus, Boolean.TRUE));
+                        if (dbRel != null) {
+                            continue;
                         }
+                        //新增关联关系
+                        EntityStockCnRel cnRel = new EntityStockCnRel();
+                        cnRel.setEntityCode(entityCode);
+                        cnRel.setStockDqCode(stockDqCode);
+                        cnRel.setStatus(Boolean.TRUE);
+                        entityStockCnRelService.getBaseMapper().insert(cnRel);
                     }
                 }
             }
-            item.setChangeType(changeType);
-            cnCheckDeclareService.save(item);
-            return new AsyncResult(new Object());
-        } catch (Exception e) {
-            log.error("==> IPO审核申报中处理出现异常:{}", e);
-            return new AsyncResult<>(e);
         }
+        item.setChangeType(changeType);
+        cnCheckDeclareService.save(item);
+        return new AsyncResult(new Object());
     }
 
     /**

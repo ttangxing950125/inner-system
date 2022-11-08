@@ -71,7 +71,7 @@ public interface IEntityBondRelService
      * @param newIss
      * @return
      */
-    boolean bindRelOrCreateTask(String issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
+    boolean bindRelOrCreateTask(List<String> issorName, BondInfo bondInfo, BondNewIss newIss, CrmWindTask windTask);
     /**
      * 查询所有被修改状态对应的主体
      *

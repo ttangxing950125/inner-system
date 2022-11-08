@@ -10,8 +10,12 @@ import com.deloitte.additional.recording.service.PrsModelMasterService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -29,9 +33,15 @@ public class PrsModelMasterServiceImpl extends ServiceImpl<PrsModelMasterMapper,
      * @return
      */
     @Override
-    public List<String> finAllPrsModelMaster() {
-
-        return prsModelMasterMapper.selectList(new LambdaQueryWrapper<PrsModelMaster>().eq(PrsModelMaster::getStatus, 1))
-                .parallelStream().filter(e->StringUtils.isNotEmpty(e.getName())).map(PrsModelMaster::getName).collect(Collectors.toList());
+    public List<Map<String, Object>> finAllPrsModelMaster() {
+        CopyOnWriteArrayList<Map<String, Object>> datas = new CopyOnWriteArrayList<>();
+        Map<String, Object> maps = new HashMap<>();
+        prsModelMasterMapper.selectList(new LambdaQueryWrapper<PrsModelMaster>().eq(PrsModelMaster::getStatus, 1)).parallelStream().filter(e -> StringUtils.isNotEmpty(e.getName())).forEach(e -> {
+            maps.put("id", e.getId());
+            maps.put("modelCode", e.getModelCode());
+            maps.put("name", e.getName());
+            datas.add(maps);
+        });
+        return datas;
     }
 }

@@ -102,6 +102,8 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     List<EntityInfo> findByName(String entityName);
 
+    List<EntityInfo> findByNames(List<String> entityNames);
+
     R addOldName(EntityInfo entityInfo);
 
     R updateOldName(String dqCode, String oldName, String newOldName, String status,String remarks);

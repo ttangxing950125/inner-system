@@ -57,59 +57,54 @@ public class CnIpoFailStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<Object> doThkStockImport(CnIpoFail item, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置属性
-            item.setTaskId(windTask.getId());
+        //设置属性
+        item.setTaskId(windTask.getId());
 
-            //查询a股是否存在
-            String code = item.getCode();
-            StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
+        //查询a股是否存在
+        String code = item.getCode();
+        StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
 
-            //没有就创建一个
-            if (stockCnInfo == null) {
-                stockCnInfo = new StockCnInfo();
-                stockCnInfo.setStockCode(code);
-            }
-
-
-            //这条CnIpoPause是新增还是修改 1-新增 2-修改
-            Integer changeType = null;
-            CnIpoFail last = cnIpoFailService.findLastByCode(code);
-
-            if (last == null) {
-                //查询不到之前的数据，代表是新增的
-                changeType = DataChangeType.INSERT.getId();
-                //当股票首次出现在 发行失败 中时，记为“发行失败”
-                if (stockCnInfo.getStockStatus() == null) {
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getMessage());
-                } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
-                    stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getCode());
-                    stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getMessage());
-                }
-            } else if (!Objects.equals(last, item)) {
-                //如果他们两个不相同，代表有属性修改了
-                changeType = DataChangeType.UPDATE.getId();
-            }
-
-            if (StrUtil.isNotBlank(code)) {
-                //保存a股信息
-                stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
-
-                //更新a股属性
-                entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
-            }
-
-
-            item.setChangeType(changeType);
-
-            cnIpoFailService.save(item);
-
-            return new AsyncResult(new Object());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AsyncResult<>(e);
+        //没有就创建一个
+        if (stockCnInfo == null) {
+            stockCnInfo = new StockCnInfo();
+            stockCnInfo.setStockCode(code);
         }
+
+
+        //这条CnIpoPause是新增还是修改 1-新增 2-修改
+        Integer changeType = null;
+        CnIpoFail last = cnIpoFailService.findLastByCode(code);
+
+        if (last == null) {
+            //查询不到之前的数据，代表是新增的
+            changeType = DataChangeType.INSERT.getId();
+            //当股票首次出现在 发行失败 中时，记为“发行失败”
+            if (stockCnInfo.getStockStatus() == null) {
+                stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getMessage());
+            } else if (stockCnInfo.getStockStatus() != null && stockCnInfo.getStockStatus() == StockCnStatus.IEC_SMPC_CHECK.getCode()) {
+                stockCnInfo.setStockStatus(StockCnStatus.IPO_FAIL.getCode());
+                stockCnInfo.setStatusDesc(StockCnStatus.IPO_FAIL.getMessage());
+            }
+        } else if (!Objects.equals(last, item)) {
+            //如果他们两个不相同，代表有属性修改了
+            changeType = DataChangeType.UPDATE.getId();
+        }
+
+        if (StrUtil.isNotBlank(code)) {
+            //保存a股信息
+            stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
+
+            //更新a股属性
+            entityAttrValueService.updateStockCnAttr(stockCnInfo.getStockDqCode(), item);
+        }
+
+
+        item.setChangeType(changeType);
+
+        cnIpoFailService.save(item);
+
+        return new AsyncResult(new Object());
     }
 
     /**

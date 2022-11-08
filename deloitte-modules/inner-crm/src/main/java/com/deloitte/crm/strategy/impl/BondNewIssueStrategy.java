@@ -76,152 +76,159 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
     @Async("taskExecutor")
     @Transactional(rollbackFor = Exception.class)
     public Future<BondInfoDto> doBondImport(BondNewIss newIss, Date timeNow, CrmWindTask windTask) {
-        try {
-            //设置任务相关信息进临时表
+        //设置任务相关信息进临时表
 //            newIss.setImportTime(new Date());
-            newIss.setTaskId(windTask.getId());
+        newIss.setTaskId(windTask.getId());
 
-            Integer resStatus = null;
+        Integer resStatus = null;
 
-            //查询债券是否存在
+        //查询债券是否存在
 //            String shortName = newIss.getBondShortName();
-            //债券全称
+        //债券全称
 
-            String bondName = newIss.getBondName().trim().replace("（", "(").replace("）", ")");
+        String bondName = newIss.getBondName().trim().replace("（", "(").replace("）", ")");
 
-            //查询有没有这个债券
-            BondInfo bondInfo = bondInfoService.findByShortName(bondName, Boolean.FALSE);
-            if (bondInfo == null) {
-                bondInfo = new BondInfo();
-            }
-            //债券简称
-            bondInfo.setBondShortName(newIss.getBondShortName());
-            //债券交易代码
-            bondInfo.setOriCode(newIss.getTradeCode());
-            //债券全称
-            bondInfo.setBondName(bondName);
-            //起息日
-            bondInfo.setValueDate(newIss.getValueDate());
-            //到期日
-            bondInfo.setDueDate(newIss.getExpireDate());
-            //上市日期
-            bondInfo.setListdate(ObjectUtil.isEmpty(newIss.getIpoDate()) ? null : DateUtil.parseDate(newIss.getIpoDate()));
-
-            //看之前有没有导入过这个数据
-            BondNewIss last = bondNewIssMapper.findLastByShortName(bondName);
-            if (last == null) {
-                resStatus = DataChangeType.INSERT.getId();
-            } else {
-                last.setWindIndustry(null);
-                newIss.setWindIndustry(null);
-                if (!Objects.equals(last, newIss)) {
-                    resStatus = DataChangeType.UPDATE.getId();
-                }
-            }
-            Integer newStatus = judgeBondStatus(bondInfo.getBondStatus(), newIss.getIssStartDate(), newIss.getIssEndDate(), newIss.getIpoDate(), timeNow);
-            if (newStatus != null) {
-                bondInfo.setBondStatus(newStatus);
-            }
-
-
-            //保存当前债券
-            BondInfo newDbBond = bondInfoService.saveOrUpdate(bondInfo);
-
-            BondInfoDto bondInfoDto = new BondInfoDto();
-            bondInfoDto.setBondInfo(bondInfo);
-            bondInfoDto.setResStatus(resStatus);
-
-            //设置newIss的状态
-            newIss.setChangeType(resStatus);
-            /***
-             * 设置Wind行业 新增发行也需记录wind行业，格式为 发行人Wind行业(一级)-发行人Wind行业(二级)
-             */
-            String windIndustry = null;
-            //发行人Wind行业(一级)
-            String issorIndustryFirst = newIss.getIssorIndustryFirst();
-            //发行人Wind行业(二级)
-            String issorIndustrySecond = newIss.getIssorIndustrySecond();
-            if (StringUtils.isNotEmpty(issorIndustryFirst)) {
-                if (StringUtils.isNotEmpty(issorIndustrySecond)) {
-                    windIndustry = issorIndustryFirst + "--" + issorIndustrySecond;
-                } else {
-                    windIndustry = issorIndustryFirst;
-                }
-            }
-            bondInfo.setWind1(issorIndustryFirst);
-            bondInfo.setWind2(issorIndustrySecond);
-            //Wind行业
-            newIss.setWindIndustry(windIndustry);
-
-            bondNewIssMapper.insert(newIss);
-
-            //绑定债券和主体关系
-            String entityName = newIss.getIssorName();
-            bondRelService.bindRelOrCreateTask(entityName, bondInfo, newIss, windTask);
-
-
-            //如果债券状态变为成功上市，创建敞口划分任务
-            List<EntityInfo> entityInfos = entityInfoService.findByName(entityName);
-            Integer bondStatus = bondInfo.getBondStatus();
-
-            //债券发行成功，主体发债状态
-            if (Objects.equals(bondStatus, BondStatus.WAIT_LIST.getId())) {
-                entityInfos.forEach(entity -> {
-                    entity.setIssueBonds(1);
-                });
-            }
-
-
-            //发债记录
-            if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())) {
-                //创建log
-                BondsListingLog log = new BondsListingLog();
-                log.setCode(newIss.getTradeCode());
-                log.setName(newIss.getBondName());
-                log.setShortName(newIss.getBondShortName());
-                log.setIssueDate(DateUtil.dateTime("yyyy-MM-dd", newIss.getIssStartDate()));
-                log.setPublisher(newIss.getIssorName());
-                log.setRecordTime(timeNow);
-                log.setSourceType(1);
-
-
-                bondsListingLogService.save(log);
-            }
-
-            if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)) {
-                newDbBond.setBondState(0);
-                newDbBond = bondInfoService.saveOrUpdate(bondInfo);
-                //修改主体的上市状态
-                entityInfos.forEach(entity -> {
-                    entity.setList(1);
-                    entity.setWindMaster(issorIndustryFirst);
-                });
-
-                for (EntityInfo entityInfo : entityInfos) {
-                    EntityBaseBusiInfo entityBaseBusiInfo = entityBaseBusiInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityBaseBusiInfo>().eq(EntityBaseBusiInfo::getEntityCode, entityInfo.getEntityCode()));
-                    //TODO 为空的话是不是要初始化
-                    if (entityBaseBusiInfo != null) {
-                        entityBaseBusiInfo.setRegEntityAddressCityName(newIss.getIssorCity());
-                        entityBaseBusiInfoService.getBaseMapper().updateById(entityBaseBusiInfo);
-                    }
-                }
-                //更新主体数据
-                entityInfoService.updateBatchById(entityInfos);
-
-
-                //新敞口划分任务
-                crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
-            }
-            if (resStatus != null) {
-                //更新当前债券属性
-                entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
-            }
-
-            return new AsyncResult(bondInfoDto);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AsyncResult(e);
+        //查询有没有这个债券
+        BondInfo bondInfo = bondInfoService.findByShortName(bondName, Boolean.FALSE);
+        if (bondInfo == null) {
+            bondInfo = new BondInfo();
         }
+        //债券简称
+        bondInfo.setBondShortName(newIss.getBondShortName());
+        //债券交易代码
+        bondInfo.setOriCode(newIss.getTradeCode());
+        //债券全称
+        bondInfo.setBondName(bondName);
+        //起息日
+        bondInfo.setValueDate(newIss.getValueDate());
+        //到期日
+        bondInfo.setDueDate(newIss.getExpireDate());
+        //上市日期
+        bondInfo.setListdate(ObjectUtil.isEmpty(newIss.getIpoDate()) ? null : DateUtil.parseDate(newIss.getIpoDate()));
+
+        //看之前有没有导入过这个数据
+        BondNewIss last = bondNewIssMapper.findLastByShortName(bondName);
+        if (last == null) {
+            resStatus = DataChangeType.INSERT.getId();
+        } else {
+            last.setWindIndustry(null);
+            newIss.setWindIndustry(null);
+            if (!Objects.equals(last, newIss)) {
+                resStatus = DataChangeType.UPDATE.getId();
+            }
+        }
+        Integer newStatus = judgeBondStatus(bondInfo.getBondStatus(), newIss.getIssStartDate(), newIss.getIssEndDate(), newIss.getIpoDate(), timeNow);
+        if (newStatus != null) {
+            bondInfo.setBondStatus(newStatus);
+        }
+
+        String entityName = newIss.getIssorName();
+        entityName = entityName.trim().replace("（","(").replace("）",")");
+        List<String> entityNames = new ArrayList<>();
+        boolean coll = entityName.contains(",");
+        if (coll){
+            entityNames = Arrays.stream(entityName.split(",")).collect(Collectors.toList());
+        }else {
+            entityNames.add(entityName);
+        }
+
+        //判断集合债
+        bondInfo.setColl(coll);
+
+
+        //保存当前债券
+        BondInfo newDbBond = bondInfoService.saveOrUpdate(bondInfo);
+
+        BondInfoDto bondInfoDto = new BondInfoDto();
+        bondInfoDto.setBondInfo(bondInfo);
+        bondInfoDto.setResStatus(resStatus);
+
+        //设置newIss的状态
+        newIss.setChangeType(resStatus);
+        /***
+         * 设置Wind行业 新增发行也需记录wind行业，格式为 发行人Wind行业(一级)-发行人Wind行业(二级)
+         */
+        String windIndustry = null;
+        //发行人Wind行业(一级)
+        String issorIndustryFirst = newIss.getIssorIndustryFirst();
+        //发行人Wind行业(二级)
+        String issorIndustrySecond = newIss.getIssorIndustrySecond();
+        if (StringUtils.isNotEmpty(issorIndustryFirst)) {
+            if (StringUtils.isNotEmpty(issorIndustrySecond)) {
+                windIndustry = issorIndustryFirst + "--" + issorIndustrySecond;
+            } else {
+                windIndustry = issorIndustryFirst;
+            }
+        }
+        bondInfo.setWind1(issorIndustryFirst);
+        bondInfo.setWind2(issorIndustrySecond);
+        //Wind行业
+        newIss.setWindIndustry(windIndustry);
+
+        bondNewIssMapper.insert(newIss);
+
+        //绑定债券和主体关系
+        bondRelService.bindRelOrCreateTask(entityNames, bondInfo, newIss, windTask);
+
+
+        //如果债券状态变为成功上市，创建敞口划分任务
+        List<EntityInfo> entityInfos = entityInfoService.findByNames(entityNames);
+        Integer bondStatus = bondInfo.getBondStatus();
+
+        //债券发行成功，主体发债状态
+        if (Objects.equals(bondStatus, BondStatus.WAIT_LIST.getId())) {
+            entityInfos.forEach(entity -> {
+                entity.setIssueBonds(1);
+            });
+        }
+
+
+        //发债记录
+        if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())) {
+            //创建log
+            BondsListingLog log = new BondsListingLog();
+            log.setCode(newIss.getTradeCode());
+            log.setName(newIss.getBondName());
+            log.setShortName(newIss.getBondShortName());
+            log.setIssueDate(DateUtil.dateTime("yyyy-MM-dd", newIss.getIssStartDate()));
+            log.setPublisher(newIss.getIssorName());
+            log.setRecordTime(timeNow);
+            log.setSourceType(1);
+
+
+            bondsListingLogService.save(log);
+        }
+
+        if (Objects.equals(bondStatus, BondStatus.LISTED.getId()) && CollUtil.isNotEmpty(entityInfos)) {
+            newDbBond.setBondState(0);
+            newDbBond = bondInfoService.saveOrUpdate(bondInfo);
+            //修改主体的上市状态
+            entityInfos.forEach(entity -> {
+                entity.setList(1);
+                entity.setWindMaster(issorIndustryFirst);
+            });
+
+            for (EntityInfo entityInfo : entityInfos) {
+                EntityBaseBusiInfo entityBaseBusiInfo = entityBaseBusiInfoService.getBaseMapper().selectOne(new LambdaQueryWrapper<EntityBaseBusiInfo>().eq(EntityBaseBusiInfo::getEntityCode, entityInfo.getEntityCode()));
+                //TODO 为空的话是不是要初始化
+                if (entityBaseBusiInfo != null) {
+                    entityBaseBusiInfo.setRegEntityAddressCityName(newIss.getIssorCity());
+                    entityBaseBusiInfoService.getBaseMapper().updateById(entityBaseBusiInfo);
+                }
+            }
+            //更新主体数据
+            entityInfoService.updateBatchById(entityInfos);
+
+
+            //新敞口划分任务
+            crmMasTaskService.createTasks(entityInfos, windTask.getTaskCategory(), windTask.getTaskDate());
+        }
+        if (resStatus != null) {
+            //更新当前债券属性
+            entityAttrValueService.updateBondAttr(newDbBond.getBondCode(), newIss);
+        }
+
+        return new AsyncResult(bondInfoDto);
     }
 
 
