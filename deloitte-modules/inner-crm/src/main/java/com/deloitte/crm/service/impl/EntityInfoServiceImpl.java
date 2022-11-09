@@ -1733,6 +1733,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
                                 .setEntityCode(entityInfo.getEntityCode())
                                 .setCreditCode(entityInfo.getCreditCode())
                                 .setBondCode(bondInfo.getOriCode())
+                                .setBondSum(entityBondRels.size())
                         )
                 );
             } else {
