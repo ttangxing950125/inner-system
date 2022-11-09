@@ -28,5 +28,7 @@ public class EntityVo {
 
     @ApiModelProperty(value="债券代码")
     private String bondCode;
+    @ApiModelProperty(value="相关债券数量")
+    private Integer bondSum;
 
 }

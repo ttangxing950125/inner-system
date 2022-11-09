@@ -524,8 +524,48 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         if (!ObjectUtils.isEmpty(byShortName)) {
             return R.fail("债券简称重复不能进行新增");
         }
-        //新增entity_info
+
+        //新增bond_info
+        BondInfo bondInfo = new BondInfo();
         EntityInfo entityInfo = new EntityInfo();
+        bondInfo.setOriCode(entityByIondVo.getStockCode());
+        bondInfo.setBondShortName(entityByIondVo.getBondShortName());
+        bondInfo.setBondName(entityByIondVo.getBondName());
+        bondInfo.setValueDate(entityByIondVo.getStartXiDate());
+        bondInfo.setDueDate(entityByIondVo.getEndDate());
+        bondInfo.setRaiseType(entityByIondVo.getBondType());
+        if(Objects.equals(entityByIondVo.getIsDefaultOrRoll(),0)){
+            //起息日
+            DateTime StartDateTime = DateUtil.parseDate(entityByIondVo.getStartXiDate());
+            //到息日
+            DateTime endDateTime = DateUtil.parseDate(entityByIondVo.getStartXiDate());
+            Date newDate = new Date();
+            if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
+                bondInfo.setBondStatus(4);
+                entityInfo.setIssueBonds(1);
+                entityInfo.setEntityBondTag("1");
+            } else if(StartDateTime.getTime() > newDate.getTime()) {
+                bondInfo.setBondStatus(2);
+                entityInfo.setIssueBonds(1);
+                entityInfo.setEntityBondTag("1");
+            } else if (endDateTime.getTime() <= newDate.getTime()){
+                bondInfo.setBondStatus(9);
+                entityInfo.setIssueBonds(1);
+                entityInfo.setEntityBondTag("1");
+            }
+        }else {
+            bondInfo.setBondStatus(7);
+            bondInfo.setDefaultDate(entityByIondVo.getDefaultDate());
+            entityInfo.setIssueBonds(0);
+            entityInfo.setEntityBondTag("1");
+        }
+        bondInfoMapper.insertBondInfo(bondInfo);
+        DecimalFormat g1 = new DecimalFormat("000000");
+        String startZeroStr = g1.format(bondInfo.getId());
+        bondInfo.setBondCode("BD" + startZeroStr);
+        bondInfoMapper.updateById(bondInfo);
+
+        //新增entity_info
         entityInfo.setCreditCode(entityByIondVo.getCreditCode());
         entityInfo.setEntityName(entityByIondVo.getEntityName());
         entityInfo.setListType(entityByIondVo.getAnRportType());
@@ -553,37 +593,7 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
                 .eq(EntityInfo::getId, id)
                 .set(EntityInfo::getEntityCode, entityInfo.getEntityCode());
         entityInfoMapper.update(entityInfo, wrapper);
-        //新增bond_info
-        BondInfo bondInfo = new BondInfo();
 
-        bondInfo.setOriCode(entityByIondVo.getStockCode());
-        bondInfo.setBondShortName(entityByIondVo.getBondShortName());
-        bondInfo.setBondName(entityByIondVo.getBondName());
-        bondInfo.setValueDate(entityByIondVo.getStartXiDate());
-        bondInfo.setDueDate(entityByIondVo.getEndDate());
-        bondInfo.setRaiseType(entityByIondVo.getBondType());
-        if(Objects.equals(entityByIondVo.getIsDefaultOrRoll(),0)){
-            //起息日
-            DateTime StartDateTime = DateUtil.parseDate(entityByIondVo.getStartXiDate());
-            //到息日
-            DateTime endDateTime = DateUtil.parseDate(entityByIondVo.getStartXiDate());
-            Date newDate = new Date();
-            if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
-                bondInfo.setBondStatus(4);
-            } else if(StartDateTime.getTime() > newDate.getTime()) {
-                bondInfo.setBondStatus(2);
-            } else if (endDateTime.getTime() <= newDate.getTime()){
-                bondInfo.setBondStatus(9);
-            }
-        }else {
-            bondInfo.setBondStatus(7);
-            bondInfo.setDefaultDate(entityByIondVo.getDefaultDate());
-        }
-        bondInfoMapper.insertBondInfo(bondInfo);
-        DecimalFormat g1 = new DecimalFormat("000000");
-        String startZeroStr = g1.format(bondInfo.getId());
-        bondInfo.setBondCode("BD" + startZeroStr);
-        bondInfoMapper.updateById(bondInfo);
         // 新增 entity_name_his
         EntityNameHis entityNameHis = new EntityNameHis();
         entityNameHis.setEntityType(1);
@@ -656,8 +666,61 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             return R.fail("新增失败:股票简称或股票代码重复不能进行新增");
         }
 
-        //新增entity_info
+        //新增Stock_cn_info
+        StockCnInfo stockCnInfo = new StockCnInfo();
         EntityInfo entityInfoBystock = new EntityInfo();
+        stockCnInfo.setStockShortName(entityStockInfoVo.getStockShortName());
+        stockCnInfo.setStockCode(entityStockInfoVo.getStockCode());
+        stockCnInfo.setListDate(entityStockInfoVo.getStartXiDate());
+        stockCnInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        stockCnInfo.setExchange(entityStockInfoVo.getExchange());
+        //上市时间
+        DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
+        //退市时间
+        DateTime endDateTime = DateUtil.parseDate(entityStockInfoVo.getEndDate());
+        Date newDate = new Date();
+        if (endDateTime == null) {
+            if (StartDateTime.getTime() <= newDate.getTime()){
+                stockCnInfo.setStockStatus(6);
+                entityInfoBystock.setList(1);
+                entityInfoBystock.setEntityStockTag("1");
+            }else {
+                stockCnInfo.setStockStatus(5);
+                entityInfoBystock.setList(0);
+                entityInfoBystock.setEntityStockTag("0");
+            }
+        }else {
+            if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
+                //成功上市
+                stockCnInfo.setStockStatus(6);
+                entityInfoBystock.setList(1);
+                entityInfoBystock.setEntityStockTag("1");
+            } else if(endDateTime.getTime() <= newDate.getTime()) {
+                //退市
+                stockCnInfo.setStockStatus(9);
+                stockCnInfo.setStockStatus(5);
+                entityInfoBystock.setList(0);
+                entityInfoBystock.setEntityStockTag("1");
+
+            } else if(StartDateTime.getTime() > newDate.getTime()){
+                //发行中
+                stockCnInfo.setStockStatus(5);
+                entityInfoBystock.setList(0);
+                entityInfoBystock.setEntityStockTag("0");
+            }
+        }
+
+        int insert = stockCnInfoMapper.insert(stockCnInfo);
+        DecimalFormat g1 = new DecimalFormat("000000");
+        String startZeroStr = g1.format(stockCnInfo.getId());
+        stockCnInfo.setStockDqCode("SA" + startZeroStr);
+        LambdaUpdateWrapper<StockCnInfo> Wrapper = new LambdaUpdateWrapper<>();
+        Wrapper.eq(StockCnInfo::getId, stockCnInfo.getId())
+                .set(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode());
+        stockCnInfoMapper.update(stockCnInfo, Wrapper);
+
+
+        //新增entity_info
         entityInfoBystock.setCreditCode(entityStockInfoVo.getCreditCode());
         entityInfoBystock.setEntityName(entityStockInfoVo.getEntityName());
         if (!ObjectUtils.isEmpty(entityStockInfoVo.getCreditError())) {
@@ -694,38 +757,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
         entityNameHisMapper.insertEntityNameHis(entityNameHis);
-        //新增Stock_cn_info
-        StockCnInfo stockCnInfo = new StockCnInfo();
-        stockCnInfo.setStockShortName(entityStockInfoVo.getStockShortName());
-        stockCnInfo.setStockCode(entityStockInfoVo.getStockCode());
-        stockCnInfo.setListDate(entityStockInfoVo.getStartXiDate());
-        stockCnInfo.setDelistingDate(entityStockInfoVo.getEndDate());
-        stockCnInfo.setExchange(entityStockInfoVo.getExchange());
-        //上市时间
-        DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
-        //退市时间
-        DateTime endDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
-        Date newDate = new Date();
-
-        if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
-            //成功上市
-            stockCnInfo.setStockStatus(6);
-        } else if(endDateTime.getTime() <= newDate.getTime()) {
-            //退市
-            stockCnInfo.setStockStatus(9);
-
-        } else if(StartDateTime.getTime() > newDate.getTime()){
-            //发行中
-            stockCnInfo.setStockStatus(5);
-        }
-        int insert = stockCnInfoMapper.insert(stockCnInfo);
-        DecimalFormat g1 = new DecimalFormat("000000");
-        String startZeroStr = g1.format(stockCnInfo.getId());
-        stockCnInfo.setStockDqCode("SA" + startZeroStr);
-        LambdaUpdateWrapper<StockCnInfo> Wrapper = new LambdaUpdateWrapper<>();
-        Wrapper.eq(StockCnInfo::getId, stockCnInfo.getId())
-                .set(StockCnInfo::getStockDqCode, stockCnInfo.getStockDqCode());
-        stockCnInfoMapper.update(stockCnInfo, Wrapper);
         //新增关联关系entity_stock_cn_rel
         EntityStockCnRel entityStockCnRel = new EntityStockCnRel();
         entityStockCnRel.setStockDqCode("SA" + startZeroStr);
@@ -771,8 +802,65 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         if (!ObjectUtils.isEmpty(entityInfo) || !ObjectUtils.isEmpty(stockThkCode)) {
             return R.fail("新增失败：社会信用代码或股票代码重复不能进行新增");
         }
-        //新增entity_info
+
+        // 新增 Stock_Thk_Info
+        StockThkInfo stockThkInfo = new StockThkInfo();
         EntityInfo entityInfoBystockHk = new EntityInfo();
+        stockThkInfo.setStockCode(entityStockInfoVo.getStockCode());
+
+        //上市时间
+        DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
+        //退市时间
+        DateTime endDateTime = DateUtil.parseDate(entityStockInfoVo.getEndDate());
+        Date newDate = new Date();
+        if (endDateTime == null) {
+            if (StartDateTime.getTime() <= newDate.getTime()){
+                stockThkInfo.setStockStatus(6);
+                entityInfoBystockHk.setList(1);
+                entityInfoBystockHk.setEntityStockTag("1");
+            }else {
+                stockThkInfo.setStockStatus(5);
+                entityInfoBystockHk.setList(0);
+                entityInfoBystockHk.setEntityStockTag("0");
+            }
+        }else
+        {
+            if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
+                //成功上市
+                stockThkInfo.setStockStatus(6);
+                entityInfoBystockHk.setList(1);
+                entityInfoBystockHk.setEntityStockTag("1");
+            } else if(endDateTime.getTime() <= newDate.getTime()) {
+                //退市
+                stockThkInfo.setStockStatus(9);
+                entityInfoBystockHk.setList(0);
+                entityInfoBystockHk.setEntityStockTag("1");
+
+            } else if(StartDateTime.getTime() > newDate.getTime()){
+                //发行中
+                stockThkInfo.setStockStatus(5);
+                entityInfoBystockHk.setList(0);
+                entityInfoBystockHk.setEntityStockTag("0");
+            }
+
+        }
+
+        int insert = stockThkInfoMapper.insert(stockThkInfo);
+        DecimalFormat g1 = new DecimalFormat("000000");
+        String startZeroStr = g1.format(stockThkInfo.getId());
+        stockThkInfo.setStockDqCode("HK" + startZeroStr);
+        LambdaUpdateWrapper<StockThkInfo> Wrapper = new LambdaUpdateWrapper<>();
+        Wrapper.eq(StockThkInfo::getId, stockThkInfo.getId())
+                .set(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode());
+        //上市时间
+        stockThkInfo.setListDate(entityStockInfoVo.getStartXiDate());
+        //退市时间
+        stockThkInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        //交易所
+        stockThkInfo.setExchange(entityStockInfoVo.getExchange());
+        stockThkInfoMapper.update(stockThkInfo, Wrapper);
+        //新增entity_info
+
         entityInfoBystockHk.setCreditCode(entityStockInfoVo.getCreditCode());
         entityInfoBystockHk.setEntityName(entityStockInfoVo.getEntityName());
 
@@ -811,41 +899,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         entityNameHis.setHappenDate(new Date());
         entityNameHis.setCreater(SecurityUtils.getUsername());
         entityNameHisMapper.insertEntityNameHis(entityNameHis);
-        // 新增 Stock_Thk_Info
-        StockThkInfo stockThkInfo = new StockThkInfo();
-        stockThkInfo.setStockCode(entityStockInfoVo.getStockCode());
-
-        //上市时间
-        DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
-        //退市时间
-        DateTime endDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
-        Date newDate = new Date();
-
-        if(StartDateTime.getTime() <= newDate.getTime() && endDateTime.getTime() > newDate.getTime()){
-            //成功上市
-            stockThkInfo.setStockStatus(6);
-        } else if(endDateTime.getTime() <= newDate.getTime()) {
-            //退市
-            stockThkInfo.setStockStatus(9);
-
-        } else if(StartDateTime.getTime() > newDate.getTime()){
-            //发行中
-            stockThkInfo.setStockStatus(5);
-        }
-        int insert = stockThkInfoMapper.insert(stockThkInfo);
-        DecimalFormat g1 = new DecimalFormat("000000");
-        String startZeroStr = g1.format(stockThkInfo.getId());
-        stockThkInfo.setStockDqCode("HK" + startZeroStr);
-        LambdaUpdateWrapper<StockThkInfo> Wrapper = new LambdaUpdateWrapper<>();
-        Wrapper.eq(StockThkInfo::getId, stockThkInfo.getId())
-                .set(StockThkInfo::getStockDqCode, stockThkInfo.getStockDqCode());
-        //上市时间
-        stockThkInfo.setListDate(entityStockInfoVo.getStartXiDate());
-        //退市时间
-        stockThkInfo.setDelistingDate(entityStockInfoVo.getEndDate());
-        //交易所
-        stockThkInfo.setExchange(entityStockInfoVo.getExchange());
-        stockThkInfoMapper.update(stockThkInfo, Wrapper);
         //新增关联关系entity_stock_thk_rel
         EntityStockThkRel entityStockThkRel = new EntityStockThkRel();
         entityStockThkRel.setStockDqCode("HK" + startZeroStr);
