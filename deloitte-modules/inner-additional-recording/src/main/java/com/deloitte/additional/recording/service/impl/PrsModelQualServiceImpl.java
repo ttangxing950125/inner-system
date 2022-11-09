@@ -53,44 +53,6 @@ public class PrsModelQualServiceImpl extends ServiceImpl<PrsModelQualMapper, Prs
      * @param modelCode
      * @param timeValue
      * @param name
-     * @return SQL>>>>>>:
-     * SELECT
-     * model.id as id,
-     * model.qual_code as qualCode,
-     * model.qual_name as qualName,
-     * model.description as  description
-     * FROM(
-     * SELECT
-     * t2.ver_mas_id,
-     * t2.qual_code
-     * FROM
-     * prs_ver_mas_qual t2
-     * LEFT JOIN (
-     * SELECT
-     * m.id,
-     * m.prj_id,
-     * m.model_code,
-     * prs.NAME,
-     * prs.time_value
-     * FROM
-     * prs_project_versions prs
-     * LEFT JOIN
-     * prs_version_master m ON prs.id = m.prj_id AND prs.`status`=1 AND m.`status`=1
-     * <where>
-     * <if test="name!=null and name!=''">
-     * prs.`name`= #{name}
-     * </if>
-     * <if test="timeValue!=null and timeValue!=''">
-     * AND prs.`time_value`= #{timeValue}
-     * </if>
-     * <if test="modelCode!=null and modelCode!=''">
-     * AND  m.`model_code`= #{modelCode}
-     * </if>
-     * </where>
-     * ) t1 ON t2.ver_mas_id = t1.id AND t2.`status`=1
-     * ) t3
-     * LEFT JOIN prs_model_qual model ON t3.qual_code = model.qual_code
-     * WHERE 1=1 AND t3.qual_code = model.qual_code AND  t3.`status`=1  ORDER BY model.qual_code
      */
     @Override
     public List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, String name) {
@@ -152,7 +114,7 @@ public class PrsModelQualServiceImpl extends ServiceImpl<PrsModelQualMapper, Prs
                 notData.add(prsVerMasQual.getQualCode());
             }
         }
-        log.info("根据 版本:{}:、敞口:{}、年份:{} 获取 指标信息 结束 获取条数>>>:{},不存在指标信息表条数>>>>:{}", dataListPageTataiVos.size(), notData.size());
+        log.info("根据 版本敞口:年份: 获取 指标信息 结束 获取条数>>>:{},不存在指标信息表条数>>>>:{},详情>>>:{}", dataListPageTataiVos.size(), notData.size(),JSON.toJSONString(notData));
         return dataListPageTataiVos;
     }
 
