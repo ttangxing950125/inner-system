@@ -510,7 +510,7 @@ public class BondInfoServiceImpl implements IBondInfoService {
             //起息日
             result.add(new BondEntityInfoVo(temp, true, "起息日", "value_date", bondInfo.getValueDate() == null ? null : bondInfo.getValueDate()).setTable(4));
             //到期日
-            result.add(new BondEntityInfoVo(temp, true, "到期日", "due_date", bondInfo.getDueDate() == null ? null : bondInfo.getValueDate()).setTable(4));
+            result.add(new BondEntityInfoVo(temp, true, "到期日", "due_date", bondInfo.getDueDate() == null ? null : bondInfo.getDueDate()).setTable(4));
             return result;
         }
     }
