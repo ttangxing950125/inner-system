@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.additional.recording.constants.Common;
 import com.deloitte.additional.recording.domain.PrsModelMaster;
+import com.deloitte.additional.recording.domain.PrsVerMasQual;
 import com.deloitte.additional.recording.mapper.PrsModelMasterMapper;
 import com.deloitte.additional.recording.mapper.PrsVerMasQualMapper;
-import com.deloitte.additional.recording.domain.PrsVerMasQual;
 import com.deloitte.additional.recording.service.PrsVerMasQualService;
 import com.deloitte.additional.recording.vo.MasterEvdVo;
 import com.deloitte.additional.recording.vo.VersionMasterEvdBackVo;
@@ -80,9 +80,14 @@ public class PrsVerMasQualServiceImpl extends ServiceImpl<PrsVerMasQualMapper, P
         if (CollectionUtils.isEmpty(list)){
             return R.fail(Common.PLEASE_SEND_PARAM);
         }
+        final Integer[] count = {0};
         list.forEach(o->{
-
+            PrsModelMaster prsModelMaster = modelMasterMapper.selectOne(new QueryWrapper<PrsModelMaster>().lambda().eq(PrsModelMaster::getModelCode, o.getMasterCode()).last(Common.SQL_LIMIT_ONE));
+            PrsVerMasQual prsVerMasQual = new PrsVerMasQual();
+            prsVerMasQual.setQualCode(o.getQualCode()).setVerMasId(prsModelMaster.getId()).setStatus(false);
+            int update = masQualMapper.update(prsVerMasQual, new QueryWrapper<PrsVerMasQual>().lambda().eq(PrsVerMasQual::getQualCode, o.getQualCode()).eq(PrsVerMasQual::getVerMasId, prsModelMaster.getId()));
+            count[0] = count[0] +update;
         });
-        return null;
+        return R.fail(Common.UPDATE_SUCCESS+",合计修改"+count[0]+"条");
     }
 }

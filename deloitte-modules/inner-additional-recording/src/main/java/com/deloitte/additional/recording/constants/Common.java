@@ -26,6 +26,8 @@ public enum Common {
     public static final String DO_SUCCESS = "操作成功";
     /** 新增成功 */
     public static final String INSERT_SUCCESS = "新增成功";
+    /** 修改成功 */
+    public static final String UPDATE_SUCCESS = "修改成功";
     /** 新增失败 */
     public static final String INSERT_FAIL = "新增失败";
     /** 敞口指标重复 */
