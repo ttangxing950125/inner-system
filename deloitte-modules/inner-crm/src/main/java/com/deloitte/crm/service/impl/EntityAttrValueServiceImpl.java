@@ -672,7 +672,9 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         stockCnInfo.setStockShortName(entityStockInfoVo.getStockShortName());
         stockCnInfo.setStockCode(entityStockInfoVo.getStockCode());
         stockCnInfo.setListDate(entityStockInfoVo.getStartXiDate());
-        stockCnInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        if (!entityStockInfoVo.getEndDate().equals("")){
+            stockCnInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        }
         stockCnInfo.setExchange(entityStockInfoVo.getExchange());
         //上市时间
         DateTime StartDateTime = DateUtil.parseDate(entityStockInfoVo.getStartXiDate());
@@ -698,7 +700,6 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
             } else if(endDateTime.getTime() <= newDate.getTime()) {
                 //退市
                 stockCnInfo.setStockStatus(9);
-                stockCnInfo.setStockStatus(5);
                 entityInfoBystock.setList(0);
                 entityInfoBystock.setEntityStockTag("1");
 
@@ -855,7 +856,9 @@ public class EntityAttrValueServiceImpl extends ServiceImpl<EntityAttrValueMappe
         //上市时间
         stockThkInfo.setListDate(entityStockInfoVo.getStartXiDate());
         //退市时间
-        stockThkInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        if (!entityStockInfoVo.getEndDate().equals("")){
+            stockThkInfo.setDelistingDate(entityStockInfoVo.getEndDate());
+        }
         //交易所
         stockThkInfo.setExchange(entityStockInfoVo.getExchange());
         stockThkInfoMapper.update(stockThkInfo, Wrapper);
