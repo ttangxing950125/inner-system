@@ -130,6 +130,9 @@ public class PrsModelQualServiceImpl extends ServiceImpl<PrsModelQualMapper, Prs
     public R getAllQualOfPage(VersionMasterEvdVo versionMasterEvdVo) {
         Page<PrsModelQual> pageInfo = new Page<>(versionMasterEvdVo.getPageNum(), versionMasterEvdVo.getPageSize());
         Page<PrsModelQual> modelQualPage = prsModelQualMapper.selectPage(pageInfo, new QueryWrapper<PrsModelQual>().lambda().eq(PrsModelQual::getStatus, 1));
+
+
+
         return R.ok(modelQualPage);
     }
 }

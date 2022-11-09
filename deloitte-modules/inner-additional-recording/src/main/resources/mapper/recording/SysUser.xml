@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.SysUserMapper">
+
+    <select id="findSysRoleByUser" resultType="string">
+        SELECT
+           name
+        FROM
+            sys_role
+        WHERE
+            id IN ( SELECT role_id FROM sys_userrole WHERE user_id =#{id} )
+    </select>
+
+    <select id="getUserByUsername" resultType="sysUser">
+        select *
+        from sys_user
+        where loginname = #{username}
+    </select>
+
+    <select id="findMenuMap" resultType="map">
+        SELECT
+            menu.*,
+            ( SELECT COUNT( 1 ) FROM sys_menu WHERE parentid = menu.id ) AS cnt
+        FROM
+            sys_menu menu
+                INNER JOIN (
+                SELECT
+                    menurole.menu_id
+                FROM
+                    sys_menurole menurole
+                        INNER JOIN sys_role role ON role.id = menurole.role_id
+                        INNER JOIN sys_userrole userrole ON userrole.role_id = role.id
+                WHERE
+                    userrole.user_id = #{userId}
+                  AND role.STATUS = '1'
+                GROUP BY
+                    menurole.menu_id
+            ) menurole ON menurole.menu_id = menu.id
+        WHERE
+            menu.STATUS = '1'
+          AND menu.type = '1'
+        ORDER BY
+            menu.sortkey ASC
+    </select>
+
+</mapper>

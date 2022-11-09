@@ -44,4 +44,21 @@ public interface SysDictDataService extends IService<SysDictData> {
      * @return
      */
     List<Map<String, Object>> finAllsysDictData();
+
+    /**
+     * 根据类型查询字典
+     * @param type
+     * 吴鹏鹏
+     * @return
+     */
+    List<SysDictData> findByType(String type);
+
+
+    /**
+     * 根据类型查询字典表默认值
+     * @param type
+     * 吴鹏鹏
+     * @return
+     */
+    SysDictData findByTypeDefault(String type);
 }

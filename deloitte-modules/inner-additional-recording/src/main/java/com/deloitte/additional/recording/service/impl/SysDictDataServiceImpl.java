@@ -78,4 +78,30 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         objectMaps.add(results);
         return objectMaps;
     }
+
+    /**
+     * 根据类型查询字典
+     *
+     * @param type 吴鹏鹏
+     * @return
+     */
+    @Override
+    public List<SysDictData> findByType(String type) {
+        return baseMapper.selectList(new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getDictType, type));
+    }
+
+    /**
+     * 根据类型查询字典表默认值
+     *
+     * @param type 吴鹏鹏
+     * @return
+     */
+    @Override
+    public SysDictData findByTypeDefault(String type) {
+        return baseMapper.selectOne(
+                new LambdaQueryWrapper<SysDictData>()
+                .eq(SysDictData::getDictType, type)
+                .eq(SysDictData::getIsDefault, "Y")
+        );
+    }
 }
