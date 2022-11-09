@@ -1,16 +1,15 @@
 package com.deloitte.additional.recording.controller;
 
 
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.deloitte.additional.recording.domain.PrsVersionMaster;
 import com.deloitte.additional.recording.service.PrsVersionMasterService;
-import org.springframework.web.bind.annotation.*;
+import com.deloitte.additional.recording.vo.VersionMasterEvdVo;
+import com.deloitte.common.core.domain.R;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * (PrsVersionMaster)表控制层
@@ -27,5 +26,16 @@ public class PrsVersionMasterController {
     @Resource
     private PrsVersionMasterService prsVersionMasterService;
 
-    
+    /**
+     * 根据版本和敞口查询对应指标
+     *
+     * @param versionMasterEvdVo
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/9 16:08
+     */
+    @PostMapping("/getVersionEvdByMasters")
+    public R getVersionEvdByMasters(@RequestBody VersionMasterEvdVo versionMasterEvdVo) {
+        return prsVersionMasterService.getVersionEvdByMasters(versionMasterEvdVo);
+    }
 }

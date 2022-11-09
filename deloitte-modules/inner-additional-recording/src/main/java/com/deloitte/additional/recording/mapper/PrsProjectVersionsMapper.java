@@ -1,8 +1,13 @@
 package com.deloitte.additional.recording.mapper;
 
+import com.deloitte.additional.recording.vo.DataListCustomEntityInfoVo;
+import com.deloitte.additional.recording.vo.DataListFindPrsProjectVersionsByYearVo;
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.additional.recording.domain.PrsProjectVersions;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (PrsProjectVersions)表数据库访问层
@@ -13,4 +18,7 @@ import com.deloitte.additional.recording.domain.PrsProjectVersions;
 @Mapper
 public interface PrsProjectVersionsMapper extends BaseMapper<PrsProjectVersions> {
 
+    List<DataListFindPrsProjectVersionsByYearVo> finPrsProjectVersionsByYear(Integer[]  year);
+
+    List<DataListCustomEntityInfoVo> getCustomEntityInfoByVersionIdAndModelId(@Param("year") String year, @Param("qualCode") String qualCode, @Param("verMasId") String verMasId);
 }

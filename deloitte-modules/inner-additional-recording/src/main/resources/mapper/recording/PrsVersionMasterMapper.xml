@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsVersionMasterMapper">
+
+
+    <select id="getVersionEvdByMasters" parameterType="java.lang.Object" resultType="com.deloitte.additional.recording.vo.VersionMasterEvdBackVo">
+        SELECT
+	    d.`name` AS masterName,
+	    d.model_code as masterCode,
+	    c.qual_name as qualName,
+	    c.qual_code as qualCode
+        FROM
+	    prs_version_master a
+        LEFT JOIN prs_ver_mas_qual b ON a.id = b.ver_mas_id
+        LEFT JOIN prs_model_qual c ON b.qual_code = c.qual_code
+        LEFT JOIN prs_model_master d ON d.model_code = a.model_code
+        <where>
+            1=1
+            <if test="prjId != null  and prjId != ''"> and a.prj_id=#{prjId} </if>
+
+            <if test="modelCodes != null  and modelCodes != ''">
+                and a.model_code in
+                <foreach item="item" collection="modelCodes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by d.model_code
+    </select>
+
+</mapper>

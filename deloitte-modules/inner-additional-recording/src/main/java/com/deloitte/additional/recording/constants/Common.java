@@ -20,10 +20,20 @@ public enum Common {
     public static final String DATA_SOURCE = "data_source";
     /** 显示类型 */
     public static final String SHOW_TYPE = "show_type";
+    /** 限定查询一条 */
+    public static final String SQL_LIMIT_ONE = " limit 1";
     /** 操作成功 */
     public static final String DO_SUCCESS = "操作成功";
     /** 新增成功 */
     public static final String INSERT_SUCCESS = "新增成功";
+    /** 修改成功 */
+    public static final String UPDATE_SUCCESS = "修改成功";
+    /** 新增失败 */
+    public static final String INSERT_FAIL = "新增失败";
+    /** 敞口指标重复 */
+    public static final String REPEAT_MAS_EVD = "敞口指标重复";
+    /** 请传入参数 */
+    public static final String PLEASE_SEND_PARAM = "请传入参数";
     /** 正常 */
     public static final Integer NORMAL = 1;
     /** 删除 */

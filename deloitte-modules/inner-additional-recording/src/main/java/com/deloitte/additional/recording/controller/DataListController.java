@@ -8,17 +8,16 @@ import com.deloitte.additional.recording.service.SysDictDataService;
 import com.deloitte.additional.recording.service.biz.DataListBizComponentService;
 import com.deloitte.additional.recording.vo.DataListGetDropDownBoxVo;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.web.controller.BaseController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,9 +41,11 @@ public class DataListController extends BaseController {
 
     /**
      * 获取下拉框 月份 版本、敞口
+     *
      * @param request
      * @param response
-     * @return
+     * @return DataListGetDropDownBoxVo
+     * {@link com.deloitte.additional.recording.vo.DataListGetDropDownBoxVo}
      */
     @PostMapping("/getDropDownBox")
     public R getDropDownBox(HttpServletRequest request, HttpServletResponse response) {
@@ -59,7 +60,7 @@ public class DataListController extends BaseController {
     }
 
     /**
-     * 获取分页数据
+     * 获取分页数据 TODO
      * @param dto
      * @param request
      * @param response
@@ -71,18 +72,43 @@ public class DataListController extends BaseController {
     }
 
     /**
-     * 获取指标头
+     * 获取指标头 TODO
      * @param modelCode 敞口Code
      * @param timeValue 年份
-     * @param name 版本
+     * @param name      版本
      * @return
      */
     @RequestMapping("/queryByPageStatsdetail")
-    public R queryByPageStatsdetail(String modelCode,String timeValue,String name){
-        return R.ok(dataListBizService.queryByPageStatsdetail(modelCode,timeValue,name));
+    public R queryByPageStatsdetail(String modelCode, String timeValue, String name) {
+        return R.ok(dataListBizService.queryByPageStatsdetail(modelCode, timeValue, name));
 
     }
 
+    /**
+     * 自定义查询
+     * 版本敞口
+     * @param year
+     * @return
+     */
+    @RequestMapping("/getCustomEntity/{ids}")
+    public R getCustomEntity(@PathVariable Integer[] ids) {
+        Optional.ofNullable(ids).orElseThrow(() -> new ServiceException("参数不可以为空"));
+        return R.ok(prsProjectVersionsService.finPrsProjectVersionsByYear(ids));
+    }
 
+    /**
+     * 自定义查询 版本敞口查询公司
+     * @param year
+     * @param versionId
+     * @param industryId
+     * @return
+     */
+    @RequestMapping("/getCustomEntityInfoByVersionIdAndModelId")
+    public R getCustomEntityInfoByVersionIdAndModelId(String year, String qualCode, String verMasId) {
+        Optional.ofNullable(year).orElseThrow(() -> new ServiceException("年份不可以为空"));
+        Optional.ofNullable(qualCode).orElseThrow(() -> new ServiceException("指标编码不可以为空"));
+        Optional.ofNullable(verMasId).orElseThrow(() -> new ServiceException("industryId不可以为空"));
+        return R.ok(prsProjectVersionsService.getCustomEntityInfoByVersionIdAndModelId(year, qualCode, verMasId));
+    }
 
 }
