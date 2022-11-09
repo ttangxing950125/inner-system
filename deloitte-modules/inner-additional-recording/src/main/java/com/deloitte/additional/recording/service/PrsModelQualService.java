@@ -56,9 +56,19 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @param modelCode
      * @param timeValue
      * @param name
+     * @return  推荐使用 queryByPageStatsdetailNoSql
+     * @see PrsModelQualService#queryByPageStatsdetailNoSql(String, String, String)
+     */
+    @Deprecated
+    List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, String name);
+    /**
+     * 获取动态表头 不通过SQL的关联查询
+     * @param modelCode
+     * @param timeValue
+     * @param name
      * @return
      */
-    List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, String name);
+    List<DataListPageTataiVo> queryByPageStatsdetailNoSql(String modelCode, String timeValue, String name);
     /**
      * 分页查询全部指标
      *

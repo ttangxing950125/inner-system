@@ -27,6 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </foreach>
             </if>
         </where>
+        and a.`status`=1   and b.`status`=1 and c.`status`=1 and d.`status`=1
         order by d.model_code
     </select>
 

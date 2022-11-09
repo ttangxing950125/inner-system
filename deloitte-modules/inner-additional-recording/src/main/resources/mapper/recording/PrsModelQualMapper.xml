@@ -26,7 +26,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                    prs.time_value
                 FROM
                     prs_project_versions prs
-          LEFT JOIN prs_version_master m ON prs.id = m.prj_id
+                LEFT JOIN
+                    prs_version_master m ON prs.id = m.prj_id AND prs.`status`=1 AND m.`status`=1
                <where>
                    <if test="name!=null and name!=''">
                        prs.`name`= #{name}
@@ -38,14 +39,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                        AND  m.`model_code`= #{modelCode}
                    </if>
                </where>
-
-                ) t1 ON t2.ver_mas_id = t1.id
-         WHERE
-                t2.ver_mas_id = t1.id
+                ) t1 ON t2.ver_mas_id = t1.id AND t2.`status`=1
          ) t3
         LEFT JOIN prs_model_qual model ON t3.qual_code = model.qual_code
-        WHERE
-         t3.qual_code = model.qual_code
+        WHERE 1=1
+        AND t3.qual_code = model.qual_code AND  t3.`status`=1
+          ORDER BY model.qual_code
     </select>
 
 </mapper>
