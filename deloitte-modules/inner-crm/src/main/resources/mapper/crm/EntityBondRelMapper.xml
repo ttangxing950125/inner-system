@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             b.bond_code as bondCode,
             b.ori_code as transactionCode,
             b.bond_name as fullName,
-            b.bond_short_name as bondShortName,
+            b.bond_short_name as shortName,
             b.bond_state as debtRaisingType,
             b.raise_type as raiseType,
             b.bond_state as bondState

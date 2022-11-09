@@ -8,6 +8,7 @@ import com.deloitte.common.core.domain.R;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * (PrsModelQual)表服务接口
@@ -67,4 +68,5 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @date 2022/11/9 16:56
      */
     R getAllQualOfPage(VersionMasterEvdVo versionMasterEvdVo);
+
 }

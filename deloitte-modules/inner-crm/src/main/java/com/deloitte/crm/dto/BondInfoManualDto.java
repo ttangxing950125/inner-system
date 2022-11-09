@@ -39,7 +39,7 @@ public class BondInfoManualDto {
     @ApiModelProperty(name="valueDate",value="起息日")
     private String valueDate;
 
-    @ApiModelProperty(name="valueDate",value="到期兑付日")
+    @ApiModelProperty(name="dueCashingDate",value="到期兑付日")
     private String dueCashingDate;
 
     @NotNull(message = "主体统一社会信用代码不能为空")
