@@ -44,7 +44,8 @@ public class DataListController extends BaseController {
      *
      * @param request
      * @param response
-     * @return
+     * @return DataListGetDropDownBoxVo
+     * {@link com.deloitte.additional.recording.vo.DataListGetDropDownBoxVo}
      */
     @PostMapping("/getDropDownBox")
     public R getDropDownBox(HttpServletRequest request, HttpServletResponse response) {
@@ -59,8 +60,7 @@ public class DataListController extends BaseController {
     }
 
     /**
-     * 获取分页数据
-     *
+     * 获取分页数据 TODO
      * @param dto
      * @param request
      * @param response
@@ -72,8 +72,7 @@ public class DataListController extends BaseController {
     }
 
     /**
-     * 获取指标头
-     *
+     * 获取指标头 TODO
      * @param modelCode 敞口Code
      * @param timeValue 年份
      * @param name      版本
@@ -87,6 +86,7 @@ public class DataListController extends BaseController {
 
     /**
      * 自定义查询
+     * 版本敞口
      * @param year
      * @return
      */
@@ -96,5 +96,19 @@ public class DataListController extends BaseController {
         return R.ok(prsProjectVersionsService.finPrsProjectVersionsByYear(ids));
     }
 
+    /**
+     * 自定义查询 版本敞口查询公司
+     * @param year
+     * @param versionId
+     * @param industryId
+     * @return
+     */
+    @RequestMapping("/getCustomEntityInfoByVersionIdAndModelId")
+    public R getCustomEntityInfoByVersionIdAndModelId(String year, String qualCode, String verMasId) {
+        Optional.ofNullable(year).orElseThrow(() -> new ServiceException("年份不可以为空"));
+        Optional.ofNullable(qualCode).orElseThrow(() -> new ServiceException("指标编码不可以为空"));
+        Optional.ofNullable(verMasId).orElseThrow(() -> new ServiceException("industryId不可以为空"));
+        return R.ok(prsProjectVersionsService.getCustomEntityInfoByVersionIdAndModelId(year, qualCode, verMasId));
+    }
 
 }

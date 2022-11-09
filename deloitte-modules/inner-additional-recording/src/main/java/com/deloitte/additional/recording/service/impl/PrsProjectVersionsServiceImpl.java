@@ -11,6 +11,7 @@ import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.mapper.PrsProjectVersionsMapper;
 import com.deloitte.additional.recording.mapper.PrsVersionMasterMapper;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
+import com.deloitte.additional.recording.vo.DataListCustomEntityInfoVo;
 import com.deloitte.additional.recording.vo.DataListFindPrsProjectVersionsByYearVo;
 import com.deloitte.common.core.domain.R;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,12 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
         return prsProjectVersionsMapper.selectPage(pageInfo, query);
     }
 
+    /**
+     * parallelStream 并发流执行 使用forkjoinpool
+     * {@link java.util.concurrent.ForkJoinPool}
+     * 统计-数据清单模块 查询版本 下拉框专用方法  版本存在重复 使用 distinct去重 后续参数传名称
+     * @return
+     */
     @Override
     public List<String> findAllPrsProjectVersions() {
         List<PrsProjectVersions> prsProjectVersions = prsProjectVersionsMapper.selectList(new LambdaQueryWrapper<PrsProjectVersions>().eq(PrsProjectVersions::getStatus, 1));
@@ -120,16 +127,37 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
         return R.ok(Common.INSERT_SUCCESS);
     }
 
+    /**
+     * 自定义查询-版本敞口
+     * @param year
+     * @return
+     */
     @Override
-    public R finPrsProjectVersionsByYear(Integer[] year) {
+    public R finPrsProjectVersionsByYear(final Integer[] year) {
 
         long start = System.currentTimeMillis();
         log.info("==> 通过年份:{}查询指标值 开始 ", year);
-        List<DataListFindPrsProjectVersionsByYearVo> dataListFindPrsProjectVersionsByYearVos = prsProjectVersionsMapper.finPrsProjectVersionsByYear(new Integer[]{2020,2021});
+        List<DataListFindPrsProjectVersionsByYearVo> dataListFindPrsProjectVersionsByYearVos = prsProjectVersionsMapper.finPrsProjectVersionsByYear(year);
         final Map<String, List<DataListFindPrsProjectVersionsByYearVo>> collect = dataListFindPrsProjectVersionsByYearVos.parallelStream().collect(Collectors.groupingBy(DataListFindPrsProjectVersionsByYearVo::getName));
         long end = System.currentTimeMillis();
         log.info("==> 通过年份:{}>>查询指标值 结束 耗时: " + (end - start) + "ms", year);
         return R.ok(collect);
+    }
+
+    /**
+     * 自定义查询-版本敞口查询公司
+     * @param year
+     * @param qualCode
+     * @param verMasId
+     * @return
+     */
+    @Override
+    public R getCustomEntityInfoByVersionIdAndModelId(String year, String qualCode, String verMasId) {
+        List<DataListCustomEntityInfoVo> resultList = prsProjectVersionsMapper.getCustomEntityInfoByVersionIdAndModelId(year, qualCode, verMasId);
+        if (CollUtil.isEmpty(resultList)) {
+            R.ok();
+        }
+        return R.ok(resultList);
     }
 
     /**

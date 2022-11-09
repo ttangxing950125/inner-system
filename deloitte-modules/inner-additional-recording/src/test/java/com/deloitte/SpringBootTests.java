@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.deloitte.additional.recording.InnerAdditionalRecordingApplication;
 import com.deloitte.additional.recording.mapper.PrsProjectVersionsMapper;
 import com.deloitte.additional.recording.service.PrsModelQualService;
+import com.deloitte.additional.recording.vo.DataListCustomEntityInfoVo;
 import com.deloitte.additional.recording.vo.DataListFindPrsProjectVersionsByYearVo;
 import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import org.junit.jupiter.api.Test;
@@ -34,10 +35,21 @@ public class SpringBootTests {
         final List<DataListPageTataiVo> dataListPageTataiVos = prsModelQualService.queryByPageStatsdetail("M_029", "2021", "第一创业");
         System.out.println(JSON.toJSONString(dataListPageTataiVos));
     }
+
+    /**
+     *
+     */
     @Test
     public void test2() {
         final List<DataListFindPrsProjectVersionsByYearVo> dataListFindPrsProjectVersionsByYearVos = prsProjectVersionsMapper.finPrsProjectVersionsByYear(new Integer[]{2020,2021});
         final Map<String, List<DataListFindPrsProjectVersionsByYearVo>> collect = dataListFindPrsProjectVersionsByYearVos.stream().collect(Collectors.groupingBy(DataListFindPrsProjectVersionsByYearVo::getName));
         System.out.println(JSON.toJSONString(collect));
+    }
+
+    @Test
+    public void test3() {
+        final List<DataListCustomEntityInfoVo> results = prsProjectVersionsMapper.getCustomEntityInfoByVersionIdAndModelId("2021", "Q_000044", "449");
+//        final Map<String, List<DataListFindPrsProjectVersionsByYearVo>> collect = dataListFindPrsProjectVersionsByYearVos.stream().collect(Collectors.groupingBy(DataListFindPrsProjectVersionsByYearVo::getName));
+        System.out.println(JSON.toJSONString(results));
     }
 }

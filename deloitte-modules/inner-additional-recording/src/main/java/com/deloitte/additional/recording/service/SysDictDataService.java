@@ -39,5 +39,9 @@ public interface SysDictDataService extends IService<SysDictData> {
      */
     R getShowType();
 
+    /**
+     * 获取月份 下拉框专用方法
+     * @return
+     */
     List<Map<String, Object>> finAllsysDictData();
 }

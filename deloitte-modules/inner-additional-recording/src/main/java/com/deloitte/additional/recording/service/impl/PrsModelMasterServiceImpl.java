@@ -28,29 +28,34 @@ public class PrsModelMasterServiceImpl extends ServiceImpl<PrsModelMasterMapper,
     private PrsModelMasterMapper prsModelMasterMapper;
 
     /**
-     * @return
+     * 统计-数据清单模块 下拉框专用 获取敞口数据
+     * @return {@link java.util.HashMap}
+     * {@link com.deloitte.additional.recording.domain.PrsModelMaster}
      */
     @Override
     public List<Map<String, Object>> finAllPrsModelMaster() {
         CopyOnWriteArrayList<Map<String, Object>> datas = new CopyOnWriteArrayList<>();
         Map<String, Object> maps = new HashMap<>();
-        prsModelMasterMapper.selectList(new LambdaQueryWrapper<PrsModelMaster>().eq(PrsModelMaster::getStatus, 1)).parallelStream().filter(e -> StringUtils.isNotEmpty(e.getName())).forEach(e -> {
+        prsModelMasterMapper.selectList(new LambdaQueryWrapper<PrsModelMaster>().eq(PrsModelMaster::getStatus, 1)).stream().filter(e -> StringUtils.isNotEmpty(e.getName())).forEach(e -> {
+            //id
             maps.put("id", e.getId());
+            //敞口编码
             maps.put("modelCode", e.getModelCode());
+            //敞口名称
             maps.put("name", e.getName());
             datas.add(maps);
         });
         return datas;
     }
+
     /**
      * 获取所有敞口基础数据
-     *
      * @return R
      * @author 冉浩岑
      * @date 2022/11/9 15:54
      */
     @Override
     public R getAllMaster() {
-        return R.ok(prsModelMasterMapper.selectList(new QueryWrapper<>()));
+        return R.ok(prsModelMasterMapper.selectList(new QueryWrapper<PrsModelMaster>().lambda().eq(PrsModelMaster::getStatus, 1)));
     }
 }

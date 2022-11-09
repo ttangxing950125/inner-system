@@ -28,6 +28,10 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      */
     Page<PrsProjectVersions> getPrsProjectVersions(String year, String status, String name, Integer pageNum, Integer pageSize);
 
+    /**
+     * 统计-数据清单模块 -查询版本 下拉框专用方法
+     * @return
+     */
     List<String> findAllPrsProjectVersions();
     /**
      * 一键禁用
@@ -57,6 +61,19 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      */
     R insertPrsProjectVersions(PrsProjectVersions prsProjectVersions);
 
-
+    /**
+     * 自定义查询-版本敞口
+     * @param year
+     * @return
+     */
     R finPrsProjectVersionsByYear(Integer[] year);
+
+    /**
+     * 自定义查询-版本敞口查询公司
+     * @param year
+     * @param versionId
+     * @param industryId
+     * @return
+     */
+    R getCustomEntityInfoByVersionIdAndModelId(String year, String versionId, String industryId);
 }

@@ -45,4 +45,32 @@
         ) t4
         INNER JOIN prs_model_qual t3 ON t3.qual_code = t4.qual_code and t3.`status`=1
     </select>
+
+
+    <select id="getCustomEntityInfoByVersionIdAndModelId"  resultType="com.deloitte.additional.recording.vo.DataListCustomEntityInfoVo">
+        SELECT
+            t1.id as id,
+            t1.entity_name as entityName,
+            t1.entity_code as entityCode,
+            t1.entity_type as entityType,
+            t2.qual_code as qualCode,
+            t2.time_value as timeValue
+        FROM
+            (
+            SELECT
+                vme.ver_mas_id,
+                vme.entity_code,
+                entity.entity_name,
+                entity.id,
+                entity.entity_type
+            FROM
+                ( SELECT * FROM prs_ver_mas_entity WHERE ver_mas_id = #{verMasId} ) vme INNER JOIN entity_info entity ON vme.entity_code = entity.entity_code
+            ) t1
+            INNER JOIN prs_qual_data t2 ON t2.entity_code = t1.entity_code
+        WHERE
+            t2.time_value = #{year} AND t2.qual_code = #{qualCode}
+    </select>
+
+
+
 </mapper>

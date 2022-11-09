@@ -63,6 +63,12 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     public R getShowType() {
         return R.ok(mapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.SHOW_TYPE)));
     }
+
+    /**
+     * 统计-数据清单模块 获取年份 从数据字典表中获取
+     * @return
+     * @see com.deloitte.system.api.domain.SysDictData
+     */
     @Override
     public List<Map<String, Object>> finAllsysDictData() {
         List<Map<String, Object>> objectMaps = new ArrayList<>();
