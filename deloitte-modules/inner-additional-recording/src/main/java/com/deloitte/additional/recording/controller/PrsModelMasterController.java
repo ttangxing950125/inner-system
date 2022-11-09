@@ -1,16 +1,13 @@
 package com.deloitte.additional.recording.controller;
 
 
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.deloitte.additional.recording.domain.PrsModelMaster;
 import com.deloitte.additional.recording.service.PrsModelMasterService;
-import org.springframework.web.bind.annotation.*;
+import com.deloitte.common.core.domain.R;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * (PrsModelMaster)表控制层
@@ -27,5 +24,15 @@ public class PrsModelMasterController {
     @Resource
     private PrsModelMasterService prsModelMasterService;
 
-    
+    /**
+     * 获取所有敞口基础数据
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/9 15:54
+    */
+    @PostMapping("/getAllMaster")
+    public R getAllMaster(){
+        return prsModelMasterService.getAllMaster();
+    }
 }

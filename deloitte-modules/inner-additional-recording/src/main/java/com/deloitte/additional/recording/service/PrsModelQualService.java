@@ -3,6 +3,8 @@ package com.deloitte.additional.recording.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsModelQual;
 import com.deloitte.additional.recording.vo.DataListPageTataiVo;
+import com.deloitte.additional.recording.vo.VersionMasterEvdVo;
+import com.deloitte.common.core.domain.R;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -56,4 +58,13 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @return
      */
     List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, String name);
+    /**
+     * 分页查询全部指标
+     *
+     * @param versionMasterEvdVo
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/9 16:56
+     */
+    R getAllQualOfPage(VersionMasterEvdVo versionMasterEvdVo);
 }
