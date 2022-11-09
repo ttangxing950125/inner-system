@@ -6,10 +6,12 @@ import com.deloitte.additional.recording.service.PrsModelMasterService;
 import com.deloitte.additional.recording.service.PrsModelQualService;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
 import com.deloitte.additional.recording.service.SysDictDataService;
+import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,6 +35,7 @@ public class DataListBizComponentService {
 
     /**
      * 分页查
+     *
      * @param dto
      * @return
      */
@@ -50,7 +53,7 @@ public class DataListBizComponentService {
     }
 
     public Object queryByPageStatsdetail(String modelCode, String timeValue, String name) {
-         prsModelQualService.queryByPageStatsdetail(modelCode,timeValue,name);
-         return null;
+        List<DataListPageTataiVo> dataListPageTataiVos = prsModelQualService.queryByPageStatsdetail(modelCode, timeValue, name);
+        return dataListPageTataiVos;
     }
 }

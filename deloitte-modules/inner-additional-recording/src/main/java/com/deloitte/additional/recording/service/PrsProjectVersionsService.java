@@ -56,4 +56,6 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      * @date 2022/11/7 18:00
      */
     R insertPrsProjectVersions(PrsProjectVersions prsProjectVersions);
+
+    R finPrsProjectVersionsByYear(String year);
 }

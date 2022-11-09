@@ -8,17 +8,16 @@ import com.deloitte.additional.recording.service.SysDictDataService;
 import com.deloitte.additional.recording.service.biz.DataListBizComponentService;
 import com.deloitte.additional.recording.vo.DataListGetDropDownBoxVo;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.web.controller.BaseController;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,6 +41,7 @@ public class DataListController extends BaseController {
 
     /**
      * 获取下拉框 月份 版本、敞口
+     *
      * @param request
      * @param response
      * @return
@@ -60,6 +60,7 @@ public class DataListController extends BaseController {
 
     /**
      * 获取分页数据
+     *
      * @param dto
      * @param request
      * @param response
@@ -72,17 +73,28 @@ public class DataListController extends BaseController {
 
     /**
      * 获取指标头
+     *
      * @param modelCode 敞口Code
      * @param timeValue 年份
-     * @param name 版本
+     * @param name      版本
      * @return
      */
     @RequestMapping("/queryByPageStatsdetail")
-    public R queryByPageStatsdetail(String modelCode,String timeValue,String name){
-        return R.ok(dataListBizService.queryByPageStatsdetail(modelCode,timeValue,name));
+    public R queryByPageStatsdetail(String modelCode, String timeValue, String name) {
+        return R.ok(dataListBizService.queryByPageStatsdetail(modelCode, timeValue, name));
 
     }
 
+    /**
+     * 自定义查询
+     * @param year
+     * @return
+     */
+    @GetMapping("/getCustomEntity/{year}")
+    public R getCustomEntity(@PathVariable("year") String year) {
+        Optional.ofNullable(year).orElseThrow(() -> new ServiceException("参数不可以为空"));
+        return R.ok(prsProjectVersionsService.finPrsProjectVersionsByYear(year));
+    }
 
 
 }

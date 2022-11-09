@@ -6,6 +6,7 @@ import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * (PrsModelQual)表服务接口
@@ -56,4 +57,5 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @return
      */
     List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, String name);
+
 }

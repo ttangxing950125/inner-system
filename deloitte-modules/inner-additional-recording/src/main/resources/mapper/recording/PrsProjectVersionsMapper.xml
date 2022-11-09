@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsProjectVersionsMapper">
+    <select id="finPrsProjectVersionsByYear"  resultType="com.deloitte.additional.recording.vo.DataListFindPrsProjectVersionsByYearVo">
+
+    SELECT
+        t4.name as name,
+        t4.qual_code as qualCode,
+        t3.qual_name as qualName,
+        t4.model_code as modelCode,
+        t4.time_value as timeValue ,
+        t4.ver_mas_id  as  verMasId
+    FROM
+        (
+        SELECT
+            t1.`name`,
+            t1.model_code,
+            t1.time_value,
+            t2.ver_mas_id,
+            t2.qual_code
+        FROM
+            (
+            SELECT
+                m.id,
+                m.prj_id,
+                m.model_code,
+                prs.NAME,
+                prs.time_value
+            FROM
+                prs_project_versions prs
+                LEFT JOIN prs_version_master m ON prs.id = m.prj_id
+            WHERE 1=1
+
+                AND prs.`status` = 1
+                AND m.`status` = 1
+                AND prs.`time_value` IN
+                <foreach item="id" collection="array" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            ) t1
+            INNER JOIN prs_ver_mas_qual t2 ON t2.ver_mas_id = t1.id
+            AND t2.`status` = 1
+        ) t4
+        INNER JOIN prs_model_qual t3 ON t3.qual_code = t4.qual_code and t3.`status`=1
+    </select>
+</mapper>
