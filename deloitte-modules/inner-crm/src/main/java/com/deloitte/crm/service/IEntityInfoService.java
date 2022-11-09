@@ -265,6 +265,9 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     R<EntityInfoVo> validateCodeAndName(String creditCode, String entityName);
 
+
+    public EntityInfo checkName(String entityName);
+
     /**
      * 修改库中主体的统一社会信用代码 by正杰
      * @param entityCode

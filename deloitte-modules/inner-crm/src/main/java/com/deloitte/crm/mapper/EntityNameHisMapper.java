@@ -16,6 +16,10 @@ import java.util.Map;
  */
 public interface EntityNameHisMapper extends BaseMapper<EntityNameHis>
 {
+
+
+    List<EntityNameHis> findByOldName(String oldName);
+
     /**
      * 查询【请填写功能名称】
      * 

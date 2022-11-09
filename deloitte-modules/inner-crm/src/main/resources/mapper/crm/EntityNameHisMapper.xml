@@ -22,6 +22,12 @@
         select id, entity_type, status, dq_code, happen_date, old_name, remarks, source, creater, created, update from entity_name_his
     </sql>
 
+    <select id="findByOldName" resultType="entityNameHis">
+        select *
+        from entity_name_his
+        where old_name = #{oldName}
+    </select>
+
     <select id="selectEntityNameHisList" parameterType="EntityNameHis" resultMap="EntityNameHisResult">
         <include refid="selectEntityNameHisVo"/>
         <where>
