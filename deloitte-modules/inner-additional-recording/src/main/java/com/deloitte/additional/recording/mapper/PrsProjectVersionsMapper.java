@@ -17,5 +17,5 @@ import java.util.List;
 @Mapper
 public interface PrsProjectVersionsMapper extends BaseMapper<PrsProjectVersions> {
 
-    List<DataListFindPrsProjectVersionsByYearVo> finPrsProjectVersionsByYear(String[]  year);
+    List<DataListFindPrsProjectVersionsByYearVo> finPrsProjectVersionsByYear(Integer[]  year);
 }

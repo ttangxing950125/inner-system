@@ -57,5 +57,5 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      */
     R insertPrsProjectVersions(PrsProjectVersions prsProjectVersions);
 
-    R finPrsProjectVersionsByYear(String year);
+    R finPrsProjectVersionsByYear(Integer[] year);
 }

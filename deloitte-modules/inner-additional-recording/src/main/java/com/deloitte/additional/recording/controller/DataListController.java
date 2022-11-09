@@ -90,10 +90,10 @@ public class DataListController extends BaseController {
      * @param year
      * @return
      */
-    @GetMapping("/getCustomEntity/{year}")
-    public R getCustomEntity(@PathVariable("year") String year) {
-        Optional.ofNullable(year).orElseThrow(() -> new ServiceException("参数不可以为空"));
-        return R.ok(prsProjectVersionsService.finPrsProjectVersionsByYear(year));
+    @RequestMapping("/getCustomEntity/{ids}")
+    public R getCustomEntity(@PathVariable Integer[] ids) {
+        Optional.ofNullable(ids).orElseThrow(() -> new ServiceException("参数不可以为空"));
+        return R.ok(prsProjectVersionsService.finPrsProjectVersionsByYear(ids));
     }
 
 

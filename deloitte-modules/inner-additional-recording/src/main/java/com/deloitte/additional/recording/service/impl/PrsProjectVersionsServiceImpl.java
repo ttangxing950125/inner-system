@@ -121,10 +121,11 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
     }
 
     @Override
-    public R finPrsProjectVersionsByYear(String year) {
+    public R finPrsProjectVersionsByYear(Integer[] year) {
+
         long start = System.currentTimeMillis();
         log.info("==> 通过年份:{}查询指标值 开始 ", year);
-        List<DataListFindPrsProjectVersionsByYearVo> dataListFindPrsProjectVersionsByYearVos = prsProjectVersionsMapper.finPrsProjectVersionsByYear(new String[]{year});
+        List<DataListFindPrsProjectVersionsByYearVo> dataListFindPrsProjectVersionsByYearVos = prsProjectVersionsMapper.finPrsProjectVersionsByYear(new Integer[]{2020,2021});
         final Map<String, List<DataListFindPrsProjectVersionsByYearVo>> collect = dataListFindPrsProjectVersionsByYearVos.parallelStream().collect(Collectors.groupingBy(DataListFindPrsProjectVersionsByYearVo::getName));
         long end = System.currentTimeMillis();
         log.info("==> 通过年份:{}>>查询指标值 结束 耗时: " + (end - start) + "ms", year);
