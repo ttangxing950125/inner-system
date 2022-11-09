@@ -17,6 +17,7 @@ import com.deloitte.crm.dto.EntityInfoInsertDTO;
 import com.deloitte.crm.mapper.EntityInfoMapper;
 import com.deloitte.crm.service.EntityInfoManager;
 import com.deloitte.crm.service.ICrmEntityTaskService;
+import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.RoleSevenTask;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +40,8 @@ import java.util.Optional;
 public class RoleSevenInsertEntity implements RoleSevenTask {
 
     private EntityInfoMapper entityInfoMapper;
+    
+    private IEntityInfoService entityInfoService;
 
     private EntityInfoManager entityInfoManager;
 
@@ -52,12 +56,11 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
 
 
         //根据企业名或社会信用代码查询
-        Wrapper<EntityInfo> wrapperName = Wrappers.<EntityInfo>lambdaQuery()
-                .eq(EntityInfo::getEntityName, entityName);
 
-        List<EntityInfo> selectByName = entityInfoMapper.selectList(wrapperName);
-        if (CollUtil.isNotEmpty(selectByName)){
-            log.info("根据名称查询主体 selectByName {},{}",entityName,selectByName.size());
+        EntityInfo selectByName = entityInfoService.checkName(entityName);
+
+        if (selectByName!=null){
+            log.info("根据名称查询主体 selectByName {},{}",entityName,selectByName);
             throw new ServiceException("已有同名主体："+entityName);
         }
 
@@ -66,7 +69,7 @@ public class RoleSevenInsertEntity implements RoleSevenTask {
 
         List<EntityInfo> selectByCode = entityInfoMapper.selectList(wrapperCreditCode);
         if (CollUtil.isNotEmpty(selectByCode)){
-            log.info("根据社会信用代码查询主体 selectByCode {},{}",entityName,selectByName.size());
+            log.info("根据社会信用代码查询主体 selectByCode {},{}",entityName,selectByCode.size());
             throw new ServiceException("已有相同社会信用代码："+creditCode);
         }
 

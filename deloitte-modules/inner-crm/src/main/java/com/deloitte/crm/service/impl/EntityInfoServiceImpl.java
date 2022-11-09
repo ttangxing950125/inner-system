@@ -430,9 +430,7 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
 
         //查询曾用名
-        LambdaQueryWrapper<EntityNameHis> wrapper = Wrappers.<EntityNameHis>lambdaQuery()
-                .eq(EntityNameHis::getOldName, entityName);
-        List<EntityNameHis> entityNameHis = entityNameHisMapper.selectList(wrapper);
+        List<EntityNameHis> entityNameHis = entityNameHisMapper.findByOldName(entityName);
 
         List<String> entityCodes = entityNameHis.stream().map(EntityNameHis::getDqCode).collect(Collectors.toList());
 
@@ -3108,8 +3106,19 @@ public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityI
         }
     }
 
+    @Override
     public EntityInfo checkName(String entityName) {
         EntityInfo entityInfo = baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityName, entityName));
+
+        if (entityInfo==null){
+            //查询曾用名表
+            List<EntityNameHis> oldNames = entityNameHisMapper.findByOldName(entityName);
+            if (CollUtil.isNotEmpty(oldNames)){
+                return baseMapper.selectOne(new QueryWrapper<EntityInfo>().lambda().eq(EntityInfo::getEntityCode, oldNames.get(0).getDqCode()));
+            }
+        }
+
+
         return entityInfo;
     }
 
