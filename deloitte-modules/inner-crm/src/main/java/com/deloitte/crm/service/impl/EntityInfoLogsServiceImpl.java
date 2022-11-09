@@ -91,7 +91,9 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
 
             CompletableFuture<EntityInfoLogsByBondVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsByBondVo sockVo = new EntityInfoLogsByBondVo();
-                Page<EntityInfoLogs> page = new Page<>(pageNum, pageSize);
+                Integer pageN=pageNum==null ? 1: pageNum;
+                Integer pageS=pageSize==null ? 10: pageSize;
+                Page<EntityInfoLogs> page = new Page<>(pageN, pageS);
                 final Page<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectPage(page,new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
                 sockVo.setEntityInfoLogs(infoLogs);
                 return sockVo;
@@ -166,7 +168,10 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
 
             CompletableFuture<EntityInfoLogsBySockVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsBySockVo sockVo = new EntityInfoLogsBySockVo();
-                Page<EntityInfoLogs> page = new Page<>(pageNum, pageSize);
+              Integer pageN=pageNum==null ? 1: pageNum;
+              Integer pageS=pageSize==null ? 10: pageSize;
+
+                Page<EntityInfoLogs> page = new Page<>(pageN, pageS);
                 Page<EntityInfoLogs> entoty = entityInfoLogsMapper.selectPage(page,new LambdaQueryWrapper<EntityInfoLogs>().between(EntityInfoLogs::getOperType, 1, 2).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
                 sockVo.setEntityInfoLogs(entoty);
                 return sockVo;

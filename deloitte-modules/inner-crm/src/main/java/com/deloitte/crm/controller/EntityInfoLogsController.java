@@ -36,8 +36,8 @@ public class EntityInfoLogsController extends BaseController {
     @ApiOperation(value = "查询 企业主体股票-历史记录")
 //    @RequiresPermissions("crm:entityInfoLogs:list")
     @RequestMapping("/list/{type}")
-    public R<Object> list(@PathVariable("type") String type,HttpServletRequest request, HttpServletResponse response) {
-        return (R<Object>) entityInfoLogsService.findAllByType(type,1,10);
+    public R<Object> list(@PathVariable("type") String type,Integer pageNum,Integer pageSize,HttpServletRequest request, HttpServletResponse response) {
+        return (R<Object>) entityInfoLogsService.findAllByType(type,pageNum,pageSize);
     }
 
     @ApiOperation(value = "撤销停用")
