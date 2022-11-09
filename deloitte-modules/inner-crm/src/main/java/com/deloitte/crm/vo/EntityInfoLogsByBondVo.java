@@ -1,5 +1,6 @@
 package com.deloitte.crm.vo;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.EntityInfoLogs;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -34,7 +35,7 @@ public class EntityInfoLogsByBondVo {
     /**
      * 实体接
      */
-    private List<EntityInfoLogs> entityInfoLogs;
+    private Page<EntityInfoLogs> entityInfoLogs;
     /**
      * 其余数据
      */

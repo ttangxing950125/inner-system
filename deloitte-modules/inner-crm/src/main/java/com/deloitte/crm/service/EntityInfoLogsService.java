@@ -17,7 +17,7 @@ public interface EntityInfoLogsService extends IService<EntityInfoLogs> {
      * 查询全部 根据分类型
      * @return
      */
-    Object findAllByType(String type);
+    Object findAllByType(String type,Integer pageNum, Integer pageSize);
 
     /**
      * 撤销

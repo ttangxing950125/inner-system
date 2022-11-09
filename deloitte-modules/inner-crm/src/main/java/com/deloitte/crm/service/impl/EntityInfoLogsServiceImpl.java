@@ -9,6 +9,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
@@ -77,11 +78,11 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
      *
      * @param findType 查询类型
      * @return 股票 & 债券
-     * @see EntityInfoLogs#operType
+     * @see EntityInfoLogs# operType
      */
     @SneakyThrows
     @Override
-    public Object findAllByType(String findType) {
+    public Object findAllByType(String findType,Integer pageNum,Integer pageSize) {
         /***
          * 处理债券
          * {@link Common#TYPE_BOND}
@@ -90,7 +91,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
 
             CompletableFuture<EntityInfoLogsByBondVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsByBondVo sockVo = new EntityInfoLogsByBondVo();
-                final List<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
+                Page<EntityInfoLogs> page = new Page<>(pageNum, pageSize);
+                final Page<EntityInfoLogs> infoLogs = entityInfoLogsMapper.selectPage(page,new LambdaQueryWrapper<EntityInfoLogs>().in(EntityInfoLogs::getOperType, new String[]{"3"}).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
                 sockVo.setEntityInfoLogs(infoLogs);
                 return sockVo;
             });
@@ -164,7 +166,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
 
             CompletableFuture<EntityInfoLogsBySockVo> baskTask = CompletableFuture.supplyAsync(() -> {
                 EntityInfoLogsBySockVo sockVo = new EntityInfoLogsBySockVo();
-                List<EntityInfoLogs> entoty = entityInfoLogsMapper.selectList(new LambdaQueryWrapper<EntityInfoLogs>().between(EntityInfoLogs::getOperType, 1, 2).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
+                Page<EntityInfoLogs> page = new Page<>(pageNum, pageSize);
+                Page<EntityInfoLogs> entoty = entityInfoLogsMapper.selectPage(page,new LambdaQueryWrapper<EntityInfoLogs>().between(EntityInfoLogs::getOperType, 1, 2).eq(EntityInfoLogs::getIsDeleted, Boolean.FALSE));
                 sockVo.setEntityInfoLogs(entoty);
                 return sockVo;
             });
@@ -240,7 +243,8 @@ public class EntityInfoLogsServiceImpl extends ServiceImpl<EntityInfoLogsMapper,
     /**
      * 撤销
      *
-     * @param code
+     * @param id
+     * @param
      * @return
      */
     @SneakyThrows

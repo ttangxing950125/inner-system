@@ -1,5 +1,6 @@
 package com.deloitte.crm.vo;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.EntityInfoLogs;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -45,10 +46,10 @@ public class EntityInfoLogsBySockVo {
     /**
      * 实体接
      */
-    private List<EntityInfoLogs> entityInfoLogs;
+    private Page<EntityInfoLogs> entityInfoLogs;
     /**
      * 其余数据
      */
-    Map<String, Object> cylinderDatas;
+     Map<String, Object> cylinderDatas;
 
 }
