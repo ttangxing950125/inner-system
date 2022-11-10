@@ -1,6 +1,8 @@
 package com.deloitte.additional.recording.domain;
 
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,7 @@ import lombok.Builder;
 public class SysRole implements Serializable {
     private static final long serialVersionUID = 779302907325580421L;
          @Excel(name = "${column.comment}")
+         @TableId
     private Integer id;
     /**
      * 角色名称

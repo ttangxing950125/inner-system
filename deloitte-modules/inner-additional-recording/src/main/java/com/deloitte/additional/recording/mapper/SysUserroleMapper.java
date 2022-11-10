@@ -2,7 +2,7 @@ package com.deloitte.additional.recording.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.deloitte.additional.recording.domain.SysUserrole;
+import com.deloitte.additional.recording.domain.SysUserRole;
 
 /**
  * (SysUserrole)表数据库访问层
@@ -11,6 +11,6 @@ import com.deloitte.additional.recording.domain.SysUserrole;
  * @since 2022-11-09 23:49:24
  */
 @Mapper
-public interface SysUserroleMapper extends BaseMapper<SysUserrole> {
+public interface SysUserroleMapper extends BaseMapper<SysUserRole> {
 
 }

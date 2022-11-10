@@ -10,10 +10,10 @@
         FROM
             sys_role
         WHERE
-            id IN ( SELECT role_id FROM sys_userrole WHERE user_id =#{id} )
+            id IN ( SELECT role_id FROM sys_user_role WHERE user_id =#{id} )
     </select>
 
-    <select id="getUserByUsername" resultType="sysUser">
+    <select id="getUserByUsername" resultType="com.deloitte.additional.recording.domain.SysUser">
         select *
         from sys_user
         where loginname = #{username}
@@ -29,9 +29,9 @@
                 SELECT
                     menurole.menu_id
                 FROM
-                    sys_menurole menurole
+                    sys_menu_role menurole
                         INNER JOIN sys_role role ON role.id = menurole.role_id
-                        INNER JOIN sys_userrole userrole ON userrole.role_id = role.id
+                        INNER JOIN sys_user_role userrole ON userrole.role_id = role.id
                 WHERE
                     userrole.user_id = #{userId}
                   AND role.STATUS = '1'

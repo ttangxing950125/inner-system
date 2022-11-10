@@ -11,4 +11,12 @@ import com.deloitte.additional.recording.domain.SysGroupUser;
  */
 public interface SysGroupUserService extends IService<SysGroupUser> {
 
+    /**
+     * 批量插入
+     * @param userId 用户id
+     * @param groupIds 分组ids
+     * @return
+     */
+    boolean insertList(Integer userId, Integer[] groupIds);
+
 }

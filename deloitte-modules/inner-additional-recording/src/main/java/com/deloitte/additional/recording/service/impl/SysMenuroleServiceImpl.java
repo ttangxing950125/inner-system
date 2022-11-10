@@ -1,8 +1,8 @@
 package com.deloitte.additional.recording.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.additional.recording.mapper.SysMenuroleMapper;
-import com.deloitte.additional.recording.domain.SysMenurole;
+import com.deloitte.additional.recording.mapper.SysMenuRoleMapper;
+import com.deloitte.additional.recording.domain.SysMenuRole;
 import com.deloitte.additional.recording.service.SysMenuroleService;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +13,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-11-09 23:49:25
  */
 @Service("sysMenuroleService")
-public class SysMenuroleServiceImpl extends ServiceImpl<SysMenuroleMapper, SysMenurole> implements SysMenuroleService {
+public class SysMenuroleServiceImpl extends ServiceImpl<SysMenuRoleMapper, SysMenuRole> implements SysMenuroleService {
 
 }

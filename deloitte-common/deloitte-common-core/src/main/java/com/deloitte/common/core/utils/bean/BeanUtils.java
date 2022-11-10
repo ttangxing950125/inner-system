@@ -1,4 +1,7 @@
 package com.deloitte.common.core.utils.bean;
+import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSON;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,4 +109,47 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
     {
         return m1.substring(BEAN_METHOD_PROP_INDEX).equals(m2.substring(BEAN_METHOD_PROP_INDEX));
     }
-}
+
+
+        /**
+         * 实体类集合转化
+         *
+         * @param objs
+         * @param clazz
+         * @param <T>
+         * @return
+         */
+        public static <T> List<T> copy(List<?> objs, Class<T> clazz) {
+            List<T> list = new ArrayList<>();
+            if (objs.isEmpty()) {
+                return list;
+            }
+            for (Object source : objs) {
+                //把源对象类型强制转换为目标对象
+                T target = JSON.parseObject(JSON.toJSONString(source), clazz);
+                //把源对象属性赋值给目标对象
+                BeanUtil.copyProperties(source, target);
+                list.add(target);
+            }
+            return list;
+        }
+
+        /**
+         * 实体类转化
+         *
+         * @param obj
+         * @param clazz
+         * @return
+         */
+        public static <T>T copyEntity(Object obj, Class<T> clazz) {
+            if (obj == null) {
+                return null;
+            }
+            //把源对象类型强制转换为目标对象
+            T target = JSON.parseObject(JSON.toJSONString(obj), clazz);
+            //把源对象属性赋值给目标对象
+            BeanUtil.copyProperties(obj, target);
+            return target;
+        }
+
+    }

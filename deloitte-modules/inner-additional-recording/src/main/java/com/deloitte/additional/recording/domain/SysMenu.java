@@ -25,6 +25,7 @@ import lombok.Builder;
 public class SysMenu implements Serializable {
     private static final long serialVersionUID = -49429765979140414L;
     @Excel(name = "${column.comment}")
+    @TableId
     private Long id;
     /**
      * 菜单名称

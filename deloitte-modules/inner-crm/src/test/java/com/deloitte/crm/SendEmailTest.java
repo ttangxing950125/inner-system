@@ -81,13 +81,13 @@ public class SendEmailTest {
 
     }
 
-    @Test
-    void test05() {
-
-        final Object cancel = entityInfoLogsService.cancel(75);
-        final Object type_stock = entityInfoLogsService.findAllByType("TYPE_BOND");
-
-    }
+//    @Test
+//    void test05() {
+//
+//        final Object cancel = entityInfoLogsService.cancel(75);
+//        final Object type_stock = entityInfoLogsService.findAllByType("TYPE_BOND");
+//
+//    }
 
     @Test
     void test06() {

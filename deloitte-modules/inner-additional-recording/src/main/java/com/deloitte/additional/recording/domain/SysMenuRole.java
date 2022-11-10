@@ -16,7 +16,7 @@ import lombok.Builder;
 @NoArgsConstructor
 @Data
 @Builder
-public class SysMenurole implements Serializable {
+public class SysMenuRole implements Serializable {
     private static final long serialVersionUID = -58298697479700190L;
          @Excel(name = "${column.comment}")
     private Integer id;

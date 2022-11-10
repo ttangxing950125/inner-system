@@ -7,6 +7,13 @@ package com.deloitte.common.core.constant;
  */
 public class Constants
 {
+
+    /**
+     * 默认初始密码
+     */
+    public static final String PASSWORD = "123456";
+
+
     /**
      * UTF-8 字符集
      */
