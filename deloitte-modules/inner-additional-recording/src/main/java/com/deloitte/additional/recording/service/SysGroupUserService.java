@@ -3,6 +3,8 @@ package com.deloitte.additional.recording.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.SysGroupUser;
 
+import java.util.List;
+
 /**
  * (SysGroupUser)表服务接口
  *
@@ -19,4 +21,17 @@ public interface SysGroupUserService extends IService<SysGroupUser> {
      */
     boolean insertList(Integer userId, Integer[] groupIds);
 
+    /**
+     * 批量插入
+     * @param userIds 用户集合
+     * @param groupId 分组id
+     */
+    boolean insertList(Integer[] userIds, Integer groupId);
+
+    /**
+     * 通过分组id查询
+     * @param groupId 分组id
+     * @return
+     */
+    List<SysGroupUser> findByGroupId(Integer groupId);
 }

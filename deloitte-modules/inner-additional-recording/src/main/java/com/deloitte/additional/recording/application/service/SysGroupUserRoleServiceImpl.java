@@ -1,12 +1,15 @@
 package com.deloitte.additional.recording.application.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.additional.recording.domain.SysGroup;
 import com.deloitte.additional.recording.domain.SysGroupUser;
 import com.deloitte.additional.recording.domain.SysUser;
 import com.deloitte.additional.recording.domain.SysUserRole;
 import com.deloitte.additional.recording.service.*;
+import com.deloitte.additional.recording.vo.group.SysGroupInfoVo;
 import com.deloitte.additional.recording.vo.user.SysUserVO;
 import com.deloitte.common.core.exception.ServiceException;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.deloitte.common.core.constant.Constants.DEFAULT_SEPARATOR;
 
 /**
  * @创建人 tangx
@@ -108,10 +113,75 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
         return userVOPage;
     }
 
+    @Transactional(rollbackFor = RuntimeException.class)
+    @Override
+    public void addGroup(String groupName, Integer groupLeader, String groupMember) {
+        //分组名称校验
+
+        SysGroup sysGroup = groupService.getByName(groupName);
+        if (sysGroup != null) {
+            throw new ServiceException("小组名称已经存在，请重试");
+        }
+        //初始化
+        SysGroup group = new SysGroup().createBy(groupName, groupLeader);
+        groupService.save(group);
+        Integer groupId = group.getId();
+        //保存组员信息
+        Integer[] userIds = srtToIntArray(groupMember);
+        //保存
+        groupUserService.insertList(userIds, groupId);
+    }
+
+    @Transactional(rollbackFor = RuntimeException.class)
+    @Override
+    public void updateGroup(Integer groupId, String groupName, Integer groupLeader, String groupMember) {
+
+        SysGroup group = groupService.getById(groupId);
+        if (group == null) {
+            throw new ServiceException("小组信息不存在", HttpStatus.NOT_FOUND.value());
+        }
+        //验证分组名称
+        SysGroup sysGroup = groupService.getByName(groupName);
+        if (sysGroup != null && !group.getId().equals(sysGroup.getId())) {
+            throw new ServiceException("小组名称已经存在，请重试", HttpStatus.FOUND.value());
+        }
+        group.setGroupLeader(groupLeader);
+        group.setGroupName(groupName);
+        groupService.updateById(group);
+        //先删除 再插入
+        Map<String, Object> deleteMap = new HashMap<>();
+        deleteMap.put("group_id", groupId);
+        groupUserService.removeByMap(deleteMap);
+        //批量插入
+        //保存组员信息
+        Integer[] userIds = srtToIntArray(groupMember);
+        //保存
+        groupUserService.insertList(userIds, groupId);
+    }
+
+    @Override
+    public SysGroupInfoVo getGroupInfo(Integer groupId) {
+
+        SysGroup group = groupService.getById(groupId);
+        if (group == null) {
+            throw new ServiceException("小组信息查询失败，请重试", HttpStatus.NOT_FOUND.value());
+        }
+        SysGroupInfoVo groupInfoVo = BeanUtils.copyEntity(group, SysGroupInfoVo.class);
+        groupInfoVo.setLeaderId(group.getGroupLeader());
+        //查询组员
+        List<SysGroupUser> groupUsers = groupUserService.findByGroupId(groupId);
+        if (groupUsers != null) {
+            List<Integer> userIds = groupUsers.stream().map(SysGroupUser::getUserId).collect(Collectors.toList());
+            String groupUser = StrUtil.listToString(userIds, DEFAULT_SEPARATOR);
+            groupInfoVo.setGrouMember(groupUser);
+        }
+        return groupInfoVo;
+    }
+
 
     private Integer[] srtToIntArray(String roles) {
         try {
-            String[] roleIds = roles.split(",");
+            String[] roleIds = roles.split(DEFAULT_SEPARATOR);
             return (Integer[]) ConvertUtils.convert(roleIds, Integer.class);
         } catch (Exception e) {
             log.info("字符串转Int数组失败 [异常信息：{}]", e.getMessage());

@@ -6,6 +6,8 @@ import com.deloitte.additional.recording.domain.SysGroup;
 import com.deloitte.additional.recording.service.SysGroupService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * (SysGroup)表服务实现类
  *
@@ -15,4 +17,11 @@ import org.springframework.stereotype.Service;
 @Service("sysGroupService")
 public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> implements SysGroupService {
 
+
+    @Override
+    public SysGroup getByName(String groupName) {
+
+
+        return lambdaQuery().eq(SysGroup::getGroupName,groupName).one();
+    }
 }

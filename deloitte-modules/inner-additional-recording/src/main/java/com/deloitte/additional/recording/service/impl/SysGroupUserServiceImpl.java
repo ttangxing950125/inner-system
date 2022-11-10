@@ -28,4 +28,20 @@ public class SysGroupUserServiceImpl extends ServiceImpl<SysGroupUserMapper, Sys
         }
         return saveBatch(list);
     }
+
+    @Override
+    public boolean insertList(Integer[] userIds, Integer groupId) {
+        List<SysGroupUser> list = new ArrayList<>();
+
+        for (Integer userId : userIds) {
+            list.add(new SysGroupUser().init(userId, groupId));
+        }
+        return saveBatch(list);
+    }
+
+    @Override
+    public List<SysGroupUser> findByGroupId(Integer groupId) {
+
+        return lambdaQuery().eq(SysGroupUser::getGroupId, groupId).list();
+    }
 }

@@ -1,6 +1,7 @@
 package com.deloitte.additional.recording.application.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.additional.recording.vo.group.SysGroupInfoVo;
 import com.deloitte.additional.recording.vo.user.SysUserVO;
 
 /**
@@ -48,4 +49,28 @@ public interface SysGroupUserRoleService {
      * @return
      */
     Page<SysUserVO> page(String name, String nickname, String status, String groups, String role, Integer page, Integer pagesize);
+
+    /**
+     * 新增小组
+     * @param groupName 小组名称
+     * @param groupLeader 小组长 id
+     * @param groupMember 组员id 用,隔开
+     */
+    void addGroup(String groupName, Integer groupLeader, String groupMember);
+
+    /**
+     * 更新分组信息
+     * @param groupId 分组id
+     * @param groupName 分组名称
+     * @param groupLeader 组长id
+     * @param groupMember 组员id 用,隔开
+     */
+    void updateGroup(Integer groupId, String groupName, Integer groupLeader, String groupMember);
+
+    /**
+     * 查询小组信息详情
+     * @param groupId 小组id
+     * @return
+     */
+    SysGroupInfoVo getGroupInfo(Integer groupId);
 }

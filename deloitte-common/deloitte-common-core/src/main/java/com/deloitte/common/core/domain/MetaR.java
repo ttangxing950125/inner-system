@@ -1,5 +1,6 @@
 package com.deloitte.common.core.domain;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.common.core.constant.Constants;
 
 import java.io.Serializable;
@@ -91,7 +92,11 @@ public class MetaR<T> implements Serializable
 
     public void setMsg(String msg)
     {
-        this.msg = msg;
+
+        this.msg = "操作成功";
+        if (StringUtils.isNotBlank(msg)){
+            this.msg = msg;
+        }
     }
 
     public T getData()

@@ -5,6 +5,8 @@ import cn.hutool.core.util.ArrayUtil;
 import com.deloitte.common.core.constant.Constants;
 import org.springframework.util.AntPathMatcher;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -16,10 +18,11 @@ public class StrUtil extends cn.hutool.core.util.StrUtil {
 
     /**
      * 如果对象不为空，就转成字符串看是否是空字符串
+     *
      * @return
      */
-    public static boolean isBlankCast(Object obj){
-        if (obj==null){
+    public static boolean isBlankCast(Object obj) {
+        if (obj == null) {
             return true;
         }
 
@@ -233,4 +236,34 @@ public class StrUtil extends cn.hutool.core.util.StrUtil {
         }
         return str;
     }
+
+    public static String ListToStr(List<?> list) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<?> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            Object next = iterator.next();
+            stringBuilder.append(next.toString()).append(",");
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 集合转为字符串 并用指定分隔符
+     *
+     * @param list      集合
+     * @param separator 分隔符
+     * @return
+     */
+    public static String listToString(List<?> list, String separator) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+            if (i < list.size() - 1) {
+                sb.append(separator);
+            }
+        }
+        return sb.toString();
+    }
+
+
 }

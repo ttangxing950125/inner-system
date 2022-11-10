@@ -38,4 +38,9 @@ public class SysGroup implements Serializable {
     private Date addTime;
 
 
+    public SysGroup createBy(String groupName, Integer groupLeader) {
+        this.groupName = groupName;
+        this.groupLeader = groupLeader;
+        return this;
+    }
 }
