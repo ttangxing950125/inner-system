@@ -7,6 +7,7 @@ import com.deloitte.additional.recording.application.service.SysGroupUserRoleSer
 import com.deloitte.additional.recording.mapper.PrsProjectVersionsMapper;
 import com.deloitte.additional.recording.request.SysUserRequest;
 import com.deloitte.additional.recording.service.PrsModelQualService;
+import com.deloitte.additional.recording.service.SysRoleService;
 import com.deloitte.additional.recording.service.SysUserService;
 import com.deloitte.additional.recording.vo.DataListCustomEntityInfoVo;
 import com.deloitte.additional.recording.vo.DataListFindPrsProjectVersionsByYearVo;
@@ -41,6 +42,9 @@ public class SpringBootTests {
     @Resource
     private SysUserService sysUserService;
 
+    @Resource
+    private SysRoleService roleService;
+
     @Test
     public void test() {
         //24
@@ -73,8 +77,9 @@ public class SpringBootTests {
 
         System.out.println(page.getRecords());
     }
+
     @Test
-    public void addUser(){
+    public void addUser() {
         SysUserRequest saveRequest = new SysUserRequest();
         saveRequest.setEmail("1164490300@qq.com");
         saveRequest.setSex("男");
@@ -82,17 +87,22 @@ public class SpringBootTests {
         saveRequest.setName("张三");
         saveRequest.setRoles("1,2");
         saveRequest.setStatus("1");
-        sysGroupUserRoleService.addSave("张三","1164490300@qq.com","男","1","1,2","1,2");
+        sysGroupUserRoleService.addSave("张三", "1164490300@qq.com", "男", "1", "1,2", "1,2");
     }
 
     @Test
-    public void resetPassword(){
+    public void resetPassword() {
         sysUserService.resetPassword(1383469057);
 
     }
 
     @Test
-    public void modfiysave(){
-        sysGroupUserRoleService.modify(1383469057,"李四","207425690@qq.com","男","1","1","2");
+    public void modfiysave() {
+        sysGroupUserRoleService.modify(1383469057, "李四", "207425690@qq.com", "男", "1", "1", "2");
+    }
+
+    @Test
+    public void rolePage() {
+
     }
 }

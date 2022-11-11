@@ -72,4 +72,6 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     Page<SysUser> selectPage(String name, String nickname, String status, Set<Integer> userIds, Page<SysUser> userPage);
+
+
 }

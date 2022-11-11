@@ -30,4 +30,9 @@ public class SysMenuRole implements Serializable {
     private Integer roleId;
 
 
+    public SysMenuRole createBy(Integer menuId, Integer roleId) {
+        this.menuId = menuId;
+        this.roleId = roleId;
+        return this;
+    }
 }

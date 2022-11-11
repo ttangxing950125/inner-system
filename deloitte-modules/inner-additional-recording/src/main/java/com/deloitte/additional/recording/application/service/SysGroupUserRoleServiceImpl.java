@@ -13,7 +13,6 @@ import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.common.security.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.deloitte.additional.recording.util.StrListUtil.srtToIntArray;
 import static com.deloitte.common.core.constant.Constants.DEFAULT_SEPARATOR;
 
 /**
@@ -103,9 +103,7 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
         List<SysGroupUser> groupUsers = groupUserService.lambdaQuery().in(SysGroupUser::getGroupId, groupIds).list();
         userIds.addAll(groupUsers.stream().map(SysGroupUser::getUserId).collect(Collectors.toSet()));
         Page<SysUser> userPage = new Page<>(page, pagesize);
-
         userPage = userService.selectPage(name, nickname, status, userIds, userPage);
-
         //转为响应体
         Page<SysUserVO> userVOPage = new Page<>(page, pagesize);
         userVOPage.setTotal(userPage.getTotal());
@@ -117,7 +115,6 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
     @Override
     public void addGroup(String groupName, Integer groupLeader, String groupMember) {
         //分组名称校验
-
         SysGroup sysGroup = groupService.getByName(groupName);
         if (sysGroup != null) {
             throw new ServiceException("小组名称已经存在，请重试");
@@ -179,16 +176,6 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
     }
 
 
-    private Integer[] srtToIntArray(String roles) {
-        try {
-            String[] roleIds = roles.split(DEFAULT_SEPARATOR);
-            return (Integer[]) ConvertUtils.convert(roleIds, Integer.class);
-        } catch (Exception e) {
-            log.info("字符串转Int数组失败 [异常信息：{}]", e.getMessage());
-            throw new ServiceException("字符串不符合转换格式");
-        }
-
-    }
 
 
 }
