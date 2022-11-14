@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ import lombok.Builder;
 public class SysMenu implements Serializable {
     private static final long serialVersionUID = -49429765979140414L;
     @Excel(name = "${column.comment}")
-    @TableId
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
     /**
      * 菜单名称

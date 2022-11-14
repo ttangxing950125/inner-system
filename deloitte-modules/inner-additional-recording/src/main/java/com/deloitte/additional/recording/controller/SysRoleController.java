@@ -40,8 +40,8 @@ public class SysRoleController {
 
     @ApiOperation("分页列表")
     @GetMapping("paging")
-    public MetaR<Page<SysRoleVo>> page(@ApiParam(name = "角色名称") @RequestParam("name") String name,
-                                       @ApiParam(name = "角色状态") @RequestParam("status") String status,
+    public MetaR<Page<SysRoleVo>> page(@ApiParam( "角色名称") @RequestParam(value = "name",required = false) String name,
+                                       @ApiParam("角色状态") @RequestParam(value = "status",required = false,defaultValue = "1") String status,
                                        @RequestParam(value = "page", defaultValue = "1") Integer page,
                                        @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 

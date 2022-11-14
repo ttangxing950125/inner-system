@@ -1,5 +1,6 @@
 package com.deloitte.additional.recording.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.common.core.annotation.Excel;
@@ -23,7 +24,7 @@ import java.io.Serializable;
 public class SysRole implements Serializable {
     private static final long serialVersionUID = 779302907325580421L;
     @Excel(name = "${column.comment}")
-    @TableId
+    @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     /**
      * 角色名称

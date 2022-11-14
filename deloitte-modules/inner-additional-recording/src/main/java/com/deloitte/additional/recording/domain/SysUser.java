@@ -1,5 +1,6 @@
 package com.deloitte.additional.recording.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.utils.MD5;
@@ -29,7 +30,7 @@ public class SysUser implements Serializable {
      * 主键
      */
     @Excel(name = "主键")
-    @TableId
+    @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     /**
      * 登陆名

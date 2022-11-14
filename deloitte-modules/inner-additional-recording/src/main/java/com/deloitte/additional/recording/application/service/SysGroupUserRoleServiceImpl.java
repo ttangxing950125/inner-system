@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ import static com.deloitte.common.core.constant.Constants.DEFAULT_SEPARATOR;
 @Slf4j
 public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
 
-    @Autowired
+    @Resource(name = "sysUserService")
     private SysUserService userService;
 
     @Autowired

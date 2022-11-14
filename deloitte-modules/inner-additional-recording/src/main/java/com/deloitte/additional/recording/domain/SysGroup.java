@@ -3,6 +3,7 @@ package com.deloitte.additional.recording.domain;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,7 @@ import lombok.Builder;
 public class SysGroup implements Serializable {
     private static final long serialVersionUID = -84253954998778810L;
          @Excel(name = "${column.comment}")
-         @TableId
+         @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     /**
      * 组名

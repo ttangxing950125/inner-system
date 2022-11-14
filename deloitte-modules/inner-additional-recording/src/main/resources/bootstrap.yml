@@ -22,21 +22,21 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 10.173.43.11:8848
+        server-addr: 192.168.0.106:8848
         # 配置所在分组
-        namespace: 2c34a3b6-3f61-47c9-b992-a9b28e418b32
+        namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
       config:
         # 配置中心地址
-        server-addr: 10.173.43.11:8848
+        server-addr: 192.168.0.106:8848
         # 配置所在分组
-        namespace: 2c34a3b6-3f61-47c9-b992-a9b28e418b32
+        namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
         # 配置文件格式
         file-extension: yml
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
         # 配置所在分组
-        group: INNER_SYSTEM_GROUP
+        group: DEV
 logging:
   level:
     com.deloitte.additional.recording: debug
