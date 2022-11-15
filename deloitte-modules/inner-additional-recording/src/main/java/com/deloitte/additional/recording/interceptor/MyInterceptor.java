@@ -50,6 +50,10 @@ public class MyInterceptor implements HandlerInterceptor {
     private static void checkValidTime() {
         SysUser user = MetaSecurity.getLoginUser();
         if (user != null) {
+            //判断是不是超级管理员
+            if (1L == user.getId()) {
+                return;
+            }
             Date validTime = user.getValidTime();
             if (validTime != null) {
                 long time = validTime.getTime();
