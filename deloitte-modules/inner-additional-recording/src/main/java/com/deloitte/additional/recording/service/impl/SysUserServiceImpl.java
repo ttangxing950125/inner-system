@@ -6,6 +6,7 @@ import com.deloitte.additional.recording.domain.SysMenu;
 import com.deloitte.additional.recording.domain.SysUser;
 import com.deloitte.additional.recording.mapper.SysUserMapper;
 import com.deloitte.additional.recording.service.SysUserService;
+import com.deloitte.additional.recording.util.TreeParserUtil;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.MD5;
 import com.deloitte.common.core.utils.StrUtil;
@@ -17,7 +18,6 @@ import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * (SysUser)表服务实现类
@@ -59,34 +59,42 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @return
      * @// TODO: 2022/11/10
      * 吴鹏鹏
+     * 更新者：tangx
+     * 时间：2022-11-15
      */
     @Override
     public SysMenu findmenubyuser(SysUser user) {
         SysMenu menu = new SysMenu();
         menu.setName("菜单");
         //查询列表并组织树形结构
-        List<Map<String, Object>> list = sysUserMapper.findMenuMap(user.getId());
-        Map<Long, SysMenu> treemenumap = new TreeMap();
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> op = list.get(i);
-            SysMenu _menu = new SysMenu();
-            this.copymenu(_menu, op);
-            treemenumap.put(Long.valueOf(op.get("id").toString()), _menu);
-
-        }
-
-        //循环组织树形结构
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> op = list.get(i);
-            SysMenu _menu = (SysMenu) treemenumap.get(op.get("id"));
-            if (Integer.parseInt(op.get("parentid") + "") != 0) {
-                SysMenu _pmenu = (SysMenu) treemenumap.get(Long.valueOf(op.get("parentid").toString()));
-                _pmenu.getMenus().add(_menu);
-            } else {
-                menu.getMenus().add(_menu);
-            }
-
-        }
+        List<SysMenu> menus = sysUserMapper.findMenuMap(user.getId());
+        //转为树形菜单
+        List<SysMenu> treeList = TreeParserUtil.getTreeList(0L, menus);
+        menu.setMenus(treeList);
+        //此处为优化前内容
+//        List<Map<String, Object>> list = sysUserMapper.findMenuMap(user.getId());
+//
+//        Map<Long, SysMenu> treemenumap = new TreeMap();
+//        for (int i = 0; i < list.size(); i++) {
+//            Map<String, Object> op = list.get(i);
+//            SysMenu _menu = new SysMenu();
+//            this.copymenu(_menu, op);
+//            treemenumap.put(Long.valueOf(op.get("id").toString()), _menu);
+//
+//        }
+//
+//        //循环组织树形结构
+//        for (int i = 0; i < list.size(); i++) {
+//            Map<String, Object> op = list.get(i);
+//            SysMenu _menu = (SysMenu) treemenumap.get(op.get("id"));
+//            if (Integer.parseInt(op.get("parentid") + "") != 0) {
+//                SysMenu _pmenu = (SysMenu) treemenumap.get(Long.valueOf(op.get("parentid").toString()));
+//                _pmenu.getMenus().add(_menu);
+//            } else {
+//                menu.getMenus().add(_menu);
+//            }
+//
+//        }
         return menu;
     }
 
@@ -124,7 +132,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public Page<SysUser> selectPage(String name, String nickname, String status, Set<Integer> userIds, Page<SysUser> userPage) {
-        return   lambdaQuery()
+        return lambdaQuery()
                 .eq(StrUtil.isNotBlank(name), SysUser::getLoginname, name)
                 .likeRight(StrUtil.isNotBlank(nickname), SysUser::getName, nickname)
                 .eq(StrUtil.isNotBlank(status), SysUser::getStatus, status)

@@ -1,5 +1,6 @@
 package com.deloitte.additional.recording.mapper;
 
+import com.deloitte.additional.recording.domain.SysMenu;
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.additional.recording.domain.SysUser;
@@ -27,8 +28,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * 查询按钮菜单。。多久重构下吧，看着头疼
      * @param userId
      * @return
+     * 更新者： tangx
+     * 时间：2022-22-15
      */
-    List<Map<String, Object>> findMenuMap(Integer userId);
+//    List<Map<String,Object>> findMenuMap(Integer userId);
+    List<SysMenu> findMenuMap(Integer userId);
 
     /**
      * 查询角色列表

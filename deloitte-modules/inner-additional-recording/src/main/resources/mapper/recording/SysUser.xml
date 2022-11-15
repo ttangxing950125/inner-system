@@ -19,7 +19,7 @@
         where loginname = #{username}
     </select>
 
-    <select id="findMenuMap" resultType="map">
+    <select id="findMenuMap" resultType="com.deloitte.additional.recording.domain.SysMenu">
         SELECT
             menu.*,
             ( SELECT COUNT( 1 ) FROM sys_menu WHERE parentid = menu.id ) AS cnt

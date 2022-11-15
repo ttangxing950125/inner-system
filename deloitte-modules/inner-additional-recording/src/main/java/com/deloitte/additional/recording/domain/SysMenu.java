@@ -1,12 +1,12 @@
 package com.deloitte.additional.recording.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.deloitte.additional.recording.util.TreeEntityInterface;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ import lombok.Builder;
 @NoArgsConstructor
 @Data
 @Builder
-public class SysMenu implements Serializable {
+public class SysMenu  implements Serializable, TreeEntityInterface<SysMenu> {
     private static final long serialVersionUID = -49429765979140414L;
     @Excel(name = "${column.comment}")
     @TableId(value = "id",type = IdType.AUTO)
@@ -64,6 +64,11 @@ public class SysMenu implements Serializable {
     @Excel(name = "是否显示菜单")
     private String type;
 
+//    @TableField(exist = false)
+//    private List<SysMenu> menus = new ArrayList<SysMenu>();
+
     @TableField(exist = false)
-    private List<SysMenu> menus = new ArrayList<SysMenu>();
+    private List<SysMenu> menus;
+
+
 }
