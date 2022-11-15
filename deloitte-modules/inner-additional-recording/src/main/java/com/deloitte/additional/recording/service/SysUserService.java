@@ -74,4 +74,8 @@ public interface SysUserService extends IService<SysUser> {
     Page<SysUser> selectPage(String name, String nickname, String status, Set<Integer> userIds, Page<SysUser> userPage);
 
 
+    /**
+     * 退出
+     */
+    void logout();
 }

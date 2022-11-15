@@ -7,7 +7,7 @@ import com.deloitte.common.core.web.page.PageDomain;
  * @创建时间 2022/11/10
  * @描述
  */
-public class PageReq extends PageDomain {
+public class PageReq  {
 
 
     private Integer page;

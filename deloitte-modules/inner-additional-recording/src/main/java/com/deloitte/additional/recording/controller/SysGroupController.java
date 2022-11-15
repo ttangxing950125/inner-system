@@ -30,7 +30,7 @@ import static com.deloitte.common.core.domain.MetaR.ok;
  */
 @RestController
 @RequestMapping("sysGroup")
-@Api("小组控制层")
+@Api(tags = "SysGroup-小组控制层")
 public class SysGroupController {
     /**
      * 服务对象

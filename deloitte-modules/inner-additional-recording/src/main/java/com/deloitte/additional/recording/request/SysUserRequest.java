@@ -1,12 +1,15 @@
 package com.deloitte.additional.recording.request;
 
 import com.deloitte.common.core.annotation.Email;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @创建人 tangx
@@ -56,5 +59,7 @@ public class SysUserRequest implements Serializable {
     @NotBlank(message = "分组不能为空")
     private String roles;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date validTime;
 
 }

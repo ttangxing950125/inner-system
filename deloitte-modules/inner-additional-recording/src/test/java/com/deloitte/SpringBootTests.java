@@ -87,7 +87,7 @@ public class SpringBootTests {
         saveRequest.setName("张三");
         saveRequest.setRoles("1,2");
         saveRequest.setStatus("1");
-        sysGroupUserRoleService.addSave("张三", "1164490300@qq.com", "男", "1", "1,2", "1,2");
+        sysGroupUserRoleService.addSave("张三", "1164490300@qq.com", "男", "1", "1,2", "1,2", saveRequest.getValidTime());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class SpringBootTests {
 
     @Test
     public void modfiysave() {
-        sysGroupUserRoleService.modify(1383469057, "李四", "207425690@qq.com", "男", "1", "1", "2");
+        //sysGroupUserRoleService.modify(1383469057, "李四", "207425690@qq.com", "男", "1", "1", "2");
     }
 
     @Test

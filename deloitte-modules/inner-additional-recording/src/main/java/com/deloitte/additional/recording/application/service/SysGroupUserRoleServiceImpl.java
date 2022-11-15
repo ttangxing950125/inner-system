@@ -51,7 +51,7 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
 
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public void addSave(String name, String email, String sex, String status, String groupid, String roles) {
+    public void addSave(String name, String email, String sex, String status, String groupid, String roles, Date validTime) {
         //验证用户是否存在 根据邮箱验证
         SysUser user = userService.getByEmail(email);
         if (user != null) {
@@ -59,7 +59,7 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
             throw new ServiceException("邮箱已经存在，请重试", HttpStatus.FOUND.value());
         }
         //初始化用户
-        SysUser init = new SysUser().init(name, email, sex, SecurityUtils.getUserId() == null ? null : Integer.valueOf(SecurityUtils.getUserId().toString()));
+        SysUser init = new SysUser().init(name, email, sex, validTime, SecurityUtils.getUserId() == null ? null : Integer.valueOf(SecurityUtils.getUserId().toString()));
         userService.save(init);
         Integer userId = init.getId();
         //绑定角色信息  可对应多个角色
@@ -73,12 +73,15 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
 
     @Transactional(rollbackFor = RuntimeException.class)
     @Override
-    public void modify(Integer userId, String name, String email, String sex, String status, String groupid, String roles) {
+    public void modify(SysUser user, String groupid, String roles) {
+        Integer userId = user.getId();
         SysUser sysUser = userService.getById(userId);
         if (sysUser == null) {
             log.info("更新用户信息失败，用户不存在。[userId:{}]", userId);
             throw new ServiceException("更新用户信息失败，用户不存在", HttpStatus.NOT_FOUND.value());
         }
+        //更新用户信息
+        userService.updateById(user);
         //绑定角色信息    可对应多个角色 先删除用户-角色绑定信息
         Map<String, Object> deleteMap = new HashMap<>();
         deleteMap.put("user_id", userId);
@@ -175,8 +178,6 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
         }
         return groupInfoVo;
     }
-
-
 
 
 }

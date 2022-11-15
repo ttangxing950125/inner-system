@@ -60,6 +60,10 @@ public class SysUserVO implements Serializable {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date created;
 
+    @ApiModelProperty("失效时间")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Date validTime;
+
     @ApiModelProperty("所拥有角色名称")
     private String rolename;
     @ApiModelProperty("所属小组名称")

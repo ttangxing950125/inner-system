@@ -139,6 +139,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .in(userIds != null, SysUser::getId, userIds).page(userPage);
     }
 
+    @Override
+    public void logout() {
+
+    }
+
     private void copymenu(SysMenu menu, Map<String, Object> val) {
         menu.setId(Long.valueOf(val.get("id") + ""));
         menu.setName((String) val.get("name"));

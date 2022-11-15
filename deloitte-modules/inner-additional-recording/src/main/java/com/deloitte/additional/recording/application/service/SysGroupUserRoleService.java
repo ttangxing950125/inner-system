@@ -1,8 +1,11 @@
 package com.deloitte.additional.recording.application.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.deloitte.additional.recording.domain.SysUser;
 import com.deloitte.additional.recording.vo.group.SysGroupInfoVo;
 import com.deloitte.additional.recording.vo.user.SysUserVO;
+
+import java.util.Date;
 
 /**
  * @创建人 tangx
@@ -15,26 +18,23 @@ public interface SysGroupUserRoleService {
     /**
      * 新增用户
      *
-     * @param name    昵称
-     * @param email   邮箱
-     * @param sex     性别
-     * @param status  状态
-     * @param groupid 分组id ，隔开
-     * @param roles   角色id ，隔开
+     * @param name      昵称
+     * @param email     邮箱
+     * @param sex       性别
+     * @param status    状态
+     * @param groupid   分组id ，隔开
+     * @param roles     角色id ，隔开
+     * @param validTime
      */
-    void addSave(String name, String email, String sex, String status, String groupid, String roles);
+    void addSave(String name, String email, String sex, String status, String groupid, String roles, Date validTime);
 
     /**
      * 更新用户
      *
-     * @param name    昵称
-     * @param email   邮箱
-     * @param sex     性别
-     * @param status  状态
      * @param groupid 分组id ，隔开
      * @param roles   角色id ，隔开
      */
-    void modify(Integer userId, String name, String email, String sex, String status, String groupid, String roles);
+    void modify(SysUser user,String groupid, String roles);
 
     /**
      * 分页条件查询用户列表

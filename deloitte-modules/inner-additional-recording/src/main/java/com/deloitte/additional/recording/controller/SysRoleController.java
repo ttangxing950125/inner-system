@@ -8,6 +8,7 @@ import com.deloitte.additional.recording.service.SysRoleService;
 import com.deloitte.additional.recording.vo.role.SysRoleVo;
 import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.utils.bean.BeanUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import static com.deloitte.common.core.domain.MetaR.ok;
  */
 @RestController
 @RequestMapping("sysRole")
+@Api(tags = "角色控制层")
 public class SysRoleController {
     /**
      * 服务对象

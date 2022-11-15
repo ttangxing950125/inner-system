@@ -16,6 +16,7 @@ import com.deloitte.additional.recording.util.MetaSecurity;
 import com.deloitte.additional.recording.vo.user.SysUserVO;
 import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.utils.JwtUtil;
+import com.deloitte.common.core.utils.bean.BeanUtils;
 import com.deloitte.system.api.domain.SysDictData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,10 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -46,7 +44,7 @@ import static com.deloitte.common.core.domain.MetaR.ok;
 @RestController
 @RequestMapping("sysUser")
 @Slf4j
-@Api("用户控制层")
+@Api(tags = "用户控制层")
 public class SysUserController {
     /**
      * 服务对象
@@ -77,11 +75,13 @@ public class SysUserController {
     }
 
     @GetMapping("/getLoginUser")
+    @ApiOperation("获得当前登录用户信息")
     public MetaR getLoginUser() {
         return MetaR.ok(MetaSecurity.getLoginUser());
     }
 
     @GetMapping("/login")
+    @ApiOperation("登录")
     public Object login(String username, String password) {
         if (StringUtil.isBlank(username)) {
             return MetaR.fail(801, "用户名不能为空。");
@@ -131,11 +131,18 @@ public class SysUserController {
         return reuslt;
     }
 
+//    @ApiOperation("退出")
+//    @GetMapping("logout")
+//    public MetaR logout(@RequestHeader("Authorization")String token){
+//
+//        sysUserService.logout();
+//        return ok();
+//    }
 
     @ApiOperation("新增用户")
     @GetMapping("addsave")
     public MetaR add(@Valid SysUserRequest saveRequest) {
-        sysGroupUserRoleService.addSave(saveRequest.getName(), saveRequest.getEmail(), saveRequest.getSex(), saveRequest.getStatus(), saveRequest.getGroupid(), saveRequest.getRoles());
+        sysGroupUserRoleService.addSave(saveRequest.getName(), saveRequest.getEmail(), saveRequest.getSex(), saveRequest.getStatus(), saveRequest.getGroupid(), saveRequest.getRoles(),saveRequest.getValidTime());
         return ok();
     }
 
@@ -143,7 +150,8 @@ public class SysUserController {
     @GetMapping("modfiysave")
     public MetaR modify(@Valid SysUserRequest modifyRequest) {
 
-        sysGroupUserRoleService.modify(modifyRequest.getId(), modifyRequest.getName(), modifyRequest.getEmail(), modifyRequest.getSex(), modifyRequest.getStatus(), modifyRequest.getGroupid(), modifyRequest.getRoles());
+        SysUser sysUser = BeanUtils.copyEntity(modifyRequest, SysUser.class);
+        sysGroupUserRoleService.modify(sysUser, modifyRequest.getGroupid(), modifyRequest.getRoles());
 
         return ok();
     }

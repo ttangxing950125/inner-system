@@ -30,7 +30,7 @@ public class SysUser implements Serializable {
      * 主键
      */
     @Excel(name = "主键")
-    @TableId(value = "id",type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
      * 登陆名
@@ -70,13 +70,18 @@ public class SysUser implements Serializable {
     @Excel(name = "${column.comment}")
     private Date created;
     /**
+     * 失效时间
+     */
+    @Excel(name = "失效时间")
+    private Date validTime;
+    /**
      * 关联的补录账号
      */
     @Excel(name = "关联的补录账号")
     private Integer inputer;
 
 
-    public SysUser init(String name, String email,  String sex, Integer inputer) {
+    public SysUser init(String name, String email, String sex, Date validTime, Integer inputer) {
         this.loginname = email;
         this.name = name;
         this.pwd = getPwdString();
@@ -84,10 +89,11 @@ public class SysUser implements Serializable {
         this.email = email;
         this.inputer = inputer;
         this.status = "1";
+        this.validTime = validTime == null ? new Date() : validTime;
         return this;
     }
 
-    public  String getPwdString() {
+    public String getPwdString() {
         MD5 md5 = new MD5();
         String md5Password = md5.getMD5ofStr(PASSWORD.toLowerCase());
         md5Password = md5.getMD5ofStr(md5Password.toLowerCase());
