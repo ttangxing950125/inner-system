@@ -78,7 +78,7 @@ public class SysUserController {
 
     @GetMapping("/getLoginUser")
     public MetaR getLoginUser() {
-        return MetaR.fail(MetaSecurity.getLoginUser());
+        return MetaR.ok(MetaSecurity.getLoginUser());
     }
 
     @GetMapping("/login")

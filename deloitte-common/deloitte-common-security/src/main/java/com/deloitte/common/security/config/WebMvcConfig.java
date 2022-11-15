@@ -12,7 +12,7 @@ import com.deloitte.common.security.interceptor.HeaderInterceptor;
 public class WebMvcConfig implements WebMvcConfigurer
 {
     /** 不需要拦截地址 */
-    public static final String[] excludeUrls = { "/login", "/logout", "/refresh" };
+    public static final String[] excludeUrls = { "/sysUser/login", "/sysUser/logout", "/sysUser/refresh" };
 
     @Override
     public void addInterceptors(InterceptorRegistry registry)

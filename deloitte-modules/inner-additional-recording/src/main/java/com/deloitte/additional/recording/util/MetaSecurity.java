@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.util;
 
 import com.deloitte.additional.recording.domain.SysUser;
 import com.deloitte.additional.recording.mapper.SysUserMapper;
+import com.deloitte.common.core.constant.TokenConstants;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.JwtUtil;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -27,7 +28,7 @@ public class MetaSecurity {
         }
         HttpServletRequest request = servletRequestAttributes.getRequest();
 
-        String token = request.getHeader("token");
+        String token = request.getHeader(TokenConstants.AUTHENTICATION);
         String userId = JwtUtil.getuserid(token);
 
         SysUserMapper userMapper = ApplicationContextHolder.getBean(SysUserMapper.class);
