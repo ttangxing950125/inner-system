@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsModelMaster;
+import com.deloitte.additional.recording.vo.master.PrsModelMasterSelectVO;
 import com.deloitte.common.core.domain.R;
 
 import java.util.List;
@@ -27,4 +28,10 @@ public interface PrsModelMasterService extends IService<PrsModelMaster> {
      * @date 2022/11/9 15:54
      */
     R getAllMaster();
+
+    /**
+     * 下拉选择列表
+     * @return List<PrsModelMasterSelectVO>
+     */
+    List<PrsModelMasterSelectVO> selectList();
 }

@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.additional.recording.domain.PrsModelMaster;
 import com.deloitte.additional.recording.mapper.PrsModelMasterMapper;
 import com.deloitte.additional.recording.service.PrsModelMasterService;
+import com.deloitte.additional.recording.vo.master.PrsModelMasterSelectVO;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.bean.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +31,7 @@ public class PrsModelMasterServiceImpl extends ServiceImpl<PrsModelMasterMapper,
 
     /**
      * 统计-数据清单模块 下拉框专用 获取敞口数据
+     *
      * @return {@link java.util.HashMap}
      * {@link com.deloitte.additional.recording.domain.PrsModelMaster}
      */
@@ -50,6 +53,7 @@ public class PrsModelMasterServiceImpl extends ServiceImpl<PrsModelMasterMapper,
 
     /**
      * 获取所有敞口基础数据
+     *
      * @return R
      * @author 冉浩岑
      * @date 2022/11/9 15:54
@@ -57,5 +61,14 @@ public class PrsModelMasterServiceImpl extends ServiceImpl<PrsModelMasterMapper,
     @Override
     public R getAllMaster() {
         return R.ok(prsModelMasterMapper.selectList(new QueryWrapper<PrsModelMaster>().lambda().eq(PrsModelMaster::getStatus, 1)));
+    }
+
+    @Override
+    public List<PrsModelMasterSelectVO> selectList() {
+        List<PrsModelMaster> list = lambdaQuery().eq(PrsModelMaster::getStatus, 1).list();
+        if (list != null) {
+            return BeanUtils.copy(list, PrsModelMasterSelectVO.class);
+        }
+        return null;
     }
 }

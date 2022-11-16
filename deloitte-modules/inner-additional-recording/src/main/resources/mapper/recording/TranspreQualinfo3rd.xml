@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.TranspreQualinfo3rdMapper">
+
+
+    <select id="page" resultType="com.deloitte.additional.recording.dto.TranspreQualinfo3rdDto">
+
+        SELECT
+        qualinfo.id,
+        qualinfo.plus_version AS versionId,
+        qualinfo.plus_modelid AS masterId,
+        qualinfo.plus_qualid as plusQualid,
+        qualinfo.plus_qualcode as plusQualcode,
+        qualinfo.pt_times as ptTimes,
+        qualinfo.tar_qualid as tarQualid,
+        qualinfo.tar_qualname as tarQualname,
+        qualinfo.tar_type as tarType,
+        qualinfo.data_year as dataYear
+        FROM transpre_qualinfo_3rd qualinfo
+
+        WHERE
+        1=1
+        <if test="useYear!=null and useYear != ''">
+            and qualinfo.data_year = #{useYear}
+
+        </if>
+        <if test="tarType!=null and tarType != ''">
+            and qualinfo.tar_type = #{tarType}
+
+        </if>
+        <if test="masterId!=null">
+            and qualinfo.plus_modelid = #{masterId}
+
+        </if>
+
+        <if test="versionId!=null">
+            and qualinfo.plus_version = #{versionId}
+
+        </if>
+
+        <if test="searchData!=null and searchData!=''">
+            AND qualinfo.`plus_qualcode` LIKE concat(#{searchData},'%')
+            OR qualinfo.`tar_qualname` LIKE concat(#{searchData},'%')
+            OR qualinfo.tar_qualid LIKE concat(#{searchData},'%')
+            OR EXISTS ( SELECT 1 FROM prs_model_qual tmp WHERE tmp.id = qualinfo.plus_qualid AND tmp.qual_name LIKE
+            concat(#{searchData},'%') )
+        </if>
+
+        ORDER BY qualinfo.id desc LIMIT #{page},#{pageSize}
+
+
+    </select>
+
+    <select id="pageCount" resultType="long">
+
+        SELECT
+        count(1)
+        FROM transpre_qualinfo_3rd qualinfo
+
+        WHERE
+        1=1
+        <if test="useYear!=null and useYear != ''">
+            and qualinfo.data_year = #{useYear}
+
+        </if>
+        <if test="tarType!=null and tarType != ''">
+            and qualinfo.tar_type = #{tarType}
+
+        </if>
+        <if test="masterId!=null">
+            and qualinfo.plus_modelid = #{masterId}
+
+        </if>
+
+        <if test="versionId!=null">
+            and qualinfo.plus_version = #{versionId}
+
+        </if>
+
+        <if test="searchData!=null and searchData!=''">
+            AND qualinfo.`plus_qualcode` LIKE concat(#{searchData},'%')
+            OR qualinfo.`tar_qualname` LIKE concat(#{searchData},'%')
+            OR qualinfo.tar_qualid LIKE concat(#{searchData},'%')
+            OR EXISTS ( SELECT 1 FROM prs_model_qual tmp WHERE tmp.id = qualinfo.plus_qualid AND tmp.qual_name LIKE
+            concat(#{searchData},'%') )
+        </if>
+    </select>
+
+</mapper>
