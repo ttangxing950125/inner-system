@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.deloitte.common.security.annotation.EnableCustomConfig;
 import com.deloitte.common.security.annotation.EnableRyFeignClients;
 import com.deloitte.common.swagger.annotation.EnableCustomSwagger2;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * 系统模块
@@ -15,6 +16,7 @@ import com.deloitte.common.swagger.annotation.EnableCustomSwagger2;
 @EnableCustomSwagger2
 @EnableRyFeignClients
 @SpringBootApplication
+@EnableAsync
 public class InnerAdditionalRecordingApplication
 {
 

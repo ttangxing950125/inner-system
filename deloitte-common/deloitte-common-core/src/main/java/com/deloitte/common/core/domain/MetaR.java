@@ -31,6 +31,10 @@ public class MetaR<T> implements Serializable
         return restResult(null, SUCCESS, null);
     }
 
+    public static <T> MetaR<T> ok(String message)
+    {
+        return restResult(null, SUCCESS, message);
+    }
     public static <T> MetaR<T> ok(T data)
     {
         return restResult(data, SUCCESS, null);

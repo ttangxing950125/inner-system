@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@TableName("transpre_qualinfo_3rd")
 public class TranspreQualinfo3rd implements Serializable {
     private static final long serialVersionUID = -52051337566664886L;
     @Excel(name = "${column.comment}")

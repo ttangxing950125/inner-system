@@ -8,11 +8,13 @@ import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.domain.TranspreQualinfo3rd;
 import com.deloitte.additional.recording.dto.TranspreQualinfo3rdDto;
 import com.deloitte.additional.recording.mapper.TranspreQualinfo3rdMapper;
+import com.deloitte.additional.recording.request.TranspreQualinfo3rdRequest;
 import com.deloitte.additional.recording.service.PrsModelMasterService;
 import com.deloitte.additional.recording.service.PrsModelQualService;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
 import com.deloitte.additional.recording.service.TranspreQualinfo3rdService;
 import com.deloitte.additional.recording.vo.qualinfo3rd.TranspreQualinfo3rdPageVO;
+import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo
     public Page<TranspreQualinfo3rdPageVO> page(String useYear, String tarType, Integer masterId, Integer versionId, String searchData, Integer page, Integer pageSize) {
 
         //根据条件查询
-        List<TranspreQualinfo3rdDto> dtoList = transpreQualinfo3rdMapper.page(useYear, tarType, masterId, versionId, searchData, page-1, pageSize);
+        List<TranspreQualinfo3rdDto> dtoList = transpreQualinfo3rdMapper.page(useYear, tarType, masterId, versionId, searchData, page - 1, pageSize);
         long count = transpreQualinfo3rdMapper.pageCount(useYear, tarType, masterId, versionId, searchData, page, pageSize);
         if (count > 0) {
             Page<TranspreQualinfo3rdPageVO> pageVo = new Page<>(page, pageSize);
@@ -59,6 +61,47 @@ public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo
 
         return null;
     }
+
+    @Override
+    public TranspreQualinfo3rd selectByVersionAndMaster(Integer versionId, Integer masterId, String useYear) {
+        return lambdaQuery().eq(TranspreQualinfo3rd::getPlusVersion, versionId)
+                .eq(TranspreQualinfo3rd::getPlusModelid, masterId)
+                .eq(TranspreQualinfo3rd::getDataYear, useYear)
+                .one();
+    }
+
+    @Override
+    public void add(TranspreQualinfo3rdRequest request, String code) {
+        //根据 前缀 - 类型 - 中心库id- 年份查询
+        check(request, code);
+        TranspreQualinfo3rd qualinfo3rd = BeanUtils.copyEntity(request, TranspreQualinfo3rd.class);
+        qualinfo3rd.setTarMid(code);
+        save(qualinfo3rd);
+    }
+
+    private void check(TranspreQualinfo3rdRequest request, String code) {
+        TranspreQualinfo3rd one = lambdaQuery().eq(TranspreQualinfo3rd::getPrefix, request.getPrefix())
+                .eq(TranspreQualinfo3rd::getTarType, request.tarType)
+                .eq(TranspreQualinfo3rd::getTarMid, code)
+                .eq(TranspreQualinfo3rd::getDataYear, request.getDataYear()).one();
+        //
+        if (one != null) {
+            throw new ServiceException("已存在相同映射指标，请勿重新添加。");
+        }
+    }
+
+    @Override
+    public void update(TranspreQualinfo3rdRequest request, String code) {
+        TranspreQualinfo3rd byId = getById(request.getId());
+        if (byId == null) {
+            throw new ServiceException("更新失败，请稍后再试");
+        }
+        check(request, code);
+        TranspreQualinfo3rd qualinfo3rd = BeanUtils.copyEntity(request, TranspreQualinfo3rd.class);
+        qualinfo3rd.setTarMid(code);
+        updateById(qualinfo3rd);
+    }
+
 
     private Page<TranspreQualinfo3rdPageVO> getVoPage(List<TranspreQualinfo3rdDto> dtoList, long count, Page<TranspreQualinfo3rdPageVO> pageVo) {
         List<TranspreQualinfo3rdPageVO> pageVOS = BeanUtils.copy(dtoList, TranspreQualinfo3rdPageVO.class);

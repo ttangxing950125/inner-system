@@ -36,13 +36,12 @@ import javax.annotation.Resource;
 
 /**
  * 新债发行-新发行债券-20220801-20220914Service业务层处理
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
 @Service
-public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNewIss> implements IBondNewIssService
-{
+public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNewIss> implements IBondNewIssService {
     @Resource
     private BondNewIssMapper bondNewIssMapper;
 
@@ -65,11 +64,12 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
     @Lazy
     private BondNewIssueStrategy bondNewIssueStrategy;
 
-    private List<String> excludeBondTypeSecond = Arrays.asList("国债","地方政府债");
+    private List<String> excludeBondTypeSecond = Arrays.asList("国债", "地方政府债");
 
 
     /**
      * 导入债券任务
+     *
      * @param windTask
      * @param isses
      * @return
@@ -81,18 +81,17 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
         crmWindTaskService.updateById(windTask);
 
 
-
         Date timeNow = DateUtil.parseDate(DateUtil.getDate());
 
         List<Future> futureList = new ArrayList<>();
 
         //入历史记录库
         for (BondNewIss newIss : isses) {
-            if (StrUtil.isBlank(newIss.getBondName())){
+            if (StrUtil.isBlank(newIss.getBondName())) {
                 continue;
             }
             //Wind债券类型(二级) 国债和地方政府债不考虑
-            if (excludeBondTypeSecond.contains(newIss.getWindBondTypeSecond())){
+            if (excludeBondTypeSecond.contains(newIss.getWindBondTypeSecond())) {
                 continue;
             }
 
@@ -134,7 +133,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
      * @return
      */
     @Override
-    public List<BondNewIss> findByTaskIdChangeType(Integer taskId, Integer...changeType) {
+    public List<BondNewIss> findByTaskIdChangeType(Integer taskId, Integer... changeType) {
         LambdaUpdateWrapper<BondNewIss> wrapper = Wrappers.<BondNewIss>lambdaUpdate()
                 .eq(BondNewIss::getTaskId, taskId)
                 .in(BondNewIss::getChangeType, changeType);
@@ -146,73 +145,67 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
 
     /**
      * 查询新债发行-新发行债券-20220801-20220914
-     * 
+     *
      * @param id 新债发行-新发行债券-20220801-20220914主键
      * @return 新债发行-新发行债券-20220801-20220914
      */
     @Override
-    public BondNewIss selectBondNewIssById(Long id)
-    {
+    public BondNewIss selectBondNewIssById(Long id) {
         return bondNewIssMapper.selectBondNewIssById(id);
     }
 
     /**
      * 查询新债发行-新发行债券-20220801-20220914列表
-     * 
+     *
      * @param bondNewIss 新债发行-新发行债券-20220801-20220914
      * @return 新债发行-新发行债券-20220801-20220914
      */
     @Override
-    public List<BondNewIss> selectBondNewIssList(BondNewIss bondNewIss)
-    {
+    public List<BondNewIss> selectBondNewIssList(BondNewIss bondNewIss) {
         return bondNewIssMapper.selectBondNewIssList(bondNewIss);
     }
 
     /**
      * 新增新债发行-新发行债券-20220801-20220914
-     * 
+     *
      * @param bondNewIss 新债发行-新发行债券-20220801-20220914
      * @return 结果
      */
     @Override
-    public int insertBondNewIss(BondNewIss bondNewIss)
-    {
+    public int insertBondNewIss(BondNewIss bondNewIss) {
         return bondNewIssMapper.insertBondNewIss(bondNewIss);
     }
 
     /**
      * 修改新债发行-新发行债券-20220801-20220914
-     * 
+     *
      * @param bondNewIss 新债发行-新发行债券-20220801-20220914
      * @return 结果
      */
     @Override
-    public int updateBondNewIss(BondNewIss bondNewIss)
-    {
+    public int updateBondNewIss(BondNewIss bondNewIss) {
         return bondNewIssMapper.updateBondNewIss(bondNewIss);
     }
 
     /**
      * 批量删除新债发行-新发行债券-20220801-20220914
-     * 
+     *
      * @param ids 需要删除的新债发行-新发行债券-20220801-20220914主键
      * @return 结果
      */
     @Override
-    public int deleteBondNewIssByIds(Long[] ids)
-    {
+    public int deleteBondNewIssByIds(Long[] ids) {
         return bondNewIssMapper.deleteBondNewIssByIds(ids);
     }
 
     /**
      * 删除新债发行-新发行债券-20220801-20220914信息
-     * 
+     *
      * @param id 新债发行-新发行债券-20220801-20220914主键
      * @return 结果
      */
     @Override
-    public int deleteBondNewIssById(Long id)
-    {
+    public int deleteBondNewIssById(Long id) {
         return bondNewIssMapper.deleteBondNewIssById(id);
     }
 

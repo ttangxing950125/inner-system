@@ -148,4 +148,21 @@ public class Constants {
      * 默认分隔符
      */
     public static final String DEFAULT_SEPARATOR = ",";
+
+    /**
+     * 政府
+     */
+    public static final String GOV_TYPE = "3";
+
+    /**
+     *定量
+     */
+    public static final String QUAN_TYPE = "2";
+
+    /**
+     *定性
+     */
+    public static final String QUAL_TYPE = "1";
+
+
 }
