@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityGovRelMapper">
+    
+    <resultMap type="EntityGovRel" id="EntityGovRelResult">
+        <result property="id"    column="id"    />
+        <result property="entityCode"    column="entity_code"    />
+        <result property="dqGovCode"    column="dq_gov_code"    />
+    </resultMap>
+
+    <sql id="selectEntityGovRelVo">
+        select id, entity_code, dq_gov_code from entity_gov_rel
+    </sql>
+
+    <select id="selectEntityGovRelList" parameterType="EntityGovRel" resultMap="EntityGovRelResult">
+        <include refid="selectEntityGovRelVo"/>
+        <where>  
+            <if test="entityCode != null  and entityCode != ''"> and entity_code = #{entityCode}</if>
+            <if test="dqGovCode != null  and dqGovCode != ''"> and dq_gov_code = #{dqGovCode}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityGovRelById" parameterType="Long" resultMap="EntityGovRelResult">
+        <include refid="selectEntityGovRelVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityGovRel" parameterType="EntityGovRel" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_gov_rel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="entityCode != null">entity_code,</if>
+            <if test="dqGovCode != null">dq_gov_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="entityCode != null">#{entityCode},</if>
+            <if test="dqGovCode != null">#{dqGovCode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityGovRel" parameterType="EntityGovRel">
+        update entity_gov_rel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="entityCode != null">entity_code = #{entityCode},</if>
+            <if test="dqGovCode != null">dq_gov_code = #{dqGovCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityGovRelById" parameterType="Long">
+        delete from entity_gov_rel where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityGovRelByIds" parameterType="String">
+        delete from entity_gov_rel where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.BondInfoMapper">
+    
+    <resultMap type="BondInfo" id="BondInfoResult">
+        <result property="id"    column="id"    />
+        <result property="bondStatus"    column="bond_status"    />
+        <result property="bondCode"    column="bond_code"    />
+        <result property="oriCode"    column="ori_code"    />
+        <result property="bondShortName"    column="bond_short_name"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectBondInfoVo">
+        select id, bond_status, ori_code,bond_code, bond_short_name, created, updated from bond_info
+    </sql>
+
+    <select id="findByShortName" resultType="bondInfo">
+        <include refid="selectBondInfoVo" />
+        where bond_name = #{shortName} And is_deleted= #{isDeleted}
+    </select>
+
+
+
+    <select id="findByDqCode" resultType="bondInfo">
+        <include refid="selectBondInfoVo" />
+        where bond_code = #{dqBondCode}
+    </select>
+
+    <select id="selectBondInfoList" parameterType="BondInfo" resultMap="BondInfoResult">
+        <include refid="selectBondInfoVo"/>
+        <where>  
+            <if test="bondStatus != null "> and bond_status = #{bondStatus}</if>
+            <if test="bondCode != null  and bondCode != ''"> and bond_code = #{bondCode}</if>
+            <if test="bondShortName != null  and bondShortName != ''"> and bond_short_name like concat('%', #{bondShortName}, '%')</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectBondInfoById" parameterType="Long" resultMap="BondInfoResult">
+        <include refid="selectBondInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBondInfo" parameterType="BondInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into bond_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bondStatus != null">bond_status,</if>
+            <if test="bondCode != null">bond_code,</if>
+            <if test="bondShortName != null">bond_short_name,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bondStatus != null">#{bondStatus},</if>
+            <if test="bondCode != null">#{bondCode},</if>
+            <if test="bondShortName != null">#{bondShortName},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBondInfo" parameterType="BondInfo">
+        update bond_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bondStatus != null">bond_status = #{bondStatus},</if>
+            <if test="bondCode != null">bond_code = #{bondCode},</if>
+            <if test="bondShortName != null">bond_short_name = #{bondShortName},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBondInfoById" parameterType="Long">
+        delete from bond_info where id = #{id}
+    </delete>
+
+    <delete id="deleteBondInfoByIds" parameterType="String">
+        delete from bond_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <resultMap type="com.deloitte.crm.dto.EntityAttrDetailDto" id="EntityAttrDetailDto">
+        <result property="name"    column="name" />
+        <result property="value"    column="value" />
+        <result property="attrId"    column="attrId" />
+        <result property="attrValueId"    column="attrValueId" />
+    </resultMap>
+
+    <select id="findByQualName" resultMap="EntityAttrDetailDto">
+        SELECT
+            b.`name`,
+            a.`value`,
+            b.id AS `attrId`,
+            a.id AS `attrValueId`
+        FROM
+            entity_attr_value AS a
+                LEFT JOIN entity_attr AS b ON a.attr_id = b.id
+        WHERE
+            a.entity_code = #{bondCode}
+            a.attr_id = 57
+    </select>
+
+    <select id="selectListByEntityCode" resultType="java.lang.Integer" parameterType="java.lang.String">
+        SELECT count(0) FROM bond_info a LEFT JOIN entity_bond_rel b ON a.bond_code = b.bd_code
+        WHERE b.entity_code = #{entityCode} AND a.bond_status = 4
+    </select>
+
+    <update id="editByBondInfoManager">
+        UPDATE `bond_info` SET ${filedName} = #{value} WHERE `id` = #{id};
+    </update>
+
+    <update id="editByBondInfoManagerDate">
+        UPDATE `bond_info` SET ${filedName} = #{date} WHERE `id` = #{id};
+    </update>
+
+</mapper>

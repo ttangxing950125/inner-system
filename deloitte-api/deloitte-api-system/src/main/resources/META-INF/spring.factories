@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.deloitte.system.api.factory.RemoteUserFallbackFactory,\
+  com.deloitte.system.api.factory.RemoteLogFallbackFactory, \
+  com.deloitte.system.api.factory.RemoteFileFallbackFactory

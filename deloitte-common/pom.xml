@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.deloitte</groupId>
+        <artifactId>deloitte</artifactId>
+        <version>3.5.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>deloitte-common-log</module>
+        <module>deloitte-common-core</module>
+        <module>deloitte-common-redis</module>
+        <module>deloitte-common-swagger</module>
+        <module>deloitte-common-security</module>
+        <module>deloitte-common-datascope</module>
+		<module>deloitte-common-datasource</module>
+    </modules>
+
+    <artifactId>deloitte-common</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+	    deloitte-common通用模块
+    </description>
+
+</project>

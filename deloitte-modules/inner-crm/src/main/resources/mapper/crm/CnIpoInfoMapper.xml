@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.CnIpoInfoMapper">
+    
+    <resultMap type="CnIpoInfo" id="CnIpoInfoResult">
+        <result property="id"    column="id"    />
+        <result property="code"    column="code"    />
+        <result property="stockName"    column="stock_name"    />
+        <result property="subsCode"    column="subs_code"    />
+        <result property="prospDate"    column="prosp_date"    />
+        <result property="netIssDate"    column="net_iss_date"    />
+        <result property="ipoDate"    column="ipo_date"    />
+        <result property="ipoBoard"    column="ipo_board"    />
+        <result property="issPrice"    column="iss_price"    />
+        <result property="issMult"    column="iss_mult"    />
+        <result property="industryPe"    column="industry_pe"    />
+        <result property="indusPeStat"    column="indus_pe_stat"    />
+        <result property="ipoPeAvg"    column="ipo_pe_avg"    />
+        <result property="indusPeTtm"    column="indus_pe_ttm"    />
+        <result property="total"    column="total"    />
+        <result property="newStockIssnub"    column="new_stock_issnub"    />
+        <result property="oldStockConvnub"    column="old_stock_convnub"    />
+        <result property="offlinPlacnub"    column="offlin_placnub"    />
+        <result property="netIssnub"    column="net_issnub"    />
+        <result property="callIssstockBefor"    column="call_issstock_befor"    />
+        <result property="callIssstockAfter"    column="call_issstock_after"    />
+        <result property="callRatio"    column="call_ratio"    />
+        <result property="offlinSubsMax"    column="offlin_subs_max"    />
+        <result property="netIsssubsMax"    column="net_isssubs_max"    />
+        <result property="predicFund"    column="predic_fund"    />
+        <result property="fundTotal"    column="fund_total"    />
+        <result property="fundNetAmount"    column="fund_net_ amount"    />
+        <result property="prsFund"    column="prs_fund"    />
+        <result property="ipoIssFees"    column="ipo_iss_fees"    />
+        <result property="ipoIssMult"    column="ipo_iss_mult"    />
+        <result property="stackConvFees"    column="stack_conv_fees"    />
+        <result property="convFees"    column="conv_fees"    />
+        <result property="issFeesTotal"    column="iss_fees_total"    />
+        <result property="issRates"    column="iss_rates"    />
+        <result property="unwSponsorFees"    column="unw_sponsor_fees"    />
+        <result property="auditVerFees"    column="audit_ver_fees"    />
+        <result property="lawFees"    column="law_fees"    />
+        <result property="inforDisFees"    column="infor_dis_fees"    />
+        <result property="investorsNub"    column="investors_nub"    />
+        <result property="placObjNub"    column="plac_obj_nub"    />
+        <result property="inquirePurNub"    column="inquire_pur_nub"    />
+        <result property="inquireSubcMult"    column="inquire_subc_mult"    />
+        <result property="validQuotePlacnub"    column="valid_quote_placnub"    />
+        <result property="validQuoteInvenub"    column="valid_quote_invenub"    />
+        <result property="validPlacsubsNub"    column="valid__placsubs_nub"    />
+        <result property="validSubsNub"    column="valid_subs_nub"    />
+        <result property="validSubsFund"    column="valid_subs_fund"    />
+        <result property="validSubsPlacratio"    column="valid_subs_placratio"    />
+        <result property="offlinSubsMult"    column="offlin_subs_mult"    />
+        <result property="tacticPlacStakeratio"    column="tactic_plac_stakeratio"    />
+        <result property="legalInvesnubA"    column="legal_invesnub_a"    />
+        <result property="legalInvesnubB"    column="legal_invesnub_b"    />
+        <result property="legalInvesnubC"    column="legal_invesnub_c"    />
+        <result property="legalInvesPlacnubA"    column="legal_inves_placnub_a"    />
+        <result property="legalInvesPlacnubB"    column="legal_inves_placnub_b"    />
+        <result property="legalInvesPlacnubC"    column="legal_inves_placnub_c"    />
+        <result property="validSubsInvenub"    column="valid_subs_invenub"    />
+        <result property="validSubsStakernub"    column="valid_subs_stakernub"    />
+        <result property="checkRatio"    column="check_ratio"    />
+        <result property="netCheckRatio"    column="net_check_ratio"    />
+        <result property="issWay"    column="iss_way"    />
+        <result property="unwWay"    column="unw_way"    />
+        <result property="unwMaster"    column="unw_master"    />
+        <result property="sponsorInst"    column="sponsor_inst"    />
+        <result property="auditInst"    column="audit_inst"    />
+        <result property="assetsEvaIns"    column="assets_eva_ins"    />
+        <result property="lawFirm"    column="law_firm"    />
+        <result property="issAnnoDate"    column="iss_anno_date"    />
+        <result property="offlinIssStardate"    column="offlin_iss_stardate"    />
+        <result property="offlinIssEnddate"    column="offlin_iss_enddate"    />
+        <result property="netIssFreeze"    column="net_iss_freeze"    />
+        <result property="offlinPlacFreeze"    column="offlin_plac_freeze"    />
+        <result property="unwSubcBalanstock"    column="unw_subc_balanstock"    />
+        <result property="underAmount"    column="under_amount"    />
+        <result property="underRatio"    column="under_ratio"    />
+        <result property="faceValue"    column="face_value"    />
+        <result property="province"    column="province"    />
+        <result property="csrcIndustry"    column="csrc_industry"    />
+        <result property="windIndustry"    column="wind_industry"    />
+        <result property="bondType"    column="bond_type"    />
+        <result property="bourse"    column="bourse"    />
+        <result property="inquiryStaringDate"    column="inquiry_staring_date"    />
+    </resultMap>
+
+    <sql id="selectCnIpoInfoVo">
+        select id, code, stock_name, subs_code, prosp_date, net_iss_date, ipo_date, ipo_board, iss_price, iss_mult, industry_pe, indus_pe_stat, ipo_pe_avg, indus_pe_ttm, total, new_stock_issnub, old_stock_convnub, offline_placnub, net_issnub, call_issstock_befor, call_issstock_after, call_ratio, offline_subs_max, online_isssubs_max, predic_fund, fund_total, fund_net_amount, prs_fund, ipo_iss_fees, ipo_iss_mult, stack_conv_fees, conv_rate, iss_fees_total, iss_rate, unw_sponsor_fees, audit_ver_fees, law_fees, infor_dis_fees, investors_nub, plac_obj_nub, inquire_pur_nub, inquire_subc_mult, valid_quote_placnub, valid_quote_invenub, valid_placsubs_nub, valid_subs_nub, valid_subs_fund, valid_subs_placratio, offline_subs_mult, tactic_plac_stakeratio, legal_invesnub_a, legal_invesnub_b, legal_invesnub_c, legal_inves_placnub_a, legal_inves_placnub_b, legal_inves_placnub_c, valid_subs_invenub, valid_subs_stakernub, check_ratio, net_check_ratio, iss_type, unw_type, main_unw, sponsor_inst, audit_inst, assets_eva_ins, law_firm, iss_anno_date, offline_iss_stardate, offline_iss_enddate, net_iss_freeze, offline_plac_freeze, unw_subc_balanstock, under_amount, under_ratio, face_value, province, csrc_industry, wind_industry, bond_type, bourse, task_id, import_time, change_type, inquiry_staring_date
+        from cn_ipo_info
+    </sql>
+
+    <select id="findLastByCode" resultType="cnIpoInfo">
+        <include refid="selectCnIpoInfoVo"></include>
+        where code = #{code}
+        order by id desc
+        limit 1
+    </select>
+
+    <select id="selectCnIpoInfoList" parameterType="CnIpoInfo" resultMap="CnIpoInfoResult">
+        <include refid="selectCnIpoInfoVo"/>
+        <where>  
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="stockName != null  and stockName != ''"> and stock_name like concat('%', #{stockName}, '%')</if>
+            <if test="subsCode != null  and subsCode != ''"> and subs_code = #{subsCode}</if>
+            <if test="prospDate != null "> and prosp_date = #{prospDate}</if>
+            <if test="netIssDate != null "> and net_iss_date = #{netIssDate}</if>
+            <if test="ipoDate != null "> and ipo_date = #{ipoDate}</if>
+            <if test="ipoBoard != null  and ipoBoard != ''"> and ipo_board = #{ipoBoard}</if>
+            <if test="issPrice != null "> and iss_price = #{issPrice}</if>
+            <if test="issMult != null "> and iss_mult = #{issMult}</if>
+            <if test="industryPe != null "> and industry_pe = #{industryPe}</if>
+            <if test="indusPeStat != null "> and indus_pe_stat = #{indusPeStat}</if>
+            <if test="ipoPeAvg != null "> and ipo_pe_avg = #{ipoPeAvg}</if>
+            <if test="indusPeTtm != null "> and indus_pe_ttm = #{indusPeTtm}</if>
+            <if test="total != null "> and total = #{total}</if>
+            <if test="newStockIssnub != null "> and new_stock_issnub = #{newStockIssnub}</if>
+            <if test="oldStockConvnub != null "> and old_stock_convnub = #{oldStockConvnub}</if>
+            <if test="offlinPlacnub != null "> and offlin_placnub = #{offlinPlacnub}</if>
+            <if test="netIssnub != null "> and net_issnub = #{netIssnub}</if>
+            <if test="callIssstockBefor != null "> and call_issstock_befor = #{callIssstockBefor}</if>
+            <if test="callIssstockAfter != null "> and call_issstock_after = #{callIssstockAfter}</if>
+            <if test="callRatio != null "> and call_ratio = #{callRatio}</if>
+            <if test="offlinSubsMax != null "> and offlin_subs_max = #{offlinSubsMax}</if>
+            <if test="netIsssubsMax != null "> and net_isssubs_max = #{netIsssubsMax}</if>
+            <if test="predicFund != null "> and predic_fund = #{predicFund}</if>
+            <if test="fundTotal != null "> and fund_total = #{fundTotal}</if>
+            <if test="fundNetAmount != null "> and fund_net_ amount = #{fundNetAmount}</if>
+            <if test="prsFund != null "> and prs_fund = #{prsFund}</if>
+            <if test="ipoIssFees != null "> and ipo_iss_fees = #{ipoIssFees}</if>
+            <if test="ipoIssMult != null "> and ipo_iss_mult = #{ipoIssMult}</if>
+            <if test="stackConvFees != null "> and stack_conv_fees = #{stackConvFees}</if>
+            <if test="convFees != null "> and conv_fees = #{convFees}</if>
+            <if test="issFeesTotal != null "> and iss_fees_total = #{issFeesTotal}</if>
+            <if test="issRates != null "> and iss_rates = #{issRates}</if>
+            <if test="unwSponsorFees != null "> and unw_sponsor_fees = #{unwSponsorFees}</if>
+            <if test="auditVerFees != null "> and audit_ver_fees = #{auditVerFees}</if>
+            <if test="lawFees != null "> and law_fees = #{lawFees}</if>
+            <if test="inforDisFees != null "> and infor_dis_fees = #{inforDisFees}</if>
+            <if test="investorsNub != null "> and investors_nub = #{investorsNub}</if>
+            <if test="placObjNub != null "> and plac_obj_nub = #{placObjNub}</if>
+            <if test="inquirePurNub != null "> and inquire_pur_nub = #{inquirePurNub}</if>
+            <if test="inquireSubcMult != null "> and inquire_subc_mult = #{inquireSubcMult}</if>
+            <if test="validQuotePlacnub != null "> and valid_quote_placnub = #{validQuotePlacnub}</if>
+            <if test="validQuoteInvenub != null "> and valid_quote_invenub = #{validQuoteInvenub}</if>
+            <if test="validPlacsubsNub != null "> and valid__placsubs_nub = #{validPlacsubsNub}</if>
+            <if test="validSubsNub != null "> and valid_subs_nub = #{validSubsNub}</if>
+            <if test="validSubsFund != null "> and valid_subs_fund = #{validSubsFund}</if>
+            <if test="validSubsPlacratio != null "> and valid_subs_placratio = #{validSubsPlacratio}</if>
+            <if test="offlinSubsMult != null "> and offlin_subs_mult = #{offlinSubsMult}</if>
+            <if test="tacticPlacStakeratio != null "> and tactic_plac_stakeratio = #{tacticPlacStakeratio}</if>
+            <if test="legalInvesnubA != null "> and legal_invesnub_a = #{legalInvesnubA}</if>
+            <if test="legalInvesnubB != null "> and legal_invesnub_b = #{legalInvesnubB}</if>
+            <if test="legalInvesnubC != null "> and legal_invesnub_c = #{legalInvesnubC}</if>
+            <if test="legalInvesPlacnubA != null "> and legal_inves_placnub_a = #{legalInvesPlacnubA}</if>
+            <if test="legalInvesPlacnubB != null "> and legal_inves_placnub_b = #{legalInvesPlacnubB}</if>
+            <if test="legalInvesPlacnubC != null "> and legal_inves_placnub_c = #{legalInvesPlacnubC}</if>
+            <if test="validSubsInvenub != null "> and valid_subs_invenub = #{validSubsInvenub}</if>
+            <if test="validSubsStakernub != null "> and valid_subs_stakernub = #{validSubsStakernub}</if>
+            <if test="checkRatio != null "> and check_ratio = #{checkRatio}</if>
+            <if test="netCheckRatio != null "> and net_check_ratio = #{netCheckRatio}</if>
+            <if test="issWay != null  and issWay != ''"> and iss_way = #{issWay}</if>
+            <if test="unwWay != null  and unwWay != ''"> and unw_way = #{unwWay}</if>
+            <if test="unwMaster != null  and unwMaster != ''"> and unw_master = #{unwMaster}</if>
+            <if test="sponsorInst != null  and sponsorInst != ''"> and sponsor_inst = #{sponsorInst}</if>
+            <if test="auditInst != null  and auditInst != ''"> and audit_inst = #{auditInst}</if>
+            <if test="assetsEvaIns != null  and assetsEvaIns != ''"> and assets_eva_ins = #{assetsEvaIns}</if>
+            <if test="lawFirm != null  and lawFirm != ''"> and law_firm = #{lawFirm}</if>
+            <if test="issAnnoDate != null "> and iss_anno_date = #{issAnnoDate}</if>
+            <if test="offlinIssStardate != null "> and offlin_iss_stardate = #{offlinIssStardate}</if>
+            <if test="offlinIssEnddate != null "> and offlin_iss_enddate = #{offlinIssEnddate}</if>
+            <if test="netIssFreeze != null "> and net_iss_freeze = #{netIssFreeze}</if>
+            <if test="offlinPlacFreeze != null "> and offlin_plac_freeze = #{offlinPlacFreeze}</if>
+            <if test="unwSubcBalanstock != null "> and unw_subc_balanstock = #{unwSubcBalanstock}</if>
+            <if test="underAmount != null "> and under_amount = #{underAmount}</if>
+            <if test="underRatio != null "> and under_ratio = #{underRatio}</if>
+            <if test="faceValue != null "> and face_value = #{faceValue}</if>
+            <if test="province != null  and province != ''"> and province = #{province}</if>
+            <if test="csrcIndustry != null  and csrcIndustry != ''"> and csrc_industry = #{csrcIndustry}</if>
+            <if test="windIndustry != null  and windIndustry != ''"> and wind_industry = #{windIndustry}</if>
+            <if test="bondType != null  and bondType != ''"> and bond_type = #{bondType}</if>
+            <if test="bourse != null  and bourse != ''"> and bourse = #{bourse}</if>
+            <if test="inquiryStaringDate != null  and inquiryStaringDate != ''"> and inquiry_staring_date = #{inquiryStaringDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectCnIpoInfoById" parameterType="Long" resultMap="CnIpoInfoResult">
+        <include refid="selectCnIpoInfoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertCnIpoInfo" parameterType="CnIpoInfo">
+        insert into cn_ipo_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="code != null">code,</if>
+            <if test="stockName != null">stock_name,</if>
+            <if test="subsCode != null">subs_code,</if>
+            <if test="prospDate != null">prosp_date,</if>
+            <if test="netIssDate != null">net_iss_date,</if>
+            <if test="ipoDate != null">ipo_date,</if>
+            <if test="ipoBoard != null">ipo_board,</if>
+            <if test="issPrice != null">iss_price,</if>
+            <if test="issMult != null">iss_mult,</if>
+            <if test="industryPe != null">industry_pe,</if>
+            <if test="indusPeStat != null">indus_pe_stat,</if>
+            <if test="ipoPeAvg != null">ipo_pe_avg,</if>
+            <if test="indusPeTtm != null">indus_pe_ttm,</if>
+            <if test="total != null">total,</if>
+            <if test="newStockIssnub != null">new_stock_issnub,</if>
+            <if test="oldStockConvnub != null">old_stock_convnub,</if>
+            <if test="offlinPlacnub != null">offlin_placnub,</if>
+            <if test="netIssnub != null">net_issnub,</if>
+            <if test="callIssstockBefor != null">call_issstock_befor,</if>
+            <if test="callIssstockAfter != null">call_issstock_after,</if>
+            <if test="callRatio != null">call_ratio,</if>
+            <if test="offlinSubsMax != null">offlin_subs_max,</if>
+            <if test="netIsssubsMax != null">net_isssubs_max,</if>
+            <if test="predicFund != null">predic_fund,</if>
+            <if test="fundTotal != null">fund_total,</if>
+            <if test="fundNetAmount != null">fund_net_ amount,</if>
+            <if test="prsFund != null">prs_fund,</if>
+            <if test="ipoIssFees != null">ipo_iss_fees,</if>
+            <if test="ipoIssMult != null">ipo_iss_mult,</if>
+            <if test="stackConvFees != null">stack_conv_fees,</if>
+            <if test="convFees != null">conv_fees,</if>
+            <if test="issFeesTotal != null">iss_fees_total,</if>
+            <if test="issRates != null">iss_rates,</if>
+            <if test="unwSponsorFees != null">unw_sponsor_fees,</if>
+            <if test="auditVerFees != null">audit_ver_fees,</if>
+            <if test="lawFees != null">law_fees,</if>
+            <if test="inforDisFees != null">infor_dis_fees,</if>
+            <if test="investorsNub != null">investors_nub,</if>
+            <if test="placObjNub != null">plac_obj_nub,</if>
+            <if test="inquirePurNub != null">inquire_pur_nub,</if>
+            <if test="inquireSubcMult != null">inquire_subc_mult,</if>
+            <if test="validQuotePlacnub != null">valid_quote_placnub,</if>
+            <if test="validQuoteInvenub != null">valid_quote_invenub,</if>
+            <if test="validPlacsubsNub != null">valid__placsubs_nub,</if>
+            <if test="validSubsNub != null">valid_subs_nub,</if>
+            <if test="validSubsFund != null">valid_subs_fund,</if>
+            <if test="validSubsPlacratio != null">valid_subs_placratio,</if>
+            <if test="offlinSubsMult != null">offlin_subs_mult,</if>
+            <if test="tacticPlacStakeratio != null">tactic_plac_stakeratio,</if>
+            <if test="legalInvesnubA != null">legal_invesnub_a,</if>
+            <if test="legalInvesnubB != null">legal_invesnub_b,</if>
+            <if test="legalInvesnubC != null">legal_invesnub_c,</if>
+            <if test="legalInvesPlacnubA != null">legal_inves_placnub_a,</if>
+            <if test="legalInvesPlacnubB != null">legal_inves_placnub_b,</if>
+            <if test="legalInvesPlacnubC != null">legal_inves_placnub_c,</if>
+            <if test="validSubsInvenub != null">valid_subs_invenub,</if>
+            <if test="validSubsStakernub != null">valid_subs_stakernub,</if>
+            <if test="checkRatio != null">check_ratio,</if>
+            <if test="netCheckRatio != null">net_check_ratio,</if>
+            <if test="issWay != null">iss_way,</if>
+            <if test="unwWay != null">unw_way,</if>
+            <if test="unwMaster != null">unw_master,</if>
+            <if test="sponsorInst != null">sponsor_inst,</if>
+            <if test="auditInst != null">audit_inst,</if>
+            <if test="assetsEvaIns != null">assets_eva_ins,</if>
+            <if test="lawFirm != null">law_firm,</if>
+            <if test="issAnnoDate != null">iss_anno_date,</if>
+            <if test="offlinIssStardate != null">offlin_iss_stardate,</if>
+            <if test="offlinIssEnddate != null">offlin_iss_enddate,</if>
+            <if test="netIssFreeze != null">net_iss_freeze,</if>
+            <if test="offlinPlacFreeze != null">offlin_plac_freeze,</if>
+            <if test="unwSubcBalanstock != null">unw_subc_balanstock,</if>
+            <if test="underAmount != null">under_amount,</if>
+            <if test="underRatio != null">under_ratio,</if>
+            <if test="faceValue != null">face_value,</if>
+            <if test="province != null">province,</if>
+            <if test="csrcIndustry != null">csrc_industry,</if>
+            <if test="windIndustry != null">wind_industry,</if>
+            <if test="bondType != null">bond_type,</if>
+            <if test="bourse != null">bourse,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="code != null">#{code},</if>
+            <if test="stockName != null">#{stockName},</if>
+            <if test="subsCode != null">#{subsCode},</if>
+            <if test="prospDate != null">#{prospDate},</if>
+            <if test="netIssDate != null">#{netIssDate},</if>
+            <if test="ipoDate != null">#{ipoDate},</if>
+            <if test="ipoBoard != null">#{ipoBoard},</if>
+            <if test="issPrice != null">#{issPrice},</if>
+            <if test="issMult != null">#{issMult},</if>
+            <if test="industryPe != null">#{industryPe},</if>
+            <if test="indusPeStat != null">#{indusPeStat},</if>
+            <if test="ipoPeAvg != null">#{ipoPeAvg},</if>
+            <if test="indusPeTtm != null">#{indusPeTtm},</if>
+            <if test="total != null">#{total},</if>
+            <if test="newStockIssnub != null">#{newStockIssnub},</if>
+            <if test="oldStockConvnub != null">#{oldStockConvnub},</if>
+            <if test="offlinPlacnub != null">#{offlinPlacnub},</if>
+            <if test="netIssnub != null">#{netIssnub},</if>
+            <if test="callIssstockBefor != null">#{callIssstockBefor},</if>
+            <if test="callIssstockAfter != null">#{callIssstockAfter},</if>
+            <if test="callRatio != null">#{callRatio},</if>
+            <if test="offlinSubsMax != null">#{offlinSubsMax},</if>
+            <if test="netIsssubsMax != null">#{netIsssubsMax},</if>
+            <if test="predicFund != null">#{predicFund},</if>
+            <if test="fundTotal != null">#{fundTotal},</if>
+            <if test="fundNetAmount != null">#{fundNetAmount},</if>
+            <if test="prsFund != null">#{prsFund},</if>
+            <if test="ipoIssFees != null">#{ipoIssFees},</if>
+            <if test="ipoIssMult != null">#{ipoIssMult},</if>
+            <if test="stackConvFees != null">#{stackConvFees},</if>
+            <if test="convFees != null">#{convFees},</if>
+            <if test="issFeesTotal != null">#{issFeesTotal},</if>
+            <if test="issRates != null">#{issRates},</if>
+            <if test="unwSponsorFees != null">#{unwSponsorFees},</if>
+            <if test="auditVerFees != null">#{auditVerFees},</if>
+            <if test="lawFees != null">#{lawFees},</if>
+            <if test="inforDisFees != null">#{inforDisFees},</if>
+            <if test="investorsNub != null">#{investorsNub},</if>
+            <if test="placObjNub != null">#{placObjNub},</if>
+            <if test="inquirePurNub != null">#{inquirePurNub},</if>
+            <if test="inquireSubcMult != null">#{inquireSubcMult},</if>
+            <if test="validQuotePlacnub != null">#{validQuotePlacnub},</if>
+            <if test="validQuoteInvenub != null">#{validQuoteInvenub},</if>
+            <if test="validPlacsubsNub != null">#{validPlacsubsNub},</if>
+            <if test="validSubsNub != null">#{validSubsNub},</if>
+            <if test="validSubsFund != null">#{validSubsFund},</if>
+            <if test="validSubsPlacratio != null">#{validSubsPlacratio},</if>
+            <if test="offlinSubsMult != null">#{offlinSubsMult},</if>
+            <if test="tacticPlacStakeratio != null">#{tacticPlacStakeratio},</if>
+            <if test="legalInvesnubA != null">#{legalInvesnubA},</if>
+            <if test="legalInvesnubB != null">#{legalInvesnubB},</if>
+            <if test="legalInvesnubC != null">#{legalInvesnubC},</if>
+            <if test="legalInvesPlacnubA != null">#{legalInvesPlacnubA},</if>
+            <if test="legalInvesPlacnubB != null">#{legalInvesPlacnubB},</if>
+            <if test="legalInvesPlacnubC != null">#{legalInvesPlacnubC},</if>
+            <if test="validSubsInvenub != null">#{validSubsInvenub},</if>
+            <if test="validSubsStakernub != null">#{validSubsStakernub},</if>
+            <if test="checkRatio != null">#{checkRatio},</if>
+            <if test="netCheckRatio != null">#{netCheckRatio},</if>
+            <if test="issWay != null">#{issWay},</if>
+            <if test="unwWay != null">#{unwWay},</if>
+            <if test="unwMaster != null">#{unwMaster},</if>
+            <if test="sponsorInst != null">#{sponsorInst},</if>
+            <if test="auditInst != null">#{auditInst},</if>
+            <if test="assetsEvaIns != null">#{assetsEvaIns},</if>
+            <if test="lawFirm != null">#{lawFirm},</if>
+            <if test="issAnnoDate != null">#{issAnnoDate},</if>
+            <if test="offlinIssStardate != null">#{offlinIssStardate},</if>
+            <if test="offlinIssEnddate != null">#{offlinIssEnddate},</if>
+            <if test="netIssFreeze != null">#{netIssFreeze},</if>
+            <if test="offlinPlacFreeze != null">#{offlinPlacFreeze},</if>
+            <if test="unwSubcBalanstock != null">#{unwSubcBalanstock},</if>
+            <if test="underAmount != null">#{underAmount},</if>
+            <if test="underRatio != null">#{underRatio},</if>
+            <if test="faceValue != null">#{faceValue},</if>
+            <if test="province != null">#{province},</if>
+            <if test="csrcIndustry != null">#{csrcIndustry},</if>
+            <if test="windIndustry != null">#{windIndustry},</if>
+            <if test="bondType != null">#{bondType},</if>
+            <if test="bourse != null">#{bourse},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCnIpoInfo" parameterType="CnIpoInfo">
+        update cn_ipo_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="code != null">code = #{code},</if>
+            <if test="stockName != null">stock_name = #{stockName},</if>
+            <if test="subsCode != null">subs_code = #{subsCode},</if>
+            <if test="prospDate != null">prosp_date = #{prospDate},</if>
+            <if test="netIssDate != null">net_iss_date = #{netIssDate},</if>
+            <if test="ipoDate != null">ipo_date = #{ipoDate},</if>
+            <if test="ipoBoard != null">ipo_board = #{ipoBoard},</if>
+            <if test="issPrice != null">iss_price = #{issPrice},</if>
+            <if test="issMult != null">iss_mult = #{issMult},</if>
+            <if test="industryPe != null">industry_pe = #{industryPe},</if>
+            <if test="indusPeStat != null">indus_pe_stat = #{indusPeStat},</if>
+            <if test="ipoPeAvg != null">ipo_pe_avg = #{ipoPeAvg},</if>
+            <if test="indusPeTtm != null">indus_pe_ttm = #{indusPeTtm},</if>
+            <if test="total != null">total = #{total},</if>
+            <if test="newStockIssnub != null">new_stock_issnub = #{newStockIssnub},</if>
+            <if test="oldStockConvnub != null">old_stock_convnub = #{oldStockConvnub},</if>
+            <if test="offlinPlacnub != null">offlin_placnub = #{offlinPlacnub},</if>
+            <if test="netIssnub != null">net_issnub = #{netIssnub},</if>
+            <if test="callIssstockBefor != null">call_issstock_befor = #{callIssstockBefor},</if>
+            <if test="callIssstockAfter != null">call_issstock_after = #{callIssstockAfter},</if>
+            <if test="callRatio != null">call_ratio = #{callRatio},</if>
+            <if test="offlinSubsMax != null">offlin_subs_max = #{offlinSubsMax},</if>
+            <if test="netIsssubsMax != null">net_isssubs_max = #{netIsssubsMax},</if>
+            <if test="predicFund != null">predic_fund = #{predicFund},</if>
+            <if test="fundTotal != null">fund_total = #{fundTotal},</if>
+            <if test="fundNetAmount != null">fund_net_ amount = #{fundNetAmount},</if>
+            <if test="prsFund != null">prs_fund = #{prsFund},</if>
+            <if test="ipoIssFees != null">ipo_iss_fees = #{ipoIssFees},</if>
+            <if test="ipoIssMult != null">ipo_iss_mult = #{ipoIssMult},</if>
+            <if test="stackConvFees != null">stack_conv_fees = #{stackConvFees},</if>
+            <if test="convFees != null">conv_fees = #{convFees},</if>
+            <if test="issFeesTotal != null">iss_fees_total = #{issFeesTotal},</if>
+            <if test="issRates != null">iss_rates = #{issRates},</if>
+            <if test="unwSponsorFees != null">unw_sponsor_fees = #{unwSponsorFees},</if>
+            <if test="auditVerFees != null">audit_ver_fees = #{auditVerFees},</if>
+            <if test="lawFees != null">law_fees = #{lawFees},</if>
+            <if test="inforDisFees != null">infor_dis_fees = #{inforDisFees},</if>
+            <if test="investorsNub != null">investors_nub = #{investorsNub},</if>
+            <if test="placObjNub != null">plac_obj_nub = #{placObjNub},</if>
+            <if test="inquirePurNub != null">inquire_pur_nub = #{inquirePurNub},</if>
+            <if test="inquireSubcMult != null">inquire_subc_mult = #{inquireSubcMult},</if>
+            <if test="validQuotePlacnub != null">valid_quote_placnub = #{validQuotePlacnub},</if>
+            <if test="validQuoteInvenub != null">valid_quote_invenub = #{validQuoteInvenub},</if>
+            <if test="validPlacsubsNub != null">valid__placsubs_nub = #{validPlacsubsNub},</if>
+            <if test="validSubsNub != null">valid_subs_nub = #{validSubsNub},</if>
+            <if test="validSubsFund != null">valid_subs_fund = #{validSubsFund},</if>
+            <if test="validSubsPlacratio != null">valid_subs_placratio = #{validSubsPlacratio},</if>
+            <if test="offlinSubsMult != null">offlin_subs_mult = #{offlinSubsMult},</if>
+            <if test="tacticPlacStakeratio != null">tactic_plac_stakeratio = #{tacticPlacStakeratio},</if>
+            <if test="legalInvesnubA != null">legal_invesnub_a = #{legalInvesnubA},</if>
+            <if test="legalInvesnubB != null">legal_invesnub_b = #{legalInvesnubB},</if>
+            <if test="legalInvesnubC != null">legal_invesnub_c = #{legalInvesnubC},</if>
+            <if test="legalInvesPlacnubA != null">legal_inves_placnub_a = #{legalInvesPlacnubA},</if>
+            <if test="legalInvesPlacnubB != null">legal_inves_placnub_b = #{legalInvesPlacnubB},</if>
+            <if test="legalInvesPlacnubC != null">legal_inves_placnub_c = #{legalInvesPlacnubC},</if>
+            <if test="validSubsInvenub != null">valid_subs_invenub = #{validSubsInvenub},</if>
+            <if test="validSubsStakernub != null">valid_subs_stakernub = #{validSubsStakernub},</if>
+            <if test="checkRatio != null">check_ratio = #{checkRatio},</if>
+            <if test="netCheckRatio != null">net_check_ratio = #{netCheckRatio},</if>
+            <if test="issWay != null">iss_way = #{issWay},</if>
+            <if test="unwWay != null">unw_way = #{unwWay},</if>
+            <if test="unwMaster != null">unw_master = #{unwMaster},</if>
+            <if test="sponsorInst != null">sponsor_inst = #{sponsorInst},</if>
+            <if test="auditInst != null">audit_inst = #{auditInst},</if>
+            <if test="assetsEvaIns != null">assets_eva_ins = #{assetsEvaIns},</if>
+            <if test="lawFirm != null">law_firm = #{lawFirm},</if>
+            <if test="issAnnoDate != null">iss_anno_date = #{issAnnoDate},</if>
+            <if test="offlinIssStardate != null">offlin_iss_stardate = #{offlinIssStardate},</if>
+            <if test="offlinIssEnddate != null">offlin_iss_enddate = #{offlinIssEnddate},</if>
+            <if test="netIssFreeze != null">net_iss_freeze = #{netIssFreeze},</if>
+            <if test="offlinPlacFreeze != null">offlin_plac_freeze = #{offlinPlacFreeze},</if>
+            <if test="unwSubcBalanstock != null">unw_subc_balanstock = #{unwSubcBalanstock},</if>
+            <if test="underAmount != null">under_amount = #{underAmount},</if>
+            <if test="underRatio != null">under_ratio = #{underRatio},</if>
+            <if test="faceValue != null">face_value = #{faceValue},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="csrcIndustry != null">csrc_industry = #{csrcIndustry},</if>
+            <if test="windIndustry != null">wind_industry = #{windIndustry},</if>
+            <if test="bondType != null">bond_type = #{bondType},</if>
+            <if test="bourse != null">bourse = #{bourse},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCnIpoInfoById" parameterType="Long">
+        delete from cn_ipo_info where id = #{id}
+    </delete>
+
+    <delete id="deleteCnIpoInfoByIds" parameterType="String">
+        delete from cn_ipo_info where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

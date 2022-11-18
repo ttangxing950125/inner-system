@@ -1,0 +1,45 @@
+# Tomcat
+server:
+  port: 8080
+
+# Spring
+spring: 
+  application:
+    # 应用名称
+    name: deloitte-gateway
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 10.173.43.11:8848
+        namespace: e8602d04-0831-48d9-a258-59f8574e4d9d
+        group: DEFAULT_GROUP
+      config:
+        # 配置中心地址
+        server-addr: 10.173.43.11:8848
+        # 配置文件格式
+        file-extension: yml
+        namespace: e8602d04-0831-48d9-a258-59f8574e4d9d
+        # 共享配置
+        shared-configs:
+          - deloitte-gateway.${spring.cloud.nacos.config.file-extension}
+        # 配置所在分组
+        group: DEFAULT_GROUP
+    sentinel:
+      # 取消控制台懒加载
+      eager: true
+      transport:
+        # 控制台地址
+        dashboard: 127.0.0.1:8718
+      # nacos配置持久化
+      datasource:
+        ds1:
+          nacos:
+            server-addr: 10.173.43.11:8848
+            dataId: sentinel-deloitte-gateway
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow

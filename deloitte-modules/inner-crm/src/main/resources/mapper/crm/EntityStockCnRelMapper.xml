@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityStockCnRelMapper">
+
+
+    <select id="findByEntityStockDeCode" resultType="EntityStockCnRel">
+        select *
+        from entity_stock_cn_rel
+        where entity_code = #{entityCode}
+        and stock_dq_code = #{dqCode}
+    </select>
+
+</mapper>

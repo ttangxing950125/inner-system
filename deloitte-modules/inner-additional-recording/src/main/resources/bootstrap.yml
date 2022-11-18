@@ -1,0 +1,44 @@
+# Tomcat
+server:
+  port: 9205
+
+# Spring
+# Spring
+
+spring: 
+  application:
+    # 应用名称
+    name: deloitte-additional-recording
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  profiles:
+    # 环境配置
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 192.168.1.7:8848
+        # 配置所在分组
+        namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
+      config:
+        # 配置中心地址
+        server-addr: 192.168.1.7:8848
+        # 配置所在分组
+        namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+        # 配置所在分组
+        group: DEV
+logging:
+  level:
+    com.deloitte.additional.recording: debug
+
+

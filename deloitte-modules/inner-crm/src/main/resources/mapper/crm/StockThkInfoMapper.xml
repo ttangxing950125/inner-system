@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.StockThkInfoMapper">
+
+
+    <select id="findByCode" resultType="stockThkInfo">
+        select *
+        from stock_thk_info
+        where stock_code = #{secIssInfoCode}
+    </select>
+    <select id="selectListByEntityCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(0) FROM stock_thk_info a
+        LEFT JOIN entity_stock_thk_rel b ON a.stock_dq_code = b.stock_dq_code
+        WHERE a.stock_status = 3 and
+	    b.entity_code = #{entityCode}
+    </select>
+</mapper>

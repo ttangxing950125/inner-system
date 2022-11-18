@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.deloitte.common.datascope.aspect.DataScopeAspect
+
+  

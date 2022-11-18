@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.deloitte.common.security.config.WebMvcConfig,\
+  com.deloitte.common.security.service.TokenService,\
+  com.deloitte.common.security.aspect.PreAuthorizeAspect,\
+  com.deloitte.common.security.aspect.InnerAuthAspect,\
+  com.deloitte.common.security.handler.GlobalExceptionHandler

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.ThkSecIssDetailMapper">
+    
+    <resultMap type="ThkSecIssDetail" id="ThkSecIssDetailResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="ipoDate"    column="ipo_date"    />
+        <result property="ipoBoard"    column="ipo_board"    />
+        <result property="issType"    column="iss_type"    />
+        <result property="issPrice"    column="iss_price"    />
+        <result property="issCountReal"    column="iss_count_real"    />
+        <result property="issCountPlan"    column="iss_count_plan"    />
+        <result property="issPlacingExceed"    column="iss_placing_exceed"    />
+        <result property="issFundCount"    column="iss_fund_count"    />
+        <result property="issFundNet"    column="iss_fund_net"    />
+        <result property="issFundExceed"    column="iss_fund_exceed"    />
+        <result property="mainUnw"    column="main_unw"    />
+        <result property="sponsor"    column="sponsor"    />
+        <result property="firstDenom"    column="first_denom"    />
+        <result property="firstCurrency"    column="first_currency"    />
+        <result property="firstUnit"    column="first_unit"    />
+        <result property="prospDate"    column="prosp_date"    />
+        <result property="prospPriceMax"    column="prosp_price_max"    />
+        <result property="prospPriceMin"    column="prosp_price_min"    />
+        <result property="belWind"    column="bel_wind"    />
+        <result property="belModle"    column="bel_modle"    />
+        <result property="stockBelong"    column="stock_belong"    />
+        <result property="entityDes"    column="entity_des"    />
+    </resultMap>
+
+    <sql id="selectThkSecIssDetailVo">
+         select id, task_id, import_time, change_type, code, name, ipo_date, ipo_board, iss_type, iss_price, iss_count_real, iss_count_plan, iss_placing_exceed, iss_fund_count, iss_fund_net, iss_fund_exceed, main_unw, sponsor, first_denom, first_currency, first_unit, prosp_date, prosp_price_max, prosp_price_min, bel_wind, bel_modle, stock_belong, entity_des
+         from thk_sec_iss_detail
+    </sql>
+
+    <select id="findLastByCode" resultType="thkSecIssDetail">
+        <include refid="selectThkSecIssDetailVo"/>
+        where code = #{code}
+        order by id desc
+        limit 1
+    </select>
+
+    <select id="selectThkSecIssDetailList" parameterType="ThkSecIssDetail" resultMap="ThkSecIssDetailResult">
+        <include refid="selectThkSecIssDetailVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="ipoDate != null "> and ipo_date = #{ipoDate}</if>
+            <if test="ipoBoard != null  and ipoBoard != ''"> and ipo_board = #{ipoBoard}</if>
+            <if test="issType != null  and issType != ''"> and iss_type = #{issType}</if>
+            <if test="issPrice != null "> and iss_price = #{issPrice}</if>
+            <if test="issCountReal != null "> and iss_count_real = #{issCountReal}</if>
+            <if test="issCountPlan != null "> and iss_count_plan = #{issCountPlan}</if>
+            <if test="issPlacingExceed != null "> and iss_placing_exceed = #{issPlacingExceed}</if>
+            <if test="issFundCount != null "> and iss_fund_count = #{issFundCount}</if>
+            <if test="issFundNet != null "> and iss_fund_net = #{issFundNet}</if>
+            <if test="issFundExceed != null "> and iss_fund_exceed = #{issFundExceed}</if>
+            <if test="mainUnw != null  and mainUnw != ''"> and main_unw = #{mainUnw}</if>
+            <if test="sponsor != null  and sponsor != ''"> and sponsor = #{sponsor}</if>
+            <if test="firstDenom != null "> and first_denom = #{firstDenom}</if>
+            <if test="firstCurrency != null  and firstCurrency != ''"> and first_currency = #{firstCurrency}</if>
+            <if test="firstUnit != null  and firstUnit != ''"> and first_unit = #{firstUnit}</if>
+            <if test="prospDate != null "> and prosp_date = #{prospDate}</if>
+            <if test="prospPriceMax != null "> and prosp_price_max = #{prospPriceMax}</if>
+            <if test="prospPriceMin != null "> and prosp_price_min = #{prospPriceMin}</if>
+            <if test="belWind != null  and belWind != ''"> and bel_wind = #{belWind}</if>
+            <if test="belModle != null  and belModle != ''"> and bel_modle = #{belModle}</if>
+            <if test="stockBelong != null  and stockBelong != ''"> and stock_belong = #{stockBelong}</if>
+            <if test="entityDes != null  and entityDes != ''"> and entity_des = #{entityDes}</if>
+        </where>
+    </select>
+    
+    <select id="selectThkSecIssDetailById" parameterType="Long" resultMap="ThkSecIssDetailResult">
+        <include refid="selectThkSecIssDetailVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertThkSecIssDetail" parameterType="ThkSecIssDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into thk_sec_iss_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="ipoDate != null">ipo_date,</if>
+            <if test="ipoBoard != null">ipo_board,</if>
+            <if test="issType != null">iss_type,</if>
+            <if test="issPrice != null">iss_price,</if>
+            <if test="issCountReal != null">iss_count_real,</if>
+            <if test="issCountPlan != null">iss_count_plan,</if>
+            <if test="issPlacingExceed != null">iss_placing_exceed,</if>
+            <if test="issFundCount != null">iss_fund_count,</if>
+            <if test="issFundNet != null">iss_fund_net,</if>
+            <if test="issFundExceed != null">iss_fund_exceed,</if>
+            <if test="mainUnw != null">main_unw,</if>
+            <if test="sponsor != null">sponsor,</if>
+            <if test="firstDenom != null">first_denom,</if>
+            <if test="firstCurrency != null">first_currency,</if>
+            <if test="firstUnit != null">first_unit,</if>
+            <if test="prospDate != null">prosp_date,</if>
+            <if test="prospPriceMax != null">prosp_price_max,</if>
+            <if test="prospPriceMin != null">prosp_price_min,</if>
+            <if test="belWind != null">bel_wind,</if>
+            <if test="belModle != null">bel_modle,</if>
+            <if test="stockBelong != null">stock_belong,</if>
+            <if test="entityDes != null">entity_des,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="ipoDate != null">#{ipoDate},</if>
+            <if test="ipoBoard != null">#{ipoBoard},</if>
+            <if test="issType != null">#{issType},</if>
+            <if test="issPrice != null">#{issPrice},</if>
+            <if test="issCountReal != null">#{issCountReal},</if>
+            <if test="issCountPlan != null">#{issCountPlan},</if>
+            <if test="issPlacingExceed != null">#{issPlacingExceed},</if>
+            <if test="issFundCount != null">#{issFundCount},</if>
+            <if test="issFundNet != null">#{issFundNet},</if>
+            <if test="issFundExceed != null">#{issFundExceed},</if>
+            <if test="mainUnw != null">#{mainUnw},</if>
+            <if test="sponsor != null">#{sponsor},</if>
+            <if test="firstDenom != null">#{firstDenom},</if>
+            <if test="firstCurrency != null">#{firstCurrency},</if>
+            <if test="firstUnit != null">#{firstUnit},</if>
+            <if test="prospDate != null">#{prospDate},</if>
+            <if test="prospPriceMax != null">#{prospPriceMax},</if>
+            <if test="prospPriceMin != null">#{prospPriceMin},</if>
+            <if test="belWind != null">#{belWind},</if>
+            <if test="belModle != null">#{belModle},</if>
+            <if test="stockBelong != null">#{stockBelong},</if>
+            <if test="entityDes != null">#{entityDes},</if>
+         </trim>
+    </insert>
+
+    <update id="updateThkSecIssDetail" parameterType="ThkSecIssDetail">
+        update thk_sec_iss_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="ipoDate != null">ipo_date = #{ipoDate},</if>
+            <if test="ipoBoard != null">ipo_board = #{ipoBoard},</if>
+            <if test="issType != null">iss_type = #{issType},</if>
+            <if test="issPrice != null">iss_price = #{issPrice},</if>
+            <if test="issCountReal != null">iss_count_real = #{issCountReal},</if>
+            <if test="issCountPlan != null">iss_count_plan = #{issCountPlan},</if>
+            <if test="issPlacingExceed != null">iss_placing_exceed = #{issPlacingExceed},</if>
+            <if test="issFundCount != null">iss_fund_count = #{issFundCount},</if>
+            <if test="issFundNet != null">iss_fund_net = #{issFundNet},</if>
+            <if test="issFundExceed != null">iss_fund_exceed = #{issFundExceed},</if>
+            <if test="mainUnw != null">main_unw = #{mainUnw},</if>
+            <if test="sponsor != null">sponsor = #{sponsor},</if>
+            <if test="firstDenom != null">first_denom = #{firstDenom},</if>
+            <if test="firstCurrency != null">first_currency = #{firstCurrency},</if>
+            <if test="firstUnit != null">first_unit = #{firstUnit},</if>
+            <if test="prospDate != null">prosp_date = #{prospDate},</if>
+            <if test="prospPriceMax != null">prosp_price_max = #{prospPriceMax},</if>
+            <if test="prospPriceMin != null">prosp_price_min = #{prospPriceMin},</if>
+            <if test="belWind != null">bel_wind = #{belWind},</if>
+            <if test="belModle != null">bel_modle = #{belModle},</if>
+            <if test="stockBelong != null">stock_belong = #{stockBelong},</if>
+            <if test="entityDes != null">entity_des = #{entityDes},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteThkSecIssDetailById" parameterType="Long">
+        delete from thk_sec_iss_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteThkSecIssDetailByIds" parameterType="String">
+        delete from thk_sec_iss_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

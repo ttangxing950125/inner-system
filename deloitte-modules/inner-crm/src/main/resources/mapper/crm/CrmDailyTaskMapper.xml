@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.CrmDailyTaskMapper">
+    
+    <resultMap type="com.deloitte.crm.domain.CrmDailyTask" id="CrmDailyTaskResult">
+        <result property="id"    column="id"   />
+        <result property="taskRoleType" column="task_role_type" />
+        <result property="taskStatus"    column="task_status" />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+
+    </resultMap>
+
+    <sql id="selectCrmDailyTaskVo">
+        select id,task_role_type,task_status,created, updated from crm_daily_task
+    </sql>
+
+    <select id="selectCrmDailyTaskList" parameterType="CrmDailyTask" resultMap="CrmDailyTaskResult">
+        <include refid="selectCrmDailyTaskVo"/>
+        <where>  
+            <if test="taskRoleType != null" > and taskRoleType = #{taskRoleType} </if>
+             <if test="taskStatus != null" > and taskStatus = #{taskStatus} </if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+
+        </where>
+    </select>
+    
+    <select id="selectCrmDailyTaskById" parameterType="Long" resultMap="CrmDailyTaskResult">
+        <include refid="selectCrmDailyTaskVo"/>
+        where id = #{id}
+    </select>
+
+
+    <insert id="insertCrmDailyTask" parameterType="com.deloitte.crm.domain.CrmDailyTask" useGeneratedKeys="true" keyProperty="id">
+        insert into crm_daily_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskRoleType != null">taskRoleType,</if>
+            <if test="taskStatus != null ">taskStatus,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskRoleType != null">taskRoleType,</if>
+            <if test="taskStatus != null ">taskStatus,</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+
+         </trim>
+    </insert>
+
+    <update id="updateCrmDailyTask" parameterType="com.deloitte.crm.domain.CrmDailyTask">
+        update crm_daily_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskRoleType != null" > and taskRoleType = #{taskRoleType} </if>
+            <if test="taskStatus != null" > and taskStatus = #{taskStatus} </if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCrmDailyTaskById" parameterType="Long">
+        delete from crm_daily_task where id = #{id}
+    </delete>
+
+    <select id="selectCrmDailyTaskListByDate" resultType="com.deloitte.crm.domain.CrmDailyTask">
+        select  * from crm_daily_task where task_role_type =#{taskRoleType} AND task_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <delete id="deleteCrmDailyTaskByIds" parameterType="String">
+        delete from crm_daily_task where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

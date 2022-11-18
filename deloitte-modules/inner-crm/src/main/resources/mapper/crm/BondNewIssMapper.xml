@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.BondNewIssMapper">
+    
+    <resultMap type="BondNewIss" id="BondNewIssResult">
+        <result property="id"    column="id"    />
+        <result property="tradeCode"    column="trade_code"    />
+        <result property="bondShortName"    column="bond_short_name"    />
+        <result property="issStartDate"    column="iss_start_date"    />
+        <result property="payDate"    column="pay_date"    />
+        <result property="issScalePlan"    column="iss_scale_plan"    />
+        <result property="issAmountTop"    column="iss_amount_top"    />
+        <result property="issScale"    column="iss_scale"    />
+        <result property="issTerm"    column="iss_term"    />
+        <result property="specialTerm"    column="special_term"    />
+        <result property="bondGrade"    column="bond_grade"    />
+        <result property="enetityGrade"    column="enetity_grade"    />
+        <result property="couponRate"    column="coupon_rate"    />
+        <result property="ipoissYield"    column="ipoIss_yield"    />
+        <result property="guideRate"    column="guide_rate"    />
+        <result property="guideRateMargin"    column="guide_rate_margin"    />
+        <result property="floatRate"    column="float_rate"    />
+        <result property="rateType"    column="rate_type"    />
+        <result property="payFre"    column="pay_fre"    />
+        <result property="annoDate"    column="anno_date"    />
+        <result property="issEndDate"    column="iss_end_date"    />
+        <result property="ipoDate"    column="ipo_date"    />
+        <result property="ipoAddr"    column="ipo_addr"    />
+        <result property="valueDate"    column="value_date"    />
+        <result property="expireDate"    column="expire_date"    />
+        <result property="bondCodeList"    column="bond_code_list"    />
+        <result property="fundUse"    column="fund_use"    />
+        <result property="specialRule"    column="special_rule"    />
+        <result property="addCreditMethod"    column="add_credit_method"    />
+        <result property="assessOrgan"    column="assess_organ"    />
+        <result property="bondName"    column="bond_name"    />
+        <result property="issorShortName"    column="issor_short_name"    />
+        <result property="issorName"    column="issor_name"    />
+        <result property="issorIndustryFirst"    column="issor_industry_first"    />
+        <result property="issorIndustrySecond"    column="issor_industry_second"    />
+        <result property="issorEntityNature"    column="issor_entity_nature"    />
+        <result property="issorProvince"    column="issor_province"    />
+        <result property="issorCity"    column="issor_city"    />
+        <result property="sponsor"    column="sponsor"    />
+        <result property="issSponsorGrade"    column="iss_sponsor_grade"    />
+        <result property="sponsorEntityNature"    column="sponsor_entity_nature"    />
+        <result property="assureRule"    column="assure_rule"    />
+        <result property="mainUnw"    column="main_unw"    />
+        <result property="fundShare"    column="fund_share"    />
+        <result property="coUnw"    column="co_unw"    />
+        <result property="bookKeeper"    column="book_keeper"    />
+        <result property="issType"    column="iss_type"    />
+        <result property="unwType"    column="unw_type"    />
+        <result property="issPrice"    column="iss_price"    />
+        <result property="target"    column="target"    />
+        <result property="bidType"    column="bid_type"    />
+        <result property="bidRegion"    column="bid_region"    />
+        <result property="bidDate"    column="bid_date"    />
+        <result property="bidTime"    column="bid_time"    />
+        <result property="bidAddr"    column="bid_addr"    />
+        <result property="winBidPrice"    column="win_bid_price"    />
+        <result property="winBidRegion"    column="win_bid_region"    />
+        <result property="subcMult"    column="subc_mult"    />
+        <result property="weightRate"    column="weight_rate"    />
+        <result property="fullCourtMult"    column="full_court_mult"    />
+        <result property="margRate"    column="marg_rate"    />
+        <result property="margMult"    column="marg_mult"    />
+        <result property="issRate"    column="iss_rate"    />
+        <result property="unwMenber"    column="unw_menber"    />
+        <result property="issOnlineNub"    column="iss_online_nub"    />
+        <result property="onlineSubcCode"    column="online_subc_code"    />
+        <result property="windBondTypeSecond"    column="wind_bond_type_second"    />
+        <result property="secondMixedCapitalBond"    column="second_mixed_capital_bond"    />
+        <result property="issStatus"    column="iss_status"    />
+        <result property="isCiBond"    column="is_ci_bond"    />
+        <result property="addIssStatus"    column="add_iss_status"    />
+        <result property="crossMarket"    column="cross_market"    />
+        <result property="denom"    column="denom"    />
+        <result property="govNewAmount"    column="gov_new_amount"    />
+        <result property="govReplaceAmount"    column="gov_replace_amount"    />
+    </resultMap>
+
+    <sql id="selectBondNewIssVo">
+        select id, trade_code, bond_short_name, iss_start_date, pay_date, iss_scale_plan, iss_amount_top, iss_scale, iss_term, special_term, bond_grade, enetity_grade, coupon_rate, ipoIss_yield, guide_rate, guide_rate_margin, float_rate, rate_type, pay_fre, anno_date, iss_end_date, ipo_date, ipo_addr, value_date, expire_date, bond_code_list, fund_use, special_rule, add_credit_method, assess_organ, bond_name, issor_short_name, issor_name, issor_industry_first, issor_industry_second, issor_entity_nature, issor_province, issor_city, sponsor, iss_sponsor_grade, sponsor_entity_nature, assure_rule, main_unw, fund_share, co_unw, book_keeper, iss_type, unw_type, iss_price, target, bid_type, bid_region, bid_date, bid_time, bid_addr, win_bid_price, win_bid_region, subc_mult, weight_rate, full_court_mult, marg_rate, marg_mult, iss_rate, unw_menber, iss_online_nub, online_subc_code, wind_bond_type_second, second_mixed_capital_bond, iss_status, is_ci_bond, add_iss_status, cross_market, denom, gov_new_amount, gov_replace_amount from bond_new_iss
+    </sql>
+
+    <select id="findLastByShortName" resultType="bondNewIss">
+        <include refid="selectBondNewIssVo"/>
+        where bond_name = #{shortName}
+        order by id desc
+        limit 1
+    </select>
+
+    <select id="findByShortName" resultType="bondNewIss">
+        <include refid="selectBondNewIssVo"/>
+        where bond_short_name = #{shortName}
+    </select>
+
+    <select id="selectBondNewIssList" parameterType="BondNewIss" resultMap="BondNewIssResult">
+        <include refid="selectBondNewIssVo"/>
+        <where>  
+            <if test="tradeCode != null  and tradeCode != ''"> and trade_code = #{tradeCode}</if>
+            <if test="bondShortName != null  and bondShortName != ''"> and bond_short_name like concat('%', #{bondShortName}, '%')</if>
+            <if test="issStartDate != null "> and iss_start_date = #{issStartDate}</if>
+            <if test="payDate != null "> and pay_date = #{payDate}</if>
+            <if test="issScalePlan != null "> and iss_scale_plan = #{issScalePlan}</if>
+            <if test="issAmountTop != null "> and iss_amount_top = #{issAmountTop}</if>
+            <if test="issScale != null "> and iss_scale = #{issScale}</if>
+            <if test="issTerm != null "> and iss_term = #{issTerm}</if>
+            <if test="specialTerm != null  and specialTerm != ''"> and special_term = #{specialTerm}</if>
+            <if test="bondGrade != null  and bondGrade != ''"> and bond_grade = #{bondGrade}</if>
+            <if test="enetityGrade != null  and enetityGrade != ''"> and enetity_grade = #{enetityGrade}</if>
+            <if test="couponRate != null "> and coupon_rate = #{couponRate}</if>
+            <if test="ipoissYield != null "> and ipoIss_yield = #{ipoissYield}</if>
+            <if test="guideRate != null "> and guide_rate = #{guideRate}</if>
+            <if test="guideRateMargin != null "> and guide_rate_margin = #{guideRateMargin}</if>
+            <if test="floatRate != null "> and float_rate = #{floatRate}</if>
+            <if test="rateType != null  and rateType != ''"> and rate_type = #{rateType}</if>
+            <if test="payFre != null "> and pay_fre = #{payFre}</if>
+            <if test="annoDate != null "> and anno_date = #{annoDate}</if>
+            <if test="issEndDate != null "> and iss_end_date = #{issEndDate}</if>
+            <if test="ipoDate != null "> and ipo_date = #{ipoDate}</if>
+            <if test="ipoAddr != null  and ipoAddr != ''"> and ipo_addr = #{ipoAddr}</if>
+            <if test="valueDate != null "> and value_date = #{valueDate}</if>
+            <if test="expireDate != null "> and expire_date = #{expireDate}</if>
+            <if test="bondCodeList != null  and bondCodeList != ''"> and bond_code_list = #{bondCodeList}</if>
+            <if test="fundUse != null  and fundUse != ''"> and fund_use = #{fundUse}</if>
+            <if test="specialRule != null  and specialRule != ''"> and special_rule = #{specialRule}</if>
+            <if test="addCreditMethod != null  and addCreditMethod != ''"> and add_credit_method = #{addCreditMethod}</if>
+            <if test="assessOrgan != null  and assessOrgan != ''"> and assess_organ = #{assessOrgan}</if>
+            <if test="bondName != null  and bondName != ''"> and bond_name like concat('%', #{bondName}, '%')</if>
+            <if test="issorShortName != null  and issorShortName != ''"> and issor_short_name like concat('%', #{issorShortName}, '%')</if>
+            <if test="issorName != null  and issorName != ''"> and issor_name like concat('%', #{issorName}, '%')</if>
+            <if test="issorIndustryFirst != null  and issorIndustryFirst != ''"> and issor_industry_first = #{issorIndustryFirst}</if>
+            <if test="issorIndustrySecond != null  and issorIndustrySecond != ''"> and issor_industry_second = #{issorIndustrySecond}</if>
+            <if test="issorEntityNature != null  and issorEntityNature != ''"> and issor_entity_nature = #{issorEntityNature}</if>
+            <if test="issorProvince != null  and issorProvince != ''"> and issor_province = #{issorProvince}</if>
+            <if test="issorCity != null  and issorCity != ''"> and issor_city = #{issorCity}</if>
+            <if test="sponsor != null  and sponsor != ''"> and sponsor = #{sponsor}</if>
+            <if test="issSponsorGrade != null  and issSponsorGrade != ''"> and iss_sponsor_grade = #{issSponsorGrade}</if>
+            <if test="sponsorEntityNature != null  and sponsorEntityNature != ''"> and sponsor_entity_nature = #{sponsorEntityNature}</if>
+            <if test="assureRule != null  and assureRule != ''"> and assure_rule = #{assureRule}</if>
+            <if test="mainUnw != null  and mainUnw != ''"> and main_unw = #{mainUnw}</if>
+            <if test="fundShare != null  and fundShare != ''"> and fund_share = #{fundShare}</if>
+            <if test="coUnw != null  and coUnw != ''"> and co_unw = #{coUnw}</if>
+            <if test="bookKeeper != null  and bookKeeper != ''"> and book_keeper = #{bookKeeper}</if>
+            <if test="issType != null  and issType != ''"> and iss_type = #{issType}</if>
+            <if test="unwType != null  and unwType != ''"> and unw_type = #{unwType}</if>
+            <if test="issPrice != null "> and iss_price = #{issPrice}</if>
+            <if test="target != null  and target != ''"> and target = #{target}</if>
+            <if test="bidType != null  and bidType != ''"> and bid_type = #{bidType}</if>
+            <if test="bidRegion != null  and bidRegion != ''"> and bid_region = #{bidRegion}</if>
+            <if test="bidDate != null "> and bid_date = #{bidDate}</if>
+            <if test="bidTime != null  and bidTime != ''"> and bid_time = #{bidTime}</if>
+            <if test="bidAddr != null  and bidAddr != ''"> and bid_addr = #{bidAddr}</if>
+            <if test="winBidPrice != null "> and win_bid_price = #{winBidPrice}</if>
+            <if test="winBidRegion != null  and winBidRegion != ''"> and win_bid_region = #{winBidRegion}</if>
+            <if test="subcMult != null "> and subc_mult = #{subcMult}</if>
+            <if test="weightRate != null "> and weight_rate = #{weightRate}</if>
+            <if test="fullCourtMult != null "> and full_court_mult = #{fullCourtMult}</if>
+            <if test="margRate != null "> and marg_rate = #{margRate}</if>
+            <if test="margMult != null "> and marg_mult = #{margMult}</if>
+            <if test="issRate != null "> and iss_rate = #{issRate}</if>
+            <if test="unwMenber != null  and unwMenber != ''"> and unw_menber = #{unwMenber}</if>
+            <if test="issOnlineNub != null "> and iss_online_nub = #{issOnlineNub}</if>
+            <if test="onlineSubcCode != null  and onlineSubcCode != ''"> and online_subc_code = #{onlineSubcCode}</if>
+            <if test="windBondTypeSecond != null  and windBondTypeSecond != ''"> and wind_bond_type_second = #{windBondTypeSecond}</if>
+            <if test="secondMixedCapitalBond != null  and secondMixedCapitalBond != ''"> and second_mixed_capital_bond = #{secondMixedCapitalBond}</if>
+            <if test="issStatus != null "> and iss_status = #{issStatus}</if>
+            <if test="isCiBond != null "> and is_ci_bond = #{isCiBond}</if>
+            <if test="addIssStatus != null "> and add_iss_status = #{addIssStatus}</if>
+            <if test="crossMarket != null "> and cross_market = #{crossMarket}</if>
+            <if test="denom != null "> and denom = #{denom}</if>
+            <if test="govNewAmount != null "> and gov_new_amount = #{govNewAmount}</if>
+            <if test="govReplaceAmount != null "> and gov_replace_amount = #{govReplaceAmount}</if>
+        </where>
+    </select>
+    
+    <select id="selectBondNewIssById" parameterType="Long" resultMap="BondNewIssResult">
+        <include refid="selectBondNewIssVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBondNewIss" parameterType="BondNewIss" useGeneratedKeys="true" keyProperty="id">
+        insert into bond_new_iss
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tradeCode != null">trade_code,</if>
+            <if test="bondShortName != null">bond_short_name,</if>
+            <if test="issStartDate != null">iss_start_date,</if>
+            <if test="payDate != null">pay_date,</if>
+            <if test="issScalePlan != null">iss_scale_plan,</if>
+            <if test="issAmountTop != null">iss_amount_top,</if>
+            <if test="issScale != null">iss_scale,</if>
+            <if test="issTerm != null">iss_term,</if>
+            <if test="specialTerm != null">special_term,</if>
+            <if test="bondGrade != null">bond_grade,</if>
+            <if test="enetityGrade != null">enetity_grade,</if>
+            <if test="couponRate != null">coupon_rate,</if>
+            <if test="ipoissYield != null">ipoIss_yield,</if>
+            <if test="guideRate != null">guide_rate,</if>
+            <if test="guideRateMargin != null">guide_rate_margin,</if>
+            <if test="floatRate != null">float_rate,</if>
+            <if test="rateType != null">rate_type,</if>
+            <if test="payFre != null">pay_fre,</if>
+            <if test="annoDate != null">anno_date,</if>
+            <if test="issEndDate != null">iss_end_date,</if>
+            <if test="ipoDate != null">ipo_date,</if>
+            <if test="ipoAddr != null">ipo_addr,</if>
+            <if test="valueDate != null">value_date,</if>
+            <if test="expireDate != null">expire_date,</if>
+            <if test="bondCodeList != null">bond_code_list,</if>
+            <if test="fundUse != null">fund_use,</if>
+            <if test="specialRule != null">special_rule,</if>
+            <if test="addCreditMethod != null">add_credit_method,</if>
+            <if test="assessOrgan != null">assess_organ,</if>
+            <if test="bondName != null">bond_name,</if>
+            <if test="issorShortName != null">issor_short_name,</if>
+            <if test="issorName != null">issor_name,</if>
+            <if test="issorIndustryFirst != null">issor_industry_first,</if>
+            <if test="issorIndustrySecond != null">issor_industry_second,</if>
+            <if test="issorEntityNature != null">issor_entity_nature,</if>
+            <if test="issorProvince != null">issor_province,</if>
+            <if test="issorCity != null">issor_city,</if>
+            <if test="sponsor != null">sponsor,</if>
+            <if test="issSponsorGrade != null">iss_sponsor_grade,</if>
+            <if test="sponsorEntityNature != null">sponsor_entity_nature,</if>
+            <if test="assureRule != null">assure_rule,</if>
+            <if test="mainUnw != null">main_unw,</if>
+            <if test="fundShare != null">fund_share,</if>
+            <if test="coUnw != null">co_unw,</if>
+            <if test="bookKeeper != null">book_keeper,</if>
+            <if test="issType != null">iss_type,</if>
+            <if test="unwType != null">unw_type,</if>
+            <if test="issPrice != null">iss_price,</if>
+            <if test="target != null">target,</if>
+            <if test="bidType != null">bid_type,</if>
+            <if test="bidRegion != null">bid_region,</if>
+            <if test="bidDate != null">bid_date,</if>
+            <if test="bidTime != null">bid_time,</if>
+            <if test="bidAddr != null">bid_addr,</if>
+            <if test="winBidPrice != null">win_bid_price,</if>
+            <if test="winBidRegion != null">win_bid_region,</if>
+            <if test="subcMult != null">subc_mult,</if>
+            <if test="weightRate != null">weight_rate,</if>
+            <if test="fullCourtMult != null">full_court_mult,</if>
+            <if test="margRate != null">marg_rate,</if>
+            <if test="margMult != null">marg_mult,</if>
+            <if test="issRate != null">iss_rate,</if>
+            <if test="unwMenber != null">unw_menber,</if>
+            <if test="issOnlineNub != null">iss_online_nub,</if>
+            <if test="onlineSubcCode != null">online_subc_code,</if>
+            <if test="windBondTypeSecond != null">wind_bond_type_second,</if>
+            <if test="secondMixedCapitalBond != null">second_mixed_capital_bond,</if>
+            <if test="issStatus != null">iss_status,</if>
+            <if test="isCiBond != null">is_ci_bond,</if>
+            <if test="addIssStatus != null">add_iss_status,</if>
+            <if test="crossMarket != null">cross_market,</if>
+            <if test="denom != null">denom,</if>
+            <if test="govNewAmount != null">gov_new_amount,</if>
+            <if test="govReplaceAmount != null">gov_replace_amount,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tradeCode != null">#{tradeCode},</if>
+            <if test="bondShortName != null">#{bondShortName},</if>
+            <if test="issStartDate != null">#{issStartDate},</if>
+            <if test="payDate != null">#{payDate},</if>
+            <if test="issScalePlan != null">#{issScalePlan},</if>
+            <if test="issAmountTop != null">#{issAmountTop},</if>
+            <if test="issScale != null">#{issScale},</if>
+            <if test="issTerm != null">#{issTerm},</if>
+            <if test="specialTerm != null">#{specialTerm},</if>
+            <if test="bondGrade != null">#{bondGrade},</if>
+            <if test="enetityGrade != null">#{enetityGrade},</if>
+            <if test="couponRate != null">#{couponRate},</if>
+            <if test="ipoissYield != null">#{ipoissYield},</if>
+            <if test="guideRate != null">#{guideRate},</if>
+            <if test="guideRateMargin != null">#{guideRateMargin},</if>
+            <if test="floatRate != null">#{floatRate},</if>
+            <if test="rateType != null">#{rateType},</if>
+            <if test="payFre != null">#{payFre},</if>
+            <if test="annoDate != null">#{annoDate},</if>
+            <if test="issEndDate != null">#{issEndDate},</if>
+            <if test="ipoDate != null">#{ipoDate},</if>
+            <if test="ipoAddr != null">#{ipoAddr},</if>
+            <if test="valueDate != null">#{valueDate},</if>
+            <if test="expireDate != null">#{expireDate},</if>
+            <if test="bondCodeList != null">#{bondCodeList},</if>
+            <if test="fundUse != null">#{fundUse},</if>
+            <if test="specialRule != null">#{specialRule},</if>
+            <if test="addCreditMethod != null">#{addCreditMethod},</if>
+            <if test="assessOrgan != null">#{assessOrgan},</if>
+            <if test="bondName != null">#{bondName},</if>
+            <if test="issorShortName != null">#{issorShortName},</if>
+            <if test="issorName != null">#{issorName},</if>
+            <if test="issorIndustryFirst != null">#{issorIndustryFirst},</if>
+            <if test="issorIndustrySecond != null">#{issorIndustrySecond},</if>
+            <if test="issorEntityNature != null">#{issorEntityNature},</if>
+            <if test="issorProvince != null">#{issorProvince},</if>
+            <if test="issorCity != null">#{issorCity},</if>
+            <if test="sponsor != null">#{sponsor},</if>
+            <if test="issSponsorGrade != null">#{issSponsorGrade},</if>
+            <if test="sponsorEntityNature != null">#{sponsorEntityNature},</if>
+            <if test="assureRule != null">#{assureRule},</if>
+            <if test="mainUnw != null">#{mainUnw},</if>
+            <if test="fundShare != null">#{fundShare},</if>
+            <if test="coUnw != null">#{coUnw},</if>
+            <if test="bookKeeper != null">#{bookKeeper},</if>
+            <if test="issType != null">#{issType},</if>
+            <if test="unwType != null">#{unwType},</if>
+            <if test="issPrice != null">#{issPrice},</if>
+            <if test="target != null">#{target},</if>
+            <if test="bidType != null">#{bidType},</if>
+            <if test="bidRegion != null">#{bidRegion},</if>
+            <if test="bidDate != null">#{bidDate},</if>
+            <if test="bidTime != null">#{bidTime},</if>
+            <if test="bidAddr != null">#{bidAddr},</if>
+            <if test="winBidPrice != null">#{winBidPrice},</if>
+            <if test="winBidRegion != null">#{winBidRegion},</if>
+            <if test="subcMult != null">#{subcMult},</if>
+            <if test="weightRate != null">#{weightRate},</if>
+            <if test="fullCourtMult != null">#{fullCourtMult},</if>
+            <if test="margRate != null">#{margRate},</if>
+            <if test="margMult != null">#{margMult},</if>
+            <if test="issRate != null">#{issRate},</if>
+            <if test="unwMenber != null">#{unwMenber},</if>
+            <if test="issOnlineNub != null">#{issOnlineNub},</if>
+            <if test="onlineSubcCode != null">#{onlineSubcCode},</if>
+            <if test="windBondTypeSecond != null">#{windBondTypeSecond},</if>
+            <if test="secondMixedCapitalBond != null">#{secondMixedCapitalBond},</if>
+            <if test="issStatus != null">#{issStatus},</if>
+            <if test="isCiBond != null">#{isCiBond},</if>
+            <if test="addIssStatus != null">#{addIssStatus},</if>
+            <if test="crossMarket != null">#{crossMarket},</if>
+            <if test="denom != null">#{denom},</if>
+            <if test="govNewAmount != null">#{govNewAmount},</if>
+            <if test="govReplaceAmount != null">#{govReplaceAmount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBondNewIss" parameterType="BondNewIss">
+        update bond_new_iss
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tradeCode != null">trade_code = #{tradeCode},</if>
+            <if test="bondShortName != null">bond_short_name = #{bondShortName},</if>
+            <if test="issStartDate != null">iss_start_date = #{issStartDate},</if>
+            <if test="payDate != null">pay_date = #{payDate},</if>
+            <if test="issScalePlan != null">iss_scale_plan = #{issScalePlan},</if>
+            <if test="issAmountTop != null">iss_amount_top = #{issAmountTop},</if>
+            <if test="issScale != null">iss_scale = #{issScale},</if>
+            <if test="issTerm != null">iss_term = #{issTerm},</if>
+            <if test="specialTerm != null">special_term = #{specialTerm},</if>
+            <if test="bondGrade != null">bond_grade = #{bondGrade},</if>
+            <if test="enetityGrade != null">enetity_grade = #{enetityGrade},</if>
+            <if test="couponRate != null">coupon_rate = #{couponRate},</if>
+            <if test="ipoissYield != null">ipoIss_yield = #{ipoissYield},</if>
+            <if test="guideRate != null">guide_rate = #{guideRate},</if>
+            <if test="guideRateMargin != null">guide_rate_margin = #{guideRateMargin},</if>
+            <if test="floatRate != null">float_rate = #{floatRate},</if>
+            <if test="rateType != null">rate_type = #{rateType},</if>
+            <if test="payFre != null">pay_fre = #{payFre},</if>
+            <if test="annoDate != null">anno_date = #{annoDate},</if>
+            <if test="issEndDate != null">iss_end_date = #{issEndDate},</if>
+            <if test="ipoDate != null">ipo_date = #{ipoDate},</if>
+            <if test="ipoAddr != null">ipo_addr = #{ipoAddr},</if>
+            <if test="valueDate != null">value_date = #{valueDate},</if>
+            <if test="expireDate != null">expire_date = #{expireDate},</if>
+            <if test="bondCodeList != null">bond_code_list = #{bondCodeList},</if>
+            <if test="fundUse != null">fund_use = #{fundUse},</if>
+            <if test="specialRule != null">special_rule = #{specialRule},</if>
+            <if test="addCreditMethod != null">add_credit_method = #{addCreditMethod},</if>
+            <if test="assessOrgan != null">assess_organ = #{assessOrgan},</if>
+            <if test="bondName != null">bond_name = #{bondName},</if>
+            <if test="issorShortName != null">issor_short_name = #{issorShortName},</if>
+            <if test="issorName != null">issor_name = #{issorName},</if>
+            <if test="issorIndustryFirst != null">issor_industry_first = #{issorIndustryFirst},</if>
+            <if test="issorIndustrySecond != null">issor_industry_second = #{issorIndustrySecond},</if>
+            <if test="issorEntityNature != null">issor_entity_nature = #{issorEntityNature},</if>
+            <if test="issorProvince != null">issor_province = #{issorProvince},</if>
+            <if test="issorCity != null">issor_city = #{issorCity},</if>
+            <if test="sponsor != null">sponsor = #{sponsor},</if>
+            <if test="issSponsorGrade != null">iss_sponsor_grade = #{issSponsorGrade},</if>
+            <if test="sponsorEntityNature != null">sponsor_entity_nature = #{sponsorEntityNature},</if>
+            <if test="assureRule != null">assure_rule = #{assureRule},</if>
+            <if test="mainUnw != null">main_unw = #{mainUnw},</if>
+            <if test="fundShare != null">fund_share = #{fundShare},</if>
+            <if test="coUnw != null">co_unw = #{coUnw},</if>
+            <if test="bookKeeper != null">book_keeper = #{bookKeeper},</if>
+            <if test="issType != null">iss_type = #{issType},</if>
+            <if test="unwType != null">unw_type = #{unwType},</if>
+            <if test="issPrice != null">iss_price = #{issPrice},</if>
+            <if test="target != null">target = #{target},</if>
+            <if test="bidType != null">bid_type = #{bidType},</if>
+            <if test="bidRegion != null">bid_region = #{bidRegion},</if>
+            <if test="bidDate != null">bid_date = #{bidDate},</if>
+            <if test="bidTime != null">bid_time = #{bidTime},</if>
+            <if test="bidAddr != null">bid_addr = #{bidAddr},</if>
+            <if test="winBidPrice != null">win_bid_price = #{winBidPrice},</if>
+            <if test="winBidRegion != null">win_bid_region = #{winBidRegion},</if>
+            <if test="subcMult != null">subc_mult = #{subcMult},</if>
+            <if test="weightRate != null">weight_rate = #{weightRate},</if>
+            <if test="fullCourtMult != null">full_court_mult = #{fullCourtMult},</if>
+            <if test="margRate != null">marg_rate = #{margRate},</if>
+            <if test="margMult != null">marg_mult = #{margMult},</if>
+            <if test="issRate != null">iss_rate = #{issRate},</if>
+            <if test="unwMenber != null">unw_menber = #{unwMenber},</if>
+            <if test="issOnlineNub != null">iss_online_nub = #{issOnlineNub},</if>
+            <if test="onlineSubcCode != null">online_subc_code = #{onlineSubcCode},</if>
+            <if test="windBondTypeSecond != null">wind_bond_type_second = #{windBondTypeSecond},</if>
+            <if test="secondMixedCapitalBond != null">second_mixed_capital_bond = #{secondMixedCapitalBond},</if>
+            <if test="issStatus != null">iss_status = #{issStatus},</if>
+            <if test="isCiBond != null">is_ci_bond = #{isCiBond},</if>
+            <if test="addIssStatus != null">add_iss_status = #{addIssStatus},</if>
+            <if test="crossMarket != null">cross_market = #{crossMarket},</if>
+            <if test="denom != null">denom = #{denom},</if>
+            <if test="govNewAmount != null">gov_new_amount = #{govNewAmount},</if>
+            <if test="govReplaceAmount != null">gov_replace_amount = #{govReplaceAmount},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBondNewIssById" parameterType="Long">
+        delete from bond_new_iss where id = #{id}
+    </delete>
+
+    <delete id="deleteBondNewIssByIds" parameterType="String">
+        delete from bond_new_iss where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

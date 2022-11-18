@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.CrmWindTaskMapper">
+    
+    <resultMap type="com.deloitte.crm.domain.CrmWindTask" id="CrmWindTaskResult">
+        <result property="id"    column="id"   />
+        <result property="taskDictId"    column="task_dict_id"    />
+        <result property="taskDesc"    column="task_desc"    />
+        <result property="taskDate"    column="task_date"    />
+        <result property="taskFileName"    column="task_file_name"    />
+        <result property="taskCategory"    column="task_category"    />
+        <result property="imported"    column="imported"    />
+        <result property="confirmInsert"    column="confirm_insert"    />
+        <result property="confirmUpdate"    column="confirm_update"    />
+        <result property="complete"    column="complete"    />
+        <result property="handleUser"    column="handle_user"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+        <result property="remarks"    column="remarks"    />
+    </resultMap>
+
+    <sql id="selectCrmWindTaskVo">
+        select id, task_dict_id, task_desc, task_date, task_file_name, task_category, imported, confirm_insert, confirm_update, complete, handle_user, created, updated, remarks from crm_wind_task
+    </sql>
+
+    <select id="selectCrmWindTaskList" parameterType="CrmWindTask" resultMap="CrmWindTaskResult">
+        <include refid="selectCrmWindTaskVo"/>
+        <where>  
+            <if test="taskDictId != null "> and task_dict_id = #{taskDictId}</if>
+            <if test="taskDesc != null  and taskDesc != ''"> and task_desc = #{taskDesc}</if>
+            <if test="taskDate != null "> and task_date = #{taskDate}</if>
+            <if test="taskFileName != null  and taskFileName != ''"> and task_file_name like concat('%', #{taskFileName}, '%')</if>
+            <if test="taskCategory != null  and taskCategory != ''"> and task_category = #{taskCategory}</if>
+            <if test="imported != null "> and imported = #{imported}</if>
+            <if test="confirmInsert != null "> and confirm_insert = #{confirmInsert}</if>
+            <if test="confirmUpdate != null "> and confirm_update = #{confirmUpdate}</if>
+            <if test="complete != null "> and complete = #{complete}</if>
+            <if test="handleUser != null "> and handle_user = #{handleUser}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+            <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
+        </where>
+    </select>
+    
+    <select id="selectCrmWindTaskById" parameterType="Long" resultMap="CrmWindTaskResult" >
+        <include refid="selectCrmWindTaskVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectComWindByDate" resultType="com.deloitte.crm.dto.CrmWindTaskDto" parameterType="string">
+        SELECT
+            task_category,
+            task_cate_id,
+            task_category task_desc,
+            COUNT( id ) AS taskCount,
+            COUNT(
+                    IF
+                        ( complete = 1, TRUE, NULL )) AS complete
+        FROM
+            crm_wind_task
+        WHERE
+            task_date = #{taskDate}
+        GROUP BY
+            task_cate_id
+    </select>
+
+    <select id="selctCrmCount" resultType="com.deloitte.crm.dto.TaskDto" parameterType="string">
+        SELECT COUNT(id) AS taskCount,COUNT(if(complete != 1,TRUE,NULL)) AS taskNoCount,COUNT(if(complete = 1,TRUE,NULL)) AS taskCop FROM crm_wind_task WHERE task_date = #{taskDate}
+    </select>
+
+    <insert id="insertCrmWindTask" parameterType="com.deloitte.crm.domain.CrmWindTask" useGeneratedKeys="true" keyProperty="id">
+        insert into crm_wind_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="taskDictId != null">task_dict_id,</if>
+            <if test="taskDesc != null">task_desc,</if>
+            <if test="taskDate != null">task_date,</if>
+            <if test="taskFileName != null">task_file_name,</if>
+            <if test="taskCategory != null">task_category,</if>
+            <if test="imported != null">imported,</if>
+            <if test="confirmInsert != null">confirm_insert,</if>
+            <if test="confirmUpdate != null">confirm_update,</if>
+            <if test="complete != null">complete,</if>
+            <if test="handleUser != null">handle_user,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+            <if test="remarks != null">remarks,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="taskDictId != null">#{taskDictId},</if>
+            <if test="taskDesc != null">#{taskDesc},</if>
+            <if test="taskDate != null">#{taskDate},</if>
+            <if test="taskFileName != null">#{taskFileName},</if>
+            <if test="taskCategory != null">#{taskCategory},</if>
+            <if test="imported != null">#{imported},</if>
+            <if test="confirmInsert != null">#{confirmInsert},</if>
+            <if test="confirmUpdate != null">#{confirmUpdate},</if>
+            <if test="complete != null">#{complete},</if>
+            <if test="handleUser != null">#{handleUser},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+            <if test="remarks != null">#{remarks},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCrmWindTask" parameterType="com.deloitte.crm.domain.CrmWindTask">
+        update crm_wind_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskDictId != null">task_dict_id = #{taskDictId},</if>
+            <if test="taskDesc != null">task_desc = #{taskDesc},</if>
+            <if test="taskDate != null">task_date = #{taskDate},</if>
+            <if test="taskFileName != null">task_file_name = #{taskFileName},</if>
+            <if test="taskCategory != null">task_category = #{taskCategory},</if>
+            <if test="imported != null">imported = #{imported},</if>
+            <if test="confirmInsert != null">confirm_insert = #{confirmInsert},</if>
+            <if test="confirmUpdate != null">confirm_update = #{confirmUpdate},</if>
+            <if test="complete != null">complete = #{complete},</if>
+            <if test="handleUser != null">handle_user = #{handleUser},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+            <if test="remarks != null">remarks = #{remarks},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCrmWindTaskById" parameterType="Long">
+        delete from crm_wind_task where id = #{id}
+    </delete>
+
+    <delete id="deleteCrmWindTaskByIds" parameterType="String">
+        delete from crm_wind_task where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

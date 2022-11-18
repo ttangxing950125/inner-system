@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.GovInfoMapper">
+
+    <resultMap type="GovInfo" id="GovInfoResult">
+        <result property="id" column="id"/>
+        <result property="govName" column="gov_name"/>
+        <result property="govCode" column="gov_code"/>
+        <result property="dqGovCode" column="dq_gov_code"/>
+        <result property="govType" column="gov_type"/>
+        <result property="provincial" column="provincial"/>
+        <result property="cityGroup" column="city_group"/>
+        <result property="countryCenter" column="country_center"/>
+        <result property="economyRegion" column="economy_region"/>
+        <result property="govLevelBig" column="gov_level_big"/>
+        <result property="govLevelSmall" column="gov_level_small"/>
+        <result property="govNameHis" column="gov_name_his"/>
+        <result property="entityNameHisRemarks" column="entity_name_his_remarks"/>
+        <result property="creditErrorRemark" column="credit_error_remark"/>
+        <result property="invalid" column="invalid"/>
+        <result property="newGovName" column="new_gov_name"/>
+        <result property="newDqCode" column="new_dq_code"/>
+        <result property="newGovCode" column="new_gov_code"/>
+        <result property="creater" column="creater"/>
+        <result property="updater" column="updater"/>
+        <result property="created" column="created"/>
+        <result property="updated" column="updated"/>
+    </resultMap>
+
+    <sql id="selectGovInfoVo">
+        select id, gov_name, gov_code, dq_gov_code,economy_region,provincial,city_group,country_center, gov_type, gov_level_big,
+        gov_level_small, gov_name_his, entity_name_his_remarks, invalid, new_gov_name, new_dq_code, new_gov_code, creater,
+        updater, created, updated from gov_info
+    </sql>
+
+    <select id="selectGovInfoList" parameterType="GovInfo" resultMap="GovInfoResult">
+        <include refid="selectGovInfoVo"/>
+        <where>
+            <if test="govName != null  and govName != ''">and gov_name like concat('%', #{govName}, '%')</if>
+            <if test="govCode != null  and govCode != ''">and gov_code = #{govCode}</if>
+            <if test="dqGovCode != null  and dqGovCode != ''">and dq_gov_code = #{dqGovCode}</if>
+            <if test="govType != null ">and gov_type = #{govType}</if>
+            <if test="govLevelBig != null ">and gov_level_big = #{govLevelBig}</if>
+            <if test="govLevelSmall != null ">and gov_level_small = #{govLevelSmall}</if>
+            <if test="govNameHis != null  and govNameHis != ''">and gov_name_his = #{govNameHis}</if>
+            <if test="entityNameHisRemarks != null  and entityNameHisRemarks != ''">and entity_name_his_remarks =
+                #{entityNameHisRemarks}
+            </if>
+            <if test="invalid != null ">and invalid = #{invalid}</if>
+            <if test="newGovName != null  and newGovName != ''">and new_gov_name like concat('%', #{newGovName}, '%')
+            </if>
+            <if test="newDqCode != null  and newDqCode != ''">and new_dq_code = #{newDqCode}</if>
+            <if test="newGovCode != null  and newGovCode != ''">and new_gov_code = #{newGovCode}</if>
+            <if test="creater != null  and creater != ''">and creater = #{creater}</if>
+            <if test="updater != null  and updater != ''">and updater = #{updater}</if>
+            <if test="created != null ">and created = #{created}</if>
+            <if test="updated != null ">and updated = #{updated}</if>
+        </where>
+    </select>
+
+    <select id="selectGovInfoById" parameterType="Long" resultMap="GovInfoResult">
+        <include refid="selectGovInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertGovInfo" parameterType="GovInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into gov_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="govName != null">gov_name,</if>
+            <if test="govCode != null">gov_code,</if>
+            <if test="dqGovCode != null">dq_gov_code,</if>
+            <if test="govType != null">gov_type,</if>
+            <if test="govLevelBig != null">gov_level_big,</if>
+            <if test="govLevelSmall != null">gov_level_small,</if>
+            <if test="govNameHis != null">gov_name_his,</if>
+            <if test="entityNameHisRemarks != null">entity_name_his_remarks,</if>
+            <if test="invalid != null">invalid,</if>
+            <if test="newGovName != null">new_gov_name,</if>
+            <if test="newDqCode != null">new_dq_code,</if>
+            <if test="newGovCode != null">new_gov_code,</if>
+            <if test="creater != null">creater,</if>
+            <if test="updater != null">updater,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="govName != null">#{govName},</if>
+            <if test="govCode != null">#{govCode},</if>
+            <if test="dqGovCode != null">#{dqGovCode},</if>
+            <if test="govType != null">#{govType},</if>
+            <if test="govLevelBig != null">#{govLevelBig},</if>
+            <if test="govLevelSmall != null">#{govLevelSmall},</if>
+            <if test="govNameHis != null">#{govNameHis},</if>
+            <if test="entityNameHisRemarks != null">#{entityNameHisRemarks},</if>
+            <if test="invalid != null">#{invalid},</if>
+            <if test="newGovName != null">#{newGovName},</if>
+            <if test="newDqCode != null">#{newDqCode},</if>
+            <if test="newGovCode != null">#{newGovCode},</if>
+            <if test="creater != null">#{creater},</if>
+            <if test="updater != null">#{updater},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGovInfo" parameterType="GovInfo">
+        update gov_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="govName != null">gov_name = #{govName},</if>
+            <if test="govCode != null">gov_code = #{govCode},</if>
+            <if test="dqGovCode != null">dq_gov_code = #{dqGovCode},</if>
+            <if test="govType != null">gov_type = #{govType},</if>
+            <if test="govLevelBig != null">gov_level_big = #{govLevelBig},</if>
+            <if test="govLevelSmall != null">gov_level_small = #{govLevelSmall},</if>
+            <if test="govNameHis != null">gov_name_his = #{govNameHis},</if>
+            <if test="entityNameHisRemarks != null">entity_name_his_remarks = #{entityNameHisRemarks},</if>
+            <if test="invalid != null">invalid = #{invalid},</if>
+            <if test="newGovName != null">new_gov_name = #{newGovName},</if>
+            <if test="newDqCode != null">new_dq_code = #{newDqCode},</if>
+            <if test="newGovCode != null">new_gov_code = #{newGovCode},</if>
+            <if test="creater != null">creater = #{creater},</if>
+            <if test="updater != null">updater = #{updater},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectGovInfoListByTypeAndParam" resultMap="GovInfoResult">
+        <include refid="selectGovInfoVo"/>
+        <where>
+            <if test="type != null  and type != '' ">and gov_type = #{type}</if>
+            <if test="param != null  and param != ''">and gov_name like concat('%', #{param}, '%')or dq_gov_code
+                like concat('%', #{param}, '%')
+            </if>
+        </where>
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="selectGovInfoCountByTypeAndParam" resultType="java.lang.Integer">
+        select count(0) from gov_info
+        <where>
+            <if test="type != null  and type != '' ">and gov_type = #{type}</if>
+            <if test="param != null  and param != ''">and gov_name like concat('%', #{param}, '%')or dq_gov_code
+                like concat('%', #{param}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectCountByGroup" parameterType="java.lang.String" resultMap="GovInfoResult">
+        SELECT * FROM gov_info WHERE dq_gov_code = CONCAT(#{param}, gov_code)
+    </select>
+
+    <select id="getGovByname" parameterType="java.lang.String" resultType="com.deloitte.crm.dto.GovInfoBynameDto">
+        SELECT gv.gov_name,gv.dq_gov_code,gl.`name` FROM gov_info gv INNER JOIN gov_level gl ON gv.gov_level_small=gl.id WHERE gv.gov_name LIKE concat('%', #{govName}, '%')
+    </select>
+
+
+    <delete id="deleteGovInfoById" parameterType="Long">
+        delete from gov_info where id = #{id}
+    </delete>
+
+    <delete id="deleteGovInfoByIds" parameterType="String">
+        delete from gov_info where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getGovByAttrValue" parameterType="com.deloitte.crm.domain.dto.GovAttrByDto"
+            resultType="com.deloitte.crm.domain.GovInfo">
+        SELECT DISTINCT * FROM gov_info
+        <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
+                or (provincial != null  and provincial != '')or (gegphZone != null  and gegphZone != '')">
+            <where>
+                <if test="isProvince != null  and isProvince != ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isProvince" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="isProvince != null  and isProvince != ''and isCity != null  and isCity != ''">or</if>
+                <if test="isCity != null  and isCity != ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != ''))and (isCounty != null  and isCounty != '')">
+                    or
+                </if>
+                <if test="isCounty != null  and isCounty!= ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isCounty" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != ''))and (isJKGX != null  and isJKGX != '')">
+                    or
+                </if>
+                <if test="isJKGX != null  and isJKGX !=''">
+                    gov_level_small in
+                    <foreach item="item" collection="isJKGX" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != ''))and (hundred != null  and hundred != '')">
+                    or
+                </if>
+                <if test="hundred != null  and hundred !=''">
+                    hundred  IN
+                    <foreach item="item" collection="hundred" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != ''))and (govScale != null  and govScale != '')">
+                    or
+                </if>
+                <if test="govScale != null  and govScale !=''">
+                    gov_scale IN
+                    <foreach item="item" collection="govScale" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != ''))and (govGrading != null  and govGrading != '')">
+                    or
+                </if>
+                <if test="govGrading != null  and govGrading !=''">
+                    gov_grading in
+                    <foreach item="item" collection="govGrading" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != ''))and (eightER != null  and eightER != '')">
+                    or
+                </if>
+                <if test="eightER != null  and eightER !=''">
+                    economy_region in
+                    <foreach item="item" collection="eightER" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != ''))and (nineteenCity != null  and nineteenCity != '')">
+                    or
+                </if>
+                <if test=" nineteenCity != null and  nineteenCity !='' ">
+                    city_group in
+                    <foreach item="item" collection="nineteenCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != ''))and (CCity != null  and CCity != '')">
+                    or
+                </if>
+                <if test="CCity != null  and CCity !=''">
+                    country_center in
+                    <foreach item="item" collection="CCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != ''))and (provincial != null  and provincial != '')">
+                    or
+                </if>
+                <if test="provincial != null  and provincial !=''">
+                    provincial in
+                    <foreach item="item" collection="provincial" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')or (provincial != null  and provincial != ''))and (gegphZone != null  and gegphZone != '')">
+                    or
+                </if>
+                <if test="gegphZone != null  and gegphZone !=''">
+                    gegph_zone in
+                    <foreach item="item" collection="gegphZone" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+        order BY id asc
+    </select>
+
+    <select id="getGovByAttrValueByPage" parameterType="com.deloitte.crm.domain.dto.GovAttrByDto"
+            resultType="com.deloitte.crm.domain.GovInfo">
+        SELECT DISTINCT * FROM gov_info
+        <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
+                or (provincial != null  and provincial != '')or (gegphZone != null  and gegphZone != '')">
+            <where>
+                <if test="isProvince != null  and isProvince != ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isProvince" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="isProvince != null  and isProvince != ''and isCity != null  and isCity != ''">or</if>
+                <if test="isCity != null  and isCity != ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != ''))and (isCounty != null  and isCounty != '')">
+                    or
+                </if>
+                <if test="isCounty != null  and isCounty!= ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isCounty" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != ''))and (isJKGX != null  and isJKGX != '')">
+                    or
+                </if>
+                <if test="isJKGX != null  and isJKGX !=''">
+                    gov_level_small in
+                    <foreach item="item" collection="isJKGX" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != ''))and (hundred != null  and hundred != '')">
+                    or
+                </if>
+                <if test="hundred != null  and hundred !=''">
+                    hundred  IN
+                    <foreach item="item" collection="hundred" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != ''))and (govScale != null  and govScale != '')">
+                    or
+                </if>
+                <if test="govScale != null  and govScale !=''">
+                    gov_scale IN
+                    <foreach item="item" collection="govScale" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != ''))and (govGrading != null  and govGrading != '')">
+                    or
+                </if>
+                <if test="govGrading != null  and govGrading !=''">
+                    gov_grading in
+                    <foreach item="item" collection="govGrading" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != ''))and (eightER != null  and eightER != '')">
+                    or
+                </if>
+                <if test="eightER != null  and eightER !=''">
+                    economy_region in
+                    <foreach item="item" collection="eightER" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != ''))and (nineteenCity != null  and nineteenCity != '')">
+                    or
+                </if>
+                <if test=" nineteenCity != null and  nineteenCity !='' ">
+                    city_group in
+                    <foreach item="item" collection="nineteenCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != ''))and (CCity != null  and CCity != '')">
+                    or
+                </if>
+                <if test="CCity != null  and CCity !=''">
+                    country_center in
+                    <foreach item="item" collection="CCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != ''))and (provincial != null  and provincial != '')">
+                    or
+                </if>
+                <if test="provincial != null  and provincial !=''">
+                    provincial in
+                    <foreach item="item" collection="provincial" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')or (provincial != null  and provincial != ''))and (gegphZone != null  and gegphZone != '')">
+                    or
+                </if>
+                <if test="gegphZone != null  and gegphZone !=''">
+                    gegph_zone in
+                    <foreach item="item" collection="gegphZone" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+        order BY id asc
+        limit #{pageNum},#{pageSize}
+    </select>
+
+    <select id="getGovCountByAttrValue" parameterType="com.deloitte.crm.domain.dto.GovAttrByDto"
+            resultType="java.lang.Integer">
+        SELECT count(0) FROM gov_info
+        <if test="(isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')
+                or (provincial != null  and provincial != '')or (gegphZone != null  and gegphZone != '')">
+            <where>
+                <if test="isProvince != null  and isProvince != ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isProvince" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="isProvince != null  and isProvince != ''and isCity != null  and isCity != ''">or</if>
+                <if test="isCity != null  and isCity != ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != ''))and (isCounty != null  and isCounty != '')">
+                    or
+                </if>
+                <if test="isCounty != null  and isCounty!= ''">
+                    gov_level_small in
+                    <foreach item="item" collection="isCounty" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != ''))and (isJKGX != null  and isJKGX != '')">
+                    or
+                </if>
+                <if test="isJKGX != null  and isJKGX !=''">
+                    gov_level_small in
+                    <foreach item="item" collection="isJKGX" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != ''))and (hundred != null  and hundred != '')">
+                    or
+                </if>
+                <if test="hundred != null  and hundred !=''">
+                    hundred  IN
+                    <foreach item="item" collection="hundred" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != ''))and (govScale != null  and govScale != '')">
+                    or
+                </if>
+                <if test="govScale != null  and govScale !=''">
+                    gov_scale IN
+                    <foreach item="item" collection="govScale" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != ''))and (govGrading != null  and govGrading != '')">
+                    or
+                </if>
+                <if test="govGrading != null  and govGrading !=''">
+                    gov_grading in
+                    <foreach item="item" collection="govGrading" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != ''))and (eightER != null  and eightER != '')">
+                    or
+                </if>
+                <if test="eightER != null  and eightER !=''">
+                    economy_region in
+                    <foreach item="item" collection="eightER" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != ''))and (nineteenCity != null  and nineteenCity != '')">
+                    or
+                </if>
+                <if test=" nineteenCity != null and  nineteenCity !='' ">
+                    city_group in
+                    <foreach item="item" collection="nineteenCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != ''))and (CCity != null  and CCity != '')">
+                    or
+                </if>
+                <if test="CCity != null  and CCity !=''">
+                    country_center in
+                    <foreach item="item" collection="CCity" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != ''))and (provincial != null  and provincial != '')">
+                    or
+                </if>
+                <if test="provincial != null  and provincial !=''">
+                    provincial in
+                    <foreach item="item" collection="provincial" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+
+                <if test="((isProvince != null  and isProvince != '')or (isCity != null  and isCity != '')or (isCounty != null  and isCounty != '') or(isJKGX != null  and isJKGX != '')or(hundred != null  and hundred != '') or (govScale != null  and govScale != '')or(govGrading != null  and govGrading != '')or(eightER != null  and eightER != '')or(nineteenCity != null  and nineteenCity != '')or(CCity != null  and CCity != '')or (provincial != null  and provincial != ''))and (gegphZone != null  and gegphZone != '')">
+                    or
+                </if>
+                <if test="gegphZone != null  and gegphZone !=''">
+                    gegph_zone in
+                    <foreach item="item" collection="gegphZone" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+    </select>
+</mapper>

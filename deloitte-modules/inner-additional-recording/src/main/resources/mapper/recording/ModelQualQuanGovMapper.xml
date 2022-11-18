@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.center.ModelQualFactorMapper">
+
+
+    <select id="findQualByPre" resultType="com.deloitte.additional.recording.dto.ModerQuanAndQualFactorDto">
+
+        SELECT qual_id AS id,
+               `name`,
+               `code`,
+               '1' as 'type',model_code
+        FROM `#{prefix}_model_qual_factor`
+      WHERE model_code = #{modelCode}  ORDER BY  id desc
+
+    </select>
+
+
+    <select id="findQuanByPre" resultType="com.deloitte.additional.recording.dto.ModerQuanAndQualFactorDto">
+
+        SELECT qual_id AS id,
+               `name`,
+               `code`,
+               '2' as 'type',model_code as modelCode
+        FROM `#{prefix}_model_quan_factor`
+      WHERE model_code = #{modelCode}  ORDER BY  id desc
+
+    </select>
+
+    <select id="findGovByPre" resultType="com.deloitte.additional.recording.dto.ModerQuanAndQualFactorDto">
+
+        SELECT qual_id AS id,
+               `name`,
+               `code`,
+               '3' as 'type',model_master as modelCode
+        FROM  ${prefix}_model_gov_qual_factor
+        WHERE model_master = #{modelCode}  ORDER BY  id desc
+
+    </select>
+
+    <select id="getQualByPre" resultType="string">
+
+        SELECT model_code   FROM ${prefix}_model_qual_factor  where id = #{id}
+    </select>
+
+    <select id="getQuanByPre" resultType="string">
+        SELECT model_code   FROM ${prefix}_model_quan_factor where id = #{id}
+
+    </select>
+
+    <select id="getGovQualByPre" resultType="string">
+        SELECT model_master   FROM ${prefix}_model_gov_qual_factor where id = #{id}
+
+    </select>
+
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.CrmWindDictMapper">
+    
+    <resultMap type="CrmWindDict" id="CrmWindDictResult">
+        <result property="id"    column="id"    />
+        <result property="cateName"    column="cate_name"    />
+        <result property="windFileName"    column="wind_file_name"    />
+        <result property="fileTable"    column="file_table"    />
+        <result property="fileTableHis"    column="file_table_his"    />
+        <result property="taskDesc"    column="task_desc"    />
+        <result property="status"    column="status"    />
+        <result property="created"    column="created"    />
+        <result property="updated"    column="updated"    />
+    </resultMap>
+
+    <sql id="selectCrmWindDictVo">
+        select id, cate_name, wind_file_name, file_table, file_table_his, task_desc, status, created, updated from crm_wind_dict
+    </sql>
+
+    <select id="selectCrmWindDictList" parameterType="CrmWindDict" resultMap="CrmWindDictResult">
+        <include refid="selectCrmWindDictVo"/>
+        <where>  
+            <if test="cateName != null  and cateName != ''"> and cate_name like concat('%', #{cateName}, '%')</if>
+            <if test="windFileName != null  and windFileName != ''"> and wind_file_name like concat('%', #{windFileName}, '%')</if>
+            <if test="fileTable != null  and fileTable != ''"> and file_table = #{fileTable}</if>
+            <if test="fileTableHis != null  and fileTableHis != ''"> and file_table_his = #{fileTableHis}</if>
+            <if test="taskDesc != null  and taskDesc != ''"> and task_desc = #{taskDesc}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="created != null "> and created = #{created}</if>
+            <if test="updated != null "> and updated = #{updated}</if>
+        </where>
+    </select>
+    
+    <select id="selectCrmWindDictById" parameterType="Long" resultMap="CrmWindDictResult">
+        <include refid="selectCrmWindDictVo"/>
+        where id = #{id}
+    </select>
+
+
+    <insert id="insertCrmWindDict" parameterType="CrmWindDict" useGeneratedKeys="true" keyProperty="id">
+        insert into crm_wind_dict
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cateName != null">cate_name,</if>
+            <if test="windFileName != null">wind_file_name,</if>
+            <if test="fileTable != null">file_table,</if>
+            <if test="fileTableHis != null">file_table_his,</if>
+            <if test="taskDesc != null">task_desc,</if>
+            <if test="status != null">status,</if>
+            <if test="created != null">created,</if>
+            <if test="updated != null">updated,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cateName != null">#{cateName},</if>
+            <if test="windFileName != null">#{windFileName},</if>
+            <if test="fileTable != null">#{fileTable},</if>
+            <if test="fileTableHis != null">#{fileTableHis},</if>
+            <if test="taskDesc != null">#{taskDesc},</if>
+            <if test="status != null">#{status},</if>
+            <if test="created != null">#{created},</if>
+            <if test="updated != null">#{updated},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCrmWindDict" parameterType="CrmWindDict">
+        update crm_wind_dict
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cateName != null">cate_name = #{cateName},</if>
+            <if test="windFileName != null">wind_file_name = #{windFileName},</if>
+            <if test="fileTable != null">file_table = #{fileTable},</if>
+            <if test="fileTableHis != null">file_table_his = #{fileTableHis},</if>
+            <if test="taskDesc != null">task_desc = #{taskDesc},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="created != null">created = #{created},</if>
+            <if test="updated != null">updated = #{updated},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteCrmWindDictById" parameterType="Long">
+        delete from crm_wind_dict where id = #{id}
+    </delete>
+
+    <delete id="deleteCrmWindDictByIds" parameterType="String">
+        delete from crm_wind_dict where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

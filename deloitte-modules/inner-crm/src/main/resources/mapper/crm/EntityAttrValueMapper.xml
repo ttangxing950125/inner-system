@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.crm.mapper.EntityAttrValueMapper">
+    
+    <resultMap type="EntityAttrValue" id="EntityAttrValueResult">
+        <result property="id"    column="id"    />
+        <result property="attrId"    column="attr_id"    />
+        <result property="entityCode"    column="entity_code"    />
+        <result property="value"    column="value"    />
+    </resultMap>
+
+    <sql id="selectEntityAttrValueVo">
+        select id, attr_id, entity_code, value from entity_attr_value
+    </sql>
+
+    <select id="findByAttrCode" resultMap="EntityAttrValueResult">
+        <include refid="selectEntityAttrValueVo"/>
+        where attr_id = #{attrId}
+        and entity_code = #{entityCode}
+    </select>
+
+    <select id="selectEntityAttrValueList" parameterType="EntityAttrValue" resultMap="EntityAttrValueResult">
+        <include refid="selectEntityAttrValueVo"/>
+        <where>  
+            <if test="attrId != null "> and attr_id = #{attrId}</if>
+            <if test="entityCode != null  and entityCode != ''"> and entity_code = #{entityCode}</if>
+            <if test="value != null  and value != ''"> and value = #{value}</if>
+        </where>
+    </select>
+    
+    <select id="selectEntityAttrValueById" parameterType="Long" resultMap="EntityAttrValueResult">
+        <include refid="selectEntityAttrValueVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEntityAttrValue" parameterType="EntityAttrValue" useGeneratedKeys="true" keyProperty="id">
+        insert into entity_attr_value
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="attrId != null">attr_id,</if>
+            <if test="entityCode != null">entity_code,</if>
+            <if test="value != null">value,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="attrId != null">#{attrId},</if>
+            <if test="entityCode != null">#{entityCode},</if>
+            <if test="value != null">#{value},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEntityAttrValue" parameterType="EntityAttrValue">
+        update entity_attr_value
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attrId != null">attr_id = #{attrId},</if>
+            <if test="entityCode != null">entity_code = #{entityCode},</if>
+            <if test="value != null">value = #{value},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEntityAttrValueById" parameterType="Long">
+        delete from entity_attr_value where id = #{id}
+    </delete>
+
+    <delete id="deleteEntityAttrValueByIds" parameterType="String">
+        delete from entity_attr_value where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findTradCode" resultMap="EntityAttrValueResult" parameterType="String">
+        SELECT * FROM entity_attr_value WHERE attr_id = 804 AND entity_code = #{entityCode}
+    </select>
+
+    <select id="matchingNameByBondName" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 57 AND value LIKE #{name}
+    </select>
+
+    <select id="checkEntityBondFullName" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 57 AND value = #{fullName}
+    </select>
+
+    <select id="checkEntityBondTradCode" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 804 AND value = #{fullName}
+    </select>
+
+    <select id="checkEntityBondTradCode" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = 804 AND value = #{fullName}
+    </select>
+
+    <select id="checkEntityBondValue" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = #{key} AND value = #{value}
+    </select>
+
+    <select id="findValueByCodeAndAttrId" resultMap="EntityAttrValueResult">
+        SELECT * FROM entity_attr_value WHERE attr_id = #{attrId} AND entity_code = #{bondCode}
+    </select>
+
+</mapper>
