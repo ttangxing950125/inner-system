@@ -22,12 +22,12 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 192.168.0.106:8848
+        server-addr: 192.168.1.7:8848
         # 配置所在分组
         namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
       config:
         # 配置中心地址
-        server-addr: 192.168.0.106:8848
+        server-addr: 192.168.1.7:8848
         # 配置所在分组
         namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
         # 配置文件格式
