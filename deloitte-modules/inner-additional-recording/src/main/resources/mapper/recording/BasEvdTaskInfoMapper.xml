@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.BasEvdTaskInfoMapper">
+
+
+    <select id="taskCount" resultType="int">
+        SELECT count(id) AS taskCount
+        FROM bas_evd_task_info eti
+        WHERE EXISTS(
+                      SELECT id
+                      FROM bas_evd_data ed
+                      WHERE EXISTS(SELECT evd_code
+                                   FROM prs_model_qual_evd mqe
+                                   WHERE qual_code = #{qualCode} AND mqe.evd_code = ed.evd_code)
+                        AND EXISTS(SELECT entity_code
+                                   FROM prs_qual_data qd
+                                   WHERE qd.entity_code = ed.entity_code
+                                     AND qual_code = #{qualCode}
+                                     AND time_value = #{dataYear})
+                        AND eti.data_id = ed.id
+                  )
+    </select>
+
+    <select id="taskCountByStatus" resultType="com.deloitte.additional.recording.dto.BasEvdTaskInfoStatusCountDto">
+        SELECT eti.status,count(eti.status) as count FROM bas_evd_task_info eti WHERE  EXISTS
+                                                                                    (
+            SELECT
+            id
+            FROM
+            bas_evd_data ed
+            WHERE
+            EXISTS ( SELECT evd_code FROM prs_model_qual_evd mqe WHERE qual_code = #{qualCode} AND mqe.evd_code = ed.evd_code )
+                                                                                  AND  EXISTS ( SELECT entity_code FROM prs_qual_data qd WHERE qd.entity_code=ed.entity_code and qual_code = #{qualCode} AND time_value = #{dataYear} )
+                                                                                  and eti.data_id = ed.id
+            ) GROUP BY eti.status
+
+    </select>
+</mapper>

@@ -10,6 +10,7 @@ import com.deloitte.additional.recording.service.center.ModelQualQuanGovFactorSe
 import com.deloitte.additional.recording.vo.qualinfo3rd.TranspreQualinfo3rdPageVO;
 import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.exception.GlobalException;
+import com.deloitte.common.core.utils.poi.ExcelUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -41,12 +43,32 @@ public class TranspreQualinfo3rdController {
 
     @ApiOperation("分页查询指标映射分页列表")
     @GetMapping("getMapQualFactorPaging")
-    public MetaR<Page<TranspreQualinfo3rdPageVO>> page(@ApiParam("年份") @RequestParam(value = "useYear", required = false) String useYear, @ApiParam("关键字搜索") @RequestParam(value = "searchData", required = false) String searchData, @ApiParam("关键字搜索") @RequestParam(value = "versionId", required = false) Integer versionId, @ApiParam("敞口id") @RequestParam(value = "masterId", required = false) Integer masterId, @ApiParam("版本id") @RequestParam(value = "tarType", required = false) String tarType, @ApiParam("当前页码") @RequestParam(value = "page", required = false, defaultValue = "1") Integer page, @ApiParam("当前页面数量") @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
+    public MetaR<Page<TranspreQualinfo3rdPageVO>> page(@ApiParam("年份") @RequestParam(value = "useYear", required = false) String useYear,
+                                                       @ApiParam("关键字搜索") @RequestParam(value = "searchData", required = false) String searchData,
+                                                       @ApiParam("关键字搜索") @RequestParam(value = "versionId", required = false) Integer versionId,
+                                                       @ApiParam("敞口id") @RequestParam(value = "masterId", required = false) Integer masterId,
+                                                       @ApiParam("版本id") @RequestParam(value = "tarType", required = false) String tarType,
+                                                       @ApiParam("当前页码") @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                                       @ApiParam("当前页面数量") @RequestParam(value = "pageSize", required = false,
+                                                               defaultValue = "10") Integer pageSize) {
 
         Page<TranspreQualinfo3rdPageVO> voPage = transpreQualinfo3rdService.page(useYear, tarType, masterId, versionId, searchData, page, pageSize);
         return MetaR.ok(voPage);
     }
 
+
+    @ApiOperation("导出指标映射列表为EXCEL")
+    @GetMapping("exportExcel")
+    public void exportExcel(HttpServletResponse response
+            , @ApiParam("年份") @RequestParam(value = "useYear", required = false) String useYear,
+                             @ApiParam("关键字搜索") @RequestParam(value = "searchData", required = false) String searchData,
+                             @ApiParam("关键字搜索") @RequestParam(value = "versionId", required = false) Integer versionId,
+                             @ApiParam("敞口id") @RequestParam(value = "masterId", required = false) Integer masterId,
+                             @ApiParam("版本id") @RequestParam(value = "tarType", required = false) String tarType) {
+        List<TranspreQualinfo3rdPageVO> list = transpreQualinfo3rdService.exportExcelData(useYear, searchData, versionId, masterId, tarType);
+        ExcelUtil<TranspreQualinfo3rdPageVO> util = new ExcelUtil<>(TranspreQualinfo3rdPageVO.class);
+        util.exportExcel(response, list, "指标映射表");
+    }
 
     @ApiOperation("获取中心库指标下拉框选择列表")
     @GetMapping("getMapQualListFromDataCenter")

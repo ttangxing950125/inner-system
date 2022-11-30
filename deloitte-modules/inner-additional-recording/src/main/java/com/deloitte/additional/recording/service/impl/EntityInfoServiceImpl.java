@@ -1,8 +1,8 @@
 package com.deloitte.additional.recording.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.additional.recording.mapper.EntityInfoMapper;
 import com.deloitte.additional.recording.domain.EntityInfo;
+import com.deloitte.additional.recording.mapper.EntityInfoMapper;
 import com.deloitte.additional.recording.service.EntityInfoService;
 import org.springframework.stereotype.Service;
 
@@ -15,4 +15,13 @@ import org.springframework.stereotype.Service;
 @Service("entityInfoService")
 public class EntityInfoServiceImpl extends ServiceImpl<EntityInfoMapper, EntityInfo> implements EntityInfoService {
 
+    @Override
+    public EntityInfo getByCode(String entity_code) {
+        return lambdaQuery().eq(EntityInfo::getEntityCode, entity_code).one();
+    }
+
+    @Override
+    public EntityInfo getByCreditCode(String creditCode) {
+        return lambdaQuery().eq(EntityInfo::getCreditCode, creditCode).one();
+    }
 }

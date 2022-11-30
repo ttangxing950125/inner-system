@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsQualEfficiencyMapper">
+
+
+    <select id="page" resultType="com.deloitte.additional.recording.vo.qual.PrsQualEfficiencyVO">
+        SELECT
+            qe.id,
+            qe.qual_code as qualCode,
+            qe.entity_count as entityCount,
+            qe.risk_level as riskLevel,
+            qe.missing_rate as missingRate,
+            qe.expected_efficiency as expectedEfficiency ,
+            qe.actual_efficiency as actualEfficiency,
+            qe.passing_rate as passingRate,
+            qe.return_rate as returnRate,
+            qe.run_batch_time as runBatchTime,
+            mq.qual_name as qualName
+        FROM
+            prs_qual_efficiency qe left join prs_model_qual  mq on mq.qual_code = 	qe.qual_code
+        <if test="boo==false">
+            LEFT JOIN prs_qual_data qd on qe.qual_code =  qd.qual_code
+        </if>
+        WHERE
+        1 = 1
+        <if test="boo==false">
+            and  qd.assign_user=#{userId}
+        </if>
+          AND EXISTS (
+                SELECT
+                    qual_code
+                FROM
+                    prs_model_qual mq
+                WHERE
+                    1 = 1
+                  AND EXISTS (
+                        SELECT
+                            qual_code
+                        FROM
+                            prs_ver_mas_qual vmq
+                        WHERE
+                            mq.qual_code = vmq.qual_code
+                          AND EXISTS (
+                                SELECT
+                                    id
+                                FROM
+                                    prs_version_master vm
+                                WHERE
+                                    1=1  and  vmq.ver_mas_id = vm .id
+                                  and
+                                    EXISTS (
+                                        SELECT id
+                                        FROM prs_project_versions pj
+                                        WHERE pj.id = vm.prj_id
+                                          <if test="userYear!=null and userYear!= ''">
+                                              and  pj.time_value = #{userYear}
+                                          </if>
+                                        )
+                                    <if test="versionId!=null">
+                                        AND vm.prj_id  = #{versionId}
+                                    </if>
+                                    <if test="modelCode!=null and modelCode!= ''">
+                                        AND vm.model_code = #{modelCode}
+                                    </if>
+
+                            )
+                    )
+                    and qe.qual_code =  mq.qual_code
+            )
+        <if test="searchKey!=null and searchKey!= ''">
+            and  mq.qual_name like "%"#{searchKey}"%" or  qe.qual_code like "%"#{searchKey}"%"
+        </if>
+        <if test="riskLevel!=null">
+            and  qe.risk_level= #{riskLevel}
+        </if>
+        ORDER BY qe.id desc  LIMIT #{page} , #{pageSize}
+    </select>
+
+    <select id="pageCount" resultType="long">
+        SELECT
+        count(1)
+        FROM
+        prs_qual_efficiency qe left join prs_model_qual  mq on mq.qual_code = 	qe.qual_code
+        <if test="boo==false">
+            LEFT JOIN prs_qual_data qd on qe.qual_code =  qd.qual_code
+        </if>
+        WHERE
+        1 = 1
+        <if test="boo==false">
+            and  qd.assign_user=#{userId}
+        </if>
+        AND EXISTS (
+        SELECT
+        qual_code
+        FROM
+        prs_model_qual mq
+        WHERE
+        1 = 1
+        AND EXISTS (
+        SELECT
+        qual_code
+        FROM
+        prs_ver_mas_qual vmq
+        WHERE
+        mq.qual_code = vmq.qual_code
+        AND EXISTS (
+        SELECT
+        id
+        FROM
+        prs_version_master vm
+        WHERE
+        1=1  and  vmq.ver_mas_id = vm .id
+        and
+        EXISTS (
+        SELECT id
+        FROM prs_project_versions pj
+        WHERE pj.id = vm.prj_id
+        <if test="userYear!=null and userYear!= ''">
+            and  pj.time_value = #{userYear}
+        </if>
+        )
+        <if test="versionId!=null">
+            AND vm.prj_id  = #{versionId}
+        </if>
+        <if test="modelCode!=null and modelCode!= ''">
+            AND vm.model_code = #{modelCode}
+        </if>
+
+        )
+        )
+        and qe.qual_code =  mq.qual_code
+        )
+        <if test="searchKey!=null and searchKey!= ''">
+            and  mq.qual_name like "%"#{searchKey}"%" or  qe.qual_code like "%"#{searchKey}"%"
+        </if>
+        <if test="riskLevel!=null">
+            and  qe.risk_level= #{riskLevel}
+        </if>
+
+    </select>
+
+    <select id="pageByCodes" resultType="com.deloitte.additional.recording.vo.qual.PrsQualEfficiencyVO">
+        SELECT
+        qe.id,
+        qe.qual_code as qualCode,
+        qe.entity_count as entityCount,
+        qe.risk_level as riskLevel,
+        qe.missing_rate as missingRate,
+        qe.expected_efficiency as expectedEfficiency ,
+        qe.actual_efficiency as actualEfficiency,
+        qe.passing_rate as passingRate,
+        qe.return_rate as returnRate,
+        qe.run_batch_time as runBatchTime,
+        mq.qual_name as qualName
+        FROM
+        prs_qual_efficiency qe left join prs_model_qual mq on mq.qual_code = qe.qual_code
+        <if test="boo==false">
+            LEFT JOIN prs_qual_data qd on qe.qual_code =  qd.qual_code
+        </if>
+        WHERE
+        1 = 1
+        <if test="boo==false">
+           and  qd.assign_user=#{userId}
+        </if>
+
+        <if test="codes!=null">
+            and mq.qual_code
+            <foreach collection="codes" item="code" index="index" open="in (" close=")" separator=",">
+                #{code}
+            </foreach>
+        </if>
+        <if test="searchKey!=null and searchKey!= ''">
+            and  mq.qual_name like "%"#{searchKey}"%" or  qe.qual_code like "%"#{searchKey}"%"
+        </if>
+        <if test="riskLevel!=null">
+            and  qe.risk_level= #{riskLevel}
+        </if>
+        LIMIT #{page},#{pageSize}
+    </select>
+
+
+    <select id="countByCodes" resultType="long">
+        SELECT
+        count(1)
+        FROM
+        prs_qual_efficiency qe left join prs_model_qual mq on mq.qual_code = qe.qual_code
+        <if test="boo==false">
+            LEFT JOIN prs_qual_data qd on qe.qual_code =  qd.qual_code
+        </if>
+        WHERE
+        1 = 1
+        <if test="boo==false">
+            and  qd.assign_user=#{userId}
+        </if>
+        <if test="codes!=null">
+            and mq.qual_code
+            <foreach collection="codes" item="code" index="index" open="in (" close=")" separator=",">
+                #{code}
+            </foreach>
+        </if>
+        <if test="searchKey!=null and searchKey!= ''">
+            and  mq.qual_name like "%"#{searchKey}"%" or  qe.qual_code like "%"#{searchKey}"%"
+        </if>
+        <if test="riskLevel!=null">
+            and  qe.risk_level= #{riskLevel}
+        </if>
+    </select>
+</mapper>

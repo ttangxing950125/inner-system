@@ -1,5 +1,9 @@
 package com.deloitte.common.core.constant;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * 通用常量信息
  *
@@ -155,14 +159,26 @@ public class Constants {
     public static final String GOV_TYPE = "3";
 
     /**
-     *定量
+     * 定量
      */
     public static final String QUAN_TYPE = "2";
 
     /**
-     *定性
+     * 定性
      */
     public static final String QUAL_TYPE = "1";
 
+    /**
+     * 导入 wind 子表 指标 常量
+     */
+    public static final List<String> IMPORT_CONTANTS =new ArrayList<String>(Arrays.asList("主体名称","实体代码","数据年份"));
 
+
+    public static final String ENTITY_NAME = "主体名称";
+
+
+    public static final String ENTITY_CODE = "主体编码";
+
+    public static final String DATA_YEAR = "数据年份";
+    public static final String EXAMINE_USER = "examineUser" ;
 }

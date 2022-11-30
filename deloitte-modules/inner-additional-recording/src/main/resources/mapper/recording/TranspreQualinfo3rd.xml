@@ -8,20 +8,25 @@
     <select id="page" resultType="com.deloitte.additional.recording.dto.TranspreQualinfo3rdDto">
 
         SELECT
-        qualinfo.id,
-        qualinfo.plus_version AS versionId,
-        qualinfo.plus_modelid AS masterId,
+        qualinfo.plus_modelid as masterId,
+        qualinfo.plus_version as versionId,
+        qualinfo.plus_ruleid as plusRuleid,
         qualinfo.plus_qualid as plusQualid,
-        qualinfo.plus_qualcode as plusQualcode,
-        qualinfo.pt_times as ptTimes,
-        qualinfo.tar_qualid as tarQualid,
-        qualinfo.tar_qualname as tarQualname,
-        qualinfo.tar_type as tarType,
-        qualinfo.data_year as dataYear
-        FROM transpre_qualinfo_3rd qualinfo
-
-        WHERE
-        1=1
+        qualinfo.prefix as prefix,
+        qualinfo.data_year as dataYear,
+        qualinfo.id,
+        version.`name` as versionName,
+        model_master.`name` AS masterName,  	qualinfo.tar_type as tarType,
+        qual.qual_name as qualName,  	qual.qual_code as qualCode,
+        qualinfo.plus_unit as unit,  	evd.`name` as evdName,  	evd.`code` as evdCode,
+        cast(qualinfo.pt_times as char)  as ptTimes,  	qualinfo.tar_qualid as tarQualid,
+        qualinfo.tar_unit AS tarUnit,  	qualinfo.tar_qualname AS tarQualname,
+        qualinfo.plus_qualcode AS plusQualcode   FROM   transpre_qualinfo_3rd qualinfo
+        LEFT JOIN prs_project_versions version ON version.id = qualinfo.plus_version
+        LEFT JOIN prs_model_master model_master ON model_master.id = qualinfo.plus_modelid
+        LEFT JOIN prs_model_qual qual ON qual.id = qualinfo.plus_qualid
+        LEFT JOIN bas_evd_info evd ON evd.id = qualinfo.plus_ruleid and qualinfo.plus_ruleid != 0
+        where 1= 1
         <if test="useYear!=null and useYear != ''">
             and qualinfo.data_year = #{useYear}
 
@@ -88,4 +93,55 @@
         </if>
     </select>
 
+
+    <select id="search"  resultType="com.deloitte.additional.recording.dto.TranspreQualinfo3rdDto">
+
+        SELECT
+        qualinfo.plus_modelid as masterId,
+        qualinfo.plus_version as versionId,
+        qualinfo.plus_ruleid as plusRuleid,
+        qualinfo.plus_qualid as plusQualid,
+        qualinfo.prefix as prefix,
+        qualinfo.data_year as dataYear,
+        qualinfo.id,
+        version.`name` as versionName,
+        model_master.`name` AS masterName,  	qualinfo.tar_type as tarType,
+        qual.qual_name as qualName,  	qual.qual_code as qualCode,
+        qualinfo.plus_unit as unit,  	evd.`name` as evdName,  	evd.`code` as evdCode,
+        cast(qualinfo.pt_times as char)  as ptTimes,  	qualinfo.tar_qualid as tarQualid,
+        qualinfo.tar_unit AS tarUnit,  	qualinfo.tar_qualname AS tarQualname,
+        qualinfo.plus_qualcode AS plusQualcode   FROM   transpre_qualinfo_3rd qualinfo
+        LEFT JOIN prs_project_versions version ON version.id = qualinfo.plus_version
+        LEFT JOIN prs_model_master model_master ON model_master.id = qualinfo.plus_modelid
+        LEFT JOIN prs_model_qual qual ON qual.id = qualinfo.plus_qualid
+        LEFT JOIN bas_evd_info evd ON evd.id = qualinfo.plus_ruleid and qualinfo.plus_ruleid != 0
+        where 1= 1
+        <if test="useYear!=null and useYear != ''">
+            and qualinfo.data_year = #{useYear}
+
+        </if>
+        <if test="tarType!=null and tarType != ''">
+            and qualinfo.tar_type = #{tarType}
+
+        </if>
+        <if test="masterId!=null">
+            and qualinfo.plus_modelid = #{masterId}
+
+        </if>
+
+        <if test="versionId!=null">
+            and qualinfo.plus_version = #{versionId}
+
+        </if>
+
+        <if test="searchData!=null and searchData!=''">
+            AND qualinfo.`plus_qualcode` LIKE concat(#{searchData},'%')
+            OR qualinfo.`tar_qualname` LIKE concat(#{searchData},'%')
+            OR qualinfo.tar_qualid LIKE concat(#{searchData},'%')
+            OR EXISTS ( SELECT 1 FROM prs_model_qual tmp WHERE tmp.id = qualinfo.plus_qualid AND tmp.qual_name LIKE
+            concat(#{searchData},'%') )
+        </if>
+
+        ORDER BY qualinfo.id desc
+    </select>
 </mapper>

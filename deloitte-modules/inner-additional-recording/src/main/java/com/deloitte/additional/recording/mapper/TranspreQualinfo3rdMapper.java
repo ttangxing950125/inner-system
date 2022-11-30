@@ -20,4 +20,6 @@ public interface TranspreQualinfo3rdMapper extends BaseMapper<TranspreQualinfo3r
     List<TranspreQualinfo3rdDto> page(@Param("useYear") String useYear, @Param("tarType") String tarType, @Param("masterId")Integer masterId, @Param("versionId")Integer versionId, @Param("searchData")String searchData, @Param("page")Integer page, @Param("pageSize") Integer pageSize);
 
     long pageCount(@Param("useYear") String useYear,@Param("tarType") String tarType, @Param("masterId")Integer masterId, @Param("versionId")Integer versionId, @Param("searchData")String searchData, @Param("page")Integer page,@Param("pageSize") Integer pageSize);
+
+    List<TranspreQualinfo3rdDto> search(@Param("useYear") String useYear,@Param("tarType") String tarType, @Param("masterId")Integer masterId, @Param("versionId")Integer versionId, @Param("searchData")String searchData);
 }

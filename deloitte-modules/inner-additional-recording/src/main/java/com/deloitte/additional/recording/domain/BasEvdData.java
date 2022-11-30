@@ -1,5 +1,6 @@
 package com.deloitte.additional.recording.domain;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
@@ -29,12 +30,12 @@ public class BasEvdData implements Serializable {
     /**
      * 主体id
      */
-    @Excel(name = "主体id")
+    @ExcelProperty(value = "实体代码")
     private String entityCode;
     /**
      * evidence_id
      */
-    @Excel(name = "evidence_id")
+    @ExcelProperty(value = "evidence_id")
     private String evdCode;
     /**
      * json格式的evidence
@@ -44,7 +45,7 @@ public class BasEvdData implements Serializable {
     /**
      * 数据时间标识
      */
-    @Excel(name = "数据时间标识")
+    @ExcelProperty(value = "数据年份")
     private String timeValue;
     /**
      * 数据针对划档流程是否可用
@@ -72,4 +73,18 @@ public class BasEvdData implements Serializable {
     private Integer isUpdate;
 
 
+    public BasEvdData createBy(String entityCode, String evdCode, String evdVal, String timeValue) {
+        Date date = new Date();
+        this.entityCode = entityCode;
+        this.evdCode = evdCode;
+        this.evdVal = evdVal;
+        this.timeValue = timeValue;
+        this.valid = 0;
+        this.created = date;
+        this.updated = date;
+        return this;
+    }
+
+    public void updateBy(String evdVal) {
+    }
 }

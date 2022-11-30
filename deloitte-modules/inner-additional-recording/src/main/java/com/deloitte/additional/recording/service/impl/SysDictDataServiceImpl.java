@@ -1,7 +1,7 @@
 package com.deloitte.additional.recording.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.additional.recording.constants.Common;
 import com.deloitte.additional.recording.mapper.SysDictDataMapper;
@@ -10,8 +10,6 @@ import com.deloitte.common.core.domain.R;
 import com.deloitte.system.api.domain.SysDictData;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -41,6 +39,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     public R getYear() {
         return R.ok(mapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.SEARCH_YEAR)));
     }
+
     /**
      * 查询可查询数据源
      *
@@ -52,6 +51,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     public R getDataSource() {
         return R.ok(mapper.selectList(new QueryWrapper<SysDictData>().lambda().eq(SysDictData::getDictType, Common.DATA_SOURCE)));
     }
+
     /**
      * 查询可显示类型
      *
@@ -66,6 +66,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
     /**
      * 统计-数据清单模块 获取年份 从数据字典表中获取
+     *
      * @return
      * @see com.deloitte.system.api.domain.SysDictData
      */
@@ -100,8 +101,13 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     public SysDictData findByTypeDefault(String type) {
         return baseMapper.selectOne(
                 new LambdaQueryWrapper<SysDictData>()
-                .eq(SysDictData::getDictType, type)
-                .eq(SysDictData::getIsDefault, "Y")
+                        .eq(SysDictData::getDictType, type)
+                        .eq(SysDictData::getIsDefault, "Y")
         );
+    }
+
+    @Override
+    public SysDictData findByValueAndType(String userId, String type) {
+        return lambdaQuery().eq(SysDictData::getDictValue, userId).eq(SysDictData::getDictType, type).one();
     }
 }

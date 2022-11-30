@@ -1,10 +1,12 @@
 package com.deloitte.additional.recording.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.additional.recording.mapper.PrsModelQualFactorMapper;
 import com.deloitte.additional.recording.domain.PrsModelQualFactor;
+import com.deloitte.additional.recording.mapper.PrsModelQualFactorMapper;
 import com.deloitte.additional.recording.service.PrsModelQualFactorService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * (PrsModelQualFactor)表服务实现类
@@ -15,4 +17,8 @@ import org.springframework.stereotype.Service;
 @Service("prsModelQualFactorService")
 public class PrsModelQualFactorServiceImpl extends ServiceImpl<PrsModelQualFactorMapper, PrsModelQualFactor> implements PrsModelQualFactorService {
 
+    @Override
+    public List<PrsModelQualFactor> findByQualCode(String qualCode) {
+        return lambdaQuery().eq(PrsModelQualFactor::getQualCode, qualCode).groupBy(PrsModelQualFactor::getFactorValue).list();
+    }
 }

@@ -11,4 +11,11 @@ import com.deloitte.additional.recording.domain.BasEvdInfo;
  */
 public interface BasEvdInfoService extends IService<BasEvdInfo> {
 
+
+    /**
+     * 根据code 查询
+     * @param evd_code code
+     * @return BasEvdInfo
+     */
+    BasEvdInfo getByCodeAndName(String evd_code,String name);
 }

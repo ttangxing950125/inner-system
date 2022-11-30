@@ -7,6 +7,8 @@ import com.deloitte.additional.recording.request.TranspreQualinfo3rdRequest;
 import com.deloitte.additional.recording.vo.qualinfo3rd.TranspreQualinfo3rdPageVO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * (TranspreQualinfo3rd)表服务接口
  *
@@ -54,4 +56,15 @@ public interface TranspreQualinfo3rdService extends IService<TranspreQualinfo3rd
      * @param code 中心库敞口code
      */
     void update(TranspreQualinfo3rdRequest request, String code);
+
+    /**
+     * 查询导出的数据
+     * @param useYear 年份
+     * @param tarType 指标类型
+     * @param masterId 敞口id
+     * @param versionId 版本id
+     * @param searchData 关键字搜索参数
+     * @return
+     */
+    List<TranspreQualinfo3rdPageVO> exportExcelData(String useYear, String searchData, Integer versionId, Integer masterId, String tarType);
 }

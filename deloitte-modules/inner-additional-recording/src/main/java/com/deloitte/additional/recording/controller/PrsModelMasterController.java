@@ -7,10 +7,8 @@ import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.domain.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -45,8 +43,10 @@ public class PrsModelMasterController {
 
     @GetMapping("selectList")
     @ApiOperation("下拉选择列表")
-    public MetaR<List<PrsModelMasterSelectVO>> selectList(){
+    public MetaR<List<PrsModelMasterSelectVO>> selectList(@ApiParam("版本id")@RequestParam(value = "versionId",required = false) Integer versionId){
 
-        return MetaR.ok( prsModelMasterService.selectList());
+        return MetaR.ok( prsModelMasterService.selectList(versionId));
     }
+
+
 }

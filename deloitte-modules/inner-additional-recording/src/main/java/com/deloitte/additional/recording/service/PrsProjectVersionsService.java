@@ -3,6 +3,7 @@ package com.deloitte.additional.recording.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsProjectVersions;
+import com.deloitte.additional.recording.vo.version.PrsProjectVersionSelectVO;
 import com.deloitte.common.core.domain.R;
 
 import java.util.List;
@@ -76,4 +77,11 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      * @return
      */
     R getCustomEntityInfoByVersionIdAndModelId(String year, String versionId, String industryId);
+
+    /**
+     * 获取版本选择列表
+     * @param userYear 年份
+     * @return  List<PrsProjectVersionSelectVO>
+     */
+    List<PrsProjectVersionSelectVO> selectList(String userYear);
 }

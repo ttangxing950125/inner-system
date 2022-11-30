@@ -6,17 +6,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.additional.recording.domain.PrsModelQual;
 import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.domain.PrsVerMasQual;
 import com.deloitte.additional.recording.domain.PrsVersionMaster;
 import com.deloitte.additional.recording.mapper.PrsModelQualMapper;
-import com.deloitte.additional.recording.domain.PrsModelQual;
 import com.deloitte.additional.recording.mapper.PrsProjectVersionsMapper;
 import com.deloitte.additional.recording.mapper.PrsVerMasQualMapper;
 import com.deloitte.additional.recording.mapper.PrsVersionMasterMapper;
 import com.deloitte.additional.recording.service.PrsModelQualService;
 import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import com.deloitte.additional.recording.vo.VersionMasterEvdVo;
+import com.deloitte.additional.recording.vo.qual.PrsQualDataSelectVO;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -114,7 +115,7 @@ public class PrsModelQualServiceImpl extends ServiceImpl<PrsModelQualMapper, Prs
                 notData.add(prsVerMasQual.getQualCode());
             }
         }
-        log.info("根据 版本敞口:年份: 获取 指标信息 结束 获取条数>>>:{},不存在指标信息表条数>>>>:{},详情>>>:{}", dataListPageTataiVos.size(), notData.size(),JSON.toJSONString(notData));
+        log.info("根据 版本敞口:年份: 获取 指标信息 结束 获取条数>>>:{},不存在指标信息表条数>>>>:{},详情>>>:{}", dataListPageTataiVos.size(), notData.size(), JSON.toJSONString(notData));
         return dataListPageTataiVos;
     }
 
@@ -132,7 +133,24 @@ public class PrsModelQualServiceImpl extends ServiceImpl<PrsModelQualMapper, Prs
         Page<PrsModelQual> modelQualPage = prsModelQualMapper.selectPage(pageInfo, new QueryWrapper<PrsModelQual>().lambda().eq(PrsModelQual::getStatus, 1));
 
 
-
         return R.ok(modelQualPage);
+    }
+
+    @Override
+    public PrsModelQual getByNameAndCode(String qualName, String qualCode) {
+        return lambdaQuery().eq(PrsModelQual::getQualName, qualName)
+                .eq(PrsModelQual::getQualCode, qualCode)
+                .one();
+    }
+
+    @Override
+    public List<PrsQualDataSelectVO> selectByMasterAndVersion(Integer versionId, String modelCode) {
+
+        return prsModelQualMapper.selectByMasterAndVersion(versionId,modelCode);
+    }
+
+    @Override
+    public String getByCode(String code) {
+        return this.baseMapper.getNameByCode(code);
     }
 }

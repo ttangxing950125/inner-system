@@ -13,4 +13,5 @@ import com.deloitte.additional.recording.domain.EntityInfo;
 @Mapper
 public interface EntityInfoMapper extends BaseMapper<EntityInfo> {
 
+
 }

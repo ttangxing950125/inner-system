@@ -1,11 +1,13 @@
 package com.deloitte.common.core.utils.poi;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelReader;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.annotation.Excel.ColumnType;
 import com.deloitte.common.core.annotation.Excel.Type;
 import com.deloitte.common.core.annotation.Excels;
+import com.deloitte.common.core.constant.Constants;
 import com.deloitte.common.core.exception.GlobalException;
 import com.deloitte.common.core.text.Convert;
 import com.deloitte.common.core.utils.DateUtil;
@@ -104,6 +106,8 @@ public class ExcelUtil<T> {
      */
     private short maxHeight;
 
+
+    private List<String> headers;
     /**
      * 统计列表
      */
@@ -121,6 +125,7 @@ public class ExcelUtil<T> {
 
     public ExcelUtil(Class<T> clazz) {
         this.clazz = clazz;
+        this.headers = new ArrayList<>();
     }
 
     public void init(List<T> list, String sheetName, String title, Type type) {
@@ -134,6 +139,14 @@ public class ExcelUtil<T> {
         createExcelField();
         createWorkbook();
         createTitle();
+    }
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(List<String> headers) {
+        this.headers = headers;
     }
 
     /**
@@ -182,6 +195,19 @@ public class ExcelUtil<T> {
         return importExcel(StrUtil.EMPTY, is, titleNum, checkCol);
     }
 
+
+    /**
+     * 得到sheet个数
+     *
+     * @param is 输入流
+     * @return
+     */
+    public int getSheetCount(InputStream is) {
+        ExcelReader build = EasyExcel.read(is).build();
+        return build.excelExecutor().sheetList() != null ? build.excelExecutor().sheetList().size() : 0;
+    }
+
+
     /**
      * 对excel表单指定表格索引名转换成list
      *
@@ -214,13 +240,14 @@ public class ExcelUtil<T> {
                 boolean merged = isMergedRegion(sheet, titleNum, cell.getColumnIndex());
                 if (ObjectUtil.isNotNull(cell)) {
                     String value = this.getCellValue(heard, i).toString();
+
                     cellMap.put(value, i);
                 } else {
                     cellMap.put(null, i);
                 }
-                if (merged){
+                if (merged) {
                     String value = getMergedRegionValue(sheet, titleNum, cell.getColumnIndex());
-                    if (ObjectUtil.isNotNull(value)){
+                    if (ObjectUtil.isNotNull(value)) {
                         cellMap.put(value, i);
                     }
                 }
@@ -231,12 +258,12 @@ public class ExcelUtil<T> {
             for (Object[] objects : fields) {
                 Excel attr = (Excel) objects[1];
                 Integer column = cellMap.get(attr.name());
-                if (column != null && StrUtil.isNotBlank(attr.name()) ) {
+                if (column != null && StrUtil.isNotBlank(attr.name())) {
                     fieldsMap.put(column, objects);
-                }else if(attr.sort()!=Integer.MAX_VALUE){
+                } else if (attr.sort() != Integer.MAX_VALUE) {
                     fieldsMap.put(attr.sort(), objects);
-                } else if (checkClo){
-                    throw new GlobalException("模板不对应,模板中缺少列:"+attr.name());
+                } else if (checkClo) {
+                    throw new GlobalException("模板不对应,模板中缺少列:" + attr.name());
                 }
             }
             for (int i = titleNum + 1; i <= rows; i++) {
@@ -246,7 +273,7 @@ public class ExcelUtil<T> {
                 if (isRowEmpty(row)) {
                     continue;
                 }
-                if (i==58){
+                if (i == 58) {
                     System.out.println("111");
                 }
                 T entity = null;
@@ -532,12 +559,13 @@ public class ExcelUtil<T> {
 
     /**
      * 判断指定的单元格是否是合并单元格
+     *
      * @param sheet
-     * @param row 行下标
+     * @param row    行下标
      * @param column 列下标
      * @return
      */
-    private static  boolean isMergedRegion(Sheet sheet, int row , int column) {
+    private static boolean isMergedRegion(Sheet sheet, int row, int column) {
         int sheetMergeCount = sheet.getNumMergedRegions();
         for (int i = 0; i < sheetMergeCount; i++) {
             CellRangeAddress range = sheet.getMergedRegion(i);
@@ -545,8 +573,8 @@ public class ExcelUtil<T> {
             int lastColumn = range.getLastColumn();
             int firstRow = range.getFirstRow();
             int lastRow = range.getLastRow();
-            if(row >= firstRow && row <= lastRow){
-                if(column >= firstColumn && column <= lastColumn){
+            if (row >= firstRow && row <= lastRow) {
+                if (column >= firstColumn && column <= lastColumn) {
                     return true;
                 }
             }
@@ -556,40 +584,42 @@ public class ExcelUtil<T> {
 
     /**
      * 获取合并单元格的值
+     *
      * @param sheet
      * @param row
      * @param column
      * @return
      */
-    public static String getMergedRegionValue(Sheet sheet ,int row , int column){
+    public static String getMergedRegionValue(Sheet sheet, int row, int column) {
         int sheetMergeCount = sheet.getNumMergedRegions();
 
-        for(int i = 0 ; i < sheetMergeCount ; i++){
+        for (int i = 0; i < sheetMergeCount; i++) {
             CellRangeAddress ca = sheet.getMergedRegion(i);
             int firstColumn = ca.getFirstColumn();
             int lastColumn = ca.getLastColumn();
             int firstRow = ca.getFirstRow();
             int lastRow = ca.getLastRow();
 
-            if(row >= firstRow && row <= lastRow){
-                if(column >= firstColumn && column <= lastColumn){
+            if (row >= firstRow && row <= lastRow) {
+                if (column >= firstColumn && column <= lastColumn) {
                     Row fRow = sheet.getRow(firstRow);
                     Cell fCell = fRow.getCell(firstColumn);
-                    return getCellValue(fCell) ;
+                    return getCellValue(fCell);
                 }
             }
         }
 
-        return null ;
+        return null;
     }
 
     /**
      * 获取单元格的值
+     *
      * @param cell
      * @return
      */
-    public  static String getCellValue(Cell cell){
-        if(cell == null) return "";
+    public static String getCellValue(Cell cell) {
+        if (cell == null) return "";
         return cell.toString();
     }
 
@@ -1020,7 +1050,7 @@ public class ExcelUtil<T> {
                         } else {
                             cell.setCellType(CellType.STRING);
                             val = cell.getStringCellValue();
-                            if(StrUtil.isBlank(Objects.toString(val,""))){
+                            if (StrUtil.isBlank(Objects.toString(val, ""))) {
                                 return null;
                             }
                             val = Double.valueOf(val.toString());

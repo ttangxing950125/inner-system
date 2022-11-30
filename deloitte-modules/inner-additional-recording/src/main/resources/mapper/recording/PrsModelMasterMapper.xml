@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsModelMasterMapper">
+
+<select id="listByVersion" resultType="com.deloitte.additional.recording.domain.PrsModelMaster">
+
+    select  id,name,model_code as modelCode
+    from prs_model_master ms
+    WHERE
+        1 = 1
+      and ms.status = '1'
+      <if test="versionId!=null">
+          AND EXISTS ( SELECT model_code FROM prs_version_master mm WHERE ms.model_code = mm.model_code AND mm.prj_id =#{versionId} )
+      </if>
+
+</select>
+
+</mapper>

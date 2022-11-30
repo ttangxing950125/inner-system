@@ -5,12 +5,13 @@
 <mapper namespace="com.deloitte.additional.recording.mapper.PrsModelQualMapper">
 
 
-    <select id="queryByPageStatsdetail" parameterType="java.lang.String" resultType="com.deloitte.additional.recording.vo.DataListPageTataiVo">
+    <select id="queryByPageStatsdetail" parameterType="java.lang.String"
+            resultType="com.deloitte.additional.recording.vo.DataListPageTataiVo">
         SELECT
         model.id as id,
         model.qual_code as qualCode,
         model.qual_name as qualName,
-        model.description as  description
+        model.description as description
         FROM(
         SELECT
         t2.ver_mas_id,
@@ -35,7 +36,7 @@
                 AND prs.`time_value`= #{timeValue}
             </if>
             <if test="modelCode!=null and modelCode!=''">
-                AND  m.`model_code`= #{modelCode}
+                AND m.`model_code`= #{modelCode}
             </if>
         </where>
 
@@ -48,4 +49,28 @@
         t3.qual_code = model.qual_code AND model.`status`=1
     </select>
 
+
+    <select id="selectByMasterAndVersion" resultType="com.deloitte.additional.recording.vo.qual.PrsQualDataSelectVO">
+        SELECT id,
+               qual_name as qualName,
+               qual_code as qualCode
+        FROM prs_model_qual mq
+        WHERE 1 = 1
+          AND EXISTS(
+                SELECT qual_code
+                FROM prs_ver_mas_qual vmq
+                WHERE mq.qual_code = vmq.qual_code
+                  AND vmq.ver_mas_id = (SELECT id
+                                        FROM prs_version_master vm
+                                        WHERE vm.prj_id = #{versionId} AND vm.model_code = #{modelCode})
+            )
+
+    </select>
+
+    <select id="getNameByCode" resultType="string">
+
+        SELECT qual_name
+        FROM prs_model_qual
+        where qual_code = #{code}
+    </select>
 </mapper>

@@ -3,12 +3,13 @@ package com.deloitte.additional.recording.controller;
 
 import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
+import com.deloitte.additional.recording.vo.version.PrsProjectVersionSelectVO;
+import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.domain.R;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -85,5 +86,11 @@ public class PrsProjectVersionsController {
         return prsProjectVersionsService.insertPrsProjectVersions(prsProjectVersions);
     }
 
+
+    @ApiOperation("版本选择下拉列表")
+    @GetMapping("selectList")
+    public MetaR<List<PrsProjectVersionSelectVO>> selectList(@ApiParam("年份") @RequestParam("userYear") String userYear) {
+        return MetaR.ok(prsProjectVersionsService.selectList(userYear));
+    }
 
 }

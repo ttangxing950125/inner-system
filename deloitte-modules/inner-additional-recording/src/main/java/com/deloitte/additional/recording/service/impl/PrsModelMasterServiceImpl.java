@@ -64,8 +64,9 @@ public class PrsModelMasterServiceImpl extends ServiceImpl<PrsModelMasterMapper,
     }
 
     @Override
-    public List<PrsModelMasterSelectVO> selectList() {
-        List<PrsModelMaster> list = lambdaQuery().eq(PrsModelMaster::getStatus, 1).list();
+    public List<PrsModelMasterSelectVO> selectList(Integer versionId) {
+
+        List<PrsModelMaster> list =  prsModelMasterMapper.listByVersion(versionId);
         if (list != null) {
             return BeanUtils.copy(list, PrsModelMasterSelectVO.class);
         }

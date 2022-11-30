@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsQualDataDiffMapper">
+
+
+    <select id="findByQual" resultType="com.deloitte.additional.recording.vo.qual.PrsQualDataDiffPageVO">
+
+        SELECT en.entity_name  as entityName,
+               mq.qual_name    as qualName,
+               mq.qual_code    as qualCode,
+               qdd.id,
+               qdd.qual_value  as qualValue,
+               qdd.time_value  as timeValue,
+               qdd.z_score     as zScore,
+               qdd.last_diff   as lastDiff,
+               qdd.avg_diff    as avgDiff,
+               qdd.t_1         as t1,
+               qdd.t_2         as t2,
+               qdd.t_3         as t3,
+               qe.entity_count as entityCount
+        FROM prs_qual_data_diff qdd
+                 LEFT JOIN entity_info en ON en.entity_code = qdd.entity_code
+                 LEFT JOIN prs_model_qual mq ON mq.qual_code = qdd.qual_code
+                 LEFT JOIN prs_qual_efficiency qe ON qe.qual_code = qdd.qual_code
+        WHERE qdd.qual_code = #{qualCode}
+    </select>
+</mapper>

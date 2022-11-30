@@ -61,4 +61,6 @@ public interface SysDictDataService extends IService<SysDictData> {
      * @return
      */
     SysDictData findByTypeDefault(String type);
+
+    SysDictData findByValueAndType(String userId,String type);
 }

@@ -11,4 +11,17 @@ import com.deloitte.additional.recording.domain.EntityInfo;
  */
 public interface EntityInfoService extends IService<EntityInfo> {
 
+    /**
+     * 根据实体code查询
+     * @param entity_code code
+     * @return EntityInfo
+     */
+    EntityInfo getByCode(String entity_code);
+
+    /**
+     * 根据社会信用统一代码查询
+     * @param creditCode 社会信用统一代码
+     * @return
+     */
+    EntityInfo getByCreditCode(String creditCode);
 }

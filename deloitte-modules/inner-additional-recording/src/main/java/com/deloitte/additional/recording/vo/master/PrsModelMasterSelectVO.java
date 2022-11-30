@@ -25,4 +25,7 @@ public class PrsModelMasterSelectVO implements Serializable {
     @ApiModelProperty(name = "敞口名称")
     private String name;
 
+    @ApiModelProperty(name = "敞口code")
+    private String modelCode;
+
 }

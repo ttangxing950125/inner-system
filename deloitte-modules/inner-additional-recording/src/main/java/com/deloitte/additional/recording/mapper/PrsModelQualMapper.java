@@ -1,6 +1,7 @@
 package com.deloitte.additional.recording.mapper;
 
 import com.deloitte.additional.recording.vo.DataListPageTataiVo;
+import com.deloitte.additional.recording.vo.qual.PrsQualDataSelectVO;
 import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.additional.recording.domain.PrsModelQual;
@@ -18,4 +19,8 @@ import java.util.List;
 public interface PrsModelQualMapper extends BaseMapper<PrsModelQual> {
 
     List<DataListPageTataiVo> queryByPageStatsdetail(@Param("modelCode") String modelCode, @Param("timeValue") String timeValue, @Param("name") String name);
+
+    List<PrsQualDataSelectVO> selectByMasterAndVersion(@Param("versionId")Integer versionId, @Param("modelCode")String modelCode);
+
+    String getNameByCode(@Param("code") String code);
 }

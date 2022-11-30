@@ -2,9 +2,6 @@ package com.deloitte.additional.recording.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.additional.recording.domain.PrsModelMaster;
-import com.deloitte.additional.recording.domain.PrsModelQual;
-import com.deloitte.additional.recording.domain.PrsProjectVersions;
 import com.deloitte.additional.recording.domain.TranspreQualinfo3rd;
 import com.deloitte.additional.recording.dto.TranspreQualinfo3rdDto;
 import com.deloitte.additional.recording.mapper.TranspreQualinfo3rdMapper;
@@ -17,9 +14,12 @@ import com.deloitte.additional.recording.vo.qualinfo3rd.TranspreQualinfo3rdPageV
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * (TranspreQualinfo3rd)表服务实现类
@@ -47,6 +47,10 @@ public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo
 
     @Autowired
     private PrsModelQualService qualService;
+
+    @Autowired
+    @Qualifier("taskExecutor")
+    private Executor executor;
 
     @Override
     public Page<TranspreQualinfo3rdPageVO> page(String useYear, String tarType, Integer masterId, Integer versionId, String searchData, Integer page, Integer pageSize) {
@@ -103,20 +107,22 @@ public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo
     }
 
 
+    @Override
+    public List<TranspreQualinfo3rdPageVO> exportExcelData(String useYear, String searchData, Integer versionId, Integer masterId, String tarType) {
+
+        List<TranspreQualinfo3rdDto> search = transpreQualinfo3rdMapper.search(useYear, tarType, masterId, versionId, searchData);
+        List<TranspreQualinfo3rdPageVO> list = new ArrayList<>();
+        if (search != null) {
+            //多线程处理
+            list = BeanUtils.copy(search, TranspreQualinfo3rdPageVO.class);
+
+        }
+        return list;
+    }
+
+
     private Page<TranspreQualinfo3rdPageVO> getVoPage(List<TranspreQualinfo3rdDto> dtoList, long count, Page<TranspreQualinfo3rdPageVO> pageVo) {
         List<TranspreQualinfo3rdPageVO> pageVOS = BeanUtils.copy(dtoList, TranspreQualinfo3rdPageVO.class);
-        pageVOS.forEach(vo -> {
-            //敞口
-            PrsModelMaster modelMaster = masterService.getById(vo.getMasterId());
-            vo.setMasterName(modelMaster == null ? null : modelMaster.getName());
-            //查询版本
-            PrsProjectVersions projectVersions = versionsService.getById(vo.getVersionId());
-            vo.setVersionName(projectVersions == null ? null : projectVersions.getName());
-            //查询指标
-            PrsModelQual modelQual = qualService.getById(vo.getPlusQualid());
-            vo.setQualName(modelQual == null ? null : modelQual.getQualName());
-        });
-
         pageVo.setRecords(pageVOS);
         pageVo.setTotal(count);
         return pageVo;

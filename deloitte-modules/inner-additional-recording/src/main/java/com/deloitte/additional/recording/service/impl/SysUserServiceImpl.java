@@ -144,6 +144,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     }
 
+    @Override
+    public SysUser getByName(String userName) {
+        return lambdaQuery().eq(SysUser::getName, userName).one();
+    }
+
     private void copymenu(SysMenu menu, Map<String, Object> val) {
         menu.setId(Long.valueOf(val.get("id") + ""));
         menu.setName((String) val.get("name"));

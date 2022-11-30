@@ -15,4 +15,9 @@ import org.springframework.stereotype.Service;
 @Service("basEvdInfoService")
 public class BasEvdInfoServiceImpl extends ServiceImpl<BasEvdInfoMapper, BasEvdInfo> implements BasEvdInfoService {
 
+    @Override
+    public BasEvdInfo getByCodeAndName(String evd_code,String name) {
+        return lambdaQuery().eq(BasEvdInfo::getCode,evd_code)
+                .eq(BasEvdInfo::getName,name).one();
+    }
 }

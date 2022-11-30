@@ -14,6 +14,21 @@ public class TranspreQualinfo3rdDto {
      * id
      */
     private Integer id;
+
+    /**
+     * 版本名称
+     */
+    private String versionName;
+
+    /**
+     * 敞口名称
+     */
+    private String masterName;
+
+    /**
+     * 指标名称
+     */
+    private String qualName;
     /**
      * 补录敞口id
      */
@@ -56,4 +71,16 @@ public class TranspreQualinfo3rdDto {
      * 年份
      */
     private String dataYear;
+
+    /**
+     * 单位
+     */
+    private String unit;
+
+    /**
+     *
+     */
+    private String evdName;
+
+    private String evdCode;
 }

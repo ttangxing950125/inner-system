@@ -78,4 +78,11 @@ public interface SysUserService extends IService<SysUser> {
      * 退出
      */
     void logout();
+
+    /**
+     * 根据名字查询  名字设计是唯一性的 （不合适）
+     * @param userName
+     * @return
+     */
+    SysUser getByName(String userName);
 }

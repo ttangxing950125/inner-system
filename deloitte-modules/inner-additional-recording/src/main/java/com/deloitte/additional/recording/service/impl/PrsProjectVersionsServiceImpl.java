@@ -13,14 +13,15 @@ import com.deloitte.additional.recording.mapper.PrsVersionMasterMapper;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
 import com.deloitte.additional.recording.vo.DataListCustomEntityInfoVo;
 import com.deloitte.additional.recording.vo.DataListFindPrsProjectVersionsByYearVo;
+import com.deloitte.additional.recording.vo.version.PrsProjectVersionSelectVO;
 import com.deloitte.common.core.domain.R;
+import com.deloitte.common.core.utils.StrUtil;
+import com.deloitte.common.core.utils.bean.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,6 +79,7 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
      * parallelStream 并发流执行 使用forkjoinpool
      * {@link java.util.concurrent.ForkJoinPool}
      * 统计-数据清单模块 查询版本 下拉框专用方法  版本存在重复 使用 distinct去重 后续参数传名称
+     *
      * @return
      */
     @Override
@@ -129,6 +131,7 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
 
     /**
      * 自定义查询-版本敞口
+     *
      * @param year
      * @return
      */
@@ -146,6 +149,7 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
 
     /**
      * 自定义查询-版本敞口查询公司
+     *
      * @param year
      * @param qualCode
      * @param verMasId
@@ -158,6 +162,18 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
             R.ok();
         }
         return R.ok(resultList);
+    }
+
+    @Override
+    public List<PrsProjectVersionSelectVO> selectList(String userYear) {
+
+        List<PrsProjectVersions> list = lambdaQuery().eq(StrUtil.isNotBlank(userYear), PrsProjectVersions::getTimeValue, userYear)
+                .list();
+        if (null != list) {
+            return BeanUtils.copy(list, PrsProjectVersionSelectVO.class);
+
+        }
+        return null;
     }
 
     /**

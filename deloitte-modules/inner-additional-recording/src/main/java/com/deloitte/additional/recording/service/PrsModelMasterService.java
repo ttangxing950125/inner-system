@@ -33,5 +33,5 @@ public interface PrsModelMasterService extends IService<PrsModelMaster> {
      * 下拉选择列表
      * @return List<PrsModelMasterSelectVO>
      */
-    List<PrsModelMasterSelectVO> selectList();
+    List<PrsModelMasterSelectVO> selectList(Integer versionId);
 }

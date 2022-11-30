@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     public static final String[] excludeUrls = {"/sysUser/login", "/sysUser/logout", "/sysUser/refresh",
-            "/swagger-ui.html", "/swagger-resources/**", "webjars/**", "/login", "/v2/**"};
+            "/swagger-ui.html", "/swagger-resources/**", "webjars/**", "/login", "/v2/**","/v2/api-docs/**"};
 
     /**
      * 添加Web项目的拦截器

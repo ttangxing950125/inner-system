@@ -45,7 +45,7 @@ public class PrsQualData implements Serializable {
      * 数据时间标识
      */
     @Excel(name = "数据时间标识")
-    private Integer timeValue;
+    private String timeValue;
     /**
      * 数据来源标识
      */
@@ -61,5 +61,31 @@ public class PrsQualData implements Serializable {
     @Excel(name = "${column.comment}")
     private Date updated;
 
+    /**
+     * 分配用户
+     */
+    private Integer assignUser;
 
+    /*
+     *任务状态：1-未分配 2-已提交 3-已分配
+     */
+    private Integer taskStatus;
+
+    public PrsQualData createBy(String qualCode, String entityCode, String qualValue, String timeValue) {
+        Date date = new Date();
+        this.created = date;
+        this.qualValue = qualValue;
+        this.qualCode = qualCode;
+        this.entityCode = entityCode;
+        this.timeValue = timeValue;
+        this.updated = date;
+        this.taskStatus = 1;//设置为未分配
+        return this;
+    }
+
+    public void setProperties(PrsQualData data, String qualValue, Integer taskStatus, Integer assignUser) {
+        data.taskStatus = taskStatus;
+        data.assignUser = assignUser;
+        data.qualValue = qualValue;
+    }
 }

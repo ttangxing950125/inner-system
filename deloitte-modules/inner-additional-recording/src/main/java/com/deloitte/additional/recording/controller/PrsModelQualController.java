@@ -3,13 +3,16 @@ package com.deloitte.additional.recording.controller;
 
 import com.deloitte.additional.recording.service.PrsModelQualService;
 import com.deloitte.additional.recording.vo.VersionMasterEvdVo;
+import com.deloitte.additional.recording.vo.qual.PrsQualDataSelectVO;
+import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.domain.R;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * (PrsModelQual)表控制层
@@ -19,6 +22,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("prsModelQual")
+@Api(tags = "指标-控制层")
 public class PrsModelQualController {
     /**
      * 服务对象
@@ -33,9 +37,16 @@ public class PrsModelQualController {
      * @return R
      * @author 冉浩岑
      * @date 2022/11/9 16:56
-    */
+     */
     @PostMapping("/getAllQualOfPage")
-    public R getAllQualOfPage(@RequestBody VersionMasterEvdVo versionMasterEvdVo){
+    public R getAllQualOfPage(@RequestBody VersionMasterEvdVo versionMasterEvdVo) {
         return prsModelQualService.getAllQualOfPage(versionMasterEvdVo);
+    }
+
+    @ApiOperation("获取选定敞口下的指标下拉选择框")
+    @GetMapping("selectListbyVm")
+    public MetaR<List<PrsQualDataSelectVO>> selectList(@ApiParam("版本id") @RequestParam("versionId") Integer versionId,
+                                                       @ApiParam("敞口code") @RequestParam("modelCode") String modelCode) {
+        return MetaR.ok(prsModelQualService.selectByMasterAndVersion(versionId, modelCode));
     }
 }

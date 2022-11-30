@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsModelQual;
 import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import com.deloitte.additional.recording.vo.VersionMasterEvdVo;
+import com.deloitte.additional.recording.vo.qual.PrsQualDataSelectVO;
 import com.deloitte.common.core.domain.R;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -79,4 +80,21 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      */
     R getAllQualOfPage(VersionMasterEvdVo versionMasterEvdVo);
 
+    /**
+     * 根据名称和code查询
+     * @param qualName 指标名称
+     * @param qualCode 指标code
+     * @return PrsModelQual
+     */
+    PrsModelQual getByNameAndCode(String qualName, String qualCode);
+
+    /**
+     * 获取版本 - 敞口下的指标下拉列表
+     * @param versionId 版本id
+     * @param modelCode 敞口coce
+     * @return  List<PrsQualDataSelectVO>
+     */
+    List<PrsQualDataSelectVO> selectByMasterAndVersion(Integer versionId, String modelCode);
+
+    String getByCode(String code);
 }
