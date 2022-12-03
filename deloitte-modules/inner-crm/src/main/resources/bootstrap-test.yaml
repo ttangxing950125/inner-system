@@ -13,6 +13,9 @@ spring:
   application:
     # 应用名称
     name: inner-crm
+  redis:
+    host: 10.173.43.11
+    port: 6379
   cloud:
     nacos:
       discovery:

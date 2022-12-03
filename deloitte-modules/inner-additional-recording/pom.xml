@@ -8,13 +8,13 @@
         <version>3.5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-	
+
     <artifactId>inner-additional-recording</artifactId>
 
     <description>
         deloitte-inner-recording补录模块
     </description>
-	
+
     <dependencies>
 
 
@@ -35,43 +35,48 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
-    	<!-- SpringCloud Alibaba Nacos -->
+        <!-- SpringCloud Alibaba Nacos -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
-        
+
         <!-- SpringCloud Alibaba Nacos Config -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
-        
-    	<!-- SpringCloud Alibaba Sentinel -->
+
+        <!-- SpringCloud Alibaba Sentinel -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
-        
-    	<!-- SpringBoot Actuator -->
+
+        <!-- SpringBoot Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-		
+
         <!-- Swagger UI -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${swagger.fox.version}</version>
         </dependency>
-		
+
         <!-- Mysql Connector -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- deloitte Common DataSource -->
         <dependency>
             <groupId>com.deloitte</groupId>
@@ -83,26 +88,44 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <!-- deloitte Common DataScope -->
         <dependency>
             <groupId>com.deloitte</groupId>
             <artifactId>deloitte-common-datascope</artifactId>
         </dependency>
-        
+
         <!-- deloitte Common Log -->
         <dependency>
             <groupId>com.deloitte</groupId>
             <artifactId>deloitte-common-log</artifactId>
         </dependency>
-        
+
         <!-- deloitte Common Swagger -->
         <dependency>
             <groupId>com.deloitte</groupId>
             <artifactId>deloitte-common-swagger</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.deloitte</groupId>
+            <artifactId>deloitte-common-core</artifactId>
+        </dependency>
+
     </dependencies>
+ <!--   <distributionManagement>
+        <repository>
+            <id>maven-releases</id>&lt;!&ndash;此处的id要和settings.xml中repository的id保持一致&ndash;&gt;
+            <name>Nexus Release Repository</name>
+            &lt;!&ndash; http://10.173.43.11:18081/repository/maven-public&ndash;&gt;
+            <url>http://10.173.43.11:18081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven-snapshots</id>&lt;!&ndash;此处的id要和settings.xml中repository的id保持一致&ndash;&gt;
+            <name>Nexus Snapshot Repository</name>
+            <url>http://10.173.43.11:18081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>-->
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -110,6 +133,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.2.6.RELEASE</version>
                 <executions>
                     <execution>
                         <goals>
@@ -118,16 +142,23 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/**</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
     </build>
-    <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**/**</include>
-            </includes>
-            <filtering>false</filtering>
-        </resource>
-    </resources>
-   
 </project>

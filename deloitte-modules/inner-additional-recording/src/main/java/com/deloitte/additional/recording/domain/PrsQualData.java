@@ -3,10 +3,7 @@ package com.deloitte.additional.recording.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,6 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@ToString
 public class PrsQualData implements Serializable {
     private static final long serialVersionUID = 306345855166810635L;
     @Excel(name = "${column.comment}")
@@ -45,7 +43,7 @@ public class PrsQualData implements Serializable {
      * 数据时间标识
      */
     @Excel(name = "数据时间标识")
-    private String timeValue;
+    private Integer timeValue;
     /**
      * 数据来源标识
      */
@@ -71,7 +69,7 @@ public class PrsQualData implements Serializable {
      */
     private Integer taskStatus;
 
-    public PrsQualData createBy(String qualCode, String entityCode, String qualValue, String timeValue) {
+    public PrsQualData createBy(String qualCode, String entityCode, String qualValue, Integer timeValue) {
         Date date = new Date();
         this.created = date;
         this.qualValue = qualValue;

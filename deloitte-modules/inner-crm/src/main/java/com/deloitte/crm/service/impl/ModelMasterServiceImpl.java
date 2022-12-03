@@ -3,7 +3,6 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.common.core.domain.R;
@@ -62,6 +61,10 @@ public class ModelMasterServiceImpl implements IModelMasterService {
     private SendEmailService sendEmailService;
 
     private GovInfoMapper govInfoMapper;
+
+    private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
+
+    private ProductsMasterRelService productsMasterRelService;
 
     /**
      * 查询【请填写功能名称】
@@ -246,20 +249,29 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         iEntityInfoService.updateById(entityInfo);
         log.info("  =>> 修改一条数据至 entity_info <<=  ");
 
-        CrmMasTask crmMasTask = Optional.ofNullable(iCrmMasTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, masDto.getId()))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+        //这个是角色2的任务id
+        Integer taskId = masDto.getId();
+
+        CrmMasTask crmMasTask = Optional.ofNullable(iCrmMasTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmMasTask>().lambda().eq(CrmMasTask::getId, taskId))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+        //拿到当前任务的时间
+        Date taskDate = crmMasTask.getTaskDate();
         updateEntityMaster(masDto.setRemarks(crmMasTask.getRemarks()));
+
         log.info("  =>> 修改一条数据至 entity_master <<=  ");
 
         if (YES.equals(masDto.getCityIb())){ updateEntityGovRel(masDto); log.info("  =>> 修改一条数据至 entity_gov_info <<=  ");}
 
         //更改当条信息任务状态
-        iCrmMasTaskService.finishTask(masDto.getId(), SecurityUtils.getUsername());
-        Date currentDate = new Date();
-        log.info("  =>> 完成任务 taskId = " + masDto.getId() + " <<=  ");
+        iCrmMasTaskService.finishTask(taskId, SecurityUtils.getUsername());
+        log.info("  =>> 完成任务 taskId = " + taskId + " <<=  ");
+        // TODO 完成一个角色2敞口 就自动映射
+        //完成一条任务后自动映射敞口
+        productsMasterRelService.updateAuto(entityCode);
 
-        // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理
+        // 查看当日任务情况 未处理的 UN_FINISH_STATE 0-未处理(查询的时间条件为当前任务的的时间)
+
         List<CrmMasTask> crmMasTasks = iCrmMasTaskService.getBaseMapper().selectList(new QueryWrapper<CrmMasTask>()
-                .lambda().eq(CrmMasTask::getTaskDate, DateUtils.format(currentDate,"yyyy-MM-dd"))
+                .lambda().eq(CrmMasTask::getTaskDate, DateUtils.format(taskDate,"yyyy-MM-dd"))
                 .eq(CrmMasTask::getState, 0));
 
         //完成当条任务后 向 crm_supply 添加任务
@@ -267,7 +279,7 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         crmSupplyTask.setEntityCode(entityCode);
         //设置为 未处理
         crmSupplyTask.setState(0);
-        crmSupplyTask.setTaskDate(currentDate);
+        crmSupplyTask.setTaskDate(taskDate);
         crmSupplyTask.setFrom(masDto.getSourceName());
         crmSupplyTask.setRemark(masDto.getRemarks());
 
@@ -275,29 +287,43 @@ public class ModelMasterServiceImpl implements IModelMasterService {
         if (YES.equals(masDto.getIsFinance())) {
             crmSupplyTask.setRoleId(5L);
             //修改每日任务状态
-            this.editeDailyTaskByRoleTwo(5);
+            this.editeDailyTaskByRoleTwo(5,taskDate);
         } else if (YES.equals(masDto.getCityIb())) {
             crmSupplyTask.setRoleId(6L);
-            this.editeDailyTaskByRoleTwo(6);
+            this.editeDailyTaskByRoleTwo(6,taskDate);
         } else {
             crmSupplyTask.setRoleId(7L);
-            this.editeDailyTaskByRoleTwo(7);
+            this.editeDailyTaskByRoleTwo(7,taskDate);
         }
         //新增任务
         crmSupplyTaskMapper.insert(crmSupplyTask);
+        //修改每日任务表的状态
+        this.createTask(crmSupplyTask.getRoleId().intValue(),2,DateUtils.format(taskDate,"yyyy-MM-dd"));
 
         // 查询到所有任务已经完成 修改当日单表
         if (crmMasTasks.size() == 0) {
             // 任务完成状态为 3
-            iCrmDailyTaskService.saveTask(4, 3, DateUtil.format(currentDate, "yyyy-MM-dd"));
+            iCrmDailyTaskService.saveTask(4, 3, DateUtil.format(taskDate, "yyyy-MM-dd"));
+            //当角色2所有任务完成时，发送邮件
+             crmMasTasks = iCrmMasTaskService.getBaseMapper().selectList(new QueryWrapper<CrmMasTask>()
+                    .lambda().eq(CrmMasTask::getTaskDate, DateUtils.format(taskDate,"yyyy-MM-dd"))
+                    .eq(CrmMasTask::getState, 1));
+            iCrmMasTaskService.isTaskFinished(crmMasTasks);
+            //向speed表里修改数据 修改状态 divide
+            EntityCaptureSpeed entityCaptureSpeed = entityCaptureSpeedMapper.selectOne(new QueryWrapper<EntityCaptureSpeed>().lambda().eq(EntityCaptureSpeed::getId, crmMasTask.getSpeedId()));
+            if(!ObjectUtils.isEmpty(entityCaptureSpeed)){
+                entityCaptureSpeed.setDivide(1);
+                entityCaptureSpeedMapper.updateById(entityCaptureSpeed);
+            }
 
             // 发送邮件
-            String dateNow = DateUtil.format(currentDate, "yyyy-MM-dd");
+            String taskDateFormat = DateUtil.format(taskDate, "yyyy-MM-dd");
             CrmDailyTask dailyTask = new CrmDailyTask();
-            dailyTask.setTaskDate(currentDate);
+            dailyTask.setTaskDate(taskDate);
 
-            List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new LambdaQueryWrapper<CrmSupplyTask>().eq(CrmSupplyTask::getTaskDate, dateNow)
-                    .between(CrmSupplyTask::getRoleId, 5L, 7L));
+            List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(new QueryWrapper<CrmSupplyTask>().lambda().eq(CrmSupplyTask::getTaskDate, taskDateFormat)
+                    .eq(CrmSupplyTask::getState,0)
+                    .last("AND `role_id` in (5,6,7)"));
             if (CollUtil.isEmpty(crmSupplyTasks)) {
                 log.warn("==> 查询角色 3 4 5任务表【crm_supply_task】数据为空!!!!");
                 return R.ok(SuccessInfo.SUCCESS.getInfo());
@@ -311,33 +337,23 @@ public class ModelMasterServiceImpl implements IModelMasterService {
             Long role5 = groupingByMap.computeIfPresent(7L, (k, v) -> v != 0 ? v : 0L);
             //角色3 角色id为 5L
             if (!ObjectUtils.isEmpty(role3)&&role3!=0) {
-                sendEmailService.email(5, role3.intValue(),dateNow);
-                //无任务为 1 有任务未完成 2
-                this.createTask(5, 2);
-            } else {
-                this.createTask(5, 1);
+                sendEmailService.email(5, role3.intValue(),taskDateFormat);
             }
             //角色4 角色id为 6L
             if (!ObjectUtils.isEmpty(role4)&&role4!=0) {
-                sendEmailService.email(6, role4.intValue(),dateNow);
-                this.createTask(6, 2);
-            } else {
-                this.createTask(6, 1);
+                sendEmailService.email(6, role4.intValue(),taskDateFormat);
             }
             //角色5 角色id为 7L
             if (!ObjectUtils.isEmpty(role5)&&role5!=0) {
-                sendEmailService.email(7, role5.intValue(),dateNow);
-                this.createTask(7, 2);
-            } else {
-                this.createTask(7, 1);
+                sendEmailService.email(7, role5.intValue(),taskDateFormat);
             }
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
     /** 修改每日任务表 角色2 */
-    public void editeDailyTaskByRoleTwo(Integer roleId){
-        CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate,DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
-        if(ObjectUtils.isEmpty(crmDailyTask)){iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskStatus(2).setTaskDate(new Date()).setTaskRoleType(roleId.toString()));}
+    public void editeDailyTaskByRoleTwo(Integer roleId,Date taskDate){
+        CrmDailyTask crmDailyTask = iCrmDailyTaskService.getBaseMapper().selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate,DateUtil.format(taskDate, "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
+        if(ObjectUtils.isEmpty(crmDailyTask)){iCrmDailyTaskService.getBaseMapper().insert(new CrmDailyTask().setTaskStatus(2).setTaskDate(taskDate).setTaskRoleType(roleId.toString()));}
         else{crmDailyTask.setTaskStatus(2);iCrmDailyTaskService.getBaseMapper().updateById(crmDailyTask);}
     }
 
@@ -382,13 +398,13 @@ public class ModelMasterServiceImpl implements IModelMasterService {
      * @param roleId 5-角色3 6-角色4 7-角色5
      * @param taskState 1- 没有任务  2-有任务未完成
      */
-    public void createTask(Integer roleId, Integer taskState) {
+    public void createTask(Integer roleId, Integer taskState,String date) {
         BaseMapper<CrmDailyTask> baseMapper = iCrmDailyTaskService.getBaseMapper();
-        CrmDailyTask crmDailyTask = baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, DateUtil.format(new Date(), "yyyy-MM-dd")).eq(CrmDailyTask::getTaskRoleType, roleId));
+        CrmDailyTask crmDailyTask = baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, roleId));
         if(ObjectUtils.isEmpty(crmDailyTask)){
             baseMapper.insert(new CrmDailyTask().setTaskDate(new Date()).setTaskStatus(taskState).setTaskRoleType(roleId.toString()));
         }else{
-            crmDailyTask.setTaskStatus(2);
+            crmDailyTask.setTaskStatus(taskState);
             baseMapper.updateById(crmDailyTask);
         }
     }

@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.PrsModelQual;
+import com.deloitte.additional.recording.vo.*;
 import com.deloitte.additional.recording.vo.DataListPageTataiVo;
 import com.deloitte.additional.recording.vo.VersionMasterEvdVo;
 import com.deloitte.additional.recording.vo.qual.PrsQualDataSelectVO;
@@ -61,7 +62,16 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @see PrsModelQualService#queryByPageStatsdetailNoSql(String, String, String)
      */
     @Deprecated
-    List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, String name);
+    List<DataListPageTataiVo> queryByPageStatsdetail(String modelCode, String timeValue, Integer Id);
+    /**
+     * 分页查询全部指标
+     *
+     * @param versionMasterEvdVo
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/9 16:56
+     */
+    R paging(VersionMasterEvdVo versionMasterEvdVo);
     /**
      * 获取动态表头 不通过SQL的关联查询
      * @param modelCode
@@ -69,7 +79,7 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @param name
      * @return
      */
-    List<DataListPageTataiVo> queryByPageStatsdetailNoSql(String modelCode, String timeValue, String name);
+    List<DataListPageTataiVo> queryByPageStatsdetailNoSql(String modelCode, String timeValue, Integer Id);
     /**
      * 分页查询全部指标
      *
@@ -79,7 +89,28 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @date 2022/11/9 16:56
      */
     R getAllQualOfPage(VersionMasterEvdVo versionMasterEvdVo);
+    R addQual(InsertQualVo insertQualVo);
 
+    R openQual(List<Integer> qualIds);
+    R disableQual(List<Integer> qualIds);
+    R qualrule(PrsModelQual prsModelQual);
+    /**
+     * 根据指标Code查询指标信息
+     *
+     * @param qualiD
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/11 16:58
+     */
+    R getQualDetal(Integer qualiD);
+    /**
+     * 修改指标
+     *
+     * @return R
+     * @author 冉浩岑
+     * @date 2022/11/11 17:05
+     */
+    R updateQualFactor(QualInfoBackVo qualInfoBackVo);
     /**
      * 根据名称和code查询
      * @param qualName 指标名称
@@ -94,7 +125,16 @@ public interface PrsModelQualService extends IService<PrsModelQual> {
      * @param modelCode 敞口coce
      * @return  List<PrsQualDataSelectVO>
      */
+    List<PrsModelQual> getPrsModelQualByVersionIdAndModelCode(String versionId, String modelCode);
+
+    /**
+     * 查询所有指标名称和指标code
+     */
+    List<QualNameCodeVo> getAllQualNameCod();
+
     List<PrsQualDataSelectVO> selectByMasterAndVersion(Integer versionId, String modelCode);
 
     String getByCode(String code);
+
+    R getqualrule(String qualcode);
 }

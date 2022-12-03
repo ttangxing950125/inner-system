@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.BondStatus;
 import com.deloitte.crm.constants.DataChangeType;
@@ -90,6 +91,8 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
 
         //查询有没有这个债券
         BondInfo bondInfo = bondInfoService.findByShortName(bondName, Boolean.FALSE);
+
+
         if (bondInfo == null) {
             bondInfo = new BondInfo();
         }
@@ -183,14 +186,20 @@ public class BondNewIssueStrategy implements WindTaskStrategy {
         }
 
 
+//        timeNow
         //发债记录
-        if (Objects.equals(bondStatus, BondStatus.ISSUE.getId())) {
+        if ( DateUtil.compare(newIss.getIpoDate(), timeNow) || DateUtil.compare(newIss.getValueDate(), timeNow) ) {
             //创建log
             BondsListingLog log = new BondsListingLog();
             log.setCode(newIss.getTradeCode());
             log.setName(newIss.getBondName());
             log.setShortName(newIss.getBondShortName());
-            log.setIssueDate(DateUtil.dateTime("yyyy-MM-dd", newIss.getIssStartDate()));
+            if (StrUtil.isNotBlank(newIss.getValueDate())){
+                log.setIssueDate(DateUtil.dateTime("yyyy-MM-dd", newIss.getValueDate()));
+            }
+            if (StrUtil.isNotBlank(newIss.getIpoDate())){
+                log.setIpoDate(DateUtil.dateTime("yyyy-MM-dd", newIss.getIpoDate()));
+            }
             log.setPublisher(newIss.getIssorName());
             log.setRecordTime(timeNow);
             log.setSourceType(1);

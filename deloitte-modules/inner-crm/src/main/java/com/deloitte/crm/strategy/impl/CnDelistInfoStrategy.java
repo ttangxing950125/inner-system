@@ -108,7 +108,7 @@ public class CnDelistInfoStrategy implements WindTaskStrategy {
         String code = item.getCode();
         StockCnInfo stockCnInfo = stockCnInfoService.findByCode(code);
         if (stockCnInfo != null) {
-            stockCnInfo.setIsDeleted(Boolean.TRUE);//TODO 1-删除 0-未删除 默认都是未删除
+//            stockCnInfo.setIsDeleted(Boolean.TRUE);//TODO 1-删除 0-未删除 默认都是未删除
             stockCnInfo.setDelistingDate(DateUtil.formatDate(item.getDelistDate()));
             stockCnInfo = stockCnInfoService.saveOrUpdateNew(stockCnInfo);
             final LambdaQueryWrapper<EntityStockCnRel> lambdaQueryWrapper = new LambdaQueryWrapper<>();

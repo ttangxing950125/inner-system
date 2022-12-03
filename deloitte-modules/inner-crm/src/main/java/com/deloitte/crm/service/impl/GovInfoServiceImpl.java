@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.utils.DateUtil;
+import com.deloitte.common.core.utils.StrUtil;
 import com.deloitte.common.security.utils.SecurityUtils;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.Common;
@@ -51,6 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.lang.System.out;
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 
 /**
  * 【请填写功能名称】Service业务层处理
@@ -404,7 +406,7 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
     }
 
     @Override
-    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+    public R getInfoList(String govLevel,Integer type, String param, Integer pageNum, Integer pageSize) {
         if (ObjectUtil.isEmpty(pageNum)) {
             pageNum = DEFAULT_PAGE_NUM;
         }
@@ -437,9 +439,10 @@ public class GovInfoServiceImpl extends ServiceImpl<GovInfoMapper, GovInfo> impl
             hisNameListMap = nameHisList.stream().collect(Collectors.groupingBy(EntityNameHis::getDqCode));
         }
         Map<String, List<EntityNameHis>> finalHisNameListMap = hisNameListMap;
-        govInfoList.stream().forEach(o -> {
-            records.add(getResultMap(o, finalHisNameListMap));
-        });
+        for (GovInfo govInfo : govInfoList) {
+            records.add(getResultMap(govInfo, finalHisNameListMap));
+        }
+
         page.setRecords(records).setCurrent(govInfoPage.getCurrent());
         return R.ok(page);
     }

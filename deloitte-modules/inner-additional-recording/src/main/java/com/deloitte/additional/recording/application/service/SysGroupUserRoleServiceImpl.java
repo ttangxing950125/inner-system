@@ -99,12 +99,12 @@ public class SysGroupUserRoleServiceImpl implements SysGroupUserRoleService {
         Integer[] roleIds = srtToIntArray(role);
         Integer[] groupIds = srtToIntArray(groups);
         //查询用户id
-        List<SysUserRole> userRoles = userRoleService.lambdaQuery().in(roleIds!=null,SysUserRole::getRoleId, roleIds).list();
+        List<SysUserRole> userRoles = userRoleService.lambdaQuery().in(roleIds != null, SysUserRole::getRoleId, roleIds).list();
         Set<Integer> userIds = new HashSet<>();
         //将userIds添加到set中
         userIds.addAll(userRoles.stream().map(SysUserRole::getUserId).collect(Collectors.toSet()));
         //查询用户分组
-        List<SysGroupUser> groupUsers = groupUserService.lambdaQuery().in(groupIds!=null,SysGroupUser::getGroupId, groupIds).list();
+        List<SysGroupUser> groupUsers = groupUserService.lambdaQuery().in(groupIds != null, SysGroupUser::getGroupId, groupIds).list();
         userIds.addAll(groupUsers.stream().map(SysGroupUser::getUserId).collect(Collectors.toSet()));
         Page<SysUser> userPage = new Page<>(page, pagesize);
         userPage = userService.selectPage(name, nickname, status, userIds, userPage);

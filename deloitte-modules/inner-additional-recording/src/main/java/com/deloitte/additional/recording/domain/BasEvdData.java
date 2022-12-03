@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.domain;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
@@ -37,11 +38,14 @@ public class BasEvdData implements Serializable {
      */
     @ExcelProperty(value = "evidence_id")
     private String evdCode;
+
+    @TableField(exist = false)
+    private String evdName;
     /**
      * json格式的evidence
      */
-    @Excel(name = "json格式的evidence")
-    private String evdVal;
+    @Excel(name = "evd的值")
+    private String evdVal = "-999999.9999";
     /**
      * 数据时间标识
      */
@@ -52,6 +56,11 @@ public class BasEvdData implements Serializable {
      */
     @Excel(name = "数据针对划档流程是否可用")
     private Integer valid;
+
+    /**
+     * 是否缺失
+     */
+    private Integer  defect;
     /**
      * 数据来源信息
      */
@@ -71,6 +80,8 @@ public class BasEvdData implements Serializable {
      */
     @Excel(name = "是否修改自动化结果")
     private Integer isUpdate;
+
+    private String unit;
 
 
     public BasEvdData createBy(String entityCode, String evdCode, String evdVal, String timeValue) {

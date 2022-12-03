@@ -530,11 +530,11 @@ public class BondInfoServiceImpl implements IBondInfoService {
             case 2:
                 //如果该变动字段是 是否为集合债 那么关键字为 coll Y为1 N为0
                 if (Objects.equals(filedName, "coll")) {
-                    value = value == "Y" ? "1" : "0";
+                    value = Objects.equals(value,"Y" )? "1" : "0";
                 }
                 //如果该变动字段是 是否为ABS 那么关键字为 abs Y为1 N为0
                 if (Objects.equals(filedName, "abs")) {
-                    value = value == "Y" ? "1" : "0";
+                    value =Objects.equals(value,"Y" )? "1" : "0";
                 }
                 bondInfoMapper.editByBondInfoManager(id, filedName, value);
                 break;

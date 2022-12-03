@@ -1,6 +1,7 @@
 package com.deloitte.crm.strategy.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.math.MathUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -89,6 +90,9 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
         stockThkInfo.setListDate(thkSecIssInfos.getIpoDate() == null ? null : cn.hutool.core.date.DateUtil.formatDate(thkSecIssInfos.getIpoDate()));
         //公司介绍
         stockThkInfo.setEntityIntro(Optional.ofNullable(thkSecIssInfos.getEntityDes()).orElse(""));
+        //当股票首次出现在  首次发行明细 中时，记为“发行中”
+        stockThkInfo.setStockStatus(StockThkStatus.ISSUE.getId());
+        stockThkInfo.setStatusDesc(StockThkStatus.ISSUE.getName());
 
         /***
          *部分代码逻辑沿用BondDelIssStrategy
@@ -120,9 +124,6 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
             changeType = DataChangeType.INSERT.getId();
 
-            //当股票首次出现在  首次发行明细 中时，记为“发行中”
-            stockThkInfo.setStockStatus(StockThkStatus.ISSUE.getId());
-            stockThkInfo.setStatusDesc(StockThkStatus.ISSUE.getName());
         } else if (!Objects.equals(lastThkSecIssInfo, thkSecIssInfos)) {
             //如果他们两个不相同，代表有属性修改了
             changeType = DataChangeType.UPDATE.getId();
@@ -136,7 +137,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
         boolean ipoNow = DateUtil.compare(ipoDate, timeNow) == 0;
 
         //当股票状态已经是“发行中”时，当【上市日期】 = 今天 时，状态改为“成功上市”
-        if (Objects.equals(StockThkStatus.ISSUE.getId(), stockThkInfo.getStockStatus()) && DateUtil.compare(ipoDate, timeNow) == 0) {
+        if ( DateUtil.compare(ipoDate, timeNow) == 0) {
             stockThkInfo.setStockStatus(StockThkStatus.LIST.getId());
             stockThkInfo.setStatusDesc(StockThkStatus.LIST.getName());
 
@@ -149,12 +150,12 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
 
             //上市记录
-            String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining());
+            String names = entityInfos.stream().map(EntityInfo::getEntityName).collect(Collectors.joining(","));
             //创建log
             BondsListingLog log = new BondsListingLog();
             log.setCode(thkSecIssInfos.getCode());
             log.setName(thkSecIssInfos.getName());
-            log.setIpoDate(DateUtil.parseDate(thkSecIssInfos.getIpoDate()));
+            log.setIpoDate(thkSecIssInfos.getIpoDate());
             log.setPublisher(names);
             log.setRecordTime(timeNow);
             log.setSourceType(2);
@@ -184,6 +185,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
         return new AsyncResult(new Object());
     }
+
 
     /**
      * 是否支持当前wind任务
@@ -233,6 +235,7 @@ public class ThkSecIssDetailStrategy implements WindTaskStrategy {
 
         return arr;
     }
+
 
     /**
      * 获得任务详情页，上传的详情数据

@@ -73,7 +73,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     @Override
     public List<Map<String, Object>> finAllsysDictData() {
         List<Map<String, Object>> objectMaps = new ArrayList<>();
-        List<SysDictData> list = mapper.selectList(new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getDictLabel, "产品年份").eq(SysDictData::getStatus, 0));
+        List<SysDictData> list = mapper.selectList(new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getDictType, Common.DICTTYPE_SEARCH_YEAR).eq(SysDictData::getStatus, 0));
         HashMap<String, Object> results = Maps.newHashMap();
         list.stream().forEach(e -> results.put(e.getDictValue(), e.getIsDefault()));
         objectMaps.add(results);
@@ -88,7 +88,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public List<SysDictData> findByType(String type) {
-        return baseMapper.selectList(new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getDictType, type));
+        return baseMapper.selectList(new LambdaQueryWrapper<SysDictData>().eq(SysDictData::getDictType, type).eq(SysDictData::getStatus,0));
     }
 
     /**

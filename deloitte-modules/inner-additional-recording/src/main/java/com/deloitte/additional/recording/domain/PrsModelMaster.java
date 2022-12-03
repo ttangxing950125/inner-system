@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,6 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class PrsModelMaster implements Serializable {
     private static final long serialVersionUID = 837763217380687555L;
     @Excel(name = "${column.comment}")
@@ -36,6 +38,11 @@ public class PrsModelMaster implements Serializable {
      */
     @Excel(name = "敞口编码")
     private String modelCode;
+    /**
+     * 敞口编码
+     */
+    @Excel(name = "1-一般敞口 2-政府敞口")
+    private String modelType;
     /**
      * 敞口描述
      */

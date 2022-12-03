@@ -22,20 +22,20 @@ public class GetTaskTargetvalPageListDto implements Serializable {
     /**
      * 分页参数开始页 1
      */
-    private Integer pageNum;
+    private Integer pageNum=1;
     /***
      *分页参数 默认是10
      */
-    private Integer pagesize;
+    private Integer pagesize=5;
     /**
-     * 版本
+     * 版本Id
      */
-    private String versionName;
+    private Integer id;
 
     /**
-     * 敞口ID
+     * 敞口Code
      */
-    private Long industryId;
+    private String modelCode;
     /**
      * 年份
      */

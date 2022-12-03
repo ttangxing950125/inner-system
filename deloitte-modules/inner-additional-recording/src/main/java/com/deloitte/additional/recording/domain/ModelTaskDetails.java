@@ -31,6 +31,8 @@ public class ModelTaskDetails implements Serializable {
      */
     @Excel(name = "主任务id")
     private String taskNo;
+
+    private Integer taskNumber;
     /**
      * 任务类型 参考sys_dict task_type
      */

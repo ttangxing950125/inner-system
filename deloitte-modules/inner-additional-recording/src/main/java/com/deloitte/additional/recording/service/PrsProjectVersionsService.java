@@ -84,4 +84,11 @@ public interface PrsProjectVersionsService extends IService<PrsProjectVersions> 
      * @return  List<PrsProjectVersionSelectVO>
      */
     List<PrsProjectVersionSelectVO> selectList(String userYear);
+    /**
+     * 获取下拉框 版本 带上年份
+     * @param timeValue
+     * @return
+     */
+    R getVersionByTimeValue(String timeValue);
+    R getVersion();
 }

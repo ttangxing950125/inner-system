@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.additional.recording.domain.PrsVerMasEntity;
 import com.deloitte.additional.recording.service.PrsVerMasEntityService;
+import com.deloitte.common.core.domain.R;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,5 +28,8 @@ public class PrsVerMasEntityController {
     @Resource
     private PrsVerMasEntityService prsVerMasEntityService;
 
-    
+    @PostMapping("/pullCrmEntity")
+    public R pullCrmEntity(Integer versionId){
+        return R.ok(prsVerMasEntityService.pullCrmEntity(versionId));
+    }
 }

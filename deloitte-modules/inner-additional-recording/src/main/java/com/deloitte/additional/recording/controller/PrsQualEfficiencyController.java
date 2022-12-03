@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -119,10 +120,8 @@ public class PrsQualEfficiencyController {
         //关闭
         IOUtils.closeQuietly(templateInputStream);
         IOUtils.closeQuietly(outputStream);
-        IOUtils.closeQuietly(excelWriter);
+        IOUtils.closeQuietly((Closeable) excelWriter);
         System.out.println("报表导出结束时间:" + new Date() + ";写入耗时: " + (System.currentTimeMillis() - exportStartTime) + "ms");
-
-
     }
 
     @ApiOperation("导入指标任务excel")

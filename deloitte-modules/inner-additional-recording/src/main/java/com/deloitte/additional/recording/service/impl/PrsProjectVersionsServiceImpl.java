@@ -190,5 +190,25 @@ public class PrsProjectVersionsServiceImpl extends ServiceImpl<PrsProjectVersion
         prsProjectVersions.setStatus(status);
         return prsProjectVersionsMapper.update(prsProjectVersions, new QueryWrapper<PrsProjectVersions>().lambda().in(PrsProjectVersions::getId, ids));
     }
+    /**
+     *
+     * @param timeValue
+     * @return
+     */
+    @Override
+    public R getVersionByTimeValue(String timeValue) {
+        final LambdaQueryWrapper<PrsProjectVersions> prsProjectVersionsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        prsProjectVersionsLambdaQueryWrapper.eq(PrsProjectVersions::getTimeValue,timeValue);
+        prsProjectVersionsLambdaQueryWrapper.eq(PrsProjectVersions::getStatus,1);
+        final List<PrsProjectVersions> prsProjectVersions = prsProjectVersionsMapper.selectList(prsProjectVersionsLambdaQueryWrapper);
+        return R.ok( prsProjectVersions);
+    }
+    @Override
+    public R getVersion() {
+        LambdaQueryWrapper<PrsProjectVersions> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(PrsProjectVersions::getStatus,1).groupBy(PrsProjectVersions::getName);
+        List<PrsProjectVersions> prsProjectVersions = prsProjectVersionsMapper.selectList(lambdaQueryWrapper);
+        return R.ok(prsProjectVersions);
+    }
 
 }

@@ -26,4 +26,7 @@ public interface PrsQualDataMapper extends BaseMapper<PrsQualData> {
 
 
     long countLose(@Param("qualCode") String qualCode, @Param("dataYear") String dataYear);
+
+
+    List<PrsQualData> listByCodeAndTimeAndValueIsNotNull(@Param("qualCode") String qualCode, @Param("dataYear") String dataYear);
 }

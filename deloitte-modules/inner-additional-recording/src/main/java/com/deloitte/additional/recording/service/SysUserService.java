@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.SysMenu;
 import com.deloitte.additional.recording.domain.SysUser;
+import com.deloitte.additional.recording.vo.TaskUserVo;
 
 import java.util.List;
 import java.util.Set;
@@ -41,6 +42,11 @@ public interface SysUserService extends IService<SysUser> {
      * @return
      */
     List<String> getRoleList(SysUser u);
+
+    /**
+     * 查询补录、审核人员
+     */
+    List<TaskUserVo> getUserNameList(String loginName);
 
 
     /**

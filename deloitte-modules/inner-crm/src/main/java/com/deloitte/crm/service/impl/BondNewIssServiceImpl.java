@@ -92,6 +92,9 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
             }
             //Wind债券类型(二级) 国债和地方政府债不考虑
             if (excludeBondTypeSecond.contains(newIss.getWindBondTypeSecond())) {
+                newIss.setTaskId(windTask.getId());
+                newIss.setImportTime(new Date());
+                bondNewIssMapper.insert(newIss);
                 continue;
             }
 
@@ -113,6 +116,7 @@ public class BondNewIssServiceImpl extends ServiceImpl<BondNewIssMapper, BondNew
                 break;
             }
         }
+
 
         //修改原任务状态
         windTask.setComplete(1);

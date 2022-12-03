@@ -1,6 +1,9 @@
 package com.deloitte.system.api.domain;
 
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import com.deloitte.common.core.annotation.Excel.ColumnType;
 import com.deloitte.common.core.constant.UserConstants;
@@ -38,6 +41,7 @@ public class SysDictData implements Serializable {
      * 字典排序
      */
     @Excel(name = "字典排序", cellType = ColumnType.NUMERIC)
+    @TableField(exist = false)
     private Long dictSort;
 
     /**

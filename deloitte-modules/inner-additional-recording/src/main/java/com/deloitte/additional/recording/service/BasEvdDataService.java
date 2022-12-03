@@ -2,6 +2,7 @@ package com.deloitte.additional.recording.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.BasEvdData;
+import com.deloitte.additional.recording.domain.PrsVersionMaster;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -12,6 +13,15 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface BasEvdDataService extends IService<BasEvdData> {
 
+    /**
+     * 绑定evd_data和evd_task和task_info
+     * @param versionMaster
+     * @param entityCode
+     * @param taskYear
+     * @author wpp
+     * @return
+     */
+    boolean bindEvdData(PrsVersionMaster versionMaster, String entityCode, Integer taskYear);
     /**
      * wind导入数据
      * @param serviceFile 文件

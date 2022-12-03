@@ -3,26 +3,25 @@ package com.deloitte.crm.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
+import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.CrmMasTask;
-import com.deloitte.crm.domain.EntityCaptureSpeed;
-import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.EntityMaster;
-import com.deloitte.crm.mapper.CrmMasTaskMapper;
-import com.deloitte.crm.mapper.EntityCaptureSpeedMapper;
-import com.deloitte.crm.mapper.EntityMasterMapper;
+import com.deloitte.crm.domain.*;
+import com.deloitte.crm.mapper.*;
 import com.deloitte.crm.service.ICrmDailyTaskService;
 import com.deloitte.crm.service.ICrmMasTaskService;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.vo.CrmMasTaskVo;
+import com.deloitte.crm.vo.EmailCrmTask;
+import com.deloitte.crm.vo.EmailVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,6 +51,13 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
     private EntityMasterMapper entityMasterMapper;
 
     private EntityCaptureSpeedMapper entityCaptureSpeedMapper;
+
+    private EntityInfoMapper entityInfoMapper;
+
+    private ModelMasterMapper modelMasterMapper;
+
+    private EmailVo emailVo;
+
 
     /**
      * 查询【请填写功能名称】
@@ -238,5 +241,66 @@ public class CrmMasTaskServiceImpl extends ServiceImpl<CrmMasTaskMapper, CrmMasT
 
         }
         return crmMasTask.getTaskDate();
+    }
+
+    @Override
+    public boolean isTaskFinished(List<CrmMasTask> crmMasTasks) {
+        try {
+            ArrayList<EmailCrmTask> emailCrmTasks = new ArrayList<>();
+            for (CrmMasTask crmMasTask : crmMasTasks) {
+                EmailCrmTask emailCrmTask = new EmailCrmTask();
+                EntityInfo entityInfo = entityInfoMapper.selectOne(new LambdaQueryWrapper<EntityInfo>().eq(EntityInfo::getEntityCode, crmMasTask.getEntityCode()));
+                EntityMaster entityMaster = entityMasterMapper.selectOne(new LambdaQueryWrapper<EntityMaster>().eq(EntityMaster::getEntityCode, crmMasTask.getEntityCode()));
+                ModelMaster modelMaster = modelMasterMapper.selectOne(new LambdaQueryWrapper<ModelMaster>().eq(ModelMaster::getMasterCode, entityMaster.getMasterCode()));
+                emailCrmTask.setEntityName(entityInfo.getEntityName());
+                emailCrmTask.setCode(entityInfo.getCreditCode());
+                emailCrmTask.setSourceName(Objects.equals(crmMasTask.getSpeedId(),null)?crmMasTask.getSourceName():"新增主体");
+                emailCrmTask.setWindMaster(Objects.equals(entityInfo.getWindMaster(),null)?"-":entityInfo.getWindMaster());
+                emailCrmTask.setShenWanMaster(Objects.equals(entityInfo.getShenWanMaster(),null)?"-":entityInfo.getShenWanMaster());
+                emailCrmTask.setResult(modelMaster.getMasterName());
+                emailCrmTask.setRemarks(Objects.equals(entityMaster.getRemark(),null)?"-":entityMaster.getRemark());
+                emailCrmTasks.add(emailCrmTask);
+            }
+            String title = "角色2完成任务情况：";
+            //画表格
+            StringBuffer content = new StringBuffer();
+            if (crmMasTasks.size() != 0) {
+                content.append("<h2 style=\" font-size: 14px;\">角色2完成任务情况详细信息如下:</h2>");
+                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=14px;\">");
+                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>主体名称</th><th>统一社会性代码</th><th>来源</th><th>Wind</th><th>申万</th><th>划分结果</th><th>备注</th></tr>");
+                for (EmailCrmTask row : emailCrmTasks) {
+                    content.append("<tr>");
+                    //主体名称
+                    content.append("<td align=\"center\">" + row.getEntityName() + "</td>");
+                    //统一社会性代码
+                    content.append("<td align=\"center\">" + row.getCode() + "</td>");
+                    //来源
+                    content.append("<td align=\"center\">" + row.getSourceName() + "</td>");
+                    //Wind
+                    content.append("<td align=\"center\">" + row.getWindMaster() + "</td>");
+                    //申万
+                    content.append("<td align=\"center\">" + row.getShenWanMaster() + "</td>");
+                    //划分结果
+                    content.append("<td align=\"center\">" + row.getResult() + "</td>");
+                    //备注
+                    content.append("<td align=\"center\">" + row.getRemarks() + "</td>");
+                    content.append("</tr>");
+                }
+                content.append("</table>");
+            } else {
+                content.append("<h2 style=\" font-size: 14px;\">角色2未提供相应的完成情况</h2>");
+            }
+            List<String> passwords = emailVo.getPasswords();
+
+            for (String s : passwords) {
+                EmailUtil.sendTemplateEmail(title, content.toString(), s);
+            }
+            return true;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return false;
+
+        }
+
     }
 }

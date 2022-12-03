@@ -203,9 +203,9 @@ public class GovInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param, Integer pageNum, Integer pageSize) {
+    public R getInfoList(String govLevel, Integer type, String param, Integer pageNum, Integer pageSize) {
         log.info("  >>>>  政府主体分类查询,type=[{}] <<<<  ",type);
-        return govInfoService.getInfoList(type, param, pageNum, pageSize);
+        return govInfoService.getInfoList(govLevel,type, param, pageNum, pageSize);
     }
 
     /**

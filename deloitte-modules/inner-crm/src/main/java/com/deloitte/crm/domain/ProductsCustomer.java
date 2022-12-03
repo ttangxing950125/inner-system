@@ -27,7 +27,10 @@ public class ProductsCustomer implements Serializable {
     @TableId(type = IdType.AUTO)
     private  Integer id;
 
-
+    /**
+     * 产品客户编码
+     */
+    private  String prcCode;
     /**
      * 产品id
      */

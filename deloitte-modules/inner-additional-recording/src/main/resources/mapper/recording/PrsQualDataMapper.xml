@@ -26,4 +26,15 @@
           AND time_value = #{dataYear}
           AND (qual_value IS NULL OR qual_value = '-999999.9999')
     </select>
+    <select id="listByCodeAndTimeAndValueIsNotNull" resultType="com.deloitte.additional.recording.domain.PrsQualData">
+        SELECT id,
+               qual_code  as qualCode,
+               qual_value as qualValue,
+               time_value as timeValue
+        FROM prs_qual_data
+        where qual_code = #{qualCode}
+          and time_value = #{dataYear}
+          and qual_value is not null
+          and qual_value != '-999999.9999'
+    </select>
 </mapper>

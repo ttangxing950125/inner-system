@@ -136,7 +136,9 @@ public class BondDelIssStrategy implements WindTaskStrategy {
         //上市地点
         bondInfo.setExchange(delIss.getIpoAddr());
         //发行总额
-        bondInfo.setIssueamount(delIss.getIssScale().toString());
+        if (delIss.getIssScale()!=null){
+            bondInfo.setIssueamount(delIss.getIssScale().toPlainString());
+        }
         //wind2二级
         bondInfo.setWind2(delIss.getWinSecondIndustry());
 

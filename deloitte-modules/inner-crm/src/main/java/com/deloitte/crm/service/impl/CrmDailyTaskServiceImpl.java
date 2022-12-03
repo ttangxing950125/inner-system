@@ -1,10 +1,11 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.excel.util.DateUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
@@ -22,13 +23,13 @@ import com.deloitte.crm.mapper.CrmDailyTaskMapper;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmSupplyTaskMapper;
 import com.deloitte.crm.service.ICrmDailyTaskService;
-import com.deloitte.crm.utils.TimeFormatUtil;
 import com.deloitte.crm.vo.EmailVo;
 import com.deloitte.system.api.RoleService;
 import com.deloitte.system.api.domain.SysRole;
 import com.deloitte.system.api.model.LoginUser;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -194,7 +195,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             baseMapper.insert(new CrmDailyTask().setTaskRoleType(taskRoleType.toString()).setTaskStatus(taskStatus).setTaskDate(new Date()));
         } else {
             log.info("  =>> 角色 id 为" + taskRoleType + " 修改 " + date + " 任务:状态为 " + taskStatus + " <<=");
-            CrmDailyTask crmDailyTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, taskStatus))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
+            CrmDailyTask crmDailyTask = Optional.ofNullable(baseMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType, taskRoleType))).orElseThrow(() -> new ServiceException(BadInfo.EMPTY_TASK_TABLE.getInfo()));
             baseMapper.updateById(crmDailyTask.setTaskStatus(taskStatus));
         }
     }
@@ -209,45 +210,27 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
      */
     @Override
     public void checkDailyTask(CrmSupplyTask crmSupplyTask) {
-
-        //完成任务前先检查一下角色3任务是否全部完成，如果都完成，则不需要修改每日任务状态
-        QueryWrapper<CrmSupplyTask> query = new QueryWrapper<>();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).eq(CrmSupplyTask::getRoleId, crmSupplyTask.getRoleId()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
-        Long count = crmSupplyTaskMapper.selectCount(query);
-        //完成任务前先检查一下角色3.4.5任务是否全部完成，如果都完成，则不需要发送邮件
-        query.clear();
-        query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
-        Long allCount = crmSupplyTaskMapper.selectCount(query);
+        Long roleId = crmSupplyTask.getRoleId();
+        Date taskDate = crmSupplyTask.getTaskDate();
 
         completeTaskById(crmSupplyTask.getId());
+        //完成任务前先检查一下角色3任务是否全部完成，如果都完成，则修改每日任务状态
+        QueryWrapper<CrmSupplyTask> query = new QueryWrapper<>();
+        query.lambda().eq(CrmSupplyTask::getTaskDate, taskDate).eq(CrmSupplyTask::getRoleId, roleId).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
+        Long count = crmSupplyTaskMapper.selectCount(query);
 
-        //如果当前角色已经完成过一次所有任务，则更新每日任务表
+        //如果当前角色完成所有任务，则更新每日任务表
         if (count < 1) {
-            Long roleId = crmSupplyTask.getRoleId();
-            Date taskDate = crmSupplyTask.getTaskDate();
             log.info("  >>>> 完成任务后根据roleId检查并修改每日任务状态,roleId=[{}],taskDate=[{}] <<<<  ", roleId, taskDate);
-            query.clear();
-            query.lambda().eq(CrmSupplyTask::getRoleId, roleId).eq(CrmSupplyTask::getTaskDate, taskDate);
-            List<CrmSupplyTask> crmSupplyTasks = crmSupplyTaskMapper.selectList(query);
-            if (CollectionUtils.isEmpty(crmSupplyTasks)) {
-                return;
-            }
-            List<CrmSupplyTask> collect = crmSupplyTasks.stream().filter(o -> ObjectUtils.isEmpty(o.getState()) || 1 != o.getState()).collect(Collectors.toList());
-            if (!CollectionUtils.isEmpty(collect)) {
-                return;
-            }
             //修改每日任务进度
             CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda()
                     .eq(CrmDailyTask::getTaskDate, taskDate).eq(CrmDailyTask::getTaskRoleType, roleId).last(" limit 1"));
-            crmDailyTask.setTaskStatus(3).setUpdated(new Date());
-            crmDailyTaskMapper.updateById(crmDailyTask);
-        }
-
-        //发送邮件
-        if (allCount < 0) {
-            query.clear();
-            query.lambda().eq(CrmSupplyTask::getTaskDate, crmSupplyTask.getTaskDate()).and(wrapper -> wrapper.eq(CrmSupplyTask::getState, 0).or().isNull(CrmSupplyTask::getState));
-            allCount = crmSupplyTaskMapper.selectCount(query);
+            if (ObjectUtils.isEmpty(crmDailyTask)){
+                return;
+            }
+            CrmDailyTask dailyTask=new CrmDailyTask();
+            dailyTask.setId(crmDailyTask.getId()).setTaskStatus(3).setUpdated(new Date());
+            crmDailyTaskMapper.updateById(dailyTask);
         }
     }
     @Transactional(rollbackFor = Exception.class)
@@ -262,17 +245,27 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
     }
 
     /**
-     * 发送邮件(今日新发债和股票情况)
+     * 发送邮件(获取当前日昨天新发债和股票情况)
      *
      * @return String
      * @author penTang
      * @date 2022/11/2 11:37
      */
     @Override
-    public String sendEmail(String date) {
+    @Async
+    public String sendEmail(String date, Integer status) {
+        log.info("----------发送当日昨天汇总邮件");
         String result ="";
         try {
-            List<CrmEntityTask> list = crmEntityTaskMapper.selectList(new QueryWrapper<>());
+            if (status==0) {
+                Date date1 = com.deloitte.common.core.utils.DateUtil.dateTime(DatePattern.NORM_DATE_PATTERN, date);
+                Date as = new Date(date1.getTime()-24*60*60*1000);
+               date = DateUtils.format(as, "yyyy-MM-dd");
+            }
+            List<CrmEntityTask> list = crmEntityTaskMapper.selectList(
+                    new LambdaQueryWrapper<CrmEntityTask>()
+                    .eq(CrmEntityTask::getTaskDate, date)
+            );
             //新增主体
             List<CrmEntityTask> addEntity = list.stream().filter(row -> row.getState() == 2).collect(Collectors.toList());
             //a股检测
@@ -282,7 +275,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             //债券
             List<CrmEntityTask> collectZ = list.stream().filter(row -> row.getState() == 2 && row.getSourceType() == 1).collect(Collectors.toList());
             //标题
-            String title = "今日平台新增主体" + addEntity.size() + "个，其中a股检测到" + collectA.size() + "个，港股检测到" + collectG.size() + "个，债券检测到" + collectZ.size() + "个";
+            String title = "昨日平台新增主体" + addEntity.size() + "个，其中a股检测到" + collectA.size() + "个，港股检测到" + collectG.size() + "个，债券检测到" + collectZ.size() + "个";
             LambdaQueryWrapper<BondsListingLog> qw = new LambdaQueryWrapper<BondsListingLog>().eq(BondsListingLog::getRecordTime, date);
             List<BondsListingLog> bondsListingLogs = bondsListingLogMapper.selectList(qw);
             List<BondsListingLog> bonds = bondsListingLogs.stream().filter(row -> row.getSourceType() == 1).collect(Collectors.toList());
@@ -290,42 +283,45 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
             //画表格
             StringBuffer content= new StringBuffer();
             if (bonds.size() != 0) {
-                content.append("<h2>今日新发债情况如下:</h2>");
-                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=12px;;font-size:18px;\">");
-                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>债券简称</th><th>债券全称</th><th>债券code</th><th>发行日期</th><th>发行人</th></tr>");
+                content.append("<h2 style=\" font-size: 14px;\">昨日新发债情况如下:</h2>");
+                content.append("<h2 style=\" font-size: 14px;\">昨日新发债数量："+bonds.size()+"</h2>");
+                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=14px;\">");
+                content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>债券全称</th><th>债券简称</th><th>债券code</th><th>起息日</th><th>上市日期</th><th>发行人</th></tr>");
                 for (BondsListingLog row : bonds) {
                     content.append("<tr>");
-                    //债券简称
+                    //债券简
                     content.append("<td align=\"center\">" + row.getName() + "</td>");
                     //债券全称
                     content.append("<td align=\"center\">" + row.getShortName() + "</td>");
                     //债券code
                     content.append("<td align=\"center\">" + row.getCode() + "</td>");
                     //发行日期
-                    content.append("<td align=\"center\">" + row.getIssueDate() + "</td>");
+                    content.append("<td align=\"center\">" + DateUtil.format(row.getIssueDate(), DatePattern.NORM_DATE_PATTERN) + "</td>");
+                    content.append("<td align=\"center\">" + DateUtil.format(row.getIpoDate(), DatePattern.NORM_DATE_PATTERN) + "</td>");
                     //发行人
                     content.append("<td align=\"center\">" + row.getPublisher() + "</td>");
                     content.append("</tr>");
                 }
                 content.append("</table>");
             } else {
-                content.append("<h2 style=\" font-size: 14px;\">今日新发债情况如下:暂无数据</h2>");
+                content.append("<h2 style=\" font-size: 14px;\">昨日新发债情况如下:暂无数据</h2>");
             }
 
             if (stocks.size() != 0) {
-                content.append("<h2>今日股票情况如下:</h2>");
-                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=12px;;font-size:18px;\">");
+                content.append("<h2 style=\" font-size: 14px;\">昨日股票情况如下:</h2>");
+                content.append("<h2 style=\" font-size: 14px;\">昨日股票数量："+stocks.size()+"</h2>");
+                content.append("<table border=\"1\" style=\"border:solid 1px #E8F2F9;font-size=14px;\">");
                 content.append("<tr style=\"background-color: #428BCA; color:#ffffff\"><th>股票简称</th><th>股票全称</th><th>股票code</th><th>发行日期</th><th>发行人</th><th>股票类型</th></tr>");
                 for (BondsListingLog stock : stocks) {
                     content.append("<tr>");
                     //股票简称
                     content.append("<td align=\"center\">" + stock.getName() + "</td>");
                     //股票全称
-                    content.append("<td align=\"center\">" + stock.getShortName() + "</td>");
+                    content.append("<td align=\"center\">" + Objects.toString(stock.getShortName(),"-") + "</td>");
                     //股票code
                     content.append("<td align=\"center\">" + stock.getCode() + "</td>");
                     //发行日期
-                    content.append("<td align=\"center\">" + stock.getIpoDate() + "</td>");
+                    content.append("<td align=\"center\">" + DateUtil.format(stock.getIpoDate(), DatePattern.NORM_DATE_PATTERN) + "</td>");
                     //发行人
                     content.append("<td align=\"center\">" + stock.getPublisher() + "</td>");
                     //股票类型
@@ -335,7 +331,7 @@ public class CrmDailyTaskServiceImpl extends ServiceImpl<CrmDailyTaskMapper, Crm
                 }
                 content.append("</table>");
             } else {
-                content.append("<h2 style=\" font-size: 14px;\">今日股票情况如下:暂无数据</h2>");
+                content.append("<h2 style=\" font-size: 14px;\">昨日股票情况如下:暂无数据</h2>");
 
             }
 

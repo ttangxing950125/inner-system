@@ -5,7 +5,7 @@ server:
 # Spring
 # Spring
 
-spring: 
+spring:
   application:
     # 应用名称
     name: deloitte-additional-recording
@@ -36,7 +36,7 @@ spring:
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
         # 配置所在分组
-        group: DEV
+        group: INNER_SYSTEM_GROUP
 logging:
   level:
     com.deloitte.additional.recording: debug

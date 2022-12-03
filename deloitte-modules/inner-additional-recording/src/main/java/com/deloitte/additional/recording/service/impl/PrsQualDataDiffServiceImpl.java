@@ -1,7 +1,7 @@
 package com.deloitte.additional.recording.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.additional.recording.domain.BasEvdTaskData;
+import com.deloitte.additional.recording.domain.PrsQualDataTask;
 import com.deloitte.additional.recording.domain.PrsModelQualFactor;
 import com.deloitte.additional.recording.domain.PrsQualDataDiff;
 import com.deloitte.additional.recording.dto.BasEvdTaskInfoStatusCountDto;
@@ -39,7 +39,7 @@ public class PrsQualDataDiffServiceImpl extends ServiceImpl<PrsQualDataDiffMappe
     private BasEvdTaskInfoService taskInfoService;
 
     @Autowired
-    private BasEvdTaskDataService basEvdTaskDataService;
+    private PrsQualDataTaskService basEvdTaskDataService;
 
 
     @Override
@@ -128,7 +128,7 @@ public class PrsQualDataDiffServiceImpl extends ServiceImpl<PrsQualDataDiffMappe
 
     @Override
     public List<BasEvdTaskDataVO> basePanel(String qualCode) {
-        List<BasEvdTaskData> evdTaskData = basEvdTaskDataService.findByQualCode(qualCode);
+        List<PrsQualDataTask> evdTaskData = basEvdTaskDataService.findByQualCode(qualCode);
         if (evdTaskData != null) {
             return BeanUtils.copy(evdTaskData, BasEvdTaskDataVO.class);
         }

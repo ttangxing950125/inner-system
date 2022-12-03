@@ -42,6 +42,12 @@ public class PrsProjectVersions implements Serializable {
      */
     @Excel(name = "版本描述")
     private String description;
+
+    /**
+     * syn_table的id
+     */
+    private Integer synId;
+
     /**
      * 来源机构
      */

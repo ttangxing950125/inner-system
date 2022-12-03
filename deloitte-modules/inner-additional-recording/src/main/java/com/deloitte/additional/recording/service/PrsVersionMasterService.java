@@ -20,5 +20,14 @@ public interface PrsVersionMasterService extends IService<PrsVersionMaster> {
      * @author 冉浩岑
      * @date 2022/11/9 16:08
      */
+    R paging(VersionMasterEvdVo versionMasterEvdVo);
+
+    /**
+     * 查询关联关系，不区分状态
+     * @param versionId
+     * @param modelCode
+     * @return
+     */
+    PrsVersionMaster findByVersionMaster(Integer versionId, String modelCode);
     R getVersionEvdByMasters(VersionMasterEvdVo versionMasterEvdVo);
 }

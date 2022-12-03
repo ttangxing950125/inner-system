@@ -3,6 +3,8 @@ package com.deloitte.common.core.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import static com.deloitte.common.core.constant.Constants.PASSWORD;
+
 /************************************************
  * MD5 算法的Java Bean
  *************************************************/
@@ -405,9 +407,15 @@ public class MD5 {
 	
 	public static void main(String args[]) {
 		MD5 md5 = new MD5();
-		String md5Password = md5.getMD5ofStr("Wnwa853870".toLowerCase());
+		String md5Password = md5.getMD5ofStr("admin888".toLowerCase());
 		System.out.println(md5Password);
 		md5Password = md5.getMD5ofStr(md5Password.toLowerCase());
 		System.out.println(md5Password);
+
+
+//		MD5 md5 = new MD5();
+//		String md5Password = md5.getMD5ofStr(PASSWORD.toLowerCase());
+//		md5Password = md5.getMD5ofStr(md5Password.toLowerCase());
+//		System.out.println(md5Password);
 	}
 }

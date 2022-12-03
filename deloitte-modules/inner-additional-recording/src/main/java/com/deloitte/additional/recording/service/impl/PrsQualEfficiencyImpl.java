@@ -137,8 +137,8 @@ public class PrsQualEfficiencyImpl extends ServiceImpl<PrsQualEfficiencyMapper, 
                     if (creditCode == null) {
                         throw new ServiceException(dto.getEntityName() + "实体信息有误,请确认后重试");
                     }
-                    //查询原来数据库是否存在，存在->更新数据  同时移除集合中数据
-                    PrsQualData prsQualData = prsQualDataService.getByEntityAndQcodeAndTime(creditCode.getEntityCode(), split[1], "2021");
+                    //查询原来数据库是否存在，存在->更新数据  同时移除集合中数据 TODO
+                    PrsQualData prsQualData = prsQualDataService.getByEntityAndQcodeAndTime(creditCode.getEntityCode(), split[1], 2021);
                     //查询用户
                     SysUser user = userService.getByName(dto.getUserName());
                     if (user == null) {
@@ -151,7 +151,7 @@ public class PrsQualEfficiencyImpl extends ServiceImpl<PrsQualEfficiencyMapper, 
                         prsQualDataService.updateById(prsQualData);
                         iterator.remove();
                     } else {
-                        PrsQualData qualData = new PrsQualData().createBy(split[1], creditCode.getEntityCode(), dto.getQualValue(), "2021");
+                        PrsQualData qualData = new PrsQualData().createBy(split[1], creditCode.getEntityCode(), dto.getQualValue(), 2021);
                         qualDataList.add(qualData);
                     }
                 }

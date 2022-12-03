@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,6 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class ModelTask implements Serializable {
     private static final long serialVersionUID = 397608005631103561L;
     @Excel(name = "${column.comment}")
@@ -29,7 +31,7 @@ public class ModelTask implements Serializable {
     /**
      * 任务编号,雪花id
      */
-    @Excel(name = "任务编号,雪花id")
+    @Excel(name = "任务编号,uuid")
     private String taskNo;
     /**
      * 任务操作的数据年份
@@ -65,7 +67,10 @@ public class ModelTask implements Serializable {
      * 执行失败的子任务量
      */
     @Excel(name = "执行失败的子任务量")
-    private Integer proceTotal;
+    private Integer failTotal;
+
+    @Excel(name = "执行成功的子任务量")
+    private Integer successTotal;
     /**
      * 子任务量
      */

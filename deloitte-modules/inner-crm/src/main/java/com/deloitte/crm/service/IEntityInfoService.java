@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.crm.domain.EntityInfo;
-import com.deloitte.crm.domain.dto.EntityAttrByDto;
-import com.deloitte.crm.domain.dto.EntityInfoDetails;
-import com.deloitte.crm.domain.dto.EntityInfoResult;
-import com.deloitte.crm.domain.dto.EntityListView;
+import com.deloitte.crm.domain.dto.*;
 import com.deloitte.crm.dto.EntityInfoCodeDto;
 import com.deloitte.crm.dto.EntityInfoDto;
 import com.deloitte.crm.dto.ExportEntityCheckDto;
@@ -28,6 +25,12 @@ import java.util.Map;
  * @date 2022-09-21
  */
 public interface IEntityInfoService extends IService<EntityInfo> {
+
+    /**
+     * 监听今天新发债主体识别是否有异常，如果有发送邮件
+     */
+    void bondIssMonitor();
+
     /**
      * 统计企业主体信息
      *
@@ -78,7 +81,7 @@ public interface IEntityInfoService extends IService<EntityInfo> {
      */
     public int deleteEntityInfoById(Long id);
 
-    R getInfoList(Integer type, String param,Integer pageNum,Integer pageSize);
+    R getInfoList(String liveState,Integer type, String param,Integer pageNum,Integer pageSize);
 
     Integer updateInfoList(List<EntityInfo> list);
 
@@ -279,4 +282,17 @@ public interface IEntityInfoService extends IService<EntityInfo> {
     void exportEntity(HttpServletResponse response);
 
     void exportEntityByType(Integer type, HttpServletResponse response);
+
+    /**
+     * 主体名前后是否有空格的监听
+     * @return
+     */
+    List<EntityInfo> findEntityNameBlank();
+
+    /**
+     * 保存企业，这时可能会带有他的债券股票等信息
+     * @param entityInfo
+     * @return
+     */
+    boolean saveEntityInfo(EntityInfoReq entityInfo);
 }

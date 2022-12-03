@@ -1,12 +1,21 @@
 package com.deloitte.additional.recording.service.impl;
 
 import com.alibaba.excel.util.IoUtils;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.additional.recording.domain.*;
+import com.deloitte.additional.recording.mapper.BasEvdDataMapper;
+import com.deloitte.additional.recording.mapper.BasEvdTaskInfoMapper;
+import com.deloitte.additional.recording.mapper.BasEvdTaskLogMapper;
+import com.deloitte.additional.recording.mapper.PrsModelQualEvdMapper;
 import com.deloitte.additional.recording.domain.BasEvdData;
 import com.deloitte.additional.recording.domain.BasEvdInfo;
 import com.deloitte.additional.recording.domain.EntityInfo;
 import com.deloitte.additional.recording.mapper.BasEvdDataMapper;
 import com.deloitte.additional.recording.service.BasEvdDataService;
+import com.deloitte.additional.recording.service.PrsModelQualEvdService;
 import com.deloitte.additional.recording.service.BasEvdInfoService;
 import com.deloitte.additional.recording.service.EntityInfoService;
 import com.deloitte.additional.recording.util.EasyExcelImportUtils;
@@ -22,6 +31,10 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * (BasEvdData)表服务实现类
  *
@@ -31,6 +44,71 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service("basEvdDataService")
 public class BasEvdDataServiceImpl extends ServiceImpl<BasEvdDataMapper, BasEvdData> implements BasEvdDataService {
 
+    @Resource
+    private PrsModelQualEvdMapper prsModelQualEvdMapper;
+
+    @Resource
+    private BasEvdTaskInfoMapper basEvdTaskInfoMapper;
+
+    @Resource
+    private BasEvdTaskLogMapper basEvdTaskLogMapper;
+
+    /**
+     * 绑定evd_data和evd_task和task_info
+     * @param versionMaster
+     * @param entityCode
+     * @param taskYear
+     * @author wpp
+     * @return
+     */
+    @Override
+    public boolean bindEvdData(PrsVersionMaster versionMaster, String entityCode, Integer taskYear) {
+
+        List<BasEvdInfo> qualEvds = prsModelQualEvdMapper.findLackEvd(versionMaster.getId(), entityCode, taskYear);
+
+        qualEvds.forEach(item->{
+            //evdData
+            BasEvdData evdData = BasEvdData.builder()
+                    .evdCode(item.getCode())
+                    .entityCode(entityCode)
+                    .timeValue(taskYear.toString())
+                    .unit(item.getUnit())
+                    .build();
+
+            Wrapper<BasEvdData> wrapper = Wrappers.<BasEvdData>lambdaQuery()
+                    .eq(BasEvdData::getEvdCode, evdData.getEvdCode())
+                    .eq(BasEvdData::getEntityCode, evdData.getEntityCode())
+                    .eq(BasEvdData::getTimeValue, taskYear);
+
+            BasEvdData dbEvdData = getOne(wrapper);
+            if (dbEvdData!=null){
+                return;
+            }
+
+            baseMapper.insert(evdData);
+
+            //task
+            BasEvdTaskInfo taskInfo = BasEvdTaskInfo.builder()
+                    .dataId(evdData.getId())
+                    .dataType(1)
+                    .build();
+
+            basEvdTaskInfoMapper.insert(taskInfo);
+
+            //log
+            BasEvdTaskLog evdTaskLog = BasEvdTaskLog.builder()
+                    .taskId(taskInfo.getId())
+                    .actType(1)
+                    .remark("拉取主体创建任务")
+                    .build();
+
+            basEvdTaskLogMapper.insert(evdTaskLog);
+        });
+
+
+
+        return true;
+    }
     @Autowired
     private EntityInfoService entityInfoService;
 

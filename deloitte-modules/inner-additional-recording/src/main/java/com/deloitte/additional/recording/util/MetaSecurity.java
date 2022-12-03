@@ -28,10 +28,13 @@ public class MetaSecurity {
         }
         HttpServletRequest request = servletRequestAttributes.getRequest();
 
-        String token = request.getHeader(TokenConstants.AUTHENTICATION);
+        String token = request.getHeader(TokenConstants.TOKEN);
+        if (token==null){
+            throw new ServiceException("当前用户没有登录");
+        }
         String userId = JwtUtil.getuserid(token);
 
-        SysUserMapper userMapper = ApplicationContextHolder.getBean(SysUserMapper.class);
+        SysUserMapper userMapper = ApplicationContextHolder.get().getBean(SysUserMapper.class);
 
         return userMapper.selectById(userId);
     }

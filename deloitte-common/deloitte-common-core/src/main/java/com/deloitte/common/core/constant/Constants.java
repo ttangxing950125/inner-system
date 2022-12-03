@@ -171,7 +171,7 @@ public class Constants {
     /**
      * 导入 wind 子表 指标 常量
      */
-    public static final List<String> IMPORT_CONTANTS =new ArrayList<String>(Arrays.asList("主体名称","实体代码","数据年份"));
+    public static final List<String> IMPORT_CONTANTS = new ArrayList<String>(Arrays.asList("主体名称", "实体代码", "数据年份"));
 
 
     public static final String ENTITY_NAME = "主体名称";
@@ -180,5 +180,18 @@ public class Constants {
     public static final String ENTITY_CODE = "主体编码";
 
     public static final String DATA_YEAR = "数据年份";
-    public static final String EXAMINE_USER = "examineUser" ;
+    public static final String EXAMINE_USER = "examineUser";
+    //百分之5
+    public static double PERCENT5 = 0.05;
+
+    //百分之25
+    public static double PERCENT25 = 0.25;
+
+    //百分之50
+    public static double PERCENT50 = 0.50;
+
+    //百分之75
+    public static double PERCENT75 = 0.75;
+    //百分之95
+    public static double PERCENT95 = 0.95;
 }

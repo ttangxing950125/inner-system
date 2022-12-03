@@ -61,8 +61,12 @@ public class EntityInfoDetails {
     /**主体产品覆盖情况*/
     // TODO
     private List<ProCoverVo> coverageDetail;
+
     /** 敞口划分 */
     private List<String> masterNames;
+
+    /** 旧敞口划分 */
+    private  String oldMaster;
     /**
      * /**主体发债情况详情
      */

@@ -94,4 +94,14 @@ public interface ICrmMasTaskService extends IService<CrmMasTask>
      */
     Date finishTask(Integer taskId,String username);
 
+    /**
+     *角色2 的某一天所有任务完成时,发送邮件
+     *
+     * @param crmMasTasks
+     * @return boolean
+     * @author penTang
+     * @date 2022/11/23 10:37
+    */
+    boolean isTaskFinished(List<CrmMasTask> crmMasTasks);
+
 }

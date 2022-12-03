@@ -1,6 +1,7 @@
 package com.deloitte.additional.recording.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
@@ -31,11 +32,26 @@ public class PrsVerMasEntity implements Serializable {
      */
     @Excel(name = "prs_version_master 中的id")
     private Integer verMasId;
+
+    /**
+     * 版本id
+     */
+    @TableField(exist = false)
+    private Integer versionId;
+
+    /**
+     * 敞口code
+     */
+    @TableField(exist = false)
+    private String modelCode;
+
     /**
      * 主体名的entity_code
      */
     @Excel(name = "主体名的entity_code")
     private String entityCode;
+
+
     /**
      * 状态 0-禁用 1-启用
      */

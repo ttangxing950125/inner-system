@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.deloitte.common.core.utils.DateUtil;
 import com.deloitte.common.core.utils.poi.ExcelUtil;
 import com.deloitte.crm.constants.DataChangeType;
 import com.deloitte.crm.domain.*;
@@ -80,15 +81,17 @@ public class DefaultMoneyTotalStrategy implements WindTaskStrategy {
 
         //TODO 通过债券代码查询BondInfo 查询一条数据  这个地方可能存在多个 目前 按照业务来讲BondInfo 是债券全程作为唯一索引
         BondInfoMapper bondInfoMapper = ApplicationContextHolder.get().getBean(BondInfoMapper.class);
-        BondInfo bondInfo1 = bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getBondCode, moneyTotal.getBondCode())
+        BondInfo bondInfo1 = bondInfoMapper.selectOne(new LambdaQueryWrapper<BondInfo>().eq(BondInfo::getOriCode, moneyTotal.getBondCode())
                 .eq(BondInfo::getIsDeleted, Boolean.FALSE));
         BondInfo bondInfo = Optional.ofNullable(bondInfo1).orElseGet(() -> BondInfo.builder().bondShortName(shortName).build());
 
-        if (moneyTotal.getLatestStatus().equals("实质违约")) {
+        bondInfo.setDefaultDate(DateUtil.formatDate(moneyTotal.getDefaultDate()));
+        if ("实质违约".equals(moneyTotal.getLatestStatus())) {
             bondInfo.setBondStatus(7);
             bondInfo.setBondState(1);
-        } else if (moneyTotal.getLatestStatus().equals("展期")) {
+        } else if ("展期".equals(moneyTotal.getLatestStatus())) {
             bondInfo.setBondStatus(8);
+            bondInfo.setBondStatus(1);
         }
         if (bondInfo.getId() != null) {
             int count = bondInfoService.updateBondInfo(bondInfo);

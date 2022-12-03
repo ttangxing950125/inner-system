@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,6 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+@Accessors(chain = true)
 public class BasEvdValrange implements Serializable {
     private static final long serialVersionUID = -81451919296422931L;
     @Excel(name = "${column.comment}")
@@ -29,8 +31,8 @@ public class BasEvdValrange implements Serializable {
     /**
      * evidence id
      */
-    @Excel(name = "evidence id")
-    private Integer evdId;
+    @Excel(name = "evidence_code")
+    private String evdCode;
     /**
      * evidence值
      */
@@ -40,6 +42,5 @@ public class BasEvdValrange implements Serializable {
     private Date created;
     @Excel(name = "${column.comment}")
     private Date updated;
-
 
 }

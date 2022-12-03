@@ -1,6 +1,7 @@
 package com.deloitte.crm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.deloitte.crm.domain.EntityInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 /**
  * 【请填写功能名称】Mapper接口
- * 
+ *
  * @author deloitte
  * @date 2022-09-21
  */
@@ -16,7 +17,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 {
     /**
      * 查询【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 【请填写功能名称】
      */
@@ -24,7 +25,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     /**
      * 查询【请填写功能名称】列表
-     * 
+     *
      * @param entityInfo 【请填写功能名称】
      * @return 【请填写功能名称】集合
      */
@@ -32,7 +33,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     /**
      * 新增【请填写功能名称】
-     * 
+     *
      * @param entityInfo 【请填写功能名称】
      * @return 结果
      */
@@ -40,7 +41,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     /**
      * 修改【请填写功能名称】
-     * 
+     *
      * @param entityInfo 【请填写功能名称】
      * @return 结果
      */
@@ -48,7 +49,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     /**
      * 删除【请填写功能名称】
-     * 
+     *
      * @param id 【请填写功能名称】主键
      * @return 结果
      */
@@ -56,7 +57,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
 
     /**
      * 批量删除【请填写功能名称】
-     * 
+     *
      * @param ids 需要删除的数据主键集合
      * @return 结果
      */
@@ -80,13 +81,8 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
                                          @Param("stockThk")Integer stockThk,
                                          @Param("stockCn")Integer stockCn);
 
-    Integer getEntityCountByBondType(@Param("raiseType") Integer raiseType,
-                                     @Param("abs")Integer abs,
-                                     @Param("coll")Integer coll,
-                                     @Param("stockThk")Integer stockThk,
-                                     @Param("stockCn")Integer stockCn);
-
-    List<EntityInfo> getEntityByBondTypeByPage(@Param("raiseType") Integer raiseType,
+    Page<EntityInfo> getEntityByBondTypeByPage(Page<EntityInfo> pageInfo,
+                                               @Param("raiseType") Integer raiseType,
                                                @Param("abs")Integer abs,
                                                @Param("coll")Integer coll,
                                                @Param("pageNum")Integer pageNum,
@@ -115,7 +111,7 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @return Long
      * @author 冉浩岑
      * @date 2022/10/17 9:02
-    */
+     */
     List<String> selectListCnLive(@Param("timeParam")String timeParam);
     /**
      * 根据时间查询港股上市存续企业
@@ -126,4 +122,26 @@ public interface EntityInfoMapper  extends BaseMapper<EntityInfo>
      * @date 2022/10/17 9:02
      */
     List<String> selectListThkLive(@Param("timeParam")String timeParam);
+
+    /**
+     * 查询已有主体还是生成了任务的主体
+     * @param now
+     * @author 吴鹏鹏
+     * @return
+     */
+    List<EntityInfo> findErrorEntityTask(String now);
+
+    /**
+     * 查询导入了，库里没有的主体，还没有生成任务的主体
+     * @param now
+     * @author 吴鹏鹏
+     * @return
+     */
+    List<String> findErrorNoTaskEntity(String now);
+
+    /**
+     * 主体名前后是否有空格的监听
+     * @return
+     */
+    List<EntityInfo> findEntityNameBlank();
 }

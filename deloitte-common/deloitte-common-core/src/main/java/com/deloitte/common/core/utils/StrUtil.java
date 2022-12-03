@@ -5,9 +5,10 @@ import cn.hutool.core.util.ArrayUtil;
 import com.deloitte.common.core.constant.Constants;
 import org.springframework.util.AntPathMatcher;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 字符串工具类
@@ -265,5 +266,28 @@ public class StrUtil extends cn.hutool.core.util.StrUtil {
         return sb.toString();
     }
 
+
+    /**
+     * 字符串是否包含中文
+     *
+     * @param str 待校验字符串
+     * @return true 包含中文字符 false 不包含中文字符
+     * @throws EmptyException
+     */
+    public static boolean isContainChinese(String str) {
+
+        if (!isEmpty(str)) {
+
+            Pattern p = Pattern.compile("[\u4E00-\u9FA5|\\！|\\，|\\。|\\（|\\）|\\《|\\》|\\“|\\”|\\？|\\：|\\；|\\【|\\】]");
+
+            Matcher m = p.matcher(str);
+
+            if (m.find()) {
+
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

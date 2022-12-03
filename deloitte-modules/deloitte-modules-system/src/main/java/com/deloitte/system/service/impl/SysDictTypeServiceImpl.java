@@ -70,16 +70,17 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
      */
     @Override
     public List<SysDictData> selectDictDataByType(String dictType) {
-        List<SysDictData> dictDatas = DictUtils.getDictCache(dictType);
+       /* List<SysDictData> dictDatas = DictUtils.getDictCache(dictType);
         if (CollUtil.isNotEmpty(dictDatas)) {
             return dictDatas;
-        }
-        dictDatas = dictDataMapper.selectDictDataByType(dictType);
-        if (CollUtil.isNotEmpty(dictDatas)) {
+        }*/
+        //TODO 暂时都查询数据库
+        final List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType);
+      /*  if (CollUtil.isNotEmpty(dictDatas)) {
             DictUtils.setDictCache(dictType, dictDatas);
             return dictDatas;
-        }
-        return null;
+        }*/
+        return dictDatas;
     }
 
     /**

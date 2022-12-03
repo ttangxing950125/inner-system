@@ -6,6 +6,7 @@ import com.deloitte.additional.recording.domain.SysMenu;
 import com.deloitte.additional.recording.domain.SysUser;
 import com.deloitte.additional.recording.mapper.SysUserMapper;
 import com.deloitte.additional.recording.service.SysUserService;
+import com.deloitte.additional.recording.vo.TaskUserVo;
 import com.deloitte.additional.recording.util.TreeParserUtil;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.MD5;
@@ -25,8 +26,8 @@ import java.util.Set;
  * @author 吴鹏鹏ppp
  * @since 2022-11-09 23:49:28
  */
-@Service("sysUserService")
 @Slf4j
+@Service("sysUserService")
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
     @Resource
@@ -100,13 +101,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     /**
      * 查询角色列表
-     *
      * @param user
      * @return
      */
     @Override
     public List<String> getRoleList(SysUser user) {
         return sysUserMapper.findSysRoleByUser(user);
+    }
+
+    @Override
+    public List<TaskUserVo> getUserNameList(String loginName) {
+        List<TaskUserVo> taskUserVoList = sysUserMapper.getUserNameList(loginName);
+        return taskUserVoList;
     }
 
     @Override

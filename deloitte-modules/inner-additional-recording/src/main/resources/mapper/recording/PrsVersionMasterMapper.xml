@@ -30,5 +30,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         and a.`status`=1   and b.`status`=1 and c.`status`=1 and d.`status`=1
         order by d.model_code
     </select>
+    <select id="selectMasterByPage" parameterType="java.lang.Object"
+            resultType="com.deloitte.additional.recording.domain.PrsVersionMaster">
+        SELECT
+        a.*
+        FROM
+        prs_model_master a
+        LEFT JOIN prs_version_master b ON a.model_code = b.model_code
+        LEFT JOIN prs_project_versions c ON c.id = b.prj_id
+        <where>
+            1=1
+            <if test="versionId != null  and versionId != ''">and b.prj_id = #{versionId}</if>
+            <if test="searchData != null  and searchData != ''">
+                and (
+                a.model_code like concat("%",#{searchData},"%") or a.`name`like concat("%",#{searchData},"%")
+                )
+            </if>
+            <if test="dataYear != null  and dataYear != ''">and c.time_value = #{dataYear}</if>
+        </where>
+    </select>
 
 </mapper>

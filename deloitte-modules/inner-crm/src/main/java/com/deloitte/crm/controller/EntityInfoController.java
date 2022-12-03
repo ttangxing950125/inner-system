@@ -13,6 +13,7 @@ import com.deloitte.crm.domain.StockCnInfo;
 import com.deloitte.crm.domain.StockThkInfo;
 import com.deloitte.crm.domain.dto.EntityAttrByDto;
 import com.deloitte.crm.domain.dto.EntityInfoDetails;
+import com.deloitte.crm.domain.dto.EntityInfoReq;
 import com.deloitte.crm.dto.*;
 import com.deloitte.crm.service.IEntityInfoService;
 import com.deloitte.crm.service.IEntityNameHisService;
@@ -43,6 +44,12 @@ public class EntityInfoController extends BaseController {
     private IEntityInfoService entityInfoService;
     @Autowired
     private IEntityNameHisService entityNameHisService;
+
+    @PostMapping("/addEntityNew")
+    public R addEntityNew(@RequestBody EntityInfoReq entityInfo){
+        return R.ok(entityInfoService.saveEntityInfo(entityInfo));
+    }
+
     /**
      * 统计整体企业主体情况
      *
@@ -191,8 +198,8 @@ public class EntityInfoController extends BaseController {
             @ApiImplicitParam(name = "param", value = "param 筛选条件", paramType = "query", example = "", dataType = "String")
     })
     @PostMapping("/getInfoList")
-    public R getInfoList(Integer type, String param, Integer pageNum,  Integer pageSize) {
-        return entityInfoService.getInfoList(type, param, pageNum, pageSize);
+    public R getInfoList(String liveState,Integer type, String param, Integer pageNum,  Integer pageSize) {
+        return entityInfoService.getInfoList(liveState,type, param, pageNum, pageSize);
     }
 
     /**

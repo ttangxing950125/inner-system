@@ -25,8 +25,12 @@ spring:
         # 配置所在分组
         namespace: e6ae65ec-eba8-41a4-8a76-165329df4964
         group: DEV
-
+#ocr
+ocr:
+  request:
+    path: http-2313131
+    apiKey: 2312313
 logging:
   level:
-    com.deloitte.crm: debug
+    com.deloitte.additional.recording: debug
 

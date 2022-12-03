@@ -1,7 +1,7 @@
 package com.deloitte.crm.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.excel.util.DateUtils;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,11 +9,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.DateUtil;
-import com.deloitte.common.core.utils.EmailUtil;
 import com.deloitte.crm.constants.BadInfo;
 import com.deloitte.crm.constants.RoleInfo;
 import com.deloitte.crm.constants.SuccessInfo;
-import com.deloitte.crm.domain.*;
+import com.deloitte.crm.domain.CrmDailyTask;
+import com.deloitte.crm.domain.CrmEntityTask;
+import com.deloitte.crm.domain.CrmMasTask;
+import com.deloitte.crm.domain.EntityCaptureSpeed;
 import com.deloitte.crm.mapper.BondsListingLogMapper;
 import com.deloitte.crm.mapper.CrmEntityTaskMapper;
 import com.deloitte.crm.mapper.CrmMasTaskMapper;
@@ -26,7 +28,6 @@ import com.deloitte.crm.vo.EmailVo;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -37,9 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 角色7，根据导入的数据新增主体的任务Service业务层处理
@@ -204,7 +202,7 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
         //  相同主体名称情况下 && 相同任务日期 && 任务状态为 0 对该次生成任务进行忽略
         List<CrmEntityTask> byEntityNameList = Optional.ofNullable(baseMapper.selectList(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, date).eq(CrmEntityTask::getState, 0).eq(CrmEntityTask::getEntityName, crmEntityTask.getEntityName()))).orElse(new ArrayList<>());
         //如果 entity_code 不为 null ，并且 任务中并未出现相同主体名称的任务，那么就是新增，便给角色 2 新增一条任务
-        if (!ObjectUtils.isEmpty(entityCode) && byEntityNameList.size() == 0) {
+        if (!(ObjectUtils.isEmpty(entityCode)) && byEntityNameList.size() == 0) {
             //向 crm_mas_task中添加任务
             crmMasTaskMapper.insert(new CrmMasTask().setEntityCode(entityCode).setSourceName(crmEntityTask.getTaskCategory()).setState(0).setSpeedId(crmEntityTask.getSpeedId()).setDetails(crmEntityTask.getDetails()).setRemarks(remarks).setTaskDate(new Date()));
             CrmDailyTask crmDailyTask = crmDailyTaskMapper.selectOne(new QueryWrapper<CrmDailyTask>().lambda().eq(CrmDailyTask::getTaskDate, date).eq(CrmDailyTask::getTaskRoleType,4));
@@ -231,15 +229,26 @@ public class CrmEntityTaskServiceImpl extends ServiceImpl<CrmEntityTaskMapper, C
                 //发送邮件 角色2 的 role ID 固定为 4
                 asyncSendEmailService(4, crmEntityTasks.size(), date);
             }
-
-            crmDailyTaskService.sendEmail(date);
+            //获取当前时间
+            String dateNow = DateUtils.format(new Date(), "yyyy-MM-dd");
+            crmDailyTaskService.sendEmail(dateNow,0);
 
             return R.ok(SuccessInfo.SUCCESS.getInfo());
         }
         return R.ok(SuccessInfo.SUCCESS.getInfo());
     }
 
-    @Async
+    @Override
+    public boolean CheckCrmEntityTaskByDate(String date) {
+
+        Long aLong = crmEntityTaskMapper.selectCount(new QueryWrapper<CrmEntityTask>().lambda().eq(CrmEntityTask::getTaskDate, date));
+
+        if (aLong == 0){
+            return true;
+        }
+        return false;
+    }
+
     public void asyncSendEmailService(Integer roleId, Integer taskCount, String date) {
         log.info(">>>>异步发送邮件开始,RoleId:{}新增主体个数：{}", roleId, taskCount);
         sendEmailService.email(roleId, taskCount, date);

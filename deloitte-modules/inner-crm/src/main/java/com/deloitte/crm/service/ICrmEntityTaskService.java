@@ -91,4 +91,16 @@ public interface ICrmEntityTaskService extends IService<CrmEntityTask>
      * @return 操作成功与否
      */
     R finishTask(Integer taskId,Integer state,String entityCode,String remarks);
+
+    /**
+     *查询角色7当天是否有任务生成
+     *
+     * @return R
+     * @author penTang
+     * @date 2022/11/22 9:52
+    */
+    boolean CheckCrmEntityTaskByDate(String date);
+
+
+
 }

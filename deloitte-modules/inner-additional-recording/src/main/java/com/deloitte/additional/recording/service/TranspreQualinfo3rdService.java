@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.deloitte.additional.recording.domain.TranspreQualinfo3rd;
 import com.deloitte.additional.recording.request.TranspreQualinfo3rdRequest;
 import com.deloitte.additional.recording.vo.qualinfo3rd.TranspreQualinfo3rdPageVO;
+import com.deloitte.common.core.domain.R;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,4 +68,6 @@ public interface TranspreQualinfo3rdService extends IService<TranspreQualinfo3rd
      * @return
      */
     List<TranspreQualinfo3rdPageVO> exportExcelData(String useYear, String searchData, Integer versionId, Integer masterId, String tarType);
+    R masterMapping(List<String> names);
+    R centerMaster(Integer versionId);
 }

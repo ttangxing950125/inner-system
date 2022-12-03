@@ -18,9 +18,13 @@ import java.util.List;
 @Mapper
 public interface PrsModelQualMapper extends BaseMapper<PrsModelQual> {
 
-    List<DataListPageTataiVo> queryByPageStatsdetail(@Param("modelCode") String modelCode, @Param("timeValue") String timeValue, @Param("name") String name);
+    List<DataListPageTataiVo> queryByPageStatsdetail(@Param("modelCode") String modelCode, @Param("timeValue") String timeValue, @Param("Integer") Integer id);
 
     List<PrsQualDataSelectVO> selectByMasterAndVersion(@Param("versionId")Integer versionId, @Param("modelCode")String modelCode);
 
+    List<PrsModelQual> getPrsModelQualByVersionIdAndModelCode(@Param("versionId") String versionId, @Param("modelCode") String modelCode);
+
     String getNameByCode(@Param("code") String code);
+
+
 }

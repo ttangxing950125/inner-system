@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 时间工具类
@@ -46,6 +47,17 @@ public class DateUtil extends cn.hutool.core.date.DateUtil {
         return cn.hutool.core.date.DateUtil.parseDate(dateString);
     }
 
+    public static boolean compare(String dateStr, Date date){
+        String dateStr2 = DateUtil.format(date, YYYY_MM_DD);
+
+        return Objects.equals(dateStr, dateStr2);
+    }
+
+    public static boolean compare(String dateStr, Date date, String format){
+        String dateStr2 = DateUtil.format(date, format);
+
+        return Objects.equals(dateStr, dateStr2);
+    }
 
     /**
      * 获取当前Date型日期
@@ -162,16 +174,4 @@ public class DateUtil extends cn.hutool.core.date.DateUtil {
         }
     }
 
-    public static void main(String[] args) {
-
-        String str="2012-10-10";
-//        final String replace = DateUtil.formatDateByString(str);
-//        final DateTime yyyMMdd = cn.hutool.core.date.DateUtil.parse(replace);
-        final Date date = dateTime("yyyy-MM-dd", str);
-        String s=null;
-        String str2=s.trim().replace("（", "(").replace("）", ")");
-
-
-        System.out.println(str2);
-    }
 }

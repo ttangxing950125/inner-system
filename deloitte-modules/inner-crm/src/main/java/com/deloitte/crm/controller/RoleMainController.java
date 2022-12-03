@@ -75,6 +75,6 @@ public class RoleMainController {
     }
     @PostMapping("/sendEmail")
     public R sendEmail(String date){
-        return R.ok(crmDailyTaskService.sendEmail(date));
+        return R.ok(crmDailyTaskService.sendEmail(date,0));
     }
 }

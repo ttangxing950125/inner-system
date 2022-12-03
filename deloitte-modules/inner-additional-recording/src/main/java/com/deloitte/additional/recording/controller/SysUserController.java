@@ -13,6 +13,7 @@ import com.deloitte.additional.recording.request.SysUserRequest;
 import com.deloitte.additional.recording.service.SysDictDataService;
 import com.deloitte.additional.recording.service.SysUserService;
 import com.deloitte.additional.recording.util.MetaSecurity;
+import com.deloitte.additional.recording.util.UserMapUtil;
 import com.deloitte.additional.recording.vo.user.SysUserVO;
 import com.deloitte.common.core.domain.MetaR;
 import com.deloitte.common.core.utils.JwtUtil;
@@ -61,18 +62,9 @@ public class SysUserController {
     @Resource
     private RocketMQTemplate rocketMQTemplate;
 
-    @GetMapping("/sendEvd")
-    public String sendEvd(Integer count) {
-        for (Integer i = 0; i < count; i++) {
-            BasEvdData evdData = new BasEvdData();
-            evdData.setEntityCode("IB" + i);
-            evdData.setEvdCode("E_" + i);
-            evdData.setEvdVal(String.valueOf(i * 100));
-            SendResult sendResult = this.rocketMQTemplate.syncSendOrderly("updateEvdTopic", evdData, i + "");
-            log.info("MQ发送顺序消息成功,key={} msg={},sendResult={}", "evdData", evdData, sendResult);
-        }
-        return "成功";
-    }
+    @Resource
+    private UserMapUtil userMapUtil;
+
 
     @GetMapping("/getLoginUser")
     @ApiOperation("获得当前登录用户信息")
@@ -80,7 +72,17 @@ public class SysUserController {
         return MetaR.ok(MetaSecurity.getLoginUser());
     }
 
-    @GetMapping("/login")
+    @GetMapping("/getMenu")
+    public MetaR getMenu(){
+        String userid= MetaSecurity.getLoginUser().getId().toString();
+        HashMap<String, Object> hashMap = new HashMap<>(1);
+        UserModel user = userMapUtil.get(userid);
+        hashMap.put("userModel", user);
+
+        return MetaR.ok(hashMap);
+    }
+
+    @PostMapping("/login")
     @ApiOperation("登录")
     public Object login(String username, String password) {
         if (StringUtil.isBlank(username)) {
@@ -120,7 +122,7 @@ public class SysUserController {
         reuslt.put("index", menu.getMenus().get(0).getUrl());
         userModel.setUser(u);
         //记录在线用户，辣鸡！
-//        UserMapUtil.userMap.put(u.getId()+"", userModel);
+        userMapUtil.put(u.getId(), userModel);
         String token = JwtUtil.sign(u.getId() + "");
         reuslt.put("retcode", "200");
         reuslt.put("access_token", token);

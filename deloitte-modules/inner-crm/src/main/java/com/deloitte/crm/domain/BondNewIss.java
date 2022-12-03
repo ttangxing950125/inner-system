@@ -43,6 +43,9 @@ public class BondNewIss implements Serializable {
 
     private Integer changeType;
 
+    @Excel(name = "序号")
+    private Integer sortNum;
+
     /**
      * 交易代码
      */

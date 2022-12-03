@@ -17,6 +17,12 @@ import java.util.List;
 @Service("sysGroupService")
 public class SysGroupServiceImpl extends ServiceImpl<SysGroupMapper, SysGroup> implements SysGroupService {
 
+    @Override
+    public List<SysGroup> getSysGroupList() {
+        List<SysGroup> list = this.list(null);
+        return   list;
+
+    }
 
     @Override
     public SysGroup getByName(String groupName) {

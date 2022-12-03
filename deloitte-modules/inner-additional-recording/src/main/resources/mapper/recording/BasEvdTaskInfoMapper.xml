@@ -4,6 +4,196 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.deloitte.additional.recording.mapper.BasEvdTaskInfoMapper">
 
+   <select id="getEntityEvdName" resultType="map">
+       SELECT
+           evddata.id,
+           info.entity_name,
+           evdinfo.`name`
+       FROM
+           bas_evd_data evddata
+           LEFT JOIN entity_info info ON evddata.entity_code = info.entity_code
+           LEFT JOIN bas_evd_info evdinfo ON evdinfo.`code` = evddata.evd_code
+       <where>
+           <if test="dataIds!=null and dataIds.size()>0">
+               <foreach collection="dataIds" item="item" open="(" separator="," close=")">
+                   #{item}
+               </foreach>
+           </if>
+
+       </where>
+   </select>
+
+    <select id="getBatchCallBack" resultType="com.deloitte.additional.recording.vo.ExcelBatchCallBackVo">
+        SELECT
+        task.id,
+        u.id 'userId',
+        task.sub_time 'subTime',
+        info.entity_name 'entityName',
+        evddata.time_value 'timeValue',
+        evdinfo.`name` 'evidenceName',
+        u.`name` 'collectionName',
+        task.status
+        FROM
+        bas_evd_task_info task
+        INNER JOIN bas_evd_data evddata ON task.data_id = evddata.id
+        INNER JOIN entity_info info ON info.entity_code = evddata.entity_code and info.`status` = 1
+        INNER JOIN bas_evd_info evdinfo ON evdinfo.`code` = evddata.evd_code and evdinfo.`status` = 1
+        INNER JOIN sys_user u ON u.id = task.collocter and u.`status` = 1
+        INNER JOIN sys_user_role ur ON ur.user_id = u.id
+        INNER JOIN sys_role r ON r.id = ur.role_id
+        <where>
+            r.name = '补录人员'
+            <if test="collectionNameList!=null and collectionNameList.sze()>0">
+                and u.name in
+                <foreach collection="collectionNameList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entityNameList!=null and entityNameList.sze()>0">
+                and info.entity_name in
+                <foreach collection="entityNameList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="timeValueList!=null and timeValueList.sze()>0">
+                and evddata.time_value in
+                <foreach collection="timeValueList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entityNameList!=null and entityNameList.sze()>0">
+                and evdinfo.name in
+                <foreach collection="entityNameList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY task.id
+
+
+    </select>
+
+    <select id="getCollectionDetails" resultType="com.deloitte.additional.recording.vo.CollectionDetailsVO">
+        SELECT
+        info.entity_code,
+        info.credit_code,
+        info.entity_bond_tag,
+        info.list
+        FROM
+        entity_info info
+        INNER JOIN bas_evd_data ed ON ed.entity_code = info.entity_code
+        <where>
+            <if test="entityCode!=null and entityCode!=''">
+                and ed.entity_code = #{entityCode}
+            </if>
+            <if test="evdCode!=null and evdCode!=''">
+                and ed.entity_code = #{evdCode}
+            </if>
+        </where>
+        WHERE
+    </select>
+
+    <select id="getModelMasterCount" resultType="com.deloitte.additional.recording.vo.ModelMasterCountVo">
+        SELECT
+            mm.model_code,
+            mm.`name` 'modelName',
+            count(*) AS counnt
+        FROM
+            prs_ver_mas_entity me
+                INNER JOIN prs_version_master nm ON me.ver_mas_id = nm.id
+                AND me.`status` = 1
+                INNER JOIN prs_model_master mm ON mm.model_code = nm.model_code
+        WHERE
+            me.entity_code = #{entityCode}
+        GROUP BY
+            mm.model_code
+        HAVING
+            count(*) > 0
+    </select>
+
+    <select id="getDropDownBox" resultType="java.util.HashMap">
+        SELECT
+            d.dict_key,
+            d.dict_value
+        FROM
+            bas_evd_valrange v
+                INNER JOIN bas_evd_data_dict d ON v.`value` = d.dict_key
+        WHERE
+            evd_code = 'E_006321'
+    </select>
+
+
+    <select id="getAdditionalEntryReviewList" resultType="com.deloitte.additional.recording.vo.EvidenceDistributionVo">
+        SELECT
+            taskinfo.id 'taskinfoId',
+            info.entity_name 'entityName',
+            evdinfo.`name` 'evidenceName',
+            evddata.time_value 'timeValue',
+            evdinfo.`name` 'evidenceName',
+            info.list,
+            info.entity_bond_tag 'entityBondTag',
+            u.`name` 'collocterName',
+            u1.`name` 'approverName',
+            taskinfo.`status`
+        FROM
+            bas_evd_task_info taskinfo
+            LEFT JOIN bas_evd_data evddata ON evddata.id = taskinfo.data_id
+            LEFT JOIN bas_evd_info evdinfo ON evdinfo.`code` = evddata.evd_code
+            LEFT JOIN entity_info info ON info.entity_code = evddata.entity_code
+            LEFT JOIN prs_ver_mas_entity me ON me.entity_code = info.entity_code
+            AND me.`status` = 1
+            LEFT JOIN prs_version_master pvm ON pvm.id = me.ver_mas_id
+            AND pvm.`status` = 1
+            LEFT JOIN sys_user u ON u.id = taskinfo.collocter
+            LEFT JOIN sys_user u1 ON u1.id = taskinfo.approver
+        <where>
+            <if test="additionalEntryReview.versionId!=null and additionalEntryReview.versionId>0">
+                and pvm.prj_id = #{additionalEntryReview.versionId}
+            </if>
+            <if test="additionalEntryReview.modelCode!=null and additionalEntryReview.modelCode!=''">
+                and pvm.model_code = #{additionalEntryReview.modelCode}
+            </if>
+            <if test="additionalEntryReview.timeValue!=null and additionalEntryReview.timeValue!=''">
+                and evddata.time_value = #{additionalEntryReview.timeValue}
+            </if>
+            <if test="additionalEntryReview.list!=null and additionalEntryReview.list!=''">
+                and info.list = #{additionalEntryReview.list}
+            </if>
+            <if test="additionalEntryReview.entityBondTag!=null and additionalEntryReview.entityBondTag!=''">
+                and info.entity_bond_tag = #{additionalEntryReview.entityBondTag}
+            </if>
+            <if test="additionalEntryReview.taskStatus!=null and additionalEntryReview.taskStatus!=''">
+                and taskinfo.status = #{additionalEntryReview.taskStatus}
+            </if>
+            <if test="collocterIds!=null and collocterIds.size()>0">
+                and taskinfo.collocter in
+                <foreach collection="collocterIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="approverIds!=null and approverIds.size()>0">
+                and taskinfo.approver in
+                <foreach collection="approverIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="additionalEntryReview.modelType!=null and additionalEntryReview.modelType==1">
+                and taskinfo.status = 1
+            </if>
+            <if test="additionalEntryReview.modelType!=null and additionalEntryReview.modelType==2">
+                and taskinfo.status = 3
+            </if>
+            <if test="additionalEntryReview.modelType!=null and additionalEntryReview.modelType==2">
+                and taskinfo.status = 3
+            </if>
+            <if test="userGroupIds!=null and userGroupIds.size()>0">
+                and taskinfo.collocter in
+                <foreach collection="userGroupIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 
     <select id="taskCount" resultType="int">
         SELECT count(id) AS taskCount

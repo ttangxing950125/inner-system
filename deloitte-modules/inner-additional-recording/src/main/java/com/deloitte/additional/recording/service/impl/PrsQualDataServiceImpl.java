@@ -1,25 +1,33 @@
 package com.deloitte.additional.recording.service.impl;
 
 import com.alibaba.excel.util.IoUtils;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.deloitte.additional.recording.domain.EntityInfo;
-import com.deloitte.additional.recording.domain.PrsModelQual;
-import com.deloitte.additional.recording.domain.PrsQualData;
+import com.deloitte.additional.recording.domain.*;
 import com.deloitte.additional.recording.dto.PrsQualDataExcelDto;
 import com.deloitte.additional.recording.mapper.PrsQualDataMapper;
+import com.deloitte.additional.recording.mapper.PrsVerMasQualMapper;
+import com.deloitte.additional.recording.service.BasEvdInfoService;
 import com.deloitte.additional.recording.service.EntityInfoService;
 import com.deloitte.additional.recording.service.PrsModelQualService;
 import com.deloitte.additional.recording.service.PrsQualDataService;
 import com.deloitte.additional.recording.util.EasyExcelImportUtils;
+import com.deloitte.additional.recording.vo.evd.BasEvdInfoDetailVO;
+import com.deloitte.additional.recording.vo.qual.PrsQualDataDetailVO;
 import com.deloitte.common.core.constant.Constants;
 import com.deloitte.common.core.exception.ServiceException;
+import com.deloitte.common.core.utils.bean.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -32,12 +40,60 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Service("prsQualDataService")
 public class PrsQualDataServiceImpl extends ServiceImpl<PrsQualDataMapper, PrsQualData> implements PrsQualDataService {
 
-
+    @Resource
+    private PrsVerMasQualMapper prsVerMasQualMapper;
     @Autowired
     private EntityInfoService entityInfoService;
 
     @Autowired
     private PrsModelQualService modelQualService;
+
+
+    @Autowired
+    private BasEvdInfoService evdInfoService;
+
+    /**
+     * 给主体绑定对应敞口的指标
+     *
+     * @param versionMaster
+     * @param entityCode
+     * @return
+     * @author wpp
+     */
+    @Override
+    public boolean bindQualData(PrsVersionMaster versionMaster, String entityCode, Integer taskYear) {
+
+        //查询当前主体缺少的指标
+        List<PrsVerMasQual> lackQuals = prsVerMasQualMapper.findLackQual(versionMaster.getId(), entityCode, taskYear.toString());
+
+        //转为qualData
+        lackQuals.stream().forEach(item ->
+                {
+                    PrsQualData qualData = PrsQualData.builder()
+                            .qualCode(item.getQualCode())
+                            .entityCode(entityCode)
+                            .timeValue(taskYear)
+                            .build();
+
+                    //查询再保存
+                    Wrapper<PrsQualData> wrapper = Wrappers.<PrsQualData>lambdaQuery()
+                            .eq(PrsQualData::getQualCode, qualData.getQualCode())
+                            .eq(PrsQualData::getEntityCode, qualData.getEntityCode())
+                            .eq(PrsQualData::getTimeValue, qualData.getTimeValue());
+
+                    PrsQualData dbQualData = this.getOne(wrapper);
+                    if (dbQualData == null) {
+                        this.save(qualData);
+                    }
+
+                }
+
+        );
+
+
+        return true;
+    }
+
 
     @Override
     public void importQualFromExcel(MultipartFile serviceFile) {
@@ -73,8 +129,8 @@ public class PrsQualDataServiceImpl extends ServiceImpl<PrsQualDataMapper, PrsQu
                     //指标code
                     String qualCode = split[1];
                     checkQual(qualName, qualCode);
-                    //组装数据
-                    PrsQualData qualData = new PrsQualData().createBy(qualCode, entityCode, map.get(head), map.get(Constants.DATA_YEAR));
+                    //组装数据 TODO
+                    PrsQualData qualData = new PrsQualData().createBy(qualCode, entityCode, map.get(head), 2021);
                     list.add(qualData);
                 });
             });
@@ -123,7 +179,7 @@ public class PrsQualDataServiceImpl extends ServiceImpl<PrsQualDataMapper, PrsQu
      * @return
      */
     @Override
-    public PrsQualData getByEntityAndQcodeAndTime(String entityCode, String qualCode, String timeValue) {
+    public PrsQualData getByEntityAndQcodeAndTime(String entityCode, String qualCode, Integer timeValue) {
 
         return lambdaQuery().eq(PrsQualData::getEntityCode, entityCode)
                 .eq(PrsQualData::getQualCode, qualCode)
@@ -139,14 +195,14 @@ public class PrsQualDataServiceImpl extends ServiceImpl<PrsQualDataMapper, PrsQu
     @Override
     public long countEntity(String qualCode, String dataYear) {
 
-        return lambdaQuery().eq(PrsQualData::getQualCode,qualCode).eq(PrsQualData::getTimeValue,dataYear).count();
+        return lambdaQuery().eq(PrsQualData::getQualCode, qualCode).eq(PrsQualData::getTimeValue, dataYear).count();
     }
 
     @Override
     public long countByValue(String qualCode, String dataYear, String value) {
 
 
-        return lambdaQuery().eq(PrsQualData::getQualCode,qualCode).eq(PrsQualData::getTimeValue,dataYear).eq(PrsQualData::getQualValue,value).count();
+        return lambdaQuery().eq(PrsQualData::getQualCode, qualCode).eq(PrsQualData::getTimeValue, dataYear).eq(PrsQualData::getQualValue, value).count();
 
     }
 
@@ -154,7 +210,23 @@ public class PrsQualDataServiceImpl extends ServiceImpl<PrsQualDataMapper, PrsQu
     public long countLose(String qualCode, String dataYear) {
 
 
-        return this.baseMapper.countLose(qualCode,dataYear);
+        return this.baseMapper.countLose(qualCode, dataYear);
+    }
+
+    @Override
+    public List<PrsQualData> listByCodeAndTimeAndValueIsNotNull(String qualCode, String dataYear) {
+        return this.baseMapper.listByCodeAndTimeAndValueIsNotNull(qualCode, dataYear);
+    }
+
+    @Override
+    public PrsQualDataDetailVO getByCode(String qualCOde) {
+
+        PrsModelQual modelQual = modelQualService.lambdaQuery().eq(PrsModelQual::getQualCode, qualCOde).one();
+        PrsQualDataDetailVO vo = BeanUtils.copyEntity(modelQual, PrsQualDataDetailVO.class);
+        //查询evd
+        List<BasEvdInfoDetailVO> evdInfoDetailVOS = evdInfoService.findByQualCode(qualCOde);
+        vo.setBasEvdInfoDetailVOS(evdInfoDetailVOS);
+        return vo;
     }
 
     /**
@@ -170,5 +242,13 @@ public class PrsQualDataServiceImpl extends ServiceImpl<PrsQualDataMapper, PrsQu
         if (modelQual == null) {
             throw new ServiceException("表格数据有误：" + qualName + "-" + qualCode);
         }
+    }
+
+    private BigDecimal getRate(long entityTotal, long count) {
+
+        BigDecimal total = new BigDecimal(entityTotal);
+        BigDecimal entityCount = new BigDecimal(count);
+
+        return entityCount.divide(total).setScale(2, RoundingMode.HALF_UP);//保留两位小数
     }
 }

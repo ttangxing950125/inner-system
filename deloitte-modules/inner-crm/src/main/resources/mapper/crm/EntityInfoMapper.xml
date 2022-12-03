@@ -208,10 +208,16 @@
         a.*
         FROM
         entity_info a
-        LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
-        LEFT JOIN bond_info c ON b.bd_code = c.bond_code
-        left JOIN entity_stock_thk_rel d on a.entity_code=d.entity_code
-        left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
+        <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '') or (coll != null  and coll != '')">
+            LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
+            LEFT JOIN bond_info c ON b.bd_code = c.bond_code
+        </if>
+        <if test="stockThk != null  and stockThk != ''">
+            left JOIN entity_stock_thk_rel d on a.entity_code=d.entity_code
+        </if>
+        <if test="stockCn != null  and stockCn != ''">
+            left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
+        </if>
         <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != '')or (stockCn != null  and stockCn != '')">
             <where>
                 <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
@@ -235,41 +241,7 @@
             </where>
         </if>
         ORDER BY a.entity_code
-        limit #{pageNum},#{pageSize}
-    </select>
-
-    <select id="getEntityCountByBondType" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        SELECT
-        count(DISTINCT a.entity_code)
-        FROM
-        entity_info a
-        LEFT JOIN entity_bond_rel b ON a.entity_code = b.entity_code
-        LEFT JOIN bond_info c ON b.bd_code = c.bond_code
-        left JOIN entity_stock_thk_rel d on a.entity_code=d.entity_code
-        left JOIN entity_stock_cn_rel e on a.entity_code=e.entity_code
-        <if test="(raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != '')or (stockCn != null  and stockCn != '')">
-            <where>
-                <if test="raiseType != null  and raiseType != ''">c.raise_type = #{raiseType}</if>
-
-                <if test="(raiseType != null  and raiseType != '') and (abs != null  and abs != '')">or</if>
-                <if test="abs != null  and abs != ''">c.abs = #{abs}</if>
-
-                <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != ''))and (coll != null  and coll != '')">
-                    or
-                </if>
-                <if test="coll != null  and coll != ''">c.coll = #{coll}</if>
-                <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != ''))and (stockThk != null  and stockThk != '')">
-                    or
-                </if>
-                <if test="stockThk != null  and stockThk != ''">d.entity_code is not null</if>
-
-                <if test="((raiseType != null  and raiseType != '') or (abs != null  and abs != '')or (coll != null  and coll != '')or (stockThk != null  and stockThk != ''))and (stockCn != null  and stockCn != '')">
-                    or
-                </if>
-                <if test="stockCn != null  and stockCn != ''">e.entity_code is not null</if>
-            </where>
-        </if>
-    </select>
+   </select>
 
     <select id="findLastOneByPrefixCredit" resultMap="EntityInfoResult">
         SELECT * FROM entity_info WHERE credit_code LIKE CONCAT (#{prefix},'%') ORDER BY id DESC  LIMIT 1

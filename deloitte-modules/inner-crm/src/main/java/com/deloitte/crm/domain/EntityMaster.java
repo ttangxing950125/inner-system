@@ -55,6 +55,12 @@ public class EntityMaster implements Serializable {
     private Date update;
 
     /**
+     * 旧敞口行业
+     */
+    private String oldMaster;
+
+
+    /**
      * entity_info的entity_code
      */
     @Excel(name = "是否为城投机构（YY） 1、Y：是YY口径下城投机构 2、N：不是YY口径下城投机构")

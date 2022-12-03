@@ -31,7 +31,7 @@ public class Products implements Serializable {
      */
     private String proRemark;
 
-
+    private String proCode;
 
     /**
      * 文件名称

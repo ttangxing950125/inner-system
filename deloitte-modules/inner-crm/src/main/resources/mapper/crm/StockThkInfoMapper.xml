@@ -16,4 +16,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE a.stock_status = 3 and
 	    b.entity_code = #{entityCode}
     </select>
+    <select id="selectStockThkList" parameterType="java.util.List"
+            resultType="com.deloitte.crm.domain.StockThkInfo">
+        select a.*
+        from stock_thk_info a
+        LEFT JOIN entity_stock_thk_rel b
+        on a.stock_dq_code = b.stock_dq_code
+        <where>
+            1=1
+            <if test="codeList != null  and codeList !=''">
+                and b.entity_code in
+                <foreach item="item" collection="codeList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

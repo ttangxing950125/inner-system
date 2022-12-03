@@ -29,14 +29,14 @@
         prs_project_versions prs
         LEFT JOIN prs_version_master m ON prs.id = m.prj_id AND m.`status`=1 and prs.`status`=1
         <where>
-            <if test="name!=null and name!=''">
-                prs.`name`= #{name}
+            <if test="id!=null and id!=''">
+                prs.`id`= #{id}
             </if>
             <if test="timeValue!=null and timeValue!=''">
                 AND prs.`time_value`= #{timeValue}
             </if>
             <if test="modelCode!=null and modelCode!=''">
-                AND m.`model_code`= #{modelCode}
+                AND  m.`model_code`= #{modelCode}
             </if>
         </where>
 

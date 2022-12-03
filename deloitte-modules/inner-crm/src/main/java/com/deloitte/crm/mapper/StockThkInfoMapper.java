@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.deloitte.crm.domain.StockThkInfo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 股票信息表(StockThkInfo)表数据库访问层
  *
@@ -22,4 +24,6 @@ public interface StockThkInfoMapper extends BaseMapper<StockThkInfo> {
     StockThkInfo findByCode(String secIssInfoCode);
 
     Integer selectListByEntityCode(@Param("entityCode") String entityCode);
+
+    List<StockThkInfo> selectStockThkList(@Param("codeList")List<String> codeList);
 }

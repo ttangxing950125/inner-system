@@ -1,9 +1,12 @@
 package com.deloitte.additional.recording.domain;
 
-import lombok.AllArgsConstructor;
+import lombok.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import java.util.Date;
+import com.baomidou.mybatisplus.annotation.TableId;
+import java.io.Serializable;
+
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -16,8 +19,10 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
-public class BasEvdTaskInfo extends BaseEntity {
-
+@EqualsAndHashCode(callSuper = false)
+public class BasEvdTaskInfo implements Serializable {
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
     /**
      * 数据记录的id，bas_evd_data.id
@@ -65,6 +70,7 @@ public class BasEvdTaskInfo extends BaseEntity {
      * 4	审核通过
      */
     private Integer status;
+
     /**
      * 该任务预期结束时间
      */
@@ -82,10 +88,20 @@ public class BasEvdTaskInfo extends BaseEntity {
      * 异常值备注
      */
     private String errDescription;
+    private Date created;
 
+    private Date updated;
     /**
      * 备注
      */
     private String mark;
+
+    /**
+     * 数据备注
+     */
+    private String dataMark;
+
+
+
 
 }

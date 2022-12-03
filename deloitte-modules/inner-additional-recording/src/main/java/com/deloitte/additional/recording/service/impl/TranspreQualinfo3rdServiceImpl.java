@@ -1,9 +1,15 @@
 package com.deloitte.additional.recording.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.deloitte.additional.recording.constants.Common;
+import com.deloitte.additional.recording.domain.DataCenterValue;
+import com.deloitte.additional.recording.domain.SynTable;
 import com.deloitte.additional.recording.domain.TranspreQualinfo3rd;
 import com.deloitte.additional.recording.dto.TranspreQualinfo3rdDto;
+import com.deloitte.additional.recording.mapper.DataCenterValueMapper;
+import com.deloitte.additional.recording.mapper.SynTableMapper;
 import com.deloitte.additional.recording.mapper.TranspreQualinfo3rdMapper;
 import com.deloitte.additional.recording.request.TranspreQualinfo3rdRequest;
 import com.deloitte.additional.recording.service.PrsModelMasterService;
@@ -11,12 +17,14 @@ import com.deloitte.additional.recording.service.PrsModelQualService;
 import com.deloitte.additional.recording.service.PrsProjectVersionsService;
 import com.deloitte.additional.recording.service.TranspreQualinfo3rdService;
 import com.deloitte.additional.recording.vo.qualinfo3rd.TranspreQualinfo3rdPageVO;
+import com.deloitte.common.core.domain.R;
 import com.deloitte.common.core.exception.ServiceException;
 import com.deloitte.common.core.utils.bean.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -29,7 +37,10 @@ import java.util.concurrent.Executor;
  */
 @Service("transpreQualinfo3rdService")
 public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo3rdMapper, TranspreQualinfo3rd> implements TranspreQualinfo3rdService {
-
+    @Resource
+    private SynTableMapper synTableMapper;
+    @Resource
+    private DataCenterValueMapper dataCenterValueMapper;
 
     @Autowired
     private TranspreQualinfo3rdMapper transpreQualinfo3rdMapper;
@@ -48,10 +59,10 @@ public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo
     @Autowired
     private PrsModelQualService qualService;
 
-    @Autowired
+  /*  @Autowired
     @Qualifier("taskExecutor")
     private Executor executor;
-
+*/
     @Override
     public Page<TranspreQualinfo3rdPageVO> page(String useYear, String tarType, Integer masterId, Integer versionId, String searchData, Integer page, Integer pageSize) {
 
@@ -120,6 +131,23 @@ public class TranspreQualinfo3rdServiceImpl extends ServiceImpl<TranspreQualinfo
         return list;
     }
 
+    @Override
+    public R masterMapping(List<String> names) {
+        List<SynTable> synTables = synTableMapper.selectList(new QueryWrapper<SynTable>().lambda().in(SynTable::getName, names));
+        List<DataCenterValue>result=new ArrayList<>();
+        synTables.forEach(o->{
+            String tableName=o.getPrefix()+ Common.MODEL_MASTER;
+            List<DataCenterValue>centerValues=dataCenterValueMapper.selectValues(tableName);
+            result.addAll(centerValues);
+        });
+        return null;
+    }
+
+    @Override
+    public R centerMaster(Integer versionId) {
+        SynTable synTables = synTableMapper.selectById(versionId);
+        return null;
+    }
 
     private Page<TranspreQualinfo3rdPageVO> getVoPage(List<TranspreQualinfo3rdDto> dtoList, long count, Page<TranspreQualinfo3rdPageVO> pageVo) {
         List<TranspreQualinfo3rdPageVO> pageVOS = BeanUtils.copy(dtoList, TranspreQualinfo3rdPageVO.class);

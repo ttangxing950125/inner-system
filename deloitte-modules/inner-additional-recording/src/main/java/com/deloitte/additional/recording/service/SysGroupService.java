@@ -13,6 +13,8 @@ import java.util.List;
  */
 public interface SysGroupService extends IService<SysGroup> {
 
+     List<SysGroup> getSysGroupList();
+
 
     /**
      * 根据名称校验

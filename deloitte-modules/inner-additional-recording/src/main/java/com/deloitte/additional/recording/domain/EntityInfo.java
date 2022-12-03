@@ -1,6 +1,7 @@
 package com.deloitte.additional.recording.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.deloitte.common.core.annotation.Excel;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * (EntityInfo)表实体类
@@ -21,6 +24,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Builder
+
 public class EntityInfo implements Serializable {
     private static final long serialVersionUID = 337891707856428940L;
     @Excel(name = "${column.comment}")
@@ -113,62 +117,75 @@ public class EntityInfo implements Serializable {
     private String creditErrorRemark;
     /**
      * 若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容：
-     1、吊销
-     2、注销
-     3、非大陆注册机构
-     4、其他未知原因
-     5、正常
+     * 1、吊销
+     * 2、注销
+     * 3、非大陆注册机构
+     * 4、其他未知原因
+     * 5、正常
      */
     @Excel(name = "若“统一社会信用代码是否异常”为0，则为5。反之，则为以下内容： 1、吊销 2、注销 3、非大陆注册机构 4、其他未知原因            5、正常")
-            private Integer creditErrorType;
-            /**
-             * 汇总合并根据企业主体-匹配表中主体所有的曾用名或别称，存在多个时以“、”区分
-
-            每次有操作曾用名表的时候，重新更新这个字段
-            */@Excel(name = "汇总合并根据企业主体-匹配表中主体所有的曾用名或别称，存在多个时以“、”区分 每次有操作曾用名表的时候，重新更新这个字段")
-            private String entityNameHis;
-            /**
-             * 汇总合并根据企业主体-匹配表中主体所有的曾用名或别称备注，形式为日期+更新人+备注；日期+更新人+备注
-            */@Excel(name = "汇总合并根据企业主体-匹配表中主体所有的曾用名或别称备注，形式为日期+更新人+备注；日期+更新人+备注")
-            private String entityNameHisRemarks;
-            /**
-             * 财报列示类型
-            */@Excel(name = "财报列示类型")
-            private String listType;
-            /**
-             * 报告类型
-            */@Excel(name = "报告类型")
-            private String reportType;
-            /**
-             * wind行业划分
-            */@Excel(name = "wind行业划分")
-            private String windMaster;
-            /**
-             * 申万行业划分
-            */@Excel(name = "申万行业划分")
-            private String shenWanMaster;
-            /**
-             * 创建这条数据的用户名
-            */@Excel(name = "创建这条数据的用户名")
-            private String creater;
-            /**
-             * 最后一次更新这条数据的用户
-            */@Excel(name = "最后一次更新这条数据的用户")
-            private String updater;
-            @Excel(name = "${column.comment}")
-            private Date created;
-            @Excel(name = "${column.comment}")
-            private Date updated;
-            /**
-             * 产业链CICS行业划分明细
-            */@Excel(name = "产业链CICS行业划分明细")
-            private String cicsIndustryDetails;
-            /**
-             * 1-企业主体 2-政府主体
-            */@Excel(name = "1-企业主体 2-政府主体")
-            private Integer entityType;
-            /**
-             * 上级政府编码，政府用
-            */@Excel(name = "上级政府编码，政府用")
-            private String preGovCode;
+    private Integer creditErrorType;
+    /**
+     * 汇总合并根据企业主体-匹配表中主体所有的曾用名或别称，存在多个时以“、”区分
+     * <p>
+     * 每次有操作曾用名表的时候，重新更新这个字段
+     */
+    @Excel(name = "汇总合并根据企业主体-匹配表中主体所有的曾用名或别称，存在多个时以“、”区分 每次有操作曾用名表的时候，重新更新这个字段")
+    private String entityNameHis;
+    /**
+     * 汇总合并根据企业主体-匹配表中主体所有的曾用名或别称备注，形式为日期+更新人+备注；日期+更新人+备注
+     */
+    @Excel(name = "汇总合并根据企业主体-匹配表中主体所有的曾用名或别称备注，形式为日期+更新人+备注；日期+更新人+备注")
+    private String entityNameHisRemarks;
+    /**
+     * 财报列示类型
+     */
+    @Excel(name = "财报列示类型")
+    private String listType;
+    /**
+     * 报告类型
+     */
+    @Excel(name = "报告类型")
+    private String reportType;
+    /**
+     * wind行业划分
+     */
+    @Excel(name = "wind行业划分")
+    private String windMaster;
+    /**
+     * 申万行业划分
+     */
+    @Excel(name = "申万行业划分")
+    private String shenWanMaster;
+    /**
+     * 创建这条数据的用户名
+     */
+    @Excel(name = "创建这条数据的用户名")
+    private String creater;
+    /**
+     * 最后一次更新这条数据的用户
+     */
+    @Excel(name = "最后一次更新这条数据的用户")
+    private String updater;
+    @Excel(name = "${column.comment}")
+    private Date created;
+    @Excel(name = "${column.comment}")
+    private Date updated;
+    /**
+     * 产业链CICS行业划分明细
+     */
+    @Excel(name = "产业链CICS行业划分明细")
+    private String cicsIndustryDetails;
+    /**
+     * 1-企业主体 2-政府主体
+     */
+    @Excel(name = "1-企业主体 2-政府主体")
+    private Integer entityType;
+    /**
+     * 上级政府编码，政府用
+     */
+    @Excel(name = "上级政府编码，政府用")
+    private String preGovCode;
+    @TableField(exist = false)
+    private List<Map<String,Object>> maps;
 }

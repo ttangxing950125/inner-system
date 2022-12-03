@@ -19,12 +19,40 @@ import java.util.List;
 @Builder
 @Accessors(chain = true)
 public class VersionMasterEvdVo {
-    /** 页面大小，默认10 */
-    private Integer pageSize=10;
-    /** 页码，默认1 */
-    private Integer pageNum=1;
-    /** 版本Id */
+    /**
+     * 页面大小，默认10
+     */
+    private Integer pageSize = 10;
+    /**
+     * 页码，默认1
+     */
+    private Integer pageNum = 1;
+    /**
+     * 版本Id
+     */
     private Integer prjId;
-    /** 敞口Id集合 */
+    /**
+     * 敞口Id集合
+     */
     private List<String> modelCodes;
+    /**
+     * 输入搜索选项
+     */
+    private String searchData;
+    /**
+     * 选择是否可用 1.正常 0.删除
+     */
+    private Integer status;
+    /**
+     * 页码，默认1
+     */
+    private Integer currPage = 1;
+    /**
+     * 时间选项
+     */
+    private Integer versionId;
+    /**
+     * 搜索的敞口
+     */
+    private List<Integer> industry;
 }
