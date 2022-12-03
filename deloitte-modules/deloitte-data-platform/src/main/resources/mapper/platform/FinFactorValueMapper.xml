@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.FinFactorValueMapper">
+
+    <select id="getApplyDataExtractionPage" resultType="com.deloitte.data.platform.vo.ApplyDataExtractionVo">
+        SELECT
+            b.factor_code AS `code`,
+            b.report_date,
+            b.`factor_value` as suggestValue
+        FROM
+            fin_factor_value b
+        WHERE 1 = 1
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and  b.`entity_code` = #{dto.entityCode}
+        </if>
+        <if test="factorCodes != null">
+            and  b.`factor_code` in
+            <foreach item="item" index="index" collection="factorCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.years != null and dto.years != ''">
+            and  b.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                concat( #{item}, '-12-31')
+            </foreach>
+        </if>
+    </select>
+    <select id="getDataMissRate" resultType="com.deloitte.data.platform.vo.ApplyDataExtractionVo">
+        SELECT
+            `factor_code` as `code`,
+            concat(round((COUNT( `factor_code` ) - COUNT( `factor_value` ))/ COUNT( `factor_code` )* 100, 2 ),'%') AS dataMissRate
+        FROM
+            fin_factor_value
+        where `factor_code` in
+        <foreach item="item" index="index" collection="codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY
+        `factor_code`
+    </select>
+    <select id="getApplyDataExtractionDetailPage"
+            resultType="com.deloitte.data.platform.vo.ApplyDataExtractionDetailVo">
+        SELECT
+            b.entity_code,
+            b.report_date,
+            b.`factor_value` as suggestValue
+        FROM fin_factor_value b
+        WHERE 1 = 1
+        <if test="dto.code != null and dto.code != ''">
+            and  b.`factor_code` = #{dto.code}
+        </if>
+        <if test="dto.years != null and dto.years != ''">
+            and  DATE_FORMAT(b.report_date,'%Y') in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by b.created_time desc
+    </select>
+
+    <select id="getOverviewApplyPage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$OverviewVo">
+        SELECT
+        ffv.factor_code AS code,
+        ffv.entity_code AS entityCode,
+        ffv.report_date AS reportDate,
+        ffv.factor_value AS suggestValue,
+        mrf.factor_name AS name,
+        mrf.accuracy
+        FROM
+        fin_factor_value AS ffv
+        LEFT JOIN model_ration_factor AS mrf ON ffv.factor_code = mrf.factor_code
+        WHERE ffv.is_deleted=0 and mrf.is_deleted=0 and YEAR(ffv.report_date) IN
+        <foreach item="item" index="index" collection="dto.years" open="( " separator="," close=" )">
+            #{item}
+        </foreach>
+        <if test="dto.businessScene != null and dto.businessScene != ''">
+            and mrf.business_scene = #{businessScene}
+        </if>
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and mrf.factor_name like concat('%', #{dto.searchName}, '%')
+        </if>
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and ffv.`entity_code` = #{dto.entityCode}
+        </if>
+        <if test="dto.code != null and dto.code != ''">
+            and ffv.`factor_code` = #{dto.code}
+        </if>
+    </select>
+
+    <select id="getYears" resultType="java.lang.String">
+        SELECT DATE_FORMAT(report_date,'%Y') FROM fin_factor_value GROUP BY DATE_FORMAT(report_date,'%Y')
+    </select>
+    <select id="getApplyDataExport" resultType="com.deloitte.data.platform.vo.ApplyDataExtractionExportVo">
+        SELECT
+            a.entity_code,
+            a.factor_code as `code`,
+            a.factor_value as suggestValue,
+            concat(round(COUNT(a.`factor_value` is NULL)/ COUNT(a.factor_code)* 100, 2 ),'%') AS dataMissRate
+        FROM fin_factor_value a
+        WHERE 1 = 1
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and  a.entity_code = #{dto.entityCode}
+        </if>
+        <if test="factorCodes != null and factorCodes.size()>0">
+            and  a.factor_code in
+            <foreach item="item" index="index" collection="factorCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.years != null and dto.years.size()>0">
+            and  a.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                concat( #{item}, '-12-31')
+            </foreach>
+        </if>
+        GROUP BY
+        a.entity_code,
+        a.factor_code
+        ORDER BY
+        a.entity_code
+    </select>
+    <select id="getExportApplyDataDetail"
+            resultType="com.deloitte.data.platform.vo.ApplyDataExtractionDetailExportVo">
+        SELECT
+        a.entity_code,
+        a.factor_code as `code`,
+        a.factor_value as suggestValue
+        FROM fin_factor_value a
+        WHERE 1 = 1
+        <if test="entityCodes != null and entityCodes.size()>0">
+            and  a.entity_code in
+            <foreach item="item" index="index" collection="entityCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.code != null and dto.code != ''">
+            and  a.factor_code = #{dto.code}
+        </if>
+        <if test="dto.years != null and dto.years.size()>0">
+            and  a.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                concat( #{item}, '-12-31')
+            </foreach>
+        </if>
+        GROUP BY
+        a.entity_code,
+        a.factor_code
+        ORDER BY
+        a.entity_code
+    </select>
+
+</mapper>

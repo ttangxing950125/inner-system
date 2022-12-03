@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.MetaEvdDataMapper">
+    <select id="getMetaEvdDatasByPage" resultType="com.deloitte.additional.recording.domain.MetaEvdData">
+        SELECT
+        a.*
+        FROM
+        meta_evd_data a
+        INNER JOIN prs_project_versions pv ON a.version_id = pv.id AND pv.`status` = 1 AND a.time_value = pv.time_value
+        INNER JOIN prs_model_master model ON a.mode_code = model.model_code AND model.`status` = 1
+        INNER JOIN prs_model_qual qual ON qual.qual_code = a.qual_code AND qual.`status` = 1
+        INNER JOIN bas_evd_info evd ON evd.`code` = a.evidence_code
+        AND evd.`status` = 1
+        WHERE 1 =1
+        <if test="id!=null and id !=''">
+            AND pv.id=#{id}
+        </if>
+        <if test="year!=null and year !=''">
+            AND a.time_value=#{year}
+        </if>
+        <if test="modelCode!=null and modelCode !=''">
+            AND model.model_code=#{modelCode}
+        </if>
+        <if test="search!=null and search !=''">
+            AND (a.evidence_name LIKE concat(concat("%",#{search}),"%" )) or (qual.qual_name LIKE
+            concat(concat("%",#{search}),"%" )) ;
+        </if>
+    </select>
+</mapper>

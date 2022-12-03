@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsVerMasQualMapper">
+
+    <select id="findLackQual" resultType="prsVerMasQual">
+        select qual_rel.*
+        from prs_ver_mas_qual qual_rel
+        left join prs_qual_data `data`
+        on `data`.qual_code = qual_rel.qual_code
+        and `data`.entity_code = #{entityCode}
+        and data.time_value = #{timeValue}
+        where qual_rel.ver_mas_id = #{verMasId}
+        and `data`.id is null
+    </select>
+
+</mapper>

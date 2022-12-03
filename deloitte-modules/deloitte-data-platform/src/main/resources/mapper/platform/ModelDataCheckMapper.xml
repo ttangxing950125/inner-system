@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.ModelDataCheckMapper">
+
+    <select id="getModelDataCheckListPage"
+            resultType="com.deloitte.data.platform.vo.ParameterConfigVo$ModelDataCheckListVo">
+        SELECT * FROM model_data_check AS mdc LEFT JOIN financial_data_config AS fdc ON mdc.check_code = fdc.code
+        WHERE 1=1
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and mdc.check_describe like concat('%', #{dto.searchName}, '%')
+        </if>
+        <if test="dto.entityType != null and dto.entityType != ''">
+            and fdc.entity_type = #{dto.entityType}
+        </if>
+    </select>
+
+</mapper>

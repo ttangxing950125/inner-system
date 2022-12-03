@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.FinancialDataConfigMapper">
+    <select id="getFinancialDataCreateTask" resultType="com.deloitte.additional.recording.vo.CreateFinTaskMetaDataVo">
+
+        SELECT
+            data.id,
+            data.entity_code as entityCode,
+            conf.data_type_code as dataTypeCode,
+            conf.table_type as tableType,
+            YEAR ( DATA.report_date ) as year,
+            data.report_date   as reportDate
+        FROM
+            base_fin_data_recording  data
+            INNER JOIN financial_data_config conf ON data.code = conf.code
+            WHERE `data`.is_create_recording = 0
+            AND data.is_deleted=0 and conf.is_deleted=0
+            GROUP BY conf.data_type_code, data.entity_code, data.report_date
+    </select>
+
+    <select id="getStructuredNotesCreateTask" resultType="com.deloitte.additional.recording.vo.CreateFinTaskMetaDataVo">
+
+        SELECT
+           note.id,
+            conf.data_type_code as dataTypeCode,
+            note.report_date as reportDate,
+            YEAR ( note.report_date ) as year,
+            conf.table_type as tableType,
+            note.entity_code as entityCode
+        FROM
+            base_structured_notes note
+            INNER JOIN financial_data_config conf ON note.CODE = conf.`code` and conf.is_deleted=0 and note.is_deleted=0
+        WHERE
+            note.is_create_recording = 0
+        GROUP BY
+            conf.data_type_code,
+            note.report_date,
+            note.entity_code
+    </select>
+
+    <select id="getTaskDataDetailByParam" parameterType="java.lang.String"
+            resultType="com.deloitte.additional.recording.vo.GetTaskDataDetailByParamVo">
+
+        SELECT
+        conf.NAME as confName ,
+        fin_data.recording_value as recordingValue ,
+        fin_data.unit as unit
+        fin_data.ocr_value as ocrValue ,
+        NULL as automationUnit,
+        NULL as automationSource ,
+        fin_data.err_description as errDescription
+        FROM
+        financial_data_config conf
+        INNER JOIN base_fin_data_recording fin_data ON fin_data.`code` = conf.`code`
+        WHERE 1=1
+        <if test="entityCode!=null and entityCode!=''">
+            AND fin_data.entity_code = #{entityCode}
+        </if>
+        <if test="dataTypeCode!=null and dataTypeCode!=''">
+            AND conf.`data_type_code` = #{dataTypeCode};
+        </if>
+        <if test="reportDate!=null and reportDate!=''">
+            AND fin_data.report_date = #{reportDate}
+        </if>
+    </select>
+
+</mapper>

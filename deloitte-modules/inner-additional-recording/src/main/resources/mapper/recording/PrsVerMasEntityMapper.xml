@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsVerMasEntityMapper">
+
+    <select id="findByVersionMasterEntity" resultType="prsVerMasEntity">
+        select rel.*
+        from prs_ver_mas_entity rel
+        inner join prs_version_master ver_mas
+        on rel.ver_mas_id = ver_mas.id
+        where ver_mas.prj_id = #{versionId}
+        and ver_mas.model_code = #{modelCode}
+        and rel.entity_code = #{entityCode}
+    </select>
+
+    <select id="findCrmEntityRel" resultType="prsVerMasEntity">
+        select
+               ent.entity_code, ent.entity_name, ent.credit_code,
+               dict.master_key model_code, dict.master_name, cust.customer,
+               ${versionId} version_id
+        from entity_info ent
+        inner join entity_master mas
+        on ent.entity_code = mas.entity_code
+        inner join products_master_mapping map
+        on map.crm_master_code = mas.master_code
+        inner join products_master_dict dict
+        on dict.id = map.pro_mas_dict_id
+        inner join products_customer cust
+        on cust.id = dict.pro_cust_id
+        where cust.products_id = #{productsId}
+        and cust.customer = #{projectName}
+
+        <if test="synTable.hasCondition == true">
+            <trim prefix=" and ( " suffix=" ) " prefixOverrides="or">
+                <if test="synTable.list==1">
+                    or ent.list = 1
+                </if>
+                <if test="synTable.bond==1">
+                    or ent.issue_bonds = 1
+                </if>
+                <if test="synTable.finance==1">
+                    or ent.finance = 1
+                </if>
+            </trim>
+        </if>
+    </select>
+</mapper>

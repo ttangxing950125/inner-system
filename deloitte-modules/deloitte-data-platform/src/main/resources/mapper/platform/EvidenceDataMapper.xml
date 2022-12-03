@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.EvidenceDataMapper">
+
+    <select id="getMiddleDataExtractionPage" resultType="com.deloitte.data.platform.vo.MiddleDataExtractionVo">
+        SELECT
+            a.evidence_code as `code`,
+            a.evidence_name as `name`,
+            b.report_date,
+            b.`value` as suggestValue
+        FROM
+            model_evidence a
+            LEFT JOIN evidence_data b ON a.evidence_code = b.`code`
+        WHERE a.is_deleted = 0
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  a.`evidence_name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and  b.entity_code = #{dto.entityCode}
+        </if>
+        <if test="dto.years != null and dto.years != ''">
+            and  b.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                concat( #{item}, '-12-31')
+            </foreach>
+        </if>
+    </select>
+    <select id="getDataMissRate" resultType="com.deloitte.data.platform.vo.MiddleDataExtractionVo">
+        SELECT
+            `code`,
+            concat(round((COUNT( `code` ) - COUNT( `value` ))/ COUNT( `code` )* 100, 2 ),'%') AS dataMissRate
+        FROM
+            evidence_data
+        where `code` in
+            <foreach item="item" index="index" collection="codes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        GROUP BY
+            `code`
+    </select>
+    <select id="getMiddleDataExtractionDetailPage"
+            resultType="com.deloitte.data.platform.vo.MiddleDataExtractionDetailVo">
+        SELECT
+            b.entity_code,
+            b.report_date,
+            b.`value` as suggestValue
+        FROM
+            evidence_data b
+        WHERE b.is_deleted = 0
+        <if test="dto.code != null and dto.code != ''">
+            and  b.`code` = #{dto.code}
+        </if>
+        <if test="dto.years != null and dto.years != ''">
+            and  DATE_FORMAT(b.report_date,'%Y') in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by b.report_date desc
+    </select>
+
+    <select id="getOverviewMiddlePage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$OverviewVo">
+        SELECT
+        ed.code,
+        ed.entity_code AS entityCode,
+        ed.report_date AS reportDate,
+        ed.value AS suggestValue,
+        me.evidence_name AS name,
+        me.accuracy
+        FROM
+        evidence_data AS ed
+        LEFT JOIN model_evidence AS me ON ed.CODE = me.evidence_code
+        WHERE ed.is_deleted=0 and me.is_deleted=0 and YEAR(ed.report_date) IN
+        <foreach item="item" index="index" collection="dto.years" open="( " separator="," close=" )">
+            #{item}
+        </foreach>
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and  me.evidence_name like concat('%', #{dto.searchName}, '%')
+        </if>
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and  ed.`entity_code` = #{dto.entityCode}
+        </if>
+        <if test="dto.code != null and dto.code != ''">
+            and  ed.`code` = #{dto.code}
+        </if>
+    </select>
+
+    <select id="getYears" resultType="java.lang.String">
+        SELECT DATE_FORMAT(report_date,'%Y') FROM evidence_data GROUP BY DATE_FORMAT(report_date,'%Y')
+    </select>
+    <select id="getExportMiddleData" resultType="com.deloitte.data.platform.vo.MiddleDataExtractionExportVo">
+        SELECT
+            a.entity_code,
+            a.`code`,
+            a.`value` as suggestValue,
+            concat(round(COUNT(a.`value` is NULL)/ COUNT( `code` )* 100, 2 ),'%') AS dataMissRate
+        FROM evidence_data a
+        WHERE 1 = 1
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and  a.entity_code = #{dto.entityCode}
+        </if>
+        <if test="modelEvidenceCodes != null and modelEvidenceCodes.size()>0">
+            and  a.code in
+            <foreach item="item" index="index" collection="modelEvidenceCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.years != null and dto.years.size()>0">
+            and  a.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                concat( #{item}, '-12-31')
+            </foreach>
+        </if>
+        GROUP BY a.entity_code,a.`code`
+        order by a.entity_code
+    </select>
+    <select id="getExportMiddleDataDetail"
+            resultType="com.deloitte.data.platform.vo.MiddleDataExtractionDetailExportVo">
+        SELECT
+            a.entity_code,
+            a.`code`,
+            a.`value`	as suggestValue,
+            concat(round(COUNT(a.`value` is NULL)/ COUNT( `code` )* 100, 2 ),'%') AS dataMissRate
+        FROM evidence_data a
+        WHERE 1 = 1
+        <if test="dto.code != null and dto.code != ''">
+            and  a.`code` = #{dto.code}
+        </if>
+        <if test="dto.years != null and dto.years.size()>0">
+            and  a.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                concat( #{item}, '-12-31')
+            </foreach>
+        </if>
+        <if test="entityCodes != null and entityCodes.size()>0">
+            and  a.entity_code in
+            <foreach item="item" index="index" collection="entityCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+        a.entity_code,
+        a.`code`
+    </select>
+
+</mapper>

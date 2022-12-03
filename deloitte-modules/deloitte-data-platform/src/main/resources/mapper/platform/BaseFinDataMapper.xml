@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.BaseFinDataMapper">
+
+    <select id="getBaseFinDataPage" resultType="com.deloitte.data.platform.vo.BaseFinDataVo">
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            a.inner_code as `code`,
+            a.inner_name as `name`,
+            b.id as dataId,
+            b.report_date,
+            b.suggest_source AS isDataMiss,
+            b.is_threshold_exceeded,
+            b.is_system_inspection,
+            b.is_artificial_inspection,
+            b.is_artificial_recording,
+            ${item} as `year`
+            FROM
+            base_orm a
+            LEFT JOIN base_fin_data_${item} b ON a.inner_code = b.`code`
+            WHERE a.is_deleted = 0
+            <if test="dto.entityCode != null and dto.entityCode != ''">
+                and b.`entity_code` = #{dto.entityCode}
+            </if>
+            <if test="dto.keyWord != null and dto.keyWord != ''">
+                and (a.`inner_name` like concat(#{dto.keyWord}, '%') or a.`inner_code` like concat(#{dto.keyWord}, '%')
+                )
+            </if>
+            <if test="dto.sources != null">
+                and b.suggest_source in
+                <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </foreach>
+    </select>
+    <select id="getBaseDataExtractionPage" resultType="com.deloitte.data.platform.vo.BaseDataExtractionVo">
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            b.`code`,
+            b.report_date,
+            b.suggest_source
+            FROM base_fin_data_${item} b
+            WHERE 1 = 1
+            <if test="dto.sources != null">
+                and b.suggest_source in
+                <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.entityCode != null and dto.entityCode != ''">
+                and b.`entity_code` = #{dto.entityCode}
+            </if>
+        </foreach>
+    </select>
+    <select id="getBaseDataExtractionAllRate" resultType="com.deloitte.data.platform.vo.BaseDataExtractionVo">
+        select
+        a.`code`,
+        concat(round(COUNT( a.`suggest_value` )/COUNT( a.`code`)*100,2),'%') AS dataMissRate,
+        concat(round(COUNT( a.`wind_value` )/COUNT( a.`code`)*100,2),'%') AS windRate,
+        concat(round(COUNT( a.flush_value )/COUNT( a.`code`)*100,2),'%') AS flushRate,
+        concat(round(COUNT( a.ocr_value )/COUNT( a.`code`)*100,2),'%') AS ocrRate,
+        concat(round(COUNT(a.is_artificial_recording = '1')/COUNT( a.`code`)*100,2),'%') AS artificialAddRecordRate
+        from (
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            b.`code`,
+            b.suggest_value,
+            b.wind_value,
+            b.flush_value,
+            b.ocr_value,
+            b.is_artificial_recording
+            FROM
+            base_fin_data_${item} b
+            WHERE 1 = 1
+            <if test="codes != null">
+                and b.`code` in
+                <foreach item="item" index="index" collection="codes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.sources != null">
+                and b.suggest_source in
+                <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </foreach>
+        ) a group by a.`code`
+    </select>
+    <select id="getDataExtractionDetailPage" resultType="com.deloitte.data.platform.vo.DataExtractionDetailVo">
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            b.`entity_code`,
+            b.report_date,
+            b.suggest_source,
+            concat(round(COUNT( b.`suggest_value` )/COUNT( b.`code`)*100,2),'%') AS dataMissRate,
+            concat(round(COUNT( b.`wind_value` )/COUNT( b.`code`)*100,2),'%') AS windRate,
+            concat(round(COUNT( b.flush_value )/COUNT( b.`code`)*100,2),'%') AS flushRate,
+            concat(round(COUNT( b.ocr_value )/COUNT( b.`code`)*100,2),'%') AS ocrRate,
+            concat(round(COUNT(b.is_artificial_recording = '1')/COUNT( b.`code`)*100,2),'%') AS artificialAddRecordRate
+            FROM
+            base_orm a
+            LEFT JOIN base_fin_data_${item} b on a.inner_code = b.`code`
+            WHERE a.is_deleted = 0
+            <if test="dto.keyWord != null and dto.keyWord != ''">
+                and a.`inner_name` like concat('%', #{dto.keyWord}, '%')
+            </if>
+            <if test="dto.code != null and dto.code != ''">
+                and b.`code` = #{dto.code}
+            </if>
+            <if test="dto.sources != null">
+                and b.suggest_source in
+                <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            GROUP BY
+            b.`entity_code`,
+            b.report_date,
+            b.suggest_source
+        </foreach>
+        ORDER BY report_date DESC
+    </select>
+    <select id="getQualityTestRate" resultType="com.deloitte.data.platform.vo.QualityTestRateVo">
+        select
+        a.entity_code,
+        concat( round( COUNT( a.is_artificial_inspection = '1' )/ COUNT( a.`entity_code` )* 100, 2 ), '%' ) AS
+        artificialInspectionRate,
+        concat( round( COUNT( a.is_system_Inspection = '1' )/ COUNT( a.`entity_code` )* 100, 2 ), '%' ) AS
+        systemInspectionRate,
+        concat(round( COUNT( a.is_artificial_inspection = '1' )/ COUNT( a.`entity_code` )* 100, 2 )+ round( COUNT(
+        a.is_system_Inspection = '1' )/ COUNT( a.`entity_code` )* 100, 2 ),'%' ) AS totalRate
+        from (
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">SELECT
+            entity_code,
+            is_artificial_inspection,
+            is_system_Inspection
+            FROM base_fin_data_${item}
+            WHERE 1 = 1
+            <if test="entityCodes != null">
+                and entity_code in
+                <foreach item="item" index="index" collection="entityCodes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </foreach>
+        )a
+        GROUP BY a.entity_code
+    </select>
+    <select id="getBaseQualityPage" resultType="com.deloitte.data.platform.vo.BaseQualityVo">
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            a.inner_code AS `code`,
+            a.inner_name AS `name`,
+            b.report_date,
+            b.is_system_inspection,
+            b.is_artificial_inspection,
+            b.is_artificial_recording
+            FROM
+            base_orm a
+            LEFT JOIN base_fin_data_${item} b ON a.inner_code = b.`code`
+            WHERE a.is_deleted = 0
+            <if test="dto.entityCode != null and dto.entityCode != ''">
+                and b.`entity_code` = #{dto.entityCode}
+            </if>
+            <if test="dto.keyWord != null and dto.keyWord != ''">
+                and a.`inner_name` like concat('%', #{dto.keyWord}, '%')
+            </if>
+        </foreach>
+    </select>
+
+    <select id="listInEntityCodeAndReportDate"
+            parameterType="com.deloitte.data.platform.dto.ListBaseFinDataDto"
+            resultType="com.deloitte.data.platform.domian.BaseFinData">
+        <foreach collection="dtoList" item="dto" index="index" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            id,
+            code,
+            entity_code,
+            wind_value,
+            flush_value,
+            ocr_value,
+            suggest_value,
+            suggest_source,
+            report_date
+            FROM
+            base_fin_data_${dto.year}
+            <where>
+                <!-- is_deleted = 0 -->
+                <if test="dto.code != null  and  dto.code != '' ">
+                    AND code = #{dto.code}
+                </if>
+                <if test="dto.entityCodeList != null and dto.entityCodeList.size() &gt; 0">
+                    AND entity_code IN
+                    <foreach collection="dto.entityCodeList" item="entityCode" open="(" close=")" separator=",">
+                        #{entityCode}
+                    </foreach>
+                </if>
+                <if test="dto.reportDate != null">
+                    AND report_date = #{dto.reportDate}
+                </if>
+            </where>
+        </foreach>
+    </select>
+
+    <select id="getOverviewPage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$OverviewVo">
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            bfd.entity_code AS `entityCode`,
+            bfd.suggest_value AS `suggestValue`,
+            IF(is_artificial_recording = '1',bfd.suggest_value,NULL) AS `artificialRecordingData`,
+            bfd.report_date AS reportDate,
+            bfd.is_artificial_recording AS isArtificialRecording,
+            bfd.wind_value AS windValue,
+            bfd.flush_value AS flushValue,
+            bfd.ocr_value AS ocrValue,
+            bfd.code AS `code`,
+            bo.inner_name AS `name`
+            FROM base_fin_data_${item} bfd
+            LEFT JOIN financial_data_config fdc ON bfd.`code` = fdc.`code`
+            LEFT JOIN base_orm bo ON bfd.`code` = bo.`inner_code`
+            WHERE 1=1
+            <if test="dto.searchName != null and dto.searchName != ''">
+                and bo.`inner_name` like concat('%', #{dto.searchName}, '%')
+            </if>
+            <if test="dto.entityCode != null and dto.entityCode != ''">
+                and bfd.`entity_code` = #{dto.entityCode}
+            </if>
+            <if test="dto.code != null and dto.code != ''">
+                and bfd.`code` = #{dto.code}
+            </if>
+            <if test="dto.entityType != null and dto.entityType != ''">
+                and fdc.`entity_type` = #{dto.entityType}
+            </if>
+            <if test="dto.sources != null">
+                and bfd.suggest_source in
+                <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </foreach>
+    </select>
+
+    <select id="getOverviewSourceCoverage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$CoverageVo">
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            round(COUNT( `wind_value` )/COUNT( `code`)*100,2) AS windRate,
+            round(COUNT( `flush_value` )/COUNT( `code`)*100,2) AS flushRate,
+            round(COUNT( `ocr_value` )/COUNT( `code`)*100,2) AS ocrRate,
+            round(COUNT( `is_artificial_recording` = '1')/COUNT(`code`)*100,2) AS artificialAddRecordRate
+            FROM
+            base_fin_data_${item}
+            WHERE 1=1
+            <if test="entityCode != null and entityCode != ''">
+                and `entity_code` = #{entityCode}
+            </if>
+            <if test="code != null and code != ''">
+                and `code` = #{code}
+            </if>
+        </foreach>
+    </select>
+
+    <select id="getOverviewSourceCoverageSuggest"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$CoverageVo">
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            concat(round(COUNT( `suggest_source` = '1' )/COUNT( `suggest_value`)*100,2),'%') AS windRate,
+            concat(round(COUNT( `suggest_source` = '3' )/COUNT( `suggest_value`)*100,2),'%') AS flushRate,
+            concat(round(COUNT( `suggest_source` = '4' )/COUNT( `suggest_value`)*100,2),'%') AS ocrRate,
+            concat(round(COUNT( `suggest_source` = '2')/COUNT(`suggest_value`)*100,2),'%') AS artificialAddRecordRate
+            FROM
+            base_fin_data_${item}
+            WHERE is_deleted = 0
+            <if test="entityCode != null and entityCode != ''">
+                and `entity_code` = #{entityCode}
+            </if>
+            <if test="code != null and code != ''">
+                and `code` = #{code}
+            </if>
+        </foreach>
+    </select>
+
+    <select id="getBusinessScenarioPage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$BusinessScenarioVo">
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            bo.inner_code AS `code`,
+            bo.inner_name AS `name`,
+            bfd.entity_code AS `entityCode`,
+            CONCAT(ROUND(100-COUNT( bfd.`suggest_value` )/COUNT( bfd.`code`)*100,2),'%') AS dataMissRate,
+            bfd.suggest_value AS `suggestValue`,
+            bfd.ocr_value AS `ocrValue`,
+            bfd.wind_value AS `artificialRecordingData`,
+            bfd.report_date,
+            bfd.is_artificial_recording
+            FROM
+            base_orm bo
+            LEFT JOIN base_fin_data_${item} bfd ON bo.inner_code = bfd.`code`
+            WHERE 1=1
+            <if test="dto.searchName != null and dto.searchName != ''">
+                and bo.`inner_name` like concat('%', #{dto.searchName}, '%')
+            </if>
+            <if test="dto.entityCode != null and dto.entityCode != ''">
+                and bfd.`entity_code` = #{dto.entityCode}
+            </if>
+            GROUP BY bo.inner_code
+        </foreach>
+    </select>
+
+
+    <select id="getBusinessScenarioSourceCoverage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$CoverageVo">
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            concat(round(COUNT( `wind_value` )/COUNT( `code`)*100,2),'%') AS windRate,
+            concat(round(COUNT( `flush_value` )/COUNT( `code`)*100,2),'%') AS flushRate,
+            concat(round(COUNT( `ocr_value` )/COUNT( `code`)*100,2),'%') AS ocrRate,
+            concat(round(COUNT( `is_artificial_recording` = '1')/COUNT(`code`)*100,2),'%') AS artificialAddRecordRate
+            FROM
+            base_fin_data_${item}
+            <if test="entityCode != null and entityCode != ''">
+                and `entity_code` = #{entityCode}
+            </if>
+        </foreach>
+    </select>
+
+    <select id="getBusinessScenarioSourceCoverageSuggest"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$CoverageVo">
+
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            concat(round(COUNT( `suggest_source` = '1' )/COUNT( `suggest_value`)*100,2),'%') AS windRate,
+            concat(round(COUNT( `suggest_source` = '3' )/COUNT( `suggest_value`)*100,2),'%') AS flushRate,
+            concat(round(COUNT( `suggest_source` = '4' )/COUNT( `suggest_value`)*100,2),'%') AS ocrRate,
+            concat(round(COUNT( `suggest_source` = '2')/COUNT(`suggest_value`)*100,2),'%') AS artificialAddRecordRate
+            FROM
+            base_fin_data_${item}
+            <if test="entityCode != null and entityCode != ''">
+                and `entity_code` = #{entityCode}
+            </if>
+        </foreach>
+    </select>
+
+    <select id="getBusinessScenarioMissRate"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$BusinessScenarioMissRateVo">
+        SELECT
+        SVG(MissRate1) AS MissRate1,
+        SVG(MissRate1) AS MissRate2,
+        SVG(MissRate1) AS MissRate3,
+        SVG(MissRate1) AS MissRate4,
+        SVG(MissRate1) AS MissRate5,
+        SVG(MissRate1) AS MissRate6
+        FROM (
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            COUNT(IF(a.dataMissRate=0,1,NULL))/COUNT(a.dataMissRate)*100 AS MissRate1,
+            COUNT(IF(a.dataMissRate &gt; 0 AND a.dataMissRate &lt; 30,1,NULL))/COUNT(a.dataMissRate)*100 AS MissRate2,
+            COUNT(IF(a.dataMissRate &gt;= 30 AND a.dataMissRate &lt; 60,1,NULL))/COUNT(a.dataMissRate)*100 AS MissRate3,
+            COUNT(IF(a.dataMissRate &gt;= 60 AND a.dataMissRate &lt; 90,1,NULL))/COUNT(a.dataMissRate)*100 AS MissRate4,
+            COUNT(IF(a.dataMissRate &gt;= 90 AND a.dataMissRate &lt; 100,1,NULL))/COUNT(a.dataMissRate)*100 AS
+            MissRate5,
+            COUNT(IF(a.dataMissRate=100,1,NULL))/COUNT(a.dataMissRate)*100 AS MissRate6
+            FROM(
+            SELECT
+            1-ROUND(COUNT(`suggest_value` )/COUNT(`code`),2) AS dataMissRate
+            FROM
+            base_fin_data_${item} b
+            WHERE 1=1
+            <if test="entityCode != null and entityCode != ''">
+                and `entity_code` = #{entityCode}
+            </if>
+            GROUP BY
+            `code`) AS a
+        </foreach>
+        ) AS b
+    </select>
+
+    <select id="getCalculationPage" resultType="com.deloitte.data.platform.vo.ModelEvidenceVo$CalculationVo">
+        SELECT
+        code,
+        entity_code AS entityCode,
+        report_date AS reportDate
+        FROM
+        base_fin_data_${year}
+        WHERE
+        CODE IN
+        <foreach item="item" index="index" collection="codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        GROUP BY
+        entity_code,
+        report_date
+    </select>
+
+    <select id="getCalculationAllData" resultType="com.deloitte.data.platform.vo.ModelEvidenceVo$FinDataVo">
+        SELECT
+        code,
+        entity_code AS entityCode,
+        report_date AS reportDate,
+        IF(suggest_value IS NULL,0,suggest_value) AS suggestValue
+        FROM
+        base_fin_data_${year}
+        WHERE
+        CODE IN
+        <foreach item="item" index="index" collection="codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND entity_code IN
+        <foreach item="item" index="index" collection="entityCodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="reportDates != null and reportDates.size() &gt; 0">
+            AND report_date IN
+            <foreach item="item" index="index" collection="reportDates" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+    <select id="getCodeEntityPage" resultType="com.deloitte.data.platform.vo.CodeEntityVo">
+        SELECT
+        id as dataId,
+        entity_code,
+        IF(is_system_inspection=1 || is_artificial_inspection = 1,1,0) as isInspection,
+        is_system_inspection,
+        is_artificial_inspection,
+        ${dto.year} as `year`
+        FROM base_fin_data_${dto.year}
+        where 1 = 1
+        <if test="dto.code != null and dto.code != ''">
+            and `code` = #{dto.code}
+        </if>
+        <if test="codes != null and codes != ''">
+            AND entity_code IN
+            <foreach item="item" index="index" collection="codes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="getParameterConfigListPage"
+            resultType="com.deloitte.data.platform.vo.ParameterConfigVo$ListVo">
+        SELECT
+        id,
+        code,
+        name,
+        accuracy,
+        change_rate_upper AS changeRateUpper,
+        threshold_value AS thresholdValue
+        FROM financial_data_config
+        WHERE 1=1
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and name like concat('%', #{dto.searchName}, '%')
+        </if>
+        <if test="dto.entityType != null and dto.entityType != ''">
+            and entity_type = #{dto.entityType}
+        </if>
+    </select>
+    <select id="getBaseFinDataYears" resultType="java.lang.String">
+        SELECT
+            right (table_name, 4) as `year`
+        FROM
+            information_schema.TABLES
+        WHERE
+            table_schema = (SELECT DATABASE())
+          AND table_name LIKE 'base_fin_data_2%'
+        order by `year` desc
+            limit 3
+    </select>
+
+    <select id="getDataMenu" resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$GetDataMenuVo">
+        SELECT
+        name,
+        code
+        FROM
+        data_platform_config_dict
+        WHERE
+        parent_code IN ( SELECT a.`code` AS `code` FROM data_platform_config_dict a
+        WHERE a.parent_code = 'data_resource_pool'
+        <if test="hierarchy != null and hierarchy != ''">
+            and seq = #{hierarchy}
+        </if>
+        )
+    </select>
+
+    <select id="getYears" resultType="java.lang.String">
+        SELECT
+            RIGHT (table_name, 4) AS `year`
+        FROM
+            information_schema.TABLES
+        WHERE
+            table_schema = (SELECT DATABASE())
+          AND table_name LIKE 'base_fin_data_2%'
+        ORDER BY YEAR DESC
+            LIMIT 3
+    </select>
+
+
+    <select id="getBusinessScenarioMissRateAll"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$BusinessScenarioMissRateAllVo">
+        SELECT AVG(a.missRate) AS dataMissRate FROM (
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT 100-ROUND(COUNT(suggest_value)/COUNT(1)*100,2) AS missRate
+            FROM
+            base_fin_data_${item} AS bfd
+            WHERE 1=1
+            <if test="entityCode != null and entityCode != ''">
+                and bfd.entity_code = #{entityCode}
+            </if>
+        </foreach>
+        ) AS a
+    </select>
+
+    <select id="getRecordingAll"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$RecordingAllVo">
+        SELECT AVG(a.recording) AS alredyRecording FROM (
+        <foreach item="item" index="index" collection="years" open=" " separator="UNION ALL" close=" ">
+            SELECT 100-ROUND(COUNT(IF(is_artificial_recording=1,1,NULL))/COUNT(1)*100,2) AS recording
+            FROM
+            base_fin_data_${item} AS bfd
+            WHERE 1=1
+            <if test="entityCode != null and entityCode != ''">
+                and bfd.entity_code = #{entityCode}
+            </if>
+        </foreach>
+        ) AS a
+    </select>
+
+    <select id="getArtificialRecordingBar" resultType="java.util.Map">
+        SELECT
+        <foreach item="config" index="index" collection="configs" open="(" separator="," close=")">
+            SUM(${config.code}) AS ${config.code},
+            SUM(concat('no_',${config.code})) AS concat('no_',${config.code})
+        </foreach>
+        FROM (
+        <foreach item="item" index="index" collection="dto.years" open=" " separator="UNION ALL" close=" ">
+            SELECT
+            <foreach item="config" index="index" collection="configs" open=" " separator="," close=" ">
+                COUNT(IF(bfd.is_artificial_recording=1 AND fdc.entity_type=${config.code} IS NULL,1,NULL)) AS
+                ${config.code},
+                COUNT(IF((bfd.is_artificial_recording=0 OR bfd.is_artificial_recording IS NULL) AND
+                fdc.entity_type=${config.code} IS NULL,1,NULL)) AS concat('no_',${config.code})
+            </foreach>
+            FROM
+            base_fin_data_${item} AS bfd
+            LEFT JOIN financial_data_config AS fdc ON bfd.code = fdc.code
+            WHERE 1=1 AND fdc.entity_type IN
+            <foreach item="config" index="index" collection="configs" open="(" separator="," close=")">
+                #{config.code}
+            </foreach>
+            <if test="dto.searchName != null and dto.searchName != ''">
+                and fdc.name like concat('%', #{dto.searchName}, '%')
+            </if>
+        </foreach>
+        ) AS a
+    </select>
+    <select id="getBaseFinDataTotal" resultType="java.lang.Integer">
+        SELECT
+        COUNT( 1 )
+        FROM
+        base_fin_data_${year}
+        WHERE 1 = 1
+        <if test="dto.entityCode != null">
+            and entity_code = #{dto.entityCode}
+        </if>
+        <if test="financialCodes != null">
+            and `code` in
+            <foreach item="item" index="index" collection="financialCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.sources != null">
+            and suggest_source in
+            <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="getExportBaseData" resultType="com.deloitte.data.platform.vo.BaseDataExtractionExportVo">
+        select
+        b.entity_code,
+        b.`code`,
+        concat(round(COUNT( b.`suggest_value` is NULL )/COUNT( b.`code`)*100,2),'%') AS dataMissRate,
+        concat(round(COUNT( b.`wind_value` is NULL)/COUNT( b.`code`)*100,2),'%') AS windRate,
+        concat(round(COUNT( b.flush_value is NULL )/COUNT( b.`code`)*100,2),'%') AS flushRate,
+        concat(round(COUNT( b.ocr_value is NULL)/COUNT( b.`code`)*100,2),'%') AS ocrRate,
+        concat(round(COUNT(b.is_artificial_recording = '1')/COUNT( b.`code`)*100,2),'%') AS artificialAddRecordRate
+        from (
+        SELECT
+        a.entity_code,
+        a.`code`,
+        a.`suggest_value`,
+        a.`wind_value`,
+        a.flush_value,
+        a.ocr_value,
+        a.is_artificial_recording
+        FROM
+        base_fin_data_${year} a
+        WHERE 1 = 1
+        <if test="dto.entityCode != null">
+            and a.entity_code = #{dto.entityCode}
+        </if>
+        <if test="financialCodes != null">
+            and a.`code` in
+            <foreach item="item" index="index" collection="financialCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.sources != null and dto.sources.size() > 0">
+            and a.suggest_source in
+            <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY a.id
+        ) b
+        GROUP BY b.entity_code,b.`code`
+        ORDER BY b.`entity_code`
+    </select>
+    <select id="getExportBaseDetailData"
+            resultType="com.deloitte.data.platform.vo.BaseDataExtractionDetailExportVo">
+        select
+        b.entity_code,
+        b.`code`,
+        concat(round(COUNT( b.`suggest_value` is NULL )/COUNT( b.`code`)*100,2),'%') AS dataMissRate,
+        concat(round(COUNT( b.`wind_value` is NULL)/COUNT( b.`code`)*100,2),'%') AS windRate,
+        concat(round(COUNT( b.flush_value is NULL )/COUNT( b.`code`)*100,2),'%') AS flushRate,
+        concat(round(COUNT( b.ocr_value is NULL)/COUNT( b.`code`)*100,2),'%') AS ocrRate,
+        concat(round(COUNT(b.is_artificial_recording = '1')/COUNT( b.`code`)*100,2),'%') AS artificialAddRecordRate
+        from (
+        SELECT
+        a.entity_code,
+        a.`code`,
+        a.`suggest_value`,
+        a.`wind_value`,
+        a.flush_value,
+        a.ocr_value,
+        a.is_artificial_recording
+        FROM
+        base_fin_data_${year} a
+        WHERE 1 = 1
+        <if test="dto.entityCode != null and dto.entityCode != ''">
+            and a.entity_code = #{dto.entityCode}
+        </if>
+        <if test="dto.code != null  and dto.code != ''">
+            and a.`code` = #{dto.code}
+        </if>
+        <if test="dto.sources != null and dto.sources.size() > 0">
+            and a.suggest_source in
+            <foreach item="item" index="index" collection="dto.sources" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY a.id
+        ) b
+        GROUP BY b.entity_code,b.`code`
+        ORDER BY b.`entity_code`
+    </select>
+
+
+    <update id="saveBatchCheckResultById">
+        <if test="baseFinDataList != null and baseFinDataList.size() &gt; 0">
+            <foreach collection="baseFinDataList" item="baseFinData" separator=";" open="" close="">
+                UPDATE base_fin_data_${year}
+                SET change_rate = #{baseFinData.changeRate},
+                is_threshold_exceeded = #{baseFinData.thresholdExceeded},
+                is_system_inspection = #{baseFinData.systemInspection},
+                is_data_check = #{baseFinData.dataCheck}
+                WHERE id = #{baseFinData.id}
+            </foreach>
+        </if>
+    </update>
+
+
+    <update id="updateIsArtificialInspection">
+        update base_fin_data_${year}
+        set is_artificial_inspection = 1
+        where id = #{dataId}
+    </update>
+
+    <select id="entityCodePage" resultType="java.lang.String">
+        SELECT entity_code
+        FROM base_fin_data_${year}
+        WHERE report_date = #{reportDate}
+        <if test="entityCodeList != null and entityCodeList.size() &gt; 0">
+            AND entity_code IN
+            <foreach collection="entityCodeList" item="entityCode" separator="," open="(" close=")">
+                #{entityCode}
+            </foreach>
+        </if>
+        GROUP BY entity_code
+        ORDER BY id
+    </select>
+</mapper>

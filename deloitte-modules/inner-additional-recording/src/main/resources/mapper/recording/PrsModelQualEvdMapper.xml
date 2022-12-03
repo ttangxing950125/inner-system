@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.PrsModelQualEvdMapper">
+
+    <select id="findLackEvd" resultType="basEvdInfo">
+        select evd.*
+        from prs_ver_mas_qual qual_rel
+        inner join prs_model_qual_evd qual_evd
+        on qual_rel.qual_code = qual_evd.qual_code
+        inner join bas_evd_info evd
+        on evd.`code` = qual_evd.evd_code
+        left join bas_evd_data `data`
+        on `data`.evd_code = qual_evd.evd_code
+        and `data`.entity_code = #{entityCode}
+        and `data`.time_value = #{taskYear}
+        where qual_rel.ver_mas_id = #{verMasId}
+        and `data`.id is null
+    </select>
+
+</mapper>

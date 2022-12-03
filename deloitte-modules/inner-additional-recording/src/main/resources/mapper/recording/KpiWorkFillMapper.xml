@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.KpiWorkFillMapper">
+
+
+    <select id="getKpiWorkCal" resultType="com.deloitte.additional.recording.vo.kpi.KpiWorkCalVo">
+        SELECT syu.`name` as userName,kpi.* FROM kpi_work_fill kpi
+        INNER JOIN sys_user syu ON kpi.user_id=syu.id
+        <where>
+            <if test="dto.userId != null">
+                and kpi.user_id =#{dto.userId}
+            </if>
+
+            <if test="sysGroups != null and sysGroups.size()>0">
+                AND kpi.user_id in
+                <foreach collection="sysGroups" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.date!=null and dto.date!=''">
+                AND kpi.work_day LIKE concat(concat("%",#{dto.date}),"%" )
+            </if>
+            <if test="dto.startDate!=null and dto.endDate !=null">
+                AND kpi.work_day BETWEEN #{dto.startDate} AND #{dto.endDate}
+            </if>
+        </where>
+
+    </select>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.BasEvdDataTaskMapper">
+
+
+    <select id="findByEvdCodeAndTimeAndType" resultType="com.deloitte.additional.recording.domain.BasEvdDataTask">
+        SELECT ed.id,
+               ed.evd_code as evdCode,
+               ed.evd_val  as evdVal
+        FROM bas_evd_data ed
+                 LEFT JOIN bas_evd_info ei ON ed.evd_code = ei.CODE
+        WHERE ei.val_type = '3'
+          and ed.evd_code = #{evdCode}
+          and ed.timeValue = #{timeValue}
+          AND ed.evd_val IS NOT NULL
+          AND ed.evd_val != '-999999.9999'
+    </select>
+
+</mapper>

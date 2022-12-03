@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.FinancialDataConfigMapper">
+
+    <select id="getFinancialBaseDataConfigPage" resultType="com.deloitte.data.platform.vo.BaseDataConfigVo">
+        SELECT
+            a.`seq`,
+            a.`code`,
+            a.`name`,
+            a.data_type,
+            a.accuracy,
+            a.unit,
+            a.currency
+        FROM
+            financial_data_config a
+        WHERE  a.is_deleted = 0
+        <if test="dto.entityType != null and dto.entityType != ''">
+            and  a.`entity_type` = #{dto.entityType}
+        </if>
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  (a.`name` like concat(#{dto.keyWord}, '%') or a.`code` like concat(#{dto.keyWord}, '%'))
+        </if>
+    </select>
+
+    <select id="getFinancialDataConfigList"
+            resultType="com.deloitte.data.platform.vo.ModelEvidenceVo$FinancialDataConfigListVo">
+         SELECT id, code ,name FROM financial_data_config
+         WHERE 1=1
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and name like concat('%', #{dto.searchName}, '%')
+        </if>
+    </select>
+</mapper>

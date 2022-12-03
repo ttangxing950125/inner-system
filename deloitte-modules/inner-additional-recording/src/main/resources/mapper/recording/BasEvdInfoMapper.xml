@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.BasEvdInfoMapper">
+    <select id="getEvidenceDistributionPage" resultType="com.deloitte.additional.recording.vo.EvidenceDistributionVo">
+        SELECT
+        taskinfo.id 'taskinfoId',
+        evdinfo.`code`,
+        info.entity_name 'entityName',
+        evddata.time_value 'timeValue',
+        evdinfo.`name` 'evidenceName',
+        info.list,
+        info.entity_bond_tag 'entityBondTag',
+        u.`name` 'collocterName',
+        u1.`name` 'approverName',
+        taskinfo.`status`
+        FROM
+        bas_evd_task_info taskinfo
+        LEFT JOIN bas_evd_data evddata ON evddata.id = taskinfo.data_id
+        LEFT JOIN bas_evd_info evdinfo ON evdinfo.`code` = evddata.evd_code
+        LEFT JOIN entity_info info ON info.entity_code = evddata.entity_code
+        AND info.`status` = 1
+        LEFT JOIN prs_qual_data qual ON qual.entity_code = info.entity_code
+        LEFT JOIN prs_model_qual mq ON mq.qual_code = qual.qual_code
+        AND mq.`status` = 1
+        LEFT JOIN prs_ver_mas_entity me ON me.entity_code = info.entity_code
+        AND me.`status` = 1
+        LEFT JOIN prs_version_master pvm ON pvm.id = me.ver_mas_id
+        AND pvm.`status` = 1
+        LEFT JOIN prs_model_master mm ON mm.model_code = pvm.model_code
+        AND mm.`status` = 1
+        LEFT JOIN prs_project_versions pv ON pvm.prj_id = pv.id
+        AND pv.`status` = 1
+        LEFT JOIN sys_user u ON taskinfo.collocter = u.id
+        AND u.`status` = 1
+        LEFT JOIN sys_user u1 ON u1.id = taskinfo.approver
+        AND u1.`status` = 1
+        <where>
+            <if test="versionNames!=null and versionNames.size()>0">
+                and pv.name in
+                <foreach collection="versionNames" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="modelMasterIds!=null and modelMasterIds.size()>0">
+                and mm.id in
+                <foreach collection="modelMasterIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="distributionPageDto.taskStatus != null">
+                and taskinfo.status = #{distributionPageDto.taskStatus}
+            </if>
+            <if test="distributionPageDto.entityBondtag != null">
+                and info.entity_bond_tag = #{distributionPageDto.entityBondtag}
+            </if>
+            <if test="distributionPageDto.list != null">
+                and info.list = #{distributionPageDto.list}
+            </if>
+            <if test="collocterIds != null and collocterIds.size()>0">
+                and taskinfo.collocter in
+                <foreach collection="collocterIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="approverIds != null and approverIds.size()>0">
+                and taskinfo.approverId in
+                <foreach collection="approverIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="distributionPageDto.timeValue != null">
+                and evddata.time_value = #{distributionPageDto.timeValue}
+            </if>
+            <if test="evidenceIds != null and evidenceIds.size()>0">
+                and evdinfo.id in
+                <foreach collection="evidenceIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="qualIds!=null and qualIds.size()>0">
+                and mq.id in
+                <foreach collection="qualIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entityIds!=null and entityIds.size()>0">
+                and info.id in
+                <foreach collection="entityIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="groupCollocterIds!=null and groupCollocterIds.size()>0">
+                and taskinfo.collocter in
+                <foreach collection="groupCollocterIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getLabel" resultType="com.deloitte.additional.recording.vo.EvidenceVo">
+        SELECT
+        evd.evd_code 'evdCode',
+        GROUP_CONCAT(
+        CONCAT( ver.NAME, '-', mas.NAME, '-', qual.qual_name, "(", rel.qual_code, ")" )) 'label'
+        FROM
+        prs_model_qual_evd evd
+        INNER JOIN prs_ver_mas_qual rel ON evd.qual_code = rel.qual_code
+        AND evd.`status` = 1
+        INNER JOIN prs_version_master ver_mas ON ver_mas.id = rel.ver_mas_id
+        AND ver_mas.`status` = 1
+        INNER JOIN prs_project_versions ver ON ver.id = ver_mas.prj_id
+        AND ver.`status` = 1
+        INNER JOIN prs_model_master mas ON mas.model_code = ver_mas.model_code
+        AND mas.`status` = 1
+        INNER JOIN prs_model_qual qual ON qual.qual_code = rel.qual_code
+        <where>
+            <if test="codeList!=null and codeList.size()>0">
+                evd.evd_code in
+                <foreach collection="codeList" index="index" item="code" open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findByQualCode" resultType="com.deloitte.additional.recording.vo.evd.BasEvdInfoDetailVO">
+        SELECT ei.id, ei.code, ei.name
+        FROM bas_evd_info ei
+        WHERE EXISTS(SELECT evd_code
+                     FROM prs_model_qual_evd qe
+                     WHERE qe.evd_code = ei.code
+                       and qe.qual_code = #{qualCode})
+    </select>
+</mapper>

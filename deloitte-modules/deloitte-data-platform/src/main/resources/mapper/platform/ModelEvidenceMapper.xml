@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.ModelEvidenceMapper">
+
+    <select id="getModelEvidenceListPage" resultType="com.deloitte.data.platform.vo.ModelEvidenceVo$ListVo">
+        SELECT
+        id,
+        evidence_name AS `name`,
+        evidence_code AS `code`,
+        evidence_formula AS formula,
+        evidence_formula_describe AS formulaDescribe,
+        unit,
+        accuracy,
+        DATE_FORMAT(created_time,'%Y-%m-%d')
+        FROM model_evidence
+        WHERE is_deleted = 0
+        <if test="dto.searchName !=null and dto.searchName!='' ">
+           and evidence_name like concat('%', #{dto.searchName}, '%')
+        </if>
+    </select>
+    <select id="getTopDataMenu" resultType="com.deloitte.data.platform.vo.TopDataMenuVo">
+        SELECT
+            2 as type,
+            a.evidence_code AS `code`,
+            a.evidence_name AS `name`
+        FROM model_evidence a
+        where 1 = 1
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and a.`evidence_name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        limit  #{dto.limitNum}
+    </select>
+
+    <select id="getParameterConfigListPage"
+            resultType="com.deloitte.data.platform.vo.ParameterConfigVo$ListVo">
+        SELECT
+        id,
+        evidence_code AS code,
+        evidence_name AS name,
+        accuracy,
+        change_rate_upper AS changeRateUpper,
+        threshold_value AS thresholdValue,
+        evidence_formula AS formula,
+        evidence_formula_describe AS formulaDescribe,
+        abnormal_value_handle AS abnormalValueHandle
+        FROM model_evidence
+        WHERE 1=1
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and evidence_name like concat('%', #{dto.searchName}, '%')
+        </if>
+    </select>
+
+</mapper>

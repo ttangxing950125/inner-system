@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.SysUserMapper">
+
+    <select id="findSysRoleByUser" resultType="string">
+        SELECT
+           name
+        FROM
+            sys_role
+        WHERE
+            id IN ( SELECT role_id FROM sys_user_role WHERE user_id =#{id} )
+    </select>
+
+    <select id="getUserByUsername" resultType="com.deloitte.additional.recording.domain.SysUser">
+        select *
+        from sys_user
+        where loginname = #{username}
+    </select>
+
+    <select id="findMenuMap" resultType="com.deloitte.additional.recording.domain.SysMenu">
+        SELECT
+            menu.*,
+            ( SELECT COUNT( 1 ) FROM sys_menu WHERE parentid = menu.id ) AS cnt
+        FROM
+            sys_menu menu
+                INNER JOIN (
+                SELECT
+                    menurole.menu_id
+                FROM
+                    sys_menu_role menurole
+                        INNER JOIN sys_role role ON role.id = menurole.role_id
+                        INNER JOIN sys_user_role userrole ON userrole.role_id = role.id
+                WHERE
+                    userrole.user_id = #{userId}
+                  AND role.STATUS = '1'
+                GROUP BY
+                    menurole.menu_id
+            ) menurole ON menurole.menu_id = menu.id
+        WHERE
+            menu.STATUS = '1'
+          AND menu.type = '1'
+        ORDER BY
+            menu.sortkey ASC
+    </select>
+
+    <select id="getUserNameList" resultType="com.deloitte.additional.recording.vo.TaskUserVo">
+        SELECT
+            s.id 'userId',
+            s.`name` 'userName'
+        FROM
+            sys_user s
+            INNER JOIN sys_user_role ur ON s.id = ur.user_id
+            INNER JOIN sys_role r ON r.id = ur.role_id
+        where 1=1 AND r.`name` = #{name} group by userId
+
+    </select>
+
+    <select id="queryCollectionNameUserId" resultType="integer">
+        SELECT DISTINCT
+            u.id
+        FROM
+            sys_user u
+                INNER JOIN sys_user_role ur ON u.id = ur.user_id
+                INNER JOIN sys_role r ON r.id = ur.role_id
+       <where>
+           1=1
+       <if test="collectionNameList!=null and collectionNameList.size()>0">
+           and  r.name in
+           <foreach collection="collectionNameList" item="item" open="(" separator="," close=")">
+               #{item}
+           </foreach>
+       </if>
+       </where>
+
+    </select>
+
+    <select id="getUserIdRoleName" resultType="string">
+        SELECT
+            s.id 'userId',
+            s.`name` 'userName',
+            r.name 'roleName'
+        FROM
+            sys_user s
+                INNER JOIN sys_user_role ur ON s.id = ur.user_id
+                INNER JOIN sys_role r ON r.id = ur.role_id
+        <where>
+            <if test="userId!=null and userId!=0">
+               and s.id = #{userId}
+            </if>
+            <if test="(name!=null and name!='') and groupLeader==null">
+                and r.name = #{name}
+            </if>
+            <if test="(name!=null and name!='') and (groupLeader!=null and groupLeader!='')">
+                and (r.name = #{name} or r.name = #{groupLeader})
+            </if>
+        </where>
+        where (r.`name` = #{name} and r.`name` = #{groupLeader})
+    </select>
+
+    <select id="chooseDistributionPeriodCollocter" resultType="com.deloitte.additional.recording.vo.recording.ChooseDistributionPeriodCollocterVo">
+        SELECT
+            u.id as sysUserId,
+            u.loginname as loginName,
+            u.NAME as userName,
+            u.pwd as pwd,
+            u.`status` as userStatus,
+            u.sex as sex,
+            u.email as email,
+            r.name as rname ,
+             g.id as gid,
+            g.group_leader as groupLeader,
+            g.group_name as groupName,
+            g.group_desc  as groupDesc
+        FROM
+            sys_user u
+            INNER JOIN sys_group_user gu ON gu.user_id = u.id
+            INNER JOIN sys_group g ON g.id = gu.group_id
+            AND u.`status` = 1
+            INNER JOIN sys_user_role ur ON ur.user_id = u.id
+            INNER JOIN sys_role r ON ur.role_id = r.id
+--             INNER JOIN bas_recording_task_info info on info.period_collocter=u.id INNER JOIN bas_recording_task_info info2 on info2.period_approver=u.id
+            <if test="rname!=null and rname!=''">
+                AND r.`name` = #{rname}
+            </if>
+--             and info.period_report_status=1 OR info.period_report_status=3
+
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.EvidenceModelMapper">
+    <select id="getMiddleDataConfigPage" resultType="com.deloitte.data.platform.vo.MiddleDataConfigVo">
+        SELECT
+            a.evidence_code as `code`,
+            a.evidence_name as `name`,
+            a.evidence_formula_describe,
+            a.accuracy,
+            a.unit
+        FROM
+            model_evidence a
+        WHERE  a.is_deleted = 0
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  (a.`evidence_name` like concat(#{dto.keyWord}, '%') or a.`evidence_code` like concat(#{dto.keyWord}, '%'))
+        </if>
+    </select>
+    <select id="getMiddleQualityPage" resultType="com.deloitte.data.platform.vo.MiddleQualityVo">
+        SELECT
+            a.evidence_code as `code`,
+            a.evidence_name as `name`,
+            b.report_date,
+            a.accuracy,
+            a.threshold_value,
+            a.change_rate_upper as migrationRate
+        FROM
+            evidence_data b
+            LEFT JOIN model_evidence a on b.`code` = a.evidence_code
+        WHERE  a.is_deleted = 0
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  a.`evidence_name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        <if test="dto.years != null and dto.years != ''">
+            and  b.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

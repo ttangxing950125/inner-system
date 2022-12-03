@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.EntityInfoMapper">
+    <select id="queryByPage" resultType="com.deloitte.additional.recording.domain.EntityInfo">
+        SELECT
+            ent.*
+        FROM
+            prs_ver_mas_entity rel
+            INNER JOIN entity_info ent ON rel.entity_code = ent.entity_code
+        WHERE
+            rel.ver_mas_id = (
+            ( SELECT id FROM prs_version_master WHERE prj_id = (( SELECT id FROM prs_project_versions WHERE id = #{id} )) AND model_code = #{modelCode} ))
+        <if test="entityName != null  and entityName != ''">
+            AND ent.entity_name LIKE concat(concat("%",#{entityName}),"%" ))
+        </if>
+    </select>
+
+    <resultMap id="principalManifestMap" type="com.deloitte.additional.recording.dto.PrincipalManifestVo">
+        <result column="entity_name" property="entityName"/>
+        <result column="list" property="list"/>
+        <result column="entity_bond_tag" property="entityBondTag"/>
+        <result column="status" property="status"/>
+        <result column="incr_status" property="incrStatus"/>
+        <result column="prj_id" property="prjId"/>
+        <result column="model_code" property="modelCode"/>
+        <result column="versionName" property="versionName"/>
+        <result column="exposureTo" property="exposureTo"/>
+        <result column="masEntityId" property="masEntityId"/>
+        <result column="timeValue" property="timeValue"/>
+    </resultMap>
+
+    <select id="queryPrincipalManifestPage" resultMap="principalManifestMap">
+        SELECT
+        info.entity_name,
+        info.list,
+        info.entity_bond_tag,
+        info.`status`,
+        pv.`name` 'versionName',
+        mas.incr_status,
+        prsmaster.prj_id,
+        prsmaster.model_code,
+        mm.`name` 'exposureTo',
+        mas.id 'masEntityId',
+        pv.time_value 'timeValue'
+        FROM
+        entity_info info
+        LEFT JOIN prs_ver_mas_entity mas ON mas.entity_code = info.entity_code
+        LEFT JOIN prs_version_master prsmaster ON prsmaster.id = mas.ver_mas_id
+        LEFT JOIN prs_project_versions pv ON pv.id = prsmaster.prj_id
+        LEFT JOIN prs_model_master mm ON mm.model_code = prsmaster.mod@el_code
+        <where>
+            <if test="mainBodyDto.list!=null and mainBodyDto.list!=0">
+                and info.list = #{mainBodyDto.list}
+            </if>
+            <if test="mainBodyDto.entityBondTag!=null and mainBodyDto.entityBondTag!=0">
+                and info.entity_bond_tag = #{mainBodyDto.entityBondTag}
+            </if>
+            <if test="mainBodyDto.status!=null and mainBodyDto.status!=0">
+                and info.status = #{mainBodyDto.status}
+            </if>
+            <if test="mainBodyDto.versionName!=null and mainBodyDto.versionName!=''">
+                and pv.name = #{mainBodyDto.versionName}
+            </if>
+            <if test="mainBodyDto.ExposureTo!=null and mainBodyDto.ExposureTo!=''">
+                and mm.name = #{mainBodyDto.ExposureTo}
+            </if>
+            <if test="mainBodyDto.timeValue!=null and mainBodyDto.timeValue!=''">
+                and pv.time_value = #{mainBodyDto.timeValue}
+            </if>
+        </where>
+        order by info.created asc
+
+    </select>
+
+</mapper>

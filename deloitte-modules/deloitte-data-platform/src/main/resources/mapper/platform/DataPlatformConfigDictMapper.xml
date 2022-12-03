@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.DataPlatformConfigDictMapper">
+
+    <select id="getDataPriorityByParentCode" resultType="java.lang.String">
+        SELECT
+            GROUP_CONCAT( `name` ORDER BY `code` ASC SEPARATOR '-' )
+        FROM
+            data_platform_config_dict
+        WHERE
+            parent_code = 'source_seq'
+    </select>
+
+    <resultMap id="allDataMenuMap" type="com.deloitte.data.platform.vo.DataPlatformMenuVo">
+        <result column="code"  property="code"/>
+        <result column="name" property="name"/>
+        <result column="parentCode" property="parentCode"/>
+        <collection select="getSonAllDataMenu" property="child" column="code" ofType="com.deloitte.data.platform.vo.DataPlatformMenuVo"/>
+    </resultMap>
+    <select id="getAllDataMenu" resultMap="allDataMenuMap">
+        SELECT
+            a.`code` as `code`,
+            a.`name` as `name`,
+            a.parent_code as parentCode
+        FROM
+            data_platform_config_dict a
+        WHERE a.parent_code = '-1'
+          AND a.`code` = 'data_asset_platform'
+        order by seq
+    </select>
+
+    <select id="getSonAllDataMenu" resultMap="allDataMenuMap">
+        SELECT
+            a.`code` as `code`,
+            a.`name` as `name`,
+            a.parent_code as parentCode
+        FROM
+            data_platform_config_dict a
+        WHERE a.parent_code = #{code}
+        order by seq
+    </select>
+
+    <select id="getReqList" resultType="com.deloitte.data.platform.domian.DataPlatformConfigDict">
+        SELECT
+            *
+        FROM
+            data_platform_config_dict
+        WHERE
+            parent_code = 'source_seq'
+    </select>
+    <select id="getTopDataMenu" resultType="com.deloitte.data.platform.vo.TopDataMenuVo">
+        SELECT
+            1 as type,
+            a.`code`,
+            a.`name`
+        FROM financial_data_config a
+        where 1 = 1
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and a.`name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        limit  #{dto.limitNum}
+    </select>
+
+    <select id="getBaseConfigDictSubordinate" resultMap="allDataMenuMap">
+        SELECT
+            a.`code` as `code`,
+            a.`name` as `name`,
+            a.parent_code as parentCode
+        FROM
+            data_platform_config_dict a
+        WHERE a.`code` = #{code}
+        order by seq
+    </select>
+
+</mapper>

@@ -1,0 +1,23 @@
+::v-deep .el-radio__label {
+  font-size: 12px !important;
+  color: #35343a;
+  font-weight: 400;
+}
+
+::v-deep .el-radio__inner {
+  width: 12px;
+  height: 12px;
+}
+
+::v-deep .el-radio__inner::after {
+  background: #fcb048;
+}
+
+::v-deep .el-radio__input.is-checked+.el-radio__label {
+  color: #35343a;
+}
+
+::v-deep .el-radio__input.is-checked .el-radio__inner {
+  border-color: #fcb048;
+  background: #fff;
+}

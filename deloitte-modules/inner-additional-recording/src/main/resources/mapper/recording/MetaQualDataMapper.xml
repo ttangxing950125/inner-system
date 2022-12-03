@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.MetaQualDataMapper">
+
+    <select id="getMetaQualDatasByPage" resultType="com.deloitte.additional.recording.domain.MetaQualData">
+        SELECT
+            a.*,
+            b.NAME AS  versioName ,
+            c.NAME AS masterName
+        FROM
+            meta_qual_data a
+            INNER JOIN prs_project_versions b ON a.version_id = b.id
+            AND a.time_value = b.time_value
+            AND b.`status` = 1
+            INNER JOIN prs_model_master c ON c.model_code = a.mode_code
+            AND c.`status` = 1
+            INNER JOIN prs_model_qual d ON d.qual_code = a.qual_code
+            AND d.`status` = 1
+        WHERE
+            1 =1
+        <if test="id!=null and id !=''">
+            AND pv.id=#{id}
+        </if>
+        <if test="year!=null and year !=''">
+            AND a.time_value=#{year}
+        </if>
+
+        <if test="search!=null and search !=''">
+            AND  (d.qual_name LIKE concat(concat("%",#{search}),"%" )) ;
+        </if>
+    </select>
+
+</mapper>

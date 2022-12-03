@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.ModelRationFactorMapper">
+
+    <select id="getApplyDataConfigPage" resultType="com.deloitte.data.platform.vo.ApplyDataConfigVo">
+        SELECT
+            a.factor_code as `code`,
+            a.factor_name as `name`,
+            b.business_scene,
+            a.factor_formula_describe,
+            a.accuracy,
+            a.unit
+        FROM
+            model_ration_factor a
+            LEFT JOIN factor_industry_orm b ON a.factor_code = b.factor_code
+        WHERE a.is_deleted = 0
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  (a.`factor_name` like concat(#{dto.keyWord}, '%') or a.`factor_code` like concat(#{dto.keyWord}, '%'))
+        </if>
+    </select>
+
+    <select id="getModelRationListPage" resultType="com.deloitte.data.platform.vo.ModelEvidenceVo$ListVo">
+        SELECT
+        id,
+        factor_name AS `name`,
+        factor_code AS `code`,
+        factor_formula AS formula,
+        factor_formula_describe AS formulaDescribe,
+        unit,
+        accuracy,
+        DATE_FORMAT(created_time,'%Y-%m-%d')
+        FROM model_ration_factor
+        WHERE is_deleted = 0
+        <if test="dto.searchName !=null and dto.searchName!='' ">
+            and factor_name like concat('%', #{dto.searchName}, '%')
+        </if>
+    </select>
+    <select id="getApplyQualityPage" resultType="com.deloitte.data.platform.vo.ApplyQualityVo">
+        SELECT
+            a.factor_code as `code`,
+            a.factor_name as `name`,
+            b.report_date,
+            a.accuracy,
+            a.threshold_value,
+            a.change_rate_upper as migrationRate
+        FROM
+            model_ration_factor a
+            RIGHT JOIN fin_factor_value b on b.factor_code = a.factor_code
+        WHERE a.is_deleted = 0
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  a.`factor_name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        <if test="dto.years != null and dto.years != ''">
+            and  b.report_date in
+            <foreach item="item" index="index" collection=" dto.years" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="getTopDataMenu" resultType="com.deloitte.data.platform.vo.TopDataMenuVo">
+        SELECT
+            3 as type,
+            a.factor_code AS `code`,
+            a.factor_name as  `name`
+        FROM
+            model_ration_factor a
+        where 1 = 1
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and a.`factor_name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        limit  #{dto.limitNum}
+    </select>
+
+    <select id="getParameterConfigListPage"
+            resultType="com.deloitte.data.platform.vo.ParameterConfigVo$ListVo">
+        SELECT
+        id,
+        factor_code AS code,
+        factor_name AS name,
+        accuracy,
+        change_rate_upper AS changeRateUpper,
+        threshold_value AS thresholdValue,
+        factor_formula AS formula,
+        factor_formula_describe AS formulaDescribe
+        FROM model_ration_factor
+        WHERE 1=1
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and factor_name like concat('%', #{dto.searchName}, '%')
+        </if>
+    </select>
+
+    <select id="getFactorCode" resultType="java.lang.String">
+        SELECT
+            factor_code
+        FROM
+            model_ration_factor
+        WHERE factor_name like concat(#{dto.factorName}, '%')
+    </select>
+    <select id="getApplyDataExtractions" resultType="com.deloitte.data.platform.vo.ApplyDataExtractionVo">
+        SELECT
+            a.factor_code AS `code`,
+            a.factor_name AS `name`,
+            b.business_scene
+        FROM
+            model_ration_factor a
+            LEFT JOIN factor_industry_orm b ON a.factor_code = b.factor_code
+        where 1 = 1
+        <if test="factorCodes != null">
+            and  a.`factor_code` in
+            <foreach item="item" index="index" collection="factorCodes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="getModelEvidenceListPage" resultType="com.deloitte.data.platform.vo.ModelEvidenceVo$ListVo">
+    SELECT
+    id,
+    factor_name AS `name`,
+    factor_code AS `code`,
+    factor_formula AS formula,
+    factor_formula_describe AS formulaDescribe,
+    unit,
+    accuracy,
+    business_scene AS businessScene,
+    DATE_FORMAT(created_time,'%Y-%m-%d')
+    FROM model_evidence
+    WHERE is_deleted = 0
+    <if test="dto.searchName !=null and dto.searchName!='' ">
+        and factor_name like concat('%', #{dto.searchName}, '%')
+    </if>
+    </select>
+</mapper>

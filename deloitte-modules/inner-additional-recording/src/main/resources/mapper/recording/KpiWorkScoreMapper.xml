@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.KpiWorkScoreMapper">
+
+
+    <select id="getKpiWorkScore" resultType="com.deloitte.additional.recording.vo.kpi.KpiWorkScoreVo">
+        SELECT a.*,c.`name` FROM kpi_work_score a
+
+        INNER JOIN sys_user c ON c.id = a.user_id
+
+        <where>
+            <if test="kpiWorkScoreDto.userId != null">
+                and a.user_id = #{kpiWorkScoreDto.userId}
+            </if>
+            <if test="kpiWorkScoreDto.workDay != null and kpiWorkScoreDto.workDay != ''">
+                and  a.work_day =#{kpiWorkScoreDto.workDay}
+            </if>
+        </where>
+
+
+    </select>
+</mapper>

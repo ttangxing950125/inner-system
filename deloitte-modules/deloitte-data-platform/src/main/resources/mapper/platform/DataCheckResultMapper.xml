@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.DataCheckResultMapper">
+    <select id="getHookArticulationPage" resultType="com.deloitte.data.platform.vo.HookArticulationVo">
+        SELECT
+            a.id,
+            b.check_describe,
+            a.report_date,
+            a.passing_ratio,
+            a.is_system_inspection,
+            a.is_need_artificial_inspection,
+            a.is_artificial_inspection
+        FROM
+            data_check_result a
+            LEFT JOIN model_data_check b ON a.check_id = b.id
+        where 1 = 1
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  b.check_describe like concat('%', #{dto.keyWord}, '%')
+        </if>
+        <if test="dto.year != null and dto.year != ''">
+            and  DATE_FORMAT(a.report_date,'%Y') = #{dto.year}
+        </if>
+    </select>
+</mapper>

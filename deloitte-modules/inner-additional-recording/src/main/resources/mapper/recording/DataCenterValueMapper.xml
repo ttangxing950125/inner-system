@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.DataCenterValueMapper">
+
+    <select id="selectValues" parameterType="java.lang.String" resultType="com.deloitte.additional.recording.domain.DataCenterValue">
+        SELECT
+        master_id as masterId,
+        name,
+        description
+        FROM  ${param} limit 2
+    </select>
+
+</mapper>

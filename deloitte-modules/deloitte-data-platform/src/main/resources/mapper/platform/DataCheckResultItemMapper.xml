@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.DataCheckResultItemMapper">
+
+    <select id="getDataCheckResultItemPage" resultType="com.deloitte.data.platform.domian.DataCheckResultItem">
+        SELECT
+            a.entity_name,
+            a.entity_code,
+            a.is_adopt,
+            a.report_date,
+            a.check_key_value
+        FROM
+            data_check_result_item a
+        where 1 = 1
+        <if test="dto.checkResultId != null and dto.checkResultId != ''">
+            and  a.check_result_id = #{dto.checkResultId}
+        </if>
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and  a.entity_name like concat('%', #{dto.keyWord}, '%')
+        </if>
+        order by a.report_date desc
+    </select>
+</mapper>

@@ -1,0 +1,26 @@
+// 弹窗yangshi 
+::v-deep .el-dialog__header {
+  height: 48px;
+  line-height: 48px;
+  padding: 0;
+  background-image: linear-gradient(176deg,
+      #707c94 0%,
+      #566272 68%) !important;
+
+  .el-dialog__title {
+    color: #fff !important;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .el-dialog__headerbtn {
+    top: 16px;
+    right: 20px;
+  }
+
+  .el-dialog__close {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 700;
+  }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.FactorIndustryOrmMapper">
+
+    <select id="list" resultType="com.deloitte.data.platform.vo.FactorOrmVo">
+        SELECT
+        IFNULL( NULL, 3 ) AS hierarchy,
+        t1.factor_code AS code,
+        t1.factor_formula AS formula,
+        t1.accuracy AS accuracy,
+        t1.change_rate_upper AS changeRateUpper,
+        t1.threshold_value AS thresholdValue,
+        t1.unit AS unit,
+        t2.industry_whitewash AS industryWhitewash
+        FROM
+        model_ration_factor AS t1
+        INNER JOIN factor_industry_orm AS t2 ON t1.factor_code = t2.factor_code
+        <where>
+            t1.is_deleted = '0'
+            AND t1.factor_status = '0'
+            AND t2.is_deleted = '0'
+            <if test="factorCodeList != null and factorCodeList.size()>0">
+                AND t1.factor_code IN
+                <foreach collection="factorCodeList" item="factorCode" open="(" close=")" separator=",">
+                    #{factorCode}
+                </foreach>
+            </if>
+            AND ( t2.industry_whitewash = null OR t2.industry_whitewash = ''
+            <if test="industryWhitewashList != null and industryWhitewashList.size()>0">
+                OR t2.industry_whitewash IN
+                <foreach collection="industryWhitewashList" item="industryWhitewash" open="(" close=")" separator=",">
+                    #{industryWhitewash}
+                </foreach>
+            </if>
+            )
+        </where>
+        GROUP BY
+        t1.factor_code,
+        t1.factor_formula,
+        t2.industry_whitewash
+    </select>
+
+</mapper>

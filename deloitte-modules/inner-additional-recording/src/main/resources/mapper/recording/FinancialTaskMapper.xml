@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.FinancialTaskMapper">
+
+    <select id="getEntityFinalView" resultType="com.deloitte.additional.recording.vo.EntityInfoByFinVo">
+
+        SELECT b.entity_name,b.list,b.issue_bonds,a.data_type,c.`name`,a.collocter,a.approver,a.`status`from
+        financial_task a
+
+        INNER JOIN entity_info b ON a.entity_code=b.entity_code
+
+        INNER JOIN financial_table_note c ON c.code =a.table_node_code
+
+        <where>
+            <if test="entityInfoByFinDto.dataType!=null">
+                and a.data_type = #{entityInfoByFinDto.dataType}
+            </if>
+            <if test="entityInfoByFinDto.status!= null">
+                and a.status = #{entityInfoByFinDto.status}
+
+            </if>
+            <if test="entityInfoByFinDto.list!= null">
+                and b.list  = #{entityInfoByFinDto.list}
+
+            </if>
+            <if test="entityInfoByFinDto.issueBonds">
+                and b.issue_bonds= #{entityInfoByFinDto.issueBonds}
+            </if>
+        <if test="entityInfoByFinDto.timeValue!=null and entityInfoByFinDto.timeValue != ''">
+                and a.time_value = #{entityInfoByFinDto.timeValue}
+        </if>
+        <if test="entityInfoByFinDto.fanName!= null and entityInfoByFinDto.fanName !=''">
+               and c.name = #{entityInfoByFinDto.fanName}
+        </if>
+        <if test="entityInfoByFinDto.entityName!= null and entityInfoByFinDtoFin!= ''">
+             and b.entity_name = #{entityInfoByFinDto.entityName}
+        </if>
+        </where>
+
+    </select>
+</mapper>

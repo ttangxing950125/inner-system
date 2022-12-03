@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.DataPlatformMyLibraryTableMapper">
+    <resultMap id="myLibraryTable" type="com.deloitte.data.platform.vo.DataPlatformMenuVo">
+        <result column="id"  property="id"/>
+        <result column="code"  property="code"/>
+        <result column="name" property="name"/>
+        <result column="parent_code" property="parentCode"/>
+        <result column="user_id" property="userId"/>
+        <collection select="getSonMyLibraryTable" property="child" column="{code=code,userId=user_id}"  ofType="com.deloitte.data.platform.vo.DataPlatformMenuVo"/>
+    </resultMap>
+
+    <select id="getMyLibraryTable"  resultMap="myLibraryTable">
+        SELECT
+            a.id,
+            a.`parent_code` as `code`,
+            b.`name`,
+            -1 as parent_code,
+            a.user_id
+        FROM
+            data_platform_my_library_table a
+                LEFT JOIN data_platform_config_dict b ON a.`parent_code` = b.`code`
+        where a.user_id = #{userId}
+          and a.`parent_code` = 'data_asset_platform'
+        order by b.seq
+    </select>
+
+    <select id="getSonMyLibraryTable" resultMap="myLibraryTable">
+        SELECT
+            a.id,
+            a.`code`,
+            b.`name`,
+            a.parent_code,
+            a.user_id
+        FROM
+            data_platform_my_library_table a
+            LEFT JOIN data_platform_config_dict b ON a.`code` = b.`code` and a.parent_code = b.parent_code
+        where a.user_id = #{userId}
+        and  a.`parent_code` = #{code}
+        order by b.seq
+    </select>
+</mapper>

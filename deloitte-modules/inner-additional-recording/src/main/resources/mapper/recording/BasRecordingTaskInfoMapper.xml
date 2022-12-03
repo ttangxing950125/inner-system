@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.BasRecordingTaskInfoMapper">
+
+    <select id="getTaskInfoByParamPage" resultType="com.deloitte.additional.recording.domain.BasRecordingTaskInfo">
+		SELECT
+		taskinfo.*
+		FROM
+		bas_recording_task_info taskinfo
+		INNER JOIN entity_info info ON info.entity_code = taskinfo.entity_code
+		INNER JOIN bas_recording_label lable ON taskinfo.lable_code = lable.code
+		INNER JOIN bas_recording_table rt on rt.code= taskinfo.table_code
+		WHERE 1=1
+		<if test="requests.entityCode!=null and requests.entityCode!=''">
+			AND taskinfo.entity_code=#{requests.entityCode}
+		</if>
+		<if test="requests.periodApproverId!=null and requests.periodApproverId!=''">
+			AND taskinfo.periodApprover=#{requests.periodApproverId}
+		</if>
+		<if test="requests.periodCollocterId!=null and requests.periodCollocterId!=''">
+			AND taskinfo.periodCollocter=#{requests.periodCollocterId}
+		</if>
+		<if test="requests.periodReportTime!=null and requests.periodReportTime!=''">
+			AND taskinfo.periodReportTime=#{requests.periodReportTime}
+		</if>
+		<if test="requests.status !=null and requests.status!=''">
+			AND taskinfo.period_report_status=#{requests.status}
+		</if>
+		<if test="requests.lableCode !=null and requests.lableCode!=''">
+			AND taskinfo.lable_code=#{requests.lableCode}
+		</if>
+		<if test="requests.tableCode !=null and requests.tableCode!=''">
+			AND taskinfo.table_code=#{requests.tableCode}
+		</if>
+		AND taskinfo.status=1
+    </select>
+</mapper>

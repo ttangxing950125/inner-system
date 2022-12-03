@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.additional.recording.mapper.FFileMapper">
+    <resultMap id="FFileMap" type="com.deloitte.additional.recording.dto.FFileDto">
+        <result column="id" property="id"/>
+        <result column="code" property="code"/>
+        <result column="fcode" property="fcode"/>
+        <result column="url" property="url"/>
+        <result column="created" property="created"/>
+        <result column="creator" property="creator"/>
+        <result column="timevalue" property="timevalue"/>
+       <association property="folderDto" javaType="com.deloitte.additional.recording.dto.FFolderDto">
+            <result column="folderId" property="id"/>
+            <result column="folderCode" property="code"/>
+            <result column="folderName" property="name"/>
+            <result column="folderPcode" property="pcode"/>
+            <result column="displaycode" property="displaycode"/>
+       </association>
+
+
+    </resultMap>
+        <select id="getFFileList" resultMap="FFileMap">
+            SELECT
+                ffile.id,
+                ffile.`code`,
+                ffile.`name`,
+                ffile.fcode,
+                ffile.url,
+                ffile.created,
+                ffile.creator,
+                ffile.timevalue,
+                o.`id` 'folderId',
+                o.`code` 'folderCode',
+                o.`name` 'folderName',
+                o.pcode 'folderPcode',
+                o.displaycode 'displaycode'
+            FROM
+                f_file ffile
+                INNER JOIN f_fileandentity fileandentity ON ffile.CODE = fileandentity.fcode
+                INNER JOIN f_folder o ON o.`code` = ffile.fcode
+            WHERE
+                ffile.timevalue = '2021'
+              AND fileandentity.entitycode = 'IB_E_025290'
+        </select>
+
+    <select id="getFFolderList" resultType="com.deloitte.additional.recording.dto.FFolderDto">
+        select * from f_folder
+    </select>
+</mapper>

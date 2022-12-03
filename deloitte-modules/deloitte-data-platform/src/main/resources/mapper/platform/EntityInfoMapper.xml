@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.deloitte.data.platform.mapper.EntityInfoMapper">
+
+    <select id="getEntityInfoPage" resultType="com.deloitte.data.platform.vo.EntityInfoVo">
+        SELECT
+            a.entity_name,
+            a.entity_code,
+            a.credit_code,
+            c.stock_code,
+            a.list,
+            a.issue_bonds
+        FROM
+            entity_info a
+            LEFT JOIN entity_stock_cn_rel b ON a.entity_code = b.entity_code
+            LEFT JOIN stock_cn_info c ON b.stock_dq_code = c.stock_dq_code
+        where a.`status` = 1
+            <if test="dto.keyword != null and dto.keyword != ''">
+                and (a.entity_name like concat(#{dto.keyword}, '%') or  a.entity_code like concat(#{dto.keyword}, '%'))
+            </if>
+            <if test="dto.list != null and dto.list != ''">
+                and  a.list = #{dto.list}
+            </if>
+            <if test="dto.issueBonds != null and dto.issueBonds != ''">
+                and  a.issue_bonds = #{dto.issueBonds}
+            </if>
+    </select>
+
+    <select id="getCustomerPage"
+            resultType="com.deloitte.data.platform.vo.StatisticalDataAnalysisVo$CustomerListVo">
+        SELECT entity_name AS entityName,
+               entity_code AS entityCode
+        FROM entity_info
+        WHERE 1=1
+        <if test="dto.searchName != null and dto.searchName != ''">
+            and entity_name like concat('%', #{dto.searchName}, '%')
+        </if>
+    </select>
+    <select id="getTopDataMenu" resultType="com.deloitte.data.platform.vo.TopDataMenuVo">
+        SELECT
+            4 as type,
+            a.entity_code AS `code`,
+            a.entity_name AS `name`
+        FROM
+            entity_info a
+        where 1 = 1
+        <if test="dto.keyWord != null and dto.keyWord != ''">
+            and a.`entity_name` like concat('%', #{dto.keyWord}, '%')
+        </if>
+        limit #{dto.limitNum}
+    </select>
+</mapper>
